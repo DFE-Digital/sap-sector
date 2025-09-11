@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -6,6 +6,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>aspnet-SAPSec.Web-c8941719-1a44-4549-a199-e682cd5f4391</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.2.3" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
