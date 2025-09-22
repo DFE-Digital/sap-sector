@@ -17,6 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPSec.Infrastructure", "SA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPSec.Infrastructure.Tests", "Tests\SAPSec.Infrastructure.Tests\SAPSec.Infrastructure.Tests.csproj", "{5F164DC3-0185-4D92-B689-7A004F81C232}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
+	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
+		Dockerfile = Dockerfile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -107,5 +113,8 @@ Global
 		{FF6CC6BE-8BD4-4353-BA24-F0B562F73534} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{EB1D1EAE-E264-4FF5-ACB9-8614FD694C69} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
 		{5F164DC3-0185-4D92-B689-7A004F81C232} = {0AB3BF05-4346-4AA6-1389-037BE0695223}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0D7E6B09-2E5D-4BA4-899B-FBCC5A7F92CD}
 	EndGlobalSection
 EndGlobal
