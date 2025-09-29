@@ -1,0 +1,30 @@
+name: CI - .NET
+
+on:
+  pull_request:
+    branches:
+      - "feature/**"
+  push:
+    branches:
+      - main
+      - develop
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0
+
+      - name: Restore
+        run: dotnet restore SAPSec.sln
+
+      - name: Build
+        run: dotnet build SAPSec.sln --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test SAPSec.sln --no-restore --configuration Release --verbosity normal

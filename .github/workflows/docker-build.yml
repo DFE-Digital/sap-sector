@@ -1,0 +1,55 @@
+name: Docker Build
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Cache NuGet packages
+      - name: Cache NuGet
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      # Cache npm packages
+      - name: Cache npm
+        uses: actions/cache@v3
+        with:
+          path: SAPSec.Web/node_modules
+          key: npm-${{ runner.os }}-${{ hashFiles('SAPSec.Web/package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-
+
+      - name: Log in to registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY }}
+          username: ${{ secrets.REGISTRY_USERNAME }}
+          password: ${{ secrets.REGISTRY_PASSWORD }}
+
+      # Enable Docker buildx (for caching & multi-platform builds)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          context: .
+          file: ./Dockerfile
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY }}/sap-sector:${{ github.sha }}
+            ${{ secrets.DOCKER_REGISTRY }}/sap-sector:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
