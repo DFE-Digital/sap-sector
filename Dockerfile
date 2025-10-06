@@ -1,32 +1,85 @@
-# See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# =====================================================
+# Stage 0: Set version arguments
+# =====================================================
+ARG DOTNET_VERSION=8.0
+ARG NODEJS_VERSION_MAJOR=22
 
-# This stage is used when running from VS in fast mode (Default for Debug configuration)
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
+
+# =====================================================
+# Stage 1: Build frontend assets (DfE / GOV.UK)
+# =====================================================
+FROM node:${NODEJS_VERSION_MAJOR}-bullseye-slim AS assets
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+
+# Copy the entire Web project to ensure we have all necessary files
+COPY ./SAPSec.Web/package*.json /app/
+COPY ./SAPSec.Web/wwwroot/ /app/wwwroot/
+
+# Install and build frontend assets
+RUN npm ci --ignore-scripts && \
+    (npm run build || npm run copy-assets || echo "Build step completed")
+
+# Debug: Show what was built
+RUN echo "=== Assets build output ===" && \
+    find /app -type f -name "*.css" -o -name "*.js" | head -20
 
 
-# This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
-WORKDIR /src
-COPY ["SAPSec.Web/SAPSec.Web.csproj", "SAPSec.Web/"]
-COPY ["SAPSec.Core/SAPSec.Core.csproj", "SAPSec.Core/"]
-COPY ["SAPSec.Infrastructure/SAPSec.Infrastructure.csproj", "SAPSec.Infrastructure/"]
-RUN dotnet restore "./SAPSec.Web/SAPSec.Web.csproj"
+# =====================================================
+# Stage 2: Build .NET project
+# =====================================================
+FROM mcr.microsoft.com/dotnet/sdk:${DOTNET_VERSION}-azurelinux3.0 AS build
+WORKDIR /build
+
+# Copy project files and restore packages
+COPY ./SAPSec.Core/SAPSec.Core.csproj /build/SAPSec.Core/
+COPY ./SAPSec.Infrastructure/SAPSec.Infrastructure.csproj /build/SAPSec.Infrastructure/
+COPY ./SAPSec.Web/SAPSec.Web.csproj /build/SAPSec.Web/
+RUN dotnet restore /build/SAPSec.Web/SAPSec.Web.csproj
+
+# Copy all code
 COPY . .
-WORKDIR "/src/SAPSec.Web"
-RUN dotnet build "./SAPSec.Web.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
-# This stage is used to publish the service project to be copied to the final stage
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./SAPSec.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+# Build and publish .NET project
+WORKDIR /build/SAPSec.Web
+RUN dotnet build -c Release --no-restore && \
+    dotnet publish -c Release --no-build -o /app/publish /p:UseAppHost=false
 
-# This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
-FROM base AS final
+
+# =====================================================
+# Stage 3: Runtime image
+# =====================================================
+FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION}-azurelinux3.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+# Environment configuration
+ENV ASPNETCORE_URLS=http://+:3000
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Create directories with proper permissions for data protection keys
+RUN mkdir -p /keys /home/app/.aspnet/DataProtection-Keys && \
+    chmod -R 777 /keys /home/app/.aspnet
+
+# Copy published .NET app first
+COPY --from=build /app/publish /app
+
+# Copy frontend assets (will overwrite/merge with published wwwroot)
+COPY --from=assets /app/wwwroot /app/wwwroot
+
+# Debug: Verify static files are present with correct permissions
+RUN echo "=== Final wwwroot contents ===" && \
+    ls -laR /app/wwwroot/ | head -50 && \
+    echo "=== Checking for CSS files ===" && \
+    find /app -name "*.css" -type f -exec ls -lh {} \;
+
+# Azure Linux images have a default non-root user (ID 1654)
+# Ensure proper ownership
+RUN chown -R 1654:1654 /app /keys
+
+# Switch to non-root user
+USER 1654
+
+# Expose port
+EXPOSE 3000
+
+# Entry point
 ENTRYPOINT ["dotnet", "SAPSec.Web.dll"]

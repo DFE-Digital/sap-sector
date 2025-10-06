@@ -1,4 +1,6 @@
 using GovUk.Frontend.AspNetCore;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.FileProviders;
 using SAPSec.Web.Helpers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -48,7 +50,49 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-        app.UseStaticFiles();
+
+        // Configure MIME types
+        var provider = new FileExtensionContentTypeProvider();
+        provider.Mappings[".css"] = "text/css";
+        provider.Mappings[".js"] = "application/javascript";
+        provider.Mappings[".mjs"] = "application/javascript";
+
+        // Log wwwroot contents on startup for debugging
+        var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+        if (Directory.Exists(wwwrootPath))
+        {
+            Console.WriteLine($"=== wwwroot exists at: {wwwrootPath} ===");
+            var files = Directory.GetFiles(wwwrootPath, "*.*", SearchOption.AllDirectories)
+                .Take(20)
+                .Select(f => f.Replace(wwwrootPath, ""));
+            Console.WriteLine("Sample files:");
+            foreach (var file in files)
+            {
+                Console.WriteLine($"  {file}");
+            }
+        }
+        else
+        {
+            Console.WriteLine($"WARNING: wwwroot directory not found at {wwwrootPath}");
+        }
+
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            ContentTypeProvider = provider,
+            OnPrepareResponse = ctx =>
+            {
+                var path = ctx.Context.Request.Path.Value;
+                var contentType = ctx.Context.Response.ContentType;
+                Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
+
+                // If content type is not set, log the file extension
+                if (string.IsNullOrEmpty(contentType))
+                {
+                    var ext = Path.GetExtension(path);
+                    Console.WriteLine($"  WARNING: No content type for extension: {ext}");
+                }
+            }
+        });
 
         app.UseRouting();
         app.UseGovUkFrontend();
