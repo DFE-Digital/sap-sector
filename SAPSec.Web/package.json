@@ -16,6 +16,7 @@
   },
   "description": "",
   "devDependencies": {
+    "copyfiles": "^2.4.1",
     "mkdirp": "^3.0.1"
   }
 }
