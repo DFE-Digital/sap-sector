@@ -11,17 +11,23 @@ ARG NODEJS_VERSION_MAJOR=22
 FROM node:${NODEJS_VERSION_MAJOR}-bullseye-slim AS assets
 WORKDIR /app
 
-# Copy the entire Web project to ensure we have all necessary files
+# Copy package files for dependency installation
 COPY ./SAPSec.Web/package*.json /app/
+
+# Install dependencies (including dfe-frontend-alpha)
+RUN npm ci --ignore-scripts
+
+# Copy source assets that need to be processed
 COPY ./SAPSec.Web/wwwroot/ /app/wwwroot/
 
-# Install and build frontend assets
-RUN npm ci --ignore-scripts && \
-    (npm run build || npm run copy-assets || echo "Build step completed")
+# Run build to compile/copy assets to proper locations
+RUN npm run build || npm run copy-assets || true
 
-# Debug: Show what was built
+# Debug: Show what was built and where
 RUN echo "=== Assets build output ===" && \
-    find /app -type f -name "*.css" -o -name "*.js" | head -20
+    ls -laR /app/wwwroot/ | head -50 && \
+    echo "=== Checking for DfE frontend files ===" && \
+    find /app -name "*dfefrontend*" -type f
 
 
 # =====================================================
@@ -73,7 +79,7 @@ RUN echo "=== Final wwwroot contents ===" && \
 
 # Azure Linux images have a default non-root user (ID 1654)
 # Ensure proper ownership
-RUN chown -R 1654:1654 /app /keys
+RUN chown -R 1654:1654 /app /keys /home/app
 
 # Switch to non-root user
 USER 1654

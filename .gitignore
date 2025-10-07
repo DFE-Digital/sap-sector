@@ -482,3 +482,9 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Ignore compiled/built assets
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/**/*.min.css
+wwwroot/**/*.min.js
