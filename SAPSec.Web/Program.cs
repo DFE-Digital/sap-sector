@@ -1,4 +1,5 @@
 using GovUk.Frontend.AspNetCore;
+using Microsoft.AspNetCore.DataProtection;
 using SAPSec.Web.Helpers;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -31,7 +32,10 @@ public class Program
         });
 
         builder.Services.AddMvc();
-
+        builder.Services.AddHealthChecks();
+        builder.Services.AddDataProtection()
+               .PersistKeysToFileSystem(new DirectoryInfo(@"/keys"))
+               .SetApplicationName("SAPSec");
 
         var app = builder.Build();
 
@@ -87,6 +91,9 @@ public class Program
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
+
+        // Add health check endpoint for AKS
+        app.MapHealthChecks("/healthcheck");
 
         app.Run();
     }
