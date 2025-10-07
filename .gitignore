@@ -488,3 +488,4 @@ wwwroot/lib/
 wwwroot/dist/
 wwwroot/**/*.min.css
 wwwroot/**/*.min.js
+**/wwwroot/lib/

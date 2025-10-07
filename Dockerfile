@@ -14,20 +14,22 @@ WORKDIR /app
 # Copy package files for dependency installation
 COPY ./SAPSec.Web/package*.json /app/
 
-# Install dependencies (including dfe-frontend-alpha)
-RUN npm ci --ignore-scripts
+# Install dependencies - this will trigger postinstall which runs copy-assets
+# The postinstall script copies dfe-frontend and govuk-frontend from node_modules to wwwroot/lib
+RUN npm ci
 
-# Copy source assets that need to be processed
+# Copy all wwwroot contents (custom assets, images, CSS, etc.)
+# The .dockerignore should exclude wwwroot/lib if it exists locally
 COPY ./SAPSec.Web/wwwroot/ /app/wwwroot/
-
-# Run build to compile/copy assets to proper locations
-RUN npm run build || npm run copy-assets || true
 
 # Debug: Show what was built and where
 RUN echo "=== Assets build output ===" && \
-    ls -laR /app/wwwroot/ | head -50 && \
-    echo "=== Checking for DfE frontend files ===" && \
-    find /app -name "*dfefrontend*" -type f
+    echo "Checking wwwroot structure:" && \
+    find /app/wwwroot -type d | head -20 && \
+    echo "=== Checking for frontend libraries ===" && \
+    ls -la /app/wwwroot/lib/ 2>/dev/null || echo "No lib directory yet" && \
+    ls -la /app/wwwroot/lib/dfe-frontend/dist/ 2>/dev/null || echo "DfE frontend not in wwwroot/lib" && \
+    ls -la /app/wwwroot/lib/govuk-frontend/dist/ 2>/dev/null || echo "GOV.UK frontend not in wwwroot/lib"
 
 
 # =====================================================

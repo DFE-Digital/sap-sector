@@ -28,3 +28,22 @@ README.md
 !.git/config
 !.git/packed-refs
 !.git/refs/heads/**
+# Exclude build artifacts
+**/bin/
+**/obj/
+**/node_modules/
+
+# Exclude generated frontend assets (will be built in Docker)
+**/wwwroot/lib/
+
+# Git and IDE files
+.git/
+.gitignore
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Documentation
+README.md
+*.md
