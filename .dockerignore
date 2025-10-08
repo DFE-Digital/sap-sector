@@ -1,30 +1,42 @@
-**/.classpath
-**/.dockerignore
-**/.env
-**/.git
-**/.gitignore
-**/.project
-**/.settings
-**/.toolstarget
-**/.vs
-**/.vscode
-**/*.*proj.user
-**/*.dbmdl
-**/*.jfm
-**/azds.yaml
-**/bin
+# Build artifacts
+**/bin/
+**/obj/
 **/charts
 **/docker-compose*
 **/Dockerfile*
-**/node_modules
-**/npm-debug.log
-**/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/azds.yaml
+
+# Node modules
+**/node_modules/
+**/npm-debug.log
+
+# Generated frontend assets (will be built in Docker)
+**/wwwroot/lib/
+
+# IDE files
+**/.classpath
+**/.project
+**/.settings
+**/.toolstarget
+**/.vs/
+**/.vscode/
+**/*.*proj.user
+**/*.dbmdl
+**/*.jfm
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Environment files
+**/.env
+
+# Documentation
 LICENSE
 README.md
-!**/.gitignore
-!.git/HEAD
-!.git/config
-!.git/packed-refs
-!.git/refs/heads/**
+*.md
+
+# IMPORTANT: Do NOT exclude .git folder - it's needed for MSBuild source control features
+# The .git folder will be included so that dotnet build can read Git information

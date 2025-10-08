@@ -495,3 +495,10 @@ bin/konduit.sh
 
 # Maintenance page manifests
 maintenance_page/manifests/maintenance/deployment_maintenance.yml
+
+# Ignore compiled/built assets
+wwwroot/lib/
+wwwroot/dist/
+wwwroot/**/*.min.css
+wwwroot/**/*.min.js
+**/wwwroot/lib/
