@@ -11,6 +11,7 @@ on:
         default: review
         options:
         - review
+        - test
       docker-image-tag:
         description: "Docker image tag to deploy (optional)"
         required: true
@@ -108,36 +109,36 @@ jobs:
 #        gcp-wip: ${{ vars.GCP_WIP }}
 #        gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
 
-#  deploy:
-#    name: Deploy environments
-#    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
-#    environment:
-#      name: ${{ matrix.environment }}
-#      url: ${{ steps.deploy_app.outputs.environment_url }}
-#    needs: [build, test]
-#    runs-on: ubuntu-latest
-#    permissions:
-#      id-token: write
-#      pull-requests: write
-#    strategy:
-#      max-parallel: 1
-#      matrix:
-#        environment: [development,production]
-#
-#    steps:
-#    - name: Deploy app to ${{ matrix.environment }}
-#      id: deploy_app
-#      uses: DFE-Digital/github-actions/deploy-to-aks@master
-#      with:
-#        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-#        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-#        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-#        environment: ${{ matrix.environment }}
-#        sha: ${{ needs.build.outputs.docker-image-tag }}
-#        terraform-base: ${{ env.TERRAFORM_BASE }}
-#        healthcheck: ${{ env.HEALTHCHECK_CMD }}
-#        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
-#        smoke-test: true
+  deploy:
+    name: Deploy environments
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    environment:
+      name: ${{ matrix.environment }}
+      url: ${{ steps.deploy_app.outputs.environment_url }}
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: write
+    strategy:
+      max-parallel: 1
+      matrix:
+        environment: [test]
+
+    steps:
+    - name: Deploy app to ${{ matrix.environment }}
+      id: deploy_app
+      uses: DFE-Digital/github-actions/deploy-to-aks@master
+      with:
+        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        environment: ${{ matrix.environment }}
+        sha: ${{ needs.build.outputs.docker-image-tag }}
+        terraform-base: ${{ env.TERRAFORM_BASE }}
+        healthcheck: ${{ env.HEALTHCHECK_CMD }}
+        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+        smoke-test: false
 #        gcp-wip: ${{ vars.GCP_WIP }}
 #        gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
 
