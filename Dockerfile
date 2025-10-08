@@ -49,7 +49,7 @@ COPY . .
 
 # Build and publish .NET project
 WORKDIR /build/SAPSec.Web
-RUN dotnet build -c Release --no-restore && \
+RUN dotnet build -c Release --no-restore -p:SourceRevisionId=docker-build && \
     dotnet publish -c Release --no-build -o /app/publish /p:UseAppHost=false
 
 
