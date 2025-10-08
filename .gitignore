@@ -483,6 +483,19 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
+# Terraform
+.terraform
+terraform/application/vendor
+terraform/domains/environment_domains/vendor
+terraform/domains/infrastructure/vendor
+terraform.tfstate*
+
+# Downloaded commands
+bin/konduit.sh
+
+# Maintenance page manifests
+maintenance_page/manifests/maintenance/deployment_maintenance.yml
+
 # Ignore compiled/built assets
 wwwroot/lib/
 wwwroot/dist/
