@@ -36,6 +36,7 @@ module "web_application" {
 
   docker_image = var.docker_image
   enable_logit = true
+  replicas     = var.replicas
 
   send_traffic_to_maintenance_page = var.send_traffic_to_maintenance_page
 }
