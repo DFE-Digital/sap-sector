@@ -1,4 +1,4 @@
-# Branching strategy
+# 002 - Branching strategy
 
 * Status: accepted
 * Deciders: Dan Murfitt, Vipin Reddy, Georgina Newcomb
@@ -22,7 +22,7 @@ To ensure consistency, a strategy is needed for branching, merging, and deployin
 
 Trunk based flow following the the diagram
 
-![SAPSec Flow](/adrs/assets/002-flow.png "Flow diagram showing branching and deployment process")
+![SAPSec Flow](https://github.com/DFE-Digital/sap-sector/blob/main/docs/adrs/assets/002-flow.png "Flow diagram showing branching and deployment process")
 
 Branches will be formatted in the following way
 
