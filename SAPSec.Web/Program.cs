@@ -8,7 +8,7 @@ using System.Globalization;
 
 namespace SAPSec.Web;
 
-public class Program
+public partial class Program
 {
     [ExcludeFromCodeCoverage]
     public static void Main(string[] args)
