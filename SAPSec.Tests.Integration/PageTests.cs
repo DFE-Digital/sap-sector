@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using SAPSec.Web;
 using Xunit;
@@ -18,9 +17,12 @@ public class PageTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task HomePage_ReturnsSuccess()
     {
+        // Act
         var response = await _client.GetAsync("/");
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal("text/html", response.Content.Headers.ContentType?.MediaType);
     }
 
     [Theory]
@@ -29,17 +31,38 @@ public class PageTests : IClassFixture<WebApplicationFactory<Program>>
     [InlineData("/healthcheck")]
     public async Task CommonPages_ReturnSuccess(string url)
     {
+        // Act
         var response = await _client.GetAsync(url);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        // Assert
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
     [Fact]
     public async Task Response_ContainsSecurityHeaders()
     {
+        // Act
         var response = await _client.GetAsync("/");
 
-        response.Headers.Should().ContainKey("X-Content-Type-Options");
-        response.Headers.Should().ContainKey("X-Frame-Options");
+        // Assert
+        Assert.True(response.Headers.Contains("X-Content-Type-Options"));
+        Assert.True(response.Headers.Contains("X-Frame-Options"));
+        Assert.True(response.Headers.Contains("Referrer-Policy"));
+
+        var xFrameOptions = response.Headers.GetValues("X-Frame-Options").First();
+        Assert.Equal("DENY", xFrameOptions);
+    }
+
+    [Fact]
+    public async Task Response_ContainsContentSecurityPolicy()
+    {
+        // Act
+        var response = await _client.GetAsync("/");
+
+        // Assert
+        Assert.True(response.Headers.Contains("Content-Security-Policy"));
+
+        var csp = response.Headers.GetValues("Content-Security-Policy").First();
+        Assert.Contains("default-src 'self'", csp);
     }
 }
