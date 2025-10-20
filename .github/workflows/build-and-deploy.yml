@@ -66,18 +66,23 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
-    # This is a skeleton test job
-    # It will need to be updated to set the environment and run required tests
-    # The steps can be moved to a separate action if preferred
-
     steps:
     - name: Check out repository
       uses: actions/checkout@v4
 
-    # - name: Run tests
-    #   shell: bash
-    #   run: |
-    #     run some tests
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Run Unit Tests
+      run: dotnet test ./SAPSec.Tests.Unit/SAPSec.Tests.Unit.csproj --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx"
 
   deploy-review-app:
     name: Deployment To Review
