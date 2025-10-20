@@ -55,7 +55,7 @@ namespace SAPSec.Web.Controllers
                 // healthStatus.Checks.Add(dbConnectionCheck);
 
                 // Determine overall status
-                if (healthStatus.Checks.Any(c => c.Status != "Pass"))
+                if (healthStatus.Checks.Any(c => c.Status == "Fail"))
                 {
                     healthStatus.Status = "Unhealthy";
                     _logger.LogWarning("Health check failed: {FailedChecks}",
