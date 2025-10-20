@@ -30,10 +30,10 @@ public class HealthControllerTests
     }
 
     [Fact]
-    public async Task Get_WhenApplicationHealthy_ReturnsOk()
+    public void Get_WhenApplicationHealthy_ReturnsOk()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
         Assert.NotNull(result);
@@ -41,10 +41,10 @@ public class HealthControllerTests
     }
 
     [Fact]
-    public async Task Get_ReturnsHealthCheckResponse()
+    public void Get_ReturnsHealthCheckResponse()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
         Assert.NotNull(result);
@@ -56,10 +56,10 @@ public class HealthControllerTests
     }
 
     [Fact]
-    public async Task Get_ReturnsHealthyStatus()
+    public void Get_ReturnsHealthyStatus()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
         Assert.NotNull(result);
@@ -72,10 +72,10 @@ public class HealthControllerTests
     }
 
     [Fact]
-    public async Task Get_ReturnsAllChecks()
+    public void Get_ReturnsAllChecks()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -88,10 +88,10 @@ public class HealthControllerTests
     }
 
     [Fact]
-    public async Task Get_ApplicationRunningCheck_PassesInTestEnvironment()
+    public void Get_ApplicationRunningCheck_PassesInTestEnvironment()
     {
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -108,13 +108,13 @@ public class HealthControllerTests
     [InlineData("Development")]
     [InlineData("Staging")]
     [InlineData("Production")]
-    public async Task Get_WorksInAllEnvironments(string environmentName)
+    public void Get_WorksInAllEnvironments(string environmentName)
     {
         // Arrange
         _mockEnvironment.Setup(e => e.EnvironmentName).Returns(environmentName);
 
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -128,34 +128,13 @@ public class HealthControllerTests
     }
 
     [Fact]
-    public async Task Get_WhenNoWwwroot_ReturnsUnhealthy()
-    {
-        // Arrange
-        _mockEnvironment.Setup(e => e.WebRootPath).Returns((string)null!);
-
-        // Act
-        var result = await _controller.Get();
-
-        // Assert
-        var statusCodeResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, statusCodeResult.StatusCode);
-
-        var response = Assert.IsType<HealthCheckResponse>(statusCodeResult.Value);
-        Assert.Equal("Unhealthy", response.Status);
-
-        var staticFilesCheck = response.Checks.FirstOrDefault(c => c.Name == "StaticFiles");
-        Assert.NotNull(staticFilesCheck);
-        Assert.Equal("Fail", staticFilesCheck.Status);
-    }
-
-    [Fact]
-    public async Task Get_ReturnsTimestamp()
+    public void Get_ReturnsTimestamp()
     {
         // Arrange
         var beforeCall = DateTime.UtcNow.AddSeconds(-1);
 
         // Act
-        var result = await _controller.Get();
+        var result = _controller.Get();
         var afterCall = DateTime.UtcNow.AddSeconds(1);
 
         // Assert

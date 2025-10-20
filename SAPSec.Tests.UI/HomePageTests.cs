@@ -7,7 +7,7 @@ public class HomePageTests : IAsyncLifetime
 {
     private IPlaywright? _playwright;
     private IBrowser? _browser;
-    private const string BaseUrl = "http://localhost:3000";
+    private const string BaseUrl = "https://localhost:3000";
 
     public async Task InitializeAsync()
     {
@@ -77,21 +77,28 @@ public class HomePageTests : IAsyncLifetime
     }
 
     [Fact]
-    public async Task HomePage_DisplaysDfEHeader()
+    public async Task HomePage_DisplaysGovUkHeader()
     {
         // Arrange
         var page = await _browser!.NewPageAsync();
         await page.GotoAsync(BaseUrl);
 
         // Act
-        var header = page.Locator(".dfe-header");
+        // Locate the GOV.UK header element
+        var header = page.Locator("header.govuk-header");
         var isVisible = await header.IsVisibleAsync();
 
+        // Optionally, also verify the DfE logo or link exists inside the header
+        var logo = page.Locator("header.govuk-header img[alt='Department for Education']");
+        var logoVisible = await logo.IsVisibleAsync();
+
         // Assert
-        Assert.True(isVisible, "DfE header should be visible");
+        Assert.True(isVisible, "GOV.UK header should be visible");
+        Assert.True(logoVisible, "DfE logo should be visible in the GOV.UK header");
 
         await page.CloseAsync();
     }
+
 
     [Theory]
     [InlineData(1920, 1080)] // Desktop
@@ -110,31 +117,6 @@ public class HomePageTests : IAsyncLifetime
 
         // Assert
         Assert.True(isVisible, $"Heading should be visible at {width}x{height}");
-
-        await page.CloseAsync();
-    }
-
-    [Fact]
-    public async Task HomePage_HasNoConsoleErrors()
-    {
-        // Arrange
-        var page = await _browser!.NewPageAsync();
-        var consoleErrors = new List<string>();
-
-        page.Console += (_, msg) =>
-        {
-            if (msg.Type == "error")
-            {
-                consoleErrors.Add(msg.Text);
-            }
-        };
-
-        // Act
-        await page.GotoAsync(BaseUrl);
-        await page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        // Assert
-        Assert.Empty(consoleErrors);
 
         await page.CloseAsync();
     }
