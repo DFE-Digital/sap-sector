@@ -95,13 +95,18 @@ jobs:
             --settings coverlet.runsettings \
             --results-directory ./TestResults/integration
 
+    - name: Debug coverage output paths
+      run: |
+          echo "Searching for coverage.cobertura.xml files..."
+          find . -type f -name "coverage.cobertura.xml" || true
+
     - name: Generate Combined Coverage Report
       run: |
-          dotnet tool install -g dotnet-reportgenerator-globaltool
           reportgenerator \
-            -reports:"**/TestResults/**/coverage.cobertura.xml" \
+            -reports:"TestResults/unit/**/coverage.cobertura.xml;TestResults/integration/**/coverage.cobertura.xml" \
             -targetdir:"TestCoverageReport" \
-            -reporttypes:HtmlSummary;Html
+            -reporttypes:"HtmlSummary;Html;Badges" \
+            -classfilters:"-AspNetCoreGeneratedDocument*;-AspNetCore.Views*"
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
