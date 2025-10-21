@@ -81,6 +81,10 @@ jobs:
     - name: Build solution
       run: dotnet build --configuration Release --no-restore
 
+    - name: Install Playwright browsers
+      working-directory: SAPSec.Tests.UI
+      run: pwsh bin/Debug/net8.0/playwright.ps1 install
+
     - name: Run Unit Tests
       run: |
           dotnet test SAPSec.Tests.Unit/SAPSec.Tests.Unit.csproj \
@@ -94,6 +98,13 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --settings coverlet.runsettings \
             --results-directory ./TestResults/integration
+
+    - name: Run UI Tests
+      run: |
+          dotnet test SAPSec.Tests.UI/SAPSec.Tests.UI.csproj \
+            --collect:"XPlat Code Coverage" \
+            --settings coverlet.runsettings \
+            --results-directory ./TestResults/ui
 
     - name: Generate Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
