@@ -95,15 +95,10 @@ jobs:
             --settings coverlet.runsettings \
             --results-directory ./TestResults/integration
 
-    - name: Debug coverage output paths
-      run: |
-          echo "Searching for coverage.cobertura.xml files..."
-          find . -type f -name "coverage.cobertura.xml" || true
-
     - name: Generate Combined Coverage Report
       run: |
           reportgenerator \
-            -reports:"TestResults/unit/**/coverage.cobertura.xml;TestResults/integration/**/coverage.cobertura.xml" \
+            -reports:"./**/coverage.cobertura.xml" \
             -targetdir:"TestCoverageReport" \
             -reporttypes:"HtmlSummary;Html;Badges" \
             -classfilters:"-AspNetCoreGeneratedDocument*;-AspNetCore.Views*"
