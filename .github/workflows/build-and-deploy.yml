@@ -99,7 +99,7 @@ jobs:
       run: |
           dotnet tool install -g dotnet-reportgenerator-globaltool
           reportgenerator \
-            -reports:"TestResults/**/coverage.cobertura.xml" \
+            -reports:"**/TestResults/**/coverage.cobertura.xml" \
             -targetdir:"TestCoverageReport" \
             -reporttypes:HtmlSummary;Html
 
