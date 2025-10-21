@@ -96,12 +96,12 @@ jobs:
             --results-directory ./TestResults/integration
 
     - name: Generate Combined Coverage Report
-      run: |
-          reportgenerator \
-            -reports:"./**/coverage.cobertura.xml" \
-            -targetdir:"TestCoverageReport" \
-            -reporttypes:"HtmlSummary;Html;Badges" \
-            -classfilters:"-AspNetCoreGeneratedDocument*;-AspNetCore.Views*"
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
+      with:
+        reports: './SAPSec.Tests.Unit/coverage.cobertura.xml;./SAPSec.Tests.Integration/coverage.cobertura.xml'
+        targetdir: 'TestCoverageReport'
+        reporttypes: 'HtmlSummary;Html;Badges'
+        classfilters: '-AspNetCoreGeneratedDocument*;-AspNetCore.Views*'
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
