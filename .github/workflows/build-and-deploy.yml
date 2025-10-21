@@ -62,22 +62,58 @@ jobs:
         snyk-token: ${{ secrets.SNYK_TOKEN }}
 
   test:
-    name: Run tests
+    name: Run Unit & Integration Tests with Coverage
     if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
-
-    # This is a skeleton test job
-    # It will need to be updated to set the environment and run required tests
-    # The steps can be moved to a separate action if preferred
 
     steps:
     - name: Check out repository
       uses: actions/checkout@v4
 
-    # - name: Run tests
-    #   shell: bash
-    #   run: |
-    #     run some tests
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build solution
+      run: dotnet build --configuration Release --no-restore
+
+    - name: Install Playwright browsers
+      working-directory: SAPSec.Tests.UI
+      run: |
+          dotnet build
+          pwsh ./bin/Debug/net8.0/playwright.ps1 install
+
+    - name: Run Unit Tests
+      run: |
+          dotnet test SAPSec.Tests.Unit/SAPSec.Tests.Unit.csproj \
+            --collect:"XPlat Code Coverage" \
+            --settings coverlet.runsettings \
+            --results-directory ./TestResults/unit
+
+    - name: Run Integration Tests
+      run: |
+          dotnet test SAPSec.Tests.Integration/SAPSec.Tests.Integration.csproj \
+            --collect:"XPlat Code Coverage" \
+            --settings coverlet.runsettings \
+            --results-directory ./TestResults/integration
+
+    - name: Generate Combined Coverage Report
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
+      with:
+        reports: './SAPSec.Tests.Unit/coverage.cobertura.xml;./SAPSec.Tests.Integration/coverage.cobertura.xml'
+        targetdir: 'TestCoverageReport'
+        reporttypes: 'HtmlSummary;Html;Badges'
+        classfilters: '-AspNetCoreGeneratedDocument*;-AspNetCore.Views*'
+
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v4
+      with:
+          name: code-coverage-report
+          path: TestCoverageReport
 
   deploy-review-app:
     name: Deployment To Review
@@ -109,6 +145,29 @@ jobs:
         smoke-test: false
 #        gcp-wip: ${{ vars.GCP_WIP }}
 #        gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Playwright browsers
+      working-directory: SAPSec.Tests.UI
+      run: |
+        dotnet build
+        pwsh ./bin/Debug/net8.0/playwright.ps1 install
+
+    - name: Run UI Tests Against Review App
+      env:
+        BASE_URL: ${{ steps.deploy_review.outputs.environment_url }}
+      run: |
+        echo "Running Playwright tests on $BASE_URL"
+        dotnet test SAPSec.Tests.UI/SAPSec.Tests.UI.csproj \
+          --logger "trx;LogFileName=ui-tests.trx" \
+          -- TestRunParameters.Parameter\(name=\"BaseUrl\",value=\"$BASE_URL\"\)
 
   deploy:
     name: Deploy environments

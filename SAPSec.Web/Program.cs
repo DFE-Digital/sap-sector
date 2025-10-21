@@ -1,14 +1,17 @@
 using GovUk.Frontend.AspNetCore;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.AspNetCore.DataProtection;
 using SAPSec.Web.Helpers;
+using SAPSec.Web.Middleware;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Text.Json;
 
 namespace SAPSec.Web;
 
-public class Program
+public partial class Program
 {
     [ExcludeFromCodeCoverage]
     public static void Main(string[] args)
@@ -20,11 +23,22 @@ public class Program
             options.Rebrand = true;
         });
 
-        builder.Services.AddControllersWithViews()
-            .AddRazorOptions(options =>
+        // Single, consolidated controllers registration
+        builder.Services.AddControllers()
+            .AddJsonOptions(options =>
             {
-                options.ViewLocationFormats.Add("/{0}.cshtml");
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
+
+        // Add Razor pages separately if needed
+        builder.Services.AddRazorPages();
+
+        // View configuration
+        builder.Services.Configure<RazorViewEngineOptions>(options =>
+        {
+            options.ViewLocationFormats.Add("/{0}.cshtml");
+        });
 
         builder.Services.Configure<RequestLocalizationOptions>(options =>
         {
@@ -33,7 +47,6 @@ public class Program
             options.RequestCultureProviders.Clear();
         });
 
-        builder.Services.AddMvc();
         builder.Services.AddHealthChecks();
         builder.Services.AddDataProtection()
                .PersistKeysToFileSystem(new DirectoryInfo(@"/keys"))
@@ -49,9 +62,11 @@ public class Program
         else
         {
             app.UseExceptionHandler("/Home/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
+
+        // Security headers middleware - MUST come before static files
+        app.UseSecurityHeaders();
 
         app.UseHttpsRedirection();
 
@@ -89,7 +104,6 @@ public class Program
                 var contentType = ctx.Context.Response.ContentType;
                 Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
 
-                // If content type is not set, log the file extension
                 if (string.IsNullOrEmpty(contentType))
                 {
                     var ext = Path.GetExtension(path);
@@ -101,42 +115,14 @@ public class Program
         app.UseRouting();
         app.UseGovUkFrontend();
 
-        app.Use(async (context, next) =>
-        {
-            context.Response.Headers.Append("Expect-CT", "max-age=86400, enforce");
-            context.Response.Headers.Append("Referrer-Policy", "same-origin");
-            context.Response.Headers.Append("Arr-Disable-Session-Affinity", "true");
-            context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
-            context.Response.Headers.Append("X-Frame-Options", "DENY");
-            context.Response.Headers.Append("X-Permitted-Cross-Domain-Policies", "none");
-            context.Response.Headers.Append("X-XSS-Protection", "0");
-            context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000;includeSubDomains; preload");
-
-            context.Items["ScriptNonce"] = CSPHelper.RandomCharacters;
-
-            context.Response.Headers.Append(
-                "Content-Security-Policy",
-                "base-uri 'self';"
-                + "object-src 'none';"
-                + "default-src 'self';"
-                + "frame-ancestors 'none';"
-                + "connect-src 'self' *.google-analytics.com *.analytics.google.com https://www.compare-school-performance.service.gov.uk https://api.postcodes.io https://*.doubleclick.net https://*.clarity.ms https://c.bing.com https://*.applicationinsights.azure.com/ https://*.visualstudio.com/; child-src 'none';"
-                + "frame-src 'none';"
-                + "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/;"
-                + "style-src 'self';"
-                + "font-src 'self' data:;"
-                + $"script-src 'self' 'nonce-{context.Items["ScriptNonce"]}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/;"
-                );
-
-            await next.Invoke();
-        });
-
+        app.MapControllers();
+        app.MapRazorPages();
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
-        // Add health check endpoint for AKS
+        // Health check endpoints for AKS
         app.MapHealthChecks("/healthcheck");
 
         app.Run();
