@@ -62,7 +62,7 @@ jobs:
         snyk-token: ${{ secrets.SNYK_TOKEN }}
 
   test:
-    name: Run Unit & Integration Tests with Coverage
+    name: Run Unit UI Tests& Integration Tests with Coverage
     if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
@@ -83,7 +83,9 @@ jobs:
 
     - name: Install Playwright browsers
       working-directory: SAPSec.Tests.UI
-      run: pwsh bin/Debug/net8.0/playwright.ps1 install
+      run: |
+          dotnet build
+          pwsh ./bin/Debug/net8.0/playwright.ps1 install
 
     - name: Run Unit Tests
       run: |
