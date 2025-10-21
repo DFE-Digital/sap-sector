@@ -62,7 +62,7 @@ jobs:
         snyk-token: ${{ secrets.SNYK_TOKEN }}
 
   test:
-    name: Run Unit UI Tests& Integration Tests with Coverage
+    name: Run Unit & Integration Tests with Coverage
     if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
@@ -100,13 +100,6 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --settings coverlet.runsettings \
             --results-directory ./TestResults/integration
-
-    - name: Run UI Tests
-      run: |
-          dotnet test SAPSec.Tests.UI/SAPSec.Tests.UI.csproj \
-            --collect:"XPlat Code Coverage" \
-            --settings coverlet.runsettings \
-            --results-directory ./TestResults/ui
 
     - name: Generate Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
@@ -152,6 +145,29 @@ jobs:
         smoke-test: false
 #        gcp-wip: ${{ vars.GCP_WIP }}
 #        gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Playwright browsers
+      working-directory: SAPSec.Tests.UI
+      run: |
+        dotnet build
+        pwsh ./bin/Debug/net8.0/playwright.ps1 install
+
+    - name: Run UI Tests Against Review App
+      env:
+        BASE_URL: ${{ steps.deploy_review.outputs.environment_url }}
+      run: |
+        echo "Running Playwright tests on $BASE_URL"
+        dotnet test SAPSec.Tests.UI/SAPSec.Tests.UI.csproj \
+          --logger "trx;LogFileName=ui-tests.trx" \
+          -- TestRunParameters.Parameter\(name=\"BaseUrl\",value=\"$BASE_URL\"\)
 
   deploy:
     name: Deploy environments

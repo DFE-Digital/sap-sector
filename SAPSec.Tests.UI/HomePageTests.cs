@@ -7,7 +7,9 @@ public class HomePageTests : IAsyncLifetime
 {
     private IPlaywright? _playwright;
     private IBrowser? _browser;
-    private const string BaseUrl = "https://localhost:3000";
+    baseUrl = TestContext.Parameters["BaseUrl"] 
+               ?? Environment.GetEnvironmentVariable("BASE_URL") 
+               ?? "https://localhost:3000";
 
     public async Task InitializeAsync()
     {
