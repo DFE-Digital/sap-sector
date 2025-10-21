@@ -7,10 +7,12 @@ public class HomePageTests : IAsyncLifetime
 {
     private IPlaywright? _playwright;
     private IBrowser? _browser;
-    baseUrl = TestContext.Parameters["BaseUrl"] 
-               ?? Environment.GetEnvironmentVariable("BASE_URL") 
-               ?? "https://localhost:3000";
-
+    private readonly string _baseUrl;
+    public HomePageTests()
+    {
+        _baseUrl = Environment.GetEnvironmentVariable("BASE_URL")
+                   ?? "https://localhost:3000";
+    }
     public async Task InitializeAsync()
     {
         _playwright = await Playwright.CreateAsync();
@@ -36,7 +38,7 @@ public class HomePageTests : IAsyncLifetime
         var page = await _browser!.NewPageAsync();
 
         // Act
-        var response = await page.GotoAsync(BaseUrl);
+        var response = await page.GotoAsync(_baseUrl);
 
         // Assert
         Assert.NotNull(response);
@@ -50,7 +52,7 @@ public class HomePageTests : IAsyncLifetime
     {
         // Arrange
         var page = await _browser!.NewPageAsync();
-        await page.GotoAsync(BaseUrl);
+        await page.GotoAsync(_baseUrl);
 
         // Act
         var title = await page.TitleAsync();
@@ -66,7 +68,7 @@ public class HomePageTests : IAsyncLifetime
     {
         // Arrange
         var page = await _browser!.NewPageAsync();
-        await page.GotoAsync(BaseUrl);
+        await page.GotoAsync(_baseUrl);
 
         // Act
         var heading = await page.Locator("h1").TextContentAsync();
@@ -83,7 +85,7 @@ public class HomePageTests : IAsyncLifetime
     {
         // Arrange
         var page = await _browser!.NewPageAsync();
-        await page.GotoAsync(BaseUrl);
+        await page.GotoAsync(_baseUrl);
 
         // Act
         // Locate the GOV.UK header element
@@ -113,7 +115,7 @@ public class HomePageTests : IAsyncLifetime
         await page.SetViewportSizeAsync(width, height);
 
         // Act
-        await page.GotoAsync(BaseUrl);
+        await page.GotoAsync(_baseUrl);
         var heading = page.Locator("h1");
         var isVisible = await heading.IsVisibleAsync();
 
