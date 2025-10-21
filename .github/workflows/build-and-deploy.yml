@@ -62,7 +62,7 @@ jobs:
         snyk-token: ${{ secrets.SNYK_TOKEN }}
 
   test:
-    name: Run tests
+    name: Run Unit & Integration Tests with Coverage
     if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
@@ -82,7 +82,32 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Run Unit Tests
-      run: dotnet test ./SAPSec.Tests.Unit/SAPSec.Tests.Unit.csproj --configuration Release --no-build --logger "trx;LogFileName=unit-tests.trx"
+      run: |
+          dotnet test SAPSec.Tests.Unit/SAPSec.Tests.Unit.csproj \
+            --collect:"XPlat Code Coverage" \
+            --settings coverlet.runsettings \
+            --results-directory ./TestResults/unit
+
+    - name: Run Integration Tests
+      run: |
+          dotnet test SAPSec.Tests.Integration/SAPSec.Tests.Integration.csproj \
+            --collect:"XPlat Code Coverage" \
+            --settings coverlet.runsettings \
+            --results-directory ./TestResults/integration
+
+    - name: Generate Combined Coverage Report
+      run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator \
+            -reports:"TestResults/**/coverage.cobertura.xml" \
+            -targetdir:"TestCoverageReport" \
+            -reporttypes:HtmlSummary;Html
+
+    - name: Upload Coverage Report
+      uses: actions/upload-artifact@v4
+      with:
+          name: code-coverage-report
+          path: TestCoverageReport
 
   deploy-review-app:
     name: Deployment To Review

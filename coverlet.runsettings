@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura,opencover</Format>
+          
+          <!-- Include your assemblies -->
+          <Include>[SAPSec.Web]*,[SAPSec.Core]*,[SAPSec.Infrastructure]*</Include>
+          
+          <!-- Exclude test assemblies and generated code -->
+          <Exclude>
+            [xunit.*]*,
+            [Microsoft.*]*,
+            [System.*]*,
+            [*.Tests]*,
+            [*.Tests.*]*,
+            [SAPSec.Tests]*,
+            [SAPSec.Tests.*]*,
+            [SAPSec.Web]AspNetCoreGeneratedDocument.*,
+            [SAPSec.Web]AspNetCore.Views*,
+            [*]AspNetCoreGeneratedDocument.*,
+            [*]AspNetCore.Views*
+          </Exclude>
+          
+          <!-- Exclude files by path pattern -->
+          <ExcludeByFile>
+            **/*.cshtml,
+            **/*.cshtml.cs,
+            **/*.cshtml.g.cs,
+            **/*.razor,
+            **/*.razor.cs,
+            **/*.razor.g.cs,
+            **/*.g.cs,
+            **/obj/**/*,
+            **/bin/**/*,
+            **/Views/**/*,
+            **/wwwroot/**/*,
+            **/Pages/**/*.cshtml.cs,
+            **/Migrations/**/*
+          </ExcludeByFile>
+          
+          <!-- Exclude by attribute -->
+          <ExcludeByAttribute>
+            ExcludeFromCodeCoverageAttribute,
+            GeneratedCodeAttribute,
+            CompilerGeneratedAttribute,
+            DebuggerNonUserCodeAttribute
+          </ExcludeByAttribute>
+          
+          <!-- Additional settings -->
+          <SkipAutoProps>true</SkipAutoProps>
+          <DeterministicReport>true</DeterministicReport>
+          <UseSourceLink>true</UseSourceLink>
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+          <SingleHit>false</SingleHit>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
