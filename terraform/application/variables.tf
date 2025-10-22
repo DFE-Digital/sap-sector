@@ -45,6 +45,11 @@ variable "enable_postgres_backup_storage" {
   default     = false
   description = "Create a storage account to store database dumps"
 }
+variable "postgres_flexible_server_sku" {
+  type        = string
+  default     = "B_Standard_B1ms"
+  description = "SKU for the PostgreSQL flexible server. Use 'GP_Standard_D2ds_v4' for production"
+}
 variable "enable_postgres_high_availability" {
   type        = bool
   default     = false
