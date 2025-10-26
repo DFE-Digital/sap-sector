@@ -1,13 +1,16 @@
-using GovUk.Frontend.AspNetCore;
+﻿using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
-using SAPSec.Web.Helpers;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using SAPSec.Web.Middleware;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
+using Azure.Identity;
+using SAPSec.Core.Services;
 
 namespace SAPSec.Web;
 
@@ -17,6 +20,13 @@ public partial class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+
+        var keyVaultName = builder.Configuration["KeyVaultName"];
+        if (!string.IsNullOrEmpty(keyVaultName))
+        {
+            var keyVaultUri = new Uri($"https://{keyVaultName}.vault.azure.net/");
+            builder.Configuration.AddAzureKeyVault(keyVaultUri, new DefaultAzureCredential());
+        }
 
         builder.Services.AddGovUkFrontend(options =>
         {
@@ -47,6 +57,141 @@ public partial class Program
             options.RequestCultureProviders.Clear();
         });
 
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromMinutes(30);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.None; // Required for DSI redirects
+        });
+
+        builder.Services.AddHttpContextAccessor();
+
+        var dsiClientId = builder.Configuration["DsiClientId"];
+        var dsiClientSecret = builder.Configuration["DsiClientSecret"];
+        var dsiAuthority = builder.Configuration["DsiAuthority"];
+
+        var dsiEnabled = !string.IsNullOrEmpty(dsiClientId) &&
+                        !string.IsNullOrEmpty(dsiClientSecret) &&
+                        !string.IsNullOrEmpty(dsiAuthority);
+        if (dsiEnabled)
+        {
+            builder.Services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    options.DefaultSignOutScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                })
+                .AddCookie(options =>
+                {
+                    options.Cookie.Name = ".SAPSec.Auth";
+                    options.Cookie.HttpOnly = true;
+                    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                    options.Cookie.SameSite = SameSiteMode.None;
+                    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+                    options.SlidingExpiration = true;
+                    options.LoginPath = "/login";
+                    options.LogoutPath = "/logout";
+                    options.AccessDeniedPath = "/access-denied";
+                })
+                .AddOpenIdConnect(options =>
+                {
+                    // DSI Configuration from Key Vault
+                    options.Authority = dsiAuthority;
+                    options.ClientId = dsiClientId;
+                    options.ClientSecret = dsiClientSecret;
+
+                    options.ResponseType = OpenIdConnectResponseType.Code;
+                    options.ResponseMode = OpenIdConnectResponseMode.FormPost;
+
+                    options.CallbackPath = "/signin-oidc";
+                    options.SignedOutCallbackPath = "/signout-callback-oidc";
+
+                    options.SaveTokens = true;
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                    options.UseTokenLifetime = false;
+
+                    options.Scope.Clear();
+                    options.Scope.Add("openid");
+                    options.Scope.Add("email");  
+                    options.Scope.Add("profile");      
+                    options.Scope.Add("organisation");
+
+                    options.MapInboundClaims = false;
+
+                    options.TokenValidationParameters.NameClaimType = "name";
+                    options.TokenValidationParameters.RoleClaimType = "role";
+
+                    options.Events = new OpenIdConnectEvents
+                    {
+                        OnTokenValidated = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices
+                                .GetRequiredService<ILogger<Program>>();
+
+                            var userId = context.Principal?.FindFirst("sub")?.Value;
+                            var orgClaim = context.Principal?.FindFirst("organisation")?.Value;
+
+                            logger.LogInformation(
+                                "DSI authentication successful for user: {UserId}",
+                                userId);
+
+                            if (!string.IsNullOrEmpty(orgClaim) && orgClaim != "{}")
+                            {
+                                context.HttpContext.Session.SetString("Organisation", orgClaim);
+                                logger.LogInformation("Organization stored in session");
+                            }
+
+                            return Task.CompletedTask;
+                        },
+
+                        OnAuthenticationFailed = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices
+                                .GetRequiredService<ILogger<Program>>();
+
+                            logger.LogError(
+                                context.Exception,
+                                "DSI authentication failed");
+
+                            context.HandleResponse();
+                            context.Response.Redirect("/error?message=Authentication failed");
+
+                            return Task.CompletedTask;
+                        },
+
+                        OnRemoteFailure = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices
+                                .GetRequiredService<ILogger<Program>>();
+
+                            logger.LogError(
+                                context.Failure,
+                                "DSI remote authentication failure");
+
+                            context.HandleResponse();
+                            context.Response.Redirect("/error");
+
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.FallbackPolicy = options.DefaultPolicy;
+            });
+
+            Console.WriteLine("✅ DSI Authentication configured");
+        }
+        else
+        {
+            Console.WriteLine("⚠️ DSI Authentication not configured - running without auth");
+        }
+
+        builder.Services.AddScoped<IOrganisationService, OrganisationService>();
         builder.Services.AddHealthChecks();
         builder.Services.AddDataProtection()
                .PersistKeysToFileSystem(new DirectoryInfo(@"/keys"))
@@ -54,7 +199,6 @@ public partial class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
@@ -65,18 +209,15 @@ public partial class Program
             app.UseHsts();
         }
 
-        // Security headers middleware - MUST come before static files
         app.UseSecurityHeaders();
 
         app.UseHttpsRedirection();
 
-        // Configure MIME types
         var provider = new FileExtensionContentTypeProvider();
         provider.Mappings[".css"] = "text/css";
         provider.Mappings[".js"] = "application/javascript";
         provider.Mappings[".mjs"] = "application/javascript";
 
-        // Log wwwroot contents on startup for debugging
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
         if (Directory.Exists(wwwrootPath))
         {
@@ -113,6 +254,14 @@ public partial class Program
         });
 
         app.UseRouting();
+
+        app.UseSession();
+        if (dsiEnabled)
+        {
+            app.UseAuthentication();
+            app.UseAuthorization();
+        }
+
         app.UseGovUkFrontend();
 
         app.MapControllers();

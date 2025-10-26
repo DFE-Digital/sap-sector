@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "Error";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        <h1 class="govuk-heading-xl">Sorry, there was a problem</h1>
+
+        <p class="govuk-body">
+            @ViewBag.ErrorMessage
+        </p>
+
+        <p class="govuk-body">
+            <a href="/login" class="govuk-button">Try signing in again</a>
+        </p>
+    </div>
+</div>
