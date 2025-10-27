@@ -63,6 +63,11 @@ RUN dotnet publish "./SAPSec.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION} AS final
 WORKDIR /app
 
+# Update system packages to the latest version
+RUN apt-get update && apt-get upgrade -y \
+    && apt-get install -y --no-install-recommends \
+    && rm -rf /var/lib/apt/lists/* \
+
 # Create a writable folder for Data Protection keys
 RUN mkdir -p /keys && chmod -R 777 /keys
 
