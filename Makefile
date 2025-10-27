@@ -1,7 +1,7 @@
 ARM_TEMPLATE_TAG=1.1.10
 RG_TAGS={"Product" : "Teacher services cloud"}
 REGION=UK South
-SERVICE_NAME=sap-sector
+SERVICE_NAME=get-school-improvement-insights
 SERVICE_SHORT=sapsec
 DOCKER_REPOSITORY=ghcr.io/dfe-digital/sap-sector
 
