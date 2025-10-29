@@ -1,0 +1,62 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full">
+                <h1 class="govuk-heading-xl">
+                    Your school dashboard
+                </h1>
+
+                @* TODO: Add school information when OrganisationService is implemented *@
+                @* <p class="govuk-body-l">
+                    @ViewBag.SchoolName
+                    <br>
+                    <span class="govuk-body-s">URN: @ViewBag.URN</span>
+                </p> *@
+
+                <div class="govuk-grid-row">
+                    <div class="govuk-grid-column-one-half">
+                        <div class="app-card">
+                            <h2 class="govuk-heading-m">
+                                <a href="#" class="govuk-link govuk-link--no-visited-state">
+                                    Compare your school
+                                </a>
+                            </h2>
+                            <p class="govuk-body">
+                                See how your school's performance compares to similar schools
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="govuk-grid-column-one-half">
+                        <div class="app-card">
+                            <h2 class="govuk-heading-m">
+                                <a href="#" class="govuk-link govuk-link--no-visited-state">
+                                    Find similar schools
+                                </a>
+                            </h2>
+                            <p class="govuk-body">
+                                Search for schools with similar characteristics
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="govuk-grid-row govuk-!-margin-top-6">
+                    <div class="govuk-grid-column-full">
+                        <h2 class="govuk-heading-m">Your school data</h2>
+                        <p class="govuk-body">
+                            View and analyse your school's performance data
+                        </p>
+                        <p class="govuk-body">
+                            <a href="#" class="govuk-link">View school profile</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
