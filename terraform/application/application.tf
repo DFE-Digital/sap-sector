@@ -1,3 +1,30 @@
+data "azurerm_key_vault" "app_key_vault" {
+  name                = local.key_vault_name
+  resource_group_name = local.resource_group_name
+}
+
+# Fetch DSI secrets from Key Vault
+data "azurerm_key_vault_secret" "dsi_client_id" {
+  name         = "DsiClientId"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "dsi_client_secret" {
+  name         = "DsiClientSecret"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "dsi_api_secret" {
+  name         = "DsiApiSecret"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "dsi_service_id" {
+  name         = "DsiServiceId"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
 
@@ -15,9 +42,27 @@ module "application_configuration" {
   config_variables = {
     ENVIRONMENT_NAME = var.environment
     PGSSLMODE        = local.postgres_ssl_mode
+
+    DsiConfiguration__ServiceName           = "SAP Sector Service"
+    DsiConfiguration__ApiUri                = local.dsi_urls.api_uri
+    DsiConfiguration__Authority             = local.dsi_urls.authority
+    DsiConfiguration__Issuer                = local.dsi_urls.issuer
+    DsiConfiguration__Audience              = "signin.education.gov.uk"
+    DsiConfiguration__MetadataAddress       = local.dsi_urls.metadata_address
+    DsiConfiguration__CallbackPath          = "/signin-oidc"
+    DsiConfiguration__SignedOutCallbackPath = "/signout-callback-oidc"
+    DsiConfiguration__RequireHttpsMetadata  = local.dsi_urls.require_https
+    DsiConfiguration__ValidateIssuer        = "true"
+    DsiConfiguration__ValidateAudience      = "true"
+    DsiConfiguration__ValidateLifetime      = "true"
+    DsiConfiguration__TokenExpiryMinutes    = "60"
   }
   secret_variables = {
     DATABASE_URL = module.postgres.url
+    DsiConfiguration__ClientId     = data.azurerm_key_vault_secret.dsi_client_id.value
+    DsiConfiguration__ClientSecret = data.azurerm_key_vault_secret.dsi_client_secret.value
+    DsiConfiguration__ApiSecret    = data.azurerm_key_vault_secret.dsi_api_secret.value
+    DsiConfiguration__ServiceId    = data.azurerm_key_vault_secret.dsi_service_id.value
   }
 }
 
