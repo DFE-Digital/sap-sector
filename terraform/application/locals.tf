@@ -1,6 +1,8 @@
 locals {
   environment = var.environment != "" ? var.environment : var.cluster
 
+  dsi_environment = contains(["production", "prod", "pd"], local.environment) ? "production" : "test"
+
   dsi_config = {
     test = {
       api_uri          = "https://test-api.signin.education.gov.uk"
@@ -18,7 +20,7 @@ locals {
     }
   }
 
-  dsi_urls = local.dsi_config[local.environment]
+  dsi_urls = local.dsi_config[local.dsi_environment]
 
   key_vault_name = "${var.azure_resource_prefix}-${var.service_short}-${var.config_short}-app-kv"
   
