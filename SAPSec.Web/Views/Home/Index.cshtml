@@ -1,5 +1,8 @@
-﻿@{
+﻿@using SAPSec.Core.Configuration
+@inject IConfiguration Configuration
+@{
     ViewData["Title"] = "School Profile - Sector facing";
+    var settings = Configuration.GetSection("DFESignInSettings").Get<DfeSignInSettings>();
 }
 
 <div class="govuk-width-container">
@@ -34,7 +37,7 @@
                 </p>
 
                 <p class="govuk-body">
-                    You will need a <a href="#" class="govuk-link">DfE Sign-in</a> account to access this service.
+                    You will need a <a href="@settings?.SignInUri" class="govuk-link">DfE Sign-in</a> account to access this service.
                 </p>
 
                 <a href="#" role="button" draggable="false" class="govuk-button govuk-button--start govuk-!-margin-top-2 govuk-!-margin-bottom-8" data-module="govuk-button">
