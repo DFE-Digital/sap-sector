@@ -26,12 +26,12 @@ public class AuthController : Controller
     {
         if (_userService.IsAuthenticated(User))
         {
-            return RedirectToLocal(returnUrl);
+            return RedirectToAction("Index");
         }
 
         var properties = new AuthenticationProperties
         {
-            RedirectUri = Url.Action(nameof(SignInCallback), new { returnUrl }),
+            RedirectUri = returnUrl,
             Items = { { "returnUrl", returnUrl ?? "/" } }
         };
 

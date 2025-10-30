@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Parlot.Fluent;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Interfaces.Services.IDsiApiService;
 using SAPSec.Core.Model.DsiConfiguration;
@@ -156,14 +157,30 @@ public static class DsiAuthenticationExtensions
 
     private static Task OnRedirectToIdentityProvider(RedirectContext context)
     {
-        // Add any custom parameters to the authentication request
-        return Task.CompletedTask;
+            if (context.ProtocolMessage.RequestType == OpenIdConnectRequestType.Logout)
+            {
+                var request = context.Request;
+                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+
+                context.ProtocolMessage.PostLogoutRedirectUri = $"{baseUrl}/auth/signed-out";
+
+                var idToken = context.HttpContext.User.FindFirst("id_token")?.Value;
+                if (!string.IsNullOrEmpty(idToken))
+                {
+                    context.ProtocolMessage.IdTokenHint = idToken;
+                }
+            }
+            return Task.CompletedTask;
     }
 
     private static Task OnRedirectToIdentityProviderForSignOut(
         RedirectContext context)
     {
-        // Customize sign-out behavior if needed
+        var request = context.Request;
+        var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
+        var postLogoutRedirectUri = $"{baseUrl}/signout-callback-oidc";
+        context.ProtocolMessage.PostLogoutRedirectUri = postLogoutRedirectUri;
+
         return Task.CompletedTask;
     }
 }
