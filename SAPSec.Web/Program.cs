@@ -1,8 +1,10 @@
-using GovUk.Frontend.AspNetCore;
+﻿using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
+using SAPSec.Core.Configuration;
+using SAPSec.Web.Extensions;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.Middleware;
 using System.Diagnostics.CodeAnalysis;
@@ -23,7 +25,6 @@ public partial class Program
             options.Rebrand = true;
         });
 
-        // Single, consolidated controllers registration
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -31,10 +32,40 @@ public partial class Program
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
 
-        // Add Razor pages separately if needed
+        builder.Services.Configure<DfeSignInSettings>(
+                  builder.Configuration.GetSection("DFESignInSettings"));
         builder.Services.AddRazorPages();
 
-        // View configuration
+        builder.Services.AddDsiAuthentication(builder.Configuration);
+
+        builder.Services.AddDistributedMemoryCache();
+
+        builder.Services.AddLogging(logging =>
+        {
+            logging.AddConsole();
+            logging.AddDebug();
+        });
+
+        builder.Services.AddSession(options =>
+        {
+            options.IdleTimeout = TimeSpan.FromHours(1);
+            options.Cookie.HttpOnly = true;
+            options.Cookie.IsEssential = true;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+
+        builder.Services.AddAuthorization(options =>
+        {
+            options.AddPolicy("RequireOrganisation", policy =>
+                policy.RequireAuthenticatedUser()
+                      .RequireClaim("organisation"));
+
+            options.AddPolicy("AdminOnly", policy =>
+                policy.RequireAuthenticatedUser()
+                      .RequireRole("Admin"));
+        });
+
         builder.Services.Configure<RazorViewEngineOptions>(options =>
         {
             options.ViewLocationFormats.Add("/{0}.cshtml");
@@ -113,6 +144,12 @@ public partial class Program
         });
 
         app.UseRouting();
+
+        app.UseSession();
+
+        app.UseAuthentication();
+        app.UseAuthorization();
+
         app.UseGovUkFrontend();
 
         app.MapControllers();
