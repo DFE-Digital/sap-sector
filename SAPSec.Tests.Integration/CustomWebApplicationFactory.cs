@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
@@ -35,6 +36,8 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 services.Remove(service);
             }
 
+            
+
             // Clear and re-add authentication services with test configuration
             services.AddAuthentication(options =>
             {
@@ -46,7 +49,11 @@ public class CustomWebApplicationFactory : WebApplicationFactory<Program>
             })
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", options => { });
         });
-
+        builder.ConfigureServices(services =>
+        {
+            services.AddDataProtection()
+                .SetApplicationName("SAPSec.Tests");
+        });
         builder.UseEnvironment("Test");
     }
 
