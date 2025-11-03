@@ -80,14 +80,12 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var keysPath = builder.Configuration.GetValue<string>("DataProtection:KeysPath") ?? "/keys";
+        var dataProtectionPath = builder.Environment.IsEnvironment("Test")
+                                 ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
+                                   : "/keys";
 
-        if (!Directory.Exists(keysPath))
-        {
-            Directory.CreateDirectory(keysPath);
-        }
         builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+               .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
                .SetApplicationName("SAPSec");
 
         var app = builder.Build();
