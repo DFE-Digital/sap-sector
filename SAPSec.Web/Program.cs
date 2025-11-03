@@ -79,8 +79,15 @@ public partial class Program
         });
 
         builder.Services.AddHealthChecks();
+
+        var keysPath = builder.Configuration.GetValue<string>("DataProtection:KeysPath") ?? "/keys";
+
+        if (!Directory.Exists(keysPath))
+        {
+            Directory.CreateDirectory(keysPath);
+        }
         builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(@"/keys"))
+               .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
                .SetApplicationName("SAPSec");
 
         var app = builder.Build();
