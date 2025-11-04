@@ -28,7 +28,7 @@ permissions:
   id-token: write
 
 env:
-  SERVICE_NAME: sap-sector
+  SERVICE_NAME: get-school-improvement-insights
   SERVICE_SHORT: sapsec
   TF_VARS_PATH: terraform/application/config
 

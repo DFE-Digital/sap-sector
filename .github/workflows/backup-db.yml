@@ -28,7 +28,7 @@ permissions:
   id-token: write
 
 env:
-  SERVICE_NAME: sap-sector
+  SERVICE_NAME: get-school-improvement-insights
   SERVICE_SHORT: sapsec
   TF_VARS_PATH: terraform/application/config
 
@@ -76,7 +76,7 @@ jobs:
       with:
         storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
         resource-group: ${{ env.RESOURCE_GROUP_NAME }}
-        app-name: sap-sector-${{ env.DEPLOY_ENV }}
+        app-name: get-school-improvement-insights-${{ env.DEPLOY_ENV }}
         namespace: ${{ env.NAMESPACE }}
         cluster: ${{ env.CLUSTER }}
         azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
