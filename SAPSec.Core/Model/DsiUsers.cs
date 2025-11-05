@@ -9,6 +9,7 @@ public class DsiUser
     public string Name { get; set; } = string.Empty;
     public List<DsiOrganisation> Organisations { get; set; } = new();
 
+    
     public string FullName => $"{GivenName} {FamilyName}";
 }
 
