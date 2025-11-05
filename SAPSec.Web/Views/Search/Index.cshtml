@@ -1,0 +1,122 @@
+﻿@using SAPSec.Core.Model.DsiUser
+@{
+    ViewData["Title"] = "Test Page - Sign In Success";
+    var user = ViewBag.User as DsiUser;
+    var organisation = ViewBag.Organisation as DsiOrganisation;
+}
+
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+
+        <!-- Success banner -->
+        <div class="govuk-notification-banner govuk-notification-banner--success" role="alert"
+             aria-labelledby="govuk-notification-banner-title" data-module="govuk-notification-banner">
+            <div class="govuk-notification-banner__header">
+                <h2 class="govuk-notification-banner__title" id="govuk-notification-banner-title">
+                    Success
+                </h2>
+            </div>
+            <div class="govuk-notification-banner__content">
+                <h3 class="govuk-notification-banner__heading">
+                    ✅ DSI Sign-in is working!
+                </h3>
+                <p class="govuk-body">You have successfully signed in using DfE Sign-in.</p>
+            </div>
+        </div>
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl">Test Page</h1>
+
+                <p class="govuk-body-l">
+                    This page confirms that DSI authentication is working correctly.
+                </p>
+
+                <!-- User Information -->
+                <h2 class="govuk-heading-m">Your Details</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Name</dt>
+                        <dd class="govuk-summary-list__value">@user?.FullName</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Email</dt>
+                        <dd class="govuk-summary-list__value">@user?.Email</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">User ID</dt>
+                        <dd class="govuk-summary-list__value">@user?.Sub</dd>
+                    </div>
+                </dl>
+
+                <!-- Organisation Information -->
+                @if (organisation != null)
+                {
+                    <h2 class="govuk-heading-m">Your Organisation</h2>
+                    <dl class="govuk-summary-list">
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Organisation</dt>
+                            <dd class="govuk-summary-list__value">@organisation.Name</dd>
+                        </div>
+                        @if (!string.IsNullOrEmpty(organisation.Urn))
+                        {
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">URN</dt>
+                                <dd class="govuk-summary-list__value">@organisation.Urn</dd>
+                            </div>
+                        }
+                        @if (organisation.Category != null)
+                        {
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Category</dt>
+                                <dd class="govuk-summary-list__value">@organisation.Category.Name</dd>
+                            </div>
+                        }
+                        @if (organisation.Status != null)
+                        {
+                            <div class="govuk-summary-list__row">
+                                <dt class="govuk-summary-list__key">Status</dt>
+                                <dd class="govuk-summary-list__value">@organisation.Status.Name</dd>
+                            </div>
+                        }
+                    </dl>
+
+                    @if (user?.Organisations.Count > 1)
+                    {
+                        <p class="govuk-body">
+                            <a asp-controller="Organisation" asp-action="Switch" class="govuk-link">
+                                Switch to a different organisation
+                            </a>
+                        </p>
+                    }
+
+                    <p class="govuk-body">
+                        <a asp-controller="Organisation" asp-action="Details" class="govuk-link">
+                            View full organisation details
+                        </a>
+                    </p>
+                }
+
+                <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible">
+
+                <!-- Actions -->
+                <h2 class="govuk-heading-m">What's next?</h2>
+                <p class="govuk-body">
+                    DSI authentication is working. You can now:
+                </p>
+                <ul class="govuk-list govuk-list--bullet">
+                    <li>Build your actual application pages</li>
+                    <li>Add more protected routes using <code>[Authorize]</code></li>
+                    <li>Access user and organisation information in your controllers</li>
+                </ul>
+
+                <div class="govuk-button-group">
+                    <a asp-controller="Home" asp-action="Index" class="govuk-button govuk-button--secondary" data-module="govuk-button">
+                        Return to home
+                    </a>
+                    <a asp-controller="Auth" asp-action="SignOut" class="govuk-link">Sign out</a>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
