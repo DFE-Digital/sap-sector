@@ -56,7 +56,7 @@ module "application_configuration" {
   is_rails_application = true
 
   config_variables = {
-     ASPNETCORE_ENVIRONMENT = var.environment == "review" ? "Development" : title(var.environment)
+     ASPNETCORE_ENVIRONMENT = "Development" 
     PGSSLMODE        = local.postgres_ssl_mode
 
     DsiConfiguration__ServiceName           = "SAP Sector Service"
