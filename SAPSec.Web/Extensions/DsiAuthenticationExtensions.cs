@@ -76,6 +76,9 @@ public static class DsiAuthenticationExtensions
                         logger.LogInformation("DSI Redirect URI: {RedirectUri}",
                             context.ProtocolMessage.RedirectUri);
                     }
+                    Console.WriteLine($"[DSI DEBUG] Client ID being used: {dsiConfig.ClientId}");
+                    Console.WriteLine($"[DSI DEBUG] Client Secret exists: {!string.IsNullOrEmpty(dsiConfig.ClientSecret)}");
+                    Console.WriteLine($"[DSI DEBUG] Client Secret length: {dsiConfig.ClientSecret?.Length ?? 0}");
 
                     return Task.CompletedTask;
                 },
