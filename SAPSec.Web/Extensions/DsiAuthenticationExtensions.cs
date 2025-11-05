@@ -83,7 +83,16 @@ public static class DsiAuthenticationExtensions
                 {
                     var logger = context.HttpContext.RequestServices
                         .GetRequiredService<ILogger<OpenIdConnectHandler>>();
-                    logger.LogError(context.Exception, "DSI Authentication failed");
+                    logger.LogError(context.Exception,"DSI Authentication Failed. Exception: {Message}",context.Exception.Message);
+
+                    // Show error details in development
+                    if (context.HttpContext.RequestServices
+                        .GetRequiredService<IWebHostEnvironment>().IsDevelopment())
+                    {
+                        context.Response.Redirect($"/Home/Error?message={context.Exception.Message}");
+                        context.HandleResponse();
+                    }
+
                     return Task.CompletedTask;
                 }
             };
