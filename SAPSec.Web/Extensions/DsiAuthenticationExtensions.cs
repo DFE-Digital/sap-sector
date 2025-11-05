@@ -3,14 +3,11 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Parlot.Fluent;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Interfaces.Services.IDsiApiService;
-using SAPSec.Core.Model.DsiConfiguration;
 using SAPSec.Core.Services;
-using SAPSec.Core.Services.DsiApiService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Web.Extensions;
 
@@ -50,6 +47,14 @@ public static class DsiAuthenticationExtensions
 
         // Clear default claim mappings
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
+
+        services.AddAuthorizationBuilder()
+            .AddPolicy("RequireOrganisation", policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim("organisation"))
+            .AddPolicy("AdminOnly", policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireRole("Admin"));
 
         // Configure authentication
         services.AddAuthentication(options =>

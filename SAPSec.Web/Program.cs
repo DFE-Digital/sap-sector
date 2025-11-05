@@ -2,17 +2,18 @@
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
 using SAPSec.Core.Configuration;
 using SAPSec.Web.Extensions;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.Middleware;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text.Json;
+using SAPSec.Core;
+using SAPSec.Infrastructure;
 
 namespace SAPSec.Web;
 
+// ReSharper disable once PartialTypeWithSinglePart
 public partial class Program
 {
     [ExcludeFromCodeCoverage]
@@ -36,7 +37,10 @@ public partial class Program
                   builder.Configuration.GetSection("DFESignInSettings"));
         builder.Services.AddRazorPages();
 
-        builder.Services.AddDsiAuthentication(builder.Configuration);
+        if (!builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddDsiAuthentication(builder.Configuration);
+        }
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -53,17 +57,6 @@ public partial class Program
             options.Cookie.IsEssential = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
-        });
-
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy("RequireOrganisation", policy =>
-                policy.RequireAuthenticatedUser()
-                      .RequireClaim("organisation"));
-
-            options.AddPolicy("AdminOnly", policy =>
-                policy.RequireAuthenticatedUser()
-                      .RequireRole("Admin"));
         });
 
         builder.Services.Configure<RazorViewEngineOptions>(options =>
@@ -88,6 +81,16 @@ public partial class Program
                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
                .SetApplicationName("SAPSec");
 
+        // Search services
+        var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
+        if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
+        {
+            establishmentsCsvPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, establishmentsCsvPath));
+        }
+
+        builder.Services.AddCoreDependencies();
+        builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -99,6 +102,9 @@ public partial class Program
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
         }
 
         // Security headers middleware - MUST come before static files
@@ -151,9 +157,6 @@ public partial class Program
         app.UseRouting();
 
         app.UseSession();
-
-        app.UseAuthentication();
-        app.UseAuthorization();
 
         app.UseGovUkFrontend();
 

@@ -1,31 +1,21 @@
-﻿using System;
-using System.Linq;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Interfaces.Services.IDsiApiService;
-using SAPSec.Core.Model.DsiUser;
 using System.Text.Json;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Services;
 
-public class DsiUserService : IDsiUserService
+public class DsiUserService(
+    IDsiApiService dsiApiService,
+    IHttpContextAccessor httpContextAccessor,
+    ILogger<DsiUserService> logger) : IDsiUserService
 {
-    private readonly IDsiApiService _dsiApiService;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly ILogger<DsiUserService> _logger;
+    private readonly IDsiApiService _dsiApiService = dsiApiService ?? throw new ArgumentNullException(nameof(dsiApiService));
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
+    private readonly ILogger<DsiUserService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private const string OrganisationSessionKey = "CurrentOrganisationId";
-
-    public DsiUserService(
-        IDsiApiService dsiApiService,
-        IHttpContextAccessor httpContextAccessor,
-        ILogger<DsiUserService> logger)
-    {
-        _dsiApiService = dsiApiService ?? throw new ArgumentNullException(nameof(dsiApiService));
-        _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
 
     public async Task<DsiUser?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
     {
@@ -44,7 +34,7 @@ public class DsiUserService : IDsiUserService
 
             // Get organisation data from claims
             var organisationClaim = principal.FindFirst("organisation")?.Value;
-            var organisations = new System.Collections.Generic.List<DsiOrganisation>();
+            var organisations = new List<DsiOrganisation>();
 
             if (!string.IsNullOrEmpty(organisationClaim))
             {

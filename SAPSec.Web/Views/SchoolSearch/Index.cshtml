@@ -1,0 +1,16 @@
+﻿@using SAPSec.Web.Constants
+@using SAPSec.Web.ViewModels
+@model SAPSec.Web.ViewModels.SchoolSearchQueryViewModel
+@{
+    ViewData[ViewDataKeys.Title] = PageTitles.FindOrganisationSchool;
+}
+
+
+@await Html.PartialAsync("_SchoolSearchQuery", new SchoolSearchQueryViewModel
+{
+    Query = Model.Query
+})
+
+
+@await Html.PartialAsync("_SchoolSearchSuggest")
+

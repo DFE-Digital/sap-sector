@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Model.DsiUser;
+﻿namespace SAPSec.Core.Model;
 
 public class DsiUser
 {

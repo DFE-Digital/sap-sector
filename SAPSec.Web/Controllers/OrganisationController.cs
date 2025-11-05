@@ -1,27 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Interfaces.Services.IDsiApiService;
 
 namespace SAPSec.Web.Controllers;
 
 [Route("[controller]")]
-[Authorize]
-public class OrganisationController : Controller
+//[Authorize]
+public class OrganisationController(
+    IDsiUserService userService,
+    IDsiApiService apiService,
+    ILogger<OrganisationController> logger) : Controller
 {
-    private readonly IDsiUserService _userService;
-    private readonly IDsiApiService _apiService;
-    private readonly ILogger<OrganisationController> _logger;
-
-    public OrganisationController(
-        IDsiUserService userService,
-        IDsiApiService apiService,
-        ILogger<OrganisationController> logger)
-    {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IDsiUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly IDsiApiService _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+    private readonly ILogger<OrganisationController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet("details")]
     public async Task<IActionResult> Details()

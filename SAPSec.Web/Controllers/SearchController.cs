@@ -4,20 +4,13 @@ using SAPSec.Core.Interfaces.Services;
 
 namespace SAPSec.Web.Controllers;
 
-[Authorize]  
-public class SearchController : Controller
+//[Authorize]
+public class SearchController(IDsiUserService userService) : Controller
 {
-    private readonly IDsiUserService _userService;
-
-    public SearchController(IDsiUserService userService)
-    {
-        _userService = userService;
-    }
-
     public async Task<IActionResult> Index()
     {
-        var user = await _userService.GetUserFromClaimsAsync(User);
-        var organisation = await _userService.GetCurrentOrganisationAsync(User);
+        var user = await userService.GetUserFromClaimsAsync(User);
+        var organisation = await userService.GetCurrentOrganisationAsync(User);
 
         ViewBag.User = user;
         ViewBag.Organisation = organisation;

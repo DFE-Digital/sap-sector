@@ -8,18 +8,12 @@ using SAPSec.Core.Interfaces.Services;
 namespace SAPSec.Web.Controllers;
 
 [Route("[controller]")]
-public class AuthController : Controller
+public class AuthController(
+    IDsiUserService userService,
+    ILogger<AuthController> logger) : Controller
 {
-    private readonly IDsiUserService _userService;
-    private readonly ILogger<AuthController> _logger;
-
-    public AuthController(
-        IDsiUserService userService,
-        ILogger<AuthController> logger)
-    {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IDsiUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly ILogger<AuthController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet("sign-in")]
     public IActionResult SignIn(string? returnUrl = null)

@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Model.DsiConfiguration;
+﻿namespace SAPSec.Core.Model;
 
 public class DsiConfiguration
 {

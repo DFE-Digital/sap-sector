@@ -1,21 +1,19 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Web.Models;
+using SAPSec.Core.Configuration;
+using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController(IConfiguration configuration, IWebHostEnvironment environment) : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
     public IActionResult Index()
     {
-        return View();
+        var settings = configuration.GetSection("DFESignInSettings").Get<DfeSignInSettings>();
+
+        var startNowUrl = environment.IsProduction() ? settings?.SignInUri : Url.Action("Index", "school", null);
+
+        return View(new HomeViewModel { StartNowUri = startNowUrl });
     }
 
     public IActionResult Privacy()
