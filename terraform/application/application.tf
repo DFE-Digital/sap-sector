@@ -24,6 +24,22 @@ data "azurerm_key_vault_secret" "dsi_service_id" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
+data "azurerm_key_vault_secret" "sign_in_url" {
+  name         = "SignInUri"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "help_uri" {
+  name         = "HelpUri"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "register_uri" {
+  name         = "RegisterUri"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+
 
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
@@ -63,6 +79,9 @@ module "application_configuration" {
     DsiConfiguration__ClientSecret = data.azurerm_key_vault_secret.dsi_client_secret.value
     DsiConfiguration__ApiSecret    = data.azurerm_key_vault_secret.dsi_api_secret.value
     DsiConfiguration__ServiceId    = data.azurerm_key_vault_secret.dsi_service_id.value
+    DFESignInSettings__SignInUri   = data.azurerm_key_vault_secret.sign_in_url.value
+    DFESignInSettings__HelpUri     = data.azurerm_key_vault_secret.help_uri.value
+    DFESignInSettings__RegisterUri = data.azurerm_key_vault_secret.register_uri.value
   }
 }
 
