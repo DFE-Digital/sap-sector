@@ -1,16 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Parlot.Fluent;
+using SAPSec.Core.Configuration;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Interfaces.Services.IDsiApiService;
 using SAPSec.Core.Model.DsiConfiguration;
 using SAPSec.Core.Services;
 using SAPSec.Core.Services.DsiApiService;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace SAPSec.Web.Extensions;
 
@@ -20,167 +20,95 @@ public static class DsiAuthenticationExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // Configure DSI settings
-        services.Configure<DsiConfiguration>(
-            configuration.GetSection("DsiConfiguration"));
+        services.Configure<DsiConfiguration>(configuration.GetSection("DsiConfiguration"));
 
-        var dsiConfig = configuration
-            .GetSection("DsiConfiguration")
-            .Get<DsiConfiguration>();
+        var dsiConfig = configuration.GetSection("DsiConfiguration").Get<DsiConfiguration>();
 
-        if (dsiConfig == null)
+        if (string.IsNullOrEmpty(dsiConfig?.ClientId))
         {
-            throw new InvalidOperationException(
-                "DsiConfiguration section not found in configuration");
+            throw new InvalidOperationException("DsiConfiguration:ClientId is required");
         }
 
-        // Register services
-        services.AddHttpClient<IDsiApiService, DsiApiService>();
-        services.AddScoped<IDsiUserService, DsiUserService>();
-        services.AddHttpContextAccessor();
-
-        // Configure session
-        services.AddSession(options =>
-        {
-            options.IdleTimeout = TimeSpan.FromMinutes(60);
-            options.Cookie.HttpOnly = true;
-            options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        });
-
-        // Clear default claim mappings
-        JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
-
-        // Configure authentication
         services.AddAuthentication(options =>
         {
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
         })
-        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        .AddCookie(options =>
         {
-            options.ExpireTimeSpan = TimeSpan.FromHours(1);
-            options.SlidingExpiration = true;
-            options.LoginPath = "/auth/sign-in";
-            options.LogoutPath = "/auth/sign-out";
-            options.AccessDeniedPath = "/auth/access-denied";
-            options.Cookie.Name = "SapSector.Auth";
+            options.Cookie.Name = "SAPSec.Auth";
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
+            options.ExpireTimeSpan = TimeSpan.FromMinutes(dsiConfig.TokenExpiryMinutes);
+            options.SlidingExpiration = true;
         })
         .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
         {
             options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             options.Authority = dsiConfig.Authority;
-            options.RequireHttpsMetadata = dsiConfig.RequireHttpsMetadata;
             options.ClientId = dsiConfig.ClientId;
             options.ClientSecret = dsiConfig.ClientSecret;
             options.ResponseType = OpenIdConnectResponseType.Code;
             options.SaveTokens = true;
             options.GetClaimsFromUserInfoEndpoint = true;
-            options.CallbackPath = dsiConfig.CallbackPath;
-            options.SignedOutCallbackPath = dsiConfig.SignedOutCallbackPath;
+            options.CallbackPath = new PathString(dsiConfig.CallbackPath);
+            options.SignedOutCallbackPath = new PathString(dsiConfig.SignedOutCallbackPath);
+            options.RequireHttpsMetadata = dsiConfig.RequireHttpsMetadata;
             options.MetadataAddress = dsiConfig.MetadataAddress;
 
-            // Configure scopes
+            // CRITICAL: Handle redirects properly for production
+            options.Events = new OpenIdConnectEvents
+            {
+                OnRedirectToIdentityProvider = context =>
+                {
+                    // Force HTTPS for production environment
+                    if (!context.HttpContext.Request.Host.Host.Contains("localhost"))
+                    {
+                        var callbackPath = dsiConfig.CallbackPath;
+                        var host = context.HttpContext.Request.Host.ToUriComponent();
+                        context.ProtocolMessage.RedirectUri = $"https://{host}{callbackPath}";
+
+                        // Log for debugging
+                        var logger = context.HttpContext.RequestServices
+                            .GetRequiredService<ILogger<OpenIdConnectHandler>>();
+                        logger.LogInformation("DSI Redirect URI: {RedirectUri}",
+                            context.ProtocolMessage.RedirectUri);
+                    }
+
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    var logger = context.HttpContext.RequestServices
+                        .GetRequiredService<ILogger<OpenIdConnectHandler>>();
+                    logger.LogError(context.Exception, "DSI Authentication failed");
+                    return Task.CompletedTask;
+                }
+            };
+
             options.Scope.Clear();
             options.Scope.Add("openid");
-            options.Scope.Add("profile");
             options.Scope.Add("email");
+            options.Scope.Add("profile");
             options.Scope.Add("organisation");
 
-            // Configure token validation
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateIssuer = dsiConfig.ValidateIssuer,
                 ValidIssuer = dsiConfig.Issuer,
                 ValidateAudience = dsiConfig.ValidateAudience,
-                ValidAudience = dsiConfig.ClientId,
+                ValidAudience = dsiConfig.Audience,
                 ValidateLifetime = dsiConfig.ValidateLifetime,
                 ClockSkew = TimeSpan.FromMinutes(5)
             };
-
-            // Handle events
-            options.Events = new OpenIdConnectEvents
-            {
-                OnTokenValidated = OnTokenValidated,
-                OnAuthenticationFailed = OnAuthenticationFailed,
-                OnRemoteFailure = OnRemoteFailure,
-                OnRedirectToIdentityProvider = OnRedirectToIdentityProvider,
-                OnRedirectToIdentityProviderForSignOut = OnRedirectToIdentityProviderForSignOut
-            };
         });
 
+        services.AddHttpContextAccessor();
+        services.AddScoped<IDsiUserService, DsiUserService>();
+        services.AddHttpClient<IDsiApiService, DsiApiService>();
+
         return services;
-    }
-
-    private static Task OnTokenValidated(TokenValidatedContext context)
-    {
-        if (context.Principal?.Identity is ClaimsIdentity identity)
-        {
-            // Extract and add custom claims from the token
-            if (context.SecurityToken is JwtSecurityToken token)
-            {
-                // Add organisation claim if present
-                var orgClaim = token.Claims.FirstOrDefault(c => c.Type == "organisation");
-                if (orgClaim != null && !string.IsNullOrEmpty(orgClaim.Value))
-                {
-                    identity.AddClaim(new Claim("organisation", orgClaim.Value));
-                }
-
-                // Add role claims if present
-                var roleClaims = token.Claims.Where(c => c.Type == "role");
-                foreach (var roleClaim in roleClaims)
-                {
-                    identity.AddClaim(new Claim(ClaimTypes.Role, roleClaim.Value));
-                }
-            }
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private static Task OnAuthenticationFailed(AuthenticationFailedContext context)
-    {
-        context.Response.Redirect("/auth/error");
-        context.HandleResponse();
-        return Task.CompletedTask;
-    }
-
-    private static Task OnRemoteFailure(RemoteFailureContext context)
-    {
-        context.Response.Redirect("/auth/error");
-        context.HandleResponse();
-        return Task.CompletedTask;
-    }
-
-    private static Task OnRedirectToIdentityProvider(RedirectContext context)
-    {
-            if (context.ProtocolMessage.RequestType == OpenIdConnectRequestType.Logout)
-            {
-                var request = context.Request;
-                var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-
-                context.ProtocolMessage.PostLogoutRedirectUri = $"{baseUrl}/auth/signed-out";
-
-                var idToken = context.HttpContext.User.FindFirst("id_token")?.Value;
-                if (!string.IsNullOrEmpty(idToken))
-                {
-                    context.ProtocolMessage.IdTokenHint = idToken;
-                }
-            }
-            return Task.CompletedTask;
-    }
-
-    private static Task OnRedirectToIdentityProviderForSignOut(
-        RedirectContext context)
-    {
-        var request = context.Request;
-        var baseUrl = $"{request.Scheme}://{request.Host}{request.PathBase}";
-        var postLogoutRedirectUri = $"{baseUrl}/signout-callback-oidc";
-        context.ProtocolMessage.PostLogoutRedirectUri = postLogoutRedirectUri;
-
-        return Task.CompletedTask;
     }
 }
