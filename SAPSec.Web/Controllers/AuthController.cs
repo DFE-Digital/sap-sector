@@ -98,6 +98,7 @@ public class AuthController : Controller
         return RedirectToAction("Index", "Home");
     }
 
+
     [HttpGet("access-denied")]
     public IActionResult AccessDenied()
     {
