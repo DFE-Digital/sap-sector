@@ -56,14 +56,14 @@ module "application_configuration" {
   is_rails_application = true
 
   config_variables = {
-     ASPNETCORE_ENVIRONMENT = "Development" 
+    ASPNETCORE_ENVIRONMENT = var.environment == "review" ? "Development" : title(var.environment)
     PGSSLMODE        = local.postgres_ssl_mode
 
     DsiConfiguration__ServiceName           = "SAP Sector Service"
     DsiConfiguration__ApiUri                = local.dsi_urls.api_uri
     DsiConfiguration__Authority             = local.dsi_urls.authority
     DsiConfiguration__Issuer                = local.dsi_urls.issuer
-    DsiConfiguration__Audience              = "signin.education.gov.uk"
+    DsiConfiguration__Audience              = "SAP"
     DsiConfiguration__MetadataAddress       = local.dsi_urls.metadata_address
     DsiConfiguration__CallbackPath          = "/signin-oidc"
     DsiConfiguration__SignedOutCallbackPath = "/signout-callback-oidc"
