@@ -27,14 +27,15 @@
                     </p>
                 }
                 <div class="govuk-input__wrapper">
-                    <div class="autocomplete-wrapper">
-                        <input type="text"
-                               id="@nameof(SchoolSearchQueryViewModel.Query)"
-                               name="@nameof(SchoolSearchQueryViewModel.Query)"
-                               class="govuk-input @(hasError ? "govuk-input--error" : string.Empty)"
-                               value="@Model.Query"
-                               data-fallback-input="true"
-                               aria-describedby="@nameof(SchoolSearchQueryViewModel.Query)-hint @(hasError ? $"{nameof(SchoolSearchQueryViewModel.Query)}-error" : string.Empty)" />
+                    <div class="school-search-suggester-wrapper">
+                        <input
+                            id="@nameof(SchoolSearchQueryViewModel.Query)"
+                            name="@nameof(SchoolSearchQueryViewModel.Query)"
+                            class="govuk-input @(hasError ? "govuk-input--error" : string.Empty)"
+                            value="@Model.Query"
+                            type="text" spellcheck="false"
+                            data-fallback-input="true"
+                            aria-describedby="@nameof(SchoolSearchQueryViewModel.Query)-hint @(hasError ? $"{nameof(SchoolSearchQueryViewModel.Query)}-error" : string.Empty)"/>
                     </div>
                     <div class="govuk-input__suffix govuk-input__suffix__button">
                         <button type="submit" class="govuk-button" data-module="govuk-button" name="action">

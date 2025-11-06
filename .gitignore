@@ -503,3 +503,5 @@ wwwroot/**/*.min.css
 wwwroot/**/*.min.js
 **/wwwroot/lib/
 /TestCoverageReport
+**/wwwroot/*
+**/wwwroot/*

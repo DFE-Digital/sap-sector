@@ -1,17 +1,19 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using SAPSec.Core.Configuration;
+using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
+using SmartBreadcrumbs.Attributes;
 
 namespace SAPSec.Web.Controllers;
 
-public class HomeController(IConfiguration configuration, IWebHostEnvironment environment) : Controller
+public class HomeController(IOptions<DfeSignInSettings> configuration, IWebHostEnvironment environment) : Controller
 {
+    [DefaultBreadcrumb(PageTitles.ServiceHome)]
     public IActionResult Index()
     {
-        var settings = configuration.GetSection("DFESignInSettings").Get<DfeSignInSettings>();
-
-        var startNowUrl = environment.IsProduction() ? settings?.SignInUri : Url.Action("Index", "school", null);
+        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Url.Action("Index", "school", null);
 
         return View(new HomeViewModel { StartNowUri = startNowUrl });
     }

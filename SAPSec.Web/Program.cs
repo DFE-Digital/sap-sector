@@ -1,15 +1,16 @@
-﻿using GovUk.Frontend.AspNetCore;
-using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
-using SAPSec.Core.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
+using Microsoft.AspNetCore.HttpOverrides;
 using SAPSec.Core;
 using SAPSec.Infrastructure;
+using SmartBreadcrumbs.Extensions;
 
 namespace SAPSec.Web;
 
@@ -21,11 +22,6 @@ public partial class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddGovUkFrontend(options =>
-        {
-            options.Rebrand = true;
-        });
-
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -33,13 +29,26 @@ public partial class Program
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
 
-        builder.Services.Configure<DfeSignInSettings>(
-                  builder.Configuration.GetSection("DFESignInSettings"));
         builder.Services.AddRazorPages();
+
+        builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
+        {
+            options.TagClasses = "govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile";
+            options.OlClasses = "govuk-breadcrumbs__list";
+            options.LiTemplate = "<li class=\"govuk-breadcrumbs__list-item\"><a class=\"govuk-breadcrumbs__link\" href=\"{1}\">{0}</a></li>";
+            options.ActiveLiTemplate = " ";
+        });
+
+        var configBuilder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", true, true)
+            .AddUserSecrets<Program>()
+            .AddEnvironmentVariables();
+
+        var config = configBuilder.Build();
 
         if (!builder.Environment.IsDevelopment())
         {
-            builder.Services.AddDsiAuthentication(builder.Configuration);
+            builder.Services.AddDsiAuthentication(config);
         }
 
         builder.Services.AddDistributedMemoryCache();
@@ -105,10 +114,15 @@ public partial class Program
 
             app.UseAuthentication();
             app.UseAuthorization();
-        }
 
-        // Security headers middleware - MUST come before static files
-        app.UseSecurityHeaders();
+            // Security headers middleware - MUST come before static files
+            app.AddMiddleware();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedProto
+            });
+        }
 
         app.UseHttpsRedirection();
 
@@ -158,9 +172,8 @@ public partial class Program
 
         app.UseSession();
 
-        app.UseGovUkFrontend();
-
         app.MapControllers();
+
         app.MapRazorPages();
 
         app.MapControllerRoute(

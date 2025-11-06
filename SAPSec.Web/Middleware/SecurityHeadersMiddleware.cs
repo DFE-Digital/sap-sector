@@ -1,4 +1,4 @@
-﻿using SAPSec.Web.Helpers;
+﻿using System.Security.Cryptography;
 
 namespace SAPSec.Web.Middleware;
 
@@ -7,7 +7,7 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext context)
     {
         // Set script nonce early
-        var nonce = CSPHelper.RandomCharacters;
+        var nonce = GenerateRandom();
         context.Items["ScriptNonce"] = nonce;
 
         // Set all security headers before processing the request
@@ -41,12 +41,16 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
 
         await next(context);
     }
-}
 
-public static class SecurityHeadersMiddlewareExtensions
-{
-    public static IApplicationBuilder UseSecurityHeaders(this IApplicationBuilder builder)
+    private static string GenerateRandom()
     {
-        return builder.UseMiddleware<SecurityHeadersMiddleware>();
+        var byteArray = new byte[32];
+
+        using (var generator = RandomNumberGenerator.Create())
+        {
+            generator.GetBytes(byteArray);
+        }
+
+        return Convert.ToBase64String(byteArray);
     }
 }

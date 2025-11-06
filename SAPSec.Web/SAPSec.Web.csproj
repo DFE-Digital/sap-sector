@@ -9,14 +9,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.4.1" />
+    <PackageReference Include="IdentityModel"/>
+    <PackageReference Include="Azure.Identity"/>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.21" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
+    <PackageReference Include="SmartBreadcrumbs" Version="3.6.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
     <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
   </ItemGroup>
-
+    
 </Project>

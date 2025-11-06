@@ -1,7 +1,6 @@
 @using SAPSec.Web.ViewModels
-<link rel="stylesheet" href="/css/accessible-autocomplete.css" />
-<script type="text/javascript" src="/js/accessible-autocomplete.min.js" nonce="@Context.Items["ScriptNonce"]"></script>
-<script type="text/javascript" nonce="@Context.Items["ScriptNonce"]">
+<script type="text/javascript" src="/js/accessible-autocomplete.min.js" asp-append-version="true"></script>
+<script add-nonce="true">
   // Sending requests to a server means that when the autocomplete has no
   // result, it may not be because there are no results, but because these
   // results are being fetched, or because an error happened. We can use the
@@ -69,7 +68,7 @@
   }
 
   // And finally, we can set up our accessible autocomplete
-  const element = document.querySelector('.autocomplete-wrapper')
+  const element = document.querySelector('.school-search-suggester-wrapper')
   const id = '@nameof(SchoolSearchQueryViewModel.Query)'
 
   // Find and remove the fallback input before initializing autocomplete
@@ -91,7 +90,7 @@
     menuAttributes: {
       "aria-labelledby": id
     },
-    inputClasses: "govuk-input"
+    inputClasses: "govuk-input-autocomplete"
   })
 
   // Apply error styling if needed
