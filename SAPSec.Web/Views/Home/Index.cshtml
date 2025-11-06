@@ -1,45 +1,108 @@
 ﻿@using SAPSec.Core.Configuration
+@using Microsoft.Extensions.Options
 @inject IConfiguration Configuration
+@inject IOptions<DsiConfiguration> DsiConfig
+@inject IWebHostEnvironment Environment
 @{
     ViewData["Title"] = "School Profile - Sector facing";
     var settings = Configuration.GetSection("DFESignInSettings").Get<DfeSignInSettings>();
+    var dsiConfig = DsiConfig.Value;
 }
-
 <div class="govuk-width-container">
     <main class="govuk-main-wrapper govuk-main-wrapper--l" id="main-content" role="main">
 
+        @* ✅ DEBUG SECTION - Only shows in Development mode *@
+        @if (Environment.IsDevelopment())
+        {
+            <div class="govuk-warning-text" style="background: #fff3cd; padding: 20px; border: 2px solid #ffc107; margin-bottom: 30px;">
+                <h2 class="govuk-heading-m">🔍 Debug Info (Development Only)</h2>
+                <dl class="govuk-summary-list" style="font-family: monospace; font-size: 12px;">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">ASPNETCORE_ENVIRONMENT</dt>
+                        <dd class="govuk-summary-list__value">@Environment.EnvironmentName</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">Client ID</dt>
+                        <dd class="govuk-summary-list__value">@(dsiConfig.ClientId ?? "❌ NOT SET")</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">Client Secret</dt>
+                        <dd class="govuk-summary-list__value">
+                            @if (string.IsNullOrEmpty(dsiConfig.ClientSecret))
+                            {
+                                <span style="color: red;">❌ NOT SET</span>
+                            }
+                            else
+                            {
+                                <span style="color: green;">✅ SET (Length: @dsiConfig.ClientSecret.Length chars)</span>
+                                <br />
+                                <span style="color: gray;">First 6 chars: @dsiConfig.ClientSecret.Substring(0, Math.Min(6, dsiConfig.ClientSecret.Length))...</span>
+                            }
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">API Secret</dt>
+                        <dd class="govuk-summary-list__value">
+                            @if (string.IsNullOrEmpty(dsiConfig.ApiSecret))
+                            {
+                                <span style="color: red;">❌ NOT SET</span>
+                            }
+                            else
+                            {
+                                <span style="color: green;">✅ SET (Length: @dsiConfig.ApiSecret.Length chars)</span>
+                            }
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">Service ID</dt>
+                        <dd class="govuk-summary-list__value">@(dsiConfig.ServiceId ?? "❌ NOT SET")</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">Authority</dt>
+                        <dd class="govuk-summary-list__value">@dsiConfig.Authority</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">Callback Path</dt>
+                        <dd class="govuk-summary-list__value">@dsiConfig.CallbackPath</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key" style="font-weight: bold;">Metadata Address</dt>
+                        <dd class="govuk-summary-list__value" style="word-break: break-all;">@dsiConfig.MetadataAddress</dd>
+                    </div>
+                </dl>
+                <p style="color: #856404; margin-top: 10px;">
+                    <strong>⚠️ This debug info is only visible in Development mode and will be hidden in Production.</strong>
+                </p>
+            </div>
+        }
+
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-
                 <h1 class="govuk-heading-xl">
                     Compare and find schools
                 </h1>
-
                 <p class="govuk-body">
-                    Use this service to search for similar schools in England and Comapre their academic perform to your school
+                    Use this service to search for similar schools in England and compare their academic performance to your school.
                 </p>
-
                 <p class="govuk-body">
                     This service uses data from the Department for Education to help you
                     understand how your school compares to other schools with similar
                     characteristics, such as:
                 </p>
-
                 <ul class="govuk-list govuk-list--bullet">
                     <li>number of pupils</li>
                     <li>eligibility for free school meals</li>
                     <li>SEN support</li>
                 </ul>
-
                 <p class="govuk-body">
                     It can also help you to identify strengths and weaknesses with your school's
-                    performance so that you can get the help and support you need to improve it
+                    performance so that you can get the help and support you need to improve it.
                 </p>
-
                 <p class="govuk-body">
-                    You will need a <a href="" class="govuk-link">DfE Sign-in</a> account to access this service.
+                    You will need a
+                    <a href="@settings?.SignInUri" class="govuk-link" target="_blank" rel="noopener noreferrer">DfE Sign-in</a>
+                    account to access this service.
                 </p>
-
                 <a asp-controller="Auth"
                    asp-action="SignIn"
                    asp-route-returnUrl="/Search"
@@ -54,6 +117,5 @@
                 </a>
             </div>
         </div>
-
     </main>
 </div>
