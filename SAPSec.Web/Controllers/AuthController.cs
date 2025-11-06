@@ -26,66 +26,15 @@ public class AuthController : Controller
     {
         if (_userService.IsAuthenticated(User))
         {
-            return RedirectToAction("Index");
+            return RedirectToLocal(returnUrl);
         }
 
         var properties = new AuthenticationProperties
         {
-            RedirectUri = returnUrl,
-            Items = { { "returnUrl", returnUrl ?? "/" } }
+            RedirectUri = returnUrl ?? "/Search" // ✅ This is where user goes after auth
         };
 
         return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
-    }
-
-    [HttpGet("sign-in-callback")]
-    public async Task<IActionResult> SignInCallback(string? returnUrl = null)
-    {
-        try
-        {
-            var authenticateResult = await HttpContext.AuthenticateAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme);
-
-            if (!authenticateResult.Succeeded)
-            {
-                _logger.LogWarning("Authentication failed");
-                return RedirectToAction("Error", "Home");
-            }
-
-            var user = await _userService.GetUserFromClaimsAsync(User);
-            if (user == null)
-            {
-                _logger.LogWarning("Failed to get user from claims");
-                return RedirectToAction("Error", "Home");
-            }
-
-            _logger.LogInformation(
-                "User {Email} signed in successfully",
-                user.Email);
-
-            // If user has multiple organisations, redirect to organisation selection
-            if (user.Organisations.Count > 1)
-            {
-                return RedirectToAction(
-                    nameof(SelectOrganisation),
-                    new { returnUrl });
-            }
-
-            // If user has one organisation, set it as current
-            if (user.Organisations.Count == 1)
-            {
-                await _userService.SetCurrentOrganisationAsync(
-                    User,
-                    user.Organisations[0].Id);
-            }
-
-            return RedirectToLocal(returnUrl);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during sign-in callback");
-            return RedirectToAction("Error", "Home");
-        }
     }
 
     [HttpGet("select-organisation")]
@@ -137,13 +86,12 @@ public class AuthController : Controller
     public async Task<IActionResult> SignOut()
     {
         var userId = _userService.GetUserId(User);
-
         _logger.LogInformation("User {UserId} signing out", userId);
 
         // Clear session
         HttpContext.Session.Clear();
 
-        // Sign out of both the cookie scheme and OIDC
+        // Sign out of both schemes
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
@@ -169,6 +117,6 @@ public class AuthController : Controller
             return Redirect(returnUrl);
         }
 
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Search"); // ✅ Default to Search page
     }
 }

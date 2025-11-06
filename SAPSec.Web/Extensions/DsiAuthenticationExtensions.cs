@@ -135,9 +135,7 @@ public static class DsiAuthenticationExtensions
                         return Task.CompletedTask;
                     },
 
-                    // Triggered after successful token validation
-                    // Process user claims and organization
-                    OnTokenValidated = context =>
+                    OnTokenValidated = async context =>
                     {
                         var logger = context.HttpContext.RequestServices
                             .GetRequiredService<ILogger<Program>>();
@@ -155,17 +153,45 @@ public static class DsiAuthenticationExtensions
                                 "UserId: {UserId}, Email: {Email}, Name: {Name}, Organisation: {Organisation}",
                                 userId, email, name, organisation);
 
-                            // You can add custom claims processing here
-                            // For example, load user roles, permissions, school access, etc.
-                            // Similar to how benchmarking code does IdentifyValidClaims
+                            // ✅ Handle organization selection HERE
+                            var userService = context.HttpContext.RequestServices
+                                .GetRequiredService<IDsiUserService>();
 
-                            return Task.CompletedTask;
+                            var user = await userService.GetUserFromClaimsAsync(context.Principal!);
+
+                            if (user != null)
+                            {
+                                // If user has one organisation, set it automatically
+                                if (user.Organisations.Count == 1)
+                                {
+                                    await userService.SetCurrentOrganisationAsync(
+                                        context.Principal!,
+                                        user.Organisations[0].Id);
+
+                                    logger.LogInformation(
+                                        "Automatically set organisation {OrgId} for user {UserId}",
+                                        user.Organisations[0].Id, userId);
+                                }
+                                // If multiple organisations, redirect to selection page
+                                else if (user.Organisations.Count > 1)
+                                {
+                                    logger.LogInformation(
+                                        "User {UserId} has {Count} organisations, needs to select one",
+                                        userId, user.Organisations.Count);
+
+                                    // Store original return URL
+                                    var returnUrl = context.Properties?.Items["returnUrl"] ?? "/Search";
+                                    context.Properties!.RedirectUri = $"/Auth/select-organisation?returnUrl={returnUrl}";
+                                }
+                            }
+
+                            return;
                         }
                         catch (Exception ex)
                         {
                             logger.LogError(ex, "Error processing validated token for user");
                             context.Fail(ex);
-                            return Task.CompletedTask;
+                            return;
                         }
                     },
 
