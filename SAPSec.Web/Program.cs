@@ -81,14 +81,6 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var dataProtectionPath = builder.Environment.IsEnvironment("Test")
-                                 ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                   : "/keys";
-
-        builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-               .SetApplicationName("SAPSec");
-
         var app = builder.Build();
 
         app.UseForwardedHeaders(new ForwardedHeadersOptions
