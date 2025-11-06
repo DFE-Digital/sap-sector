@@ -1,5 +1,6 @@
 ﻿using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.Extensions.FileProviders;
@@ -80,15 +81,12 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var dataProtectionPath = builder.Environment.IsEnvironment("Test")
-                                 ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                   : "/keys";
-
-        builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-               .SetApplicationName("SAPSec");
-
         var app = builder.Build();
+
+        app.UseForwardedHeaders(new ForwardedHeadersOptions
+        {
+            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+        });
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
