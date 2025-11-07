@@ -147,7 +147,9 @@ jobs:
 
   deploy-review-app:
     name: Deployment To Review
-    concurrency: deploy_review_${{ github.event.pull_request.number }}
+    concurrency:
+      group: deploy_review_${{ github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: true
     if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy') }}
     needs: [build]
     environment:
@@ -210,6 +212,9 @@ jobs:
 
   manual_deploy:
     name: Manual deploy
+    concurrency:
+      group: deploy_manual_${{ inputs.environment }}_${{ inputs.pull-request-number || github.run_id }}
+      cancel-in-progress: true
     if: ${{ github.event_name == 'workflow_dispatch' }}
     environment:
       name: ${{ inputs.environment }}
