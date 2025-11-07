@@ -81,11 +81,8 @@ jobs:
     - name: Build solution
       run: dotnet build --configuration Release --no-restore
 
-    - name: Install Playwright browsers
-      working-directory: Tests/SAPSec.UI.Tests
-      run: |
-        dotnet tool install --global Microsoft.Playwright.CLI
-        playwright install --with-deps chromium
+    - name: Install Playwright
+      uses: microsoft/playwright-github-action@v1
 
     - name: Setup Node
       uses: actions/setup-node@v4
@@ -100,39 +97,48 @@ jobs:
         npm ci
         npm run build-fe
 
-    - name: Run All Tests
+    - name: Run All Tests with Coverage
       env:
         HEADED: 0
         PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
       run: |
-        echo "Running tests sequentially to avoid port/fixture race conditions"
+        echo "Running tests with full coverage (including WebApplicationFactory)"
         
-        # Find all test projects
+        mkdir -p TestResults/coverage
+        
         TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
         
-        # Run one by one
+        FIRST=true
         for proj in $TEST_PROJECTS; do
           echo "=== Running tests in $proj ==="
+        
+          MERGE_FLAG=""
+          if [ "$FIRST" = false ]; then
+            MERGE_FLAG="/p:MergeWith=../TestResults/coverage/coverage.json"
+          fi
+          FIRST=false
+        
           dotnet test "$proj" \
             --configuration Release \
             --no-build \
-            --collect:"XPlat Code Coverage" \
-            --settings coverlet.runsettings \
             --results-directory ./TestResults \
             --logger "trx;LogFileName=$(basename $proj .csproj).trx" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:CoverletOutput=./TestResults/coverage/ \
+            $MERGE_FLAG \
+            /p:Include="[SAPSec.Web]*,[SAPSec.Core]*,[SAPSec.Infrastructure]*" \
+            /p:Exclude="[*]*Tests*,[*]AspNetCoreGeneratedDocument.*, [*]AspNetCore.Views*" \
+            /p:SkipAutoProps=true \
             --verbosity normal || exit 1
         done
-        
-        echo "All test projects completed successfully"
 
     - name: Generate Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
       with:
-        # Find all coverage reports from all test runs and combine them
-        reports: './TestResults/**/coverage.cobertura.xml'
+        reports: './TestResults/coverage/coverage.cobertura.xml'
         targetdir: 'TestCoverageReport'
         reporttypes: 'HtmlSummary;Html;Badges'
-        classfilters: '-AspNetCoreGeneratedDocument*;-AspNetCore.Views*'
 
     - name: Upload Coverage Report
       uses: actions/upload-artifact@v4
