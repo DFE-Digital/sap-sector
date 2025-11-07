@@ -105,8 +105,6 @@ jobs:
         HEADED: 0
         PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
       run: |
-        echo "Running tests with full coverage (including WebApplicationFactory)"
-        
         mkdir -p TestResults/coverage
         
         TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
@@ -125,13 +123,13 @@ jobs:
             --configuration Release \
             --no-build \
             --results-directory ./TestResults \
-            --logger "trx;LogFileName=$(basename $proj .csproj).trx" \
+            --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=./TestResults/coverage/ \
+            /p:CoverletOutput=$(pwd)/TestResults/coverage/ \
             $MERGE_FLAG \
-            /p:Include="[SAPSec.Web]*,[SAPSec.Core]*,[SAPSec.Infrastructure]*" \
-            /p:Exclude="[*]*Tests*,[*]AspNetCoreGeneratedDocument.*, [*]AspNetCore.Views*" \
+            /p:Include='[SAPSec.Web]*,[SAPSec.Core]*,[SAPSec.Infrastructure]*' \
+            /p:Exclude='[*]*Tests*,[*]AspNetCoreGeneratedDocument.*, [*]AspNetCore.Views*' \
             /p:SkipAutoProps=true \
             --verbosity normal || exit 1
         done
