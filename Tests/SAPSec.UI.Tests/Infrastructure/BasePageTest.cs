@@ -28,7 +28,8 @@ public abstract class BasePageTest : PageTest
     {
         return new BrowserNewContextOptions
         {
-            BaseURL = _fixture.BaseUrl
+            BaseURL = _fixture.BaseUrl,
+            IgnoreHTTPSErrors = true  // Ignore self-signed cert errors for CI/local dev
         };
     }
 }
