@@ -84,11 +84,24 @@ jobs:
     - name: Install Playwright browsers
       working-directory: Tests/SAPSec.UI.Tests
       run: |
-          pwsh ./bin/Release/net8.0/playwright.ps1 install
+        dotnet tool install --global Microsoft.Playwright.CLI
+        playwright install --with-deps chromium
 
-    - name: Run All Tests (Sequential - Safe for Playwright + Kestrel)
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
+
+    - name: build frontend assets
+      working-directory: SAPSec.UI
+      run: |
+        npm ci
+        npm run build-fe
+
+    - name: Run All Tests
       env:
-        PLAYWRIGHT_BROWSERS_PATH: 0
         HEADED: 0
         PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
       run: |
