@@ -85,7 +85,7 @@ jobs:
       working-directory: Tests/SAPSec.Tests.UI
       run: |
           dotnet build
-          pwsh ./bin/Debug/net8.0/playwright.ps1 install
+          dotnet playwright install
 
     - name: Run All Tests
       run: |
