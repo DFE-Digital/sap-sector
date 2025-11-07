@@ -115,7 +115,7 @@ jobs:
         
           MERGE_FLAG=""
           if [ "$FIRST" = false ]; then
-            MERGE_FLAG="/p:MergeWith=../TestResults/coverage/coverage.json"
+            MERGE_FLAG="/p:MergeWith=$(pwd)/TestResults/coverage/coverage.json"
           fi
           FIRST=false
         
@@ -126,10 +126,10 @@ jobs:
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=$(pwd)/TestResults/coverage/ \
+            /p:CoverletOutput="$(pwd)/TestResults/coverage/" \
             $MERGE_FLAG \
-            /p:Include='[SAPSec.Web]*,[SAPSec.Core]*,[SAPSec.Infrastructure]*' \
-            /p:Exclude='[*]*Tests*,[*]AspNetCoreGeneratedDocument.*, [*]AspNetCore.Views*' \
+            /p:Include="SAPSec.Web*,SAPSec.Core*,SAPSec.Infrastructure*" \
+            /p:Exclude="*Tests*,*AspNetCoreGeneratedDocument.*, *AspNetCore.Views*' \
             /p:SkipAutoProps=true \
             --verbosity normal || exit 1
         done
