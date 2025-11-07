@@ -95,7 +95,7 @@ jobs:
         cache-dependency-path: '**/package-lock.json'
 
     - name: build frontend assets
-      working-directory: SAPSec.UI
+      working-directory: SAPSec.Web
       run: |
         npm ci
         npm run build-fe
