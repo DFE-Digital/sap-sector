@@ -158,7 +158,7 @@ public partial class Program
             {
                 var path = ctx.Context.Request.Path.Value;
                 var contentType = ctx.Context.Response.ContentType;
-                Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
+                //Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
 
                 if (string.IsNullOrEmpty(contentType))
                 {

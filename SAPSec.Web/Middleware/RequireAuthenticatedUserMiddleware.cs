@@ -11,7 +11,7 @@ public class RequireAuthenticatedUserMiddleware(RequestDelegate next)
         var path = context.Request.Path.Value?.ToLowerInvariant();
         if (path != null && (path == "/" || path.StartsWith("/auth") || path.StartsWith("/health") || path.Contains("assets") || path.EndsWith("css") || path.EndsWith("js")))
         {
-            Console.WriteLine($"skipping: {path}");
+            //Console.WriteLine($"skipping: {path}");
             await next(context);
             return;
         }
