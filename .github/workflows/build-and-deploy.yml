@@ -124,11 +124,8 @@ jobs:
             --no-build \
             --results-directory ./TestResults \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura \
             /p:CoverletOutput="$(pwd)/TestResults/coverage/" \
             $MERGE_FLAG \
-            /p:SkipAutoProps=true \
             --verbosity normal || exit 1
         done
 

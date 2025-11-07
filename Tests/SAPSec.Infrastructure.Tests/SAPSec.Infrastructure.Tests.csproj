@@ -26,6 +26,18 @@
     <PackageReference Include="Moq" Version="4.20.72" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <ExcludeByFile>**/*.cshtml,**/*.cshtml.cs,**/*.g.cs,**/obj/**/*,**/Views/**/*</ExcludeByFile>
+    <Exclude>[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*</Exclude>
+    <SkipAutoProps>true</SkipAutoProps>
+    <DeterministicReport>true</DeterministicReport>
+    <UseSourceLink>true</UseSourceLink>
+    <IncludeTestAssembly>false</IncludeTestAssembly>
+    <SingleHit>false</SingleHit>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
   </ItemGroup>

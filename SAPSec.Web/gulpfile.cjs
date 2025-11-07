@@ -7,13 +7,26 @@ const sourcemaps = require("gulp-sourcemaps");
 const rename = require("gulp-rename");
 
 const buildSass = () =>
-  gulp
-    .src("AssetSrc/scss/*.scss")
-    .pipe(sourcemaps.init())
-    .pipe(sass().on("error", sass.logError))
-    .pipe(cleanCSS())
-    .pipe(sourcemaps.write("./"))
-    .pipe(gulp.dest("wwwroot/css"));
+    gulp
+        .src("AssetSrc/scss/*.scss")
+        .pipe(sourcemaps.init())
+        .pipe(
+            sass({
+                logger: {
+                    warn: (message, options) => {
+                        const filePath = options?.span?.url || options?.span?.context?.file || '';
+                        if (!String(filePath).includes('govuk-frontend')) {
+                            // If it's NOT from govuk-frontend, output the warning.
+                            console.warn(message);
+                        }
+                        // If it is from govuk-frontend suppressed
+                    }
+                }
+            }).on("error", sass.logError)
+        )
+        .pipe(cleanCSS())
+        .pipe(sourcemaps.write("./"))
+        .pipe(gulp.dest("wwwroot/css"));
 
 const copyStaticAssets = () =>
   gulp
