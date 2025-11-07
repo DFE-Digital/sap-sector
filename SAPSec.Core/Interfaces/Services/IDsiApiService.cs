@@ -1,6 +1,6 @@
-﻿using SAPSec.Core.Model.DsiUser;
+﻿using SAPSec.Core.Model;
 
-namespace SAPSec.Core.Interfaces.Services.IDsiApiService;
+namespace SAPSec.Core.Interfaces.Services;
 
 public interface IDsiApiService
 {

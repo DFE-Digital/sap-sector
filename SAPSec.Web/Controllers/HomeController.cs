@@ -1,21 +1,21 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Web.Models;
+using Microsoft.Extensions.Options;
+using SAPSec.Core.Configuration;
+using SAPSec.Web.Constants;
+using SAPSec.Web.ViewModels;
+using SmartBreadcrumbs.Attributes;
 
 namespace SAPSec.Web.Controllers;
 
-public class HomeController : Controller
+public class HomeController(IOptions<DfeSignInSettings> configuration, IWebHostEnvironment environment) : Controller
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
-    {
-        _logger = logger;
-    }
-
+    [DefaultBreadcrumb(PageTitles.ServiceHome)]
     public IActionResult Index()
     {
-        return View();
+        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Url.Action("Index", "school", null);
+
+        return View(new HomeViewModel { StartNowUri = startNowUrl });
     }
 
     public IActionResult Privacy()

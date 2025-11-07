@@ -12,9 +12,11 @@ WORKDIR /app
 
 COPY ./SAPSec.Web/package*.json /app/
 
-RUN npm ci
+COPY ./SAPSec.Web/gulpfile.cjs /app/
 
-COPY ./SAPSec.Web/wwwroot/ /app/wwwroot/
+COPY ./SAPSec.Web/AssetSrc/ /app/AssetSrc/
+
+RUN npm ci
 
 RUN echo "=== Assets build output ===" && \
     echo "Checking wwwroot structure:" && \

@@ -1,5 +1,5 @@
-﻿using SAPSec.Core.Model.DsiUser;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Interfaces.Services;
 

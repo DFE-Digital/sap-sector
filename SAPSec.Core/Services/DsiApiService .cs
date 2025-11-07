@@ -1,16 +1,16 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using SAPSec.Core.Interfaces.Services.IDsiApiService;
-using SAPSec.Core.Model.DsiConfiguration;
-using SAPSec.Core.Model.DsiUser;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using SAPSec.Core.Configuration;
+using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Model;
 
-namespace SAPSec.Core.Services.DsiApiService;
+namespace SAPSec.Core.Services;
 
 public class DsiApiService : IDsiApiService
 {
@@ -24,7 +24,7 @@ public class DsiApiService : IDsiApiService
         ILogger<DsiApiService> logger)
     {
         _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-        _config = config?.Value ?? throw new ArgumentNullException(nameof(config));
+        _config = config.Value ?? throw new ArgumentNullException(nameof(config));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
         _httpClient.BaseAddress = new Uri(_config.ApiUri);

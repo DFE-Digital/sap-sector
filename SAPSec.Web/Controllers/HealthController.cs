@@ -1,23 +1,15 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SAPSec.Web.Domain;
 
 namespace SAPSec.Web.Controllers
 {
     [ApiController]
     [Produces("application/json")]
     [Route("[controller]")]
-    public class HealthController : ControllerBase
+    public class HealthController(
+        ILogger<HealthController> logger,
+        IWebHostEnvironment environment) : ControllerBase
     {
-        private readonly ILogger<HealthController> _logger;
-        private readonly IWebHostEnvironment _environment;
-
-        public HealthController(
-            ILogger<HealthController> logger,
-            IWebHostEnvironment environment)
-        {
-            _logger = logger;
-            _environment = environment;
-        }
-
         /// <summary>
         /// Health check endpoint that reports the status of the application/service
         /// Returns HTTP 200 if all checks pass, HTTP 500 if any check fails
@@ -48,17 +40,17 @@ namespace SAPSec.Web.Controllers
                 if (healthStatus.Checks.Any(c => c.Status == "Fail"))
                 {
                     healthStatus.Status = "Unhealthy";
-                    _logger.LogWarning("Health check failed: {FailedChecks}",
+                    logger.LogWarning("Health check failed: {FailedChecks}",
                         string.Join(", ", healthStatus.Checks.Where(c => c.Status != "Pass").Select(c => c.Name)));
                     return StatusCode(500, healthStatus);
                 }
 
-                _logger.LogInformation("Health check passed");
+                logger.LogInformation("Health check passed");
                 return Ok(healthStatus);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Health check encountered an unexpected error: {Message}", ex.Message);
+                logger.LogError(ex, "Health check encountered an unexpected error: {Message}", ex.Message);
                 healthStatus.Status = "Unhealthy";
                 healthStatus.Checks.Add(new HealthCheckItem
                 {
@@ -75,8 +67,8 @@ namespace SAPSec.Web.Controllers
             try
             {
                 // Basic check that the application is responding
-                var environmentName = _environment.EnvironmentName ?? "Unknown";
-                var appName = _environment.ApplicationName ?? "SAPSec";
+                var environmentName = environment.EnvironmentName ?? "Unknown";
+                var appName = environment.ApplicationName ?? "SAPSec";
 
                 return new HealthCheckItem
                 {
@@ -87,7 +79,7 @@ namespace SAPSec.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking application status");
+                logger.LogError(ex, "Error checking application status");
                 return new HealthCheckItem
                 {
                     Name = "ApplicationRunning",
@@ -102,7 +94,7 @@ namespace SAPSec.Web.Controllers
             try
             {
                 // Check if wwwroot directory exists
-                var wwwrootPath = _environment.WebRootPath;
+                var wwwrootPath = environment.WebRootPath;
 
                 // If WebRootPath is null, that's not necessarily a failure in test environment
                 if (string.IsNullOrEmpty(wwwrootPath))
@@ -153,7 +145,7 @@ namespace SAPSec.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error checking static files");
+                logger.LogError(ex, "Error checking static files");
                 return new HealthCheckItem
                 {
                     Name = "StaticFiles",
@@ -162,19 +154,5 @@ namespace SAPSec.Web.Controllers
                 };
             }
         }
-    }
-
-    public class HealthCheckResponse
-    {
-        public string Status { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; }
-        public List<HealthCheckItem> Checks { get; set; } = new();
-    }
-
-    public class HealthCheckItem
-    {
-        public string Name { get; set; } = string.Empty;
-        public string Status { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
     }
 }

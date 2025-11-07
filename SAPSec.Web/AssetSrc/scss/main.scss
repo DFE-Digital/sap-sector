@@ -1,0 +1,48 @@
+@import "../../node_modules/govuk-frontend/dist/govuk/index";
+@import "../../node_modules/accessible-autocomplete/dist/accessible-autocomplete.min";
+
+//.school-search-suggester-wrapper {
+//    position: relative;
+//    margin-bottom: 4rem;
+//    width: 500px;
+//}
+
+.govuk-input__suffix {
+  &.govuk-input__suffix__button {
+    border: 0;
+    background: none;
+    padding-left: 0;
+    margin-top: -1px;
+
+    > .govuk-button {
+      margin: 0;
+      background-color: govuk-colour("blue");
+
+      > img {
+        filter: invert(1);
+      }
+
+      &:focus {
+        > img {
+          filter: invert(0);
+        }
+
+        &:hover {
+          background-color: govuk-colour("yellow");
+        }
+      }
+    }
+  }
+}
+
+.govuk-input-autocomplete {
+  width: 411px;
+
+  @include govuk-media-query($from: tablet) {
+    width: 586px;
+  }
+}
+
+.govuk-header__link .govuk-header__logotype {
+  height: 30px;
+}

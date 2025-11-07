@@ -1,66 +1,175 @@
-﻿@{
-    ViewBag.ServiceName = "School Profile - Sector facing";
-}
+﻿@using SAPSec.Web.Constants
+@using SAPSec.Web.Extensions
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - @ViewBag.ServiceName</title>
+    <meta charset="utf-8"/>
+    <title>
+        @if (ViewData.ContainsKey(ViewDataKeys.Title))
+        {
+            <text>@ViewData[ViewDataKeys.Title] - @LayoutConstants.ServiceName - GOV.UK</text>
+        }
+        else
+        {
+            <text>@LayoutConstants.ServiceName - GOV.UK</text>
+        }
+    </title>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-    <meta name="theme-color" content="blue">
-    <link rel="icon" sizes="48x48" href="/~/lib/govuk-frontend/dist/govuk/assets/rebrand/images/favicon.ico">
-    <link rel="icon" sizes="any" href="/~/lib/govuk-frontend/dist/govuk/assets/rebrand/images/favicon.svg" type="image/svg+xml">
-    <link rel="mask-icon" href="~/lib/govuk-frontend/dist/govuk/assets/rebrand/images/govuk-icon-mask.svg" color="blue">
-    <link rel="apple-touch-icon" href="~/lib/govuk-frontend/dist/govuk/assets/rebrand/images/govuk-icon-180.png">
-    <link rel="stylesheet" href="~/lib/dfe-frontend/dist/dfefrontend-2.0.0.min.css" />
-    <script src="~/lib/dfe-frontend/dist/dfefrontend-2.0.0.min.js"></script>
-    <link rel="manifest" href="/assets/rebrand/manifest.json">
-    <meta property="og:image" content="YOUR-DOMAIN/images/govuk-opengraph-image.png">
-    @Html.GovUkFrontendStyleImports()
-    @Html.GovUkFrontendScriptImports()
-    <link rel="stylesheet" href="~/css/site.css" />
+    <meta name="theme-color" content="#0b0c0c">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="icon" sizes="48x48" href="/assets/images/favicon.ico">
+    <link rel="icon" sizes="any" href="/assets/images/favicon.svg" type="image/svg+xml">
+    <link rel="mask-icon" href="/assets/images/govuk-icon-mask.svg" color="#0b0c0c">
+    <link rel="apple-touch-icon" href="/assets/images/govuk-icon-180.png">
+    <link rel="manifest" href="/assets/manifest.json">
+    <link rel="stylesheet" href="/css/accessible-autocomplete.min.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/main.css" asp-append-version="true"/>
+    @* @await Component.InvokeAsync("Analytics") *@
 </head>
+<body class="govuk-template__body govuk-frontend-supported app-body-class">
+<script add-nonce="true">
+    document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
+</script>
 
-<body class="govuk-template__body app-body-class">
-    @Html.GovUkFrontendJsEnabledScript(Html.ScriptNonce().ToString())
-    @await Html.PartialAsync("_CookieBanner")
+<a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+@await Component.InvokeAsync("Cookies")
+<header class="govuk-header" data-module="govuk-header">
+    <div class="govuk-header__container govuk-width-container">
+        <div class="govuk-header__logo">
+            <a href="/" class="govuk-header__link govuk-header__link--homepage">
+                <img src="~/assets/images/department-for-education_white.png"
+                     alt="Department for Education"
+                     class="govuk-header__logotype" />
+            </a>
+        </div>
+        <div class="govuk-header__content">
+            @Html.TrackedAnchor(
+                TrackedLinks.ServiceBanner,
+                "/",
+                LayoutConstants.ServiceName,
+                classes: ["govuk-header__link govuk-header__service-name"])
 
-    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
-    <header class="govuk-header" data-module="govuk-header">
-        <div class="govuk-header__container govuk-width-container">
-            <div class="govuk-header__logo">
-                <a href="/" class="govuk-header__link govuk-header__link--homepage">
-                    <img src="~/assets/images/department-for-education_white.png"
-                         alt="Department for Education"
-                         class="govuk-header__logotype" />
+            @* @if (User.Identity is { IsAuthenticated: true }) *@
+            @* { *@
+            @*     @Html.ActionLink("Sign out", "Signout", "Home", null, new *@
+            @*     { *@
+            @*         @class = "govuk-header__link govuk-header__service-name app-signin govuk-!-display-none-print" *@
+            @*     }) *@
+            @* } *@
+            @* else *@
+            @* { *@
+            @*     @Html.ActionLink("Sign in", "Signin", "Home", new *@
+            @*     { *@
+            @*         redirectUri = ViewContext.HttpContext.Request.Path *@
+            @*     }, new *@
+            @*     { *@
+            @*         @class = "govuk-header__link govuk-header__service-name app-signin govuk-!-display-none-print" *@
+            @*     }) *@
+            @* } *@
+        </div>
+    </div>
+</header>
+
+<nav>
+    <div class="govuk-width-container">
+        @await Component.InvokeAsync("PhaseBanner")
+        <navigation></navigation>
+    </div>
+</nav>
+
+<div class="govuk-width-container app-width-container">
+    <main class="govuk-main-wrapper app-main-class govuk-body" id="main-content">
+        @RenderBody()
+    </main>
+</div>
+
+<footer class="govuk-footer" role="contentinfo">
+    <div class="govuk-width-container ">
+        <div class="govuk-footer__meta">
+            <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                <h2 class="govuk-visually-hidden">Support links</h2>
+                <ul class="govuk-footer__inline-list govuk-!-display-none-print">
+                    <li class="govuk-footer__inline-list-item">
+                        <a class="govuk-footer__link" href="@Url.Action("Index", "Cookies")">
+                            Cookies
+                        </a>
+                    </li>
+                    <li class="govuk-footer__inline-list-item">
+                        <a class="govuk-footer__link" href="@Url.Action("Accessibility", "StaticContent")">
+                            Accessibility
+                        </a>
+                    </li>
+                    <li class="govuk-footer__inline-list-item">
+                        <a class="govuk-footer__link"
+                           href="https://www.gov.uk/government/organisations/department-for-education/about/personal-information-charter">
+                            Privacy
+                        </a>
+                    </li>
+                    @* <li class="govuk-footer__inline-list-item"> *@
+                    @*     <a class="govuk-footer__link" href="@Url.Action("Index", "DataSource")"> *@
+                    @*         Data Sources *@
+                    @*     </a> *@
+                    @* </li> *@
+                    @* <li class="govuk-footer__inline-list-item"> *@
+                    @*     <a class="govuk-footer__link" href="@Url.Action("Contact", "StaticContent")"> *@
+                    @*         Contact *@
+                    @*     </a> *@
+                    @* </li> *@
+                </ul>
+                <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    class="govuk-footer__licence-logo"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 483.2 195.7"
+                    height="17"
+                    width="41">
+                    <path
+                        fill="currentColor"
+                        d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"/>
+                </svg>
+                <span class="govuk-footer__licence-description">
+                    All content is available under the
+                    <a
+                        class="govuk-footer__link"
+                        href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+                        rel="license">
+                        Open Government Licence v3.0</a>, except where otherwise stated
+                </span>
+            </div>
+            <div class="govuk-footer__meta-item">
+                <a
+                    class="govuk-footer__link govuk-footer__copyright-logo"
+                    href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">
+                    © Crown copyright
                 </a>
             </div>
         </div>
-    </header>
-
-    <govuk-service-navigation service-name="@ViewBag.ServiceName" service-url="#">
-        <govuk-service-navigation-nav>
-        </govuk-service-navigation-nav>
-    </govuk-service-navigation>
-
-    <div class="govuk-width-container app-width-container">
-        @await Html.PartialAsync("_PhaseBanner")
-        <main class="govuk-main-wrapper app-main-class govuk-body" id="main-content">
-            @RenderBody()
-        </main>
     </div>
-    <govuk-footer>
-        <govuk-footer-meta>
-            <govuk-footer-meta-items>
-                <govuk-footer-meta-item href="@Url.Action("Accessibility", "Content")">Accessibility</govuk-footer-meta-item>
-                <govuk-footer-meta-item href="@Url.Action("Cookies", "Content")">Cookies</govuk-footer-meta-item>
-                <govuk-footer-meta-item href="@Url.Action("Privacy", "Content")">Privacy</govuk-footer-meta-item>
-            </govuk-footer-meta-items>
-        </govuk-footer-meta>
-    </govuk-footer>
+</footer>
 
-    @Html.GovUkFrontendScriptImports(Html.ScriptNonce().ToString())
-    @await RenderSectionAsync("Scripts", required: false)
+<script type="module" src="/js/dfefrontend.js" asp-append-version="true"></script>
+<script type="module" src="/js/govuk-frontend.min.js"></script>
+
+<script add-nonce="true">
+    document.getElementById("js-back-link")?.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        history.back();
+    });
+    document.querySelectorAll(".app-print-link").forEach((element) => {
+        if (element.classList.contains("govuk-visually-hidden")) {
+            element.classList.remove("govuk-visually-hidden");
+        }
+
+        element.addEventListener("click", function (ev) {
+            ev.preventDefault();
+            window.print();
+        });
+    })
+</script>
+
+@await RenderSectionAsync("scripts", false)
+
 </body>
 </html>

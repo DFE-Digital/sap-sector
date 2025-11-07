@@ -81,35 +81,76 @@ jobs:
     - name: Build solution
       run: dotnet build --configuration Release --no-restore
 
-    - name: Install Playwright browsers
-      working-directory: SAPSec.Tests.UI
+    - name: Install Playwright
+      working-directory: Tests/SAPSec.UI.Tests
       run: |
-          dotnet build
-          pwsh ./bin/Debug/net8.0/playwright.ps1 install
+        dotnet tool install --global Microsoft.Playwright.CLI
+        playwright install --with-deps chromium
 
-    - name: Run Unit Tests
-      run: |
-          dotnet test SAPSec.Tests.Unit/SAPSec.Tests.Unit.csproj \
-            --collect:"XPlat Code Coverage" \
-            --settings coverlet.runsettings \
-            --results-directory ./TestResults/unit
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
 
-    - name: Run Integration Tests
+    - name: build frontend assets
+      working-directory: SAPSec.Web
       run: |
-          dotnet test SAPSec.Tests.Integration/SAPSec.Tests.Integration.csproj \
-            --collect:"XPlat Code Coverage" \
-            --settings coverlet.runsettings \
-            --results-directory ./TestResults/integration
+        npm ci
+        npm run build-fe
+
+    - name: Run All Tests with Coverage
+      env:
+        HEADED: 0
+        PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
+      run: |
+        mkdir -p TestResults/coverage
+        
+        TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
+        
+        FIRST=true
+        for proj in $TEST_PROJECTS; do
+          echo "=== Running tests in $proj ==="
+        
+          MERGE_FLAG=""
+          if [ "$FIRST" = false ]; then
+            MERGE_FLAG="/p:MergeWith=$(pwd)/TestResults/coverage/coverage.json"
+          fi
+          FIRST=false
+        
+          dotnet test "$proj" \
+            --configuration Release \
+            --no-build \
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
+            /p:CoverletOutput="$(pwd)/TestResults/coverage/" \
+            $MERGE_FLAG \
+            --verbosity normal || exit 1
+        done
 
     - name: Generate Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
       with:
-        reports: './SAPSec.Tests.Unit/coverage.cobertura.xml;./SAPSec.Tests.Integration/coverage.cobertura.xml'
+        reports: './TestResults/coverage/coverage.cobertura.xml'
         targetdir: 'TestCoverageReport'
         reporttypes: 'HtmlSummary;Html;Badges'
-        classfilters: '-AspNetCoreGeneratedDocument*;-AspNetCore.Views*'
 
-    - name: Upload Coverage Report
+    - name: Generate Coverage Markdown Report
+      uses: clearlyip/code-coverage-report-action@v4
+      id: code_coverage_report_action
+      with:
+        filename: './TestResults/coverage/coverage.cobertura.xml'
+
+    - name: Upload Cobertura Coverage Artifact for Comparison
+      if: ${{ github.ref == 'refs/heads/main' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-main
+        path: ./TestResults/coverage/coverage.cobertura.xml
+        # retention-days: 7
+
+    - name: Upload Full Coverage Report
       uses: actions/upload-artifact@v4
       with:
           name: code-coverage-report
@@ -117,7 +158,9 @@ jobs:
 
   deploy-review-app:
     name: Deployment To Review
-    concurrency: deploy_review_${{ github.event.pull_request.number }}
+    concurrency:
+      group: deploy_review_${{ github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: true
     if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy') }}
     needs: [build]
     environment:
@@ -143,31 +186,6 @@ jobs:
         healthcheck: ${{ env.HEALTHCHECK_CMD }}
         db-seed: false
         smoke-test: false
-#        gcp-wip: ${{ vars.GCP_WIP }}
-#        gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Install Playwright browsers
-      working-directory: SAPSec.Tests.UI
-      run: |
-        dotnet build
-        pwsh ./bin/Debug/net8.0/playwright.ps1 install
-
-    - name: Run UI Tests Against Review App
-      env:
-        BASE_URL: ${{ steps.deploy_review.outputs.environment_url }}
-      run: |
-        echo "Running Playwright tests on $BASE_URL"
-        dotnet test SAPSec.Tests.UI/SAPSec.Tests.UI.csproj \
-          --logger "trx;LogFileName=ui-tests.trx" \
-          -- TestRunParameters.Parameter\(name=\"BaseUrl\",value=\"$BASE_URL\"\)
 
   deploy:
     name: Deploy environments
@@ -199,12 +217,12 @@ jobs:
         healthcheck: ${{ env.HEALTHCHECK_CMD }}
         slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
         smoke-test: false
-#        gcp-wip: ${{ vars.GCP_WIP }}
-#        gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
-
 
   manual_deploy:
     name: Manual deploy
+    concurrency:
+      group: deploy_manual_${{ inputs.environment }}_${{ inputs.pull-request-number || github.run_id }}
+      cancel-in-progress: true
     if: ${{ github.event_name == 'workflow_dispatch' }}
     environment:
       name: ${{ inputs.environment }}
@@ -229,52 +247,3 @@ jobs:
         healthcheck: ${{ env.HEALTHCHECK_CMD }}
         slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
         smoke-test: false
-#        db-seed: ${{ inputs.environment == 'review' && 'true' || 'false' }}
-#        gcp-wip: ${{ vars.GCP_WIP }}
-#        gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
-#
-#  deploy_domains_infra:
-#    name: Deploy Domains Infrastructure
-#    runs-on: ubuntu-latest
-#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-#    concurrency: deploy_domains_infra
-#    needs: [deploy]
-#    environment:
-#      name: production
-#    permissions:
-#      id-token: write
-#
-#    steps:
-#    - name: Deploy Domains Infrastructure
-#      uses: DFE-Digital/github-actions/deploy-domains-infra@master
-#      with:
-#        azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
-#        azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
-#        azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-#        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
-#
-#  deploy_domains_env:
-#    name: Deploy Domains to ${{ matrix.domain_environment }} environment
-#    runs-on: ubuntu-latest
-#    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-#    concurrency: deploy_domains_${{ matrix.domain_environment }}
-#    needs: [deploy_domains_infra]
-#    strategy:
-#      max-parallel: 1
-#      matrix:
-#        domain_environment: [development, production]
-#    environment:
-#      name: production
-#    permissions:
-#      id-token: write
-#
-#    steps:
-#    - name: Deploy Domains Environment
-#      uses: DFE-Digital/github-actions/deploy-domains-env@master
-#      with:
-#        azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
-#        azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
-#        azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-#        environment: ${{ matrix.domain_environment }}
-#        healthcheck: healthcheck
-#        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}

@@ -3,26 +3,24 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using Parlot.Fluent;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Interfaces.Services.IDsiApiService;
-using SAPSec.Core.Model.DsiConfiguration;
 using SAPSec.Core.Services;
-using SAPSec.Core.Services.DsiApiService;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using SAPSec.Core.Configuration;
 
 namespace SAPSec.Web.Extensions;
 
 public static class DsiAuthenticationExtensions
 {
-    public static IServiceCollection AddDsiAuthentication(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    public static void AddDsiAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         // Configure DSI settings
-        services.Configure<DsiConfiguration>(
-            configuration.GetSection("DsiConfiguration"));
+        services.AddOptions();
+
+        services.Configure<DsiConfiguration>(configuration.GetSection("DsiConfiguration").Bind);
+
+        services.Configure<DfeSignInSettings>(configuration.GetSection("DfeSignInSettings").Bind);
 
         var dsiConfig = configuration
             .GetSection("DsiConfiguration")
@@ -112,7 +110,13 @@ public static class DsiAuthenticationExtensions
             };
         });
 
-        return services;
+        services.AddAuthorizationBuilder()
+            .AddPolicy("RequireOrganisation", policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireClaim("organisation"))
+            .AddPolicy("AdminOnly", policy =>
+                policy.RequireAuthenticatedUser()
+                    .RequireRole("Admin"));
     }
 
     private static Task OnTokenValidated(TokenValidatedContext context)
@@ -120,7 +124,7 @@ public static class DsiAuthenticationExtensions
         if (context.Principal?.Identity is ClaimsIdentity identity)
         {
             // Extract and add custom claims from the token
-            if (context.SecurityToken is JwtSecurityToken token)
+            if (context.SecurityToken is { } token)
             {
                 // Add organisation claim if present
                 var orgClaim = token.Claims.FirstOrDefault(c => c.Type == "organisation");

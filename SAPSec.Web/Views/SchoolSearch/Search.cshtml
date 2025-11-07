@@ -1,0 +1,33 @@
+@using SAPSec.Web.Constants
+@using SAPSec.Web.ViewModels
+@model SchoolSearchResultsViewModel
+@{
+    ViewData[ViewDataKeys.Title] = PageTitles.FindOrganisationSchool;
+}
+
+@await Html.PartialAsync("_SchoolSearchQuery", new SchoolSearchQueryViewModel
+{
+    Query = Model.Query
+})
+
+
+<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+        @if (Model.Results.Length == 0)
+        {
+            <p id="search-warning" class="govuk-body-s govuk-!-margin-top-1">
+                We couldn't find any schools matching your search criteria.
+            </p>
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-6">
+        }
+        else
+        {
+            @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
+        }
+    </div>
+</div>
+
+
+@await Html.PartialAsync("_SchoolSearchSuggest")

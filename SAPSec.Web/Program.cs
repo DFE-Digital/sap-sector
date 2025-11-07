@@ -1,29 +1,26 @@
-﻿using GovUk.Frontend.AspNetCore;
-using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
-using SAPSec.Core.Configuration;
 using SAPSec.Web.Extensions;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.Middleware;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
+using Microsoft.AspNetCore.HttpOverrides;
+using SAPSec.Core;
+using SAPSec.Infrastructure;
+using SmartBreadcrumbs.Extensions;
 
 namespace SAPSec.Web;
 
+// ReSharper disable once PartialTypeWithSinglePart
 public partial class Program
 {
     [ExcludeFromCodeCoverage]
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
-        builder.Services.AddGovUkFrontend(options =>
-        {
-            options.Rebrand = true;
-        });
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -32,11 +29,27 @@ public partial class Program
                 options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             });
 
-        builder.Services.Configure<DfeSignInSettings>(
-                  builder.Configuration.GetSection("DFESignInSettings"));
         builder.Services.AddRazorPages();
 
-        builder.Services.AddDsiAuthentication(builder.Configuration);
+        builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
+        {
+            options.TagClasses = "govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile";
+            options.OlClasses = "govuk-breadcrumbs__list";
+            options.LiTemplate = "<li class=\"govuk-breadcrumbs__list-item\"><a class=\"govuk-breadcrumbs__link\" href=\"{1}\">{0}</a></li>";
+            options.ActiveLiTemplate = " ";
+        });
+
+        var configBuilder = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", true, true)
+            .AddUserSecrets<Program>()
+            .AddEnvironmentVariables();
+
+        var config = configBuilder.Build();
+
+        if (!builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddDsiAuthentication(config);
+        }
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -55,17 +68,6 @@ public partial class Program
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.AddPolicy("RequireOrganisation", policy =>
-                policy.RequireAuthenticatedUser()
-                      .RequireClaim("organisation"));
-
-            options.AddPolicy("AdminOnly", policy =>
-                policy.RequireAuthenticatedUser()
-                      .RequireRole("Admin"));
-        });
-
         builder.Services.Configure<RazorViewEngineOptions>(options =>
         {
             options.ViewLocationFormats.Add("/{0}.cshtml");
@@ -80,13 +82,23 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var dataProtectionPath = builder.Environment.IsEnvironment("Test")
+        var dataProtectionPath = builder.Environment.IsDevelopment()
                                  ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
                                    : "/keys";
 
         builder.Services.AddDataProtection()
                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
                .SetApplicationName("SAPSec");
+
+        // Search services
+        var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
+        if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
+        {
+            establishmentsCsvPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, establishmentsCsvPath));
+        }
+
+        builder.Services.AddCoreDependencies();
+        builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 
         var app = builder.Build();
 
@@ -99,10 +111,18 @@ public partial class Program
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedProto
+            });
         }
 
         // Security headers middleware - MUST come before static files
-        app.UseSecurityHeaders();
+        app.AddMiddleware(app.Environment.IsDevelopment());
 
         app.UseHttpsRedirection();
 
@@ -138,7 +158,7 @@ public partial class Program
             {
                 var path = ctx.Context.Request.Path.Value;
                 var contentType = ctx.Context.Response.ContentType;
-                Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
+                //Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
 
                 if (string.IsNullOrEmpty(contentType))
                 {
@@ -152,12 +172,8 @@ public partial class Program
 
         app.UseSession();
 
-        app.UseAuthentication();
-        app.UseAuthorization();
-
-        app.UseGovUkFrontend();
-
         app.MapControllers();
+
         app.MapRazorPages();
 
         app.MapControllerRoute(
