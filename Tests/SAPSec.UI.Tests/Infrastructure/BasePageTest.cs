@@ -18,7 +18,7 @@ public abstract class BasePageTest : PageTest
         _fixture = fixture;
 
         //TODO:Uncomment to run tests in headed mode
-        Environment.SetEnvironmentVariable("HEADED", "1");
+        //Environment.SetEnvironmentVariable("HEADED", "1");
     }
 
     /// <summary>

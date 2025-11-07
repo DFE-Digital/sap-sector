@@ -2,10 +2,12 @@
 
 public static class MiddlewareExtensions
 {
-    public static IApplicationBuilder AddMiddleware(this IApplicationBuilder builder)
+    public static void AddMiddleware(this IApplicationBuilder builder, bool isDevelopment)
     {
-        return builder.UseMiddleware<SecurityHeadersMiddleware>()
-            .UseMiddleware<DsiOrganisationMiddleware>()
-            .UseMiddleware<RequireAuthenticatedUserMiddleware>();
+        builder.UseMiddleware<SecurityHeadersMiddleware>();
+
+        if (!isDevelopment)
+            builder.UseMiddleware<DsiOrganisationMiddleware>()
+                .UseMiddleware<RequireAuthenticatedUserMiddleware>();
     }
 }

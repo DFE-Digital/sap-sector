@@ -46,7 +46,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         var input = Page.Locator("input[name='Query']");
-        var button = Page.Locator("button[type='submit']");
+        var button = Page.Locator("button[name='Search']");
         var form = Page.Locator("form");
 
         var inputIsVisible = await input.IsVisibleAsync();
@@ -84,7 +84,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
 
         // Act
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -104,7 +104,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         await Page.Locator("input[name='Query']").FillAsync("AB");
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -124,7 +124,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         await Page.Locator("input[name='Query']").FillAsync("Test School");
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForURLAsync("**/school/search?query=Test%20School");
 
         // Assert
@@ -139,7 +139,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
 
         // Act
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -200,7 +200,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         await Page.Locator("input[name='Query']").FillAsync("Another School");
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -246,7 +246,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         // Act
         var specialQuery = "St. Mary's & John's School (Primary)";
         await Page.Locator("input[name='Query']").FillAsync(specialQuery);
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -261,7 +261,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         await Page.Locator("input[name='Query']").FillAsync("123456");
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -278,7 +278,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         await Page.Locator("input[name='Query']").FillAsync(longQuery);
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -336,7 +336,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
 
         // Act
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -359,7 +359,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
 
         // Act
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -431,7 +431,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         await jsDisabledPage.Locator("input[name='Query']").FillAsync("Test School");
-        await jsDisabledPage.Locator("button[type='submit']").ClickAsync();
+        await jsDisabledPage.Locator("button[name='Search']").ClickAsync();
         await jsDisabledPage.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
@@ -465,7 +465,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Act
         await Page.Locator("input[name='Query']").ClearAsync();
-        await Page.Locator("button[type='submit']").ClickAsync();
+        await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert

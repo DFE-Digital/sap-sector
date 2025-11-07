@@ -82,7 +82,7 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var dataProtectionPath = builder.Environment.IsEnvironment("Test")
+        var dataProtectionPath = builder.Environment.IsDevelopment()
                                  ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
                                    : "/keys";
 
@@ -115,14 +115,14 @@ public partial class Program
             app.UseAuthentication();
             app.UseAuthorization();
 
-            // Security headers middleware - MUST come before static files
-            app.AddMiddleware();
-
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
                 ForwardedHeaders = ForwardedHeaders.XForwardedProto
             });
         }
+
+        // Security headers middleware - MUST come before static files
+        app.AddMiddleware(app.Environment.IsDevelopment());
 
         app.UseHttpsRedirection();
 
