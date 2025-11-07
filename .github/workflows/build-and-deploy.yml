@@ -142,7 +142,13 @@ jobs:
       with:
         filename: './TestResults/coverage/coverage.cobertura.xml'
 
-    - name: Upload Coverage Report
+    - name: Upload Cobertura Coverage Artifact for Comparison
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-main
+        path: ./TestResults/coverage/coverage.cobertura.xml
+
+    - name: Upload Full Coverage Report
       uses: actions/upload-artifact@v4
       with:
           name: code-coverage-report
