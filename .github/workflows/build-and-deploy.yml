@@ -86,16 +86,31 @@ jobs:
       run: |
           pwsh ./bin/Release/net8.0/playwright.ps1 install
 
-    - name: Run All Tests
+    - name: Run All Tests (Sequential - Safe for Playwright + Kestrel)
+      env:
+        PLAYWRIGHT_BROWSERS_PATH: 0
+        HEADED: 0
+        PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
       run: |
-        find ./Tests -type f -name "*.Tests.csproj" | \
-          xargs -I {} -P 4 dotnet test {} \
+        echo "Running tests sequentially to avoid port/fixture race conditions"
+        
+        # Find all test projects
+        TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
+        
+        # Run one by one
+        for proj in $TEST_PROJECTS; do
+          echo "=== Running tests in $proj ==="
+          dotnet test "$proj" \
             --configuration Release \
             --no-build \
             --collect:"XPlat Code Coverage" \
             --settings coverlet.runsettings \
             --results-directory ./TestResults \
-            --logger "trx;LogFileName={}.trx"
+            --logger "trx;LogFileName=$(basename $proj .csproj).trx" \
+            --verbosity normal || exit 1
+        done
+        
+        echo "All test projects completed successfully"
 
     - name: Generate Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11

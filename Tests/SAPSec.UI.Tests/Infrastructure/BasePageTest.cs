@@ -29,7 +29,10 @@ public abstract class BasePageTest : PageTest
         return new BrowserNewContextOptions
         {
             BaseURL = _fixture.BaseUrl,
-            IgnoreHTTPSErrors = true  // Ignore self-signed cert errors for CI/local dev
+            IgnoreHTTPSErrors = true,
+            ViewportSize = new() { Width = 1280, Height = 720 },
+            Locale = "en-GB",
+            TimezoneId = "Europe/London"
         };
     }
 }

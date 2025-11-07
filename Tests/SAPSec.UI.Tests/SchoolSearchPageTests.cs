@@ -423,7 +423,8 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var context = await Browser.NewContextAsync(new()
         {
             JavaScriptEnabled = false,
-            BaseURL = _fixture.BaseUrl
+            BaseURL = _fixture.BaseUrl,
+            IgnoreHTTPSErrors = true
         });
         var jsDisabledPage = await context.NewPageAsync();
 
