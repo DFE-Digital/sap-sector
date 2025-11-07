@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.Extensions.Options;
-using SAPSec.Core.Configuration;
 
 namespace SAPSec.Web.Middleware;
 
-public class RequireAuthenticatedUserMiddleware(RequestDelegate next, IOptions<DfeSignInSettings> configuration)
+public class RequireAuthenticatedUserMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context)
     {

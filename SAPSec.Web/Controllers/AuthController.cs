@@ -99,9 +99,7 @@ public class AuthController(
     [HttpPost("select-organisation")]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SelectOrganisation(
-        string organisationId,
-        string? returnUrl = null)
+    public async Task<IActionResult> SelectOrganisation(string organisationId, string? returnUrl = null)
     {
         if (string.IsNullOrEmpty(organisationId))
         {
@@ -128,7 +126,7 @@ public class AuthController(
 
     [HttpGet("sign-out")]
     [Authorize]
-    public async Task<IActionResult> SignOut()
+    public async Task<IActionResult> SignOutCallback()
     {
         var userId = _userService.GetUserId(User);
 
