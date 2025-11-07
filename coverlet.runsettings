@@ -4,7 +4,7 @@
     <DataCollectors>
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
-          <Format>cobertura,opencover</Format>
+          <Format>cobertura</Format>
           
           <!-- Include your assemblies -->
           <Include>[SAPSec.Web]*,[SAPSec.Core]*,[SAPSec.Infrastructure]*</Include>

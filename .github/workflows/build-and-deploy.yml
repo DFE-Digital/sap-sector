@@ -88,12 +88,14 @@ jobs:
 
     - name: Run All Tests
       run: |
-        # Find all .Tests.csproj files under the Tests directory and run them in parallel
         find ./Tests -type f -name "*.Tests.csproj" | \
           xargs -I {} -P 4 dotnet test {} \
+            --configuration Release \
+            --no-build \
             --collect:"XPlat Code Coverage" \
             --settings coverlet.runsettings \
-            --results-directory ./TestResults
+            --results-directory ./TestResults \
+            --logger "trx;LogFileName={}.trx"
 
     - name: Generate Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11

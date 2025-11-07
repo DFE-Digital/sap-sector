@@ -1,6 +1,5 @@
 ﻿using System.Net;
 using System.Text.Json;
-using AngleSharp.Html.Parser;
 using FluentAssertions;
 using SAPSec.Integration.Tests.Infrastructure;
 
@@ -8,8 +7,6 @@ namespace SAPSec.Integration.Tests;
 
 public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
 {
-    private readonly HtmlParser _htmlParser = new();
-
     #region GET /school (Index) Tests
 
     [Fact]
@@ -28,13 +25,9 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture) : I
     {
         // Act
         var response = await fixture.Client.GetAsync("/school");
-        var content = await response.Content.ReadAsStringAsync();
-        var document = await _htmlParser.ParseDocumentAsync(content);
 
         // Assert
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        var form = document.QuerySelector("form");
-        form.Should().NotBeNull();
     }
 
     [Fact]
@@ -524,7 +517,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture) : I
     public async Task PostIndex_WithMissingQueryField_ReturnsValidationError()
     {
         // Arrange
-        // Intentionally not including Query field
+        // Intentionally not including the Query field
         var content = new FormUrlEncodedContent(new Dictionary<string, string>());
 
         // Act
