@@ -143,10 +143,12 @@ jobs:
         filename: './TestResults/coverage/coverage.cobertura.xml'
 
     - name: Upload Cobertura Coverage Artifact for Comparison
+      if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-artifact@v4
       with:
         name: coverage-main
         path: ./TestResults/coverage/coverage.cobertura.xml
+        # retention-days: 7
 
     - name: Upload Full Coverage Report
       uses: actions/upload-artifact@v4
