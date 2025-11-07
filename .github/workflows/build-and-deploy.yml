@@ -82,7 +82,7 @@ jobs:
       run: dotnet build --configuration Release --no-restore
 
     - name: Install Playwright browsers
-      working-directory: ./Tests/SAPSec.Tests.UI
+      working-directory: Tests/SAPSec.Tests.UI
       run: |
           dotnet build
           pwsh ./bin/Debug/net8.0/playwright.ps1 install
