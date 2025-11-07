@@ -17,7 +17,7 @@ COPY ./SAPSec.Web/gulpfile.cjs /app/
 
 RUN npm ci
 
-COPY ./SAPSec.Web/wwwroot/ /app/wwwroot/
+COPY ./SAPSec.Web/AssetSrc/ /app/AssetSrc/
 
 RUN echo "=== Assets build output ===" && \
     echo "Checking wwwroot structure:" && \
