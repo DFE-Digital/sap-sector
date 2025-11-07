@@ -84,7 +84,6 @@ jobs:
     - name: Install Playwright browsers
       working-directory: Tests/SAPSec.UI.Tests
       run: |
-          dotnet build
           pwsh ./bin/Debug/net8.0/playwright.ps1 install
 
     - name: Run All Tests
