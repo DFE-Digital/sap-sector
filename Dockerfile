@@ -12,6 +12,9 @@ WORKDIR /app
 
 COPY ./SAPSec.Web/package*.json /app/
 
+COPY ./SAPSec.Web/gulpfile.cjs /app/
+
+
 RUN npm ci
 
 COPY ./SAPSec.Web/wwwroot/ /app/wwwroot/
