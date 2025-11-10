@@ -120,13 +120,18 @@ jobs:
           echo "=== Running tests in $proj ==="
 
           dotnet test "$proj" \
+            --no-build \
             --configuration Debug \
             --results-directory "TestResults" \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura \
-#           /p:Exclude=[Assembly-Filter]Type-Filter,https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:DeterministicReport=true \
+            /p:UseSourceLink=true \
             --verbosity normal || exit 1
         done
+
+#           /p:Exclude=[Assembly-Filter]Type-Filter,https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
 
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
