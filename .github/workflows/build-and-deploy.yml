@@ -121,10 +121,10 @@ jobs:
 
           dotnet test "$proj" \
             --configuration Debug \
-            --no-build \
             --results-directory "TestResults" \
-            --collect:"XPlat Code Coverage" \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
+            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura \
+#           /p:Exclude=[Assembly-Filter]Type-Filter,https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
             --verbosity normal || exit 1
         done
 
