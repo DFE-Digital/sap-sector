@@ -141,23 +141,16 @@ jobs:
       with:
         trx_files: "**/*.trx"
 
-    - name: Combined Coverage Report
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
-      with:
-        reports: './CoverageReport/coverage.cobertura.xml'
-        targetdir: "CoverageReport"
-        reporttypes: "Cobertura"
-        verbosity: "Info"
-        title: "Code Coverage"
-        tag: "${{ github.run_number }}_${{ github.run_id }}"
-        customSettings: "" # Optional custom settings (separated by semicolon). See: https://github.com/danielpalme/ReportGenerator/wiki/Settings.
-        toolpath: "reportgeneratortool"
-
-    - name: Publish Code Coverage Report
-      uses: clearlyip/code-coverage-report-action@v4
+    - name: Generate Coverage Report
+      uses: clearlyip/code-coverage-report-action@v6
       id: code_coverage_report_action
+      #Dont run for dependabot unless you fix PR comment permissions
+      if: ${{ github.actor != 'dependabot[bot]'}}
       with:
-        filename: "./CoverageReport/coverage.cobertura.xml"
+        #Location of the generate coverage file
+        filename: './CoverageReport/coverage.cobertura.xml'
+        fail_on_negative_difference: true
+        artifact_download_workflow_names: 'ci,cron'
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
