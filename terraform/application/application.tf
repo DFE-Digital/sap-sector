@@ -39,6 +39,21 @@ data "azurerm_key_vault_secret" "register_uri" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
+data "azurerm_key_vault_secret" "sign_in_url" {
+  name         = "SignInUri"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "help_uri" {
+  name         = "HelpUri"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "register_uri" {
+  name         = "RegisterUri"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
 
 
 module "application_configuration" {
@@ -63,6 +78,7 @@ module "application_configuration" {
     DsiConfiguration__ApiUri                = local.dsi_urls.api_uri
     DsiConfiguration__Authority             = local.dsi_urls.authority
     DsiConfiguration__Issuer                = local.dsi_urls.issuer
+    DsiConfiguration__Audience              = "SAP"
     DsiConfiguration__Audience              = "signin.education.gov.uk"
     DsiConfiguration__MetadataAddress       = local.dsi_urls.metadata_address
     DsiConfiguration__CallbackPath          = "/signin-oidc"
