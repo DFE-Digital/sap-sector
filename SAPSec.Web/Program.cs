@@ -106,6 +106,11 @@ public partial class Program
 
         var app = builder.Build();
 
+        app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions
+        {
+            SourceCodeLineCount = 10
+        });
+
         //if (app.Environment.IsDevelopment())
         //{
         //    app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
