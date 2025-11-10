@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
 
 namespace SAPSec.Web.Controllers;
 
+[Authorize]
 public class SearchController(IDsiUserService userService) : Controller
 {
     public async Task<IActionResult> Index()
