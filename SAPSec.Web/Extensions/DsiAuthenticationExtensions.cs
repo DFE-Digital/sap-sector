@@ -230,19 +230,11 @@ public static class DsiAuthenticationExtensions
                         var env = context.HttpContext.RequestServices
                             .GetRequiredService<IWebHostEnvironment>();
 
-                        if (env.IsDevelopment())
-                        {
+                       
                             var errorMessage = context.Exception.Message;
                             context.Response.Redirect(
                                 $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
                             context.HandleResponse();
-                        }
-                        else
-                        {
-                            // In production, show generic error
-                            context.Response.Redirect("/Home/Error");
-                            context.HandleResponse();
-                        }
 
                         return Task.CompletedTask;
                     },
