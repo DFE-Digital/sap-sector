@@ -148,6 +148,7 @@ jobs:
       with:
         name: coverage-main
         path: ./TestResults/coverage/coverage.cobertura.xml
+        overwrite: true
         # retention-days: 7
 
     - name: Upload Full Coverage Report
