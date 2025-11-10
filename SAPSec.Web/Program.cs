@@ -117,6 +117,8 @@ public partial class Program
         }
         app.UseForwardedHeaders();
 
+        app.UseSecurityHeaders();
+
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider();
@@ -160,15 +162,11 @@ public partial class Program
 
         app.UseRouting();
 
-        app.UseCookiePolicy();
-
         app.UseSession();
 
         app.UseAuthentication();
 
         app.UseAuthorization();
-
-        app.AddMiddleware(app.Environment.IsDevelopment());
 
         app.MapHealthChecks("/healthcheck");
 
