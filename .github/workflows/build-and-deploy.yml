@@ -46,20 +46,20 @@ jobs:
       pull-requests: write
     runs-on: ubuntu-latest
 
-#    steps:
-#    - uses: actions/checkout@v4
-#      name: Checkout
-#
-#    - name: Build and push docker image
-#      id: build-image
-#      uses: DFE-Digital/github-actions/build-docker-image@master
-#      with:
-#        github-token: ${{ secrets.GITHUB_TOKEN }}
-#        context: .
-#        docker-repository: ${{ env.DOCKER_REPOSITORY }}
-#        max-cache: true
-#        reuse-cache: true
-#        snyk-token: ${{ secrets.SNYK_TOKEN }}
+    steps:
+    - uses: actions/checkout@v4
+      name: Checkout
+
+    - name: Build and push docker image
+      id: build-image
+      uses: DFE-Digital/github-actions/build-docker-image@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        context: .
+        docker-repository: ${{ env.DOCKER_REPOSITORY }}
+        max-cache: true
+        reuse-cache: true
+        snyk-token: ${{ secrets.SNYK_TOKEN }}
 
   test:
     name: Run Unit & Integration Tests with Coverage
