@@ -144,13 +144,12 @@ jobs:
     - name: Generate Coverage Report
       uses: clearlyip/code-coverage-report-action@v6
       id: code_coverage_report_action
-      #Dont run for dependabot unless you fix PR comment permissions
       if: ${{ github.actor != 'dependabot[bot]'}}
       with:
-        #Location of the generate coverage file
         filename: './CoverageReport/coverage.cobertura.xml'
         fail_on_negative_difference: true
-        artifact_download_workflow_names: 'ci,cron'
+        only_list_changed_files: true
+        overall_coverage_fail_threshold: 0
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
