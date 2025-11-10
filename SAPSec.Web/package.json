@@ -29,6 +29,6 @@
   "type": "module",
   "types": "./types",
   "engines": {
-    "node": ">=22"
+    "node": ">=20"
   }
 }
