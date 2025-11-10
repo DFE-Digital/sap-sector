@@ -27,15 +27,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <CollectCoverage>true</CollectCoverage>
-    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
-    <ExcludeByFile>**/*.cshtml,**/*.cshtml.cs,**/*.g.cs,**/obj/**/*,**/Views/**/*</ExcludeByFile>
-    <Exclude>[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*</Exclude>
-    <SkipAutoProps>true</SkipAutoProps>
+    <ExcludeByFile>**/obj/**/*</ExcludeByFile>
+    <Exclude>[*SAPSec.Core*]</Exclude>
     <DeterministicReport>true</DeterministicReport>
-    <UseSourceLink>true</UseSourceLink>
-    <IncludeTestAssembly>false</IncludeTestAssembly>
-    <SingleHit>false</SingleHit>
   </PropertyGroup>
 
   <ItemGroup>

@@ -144,9 +144,7 @@ jobs:
     - name: merge coverage files
       run: |
         dotnet tool install -g dotnet-coverage
-        COVERAGE_FILES=$(find Tests -maxdepth 2 -type f -name "coverage.cobertura.xml" -print | tr '\n' ' ')
-        dotnet coverage merge --reports $COVERAGE_FILES -f cobertura -o coverage-results/coverage.xml
-#        dotnet coverage merge --reports "Tests/SAPSec.Infrastructure.Tests/coverage.cobertura.xml" "Tests/SAPSec.Core.Tests/coverage.cobertura.xml" "Tests/SAPSec.Web.Tests/coverage.cobertura.xml" "Tests/SAPSec.UI.Tests/coverage.cobertura.xml" "Tests/SAPSec.Integration.Tests/coverage.cobertura.xml" -f cobertura -o coverage-results/coverage.xml
+        dotnet coverage merge --reports $(find Tests -name "coverage.cobertura.xml") -f cobertura -o coverage-results/coverage.xml
 
     - name: Generate Coverage Report
       uses: clearlyip/code-coverage-report-action@v6

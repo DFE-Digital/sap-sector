@@ -30,12 +30,8 @@
     <CollectCoverage>true</CollectCoverage>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
     <ExcludeByFile>**/*.cshtml,**/*.cshtml.cs,**/*.g.cs,**/obj/**/*,**/Views/**/*</ExcludeByFile>
-    <Exclude>[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*</Exclude>
-    <SkipAutoProps>true</SkipAutoProps>
+    <Exclude>[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*, [*SAPSec.Core*], [*SAPSec.Infrastructure*], [*SAPSec.Web*]</Exclude>
     <DeterministicReport>true</DeterministicReport>
-    <UseSourceLink>true</UseSourceLink>
-    <IncludeTestAssembly>false</IncludeTestAssembly>
-    <SingleHit>false</SingleHit>
   </PropertyGroup>
 
   <ItemGroup>
