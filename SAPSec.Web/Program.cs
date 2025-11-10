@@ -117,7 +117,10 @@ public partial class Program
         }
         app.UseForwardedHeaders();
 
-        app.UseSecurityHeaders();
+        if (!app.Environment.IsDevelopment())  // ✅ Only in production
+        {
+            app.UseMiddleware<SecurityHeadersMiddleware>();
+        }
 
         app.UseHttpsRedirection();
 
