@@ -27,8 +27,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <CollectCoverage>false</CollectCoverage>
-    <Exclude>[*SAPSec.Core*], [*SAPSec.Infrastructure*], [*SAPSec.Web*]</Exclude>
+    <CollectCoverage>true</CollectCoverage>
+    <CoverletOutputFormat>cobertura</CoverletOutputFormat>
+    <DeterministicReport>true</DeterministicReport>
   </PropertyGroup>
 
   <ItemGroup>

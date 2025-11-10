@@ -29,9 +29,9 @@
   <PropertyGroup>
     <CollectCoverage>true</CollectCoverage>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
-    <ExcludeByFile>**/*.cshtml,**/*.cshtml.cs,**/*.g.cs,**/obj/**/*,**/Views/**/*</ExcludeByFile>
-    <Exclude>[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*, [*SAPSec.Core*], [*SAPSec.Infrastructure*], [*SAPSec.Web*]</Exclude>
     <DeterministicReport>true</DeterministicReport>
+    <ExcludeByFile>**/*.cshtml,**/*.cshtml.cs,**/*.g.cs,**/obj/**/*,**/Views/**/*</ExcludeByFile>
+    <Exclude>[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*, [*SAPSec.Core*], [*SAPSec.Infrastructure*]</Exclude>
   </PropertyGroup>
 
   <ItemGroup>
