@@ -132,31 +132,31 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: test-results
-        path: ${{ github.workspace }}/**/TestResults/**/*
+        path: "**/TestResults/**/*"
         retention-days: 5
 
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2.16.1
       if: always()
       with:
-        trx_files: "${{ github.workspace }}/**/*.trx"
+        trx_files: "**/*.trx"
 
     - name: Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
       with:
-        reports: "**/*.cobertura.xml" # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
-        targetdir: "${{ github.workspace }}" # REQUIRED # The directory where the generated report should be saved.
-        reporttypes: "Cobertura" # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, Html_Dark, Html_Light, Html_BlueRed, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlInline_AzurePipelines_Light, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MarkdownSummary, MarkdownSummaryGithub, MarkdownDeltaSummary, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, TextDeltaSummary, Xml, XmlSummary
-        verbosity: "Info" # The verbosity level of the log messages. Values: Verbose, Info, Warning, Error, Off
-        title: "Code Coverage" # Optional title.
-        tag: "${{ github.run_number }}_${{ github.run_id }}" # Optional tag or build version.
+        reports: "**/*.cobertura.xml"
+        targetdir: "TestCoverageReport"
+        reporttypes: "Cobertura"
+        verbosity: "Info"
+        title: "Code Coverage"
+        tag: "${{ github.run_number }}_${{ github.run_id }}"
         customSettings: "" # Optional custom settings (separated by semicolon). See: https://github.com/danielpalme/ReportGenerator/wiki/Settings.
-        toolpath: "reportgeneratortool" # Default directory for installing the dotnet tool.
+        toolpath: "reportgeneratortool"
 
     - name: Publish Code Coverage Report
       uses: irongut/CodeCoverageSummary@v1.3.0
       with:
-        filename: "**/coverage.cobertura.xml"
+        filename: "**/*.cobertura.xml"
         badge: true
         fail_below_min: false # just informative for now
         format: markdown
@@ -165,6 +165,13 @@ jobs:
         indicators: true
         output: both
         thresholds: "10 30"
+
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: github.event_name == 'pull_request'
+      with:
+        recreate: true
+        path: code-coverage-results.md
 
   deploy-review-app:
     name: Deployment To Review
