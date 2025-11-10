@@ -94,6 +94,9 @@ public partial class Program
         builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 
         var app = builder.Build();
+        app.UseRouting();
+
+        app.UseSession();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
@@ -161,9 +164,7 @@ public partial class Program
             }
         });
 
-        app.UseRouting();
-
-        app.UseSession();
+       
 
         app.MapControllers();
 
