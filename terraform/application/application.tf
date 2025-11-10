@@ -58,7 +58,6 @@ module "application_configuration" {
     DsiConfiguration__Authority             = local.dsi_urls.authority
     DsiConfiguration__Issuer                = local.dsi_urls.issuer
     DsiConfiguration__Audience              = "SAP"
-    DsiConfiguration__Audience              = "signin.education.gov.uk"
     DsiConfiguration__MetadataAddress       = local.dsi_urls.metadata_address
     DsiConfiguration__CallbackPath          = "/signin-oidc"
     DsiConfiguration__SignedOutCallbackPath = "/signout-callback-oidc"
