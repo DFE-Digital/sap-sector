@@ -106,15 +106,15 @@ public partial class Program
 
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
-        }
-        else
-        {
-            app.UseExceptionHandler("/Home/Error");
-            app.UseHsts();
-        }
+        //if (app.Environment.IsDevelopment())
+        //{
+        //    app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
+        //}
+        //else
+        //{
+        //    app.UseExceptionHandler("/Home/Error");
+        //    app.UseHsts();
+        //}
         app.UseForwardedHeaders();
 
         if (!app.Environment.IsDevelopment())  // ✅ Only in production
