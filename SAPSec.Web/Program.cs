@@ -14,7 +14,6 @@ using SmartBreadcrumbs.Extensions;
 
 namespace SAPSec.Web;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public partial class Program
 {
     [ExcludeFromCodeCoverage]
@@ -46,18 +45,18 @@ public partial class Program
 
         var config = configBuilder.Build();
 
-        if (!builder.Environment.IsDevelopment())
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
-            builder.Services.AddDsiAuthentication(config);
-        }
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedHost
+                                     | ForwardedHeaders.XForwardedProto
+                                     | ForwardedHeaders.XForwardedFor;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
+        builder.Services.AddDsiAuthentication(config);
 
         builder.Services.AddDistributedMemoryCache();
-
-        builder.Services.AddLogging(logging =>
-        {
-            logging.AddConsole();
-            logging.AddDebug();
-        });
 
         builder.Services.AddSession(options =>
         {
@@ -67,6 +66,19 @@ public partial class Program
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.Name = ".SAPSec.Session";
+        });
+
+        builder.Services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.CheckConsentNeeded = context => false;
+            options.MinimumSameSitePolicy = SameSiteMode.Lax;
+            options.Secure = CookieSecurePolicy.Always;
+        });
+
+        builder.Services.AddLogging(logging =>
+        {
+            logging.AddConsole();
+            logging.AddDebug();
         });
 
         builder.Services.Configure<RazorViewEngineOptions>(options =>
@@ -83,7 +95,6 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        // Search services
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
         {
@@ -94,11 +105,7 @@ public partial class Program
         builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 
         var app = builder.Build();
-        app.UseRouting();
 
-        app.UseSession();
-
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
@@ -107,28 +114,16 @@ public partial class Program
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedHost  | ForwardedHeaders.XForwardedProto
-            });
         }
-
-        // Security headers middleware - MUST come before static files
-        app.AddMiddleware(app.Environment.IsDevelopment());
+        app.UseForwardedHeaders();
 
         app.UseHttpsRedirection();
 
-        // Configure MIME types
         var provider = new FileExtensionContentTypeProvider();
         provider.Mappings[".css"] = "text/css";
         provider.Mappings[".js"] = "application/javascript";
         provider.Mappings[".mjs"] = "application/javascript";
 
-        // Log wwwroot contents on startup for debugging
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
         if (Directory.Exists(wwwrootPath))
         {
@@ -154,7 +149,6 @@ public partial class Program
             {
                 var path = ctx.Context.Request.Path.Value;
                 var contentType = ctx.Context.Response.ContentType;
-                //Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
 
                 if (string.IsNullOrEmpty(contentType))
                 {
@@ -164,18 +158,26 @@ public partial class Program
             }
         });
 
-       
+        app.UseRouting();
+
+        app.UseCookiePolicy();
+
+        app.UseSession();
+
+        app.UseAuthentication();
+
+        app.UseAuthorization();
+
+        app.AddMiddleware(app.Environment.IsDevelopment());
+
+        app.MapHealthChecks("/healthcheck");
 
         app.MapControllers();
-
         app.MapRazorPages();
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
-
-        // Health check endpoints for AKS
-        app.MapHealthChecks("/healthcheck");
 
         app.Run();
     }
