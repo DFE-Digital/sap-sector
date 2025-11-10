@@ -79,7 +79,7 @@ jobs:
       run: dotnet restore
 
     - name: Build solution
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Debug --no-restore
 
     - name: Install Playwright
       working-directory: Tests/SAPSec.UI.Tests
@@ -102,12 +102,12 @@ jobs:
         npm run build-fe
         
         echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
-        mkdir -p ../Tests/SAPSec.UI.Tests/bin/Release/net8.0/wwwroot
-        cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Release/net8.0/wwwroot/ || true
+        mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
+        cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
         
         echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="       
-        mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Release/net8.0/wwwroot
-        cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Release/net8.0/wwwroot/ || true
+        mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
+        cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
 
     - name: Run All Tests with Coverage
       env:
@@ -120,12 +120,12 @@ jobs:
           echo "=== Running tests in $proj ==="
 
           dotnet test "$proj" \
-            --configuration Release \
+            --configuration Debug \
             --no-build \
             --results-directory "TestResults" \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            --collect:"XPlat Code Coverage" \
-            --verbosity normal || exit 1
+            --verbosity normal
+            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura || exit 1
         done
 
     - name: Upload Test Result Files
@@ -144,7 +144,9 @@ jobs:
     - name: merge coverage files
       run: |
         dotnet tool install -g dotnet-coverage
-        dotnet coverage merge --reports "Tests/SAPSec.Infrastructure.Tests/coverage.cobertura.xml" "Tests/SAPSec.Core.Tests/coverage.cobertura.xml" "Tests/SAPSec.Web.Tests/coverage.cobertura.xml" "Tests/SAPSec.UI.Tests/coverage.cobertura.xml" "Tests/SAPSec.Integration.Tests/coverage.cobertura.xml" -f cobertura -o coverage-results/coverage.xml
+        COVERAGE_FILES=$(find Tests -maxdepth 2 -type f -name "coverage.cobertura.xml" -print | tr '\n' ' ')
+        dotnet coverage merge --reports $COVERAGE_FILES -f cobertura -o coverage-results/coverage.xml
+#        dotnet coverage merge --reports "Tests/SAPSec.Infrastructure.Tests/coverage.cobertura.xml" "Tests/SAPSec.Core.Tests/coverage.cobertura.xml" "Tests/SAPSec.Web.Tests/coverage.cobertura.xml" "Tests/SAPSec.UI.Tests/coverage.cobertura.xml" "Tests/SAPSec.Integration.Tests/coverage.cobertura.xml" -f cobertura -o coverage-results/coverage.xml
 
     - name: Generate Coverage Report
       uses: clearlyip/code-coverage-report-action@v6
