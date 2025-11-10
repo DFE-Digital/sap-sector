@@ -116,7 +116,6 @@ jobs:
       run: |
         TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
 
-        FIRST=true
         for proj in $TEST_PROJECTS; do
           echo "=== Running tests in $proj ==="
 
