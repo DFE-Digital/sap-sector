@@ -124,7 +124,7 @@ jobs:
             --no-build \
             --results-directory ./TestResults \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            /p:CoverletOutput="$(pwd)/CoverageReport/" \
+            /p:CollectCoverage=true \
             --verbosity normal || exit 1
         done
 
@@ -141,12 +141,20 @@ jobs:
       with:
         trx_files: "**/*.trx"
 
+    - name: Install dotnet-coverage tool
+      run: dotnet tool install -g dotnet-coverage
+
+    - name: Run tests and merge coverage files
+      run: |
+        dotnet test --collect:"XPlat Code Coverage" --results-directory "coverage-results"
+        dotnet coverage merge --reports "**/coverage.cobertura.xml" -f cobertura -o coverage-results/coverage.xml
+
     - name: Generate Coverage Report
       uses: clearlyip/code-coverage-report-action@v6
       id: code_coverage_report_action
       if: ${{ github.actor != 'dependabot[bot]'}}
       with:
-        filename: './CoverageReport/coverage.cobertura.xml'
+        filename: '**/coverage.cobertura.xml'
         fail_on_negative_difference: true
         only_list_changed_files: true
         overall_coverage_fail_threshold: 0
