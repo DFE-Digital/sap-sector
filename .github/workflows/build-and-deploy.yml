@@ -124,7 +124,7 @@ jobs:
             --no-build \
             --results-directory ./TestResults \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            /p:CoverletOutput="$(pwd)/CodeCoverageReport/" \
+            /p:CoverletOutput="$(pwd)/CoverageReport/" \
             --verbosity normal || exit 1
         done
 
@@ -144,7 +144,7 @@ jobs:
     - name: Combined Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
       with:
-        reports: "CodeCoverageReport/coverage.Cobertura.xml"
+        reports: './CoverageReport/coverage.cobertura.xml'
         targetdir: "CodeCoverageReport"
         reporttypes: "Cobertura"
         verbosity: "Info"
