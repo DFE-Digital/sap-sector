@@ -67,8 +67,8 @@ namespace SAPSec.Web.Controllers
             try
             {
                 // Basic check that the application is responding
-                var environmentName = environment.EnvironmentName ?? "Unknown";
-                var appName = environment.ApplicationName ?? "SAPSec";
+                var environmentName = environment.EnvironmentName;
+                var appName = environment.ApplicationName;
 
                 return new HealthCheckItem
                 {

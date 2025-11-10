@@ -14,7 +14,7 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
 
         // Assert
         response.Should().NotBeNull();
-        response!.Status.Should().Be(200);
+        response.Status.Should().Be(200);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
 
         // Assert
         heading.Should().NotBeNull();
-        heading!.Should().NotBeNullOrWhiteSpace();
+        heading.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
