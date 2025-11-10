@@ -124,8 +124,8 @@ jobs:
             --no-build \
             --results-directory "TestResults" \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            --verbosity normal
-            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura || exit 1
+            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura \
+            --verbosity normal || exit 1
         done
 
     - name: Upload Test Result Files
