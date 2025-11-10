@@ -66,6 +66,7 @@ public partial class Program
             options.Cookie.IsEssential = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.Name = ".SAPSec.Session";
         });
 
         builder.Services.Configure<RazorViewEngineOptions>(options =>
@@ -109,7 +110,7 @@ public partial class Program
 
             app.UseForwardedHeaders(new ForwardedHeadersOptions
             {
-                ForwardedHeaders = ForwardedHeaders.XForwardedProto
+                ForwardedHeaders = ForwardedHeaders.XForwardedHost  | ForwardedHeaders.XForwardedProto
             });
         }
 
