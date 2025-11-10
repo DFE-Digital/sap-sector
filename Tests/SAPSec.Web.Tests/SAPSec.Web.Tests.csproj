@@ -12,11 +12,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="coverlet.msbuild" Version="6.0.2">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
@@ -30,8 +30,7 @@
     <CollectCoverage>true</CollectCoverage>
     <CoverletOutputFormat>cobertura</CoverletOutputFormat>
     <DeterministicReport>true</DeterministicReport>
-    <ExcludeByFile>**/*.cshtml,**/*.cshtml.cs,**/*.g.cs,**/obj/**/*,**/Views/**/*</ExcludeByFile>
-    <Exclude>[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*, [*SAPSec.Core*], [*SAPSec.Infrastructure*]</Exclude>
+    <Exclude>[*]SAPSec.Core*, [*]SAPSec.Infrastructure*</Exclude>
   </PropertyGroup>
 
   <ItemGroup>

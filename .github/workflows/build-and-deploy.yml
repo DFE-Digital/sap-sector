@@ -123,8 +123,8 @@ jobs:
             --configuration Debug \
             --no-build \
             --results-directory "TestResults" \
+            --collect:"XPlat Code Coverage" \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura \
             --verbosity normal || exit 1
         done
 
