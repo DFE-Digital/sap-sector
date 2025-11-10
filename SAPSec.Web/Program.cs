@@ -82,14 +82,6 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var dataProtectionPath = builder.Environment.IsDevelopment()
-                                 ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                   : "/keys";
-
-        builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-               .SetApplicationName("SAPSec");
-
         // Search services
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
