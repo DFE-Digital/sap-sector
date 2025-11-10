@@ -34,27 +34,6 @@ data "azurerm_key_vault_secret" "help_uri" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
-data "azurerm_key_vault_secret" "register_uri" {
-  name         = "RegisterUri"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-data "azurerm_key_vault_secret" "sign_in_url" {
-  name         = "SignInUri"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-data "azurerm_key_vault_secret" "help_uri" {
-  name         = "HelpUri"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-data "azurerm_key_vault_secret" "register_uri" {
-  name         = "RegisterUri"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-
 
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
