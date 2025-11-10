@@ -144,7 +144,7 @@ jobs:
     - name: merge coverage files
       run: |
         dotnet tool install -g dotnet-coverage
-        dotnet coverage merge --reports "TestResults/**/coverage.cobertura.xml" -f cobertura -o coverage-results/coverage.xml
+        dotnet coverage merge --reports "Tests/SAPSec.Infrastructure.Tests/coverage.cobertura.xml" "Tests/SAPSec.Core.Tests/coverage.cobertura.xml" "Tests/SAPSec.Web.Tests/coverage.cobertura.xml" "Tests/SAPSec.UI.Tests/coverage.cobertura.xml" "Tests/SAPSec.Integration.Tests/coverage.cobertura.xml" -f cobertura -o coverage-results/coverage.xml
 
     - name: Generate Coverage Report
       uses: clearlyip/code-coverage-report-action@v6
@@ -153,7 +153,7 @@ jobs:
       with:
         filename: "coverage-results/coverage.xml"
         fail_on_negative_difference: true
-        only_list_changed_files: true
+#        only_list_changed_files: true
         overall_coverage_fail_threshold: 0
 
     - name: Add Coverage PR Comment
