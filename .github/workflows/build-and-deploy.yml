@@ -163,7 +163,7 @@ jobs:
         filename: "coverage-results/coverage.xml"
         fail_on_negative_difference: true
         only_list_changed_files: true
-        artifact_download_workflow_names: 'Run Unit & Integration Tests with Coverage'
+        artifact_download_workflow_names: 'Build and Deploy'
         #overall_coverage_fail_threshold: 80
 
     - name: Add Coverage PR Comment
