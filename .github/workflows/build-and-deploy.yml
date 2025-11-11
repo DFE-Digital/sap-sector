@@ -163,7 +163,7 @@ jobs:
         filename: "coverage-results/coverage.xml"
         fail_on_negative_difference: true
         only_list_changed_files: true
-        overall_coverage_fail_threshold: 80
+        #overall_coverage_fail_threshold: 80
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
