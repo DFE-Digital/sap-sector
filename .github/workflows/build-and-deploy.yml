@@ -131,7 +131,8 @@ jobs:
             --verbosity normal || exit 1
         done
 
-#           /p:Exclude=[Assembly-Filter]Type-Filter,https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
+#Example of how to exclude tests from coverage:
+#/p:Exclude=[Assembly-Filter]Type-Filter,https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
 
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
@@ -141,10 +142,13 @@ jobs:
         retention-days: 5
 
     - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2.16.1
-      if: always()
+      uses: dorny/test-reporter@v2
+      if: ${{ !cancelled() }}
       with:
-        trx_files: "**/*.trx"
+        artifact: test-results
+        reporter: 'dotnet-trx'
+        path: "*.trx"
+        name: 'Test Results'
 
     - name: merge coverage files
       run: |
@@ -158,8 +162,8 @@ jobs:
       with:
         filename: "coverage-results/coverage.xml"
         fail_on_negative_difference: true
-#        only_list_changed_files: true
-        overall_coverage_fail_threshold: 0
+        only_list_changed_files: true
+        overall_coverage_fail_threshold: 80
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2
