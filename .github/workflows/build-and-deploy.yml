@@ -147,7 +147,7 @@ jobs:
       with:
         artifact: test-results
         reporter: 'dotnet-trx'
-        path: "*.trx"
+        path: "**/*.trx"
         name: 'Test Results'
 
     - name: merge coverage files
