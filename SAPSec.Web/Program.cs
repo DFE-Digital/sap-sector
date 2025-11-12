@@ -106,23 +106,18 @@ public partial class Program
 
         var app = builder.Build();
 
-        app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions
+        if (app.Environment.IsDevelopment())
         {
-            SourceCodeLineCount = 10
-        });
-
-        //if (app.Environment.IsDevelopment())
-        //{
-        //    app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
-        //}
-        //else
-        //{
-        //    app.UseExceptionHandler("/Home/Error");
-        //    app.UseHsts();
-        //}
+            app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
+        }
+        else
+        {
+            app.UseExceptionHandler("/Home/Error");
+            app.UseHsts();
+        }
         app.UseForwardedHeaders();
 
-        if (!app.Environment.IsDevelopment())  // ✅ Only in production
+        if (!app.Environment.IsDevelopment()) 
         {
             app.UseMiddleware<SecurityHeadersMiddleware>();
         }
