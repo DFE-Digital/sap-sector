@@ -43,16 +43,16 @@
                      class="govuk-header__logotype" />
             </a>
         </div>
-        <div class="govuk-header__content">
-             @if (User.Identity is { IsAuthenticated: true })
-                {
-                    @Html.ActionLink("Sign out", "SignOutCallback", "Auth", null, new
-                    {
-                        @class = "govuk-header__link govuk-header__service-name app-signin govuk-!-display-none-print"
-                                })
-                                }
-            </div>
     </div>
+        <div class="govuk-header__content">
+            @if (User.Identity is { IsAuthenticated: true })
+            {
+                @Html.ActionLink("Sign out", "SignOutCallback", "Auth", null, new
+                {
+                    @class = "govuk-header__link govuk-header__service-name app-signin govuk-!-display-none-print"
+                        })
+                        }
+        </div>
 </header>
     <nav>
         <div class="govuk-width-container">
