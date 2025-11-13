@@ -134,22 +134,9 @@ public partial class Program
 
         // Log wwwroot contents on startup for debugging
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
-        if (Directory.Exists(wwwrootPath))
-        {
-            Console.WriteLine($"=== wwwroot exists at: {wwwrootPath} ===");
-            var files = Directory.GetFiles(wwwrootPath, "*.*", SearchOption.AllDirectories)
-                .Take(20)
-                .Select(f => f.Replace(wwwrootPath, ""));
-            Console.WriteLine("Sample files:");
-            foreach (var file in files)
-            {
-                Console.WriteLine($"  {file}");
-            }
-        }
-        else
-        {
-            Console.WriteLine($"WARNING: wwwroot directory not found at {wwwrootPath}");
-        }
+        Console.WriteLine(Directory.Exists(wwwrootPath)
+            ? $"=== wwwroot exists at: {wwwrootPath} ==="
+            : $"WARNING: wwwroot directory not found at {wwwrootPath}");
 
         app.UseStaticFiles(new StaticFileOptions
         {

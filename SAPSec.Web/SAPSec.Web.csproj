@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
-    <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
   </ItemGroup>
     
 </Project>

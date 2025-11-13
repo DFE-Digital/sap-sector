@@ -79,12 +79,13 @@ jobs:
       run: dotnet restore
 
     - name: Build solution
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build --configuration Debug --no-restore
 
     - name: Install Playwright
       working-directory: Tests/SAPSec.UI.Tests
       run: |
         dotnet tool install --global Microsoft.Playwright.CLI
+        export PATH="$PATH:/root/.dotnet/tools"
         playwright install --with-deps chromium
 
     - name: Setup Node
@@ -99,63 +100,78 @@ jobs:
       run: |
         npm ci
         npm run build-fe
+        
+        echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
+        mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
+        cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
+        
+        echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="       
+        mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
+        cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
 
     - name: Run All Tests with Coverage
       env:
         HEADED: 0
         PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
       run: |
-        mkdir -p TestResults/coverage
-        
         TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
-        
-        FIRST=true
+
         for proj in $TEST_PROJECTS; do
           echo "=== Running tests in $proj ==="
-        
-          MERGE_FLAG=""
-          if [ "$FIRST" = false ]; then
-            MERGE_FLAG="/p:MergeWith=$(pwd)/TestResults/coverage/coverage.json"
-          fi
-          FIRST=false
-        
+
           dotnet test "$proj" \
-            --configuration Release \
             --no-build \
-            --results-directory ./TestResults \
+            --configuration Debug \
+            --results-directory "TestResults" \
             --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            /p:CoverletOutput="$(pwd)/TestResults/coverage/" \
-            $MERGE_FLAG \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=cobertura \
+            /p:DeterministicReport=true \
+            /p:UseSourceLink=true \
             --verbosity normal || exit 1
         done
 
-    - name: Generate Combined Coverage Report
-      uses: danielpalme/ReportGenerator-GitHub-Action@5.3.11
-      with:
-        reports: './TestResults/coverage/coverage.cobertura.xml'
-        targetdir: 'TestCoverageReport'
-        reporttypes: 'HtmlSummary;Html;Badges'
+#Example of how to exclude tests from coverage:
+#/p:Exclude=[Assembly-Filter]Type-Filter,https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
 
-    - name: Generate Coverage Markdown Report
-      uses: clearlyip/code-coverage-report-action@v4
+    - name: Upload Test Result Files
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: "**/TestResults/**/*"
+        retention-days: 5
+
+    - name: Publish Test Results
+      uses: dorny/test-reporter@v2
+      if: ${{ !cancelled() }}
+      with:
+        artifact: test-results
+        reporter: 'dotnet-trx'
+        path: "**/*.trx"
+        name: 'Test Results'
+
+    - name: merge coverage files
+      run: |
+        dotnet tool install -g dotnet-coverage
+        dotnet coverage merge --reports $(find Tests -name "coverage.cobertura.xml") -f cobertura -o coverage-results/coverage.xml
+
+    - name: Generate Coverage Report
+      uses: clearlyip/code-coverage-report-action@v6
       id: code_coverage_report_action
+      if: ${{ github.actor != 'dependabot[bot]'}}
       with:
-        filename: './TestResults/coverage/coverage.cobertura.xml'
+        filename: "coverage-results/coverage.xml"
+        fail_on_negative_difference: true
+        only_list_changed_files: true
+        #artifact_download_workflow_names: 'Build and Deploy'
+        #overall_coverage_fail_threshold: 80
 
-    - name: Upload Cobertura Coverage Artifact for Comparison
-      if: ${{ github.ref == 'refs/heads/main' }}
-      uses: actions/upload-artifact@v4
+    - name: Add Coverage PR Comment
+      uses: marocchino/sticky-pull-request-comment@v2
+      if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
       with:
-        name: coverage-main
-        path: ./TestResults/coverage/coverage.cobertura.xml
-        overwrite: true
-        # retention-days: 7
-
-    - name: Upload Full Coverage Report
-      uses: actions/upload-artifact@v4
-      with:
-          name: code-coverage-report
-          path: TestCoverageReport
+        recreate: true
+        path: code-coverage-results.md
 
   deploy-review-app:
     name: Deployment To Review

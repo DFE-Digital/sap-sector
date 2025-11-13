@@ -22,7 +22,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Assert
         response.Should().NotBeNull();
-        response!.Status.Should().Be(200);
+        response.Status.Should().Be(200);
     }
 
     // [Fact(Skip = "Not implemented")]
@@ -160,7 +160,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         // Assert
         response.Should().NotBeNull();
-        response!.Status.Should().Be(200);
+        response.Status.Should().Be(200);
     }
 
     [Fact]
