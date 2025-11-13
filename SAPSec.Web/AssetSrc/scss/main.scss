@@ -46,3 +46,24 @@
 .govuk-header__link .govuk-header__logotype {
   height: 30px;
 }
+.govuk-header__navigation {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.govuk-header__navigation-item {
+    display: inline-block;
+    margin-left: 480px;
+}
+
+.govuk-header__navigation .govuk-header__link {
+    color: white;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.govuk-header__navigation .govuk-header__link:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+}
