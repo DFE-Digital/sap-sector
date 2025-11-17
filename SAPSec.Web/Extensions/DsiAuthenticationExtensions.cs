@@ -40,9 +40,6 @@ public static class DsiAuthenticationExtensions
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(dsiConfig.TokenExpiryMinutes);
                 options.SlidingExpiration = true;
-                options.LoginPath = "/Auth/sign-in";
-                options.LogoutPath = "/Auth/sign-out";
-                options.AccessDeniedPath = "/Auth/access-denied";
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
