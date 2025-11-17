@@ -151,38 +151,38 @@ public static class DsiAuthenticationExtensions
                                 userId, email, name, organisation);
 
                             // ✅ Handle organization selection HERE
-                            var userService = context.HttpContext.RequestServices
-                                .GetRequiredService<IDsiUserService>();
+                            //var userService = context.HttpContext.RequestServices
+                            //    .GetRequiredService<IDsiUserService>();
 
-                            var user = await userService.GetUserFromClaimsAsync(context.Principal!);
+                            //var user = await userService.GetUserFromClaimsAsync(context.Principal!);
 
-                            if (user != null)
-                            {
-                                // If user has one organisation, set it automatically
-                                if (user.Organisations.Count == 1)
-                                {
-                                    await userService.SetCurrentOrganisationAsync(
-                                        context.Principal!,
-                                        user.Organisations[0].Id);
+                            //if (user != null)
+                            //{
+                            //    // If user has one organisation, set it automatically
+                            //    if (user.Organisations.Count == 1)
+                            //    {
+                            //        await userService.SetCurrentOrganisationAsync(
+                            //            context.Principal!,
+                            //            user.Organisations[0].Id);
 
-                                    logger.LogInformation(
-                                        "Automatically set organisation {OrgId} for user {UserId}",
-                                        user.Organisations[0].Id, userId);
+                            //        logger.LogInformation(
+                            //            "Automatically set organisation {OrgId} for user {UserId}",
+                            //            user.Organisations[0].Id, userId);
 
-                                   // context.Properties!.RedirectUri = "/SchoolHome";
-                                }
-                                // If multiple organisations, redirect to selection page
-                                else if (user.Organisations.Count > 1)
-                                {
-                                    logger.LogInformation(
-                                        "User {UserId} has {Count} organisations, needs to select one",
-                                        userId, user.Organisations.Count);
+                            //       // context.Properties!.RedirectUri = "/SchoolHome";
+                            //    }
+                            //    // If multiple organisations, redirect to selection page
+                            //    else if (user.Organisations.Count > 1)
+                            //    {
+                            //        logger.LogInformation(
+                            //            "User {UserId} has {Count} organisations, needs to select one",
+                            //            userId, user.Organisations.Count);
 
-                                    // Store original return URL
-                                    var returnUrl = context.Properties?.Items["returnUrl"] ?? "/Search";
-                                    context.Properties!.RedirectUri = $"/SchoolSearch";
-                                }
-                            }
+                            //        // Store original return URL
+                            //        var returnUrl = context.Properties?.Items["returnUrl"] ?? "/Search";
+                            //        context.Properties!.RedirectUri = $"/SchoolSearch";
+                            //    }
+                            //}
 
                             return;
                         }
