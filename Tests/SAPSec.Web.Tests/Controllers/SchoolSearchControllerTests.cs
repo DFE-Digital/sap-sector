@@ -43,7 +43,7 @@ public class SchoolSearchControllerTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Model.Should().NotBeNull();
+        result.Model.Should().NotBeNull();
         result.Model.Should().BeOfType<SchoolSearchQueryViewModel>();
 
         var model = result.Model as SchoolSearchQueryViewModel;
