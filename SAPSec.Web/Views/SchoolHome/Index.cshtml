@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Get school improvement insights";
+}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        <h1 class="govuk-heading-l govuk-!-margin-bottom-2">Get school improvement insights</h1>
+        <h2 class="govuk-heading-xl govuk-!-margin-bottom-8">@ViewBag.SchoolName</h2>
+    </div>
+</div>
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-third">
+        <div class="app-card app-card--clickable app-card__compare">
+            <div class="app-card__image app-card__compare">
+                <img src="~/assets/images/compare_icon.svg"
+                     alt=""
+                     class="app-card__icon"
+                     onerror="this.style.display='none'">
+            </div>
+        </div>
+        <h3 class="govuk-heading-m app-card__heading">
+            <a href="@Url.Action("Index", "ComparePerformance")"
+               class="govuk-link app-card__link">
+                Compare this school's performance
+            </a>
+        </h3>
+        <p class="govuk-body app-card__description">
+            View how this school's performance compares with similar schools as well as local and national averages.
+        </p>
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+        <div class="app-card app-card--clickable app-card__connect">
+            <div class="app-card__image">
+                <img src="~/assets/images/connect_icon.svg"
+                     alt=""
+                     class="app-card__icon"
+                     onerror="this.style.display='none'">
+            </div>
+        </div>
+        <h3 class="govuk-heading-m app-card__heading">
+            <a href="@Url.Action("Index", "FindSchools")"
+               class="govuk-link app-card__link">
+                Connect with similar schools
+            </a>
+        </h3>
+        <p class="govuk-body app-card__description">
+            Find contact details for similar schools with stronger academic performance to connect with.
+        </p>
+    </div>
+
+    <div class="govuk-grid-column-one-third">
+        <div class="app-card app-card--clickable">
+            <div class="app-card__image">
+                <img src="~/assets/images/details_icon.svg"
+                     alt=""
+                     class="app-card__icon"
+                     onerror="this.style.display='none'">
+            </div>
+        </div>
+            <h3 class="govuk-heading-m app-card__heading">
+                <a href="@Url.Action("Index", "SchoolDetails")"
+                   class="govuk-link app-card__link">
+                    School details
+                </a>
+            </h3>
+            <p class="govuk-body app-card__description">
+                View information about this school.
+            </p>
+       
+    </div>
+</div>

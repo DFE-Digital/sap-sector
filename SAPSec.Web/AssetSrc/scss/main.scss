@@ -67,3 +67,129 @@
     text-decoration: underline;
     text-decoration-thickness: 3px;
 }
+
+/* School home page cards */
+.app-card {
+    background-color: #f3f2f1;
+    padding: 40px 30px;
+    text-align: center;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+.app-card--clickable {
+    transition: box-shadow 0.2s ease;
+}
+
+.app-card--clickable:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.app-card__image {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+}
+
+.app-card__compare {
+    background-color: #D4ECEA;
+}
+
+.app-card__connect {
+    background-color: #BBD4EA;
+}
+
+.app-card__icon {
+    max-width: 100px;
+    max-height: 100px;
+    height: auto;
+    width: auto;
+}
+
+.app-card__heading {
+    margin-bottom: 20px !important;
+    font-size: 1.1875rem !important;
+    line-height: 1.3157894737 !important;
+}
+
+.app-card__link {
+    text-decoration: underline;
+    text-decoration-thickness: max(1px, .0625rem);
+    text-underline-offset: .1578em;
+    color: #1d70b8;
+    font-weight: 700;
+}
+
+.app-card__link:hover {
+    text-decoration-thickness: max(3px, .1875rem, .12em);
+    color: #003078;
+}
+
+.app-card__link:visited {
+    color: #1d70b8;
+}
+
+.app-card__link::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+.app-card__description {
+    margin-bottom: 0 !important;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #0b0c0c;
+}
+
+/* Ensure proper grid spacing */
+.govuk-grid-row {
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.govuk-grid-column-one-third {
+    padding-right: 15px;
+    padding-left: 15px;
+    box-sizing: border-box;
+}
+
+/* Responsive adjustments */
+@media (max-width: 40.0625em) {
+    .app-card {
+        margin-bottom: 20px;
+        padding: 30px 20px;
+    }
+
+    .app-card__image {
+        min-height: 80px;
+        margin-bottom: 20px;
+    }
+
+    .app-card__icon {
+        max-width: 80px;
+        max-height: 80px;
+    }
+}
+
+@media (min-width: 40.0625em) {
+    .govuk-grid-column-one-third {
+        width: 33.3333%;
+        float: left;
+    }
+}
+
+/* Clear floats */
+.govuk-grid-row::after {
+    content: "";
+    display: block;
+    clear: both;
+}
