@@ -149,7 +149,7 @@ public static class DsiAuthenticationExtensions
                                 "User authenticated successfully. " +
                                 "UserId: {UserId}, Email: {Email}, Name: {Name}, Organisation: {Organisation}",
                                 userId, email, name, organisation);
-
+                            context.Properties!.RedirectUri = $"/Search";
                             // ✅ Handle organization selection HERE
                             //var userService = context.HttpContext.RequestServices
                             //    .GetRequiredService<IDsiUserService>();
