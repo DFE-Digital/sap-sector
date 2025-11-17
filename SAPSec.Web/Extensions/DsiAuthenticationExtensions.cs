@@ -208,7 +208,7 @@ public static class DsiAuthenticationExtensions
                         // Redirect to error page with message
                         var errorMessage = context.Failure?.Message ?? "Authentication failed";
                         context.Response.Redirect(
-                            $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
+                            $"/Home/Error?message=OnRemoteFailure");
                         context.HandleResponse();
 
                         return Task.CompletedTask;
@@ -232,7 +232,7 @@ public static class DsiAuthenticationExtensions
                        
                             var errorMessage = context.Exception.Message;
                             context.Response.Redirect(
-                                $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
+                                $"/Home/Error?message=OnAuthenticationFailed");
                             context.HandleResponse();
 
                         return Task.CompletedTask;
