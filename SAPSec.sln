@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPSec.Web", "SAPSec.Web\SAPSec.Web.csproj", "{24624574-4DE4-4A91-8273-7AE3EEE13537}"
+	ProjectSection(ProjectDependencies) = postProject
+		{00C4D1FC-D67E-DA5C-FD42-20F0B1A38212} = {00C4D1FC-D67E-DA5C-FD42-20F0B1A38212}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPSec.Web.Tests", "Tests\SAPSec.Web.Tests\SAPSec.Web.Tests.csproj", "{FF6CC6BE-8BD4-4353-BA24-F0B562F73534}"
 EndProject
