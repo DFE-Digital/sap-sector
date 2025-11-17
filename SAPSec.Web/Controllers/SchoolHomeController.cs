@@ -21,23 +21,23 @@ public class SchoolHomeController : Controller
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var user = await _userService.GetUserFromClaimsAsync(User);
+        //var user = await _userService.GetUserFromClaimsAsync(User);
 
-        if (user == null)
-        {
-            return RedirectToAction("Index", "SchoolSearch");
-        }
+        //if (user == null)
+        //{
+        //    return RedirectToAction("Index", "SchoolSearch");
+        //}
 
-        var currentOrg = await _userService.GetCurrentOrganisationAsync(User);
+        //var currentOrg = await _userService.GetCurrentOrganisationAsync(User);
 
-        if (currentOrg == null && user.Organisations.Count > 1)
-        {
-            _logger.LogInformation("User needs to select organisation");
-            return RedirectToAction("Index", "SchoolSearch");
-        }
+        //if (currentOrg == null && user.Organisations.Count > 1)
+        //{
+        //    _logger.LogInformation("User needs to select organisation");
+        //    return RedirectToAction("Index", "SchoolSearch");
+        //}
 
-        ViewBag.SchoolName = currentOrg?.Name ?? "Your School";
-        ViewBag.UserName = user.Name;
+        ViewBag.SchoolName = "Your School";
+       // ViewBag.UserName = user.Name;
 
         return View();
     }
