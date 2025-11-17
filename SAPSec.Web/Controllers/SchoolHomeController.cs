@@ -25,8 +25,7 @@ public class SchoolHomeController : Controller
 
         if (user == null)
         {
-            _logger.LogWarning("User authenticated but could not load user data");
-            return RedirectToAction("Error", "Home");
+            return RedirectToAction("Index", "SchoolSearch");
         }
 
         var currentOrg = await _userService.GetCurrentOrganisationAsync(User);

@@ -172,7 +172,7 @@ public static class DsiAuthenticationExtensions
                                         "Automatically set organisation {OrgId} for user {UserId}",
                                         user.Organisations[0].Id, userId);
 
-                                    context.Properties!.RedirectUri = "/SchoolHome";
+                                   // context.Properties!.RedirectUri = "/SchoolHome";
                                 }
                                 // If multiple organisations, redirect to selection page
                                 else if (user.Organisations.Count > 1)
