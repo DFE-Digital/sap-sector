@@ -42,7 +42,7 @@ public static class DsiAuthenticationExtensions
                 options.SlidingExpiration = true;
                 options.LoginPath = "/Auth/sign-in";
                 options.LogoutPath = "/Auth/sign-out";
-                options.AccessDeniedPath = "/Auth/access-denied";
+                options.AccessDeniedPath = "/Auth/AccessDenied";
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
@@ -171,6 +171,7 @@ public static class DsiAuthenticationExtensions
                                     logger.LogInformation(
                                         "Automatically set organisation {OrgId} for user {UserId}",
                                         user.Organisations[0].Id, userId);
+                                    context.Properties!.RedirectUri = $"/SchoolHome";
                                 }
                                 // If multiple organisations, redirect to selection page
                                 else if (user.Organisations.Count > 1)
@@ -180,8 +181,8 @@ public static class DsiAuthenticationExtensions
                                         userId, user.Organisations.Count);
 
                                     // Store original return URL
-                                    var returnUrl = context.Properties?.Items["returnUrl"] ?? "/Search";
-                                    context.Properties!.RedirectUri = $"/Auth/select-organisation?returnUrl={returnUrl}";
+                                    var returnUrl = context.Properties?.Items["returnUrl"] ?? "/SchoolSearch";
+                                    context.Properties!.RedirectUri = $"/SchoolSearch";
                                 }
                             }
 
