@@ -119,10 +119,9 @@ public partial class Program
 
         app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
 
-        if (!app.Environment.IsDevelopment()) 
-        {
-            app.UseMiddleware<SecurityHeadersMiddleware>();
-        }
+        
+        app.UseMiddleware<SecurityHeadersMiddleware>();
+        
 
         app.UseHttpsRedirection();
 
