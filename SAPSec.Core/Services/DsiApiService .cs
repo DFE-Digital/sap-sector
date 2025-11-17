@@ -27,7 +27,24 @@ public class DsiApiService : IDsiApiService
         _config = config.Value ?? throw new ArgumentNullException(nameof(config));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        _httpClient.BaseAddress = new Uri(_config.ApiUri);
+        if (string.IsNullOrEmpty(_config.ApiUri))
+        {
+            _logger.LogWarning("DsiConfiguration:ApiUri is not configured - API calls will fail");
+        }
+        else
+        {
+            try
+            {
+                _httpClient.BaseAddress = new Uri(_config.ApiUri);
+                _logger.LogInformation("DSI API BaseAddress set to: {BaseAddress}", _config.ApiUri);
+            }
+            catch (UriFormatException ex)
+            {
+                _logger.LogError(ex, "Invalid ApiUri format: {ApiUri}", _config.ApiUri);
+                throw;
+            }
+        }
+
     }
 
     public async Task<DsiUserInfo?> GetUserAsync(string userId)

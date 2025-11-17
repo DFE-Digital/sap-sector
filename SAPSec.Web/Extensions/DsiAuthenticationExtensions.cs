@@ -281,6 +281,24 @@ public static class DsiAuthenticationExtensions
         services.AddScoped<IDsiUserService, DsiUserService>();
         services.AddHttpClient<IDsiApiService, DsiApiService>();
 
+        services.AddHttpClient<IDsiApiService, DsiApiService>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var dsiConfig = configuration.GetSection("DsiConfiguration").Get<DsiConfiguration>();
+
+            if (string.IsNullOrEmpty(dsiConfig?.ApiUri))
+            {
+                throw new InvalidOperationException("DsiConfiguration:ApiBaseUrl is required");
+            }
+
+            // ✅ Set the base address
+            client.BaseAddress = new Uri(dsiConfig.ApiUri);
+
+            // ✅ Set default headers
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+
         return services;
     }
 }
