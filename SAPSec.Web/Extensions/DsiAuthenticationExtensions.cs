@@ -40,6 +40,9 @@ public static class DsiAuthenticationExtensions
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.ExpireTimeSpan = TimeSpan.FromMinutes(dsiConfig.TokenExpiryMinutes);
                 options.SlidingExpiration = true;
+                options.LoginPath = "/Auth/sign-in";
+                options.LogoutPath = "/Auth/sign-out";
+                options.AccessDeniedPath = "/Auth/access-denied";
             })
             .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
             {
@@ -149,40 +152,38 @@ public static class DsiAuthenticationExtensions
                                 "User authenticated successfully. " +
                                 "UserId: {UserId}, Email: {Email}, Name: {Name}, Organisation: {Organisation}",
                                 userId, email, name, organisation);
-                            var returnUrl = context.Properties?.Items["returnUrl"] ?? "/Search";
+
                             // ✅ Handle organization selection HERE
-                            //var userService = context.HttpContext.RequestServices
-                            //    .GetRequiredService<IDsiUserService>();
+                            var userService = context.HttpContext.RequestServices
+                                .GetRequiredService<IDsiUserService>();
 
-                            //var user = await userService.GetUserFromClaimsAsync(context.Principal!);
+                            var user = await userService.GetUserFromClaimsAsync(context.Principal!);
 
-                            //if (user != null)
-                            //{
-                            //    // If user has one organisation, set it automatically
-                            //    if (user.Organisations.Count == 1)
-                            //    {
-                            //        await userService.SetCurrentOrganisationAsync(
-                            //            context.Principal!,
-                            //            user.Organisations[0].Id);
+                            if (user != null)
+                            {
+                                // If user has one organisation, set it automatically
+                                if (user.Organisations.Count == 1)
+                                {
+                                    await userService.SetCurrentOrganisationAsync(
+                                        context.Principal!,
+                                        user.Organisations[0].Id);
 
-                            //        logger.LogInformation(
-                            //            "Automatically set organisation {OrgId} for user {UserId}",
-                            //            user.Organisations[0].Id, userId);
+                                    logger.LogInformation(
+                                        "Automatically set organisation {OrgId} for user {UserId}",
+                                        user.Organisations[0].Id, userId);
+                                }
+                                // If multiple organisations, redirect to selection page
+                                else if (user.Organisations.Count > 1)
+                                {
+                                    logger.LogInformation(
+                                        "User {UserId} has {Count} organisations, needs to select one",
+                                        userId, user.Organisations.Count);
 
-                            //       // context.Properties!.RedirectUri = "/SchoolHome";
-                            //    }
-                            //    // If multiple organisations, redirect to selection page
-                            //    else if (user.Organisations.Count > 1)
-                            //    {
-                            //        logger.LogInformation(
-                            //            "User {UserId} has {Count} organisations, needs to select one",
-                            //            userId, user.Organisations.Count);
-
-                            //        // Store original return URL
-                            //        var returnUrl = context.Properties?.Items["returnUrl"] ?? "/Search";
-                            //        context.Properties!.RedirectUri = $"/SchoolSearch";
-                            //    }
-                            //}
+                                    // Store original return URL
+                                    var returnUrl = context.Properties?.Items["returnUrl"] ?? "/Search";
+                                    context.Properties!.RedirectUri = $"/Auth/select-organisation?returnUrl={returnUrl}";
+                                }
+                            }
 
                             return;
                         }
@@ -208,7 +209,7 @@ public static class DsiAuthenticationExtensions
                         // Redirect to error page with message
                         var errorMessage = context.Failure?.Message ?? "Authentication failed";
                         context.Response.Redirect(
-                            $"/Home/Error?message=OnRemoteFailure");
+                            $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
                         context.HandleResponse();
 
                         return Task.CompletedTask;
@@ -229,11 +230,11 @@ public static class DsiAuthenticationExtensions
                         var env = context.HttpContext.RequestServices
                             .GetRequiredService<IWebHostEnvironment>();
 
-                       
-                            var errorMessage = context.Exception.Message;
-                            context.Response.Redirect(
-                                $"/Home/Error?message=OnAuthenticationFailed");
-                            context.HandleResponse();
+
+                        var errorMessage = context.Exception.Message;
+                        context.Response.Redirect(
+                            $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
+                        context.HandleResponse();
 
                         return Task.CompletedTask;
                     },
