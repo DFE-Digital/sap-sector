@@ -117,6 +117,8 @@ public partial class Program
         }
         app.UseForwardedHeaders();
 
+        //app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
+
         if (!app.Environment.IsDevelopment()) 
         {
             app.UseMiddleware<SecurityHeadersMiddleware>();

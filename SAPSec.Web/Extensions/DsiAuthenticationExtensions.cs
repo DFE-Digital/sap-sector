@@ -230,11 +230,11 @@ public static class DsiAuthenticationExtensions
                         var env = context.HttpContext.RequestServices
                             .GetRequiredService<IWebHostEnvironment>();
 
-                       
-                            var errorMessage = context.Exception.Message;
-                            context.Response.Redirect(
-                                $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
-                            context.HandleResponse();
+
+                        var errorMessage = context.Exception.Message;
+                        context.Response.Redirect(
+                            $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
+                        context.HandleResponse();
 
                         return Task.CompletedTask;
                     },
@@ -280,6 +280,24 @@ public static class DsiAuthenticationExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<IDsiUserService, DsiUserService>();
         services.AddHttpClient<IDsiApiService, DsiApiService>();
+
+        services.AddHttpClient<IDsiApiService, DsiApiService>((serviceProvider, client) =>
+        {
+            var configuration = serviceProvider.GetRequiredService<IConfiguration>();
+            var dsiConfig = configuration.GetSection("DsiConfiguration").Get<DsiConfiguration>();
+
+            if (string.IsNullOrEmpty(dsiConfig?.ApiUri))
+            {
+                throw new InvalidOperationException("DsiConfiguration:ApiBaseUrl is required");
+            }
+
+            // ✅ Set the base address
+            client.BaseAddress = new Uri(dsiConfig.ApiUri);
+
+            // ✅ Set default headers
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
 
         return services;
     }
