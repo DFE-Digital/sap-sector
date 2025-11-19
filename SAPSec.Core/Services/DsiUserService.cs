@@ -49,16 +49,33 @@ public class DsiUserService(
                 catch (JsonException ex)
                 {
                     _logger.LogWarning(ex, "Failed to deserialize organisation claim for user {UserId}", userId);
+
+                    // ✅ Fallback: Create organization from simple claim
+                    var orgName = principal.FindFirst("organisation:name")?.Value ?? "Your School";
+                    organisations.Add(new DsiOrganisation
+                    {
+                        Id = organisationClaim,
+                        Name = orgName
+                    });
                 }
             }
 
-            // If no organisations in claims, fetch from API
+            // ✅ Try to fetch from API only if needed and configured
             if (!organisations.Any() && !string.IsNullOrEmpty(userId))
             {
-                var userInfo = await _dsiApiService.GetUserAsync(userId);
-                if (userInfo != null)
+                try
                 {
-                    organisations = userInfo.Organisations;
+                    _logger.LogInformation("No organisations in claims, fetching from API for user {UserId}", userId);
+                    var userInfo = await _dsiApiService.GetUserAsync(userId);
+                    if (userInfo != null && userInfo.Organisations != null)
+                    {
+                        organisations = userInfo.Organisations;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // ✅ Don't fail if API call fails - just log warning
+                    _logger.LogWarning(ex, "Failed to fetch organisations from API for user {UserId}, using claims only", userId);
                 }
             }
 

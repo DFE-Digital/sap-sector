@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Web;
@@ -26,6 +27,27 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseContentRoot(Directory.GetCurrentDirectory());
 
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            // ✅ Add test configuration that includes DSI settings
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                // DSI Configuration with dummy values for tests
+                ["DsiConfiguration:ClientId"] = "test-client-id",
+                ["DsiConfiguration:ClientSecret"] = "test-client-secret",
+                ["DsiConfiguration:Authority"] = "https://test-oidc.signin.education.gov.uk",
+                ["DsiConfiguration:Issuer"] = "https://test-oidc.signin.education.gov.uk",
+                ["DsiConfiguration:MetadataAddress"] = "https://test-oidc.signin.education.gov.uk/.well-known/openid-configuration",
+                ["DsiConfiguration:CallbackPath"] = "/signin-oidc",
+                ["DsiConfiguration:SignedOutCallbackPath"] = "/signout-callback-oidc",
+                ["DsiConfiguration:RequireHttpsMetadata"] = "false",
+                ["DsiConfiguration:Audience"] = "SAP",
+                ["DsiConfiguration:ValidateIssuer"] = "false",
+                ["DsiConfiguration:ValidateAudience"] = "false",
+                ["DsiConfiguration:ValidateLifetime"] = "true",
+                ["DsiConfiguration:TokenExpiryMinutes"] = "60"
+            });
+        });
         // Create the host for TestServer now before we
         // modify the builder to use Kestrel instead.
         var testHost = builder.Build();

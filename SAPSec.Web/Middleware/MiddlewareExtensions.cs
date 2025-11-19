@@ -1,13 +1,12 @@
-﻿namespace SAPSec.Web.Middleware;
+﻿using SAPSec.Web.Middleware;
+
+namespace SAPSec.Web.Extensions;
 
 public static class MiddlewareExtensions
 {
-    public static void AddMiddleware(this IApplicationBuilder builder, bool isDevelopment)
+    public static IApplicationBuilder UseDsiOrganisationMiddleware(
+        this IApplicationBuilder builder)
     {
-        builder.UseMiddleware<SecurityHeadersMiddleware>();
-
-        if (!isDevelopment)
-            builder.UseMiddleware<DsiOrganisationMiddleware>()
-                .UseMiddleware<RequireAuthenticatedUserMiddleware>();
+        return builder.UseMiddleware<DsiOrganisationMiddleware>();
     }
 }
