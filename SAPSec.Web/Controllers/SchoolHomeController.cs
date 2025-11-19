@@ -36,7 +36,7 @@ public class SchoolHomeController : Controller
         //    return RedirectToAction("Index", "SchoolSearch");
         //}
 
-        ViewBag.SchoolName = "Your School";
+        ViewBag.SchoolName = "This is Test School Home Page";
        // ViewBag.UserName = user.Name;
 
         return View();
