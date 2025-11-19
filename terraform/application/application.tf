@@ -86,13 +86,16 @@ module "application_configuration" {
 }
 
 module "web_application" {
-  source = "./vendor/modules/aks//aks/application"
+  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/application?ref=spike-alerting-module"
 
   is_web = true
 
+  kubernetes_cluster_id = module.cluster_data.kubernetes_id
+  azure_resource_prefix = var.azure_resource_prefix
   namespace    = var.namespace
   environment  = var.environment
   service_name = var.service_name
+  service_short = var.service_short
 
   cluster_configuration_map  = module.cluster_data.configuration_map
   kubernetes_config_map_name = module.application_configuration.kubernetes_config_map_name
@@ -102,5 +105,6 @@ module "web_application" {
   enable_logit = true
   replicas     = var.replicas
 
+  azure_enable_monitoring = true
   send_traffic_to_maintenance_page = var.send_traffic_to_maintenance_page
 }
