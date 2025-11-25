@@ -1,15 +1,17 @@
-﻿using Microsoft.AspNetCore.DataProtection;
-using Microsoft.AspNetCore.Mvc.Razor;
-using Microsoft.AspNetCore.StaticFiles;
-using SAPSec.Web.Extensions;
-using SAPSec.Web.Middleware;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.StaticFiles;
 using SAPSec.Core;
 using SAPSec.Infrastructure;
+using SAPSec.Web.Extensions;
+using SAPSec.Web.Middleware;
 using SmartBreadcrumbs.Extensions;
 
 namespace SAPSec.Web;
@@ -26,7 +28,7 @@ public partial class Program
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 
         builder.Services.AddRazorPages();
@@ -75,7 +77,7 @@ public partial class Program
 
         builder.Services.Configure<RequestLocalizationOptions>(options =>
         {
-            options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
+            options.DefaultRequestCulture = new RequestCulture("en-GB");
             options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB") };
             options.RequestCultureProviders.Clear();
         });
@@ -92,10 +94,10 @@ public partial class Program
 
         // Search services
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-        if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
-        {
-            establishmentsCsvPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, establishmentsCsvPath));
-        }
+        // if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
+        // {
+        //     establishmentsCsvPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, establishmentsCsvPath));
+        // }
 
         builder.Services.AddCoreDependencies();
         builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);

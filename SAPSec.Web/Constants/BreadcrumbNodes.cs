@@ -4,7 +4,7 @@ namespace SAPSec.Web.Constants;
 
 public static class BreadcrumbNodes
 {
-    public static MvcBreadcrumbNode SchoolHome(string urn) => new("Index", "School", PageTitles.SchoolHome)
+    public static MvcBreadcrumbNode SchoolHome(string? urn) => new("Index", "School", PageTitles.SchoolHome)
     {
         RouteValues = new
         {

@@ -128,11 +128,11 @@ jobs:
             /p:CoverletOutputFormat=cobertura \
             /p:DeterministicReport=true \
             /p:UseSourceLink=true \
+            /p:Exclude="[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*"
             --verbosity normal || exit 1
         done
 
-#Example of how to exclude tests from coverage:
-#/p:Exclude=[Assembly-Filter]Type-Filter,https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
+#Example of how to exclude tests from coverage https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
 
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
@@ -163,8 +163,6 @@ jobs:
         filename: "coverage-results/coverage.xml"
         fail_on_negative_difference: true
         only_list_changed_files: true
-        #artifact_download_workflow_names: 'Build and Deploy'
-        #overall_coverage_fail_threshold: 80
 
     - name: Add Coverage PR Comment
       uses: marocchino/sticky-pull-request-comment@v2

@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using SAPSec.Core.Configuration;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Services;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using SAPSec.Core.Configuration;
 
 namespace SAPSec.Web.Extensions;
 

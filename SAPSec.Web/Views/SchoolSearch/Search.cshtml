@@ -1,6 +1,6 @@
 @using SAPSec.Web.Constants
 @using SAPSec.Web.ViewModels
-@model SchoolSearchResultsViewModel
+@model SAPSec.Web.ViewModels.SchoolSearchResultsViewModel
 @{
     ViewData[ViewDataKeys.Title] = PageTitles.FindOrganisationSchool;
 }
@@ -30,4 +30,9 @@
 </div>
 
 
-@await Html.PartialAsync("_SchoolSearchSuggest")
+@await Html.PartialAsync("_SchoolSearchSuggest", new SchoolSearchSuggesterViewModel
+{
+    InputElementId = nameof(Model.Query),
+    TargetElementId = nameof(Model.Urn),
+    IdFieldName = "urn"
+})

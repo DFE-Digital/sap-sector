@@ -5,54 +5,69 @@ using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
-[Route("school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
     ISearchService searchService) : Controller
 {
     [HttpGet]
+    [Route("search-for-a-school")]
     public IActionResult Index() => View(new SchoolSearchQueryViewModel());
 
     [HttpPost]
+    [Route("search-for-a-school")]
     public IActionResult Index(SchoolSearchQueryViewModel searchQueryViewModel)
     {
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome("123");
-
-        if (!ModelState.IsValid)
+        using (logger.BeginScope(new { searchQueryViewModel }))
         {
+            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(searchQueryViewModel.Urn);
+
+            if (!ModelState.IsValid)
+            {
+                return View(searchQueryViewModel);
+            }
+
+            if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
+            {
+                return RedirectToAction("Search", new
+                {
+                    query = searchQueryViewModel.Query
+                });
+            }
+
+            var school = searchService.SearchByNumber(searchQueryViewModel.Urn);
+            if (school != null)
+            {
+                return RedirectToAction("Index", "School", new
+                {
+                    school.Urn
+                });
+            }
+
+            ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
             return View(searchQueryViewModel);
         }
-
-        //TODO: how do we redirect to exaxt school?
-        // if (!string.IsNullOrWhiteSpace(searchQueryViewModel.EstablishmentId))
-        // {
-        //     return RedirectToAction("Index", "School", new
-        //     {
-        //         query = searchQueryViewModel.EstablishmentId
-        //     });
-        // }
-
-        return RedirectToAction("Search", new
-        {
-            query = searchQueryViewModel.Query
-        });
     }
 
     [HttpGet]
-    [Route("search")]
+    [Route("school/search")]
     public async Task<IActionResult> Search([FromQuery] string? query)
     {
         using (logger.BeginScope(new { query }))
         {
-            var results = await searchService.SearchAsync(query ?? string.Empty, 50);
+            var results = await searchService.SearchAsync(query ?? string.Empty);
+
+            if (results.Count == 1)
+            {
+                return RedirectToAction("Index", "School", new { results[0].School.Urn });
+            }
 
             return View(new SchoolSearchResultsViewModel
                 {
                     Query = query ?? string.Empty,
                     Results = results.Select(s => new SchoolSearchResultViewModel
                     {
-                        SchoolName = s.Establishment.EstablishmentName,
-                        URN = s.Establishment.EstablishmentNumber.ToString()
+                        SchoolName = s.School.EstablishmentName,
+                        URN = s.School.Urn.ToString()
                     }).ToArray()
                 }
             );
@@ -60,36 +75,46 @@ public class SchoolSearchController(
     }
 
     [HttpPost]
-    [Route("search")]
+    [Route("school/search")]
     public IActionResult Search(SchoolSearchQueryViewModel searchQueryViewModel)
     {
-        if (!ModelState.IsValid)
+        using (logger.BeginScope(new { searchQueryViewModel }))
         {
-            return View(new SchoolSearchResultsViewModel
+            if (!ModelState.IsValid)
             {
-                Query = searchQueryViewModel.Query,
-            });
-        }
+                return View(new SchoolSearchResultsViewModel
+                {
+                    Query = searchQueryViewModel.Query,
+                });
+            }
 
-        if (!string.IsNullOrWhiteSpace(searchQueryViewModel.EstablishmentId))
-        {
-            return RedirectToAction("Index", "School", new
+            if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
             {
-                urn = searchQueryViewModel.EstablishmentId
-            });
-        }
+                return RedirectToAction("Search", searchQueryViewModel);
+            }
 
-        return RedirectToAction("Search", searchQueryViewModel);
+            var school = searchService.SearchByNumber(searchQueryViewModel.Urn);
+            if (school != null)
+            {
+                return RedirectToAction("Index", "School", new
+                {
+                    school.Urn
+                });
+            }
+
+            ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
+            return RedirectToAction("Search", searchQueryViewModel);
+        }
     }
 
-    [HttpGet("suggest")]
+    [HttpGet("school/suggest")]
     public async Task<IActionResult> Suggest([FromQuery] string queryPart)
     {
-        //TODO: do we need to configure this?
-        var take = 10;
+        using (logger.BeginScope(new { queryPart }))
+        {
+            var suggestions = await searchService.SuggestAsync(queryPart);
 
-        var suggestions = await searchService.SuggestAsync(queryPart, take);
-
-        return Ok(suggestions);
+            return Ok(suggestions);
+        }
     }
 }
