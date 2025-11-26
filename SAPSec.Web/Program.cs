@@ -56,7 +56,7 @@ public partial class Program
             options.KnownProxies.Clear();
         });
 
-        if (builder.Environment.EnvironmentName == "UITesting")
+        if (builder.Environment.EnvironmentName == "Testing" || builder.Environment.EnvironmentName == "UITesting" )
         {
             builder.Services.AddAuthentication(options =>
             {
