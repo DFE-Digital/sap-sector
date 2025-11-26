@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting.Server.Features;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Web;
 
@@ -11,80 +11,79 @@ namespace SAPSec.Integration.Tests.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly Random _random = new Random();
-    private IHost? _host;
+    private bool _useTestAuth = false;
+    private TestUserData? _testUserData;
+
+    public TestWebApplicationFactory WithTestAuthentication(
+        string userId = "test-user-123",
+        string email = "test@example.com",
+        string organisationId = "org-123",
+        string organisationName = "Test Organisation")
+    {
+        _useTestAuth = true;
+        _testUserData = new TestUserData
+        {
+            UserId = userId,
+            Email = email,
+            OrganisationId = organisationId,
+            OrganisationName = organisationName
+        };
+        return this;
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = _random.Next(5001, 5999);
-
-        builder.UseUrls($"https://localhost:{port}");
-
-        builder.UseEnvironment("Development");
-    }
-
-    protected override IHost CreateHost(IHostBuilder builder)
-    {
-        builder.UseContentRoot(Directory.GetCurrentDirectory());
+        builder.UseEnvironment("Testing");
 
         builder.ConfigureAppConfiguration((context, config) =>
         {
-            // ✅ Add test configuration that includes DSI settings
             config.AddInMemoryCollection(new Dictionary<string, string?>
             {
-                // DSI Configuration with dummy values for tests
                 ["DsiConfiguration:ClientId"] = "test-client-id",
                 ["DsiConfiguration:ClientSecret"] = "test-client-secret",
                 ["DsiConfiguration:Authority"] = "https://test-oidc.signin.education.gov.uk",
-                ["DsiConfiguration:Issuer"] = "https://test-oidc.signin.education.gov.uk",
-                ["DsiConfiguration:MetadataAddress"] = "https://test-oidc.signin.education.gov.uk/.well-known/openid-configuration",
-                ["DsiConfiguration:CallbackPath"] = "/signin-oidc",
-                ["DsiConfiguration:SignedOutCallbackPath"] = "/signout-callback-oidc",
                 ["DsiConfiguration:RequireHttpsMetadata"] = "false",
-                ["DsiConfiguration:Audience"] = "SAP",
                 ["DsiConfiguration:ValidateIssuer"] = "false",
-                ["DsiConfiguration:ValidateAudience"] = "false",
-                ["DsiConfiguration:ValidateLifetime"] = "true",
-                ["DsiConfiguration:TokenExpiryMinutes"] = "60"
+                ["DsiConfiguration:ValidateAudience"] = "false"
             });
         });
-        // Create the host for TestServer now before we
-        // modify the builder to use Kestrel instead.
-        var testHost = builder.Build();
 
-        // Modify the host builder to use Kestrel instead
-        // of TestServer so we can listen on a real address.
-        builder.ConfigureWebHost(webHostBuilder => webHostBuilder.UseKestrel());
+        if (_useTestAuth && _testUserData != null)
+        {
+            builder.ConfigureServices(services =>
+            {
+                // ✅ CRITICAL: Remove ALL authentication-related services
+                var authServiceDescriptors = services
+                    .Where(d => d.ServiceType.FullName?.Contains("Authentication") == true)
+                    .ToList();
 
-        // Create and start the Kestrel server before the test server;
-        // otherwise, due to the way the deferred host builder works
-        // for minimal hosting, the server will not get "initialized
-        // enough" for the address to be available.
-        // See https://github.com/dotnet/aspnetcore/issues/33846.
-        _host = builder.Build();
-        _host.Start();
+                foreach (var descriptor in authServiceDescriptors)
+                {
+                    services.Remove(descriptor);
+                }
 
-        // Extract the selected dynamic port out of the Kestrel server
-        // and assign it onto the client options for convenience so it
-        // "just works" as otherwise it'll be the default http://localhost
-        // URL, which won't route to the Kestrel-hosted HTTP server.
-         var server = _host.Services.GetRequiredService<IServer>();
-         var addresses = server.Features.Get<IServerAddressesFeature>();
+                // ✅ Remove specific authentication services
+                services.RemoveAll<IAuthenticationService>();
+                services.RemoveAll<IAuthenticationHandlerProvider>();
+                services.RemoveAll<IAuthenticationSchemeProvider>();
+                services.RemoveAll<AuthenticationOptions>();
 
-        ClientOptions.BaseAddress = addresses!.Addresses
-            .Select(x => new Uri(x))
-            .Last();
+                // ✅ Add fresh authentication with ONLY our test scheme
+                services.AddAuthentication(options =>
+                {
+                    options.DefaultScheme = "TestScheme";
+                    options.DefaultAuthenticateScheme = "TestScheme";
+                    options.DefaultChallengeScheme = "TestScheme";
+                    options.DefaultSignInScheme = "TestScheme";
+                    options.DefaultSignOutScheme = "TestScheme";
+                })
+                .AddScheme<AuthenticationSchemeOptions, TestAuthenticationHandler>(
+                    "TestScheme",
+                    options => { });
 
-        // Return the host that uses TestServer, rather than the real one.
-        // Otherwise, the internals will complain about the host's server
-        // not being an instance of the concrete type TestServer.
-        // See https://github.com/dotnet/aspnetcore/pull/34702.
-        testHost.Start();
-        return testHost;
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        _host?.Dispose();
+                // ✅ Register test user data
+                services.AddSingleton(_testUserData);
+            });
+        }
     }
 }

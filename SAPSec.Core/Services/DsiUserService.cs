@@ -1,9 +1,10 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Services;
-using System.Text.Json;
 using SAPSec.Core.Model;
+using SAPSec.Core.Services.Helper;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace SAPSec.Core.Services;
 
@@ -34,31 +35,7 @@ public class DsiUserService(
 
             // Get organisation data from claims
             var organisationClaim = principal.FindFirst("organisation")?.Value;
-            var organisations = new List<DsiOrganisation>();
-
-            if (!string.IsNullOrEmpty(organisationClaim))
-            {
-                try
-                {
-                    var orgData = JsonSerializer.Deserialize<DsiOrganisation[]>(organisationClaim);
-                    if (orgData != null)
-                    {
-                        organisations.AddRange(orgData);
-                    }
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogWarning(ex, "Failed to deserialize organisation claim for user {UserId}", userId);
-
-                    // ✅ Fallback: Create organization from simple claim
-                    var orgName = principal.FindFirst("organisation:name")?.Value ?? "Your School";
-                    organisations.Add(new DsiOrganisation
-                    {
-                        Id = organisationClaim,
-                        Name = orgName
-                    });
-                }
-            }
+            var organisations = organisationClaim.DeserializeToList<DsiOrganisation>();
 
             // ✅ Try to fetch from API only if needed and configured
             if (!organisations.Any() && !string.IsNullOrEmpty(userId))
@@ -170,4 +147,5 @@ public class DsiUserService(
     {
         return principal?.IsInRole(role) == true;
     }
+
 }

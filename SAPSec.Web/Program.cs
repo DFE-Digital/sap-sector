@@ -1,16 +1,18 @@
-﻿using Microsoft.AspNetCore.DataProtection;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
+using SAPSec.Core;
+using SAPSec.Infrastructure;
+using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
+using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
-using Microsoft.AspNetCore.HttpOverrides;
-using SAPSec.Core;
-using SAPSec.Infrastructure;
-using SmartBreadcrumbs.Extensions;
 
 namespace SAPSec.Web;
 
@@ -54,7 +56,21 @@ public partial class Program
             options.KnownProxies.Clear();
         });
 
-        builder.Services.AddDsiAuthentication(config);
+        if (builder.Environment.EnvironmentName == "UITesting")
+        {
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "TestScheme";
+                options.DefaultAuthenticateScheme = "TestScheme";
+                options.DefaultChallengeScheme = "TestScheme";
+            })
+            .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
+        }
+        else
+        {
+            builder.Services.AddDsiAuthentication(builder.Configuration);
+        }
+
 
         builder.Services.AddDistributedMemoryCache();
 
