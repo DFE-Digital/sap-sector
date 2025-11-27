@@ -128,8 +128,8 @@ jobs:
             /p:CoverletOutputFormat=cobertura \
             /p:DeterministicReport=true \
             /p:UseSourceLink=true \
-            /p:Exclude='[*]AspNetCoreGeneratedDocument.*,[*]AspNetCore.Views*' \
-            /p:ExcludeByAttribute='GeneratedCodeAttribute,ObsoleteAttribute,ExcludeFromCodeCoverage' \
+            /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*' \
+            /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
             --verbosity normal || exit 1
         done
 
