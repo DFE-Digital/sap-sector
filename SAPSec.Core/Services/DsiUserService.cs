@@ -1,9 +1,10 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Services;
-using System.Text.Json;
 using SAPSec.Core.Model;
+using SAPSec.Core.Services.Helper;
+using System.Security.Claims;
+using System.Text.Json;
 
 namespace SAPSec.Core.Services;
 
@@ -34,31 +35,24 @@ public class DsiUserService(
 
             // Get organisation data from claims
             var organisationClaim = principal.FindFirst("organisation")?.Value;
-            var organisations = new List<DsiOrganisation>();
+            var organisations = organisationClaim.DeserializeToList<DsiOrganisation>();
 
-            if (!string.IsNullOrEmpty(organisationClaim))
+            // ✅ Try to fetch from API only if needed and configured
+            if (!organisations.Any() && !string.IsNullOrEmpty(userId))
             {
                 try
                 {
-                    var orgData = JsonSerializer.Deserialize<DsiOrganisation[]>(organisationClaim);
-                    if (orgData != null)
+                    _logger.LogInformation("No organisations in claims, fetching from API for user {UserId}", userId);
+                    var userInfo = await _dsiApiService.GetUserAsync(userId);
+                    if (userInfo != null && userInfo.Organisations != null)
                     {
-                        organisations.AddRange(orgData);
+                        organisations = userInfo.Organisations;
                     }
                 }
-                catch (JsonException ex)
+                catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to deserialize organisation claim for user {UserId}", userId);
-                }
-            }
-
-            // If no organisations in claims, fetch from API
-            if (!organisations.Any() && !string.IsNullOrEmpty(userId))
-            {
-                var userInfo = await _dsiApiService.GetUserAsync(userId);
-                if (userInfo != null)
-                {
-                    organisations = userInfo.Organisations;
+                    // ✅ Don't fail if API call fails - just log warning
+                    _logger.LogWarning(ex, "Failed to fetch organisations from API for user {UserId}, using claims only", userId);
                 }
             }
 
@@ -153,4 +147,5 @@ public class DsiUserService(
     {
         return principal?.IsInRole(role) == true;
     }
+
 }

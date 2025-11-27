@@ -28,4 +28,21 @@ public class HomeController(IOptions<DfeSignInSettings> configuration, IWebHostE
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
+
+    [HttpGet]
+    [Route("/Home/StatusCode")]
+    public IActionResult StatusCode(int code)
+    {
+        if (code == 403)
+        {
+            return RedirectToAction("AccessDenied", "Auth");
+        }
+
+        if (code == 404)
+        {
+            return View("NotFound");
+        }
+
+        return View("Error");
+    }
 }
