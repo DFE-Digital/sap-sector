@@ -15,8 +15,8 @@ public class StartupIndexBuilderTests
         var logger = new Mock<ILogger<StartupIndexBuilder>>();
         var repo = new DummyRepo();
         using var ctx = new LuceneIndexContext();
-        var writer = new LuceneSearchIndexWriterService(repo, ctx);
-        var sut = new StartupIndexBuilder(logger.Object, writer);
+        var writer = new LuceneIndexWriter(ctx);
+        var sut = new StartupIndexBuilder(logger.Object, writer, repo);
 
         // Act
         var act = async () => await sut.StartAsync(CancellationToken.None);
@@ -26,8 +26,18 @@ public class StartupIndexBuilderTests
         await sut.StopAsync(CancellationToken.None);
     }
 
-    private sealed class DummyRepo : IEstablishmentRepository
+    private sealed class DummyRepo : ISchoolRepository
     {
-        public IEnumerable<Establishment> GetAll() => [];
+        public IList<School> GetAll() => [];
+
+        public School GetSchoolByUrn(int schoolNumber)
+        {
+            return null!;
+        }
+
+        public School GetSchoolByNumber(int schoolNumber)
+        {
+            return null!;
+        }
     }
 }

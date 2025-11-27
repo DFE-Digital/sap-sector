@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Web;
@@ -15,11 +16,32 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = _random.Next(5001, 5999);
+        var port = _random.Next(5001, 5100);
 
         builder.UseUrls($"https://localhost:{port}");
 
         builder.UseEnvironment("Development");
+
+        var configurationValues = new Dictionary<string, string?>
+        {
+            { "Establishments:CsvPath", ".\\TestData\\Establishments-Integration-Test-Data.csv" }
+        };
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(configurationValues)
+            .Build();
+
+        builder
+            // This configuration is used during the creation of the application
+            // (e.g. BEFORE WebApplication.CreateBuilder(args) is called in Program.cs).
+            .UseConfiguration(configuration)
+            .ConfigureAppConfiguration(configurationBuilder =>
+            {
+                configurationBuilder.AddInMemoryCollection(configurationValues);
+            })
+            .ConfigureServices(_ =>
+            {
+                // Add or replace any services that the application needs during testing.
+            });
     }
 
     protected override IHost CreateHost(IHostBuilder builder)

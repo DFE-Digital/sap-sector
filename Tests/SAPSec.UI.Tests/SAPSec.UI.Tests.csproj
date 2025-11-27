@@ -9,10 +9,12 @@
     <IsTestProject>true</IsTestProject>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="7.2.0" />
+    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -36,9 +38,11 @@
     <ProjectReference Include="..\..\SAPSec.Web\SAPSec.Web.csproj" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <CoverletOutput Condition=" '$(OutputPath)' != '' ">$([MSBuild]::EnsureTrailingSlash('$(OutputPath)'))</CoverletOutput>
-    <CollectCoverage>true</CollectCoverage>
-    <CoverletOutputFormat>cobertura,json</CoverletOutputFormat>
-  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="TestData\Establishments-UI-Test-Data.csv" />
+    <Content Include="TestData\Establishments-UI-Test-Data.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  
 </Project>
