@@ -23,16 +23,10 @@ public class SchoolHomeController : Controller
     {
         var user = await _userService.GetUserFromClaimsAsync(User);
 
-        if (user == null)
-        {
-            return RedirectToAction("Index", "SchoolSearch");
-        }
-
         var currentOrg = await _userService.GetCurrentOrganisationAsync(User);
 
-        if (currentOrg == null && user.Organisations.Count > 1)
+        if (currentOrg.Category.Name != "Establishment")
         {
-            _logger.LogInformation("User needs to select organisation");
             return RedirectToAction("Index", "SchoolSearch");
         }
 
