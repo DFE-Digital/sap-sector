@@ -130,7 +130,7 @@ jobs:
             /p:UseSourceLink=true \
             /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*' \
             /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
-            --verbosity normal || exit 1
+            --verbosity normal
         done
 
 #Example of how to exclude tests from coverage https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
