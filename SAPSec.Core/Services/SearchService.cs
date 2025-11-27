@@ -18,7 +18,7 @@ public class SearchService(ILuceneIndexReader indexReader, ISchoolRepository sch
 
         foreach (var (urn, schoolName) in searchResults)
         {
-            var school = GetSchoolByUrnAsync(urn);
+            var school = GetSchoolByUrn(urn);
             results.Add(new SchoolSearchResult(schoolName, school));
         }
 
@@ -44,7 +44,7 @@ public class SearchService(ILuceneIndexReader indexReader, ISchoolRepository sch
                 : null;
     }
 
-    public School GetSchoolByUrnAsync(int urn)
+    public School GetSchoolByUrn(int urn)
     {
         return schoolRepository.GetSchoolByUrn(urn);
     }
