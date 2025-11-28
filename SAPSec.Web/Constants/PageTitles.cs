@@ -2,6 +2,7 @@ namespace SAPSec.Web.Constants;
 
 public static class PageTitles
 {
+    public const string TermsOfUse = "Terms of use";
     public const string PrivacyPolicy = "Privacy Policy";
     public const string ServiceHome = "School Profile - Sector facing";
     public const string ErrorNotFound = "Page not found";

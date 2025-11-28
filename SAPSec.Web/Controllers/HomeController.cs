@@ -18,11 +18,6 @@ public class HomeController(IOptions<DfeSignInSettings> configuration, IWebHostE
         return View(new HomeViewModel { StartNowUri = startNowUrl });
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
