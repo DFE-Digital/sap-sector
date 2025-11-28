@@ -137,6 +137,7 @@ jobs:
 
     - name: Upload Test Result Files
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: test-results
         path: "**/TestResults/**/*"
@@ -144,11 +145,10 @@ jobs:
 
     - name: Publish Test Results
       uses: dorny/test-reporter@v2
-      if: ${{ !cancelled() }}
+      if: always()
       with:
-        artifact: test-results
         reporter: 'dotnet-trx'
-        path: "**/*.trx"
+        path: "**/TestResults/**/*.trx"
         name: 'Test Results'
 
     - name: merge coverage files
