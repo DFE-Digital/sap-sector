@@ -1,208 +1,192 @@
-@using SAPSec.Web.ViewModels
+@model SAPSec.Web.ViewModels.SchoolSearchSuggesterViewModel
+
 <script type="text/javascript" src="/js/accessible-autocomplete.min.js" asp-append-version="true"></script>
+<script type="text/javascript" src="/js/lodash.debounce/index.js" asp-append-version="true"></script>
 <script add-nonce="true">
-  // Sending requests to a server means that when the autocomplete has no
-  // result, it may not be because there are no results, but because these
-  // results are being fetched, or because an error happened. We can use the
-  // function for internationalizing the 'No results found' message to
-  // provide a little more context to users.
-  //
-  // It'll rely on a `status` variable updated by the wrappers of the
-  // function making the request (see thereafter)
-  let status;
 
-  function tNoResults() {
-    if (status === 'loading') {
-      return 'Loading suggestions...'
-    } else if (status === 'error') {
-      return 'Sorry, an error occurred'
-    } else {
-      return 'No results found'
-    }
-  }
+    function Suggester(options) {
+        const {
+            inputElementId,
+            targetElementId,
+            documentKey,
+            exclude
+        } = options;
 
-  // We'll wrap that function multiple times, each enhancing the previous
-  // wrapping to handle the different behaviors necessary to
-  // appropriately coordinate requests to the server and display feedback to
-  // users
-  const makeRequest =
-    // Wrapping everything is the error handling to make sure it catches
-    // errors from any of the other wrappers
-    trackErrors(
-      // Next up is tracking whether we're loading new results
-      trackLoading(
-        // To avoid overloading the server with potentially costly requests
-        // as well as avoid wasting bandwidth while users are typing, we'll
-        // only send requests a little bit after they stop typing
-        debounce(
-          // Finally, we want to cancel requests that are already sent, so
-          // only the results of the last one update the UI This is the role
-          // of the next two wrappers
-          abortExisting(
-            // That last one is for demo only, to simulate server behaviors
-            // (latency, errors, filtering) on the client
-            requestSuggestions
-          ),
-          250
-        )
-      )
-    );
+        let abortController = new AbortController();
 
-  // We can then use the function we built and adapt it to the autocomplete
-  // API encapsulating the adjustments specific to rendering the 'No result
-  // found' message
-  function source(query, populateResults) {
-    // Start by clearing the results to ensure a loading message
-    // shows when the query gets updated after results have loaded
-    populateResults([])
+        const handleSuggest = async (query) => {
+            const params = new URLSearchParams({
+                queryPart: query,
+            });
+            if (exclude) {
+                exclude.forEach((e) => {
+                    params.append("exclude", e);
+                });
+            }
 
-    makeRequest(query)
-      // Only update the results if an actual array of options gets returned
-      // allowing for `makeRequest` to avoid making updates to results being
-      // already displayed by resolving to `undefined`, like when we're
-      // aborting requests
-      .then(options => options && populateResults(options))
-      // In case of errors, we need to clear the results, so the accessible
-      // autocomplete shows its 'No result found'
-      .catch(_ => populateResults([]))
-  }
+            const res = await fetch("/school/suggest?" + params.toString(), {
+                redirect: "manual",
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                signal: abortController.signal,
+            });
 
-  // And finally, we can set up our accessible autocomplete
-  const element = document.querySelector('.school-search-suggester-wrapper')
-  const id = '@nameof(SchoolSearchQueryViewModel.Query)'
+            const response = (await res.json());
 
-  // Find and remove the fallback input before initializing autocomplete
-  const fallbackInput = element.querySelector('input[data-fallback-input="true"]');
-  const savedValue = fallbackInput ? fallbackInput.value : '';
-  const hasError = fallbackInput ? fallbackInput.classList.contains('govuk-input--error') : false;
+            if (!response.error) {
+                return response;
+            }
 
-  if (fallbackInput) {
-    fallbackInput.remove();
-  }
+            return [];
+        };
 
-  accessibleAutocomplete({
-    element: element,
-    id: id,
-    name: id,
-    source: source,
-    tNoResults: tNoResults,
-    defaultValue: savedValue,
-    menuAttributes: {
-      "aria-labelledby": id
-    },
-    inputClasses: "govuk-input-autocomplete"
-  })
+        const suggestHighlightRegex = /\*([^*]+)\*/g;
 
-  // Apply error styling if needed
-  const autoCompleteInput = element.querySelector('input');
+        const templates = {
+            inputValue: itemFormatter,
+            suggestion: (item) => {
+                if (item?.schoolName) {
+                    return item.schoolName.replace(suggestHighlightRegex, "<b>$1</b>");
+                } else {
+                    return "";
+                }
+            },
+        };
 
-  if (hasError) {
-    if (autoCompleteInput) {
-      autoCompleteInput.classList.add('govuk-input--error');
-    }
-  }
-
-  window.addEventListener('pageshow', function(event) {
-    if (event.persisted) {
-      // Clear the autocomplete input
-      if (autoCompleteInput) {
-        autoCompleteInput.value = '';
-      }
-
-      // Clear the fallback input if it exists
-      if (fallbackInput) {
-        fallbackInput.value = '';
-      }
-    }
-  });
-
-  const SERVER_LATENCY = 200;
-
-  function requestSuggestions(query) {
-      return new Promise(resolve => {
-        return  setTimeout(async () => {
-          const suggestions = await fetch(`/school/suggest?queryPart=${encodeURIComponent(query)}`)
-            .then((response) => response.json())
-            .then((response) => {
-              return response;
-            })
-
-          resolve(suggestions)
-        }, SERVER_LATENCY)
-      })
-  }
-
-  // Debouncing limits the number of requests being sent
-  // but does not guarantee the order in which the responses come in
-  // Due to network and server latency, a response to an earlier request
-  // may come back after a response to a later request
-  // This keeps track of the AbortController of the last request sent
-  // so it can be canceled before sending a new one
-  let abortController;
-
-  function abortExisting(fn) {
-    return function (...args) {
-      if (abortController) {
-        abortController.abort();
-      }
-
-      abortController = new AbortController();
-
-      return fn(...args, {signal: abortController.signal})
-        .then(result => {
-          abortController = null;
-          return result;
-        }, error => {
-          // Aborting requests will lead to `fetch` rejecting with an
-          // `AbortError` In that situation, that's something we expect, so
-          // we don't want to show a message to users
-          if (error.name !== 'AbortError') {
-            abortController = null;
-            throw error;
-          }
-        })
-    }
-  }
-
-  // Debounce the given function so it only gets executed after a specific delay
-  function debounce(fn, wait) {
-    let timeout
-    return function (...args) {
-      return new Promise(resolve => {
-        clearTimeout(timeout)
-
-        const later = function () {
-          timeout = null
-          resolve(fn(...args))
+        function itemFormatter(item) {
+            return item?.schoolName ? item.schoolName.replace(suggestHighlightRegex, "$1") : "";
         }
-        timeout = setTimeout(later, wait)
-      })
-    }
-  }
 
-  // Tracks the loading state so we can adapt the message being displayed to the user
-  function trackLoading(fn) {
-    return function (...args) {
-      status = 'loading';
-      return fn(...args)
-        .then(result => {
-          status = null;
-          return result
-        }, error => {
-          status = null;
-          throw error
-        })
-    }
-  }
+        function valueFormatter(item) {
+            if (!item?.school) {
+                return "";
+            }
 
-  // In a similar fashion, we can track errors happening, which will adjust the message
-  function trackErrors(fn) {
-    return function (...args) {
-      return fn(...args)
-        .catch(error => {
-          status = 'error'
-          throw error
-        })
+            return (item.school[documentKey]) ?? "";
+        }
+
+        function onConfirm(item) {
+            const targetElement = document.getElementById(targetElementId);
+
+            if (targetElement) {
+                targetElement.value = valueFormatter(item);
+            }
+
+            if (inputElement) {
+                inputElement.value = itemFormatter(item);
+            }
+        }
+
+        const numericRegex = /^\d+\\*\/*\d+$/; // match for all number or number[/or\]number format
+
+        // debounce and/or cancel ongoing suggestions to prevent excessive requests
+        let suggesting = false;
+        const source = debounce(
+            (query, populateResults) => {
+                const trimmedQuery = query.trim();
+
+                if (suggesting) {
+                    abortController.abort("Query updated");
+                    abortController = new AbortController();
+                }
+
+                if (trimmedQuery.length < 3) {
+                    populateResults([]);
+                    return;
+                }
+
+                const targetElement = document.getElementById(targetElementId);
+
+                if (numericRegex.test(trimmedQuery)) {
+                    if (targetElement) {
+                        targetElement.value = inputElement.value;
+                    }
+                    populateResults([]);
+                    return;
+                } else if (targetElement) {
+                    targetElement.value = "";
+                }
+
+                suggesting = true;
+                handleSuggest(trimmedQuery)
+                    .then((results) => {
+                        populateResults(results);
+                    })
+                    .catch((e) => {
+                        if (e.name !== "AbortError") {
+                            throw e;
+                        }
+                    })
+                    .finally(() => {
+                        suggesting = false;
+                    });
+            },
+            300
+        );
+
+        const inputElement = document.getElementById(inputElementId);
+        if (inputElement) {
+            // create a placeholder element to render the autocomplete within
+            const autoCompleteElement = document.createElement("div");
+            const id = `__${inputElementId}`;
+            inputElement.parentNode?.insertBefore(autoCompleteElement, inputElement);
+
+            // create a hidden element to store the selected item ID
+            const targetElement = document.createElement("input");
+            targetElement.id = targetElementId;
+            targetElement.name = targetElementId;
+            targetElement.type = "hidden";
+            inputElement.parentNode?.insertBefore(targetElement, inputElement);
+
+            accessibleAutocomplete({
+                element: autoCompleteElement,
+                id,
+                name: id,
+                defaultValue: inputElement.value ?? "",
+                autoselect: false,
+                displayMenu: "overlay",
+                minLength: 3,
+                showAllValues: false,
+                showNoOptionsFound: false,
+                confirmOnBlur: false,
+                source,
+                templates,
+                onConfirm,
+                inputClasses: "govuk-input-autocomplete",
+            });
+
+            inputElement.type = "hidden";
+
+            autoCompleteElement.addEventListener("keydown", (e) => {
+                // submit form automatically on pressing the Enter Key, whether an item has been selected or not
+                if (e.key === "Enter") {
+                    autoCompleteElement.closest("form")?.submit();
+                }
+            });
+
+            autoCompleteElement.addEventListener("input", (e) => {
+                // keep the original input in sync with autocomplete input
+                const target = e.target;
+                let value = target.value?.toString();
+                if (value === "0") {
+                    value = target.innerText;
+                }
+
+                inputElement.value = value;
+
+                // clear any previously selected school
+                if (e.key !== "Enter") {
+                    targetElement.value = "";
+                }
+            });
+        }
     }
-  }
+
+    Suggester({
+        inputElementId: "@Model.InputElementId",
+        targetElementId: "@Model.TargetElementId",
+        documentKey: "@Model.IdFieldName"
+    });
 </script>

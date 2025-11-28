@@ -1,0 +1,39 @@
+﻿@model SAPSec.Web.ViewModels.SchoolViewModel
+@{
+    ViewData["Title"] = "Test Page - Sign In Success";
+}
+
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper" id="main-content" role="main">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <h1 class="govuk-heading-xl">Test Page for School</h1>
+
+                <p class="govuk-body-l">
+                    This page Displays the School details.
+                </p>
+
+                <!-- User Information -->
+                <h2 class="govuk-heading-m">Your Details</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Name</dt>
+                        <dd class="govuk-summary-list__value">@Model.Name</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Urn</dt>
+                        <dd class="govuk-summary-list__value">@Model.Urn</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Ukprn</dt>
+                        <dd class="govuk-summary-list__value">@Model.Ukprn</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">DfE Number</dt>
+                        <dd class="govuk-summary-list__value">@Model.DfENumber</dd>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </main>
+</div>

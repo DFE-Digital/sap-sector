@@ -70,6 +70,13 @@ const copyStaticAssets = () =>
     .on("end", () =>
       gulp
         .src([
+          "node_modules/lodash.debounce/index.js",
+        ])
+        .pipe(gulp.dest("wwwroot/js/lodash.debounce/"))
+    )
+    .on("end", () =>
+      gulp
+        .src([
           "node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js*",
         ])
         .pipe(gulp.dest("wwwroot/js/"))

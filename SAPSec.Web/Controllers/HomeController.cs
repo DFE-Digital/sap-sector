@@ -13,7 +13,7 @@ public class HomeController(IOptions<DfeSignInSettings> configuration, IWebHostE
     [DefaultBreadcrumb(PageTitles.ServiceHome)]
     public IActionResult Index()
     {
-        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Url.Action("Index", "school", null);
+        var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Url.Action("Index", "SchoolSearch", null);
 
         return View(new HomeViewModel { StartNowUri = startNowUrl });
     }

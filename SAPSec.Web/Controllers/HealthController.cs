@@ -10,10 +10,6 @@ namespace SAPSec.Web.Controllers
         ILogger<HealthController> logger,
         IWebHostEnvironment environment) : ControllerBase
     {
-        /// <summary>
-        /// Health check endpoint that reports the status of the application/service
-        /// Returns HTTP 200 if all checks pass, HTTP 500 if any check fails
-        /// </summary>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

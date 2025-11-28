@@ -4,7 +4,7 @@
     @foreach (var result in Model)
     {
         <li id="search-result-@result.URN">
-            <a href="@Url.Action("Index", "School", new { urn = result.URN })"
+            <a href="@Url.Action("Index", "School", new { result.URN })"
                class="govuk-link govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-2">@result.SchoolName</a>
         </li>
     }

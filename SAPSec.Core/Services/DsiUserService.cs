@@ -1,8 +1,9 @@
 ﻿using System.Security.Claims;
+using System.Text;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Services;
-using System.Text.Json;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Services;
@@ -95,7 +96,7 @@ public class DsiUserService(
             // Fix: ISession does not have GetString, so use TryGetValue and convert to string
             if (httpContext.Session.TryGetValue(OrganisationSessionKey, out var value) && value != null)
             {
-                selectedOrgId = System.Text.Encoding.UTF8.GetString(value);
+                selectedOrgId = Encoding.UTF8.GetString(value);
             }
         }
 
@@ -122,7 +123,7 @@ public class DsiUserService(
                 return Task.FromResult(false);
             }
 
-            httpContext.Session.Set(OrganisationSessionKey, System.Text.Encoding.UTF8.GetBytes(organisationId));
+            httpContext.Session.Set(OrganisationSessionKey, Encoding.UTF8.GetBytes(organisationId));
             return Task.FromResult(true);
         }
         catch (Exception ex)

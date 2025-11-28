@@ -10,7 +10,6 @@ public class WebApplicationSetupFixture : IAsyncLifetime
 
     public Task InitializeAsync()
     {
-        // Spin up the test server using TestWebApplicationFactory
         _factory = new TestWebApplicationFactory();
 
         if(_factory.Server == null) throw new InvalidOperationException("Test Server not started");
