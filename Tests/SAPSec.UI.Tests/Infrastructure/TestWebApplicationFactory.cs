@@ -22,9 +22,12 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.UseEnvironment("Development");
 
+        var testDataFilePath = Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-UI-Test-Data.csv");
+        if (!File.Exists(testDataFilePath)) throw new FileNotFoundException("Test data file not found", testDataFilePath);
+
         var configurationValues = new Dictionary<string, string?>
         {
-            { "Establishments:CsvPath", ".\\TestData\\Establishments-UI-Test-Data.csv" }
+            { "Establishments:CsvPath", testDataFilePath }
         };
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configurationValues)

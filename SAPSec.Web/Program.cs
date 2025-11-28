@@ -92,13 +92,7 @@ public partial class Program
                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
                .SetApplicationName("SAPSec");
 
-        // Search services
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-        // if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
-        // {
-        //     establishmentsCsvPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, establishmentsCsvPath));
-        // }
-
         builder.Services.AddCoreDependencies();
         builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 
@@ -136,9 +130,7 @@ public partial class Program
 
         // Log wwwroot contents on startup for debugging
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
-        Console.WriteLine(Directory.Exists(wwwrootPath)
-            ? $"=== wwwroot exists at: {wwwrootPath} ==="
-            : $"WARNING: wwwroot directory not found at {wwwrootPath}");
+        if(!Directory.Exists(wwwrootPath)) Console.WriteLine( $"WARNING: wwwroot directory not found at {wwwrootPath}");
 
         app.UseStaticFiles(new StaticFileOptions
         {
