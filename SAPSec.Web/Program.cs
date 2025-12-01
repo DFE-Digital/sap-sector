@@ -13,6 +13,17 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.StaticFiles;
+using SAPSec.Core;
+using SAPSec.Infrastructure;
+using SAPSec.Web.Extensions;
+using SAPSec.Web.Middleware;
+using SmartBreadcrumbs.Extensions;
 
 namespace SAPSec.Web;
 
@@ -27,7 +38,7 @@ public partial class Program
             .AddJsonOptions(options =>
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
 
         builder.Services.AddRazorPages();
@@ -104,19 +115,22 @@ public partial class Program
 
         builder.Services.Configure<RequestLocalizationOptions>(options =>
         {
-            options.DefaultRequestCulture = new Microsoft.AspNetCore.Localization.RequestCulture("en-GB");
+            options.DefaultRequestCulture = new RequestCulture("en-GB");
             options.SupportedCultures = new List<CultureInfo> { new CultureInfo("en-GB") };
             options.RequestCultureProviders.Clear();
         });
 
         builder.Services.AddHealthChecks();
 
-        var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-        if (!string.IsNullOrWhiteSpace(establishmentsCsvPath) && !Path.IsPathRooted(establishmentsCsvPath))
-        {
-            establishmentsCsvPath = Path.GetFullPath(Path.Combine(builder.Environment.ContentRootPath, establishmentsCsvPath));
-        }
+        var dataProtectionPath = builder.Environment.IsDevelopment()
+                                 ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
+                                   : "/keys";
 
+        builder.Services.AddDataProtection()
+               .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
+               .SetApplicationName("SAPSec");
+
+        var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         builder.Services.AddCoreDependencies();
         builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 
@@ -147,9 +161,7 @@ public partial class Program
         provider.Mappings[".mjs"] = "application/javascript";
 
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
-        Console.WriteLine(Directory.Exists(wwwrootPath)
-            ? $"=== wwwroot exists at: {wwwrootPath} ==="
-            : $"WARNING: wwwroot directory not found at {wwwrootPath}");
+        if(!Directory.Exists(wwwrootPath)) Console.WriteLine( $"WARNING: wwwroot directory not found at {wwwrootPath}");
 
         app.UseStaticFiles(new StaticFileOptions
         {

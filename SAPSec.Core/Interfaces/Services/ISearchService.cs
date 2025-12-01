@@ -4,6 +4,8 @@ namespace SAPSec.Core.Interfaces.Services;
 
 public interface ISearchService
 {
-    Task<IReadOnlyList<SearchResult>> SearchAsync(string query, int take = 10);
-    Task<IReadOnlyList<string>> SuggestAsync(string prefix, int take = 10);
+    Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query);
+    Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart);
+    School? SearchByNumber(string schoolNumber);
+    School GetSchoolByUrn(int urn);
 }

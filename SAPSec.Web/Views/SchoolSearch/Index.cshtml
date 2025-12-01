@@ -12,5 +12,9 @@
 })
 
 
-@await Html.PartialAsync("_SchoolSearchSuggest")
-
+@await Html.PartialAsync("_SchoolSearchSuggest", new SchoolSearchSuggesterViewModel
+{
+    InputElementId = nameof(Model.Query),
+    TargetElementId = nameof(Model.Urn),
+    IdFieldName = "urn"
+})

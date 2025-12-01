@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Web;
@@ -15,11 +16,35 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = _random.Next(6001, 6999);
+        var port = _random.Next(6001, 6100);
 
         builder.UseUrls($"https://localhost:{port}");
 
         builder.UseEnvironment("Development");
+
+        var testDataFilePath = Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-UI-Test-Data.csv");
+        if (!File.Exists(testDataFilePath)) throw new FileNotFoundException("Test data file not found", testDataFilePath);
+
+        var configurationValues = new Dictionary<string, string?>
+        {
+            { "Establishments:CsvPath", testDataFilePath }
+        };
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(configurationValues)
+            .Build();
+
+        builder
+            // This configuration is used during the creation of the application
+            // (e.g. BEFORE WebApplication.CreateBuilder(args) is called in Program.cs).
+            .UseConfiguration(configuration)
+            .ConfigureAppConfiguration(configurationBuilder =>
+            {
+                configurationBuilder.AddInMemoryCollection(configurationValues);
+            })
+            .ConfigureServices(_ =>
+            {
+                // Add or replace any services that the application needs during testing.
+            });
     }
 
     protected override IHost CreateHost(IHostBuilder builder)

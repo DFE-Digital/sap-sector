@@ -48,7 +48,7 @@ public class SchoolSearchControllerTests
 
         var model = result.Model as SchoolSearchQueryViewModel;
         model!.Query.Should().BeEmpty();
-        model.EstablishmentId.Should().BeNull();
+        model.Urn.Should().BeNull();
     }
 
     #endregion
@@ -56,18 +56,15 @@ public class SchoolSearchControllerTests
     #region Index POST Tests
 
     [Fact]
-    public void Index_Post_WithValidModel_RedirectsToSearch()
+    public void Index_Post_WithValidQuery_RedirectsToSearch()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School"
         };
 
-        // Act
         var result = _controller.Index(viewModel);
 
-        // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -78,19 +75,16 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithInvalidModelState_ReturnsViewWithModel()
+    public void Index_Post_WithInvalidShortQuery_ReturnsViewWithModelError()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "AB" // Too short - minimum is 3 characters
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or URN (minimum 3 characters)");
+        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn (minimum 3 characters)");
 
-        // Act
         var result = _controller.Index(viewModel);
 
-        // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
 
@@ -99,19 +93,16 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithEmptyQuery_ReturnsViewWithModel()
+    public void Index_Post_WithEmptyQuery_ReturnsViewWithModelError()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = string.Empty
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or URN to start a search");
+        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn to start a search");
 
-        // Act
         var result = _controller.Index(viewModel);
 
-        // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
 
@@ -121,22 +112,55 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithMinimumValidQuery_RedirectsToSearch()
+    public void Index_Post_WithThreeCharQuery_RedirectsToSearch()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
-            Query = "ABC" // Minimum 3 characters
+            Query = "ABC"
         };
 
-        // Act
         var result = _controller.Index(viewModel);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.RouteValues!["query"].Should().Be("ABC");
+    }
+
+    [Fact]
+    public void Index_Post_WithQueryAndUln_RedirectsToSchoolDetails()
+    {
+        var viewModel = new SchoolSearchQueryViewModel
+        {
+            Query = "School",
+            Urn = "123456"
+        };
+
+        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
+            .Returns(new School(123456, 10, 100, 1, "School by Urn"));
+
+        var result = _controller.Index(viewModel);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.RouteValues!["urn"].Should().Be(123456);
+    }
+
+    [Fact]
+    public void Index_Post_WithNumericSearch_RedirectsToSchoolDetails()
+    {
+        var viewModel = new SchoolSearchQueryViewModel
+        {
+            Query = "123/123"
+        };
+
+        var result = _controller.Index(viewModel);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.RouteValues!["query"].Should().Be("123/123");
     }
 
     #endregion
@@ -146,21 +170,18 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Search_Get_WithValidQuery_ReturnsViewWithResults()
     {
-        // Arrange
         var query = "Test School";
-        var searchResults = new List<SearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new SearchResult(new Establishment(123456, "Test School 1"), 1),
-            new SearchResult(new Establishment(789012, "Test School 2"), 0.9f)
+            new SchoolSearchResult("Test School 1", new School(123456, 10, 100, 1, "Test School 1")),
+            new SchoolSearchResult("Test School 2", new School(789012, 10, 100, 1, "Test School 2"))
         };
 
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
+        _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        // Act
         var result = await _controller.Search(query);
 
-        // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
 
@@ -179,14 +200,11 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Search_Get_WithNullQuery_SearchesWithEmptyString()
     {
-        // Arrange
-        _mockSearchService.Setup(s => s.SearchAsync(string.Empty, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Search((string?) null);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
 
         var viewResult = result as ViewResult;
@@ -194,20 +212,17 @@ public class SchoolSearchControllerTests
         model!.Query.Should().BeEmpty();
         model.Results.Should().BeEmpty();
 
-        _mockSearchService.Verify(s => s.SearchAsync(string.Empty, 50), Times.Once);
+        _mockSearchService.Verify(s => s.SearchAsync(string.Empty), Times.Once);
     }
 
     [Fact]
     public async Task Search_Get_WithEmptyQuery_ReturnsEmptyResults()
     {
-        // Arrange
-        _mockSearchService.Setup(s => s.SearchAsync(string.Empty, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Search(string.Empty);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
 
         var viewResult = result as ViewResult;
@@ -219,15 +234,12 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Search_Get_WithWhitespaceQuery_SearchesWithWhitespace()
     {
-        // Arrange
         var query = "   ";
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Search(query);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
 
         var viewResult = result as ViewResult;
@@ -238,15 +250,12 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Search_Get_WhenServiceReturnsNoResults_ReturnsEmptyResultsViewModel()
     {
-        // Arrange
         var query = "Nonexistent School";
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Search(query);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
 
         var viewResult = result as ViewResult;
@@ -258,58 +267,60 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Search_Get_WithURNQuery_ReturnsMatchingSchool()
     {
-        // Arrange
         var query = "123456";
-        var searchResults = new List<SearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new SearchResult(new Establishment(123456, "School by URN"), 1)
+            new SchoolSearchResult("School by Urn", new School(123456, 10, 100, 1, "School by Urn"))
         };
 
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
+        _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        // Act
         var result = await _controller.Search(query);
 
-        // Assert
-        result.Should().BeOfType<ViewResult>();
-
-        var viewResult = result as ViewResult;
-        var model = viewResult!.Model as SchoolSearchResultsViewModel;
-        model!.Results.Should().HaveCount(1);
-        model.Results[0].URN.Should().Be("123456");
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.ControllerName.Should().Be("School");
+        redirectResult.RouteValues!["urn"].Should().Be(123456);
     }
 
     [Fact]
     public async Task Search_Get_CallsSearchServiceWithCorrectParameters()
     {
-        // Arrange
         var query = "Test School";
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         await _controller.Search(query);
 
-        // Assert
-        _mockSearchService.Verify(s => s.SearchAsync(query, 50), Times.Once);
+        _mockSearchService.Verify(s => s.SearchAsync(query), Times.Once);
     }
 
     [Fact]
     public async Task Search_Get_LogsScopeWithQuery()
     {
-        // Arrange
         var query = "Test School";
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         await _controller.Search(query);
 
-        // Assert
-        _mockLogger.Verify(
-            x => x.BeginScope(It.IsAny<It.IsAnyType>()),
-            Times.Once);
+        _mockLogger.Verify(x => x.BeginScope(It.IsAny<It.IsAnyType>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Search_Get_WithSingle_Match_RedirectsToSchoolDetails()
+    {
+        var query = "Saint Paul Roman Catholic";
+
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult> { new SchoolSearchResult(query, new School(100273, 1, 2, 3, query)) });
+
+        var result = await _controller.Search(query);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.RouteValues!["urn"].Should().Be(100273);
     }
 
     #endregion
@@ -317,19 +328,16 @@ public class SchoolSearchControllerTests
     #region Search POST Tests
 
     [Fact]
-    public void Search_Post_WithValidQueryAndNoEstablishmentId_RedirectsToSearchGet()
+    public void Search_Post_WithValidQueryAndNoUrn_RedirectsToSearchGet()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School",
-            EstablishmentId = null
+            Urn = null
         };
 
-        // Act
         var result = _controller.Search(viewModel);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
@@ -338,42 +346,38 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithEstablishmentId_RedirectsToSchoolController()
+    public void Search_Post_WithUrn_RedirectsToSchoolController()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School",
-            EstablishmentId = "123456"
+            Urn = "123456"
         };
+        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
+            .Returns(new School(123456, 10, 100, 1, "School by Urn"));
 
-        // Act
         var result = _controller.Search(viewModel);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.ActionName.Should().Be("Index");
         redirectResult.ControllerName.Should().Be("School");
         redirectResult.RouteValues.Should().ContainKey("urn");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+        redirectResult.RouteValues!["urn"].Should().Be(123456);
     }
 
     [Fact]
-    public void Search_Post_WithWhitespaceEstablishmentId_RedirectsToSearchGet()
+    public void Search_Post_WithWhitespaceUrn_RedirectsToSearchGet()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School",
-            EstablishmentId = "   "
+            Urn = "   "
         };
 
-        // Act
         var result = _controller.Search(viewModel);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
@@ -382,19 +386,16 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithEmptyEstablishmentId_RedirectsToSearchGet()
+    public void Search_Post_WithEmptyUrn_RedirectsToSearchGet()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School",
-            EstablishmentId = string.Empty
+            Urn = string.Empty
         };
 
-        // Act
         var result = _controller.Search(viewModel);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
@@ -402,19 +403,16 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithInvalidModelState_ReturnsViewWithResultsViewModel()
+    public void Search_Post_WithInvalidShorQuery_ReturnsViewWithResultsViewModel()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
-            Query = "AB" // Too short
+            Query = "AB"
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or URN (minimum 3 characters)");
+        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn (minimum 3 characters)");
 
-        // Act
         var result = _controller.Search(viewModel);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
 
         var viewResult = result as ViewResult;
@@ -428,17 +426,14 @@ public class SchoolSearchControllerTests
     [Fact]
     public void Search_Post_WithInvalidModelStateAndNullQuery_ReturnsViewWithEmptyQuery()
     {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = null!
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or URN to start a search");
+        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn to start a search");
 
-        // Act
         var result = _controller.Search(viewModel);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
 
         var viewResult = result as ViewResult;
@@ -446,42 +441,26 @@ public class SchoolSearchControllerTests
         model!.Query.Should().BeNull();
     }
 
-    [Fact]
-    public void Search_Post_WithMultipleErrors_ReturnsViewWithModel()
-    {
-        // Arrange
-        var viewModel = new SchoolSearchQueryViewModel
-        {
-            Query = "A"
-        };
-        _controller.ModelState.AddModelError("Query", "Error 1");
-        _controller.ModelState.AddModelError("Query", "Error 2");
-
-        // Act
-        var result = _controller.Search(viewModel);
-
-        // Assert
-        result.Should().BeOfType<ViewResult>();
-        _controller.ModelState.ErrorCount.Should().Be(2);
-    }
-
     #endregion
 
     #region Suggest Tests
 
     [Fact]
-    public async Task Suggest_WithValidQueryPart_ReturnsOkWithsuggest()
+    public async Task Suggest_WithValidQueryPart_ReturnsOkWithSuggest()
     {
-        // Arrange
         var queryPart = "Test";
-        var suggestions = new List<string> { "Test School 1", "Test School 2", "Test Academy" };
-        _mockSearchService.Setup(s => s.SuggestAsync(queryPart, 10))
+        var suggestions = new List<SchoolSearchResult>
+        {
+            new SchoolSearchResult("Test School 1", new School(1, 10, 100, 1, "Test School 1")),
+            new SchoolSearchResult("Test School 2", new School(2, 20, 200, 1, "Test School 2")),
+            new SchoolSearchResult("Test School 3", new School(3, 30, 300, 1, "Test School 3"))
+        };
+
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
             .ReturnsAsync(suggestions);
 
-        // Act
         var result = await _controller.Suggest(queryPart);
 
-        // Assert
         result.Should().BeOfType<OkObjectResult>();
 
         var okResult = result as OkObjectResult;
@@ -491,81 +470,70 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Suggest_WithDefaultTakeParameter_Uses10()
     {
-        // Arrange
         var queryPart = "Test";
-        _mockSearchService.Setup(s => s.SuggestAsync(queryPart, 10))
-            .ReturnsAsync(new List<string>());
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         await _controller.Suggest(queryPart);
 
-        // Assert
-        _mockSearchService.Verify(s => s.SuggestAsync(queryPart, 10), Times.Once);
+        _mockSearchService.Verify(s => s.SuggestAsync(queryPart), Times.Once);
     }
 
     [Fact]
-    public async Task Suggest_WhenNosuggest_ReturnsEmptyList()
+    public async Task Suggest_WhenNoSuggest_ReturnsEmptyList()
     {
-        // Arrange
         var queryPart = "XYZ";
-        _mockSearchService.Setup(s => s.SuggestAsync(queryPart, 10))
-            .ReturnsAsync(new List<string>());
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Suggest(queryPart);
 
-        // Assert
         result.Should().BeOfType<OkObjectResult>();
 
         var okResult = result as OkObjectResult;
-        var suggestions = okResult!.Value as List<string>;
+        var suggestions = okResult!.Value as List<SchoolSearchResult>;
         suggestions.Should().BeEmpty();
     }
 
     [Fact]
     public async Task Suggest_WithEmptyQueryPart_CallsService()
     {
-        // Arrange
         var queryPart = string.Empty;
-        _mockSearchService.Setup(s => s.SuggestAsync(queryPart, 10))
-            .ReturnsAsync(new List<string>());
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Suggest(queryPart);
 
-        // Assert
         result.Should().BeOfType<OkObjectResult>();
-        _mockSearchService.Verify(s => s.SuggestAsync(queryPart, 10), Times.Once);
+        _mockSearchService.Verify(s => s.SuggestAsync(queryPart), Times.Once);
     }
 
     [Fact]
     public async Task Suggest_WithNullQueryPart_CallsServiceWithNull()
     {
-        // Arrange
         string? queryPart = null;
-        _mockSearchService.Setup(s => s.SuggestAsync(It.IsAny<string>(), 10))
-            .ReturnsAsync(new List<string>());
+        _mockSearchService.Setup(s => s.SuggestAsync(It.IsAny<string>()))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Suggest(queryPart!);
 
-        // Assert
         result.Should().BeOfType<OkObjectResult>();
     }
 
     [Fact]
     public async Task Suggest_WithSingleCharacter_ReturnsResults()
     {
-        // Arrange
         var queryPart = "A";
-        var suggestions = new List<string> { "Academy 1", "Academy 2" };
-        _mockSearchService.Setup(s => s.SuggestAsync(queryPart, 10))
+        var suggestions = new List<SchoolSearchResult>
+        {
+            new SchoolSearchResult("Test School 1", new School(1, 10, 100, 2, "Test School 1")),
+            new SchoolSearchResult("Test School 2", new School(2, 10, 100, 2, "Test School 2"))
+        };
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
             .ReturnsAsync(suggestions);
 
-        // Act
         var result = await _controller.Suggest(queryPart);
 
-        // Assert
         result.Should().BeOfType<OkObjectResult>();
 
         var okResult = result as OkObjectResult;
@@ -575,16 +543,13 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Suggest_WithSpecialCharacters_CallsService()
     {
-        // Arrange
-        var queryPart = "St. Mary's";
-        var suggestions = new List<string> { "St. Mary's School" };
-        _mockSearchService.Setup(s => s.SuggestAsync(queryPart, 10))
+        var queryPart = "St. * + Mary's";
+        var suggestions = new List<SchoolSearchResult> { new SchoolSearchResult("St. Mary's School", new School(123456, 10, 100, 1, "St. Mary's School")) };
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
             .ReturnsAsync(suggestions);
 
-        // Act
         var result = await _controller.Suggest(queryPart);
 
-        // Assert
         result.Should().BeOfType<OkObjectResult>();
 
         var okResult = result as OkObjectResult;
@@ -598,95 +563,66 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Search_Get_WhenServiceThrowsException_PropagatesException()
     {
-        // Arrange
         var query = "Test";
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
+        _mockSearchService.Setup(s => s.SearchAsync(query))
             .ThrowsAsync(new InvalidOperationException("Service error"));
 
-        // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Search(query));
     }
 
     [Fact]
     public async Task Suggest_WhenServiceThrowsException_PropagatesException()
     {
-        // Arrange
         var queryPart = "Test";
-        _mockSearchService.Setup(s => s.SuggestAsync(queryPart, 10))
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
             .ThrowsAsync(new InvalidOperationException("Service error"));
 
-        // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Suggest(queryPart));
     }
 
     [Fact]
     public async Task Search_Get_WithVeryLongQuery_CallsService()
     {
-        // Arrange
         var query = new string('A', 1000);
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Search(query);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
-        _mockSearchService.Verify(s => s.SearchAsync(query, 50), Times.Once);
+        _mockSearchService.Verify(s => s.SearchAsync(query), Times.Once);
     }
 
     [Fact]
-    public async Task Search_Get_WithUnicodeCharacters_CallsService()
+    public void Search_Post_WithBothUrnAndQuery_PrioritizesUrn()
     {
-        // Arrange
-        var query = "École Français 中文学校";
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
-            .ReturnsAsync(new List<SearchResult>());
-
-        // Act
-        var result = await _controller.Search(query);
-
-        // Assert
-        result.Should().BeOfType<ViewResult>();
-
-        var viewResult = result as ViewResult;
-        var model = viewResult!.Model as SchoolSearchResultsViewModel;
-        model!.Query.Should().Be(query);
-    }
-
-    [Fact]
-    public void Search_Post_WithBothEstablishmentIdAndQuery_PrioritizesEstablishmentId()
-    {
-        // Arrange
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School",
-            EstablishmentId = "123456"
+            Urn = "123456"
         };
 
-        // Act
+        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
+            .Returns(new School(123456, 10, 100, 1, "School by Urn"));
+
         var result = _controller.Search(viewModel);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+        redirectResult.RouteValues!["urn"].Should().Be(123456);
     }
 
     [Fact]
     public async Task Search_Get_WithMultipleSpacesInQuery_PreservesSpaces()
     {
-        // Arrange
         var query = "Test     School";
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
-            .ReturnsAsync(new List<SearchResult>());
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
-        // Act
         var result = await _controller.Search(query);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
 
         var viewResult = result as ViewResult;
@@ -697,27 +633,22 @@ public class SchoolSearchControllerTests
     [Fact]
     public async Task Search_Get_WithSingleResult_ReturnsCorrectly()
     {
-        // Arrange
         var query = "Unique School";
-        var searchResults = new List<SearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new SearchResult(new Establishment(999999, "Unique School"), 1)
+            new SchoolSearchResult("Unique School", new School(999999, 10, 100, 1, "Unique School"))
         };
 
-        _mockSearchService.Setup(s => s.SearchAsync(query, 50))
+        _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        // Act
         var result = await _controller.Search(query);
 
-        // Assert
-        result.Should().BeOfType<ViewResult>();
+        result.Should().BeOfType<RedirectToActionResult>();
 
-        var viewResult = result as ViewResult;
-        var model = viewResult!.Model as SchoolSearchResultsViewModel;
-        model!.Results.Should().HaveCount(1);
-        model.Results[0].SchoolName.Should().Be("Unique School");
-        model.Results[0].URN.Should().Be("999999");
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.ControllerName.Should().Be("School");
+        redirectResult.RouteValues!["urn"].Should().Be(999999);
     }
 
     #endregion

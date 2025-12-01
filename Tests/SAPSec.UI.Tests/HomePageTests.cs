@@ -18,6 +18,28 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
     }
 
     [Fact]
+    public async Task Privacy_LoadsSuccessfully()
+    {
+        // Act - Use Page property from PageTest with relative URL
+        var response = await Page.GotoAsync("/Home/Privacy");
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Status.Should().Be(200);
+    }
+
+    [Fact]
+    public async Task Error_LoadsSuccessfully()
+    {
+        // Act - Use Page property from PageTest with relative URL
+        var response = await Page.GotoAsync("/Home/Error");
+
+        // Assert
+        response.Should().NotBeNull();
+        response.Status.Should().Be(200);
+    }
+
+    [Fact]
     public async Task HomePage_HasCorrectTitle()
     {
         // Arrange

@@ -15,4 +15,11 @@
     <None Remove="Data\Schools.csv" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Remove="Data\Establishments.csv" />
+    <Content Include="Data\Establishments.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
