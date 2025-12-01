@@ -5,7 +5,8 @@ using Xunit;
 
 namespace SAPSec.UI.Tests;
 
-public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
+[Collection("UITestsCollection")]
+public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private const string TermsOfUsePath = "/terms-of-use";
 

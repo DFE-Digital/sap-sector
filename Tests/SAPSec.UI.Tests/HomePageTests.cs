@@ -4,7 +4,8 @@ using Xunit;
 
 namespace SAPSec.UI.Tests;
 
-public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
+[Collection("UITestsCollection")]
+public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     [Fact]
     public async Task HomePage_LoadsSuccessfully()

@@ -5,7 +5,8 @@ using SAPSec.Web.Domain;
 
 namespace SAPSec.Integration.Tests;
 
-public class HealthEndpointTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
+[Collection("IntegrationTestsCollection")]
+public class HealthEndpointTests(WebApplicationSetupFixture fixture)
 {
     [Fact]
     public async Task HealthEndpoint_ReturnsSuccess()

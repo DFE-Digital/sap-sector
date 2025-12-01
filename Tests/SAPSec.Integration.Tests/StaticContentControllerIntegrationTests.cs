@@ -4,7 +4,8 @@ using SAPSec.Integration.Tests.Infrastructure;
 
 namespace SAPSec.Integration.Tests;
 
-public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
+[Collection("IntegrationTestsCollection")]
+public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture fixture)
 {
     [Fact]
     public async Task GetAccessibility_ReturnsSuccess()

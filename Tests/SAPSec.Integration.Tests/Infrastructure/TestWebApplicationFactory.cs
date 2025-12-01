@@ -11,14 +11,11 @@ namespace SAPSec.Integration.Tests.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private readonly Random _random = new Random();
     private IHost? _host;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = _random.Next(5010, 5020);
-
-        builder.UseUrls($"https://localhost:{port}");
+        builder.UseUrls("http://127.0.0.1:0", "https://127.0.0.1:0");
 
         builder.UseEnvironment("Development");
 
@@ -89,6 +86,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void Dispose(bool disposing)
     {
-        _host?.Dispose();
+        if (disposing)
+        {
+            _host?.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

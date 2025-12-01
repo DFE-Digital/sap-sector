@@ -5,7 +5,8 @@ using Xunit;
 
 namespace SAPSec.UI.Tests;
 
-public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
+[Collection("UITestsCollection")]
+public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private const string AccessibilityPath = "/accessibility";
 

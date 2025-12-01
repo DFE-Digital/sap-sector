@@ -5,7 +5,8 @@ using Xunit;
 
 namespace SAPSec.UI.Tests;
 
-public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
+[Collection("UITestsCollection")]
+public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 

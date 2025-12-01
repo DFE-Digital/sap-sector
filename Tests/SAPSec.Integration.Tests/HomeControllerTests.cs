@@ -5,7 +5,8 @@ using SAPSec.Web.Constants;
 
 namespace SAPSec.Integration.Tests;
 
-public class HomeControllerTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
+[Collection("IntegrationTestsCollection")]
+public class HomeControllerTests(WebApplicationSetupFixture fixture)
 {
     [Fact]
     public async Task HomePage_ReturnsHtmlWithCorrectTitle()

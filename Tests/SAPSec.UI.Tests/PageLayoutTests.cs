@@ -5,7 +5,8 @@ using Xunit;
 
 namespace SAPSec.UI.Tests;
 
-public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
+[Collection("UITestsCollection")]
+public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private const string HomePagePath = "/";
 
