@@ -25,9 +25,9 @@ public class HomeControllerTests(WebApplicationSetupFixture fixture) : IClassFix
         var response = await fixture.Client.GetAsync("/");
         var content = await response.Content.ReadAsStringAsync();
 
-        content.Should().Contain("<a href=\"/cookies\">Cookies</a>");
-        content.Should().Contain("<a href=\"/accessibility\">Accessibility</a>");
-        content.Should().Contain("<a href=\"/terms-of-use\">Terms of use</a>");
+        content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/StaticContent/Cookies\">Cookies</a>");
+        content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/accessibility\">Accessibility</a>");
+        content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/terms-of-use\">Terms of use</a>");
         content.Should().Contain("https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers");
     }
 

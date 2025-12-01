@@ -1,39 +1,63 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Web.Constants;
+using Microsoft.AspNetCore.Mvc.Routing;
+using Microsoft.Extensions.Options;
+using Moq;
+using SAPSec.Core.Configuration;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
 
 public class HomeControllerTests
 {
-    private readonly HomeController _controller = new(null!, null!);
+    private readonly HomeController _controller;
+    private readonly Mock<IWebHostEnvironment> _mockEnvironment;
+    private readonly Mock<IUrlHelper> _mockUrlHelper;
+    private readonly string _signInUri = "https://example.com/signin";
+
+    public HomeControllerTests()
+    {
+        _mockEnvironment = new();
+        _mockUrlHelper = new();
+        Mock<IOptions<DfeSignInSettings>> options = new();
+
+        _controller = new(options.Object, _mockEnvironment.Object)
+        {
+            Url = _mockUrlHelper.Object
+        };
+
+        options.Setup(x => x.Value).Returns(new DfeSignInSettings { SignInUri = _signInUri });
+    }
 
     [Fact]
-    public void Index_Get_ReturnsViewResult()
+    public void Index_Get_In_Production_Environment_ReturnsViewResult()
     {
+        _mockEnvironment.SetupGet(x => x.EnvironmentName).Returns("Production");
         var result = _controller.Index();
 
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
+        var homeViewModel = (result as ViewResult)!.Model as HomeViewModel;
+        homeViewModel.Should().NotBeNull();
+        homeViewModel.StartNowUri.Should().Be(_signInUri);
     }
 
     [Fact]
-    public void Index_Get_SetsPageTitleInViewData()
+    public void Index_Get_In_Development_Environment_ReturnsViewResult()
     {
-        var result = _controller.Index() as ViewResult;
+        _mockEnvironment.SetupGet(x => x.EnvironmentName).Returns("Development");
+        _mockUrlHelper.Setup(x => x.Action(It.IsAny<UrlActionContext>())).Returns("/school-search");
 
-        result.Should().NotBeNull();
-        result.ViewData.ContainsKey(ViewDataKeys.Title).Should().BeTrue();
-        result.ViewData[ViewDataKeys.Title].Should().Be(PageTitles.ServiceHome);
-    }
-
-    [Fact]
-    public void Error_Get_ReturnsViewResult()
-    {
-        var result = _controller.Error();
+        var result = _controller.Index();
 
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
+        var homeViewModel = (result as ViewResult)!.Model as HomeViewModel;
+        homeViewModel.Should().NotBeNull();
+        homeViewModel.StartNowUri.Should().Be("/school-search");
     }
 }
