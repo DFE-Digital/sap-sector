@@ -16,7 +16,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = _random.Next(5001, 5010);
+        var port = _random.Next(5010, 5020);
 
         builder.UseUrls($"https://localhost:{port}");
 
