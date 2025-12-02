@@ -13,12 +13,14 @@ namespace SAPSec.UI.Tests.Infrastructure;
 public class WebApplicationSetupFixture : IAsyncLifetime
 {
     private Process? _appProcess;
-    public string BaseUrl { get; } = "https://localhost:5555";
+    public string BaseUrl { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {
+        var port = GetAvailablePort();
         var webProjectPath = GetWebProjectPath();
         var testDataPath = GetTestDataPath();
+        BaseUrl = $"https://localhost:{port}";
 
         Console.WriteLine($"📁 Starting app from: {webProjectPath}");
 
@@ -133,6 +135,16 @@ public class WebApplicationSetupFixture : IAsyncLifetime
 
         throw new FileNotFoundException(
             $"Test data file not found. Searched paths:\n{string.Join("\n", possiblePaths.Select(Path.GetFullPath))}");
+    }
+
+    private static int GetAvailablePort()
+    {
+        // This finds an available port by briefly opening a socket
+        var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
     }
 
 
