@@ -122,13 +122,22 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var dataProtectionPath = builder.Environment.IsDevelopment()
-                                 ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                   : "/keys";
+        if (builder.Environment.EnvironmentName == "Testing" || builder.Environment.EnvironmentName == "UITesting")
+        {
+            builder.Services.AddDataProtection()
+                .UseEphemeralDataProtectionProvider()
+                .SetApplicationName("SAPSec");
+        }
+        else
+        {
+            var dataProtectionPath = builder.Environment.IsDevelopment()
+                                     ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
+                                     : "/keys";
 
-        builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-               .SetApplicationName("SAPSec");
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
+                .SetApplicationName("SAPSec");
+        }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         builder.Services.AddCoreDependencies();
