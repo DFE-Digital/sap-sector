@@ -20,7 +20,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = _random.Next(5001, 5100);
+        var port = GetAvailablePort();  // Gets a guaranteed free port
         builder.UseUrls($"https://localhost:{port}");
 
         // Use "Testing" environment to trigger AutoAuthenticationHandler in Program.cs
@@ -106,5 +106,15 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         _host?.Dispose();
         base.Dispose(disposing);
+    }
+
+    private static int GetAvailablePort()
+    {
+        // This finds an available port by briefly opening a socket
+        var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
+        listener.Stop();
+        return port;
     }
 }
