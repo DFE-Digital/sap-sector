@@ -18,6 +18,7 @@ public class WebApplicationSetupFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         var webProjectPath = GetWebProjectPath();
+        var testDataPath = GetTestDataPath();
 
         Console.WriteLine($"📁 Starting app from: {webProjectPath}");
 
@@ -37,7 +38,7 @@ public class WebApplicationSetupFixture : IAsyncLifetime
 
         // ✅ Set environment variable
         _appProcess.StartInfo.EnvironmentVariables["ASPNETCORE_ENVIRONMENT"] = "UITesting";
-
+        _appProcess.StartInfo.EnvironmentVariables["Establishments__CsvPath"] = testDataPath;
         _appProcess.Start();
 
         // Read output for debugging
@@ -107,4 +108,32 @@ public class WebApplicationSetupFixture : IAsyncLifetime
             _appProcess.Dispose();
         }
     }
+    private string GetTestDataPath()
+    {
+        // Try multiple paths to find the test data file
+        var possiblePaths = new[]
+        {
+            // From bin/Debug/net8.0
+            Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-UI-Test-Data.csv"),
+            // From current directory
+            Path.Combine(Directory.GetCurrentDirectory(), "TestData", "Establishments-UI-Test-Data.csv"),
+            // Up from bin
+            Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "TestData", "Establishments-UI-Test-Data.csv")),
+        };
+
+        foreach (var path in possiblePaths)
+        {
+            var fullPath = Path.GetFullPath(path);
+            if (File.Exists(fullPath))
+            {
+                Console.WriteLine($"✅ Found test data at: {fullPath}");
+                return fullPath;
+            }
+        }
+
+        throw new FileNotFoundException(
+            $"Test data file not found. Searched paths:\n{string.Join("\n", possiblePaths.Select(Path.GetFullPath))}");
+    }
+
+
 }

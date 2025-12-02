@@ -5,42 +5,43 @@ namespace SAPSec.Integration.Tests.Infrastructure;
 public class WebApplicationSetupFixture : IAsyncLifetime
 {
     private TestWebApplicationFactory _factory = null!;
-    private TestWebApplicationFactory _authenticatedFactory = null!;
 
     public TestWebApplicationFactory Factory => _factory;
 
+    /// <summary>
+    /// Client that follows redirects - authenticated via "Testing" environment
+    /// </summary>
     public HttpClient Client { get; private set; } = null!;
+
+    /// <summary>
+    /// Client that doesn't follow redirects - authenticated via "Testing" environment
+    /// </summary>
     public HttpClient NonRedirectingClient { get; private set; } = null!;
-    public HttpClient AuthenticatedClient { get; private set; } = null!;
+
+    /// <summary>
+    /// Alias for NonRedirectingClient - for backward compatibility with tests using AuthenticatedClient
+    /// </summary>
+    public HttpClient AuthenticatedClient => NonRedirectingClient;
 
     public Task InitializeAsync()
     {
-        // Factory WITHOUT authentication
         _factory = new TestWebApplicationFactory();
 
+        // Client that follows redirects
         Client = _factory.CreateClient(new WebApplicationFactoryClientOptions
         {
+            BaseAddress = _factory.ClientOptions.BaseAddress,
             AllowAutoRedirect = true
         });
 
+        // Client that doesn't follow redirects
         NonRedirectingClient = _factory.CreateClient(new WebApplicationFactoryClientOptions
         {
+            BaseAddress = _factory.ClientOptions.BaseAddress,
             AllowAutoRedirect = false
         });
 
-        // ✅ SEPARATE factory WITH test authentication
-        _authenticatedFactory = new TestWebApplicationFactory()
-            .WithTestAuthentication(
-                userId: "test-user-123",
-                email: "test@example.com",
-                organisationId: "org-123",
-                organisationName: "Test Organisation"
-            );
-
-        AuthenticatedClient = _authenticatedFactory.CreateClient(new WebApplicationFactoryClientOptions
-        {
-            AllowAutoRedirect = false
-        });
+        Console.WriteLine($"✅ Fixture initialized with base URL: {_factory.ClientOptions.BaseAddress}");
 
         return Task.CompletedTask;
     }
@@ -49,9 +50,6 @@ public class WebApplicationSetupFixture : IAsyncLifetime
     {
         Client?.Dispose();
         NonRedirectingClient?.Dispose();
-        AuthenticatedClient?.Dispose();
-
         await _factory.DisposeAsync();
-        await _authenticatedFactory.DisposeAsync();
     }
 }

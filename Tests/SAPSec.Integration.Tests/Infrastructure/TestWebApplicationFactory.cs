@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;  // ✅ Add this for ConfigureTestServices
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -14,124 +15,96 @@ namespace SAPSec.Integration.Tests.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
-    private bool _useTestAuth = false;
-    private TestUserData? _testUserData;
-
-    public TestWebApplicationFactory WithTestAuthentication(
-        string userId = "test-user-123",
-        string email = "test@example.com",
-        string organisationId = "org-123",
-        string organisationName = "Test Organisation")
-    {
-        _useTestAuth = true;
-        _testUserData = new TestUserData
-        {
-            UserId = userId,
-            Email = email,
-            OrganisationId = organisationId,
-            OrganisationName = organisationName
-        };
-        return this;
-    }
+    private readonly Random _random = new();
+    private IHost? _host;
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        var port = _random.Next(5001, 5100);
+        builder.UseUrls($"https://localhost:{port}");
+
+        // Use "Testing" environment to trigger AutoAuthenticationHandler in Program.cs
         builder.UseEnvironment("Testing");
 
-        // ✅ Add configuration BEFORE Program.cs runs
-        builder.ConfigureAppConfiguration((context, config) =>
+        // Find test data file
+        var testDataFilePath = Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-Integration-Test-Data.csv");
+        if (!File.Exists(testDataFilePath))
         {
-            config.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["DsiConfiguration:ClientId"] = "test-client-id",
-                ["DsiConfiguration:ClientSecret"] = "test-client-secret",
-                ["DsiConfiguration:Authority"] = "https://test-oidc.signin.education.gov.uk",
-                ["DsiConfiguration:RequireHttpsMetadata"] = "false",
-                ["DsiConfiguration:ValidateIssuer"] = "false",
-                ["DsiConfiguration:ValidateAudience"] = "false",
-                ["DsiConfiguration:ApiUri"] = "https://test-api.signin.education.gov.uk",
-                ["DsiConfiguration:ApiSecret"] = "test-api-secret",
-                ["DsiConfiguration:Audience"] = "test-audience",
-                ["DsiConfiguration:TokenExpiryMinutes"] = "60"
-            });
-        });
+            throw new FileNotFoundException("Test data file not found", testDataFilePath);
+        }
 
-        // ✅ Use ConfigureTestServices - runs AFTER Program.cs
+        Console.WriteLine($"📁 Using test data: {testDataFilePath}");
+
+        var configurationValues = new Dictionary<string, string?>
+        {
+            ["Establishments:CsvPath"] = testDataFilePath,
+            // DSI Configuration for tests
+            ["DsiConfiguration:ClientId"] = "test-client-id",
+            ["DsiConfiguration:ClientSecret"] = "test-client-secret",
+            ["DsiConfiguration:Authority"] = "https://test-oidc.signin.education.gov.uk",
+            ["DsiConfiguration:RequireHttpsMetadata"] = "false",
+            ["DsiConfiguration:ValidateIssuer"] = "false",
+            ["DsiConfiguration:ValidateAudience"] = "false",
+            ["DsiConfiguration:ApiUri"] = "https://test-api.signin.education.gov.uk",
+            ["DsiConfiguration:ApiSecret"] = "test-api-secret",
+            ["DsiConfiguration:Audience"] = "test-audience",
+            ["DsiConfiguration:TokenExpiryMinutes"] = "60"
+        };
+
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(configurationValues)
+            .Build();
+
+        builder
+            .UseConfiguration(configuration)
+            .ConfigureAppConfiguration(configurationBuilder =>
+            {
+                configurationBuilder.AddInMemoryCollection(configurationValues);
+            });
+
+        // Replace DSI services with mocks (these make external API calls)
         builder.ConfigureTestServices(services =>
         {
-            // ✅ ALWAYS remove and replace DSI services (not just when using test auth)
             services.RemoveAll<IDsiUserService>();
             services.RemoveAll<IDsiApiService>();
             services.AddScoped<IDsiUserService, MockDsiUserService>();
             services.AddScoped<IDsiApiService, MockDsiApiService>();
-
-            // ✅ Only replace authentication when using test auth
         });
     }
-    /// <summary>
-    /// Gets the path to the SAPSec.Web project directory
-    /// </summary>
-    private static string GetProjectPath()
+
+    protected override IHost CreateHost(IHostBuilder builder)
     {
-        // Get the path to the test assembly
-        var startupAssembly = typeof(Program).Assembly;
-        var projectName = "SAPSec.Web";
+        builder.UseContentRoot(Directory.GetCurrentDirectory());
 
-        // Get the target framework (e.g., net8.0)
-        var currentDir = Directory.GetCurrentDirectory();
+        // Create the host for TestServer now before we
+        // modify the builder to use Kestrel instead.
+        var testHost = builder.Build();
 
-        // Navigate up from bin/Debug/net8.0 to find the solution root
-        var directoryInfo = new DirectoryInfo(currentDir);
+        // Modify the host builder to use Kestrel instead
+        // of TestServer so we can listen on a real address.
+        builder.ConfigureWebHost(webHostBuilder => webHostBuilder.UseKestrel());
 
-        while (directoryInfo != null)
-        {
-            // Check if SAPSec.Web exists at this level
-            var webProjectPath = Path.Combine(directoryInfo.FullName, projectName);
-            if (Directory.Exists(webProjectPath))
-            {
-                var viewsPath = Path.Combine(webProjectPath, "Views");
-                if (Directory.Exists(viewsPath))
-                {
-                    return webProjectPath;
-                }
-            }
+        // Create and start the Kestrel server before the test server
+        _host = builder.Build();
+        _host.Start();
 
-            // Also check if we're in the Tests folder structure
-            var parentWebPath = Path.Combine(directoryInfo.FullName, "..", projectName);
-            if (Directory.Exists(parentWebPath))
-            {
-                var fullPath = Path.GetFullPath(parentWebPath);
-                var viewsPath = Path.Combine(fullPath, "Views");
-                if (Directory.Exists(viewsPath))
-                {
-                    return fullPath;
-                }
-            }
+        // Extract the selected dynamic port out of the Kestrel server
+        var server = _host.Services.GetRequiredService<IServer>();
+        var addresses = server.Features.Get<IServerAddressesFeature>();
+        ClientOptions.BaseAddress = addresses!.Addresses
+            .Select(x => new Uri(x))
+            .Last();
 
-            directoryInfo = directoryInfo.Parent;
-        }
+        Console.WriteLine($"✅ Test server started at: {ClientOptions.BaseAddress}");
 
-        // Fallback: use the assembly location to find the project
-        var assemblyLocation = startupAssembly.Location;
-        var assemblyDir = Path.GetDirectoryName(assemblyLocation);
+        // Return the host that uses TestServer
+        testHost.Start();
+        return testHost;
+    }
 
-        // Try common relative paths from test output
-        var possiblePaths = new[]
-        {
-            Path.GetFullPath(Path.Combine(assemblyDir!, "..", "..", "..", "..", projectName)),
-            Path.GetFullPath(Path.Combine(assemblyDir!, "..", "..", "..", "..", "..", projectName)),
-            Path.GetFullPath(Path.Combine(assemblyDir!, "..", "..", "..", projectName)),
-        };
-
-        foreach (var path in possiblePaths)
-        {
-            if (Directory.Exists(path) && Directory.Exists(Path.Combine(path, "Views")))
-            {
-                return path;
-            }
-        }
-
-        throw new DirectoryNotFoundException(
-            $"Could not find {projectName} project directory. Current directory: {currentDir}");
+    protected override void Dispose(bool disposing)
+    {
+        _host?.Dispose();
+        base.Dispose(disposing);
     }
 }

@@ -6,8 +6,6 @@ using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Services.Helper;
-using System.Security.Claims;
-using System.Text.Json;
 
 namespace SAPSec.Core.Services;
 
