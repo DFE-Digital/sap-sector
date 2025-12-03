@@ -25,7 +25,7 @@ public class SchoolHomeController : Controller
 
         var currentOrg = await _userService.GetCurrentOrganisationAsync(User);
 
-        if (currentOrg.Category.Name != "Establishment")
+        if (currentOrg?.Category?.Name != "Establishment")
         {
             return RedirectToAction("Index", "SchoolSearch");
         }

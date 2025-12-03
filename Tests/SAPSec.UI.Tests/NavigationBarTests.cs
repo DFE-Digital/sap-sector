@@ -5,54 +5,18 @@ using Xunit;
 
 namespace SAPSec.UI.Tests;
 
-public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAsyncLifetime
+public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
 {
-    private readonly WebApplicationSetupFixture _fixture;
-    private IPlaywright _playwright = null!;
-    private IBrowser _browser = null!;
-    private IBrowserContext _context = null!;
-    private IPage _page = null!;
-
-    public NavigationBarTests(WebApplicationSetupFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
-    public async Task InitializeAsync()
-    {
-        _playwright = await Playwright.CreateAsync();
-        _browser = await _playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
-        {
-            Headless = true
-        });
-
-        _context = await _browser.NewContextAsync(new BrowserNewContextOptions
-        {
-            IgnoreHTTPSErrors = true,
-            ViewportSize = new() { Width = 1280, Height = 720 }
-        });
-
-        _page = await _context.NewPageAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _page.CloseAsync();
-        await _context.DisposeAsync();
-        await _browser.DisposeAsync();
-        _playwright.Dispose();
-    }
-
     #region Header Tests
 
     [Fact]
     public async Task Header_IsVisible()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var header = _page.Locator(".govuk-header");
+        var header = Page.Locator(".govuk-header");
         var isVisible = await header.IsVisibleAsync();
 
         // Assert
@@ -63,10 +27,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Header_HasDfELogo()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var logo = _page.Locator(".govuk-header__logo img");
+        var logo = Page.Locator(".govuk-header__logo img");
         var isVisible = await logo.IsVisibleAsync();
 
         // Assert
@@ -77,10 +41,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Header_LogoLinksToHomePage()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var logoLink = _page.Locator(".govuk-header__link--homepage");
+        var logoLink = Page.Locator(".govuk-header__link--homepage");
         var href = await logoLink.GetAttributeAsync("href");
 
         // Assert
@@ -91,10 +55,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Header_LogoHasCorrectAltText()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var logoImg = _page.Locator(".govuk-header__logo img");
+        var logoImg = Page.Locator(".govuk-header__logo img");
         var altText = await logoImg.GetAttributeAsync("alt");
 
         // Assert
@@ -109,10 +73,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ServiceNavigation_IsVisible()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var serviceNav = _page.Locator(".govuk-service-navigation");
+        var serviceNav = Page.Locator(".govuk-service-navigation");
         var isVisible = await serviceNav.IsVisibleAsync();
 
         // Assert
@@ -123,10 +87,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ServiceNavigation_HasServiceName()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var serviceName = _page.Locator(".govuk-service-navigation__service-name");
+        var serviceName = Page.Locator(".govuk-service-navigation__service-name");
         var isVisible = await serviceName.IsVisibleAsync();
 
         // Assert
@@ -137,10 +101,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ServiceNavigation_ServiceNameLinksToHome()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var serviceNameLink = _page.Locator(".govuk-service-navigation__service-name a");
+        var serviceNameLink = Page.Locator(".govuk-service-navigation__service-name a");
         var href = await serviceNameLink.GetAttributeAsync("href");
 
         // Assert
@@ -155,10 +119,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task AuthenticatedNav_SignOutLinkVisible_WhenAuthenticated()
     {
         // Arrange - Navigate to a page that requires authentication or simulates auth
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var signOutLink = _page.Locator("a[href*='Auth/SignOutCallback']");
+        var signOutLink = Page.Locator("a[href*='Auth/SignOutCallback']");
 
         // Assert - Check if element exists (may not be visible if not authenticated)
         var count = await signOutLink.CountAsync();
@@ -175,10 +139,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task AuthenticatedNav_MenuItemsExist_WhenAuthenticated()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var menuNav = _page.Locator(".govuk-service-navigation__wrapper");
+        var menuNav = Page.Locator(".govuk-service-navigation__wrapper");
         var count = await menuNav.CountAsync();
 
         // Assert - Menu wrapper exists when authenticated
@@ -193,10 +157,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task AuthenticatedNav_HasComparePerformanceLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var compareLink = _page.Locator(".govuk-service-navigation__list a[href*='ComparePerformance']");
+        var compareLink = Page.Locator(".govuk-service-navigation__list a[href*='ComparePerformance']");
         var count = await compareLink.CountAsync();
 
         // Assert
@@ -211,10 +175,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task AuthenticatedNav_HasFindSchoolsLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var findSchoolsLink = _page.Locator(".govuk-service-navigation__list a[href*='SchoolSearch']");
+        var findSchoolsLink = Page.Locator(".govuk-service-navigation__list a[href*='SchoolSearch']");
         var count = await findSchoolsLink.CountAsync();
 
         // Assert
@@ -229,10 +193,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task AuthenticatedNav_HasSchoolDetailsLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var schoolDetailsLink = _page.Locator(".govuk-service-navigation__list a[href*='SchoolDetails']");
+        var schoolDetailsLink = Page.Locator(".govuk-service-navigation__list a[href*='SchoolDetails']");
         var count = await schoolDetailsLink.CountAsync();
 
         // Assert
@@ -247,10 +211,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task AuthenticatedNav_HasChangeSchoolLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var changeSchoolLink = _page.Locator(".govuk-service-navigation__list a[href*='ChangeSchool']");
+        var changeSchoolLink = Page.Locator(".govuk-service-navigation__list a[href*='ChangeSchool']");
         var count = await changeSchoolLink.CountAsync();
 
         // Assert
@@ -265,10 +229,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task AuthenticatedNav_MenuHasFourItems_WhenAuthenticated()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var menuItems = _page.Locator(".govuk-service-navigation__list .govuk-service-navigation__item");
+        var menuItems = Page.Locator(".govuk-service-navigation__list .govuk-service-navigation__item");
         var count = await menuItems.CountAsync();
 
         // Assert - When authenticated, should have 4 menu items
@@ -286,18 +250,18 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ClickComparePerformance_NavigatesToCorrectPage()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
-        var compareLink = _page.Locator(".govuk-service-navigation__list a[href*='ComparePerformance']");
+        await Page.GotoAsync(fixture.BaseUrl);
+        var compareLink = Page.Locator(".govuk-service-navigation__list a[href*='ComparePerformance']");
         var count = await compareLink.CountAsync();
 
         if (count > 0)
         {
             // Act
             await compareLink.ClickAsync();
-            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
             // Assert
-            _page.Url.Should().Contain("ComparePerformance");
+            Page.Url.Should().Contain("ComparePerformance");
         }
     }
 
@@ -305,18 +269,18 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ClickFindSchools_NavigatesToCorrectPage()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
-        var findSchoolsLink = _page.Locator(".govuk-service-navigation__list a[href*='SchoolSearch']");
+        await Page.GotoAsync(fixture.BaseUrl);
+        var findSchoolsLink = Page.Locator(".govuk-service-navigation__list a[href*='SchoolSearch']");
         var count = await findSchoolsLink.CountAsync();
 
         if (count > 0)
         {
             // Act
             await findSchoolsLink.ClickAsync();
-            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
             // Assert
-            _page.Url.Should().Contain("SchoolSearch");
+            Page.Url.Should().Contain("SchoolSearch");
         }
     }
 
@@ -324,18 +288,18 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ClickSchoolDetails_NavigatesToCorrectPage()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
-        var schoolDetailsLink = _page.Locator(".govuk-service-navigation__list a[href*='SchoolDetails']");
+        await Page.GotoAsync(fixture.BaseUrl);
+        var schoolDetailsLink = Page.Locator(".govuk-service-navigation__list a[href*='SchoolDetails']");
         var count = await schoolDetailsLink.CountAsync();
 
         if (count > 0)
         {
             // Act
             await schoolDetailsLink.ClickAsync();
-            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
             // Assert
-            _page.Url.Should().Contain("SchoolDetails");
+            Page.Url.Should().Contain("SchoolDetails");
         }
     }
 
@@ -343,18 +307,18 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ClickChangeSchool_NavigatesToCorrectPage()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
-        var changeSchoolLink = _page.Locator(".govuk-service-navigation__list a[href*='ChangeSchool']");
+        await Page.GotoAsync(fixture.BaseUrl);
+        var changeSchoolLink = Page.Locator(".govuk-service-navigation__list a[href*='ChangeSchool']");
         var count = await changeSchoolLink.CountAsync();
 
         if (count > 0)
         {
             // Act
             await changeSchoolLink.ClickAsync();
-            await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+            await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
             // Assert
-            _page.Url.Should().Contain("ChangeSchool");
+            Page.Url.Should().Contain("ChangeSchool");
         }
     }
 
@@ -362,15 +326,15 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ClickServiceName_NavigatesToHomePage()
     {
         // Arrange
-        await _page.GotoAsync($"{_fixture.BaseUrl}/school");
-        var serviceNameLink = _page.Locator(".govuk-service-navigation__service-name a");
+        await Page.GotoAsync($"{fixture.BaseUrl}/school");
+        var serviceNameLink = Page.Locator(".govuk-service-navigation__service-name a");
 
         // Act
         await serviceNameLink.ClickAsync();
-        await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        var url = new Uri(_page.Url);
+        var url = new Uri(Page.Url);
         url.AbsolutePath.Should().Be("/");
     }
 
@@ -378,15 +342,15 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ClickLogo_NavigatesToHomePage()
     {
         // Arrange
-        await _page.GotoAsync($"{_fixture.BaseUrl}/school");
-        var logoLink = _page.Locator(".govuk-header__link--homepage");
+        await Page.GotoAsync($"{fixture.BaseUrl}/school");
+        var logoLink = Page.Locator(".govuk-header__link--homepage");
 
         // Act
         await logoLink.ClickAsync();
-        await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        var url = new Uri(_page.Url);
+        var url = new Uri(Page.Url);
         url.AbsolutePath.Should().Be("/");
     }
 
@@ -398,10 +362,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task SkipLink_Exists()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var skipLink = _page.Locator(".govuk-skip-link");
+        var skipLink = Page.Locator(".govuk-skip-link");
         var count = await skipLink.CountAsync();
 
         // Assert
@@ -412,10 +376,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task SkipLink_HasCorrectHref()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var skipLink = _page.Locator(".govuk-skip-link");
+        var skipLink = Page.Locator(".govuk-skip-link");
         var href = await skipLink.GetAttributeAsync("href");
 
         // Assert
@@ -426,10 +390,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task SkipLink_HasCorrectText()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var skipLink = _page.Locator(".govuk-skip-link");
+        var skipLink = Page.Locator(".govuk-skip-link");
         var text = await skipLink.TextContentAsync();
 
         // Assert
@@ -444,10 +408,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Footer_IsVisible()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var footer = _page.Locator(".govuk-footer");
+        var footer = Page.Locator(".govuk-footer");
         var isVisible = await footer.IsVisibleAsync();
 
         // Assert
@@ -458,10 +422,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Footer_HasCookiesLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var cookiesLink = _page.Locator(".govuk-footer__link[href*='Cookies']");
+        var cookiesLink = Page.Locator(".govuk-footer__link[href*='Cookies']");
         var isVisible = await cookiesLink.IsVisibleAsync();
 
         // Assert
@@ -472,10 +436,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Footer_HasAccessibilityLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var accessibilityLink = _page.Locator(".govuk-footer__link[href*='Accessibility']");
+        var accessibilityLink = Page.Locator(".govuk-footer__link[href*='Accessibility']");
         var isVisible = await accessibilityLink.IsVisibleAsync();
 
         // Assert
@@ -486,10 +450,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Footer_HasPrivacyLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var privacyLink = _page.Locator(".govuk-footer__link[href*='personal-information-charter']");
+        var privacyLink = Page.Locator(".govuk-footer__link[href*='personal-information-charter']");
         var isVisible = await privacyLink.IsVisibleAsync();
 
         // Assert
@@ -500,10 +464,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Footer_HasOpenGovernmentLicenceLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var oglLink = _page.Locator(".govuk-footer__link[href*='open-government-licence']");
+        var oglLink = Page.Locator(".govuk-footer__link[href*='open-government-licence']");
         var isVisible = await oglLink.IsVisibleAsync();
 
         // Assert
@@ -514,10 +478,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Footer_HasCrownCopyrightLink()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var crownCopyrightLink = _page.Locator(".govuk-footer__copyright-logo");
+        var crownCopyrightLink = Page.Locator(".govuk-footer__copyright-logo");
         var isVisible = await crownCopyrightLink.IsVisibleAsync();
 
         // Assert
@@ -532,10 +496,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task PhaseBanner_IsVisible()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var phaseBanner = _page.Locator(".govuk-phase-banner");
+        var phaseBanner = Page.Locator(".govuk-phase-banner");
         var count = await phaseBanner.CountAsync();
 
         // Assert - Phase banner should exist if component is rendered
@@ -554,10 +518,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task MobileNav_MenuToggleExists()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var menuToggle = _page.Locator(".govuk-service-navigation__toggle");
+        var menuToggle = Page.Locator(".govuk-service-navigation__toggle");
         var count = await menuToggle.CountAsync();
 
         // Assert - Toggle exists but may be hidden on desktop
@@ -573,11 +537,11 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task MobileNav_MenuToggleVisibleOnMobile()
     {
         // Arrange - Set mobile viewport
-        await _page.SetViewportSizeAsync(375, 667);
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.SetViewportSizeAsync(375, 667);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var menuToggle = _page.Locator(".govuk-service-navigation__toggle");
+        var menuToggle = Page.Locator(".govuk-service-navigation__toggle");
         var count = await menuToggle.CountAsync();
 
         // Assert
@@ -604,15 +568,15 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
         foreach (var (width, height, name) in viewports)
         {
             // Act
-            await _page.SetViewportSizeAsync(width, height);
-            await _page.GotoAsync(_fixture.BaseUrl);
+            await Page.SetViewportSizeAsync(width, height);
+            await Page.GotoAsync(fixture.BaseUrl);
 
             // Assert
-            var header = _page.Locator(".govuk-header");
+            var header = Page.Locator(".govuk-header");
             var isVisible = await header.IsVisibleAsync();
             isVisible.Should().BeTrue($"Header should be visible on {name} ({width}x{height})");
 
-            var serviceNav = _page.Locator(".govuk-service-navigation");
+            var serviceNav = Page.Locator(".govuk-service-navigation");
             var serviceNavVisible = await serviceNav.IsVisibleAsync();
             serviceNavVisible.Should().BeTrue($"Service navigation should be visible on {name}");
         }
@@ -626,10 +590,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Header_HasCorrectAriaLabel()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var accountNav = _page.Locator("nav[aria-label='Account navigation']");
+        var accountNav = Page.Locator("nav[aria-label='Account navigation']");
         var count = await accountNav.CountAsync();
 
         // Assert - Account nav only appears when authenticated
@@ -644,10 +608,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task ServiceNav_HasCorrectAriaLabel()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var serviceNav = _page.Locator("section[aria-label='Service information']");
+        var serviceNav = Page.Locator("section[aria-label='Service information']");
         var count = await serviceNav.CountAsync();
 
         // Assert
@@ -658,10 +622,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task MenuNav_HasCorrectAriaLabel()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var menuNav = _page.Locator("nav[aria-label='Menu']");
+        var menuNav = Page.Locator("nav[aria-label='Menu']");
         var count = await menuNav.CountAsync();
 
         // Assert - Menu nav only appears when authenticated
@@ -676,10 +640,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task Footer_HasCorrectRole()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var footer = _page.Locator("footer[role='contentinfo']");
+        var footer = Page.Locator("footer[role='contentinfo']");
         var count = await footer.CountAsync();
 
         // Assert
@@ -690,10 +654,10 @@ public class NavigationBarTests : IClassFixture<WebApplicationSetupFixture>, IAs
     public async Task SupportLinksHeading_IsVisuallyHidden()
     {
         // Arrange
-        await _page.GotoAsync(_fixture.BaseUrl);
+        await Page.GotoAsync(fixture.BaseUrl);
 
         // Act
-        var supportHeading = _page.Locator(".govuk-visually-hidden", new() { HasText = "Support links" });
+        var supportHeading = Page.Locator(".govuk-visually-hidden", new() { HasText = "Support links" });
         var count = await supportHeading.CountAsync();
 
         // Assert

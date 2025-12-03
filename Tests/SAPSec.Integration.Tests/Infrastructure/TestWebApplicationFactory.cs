@@ -32,8 +32,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             throw new FileNotFoundException("Test data file not found", testDataFilePath);
         }
 
-        Console.WriteLine($"📁 Using test data: {testDataFilePath}");
-
         var configurationValues = new Dictionary<string, string?>
         {
             ["Establishments:CsvPath"] = testDataFilePath,
