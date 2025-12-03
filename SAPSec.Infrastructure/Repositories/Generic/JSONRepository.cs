@@ -1,0 +1,59 @@
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using SAPSec.Core.Interfaces.Repositories.Generic;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+
+namespace SAPSec.Infrastructure.Repositories.Generic
+{
+    public class JSONRepository<T> : IGenericRepository<T> where T : class
+    {
+        private readonly string _filePath = Path.Combine(
+            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Data\Files\");
+        private readonly ILogger<JSONRepository<T>> _logger;
+
+        public JSONRepository(ILogger<JSONRepository<T>> logger)
+        {
+            _logger = logger ?? throw new ArgumentNullException();
+        }
+
+
+        public IEnumerable<T> ReadAll()
+        {
+            try
+            {
+                var fileData = ReadFile(typeof(T).Name);
+                if (!string.IsNullOrWhiteSpace(fileData))
+                {
+                    return JsonConvert.DeserializeObject<IEnumerable<T>>(fileData);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to execute generic readall for {typeof(T).Name}! - {ex.Message}, {ex}");
+            }
+
+            return default;
+        }
+
+        private string ReadFile(string fileName)
+        {
+            try
+            {
+                return System.IO.File.ReadAllText($"{_filePath}/{fileName}.json");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Failed to Read file {fileName}! - {ex.Message}, {ex}");
+                return string.Empty;
+            }
+        }
+    }
+}
