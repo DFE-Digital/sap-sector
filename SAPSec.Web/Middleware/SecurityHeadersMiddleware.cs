@@ -1,7 +1,9 @@
-﻿using System.Security.Cryptography;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography;
 
 namespace SAPSec.Web.Middleware;
 
+[ExcludeFromCodeCoverage]
 public class SecurityHeadersMiddleware(RequestDelegate next)
 {
     public async Task InvokeAsync(HttpContext context)

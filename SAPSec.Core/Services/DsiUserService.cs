@@ -34,7 +34,6 @@ public class DsiUserService(
             var familyName = principal.FindFirst(ClaimTypes.Surname)?.Value ?? string.Empty;
             var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
 
-            // Get organisation data from claims
             var organisationClaim = principal.FindFirst("organisation")?.Value;
             var organisations = organisationClaim.DeserializeToList<DsiOrganisation>();
 
