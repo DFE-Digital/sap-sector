@@ -29,7 +29,6 @@ public class WebApplicationSetupFixture : IAsyncLifetime
             StartInfo = new ProcessStartInfo
             {
                 FileName = "dotnet",
-                // ✅ Add --no-launch-profile to ignore launchSettings.json
                 Arguments = $"run --project \"{webProjectPath}\" --no-launch-profile --urls {BaseUrl}",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
@@ -38,12 +37,10 @@ public class WebApplicationSetupFixture : IAsyncLifetime
             }
         };
 
-        // ✅ Set environment variable
         _appProcess.StartInfo.EnvironmentVariables["ASPNETCORE_ENVIRONMENT"] = "UITesting";
         _appProcess.StartInfo.EnvironmentVariables["Establishments__CsvPath"] = testDataPath;
         _appProcess.Start();
 
-        // Read output for debugging
         _ = Task.Run(async () =>
         {
             while (!_appProcess.StandardOutput.EndOfStream)
@@ -53,7 +50,6 @@ public class WebApplicationSetupFixture : IAsyncLifetime
             }
         });
 
-        // Wait for server
         await WaitForServerAsync();
 
         Console.WriteLine($"✅ Test server started at: {BaseUrl}");
@@ -93,7 +89,6 @@ public class WebApplicationSetupFixture : IAsyncLifetime
             }
             catch
             {
-                // Server not ready
             }
             await Task.Delay(500);
         }
@@ -112,14 +107,10 @@ public class WebApplicationSetupFixture : IAsyncLifetime
     }
     private string GetTestDataPath()
     {
-        // Try multiple paths to find the test data file
         var possiblePaths = new[]
         {
-            // From bin/Debug/net8.0
             Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-UI-Test-Data.csv"),
-            // From current directory
             Path.Combine(Directory.GetCurrentDirectory(), "TestData", "Establishments-UI-Test-Data.csv"),
-            // Up from bin
             Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "TestData", "Establishments-UI-Test-Data.csv")),
         };
 
@@ -139,7 +130,6 @@ public class WebApplicationSetupFixture : IAsyncLifetime
 
     private static int GetAvailablePort()
     {
-        // This finds an available port by briefly opening a socket
         var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
         listener.Start();
         var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;

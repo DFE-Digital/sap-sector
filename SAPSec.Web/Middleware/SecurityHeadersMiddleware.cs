@@ -8,7 +8,6 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
     {
         var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
 
-        // Skip security headers for OAuth and error pages
         if (path.StartsWith("/signin-oidc") ||
             path.StartsWith("/signout-callback-oidc") ||
             path.StartsWith("/auth") ||
@@ -24,7 +23,6 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
         var nonce = GenerateRandom();
         context.Items["ScriptNonce"] = nonce;
 
-        // Security headers
         context.Response.Headers.Append("Expect-CT", "max-age=86400, enforce");
         context.Response.Headers.Append("Referrer-Policy", "same-origin");
         context.Response.Headers.Append("Arr-Disable-Session-Affinity", "true");
@@ -34,7 +32,6 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
         context.Response.Headers.Append("X-XSS-Protection", "0");
         context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
 
-        // ✅ CSP with nonce - more secure than 'unsafe-inline'
         context.Response.Headers.Append(
             "Content-Security-Policy",
             "base-uri 'self'; " +

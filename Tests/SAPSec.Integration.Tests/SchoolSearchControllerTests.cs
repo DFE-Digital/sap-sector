@@ -8,13 +8,9 @@ public class SchoolSearchControllerIntegrationTests : IClassFixture<WebApplicati
 {
     private readonly WebApplicationSetupFixture _fixture;
 
-    // Routes based on actual controller configuration:
-    // SchoolSearchController has [Route("school")] and actions have [Route("school/search")] etc.
-    // This creates doubled routes: /school/school/search, /school/school/suggest
-    // Exception: search-for-a-school works at /school/search-for-a-school
-    private const string SearchForSchoolUrl = "/school/search-for-a-school";
-    private const string SearchUrl = "/school/school/search";  // Doubled!
-    private const string SuggestUrl = "/school/school/suggest"; // Doubled!
+    private const string SearchForSchoolUrl = "/search-for-a-school";
+    private const string SearchUrl = "/school/search";  
+    private const string SuggestUrl = "/school/suggest"; 
 
     public SchoolSearchControllerIntegrationTests(WebApplicationSetupFixture fixture)
     {
@@ -58,8 +54,7 @@ public class SchoolSearchControllerIntegrationTests : IClassFixture<WebApplicati
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        // Note: RedirectToAction("Search") creates /school/school/search due to doubled routes
-        response.Headers.Location!.ToString().Should().Contain("/school/school/search");
+        response.Headers.Location!.ToString().Should().Contain("/school/search");
     }
 
     [Fact]

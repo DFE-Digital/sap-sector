@@ -20,10 +20,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = GetAvailablePort();  // Gets a guaranteed free port
+        var port = GetAvailablePort();  
         builder.UseUrls($"https://localhost:{port}");
 
-        // Use "Testing" environment to trigger AutoAuthenticationHandler in Program.cs
         builder.UseEnvironment("Testing");
 
         // Find test data file
@@ -38,7 +37,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         var configurationValues = new Dictionary<string, string?>
         {
             ["Establishments:CsvPath"] = testDataFilePath,
-            // DSI Configuration for tests
             ["DsiConfiguration:ClientId"] = "test-client-id",
             ["DsiConfiguration:ClientSecret"] = "test-client-secret",
             ["DsiConfiguration:Authority"] = "https://test-oidc.signin.education.gov.uk",
@@ -62,7 +60,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 configurationBuilder.AddInMemoryCollection(configurationValues);
             });
 
-        // Replace DSI services with mocks (these make external API calls)
         builder.ConfigureTestServices(services =>
         {
             services.RemoveAll<IDsiUserService>();
@@ -76,19 +73,13 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseContentRoot(Directory.GetCurrentDirectory());
 
-        // Create the host for TestServer now before we
-        // modify the builder to use Kestrel instead.
         var testHost = builder.Build();
 
-        // Modify the host builder to use Kestrel instead
-        // of TestServer so we can listen on a real address.
         builder.ConfigureWebHost(webHostBuilder => webHostBuilder.UseKestrel());
 
-        // Create and start the Kestrel server before the test server
         _host = builder.Build();
         _host.Start();
 
-        // Extract the selected dynamic port out of the Kestrel server
         var server = _host.Services.GetRequiredService<IServer>();
         var addresses = server.Features.Get<IServerAddressesFeature>();
         ClientOptions.BaseAddress = addresses!.Addresses
@@ -97,7 +88,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
         Console.WriteLine($"✅ Test server started at: {ClientOptions.BaseAddress}");
 
-        // Return the host that uses TestServer
         testHost.Start();
         return testHost;
     }
@@ -110,7 +100,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     private static int GetAvailablePort()
     {
-        // This finds an available port by briefly opening a socket
         var listener = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
         listener.Start();
         var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;

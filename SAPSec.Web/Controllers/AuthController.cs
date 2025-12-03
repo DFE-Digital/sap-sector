@@ -81,10 +81,8 @@ public class AuthController(
 
         _logger.LogInformation("User {UserId} signing out", userId);
 
-        // Clear session
         HttpContext.Session.Clear();
 
-        // Sign out of both the cookie scheme and OIDC
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
 

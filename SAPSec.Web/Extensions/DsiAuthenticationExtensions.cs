@@ -59,10 +59,8 @@ public static class DsiAuthenticationExtensions
                 options.RequireHttpsMetadata = dsiConfig.RequireHttpsMetadata;
                 options.MetadataAddress = dsiConfig.MetadataAddress;
 
-                // Event handlers for authentication lifecycle
                 options.Events = new OpenIdConnectEvents
                 {
-                    // Triggered when redirecting to DSI for authentication
                     OnRedirectToIdentityProvider = context =>
                     {
                         var logger = context.HttpContext.RequestServices
@@ -70,36 +68,22 @@ public static class DsiAuthenticationExtensions
 
                         logger.LogInformation("User initiating sign-in to DSI");
 
-                        // Force HTTPS redirect_uri for non-localhost environments
                         if (!context.HttpContext.Request.Host.Host.Contains("localhost"))
                         {
                             var callbackPath = dsiConfig.CallbackPath;
                             var host = context.HttpContext.Request.Host.ToUriComponent();
                             context.ProtocolMessage.RedirectUri = $"https://{host}{callbackPath}";
 
-                            logger.LogInformation("DSI Redirect URI: {RedirectUri}",
-                                context.ProtocolMessage.RedirectUri);
                         }
-
-                        // Debug logging (can be removed after testing)
-                        logger.LogDebug("Client ID: {ClientId}", dsiConfig.ClientId);
-                        logger.LogDebug("Client Secret configured: {HasSecret}",
-                            !string.IsNullOrEmpty(dsiConfig.ClientSecret));
-                        logger.LogDebug("Client Secret length: {Length}",
-                            dsiConfig.ClientSecret?.Length ?? 0);
 
                         return Task.CompletedTask;
                     },
 
-                    // Triggered when receiving message from DSI (before processing)
-                    // Handles spurious callback requests
                     OnMessageReceived = context =>
                     {
                         var logger = context.HttpContext.RequestServices
                             .GetRequiredService<ILogger<Program>>();
 
-                        // Check for spurious authentication callback requests
-                        // (callbacks without an authorization code)
                         var isSpuriousAuthCbRequest =
                             context.Request.Path == options.CallbackPath &&
                             context.Request.Method == "GET" &&
@@ -118,20 +102,10 @@ public static class DsiAuthenticationExtensions
                         return Task.CompletedTask;
                     },
 
-                    // Triggered when authorization code is received from DSI
-                    // Before token exchange
                     OnAuthorizationCodeReceived = context =>
                     {
                         var logger = context.HttpContext.RequestServices
                             .GetRequiredService<ILogger<Program>>();
-
-                        logger.LogInformation("Authorization code received from DSI, exchanging for tokens");
-
-                        // Debug logging for token exchange
-                        logger.LogDebug("Token endpoint: {Endpoint}",
-                            context.Options.Configuration?.TokenEndpoint);
-                        logger.LogDebug("Code received: {HasCode}",
-                            !string.IsNullOrEmpty(context.TokenEndpointRequest?.Code));
 
                         return Task.CompletedTask;
                     },
@@ -143,18 +117,11 @@ public static class DsiAuthenticationExtensions
 
                         try
                         {
-                            // Extract claims
                             var userId = context.Principal?.FindFirst("sub")?.Value;
                             var email = context.Principal?.FindFirst("email")?.Value;
                             var name = context.Principal?.FindFirst("name")?.Value;
                             var organisation = context.Principal?.FindFirst("organisation")?.Value;
 
-                            logger.LogInformation(
-                                "User authenticated successfully. " +
-                                "UserId: {UserId}, Email: {Email}, Name: {Name}, Organisation: {Organisation}",
-                                userId, email, name, organisation);
-
-                            // ✅ Handle organization selection HERE
                             var userService = context.HttpContext.RequestServices
                                 .GetRequiredService<IDsiUserService>();
 
@@ -162,7 +129,6 @@ public static class DsiAuthenticationExtensions
 
                             if (user != null)
                             {
-                                // If user has one organisation, set it automatically
                                 if (user.Organisations.Count == 1)
                                 {
                                     await userService.SetCurrentOrganisationAsync(
@@ -174,16 +140,14 @@ public static class DsiAuthenticationExtensions
                                         user.Organisations[0].Id, userId);
                                     context.Properties!.RedirectUri = $"/SchoolHome";
                                 }
-                                // If multiple organisations, redirect to selection page
                                 else if (user.Organisations.Count > 1)
                                 {
                                     logger.LogInformation(
                                         "User {UserId} has {Count} organisations, needs to select one",
                                         userId, user.Organisations.Count);
 
-                                    // Store original return URL
-                                    var returnUrl = context.Properties?.Items["returnUrl"] ?? "/SchoolSearch";
-                                    context.Properties!.RedirectUri = $"/SchoolSearch";
+                                    var returnUrl = context.Properties?.Items["returnUrl"] ?? "/search-for-a-school";
+                                    context.Properties!.RedirectUri = $"/search-for-a-school";
                                 }
                             }
 
@@ -197,8 +161,6 @@ public static class DsiAuthenticationExtensions
                         }
                     },
 
-                    // Triggered when remote authentication fails
-                    // This catches errors from DSI (like invalid_client)
                     OnRemoteFailure = context =>
                     {
                         var logger = context.HttpContext.RequestServices
@@ -208,17 +170,14 @@ public static class DsiAuthenticationExtensions
                             "DSI remote authentication failure: {Message}",
                             context.Failure?.Message);
 
-                        // Redirect to error page with message
                         var errorMessage = context.Failure?.Message ?? "Authentication failed";
                         context.Response.Redirect(
-                            $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
+                            $"/error");
                         context.HandleResponse();
 
                         return Task.CompletedTask;
                     },
 
-                    // Triggered when authentication fails for other reasons
-                    // (correlation, state, etc.)
                     OnAuthenticationFailed = context =>
                     {
                         var logger = context.HttpContext.RequestServices
@@ -228,28 +187,23 @@ public static class DsiAuthenticationExtensions
                             "DSI authentication failed: {Message}",
                             context.Exception.Message);
 
-                        // Show detailed error in development mode
                         var env = context.HttpContext.RequestServices
                             .GetRequiredService<IWebHostEnvironment>();
 
 
                         var errorMessage = context.Exception.Message;
                         context.Response.Redirect(
-                            $"/Home/Error?message={Uri.EscapeDataString(errorMessage)}");
+                            $"/error");
                         context.HandleResponse();
 
                         return Task.CompletedTask;
                     },
 
-                    // Triggered when user signs out
                     OnSignedOutCallbackRedirect = context =>
                     {
                         var logger = context.HttpContext.RequestServices
                             .GetRequiredService<ILogger<Program>>();
 
-                        logger.LogInformation("User signed out from DSI");
-
-                        // Redirect to home page after sign out
                         context.Response.Redirect("/");
                         context.HandleResponse();
 
@@ -257,14 +211,12 @@ public static class DsiAuthenticationExtensions
                     }
                 };
 
-                // Configure required scopes
                 options.Scope.Clear();
                 options.Scope.Add("openid");
                 options.Scope.Add("email");
                 options.Scope.Add("profile");
                 options.Scope.Add("organisation");
 
-                // Token validation parameters
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = dsiConfig.ValidateIssuer,
@@ -278,7 +230,6 @@ public static class DsiAuthenticationExtensions
                 };
             });
 
-        // Register DSI-related services
         services.AddHttpContextAccessor();
         services.AddScoped<IDsiUserService, DsiUserService>();
         services.AddHttpClient<IDsiApiService, DsiApiService>();
@@ -293,10 +244,7 @@ public static class DsiAuthenticationExtensions
                 throw new InvalidOperationException("DsiConfiguration:ApiBaseUrl is required");
             }
 
-            // ✅ Set the base address
             client.BaseAddress = new Uri(dsiConfig.ApiUri);
-
-            // ✅ Set default headers
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             client.Timeout = TimeSpan.FromSeconds(30);
         });

@@ -47,10 +47,8 @@ public class TestAuthenticationHandler : AuthenticationHandler<AuthenticationSch
         return Task.FromResult(AuthenticateResult.Success(ticket));
     }
 
-    // ✅ Override challenge to prevent redirect
     protected override Task HandleChallengeAsync(AuthenticationProperties properties)
     {
-        // Don't redirect, just return 401
         Response.StatusCode = 401;
         return Task.CompletedTask;
     }

@@ -13,12 +13,9 @@ public class SchoolSearchPageTests : IClassFixture<WebApplicationSetupFixture>, 
     private IBrowserContext _context = null!;
     private IPage _page = null!;
 
-    // URLs using fixture BaseUrl
-    // Note: Routes are doubled due to controller configuration
-    // SchoolSearchController has [Route("school")] and actions have [Route("school/search")] etc.
-    private string SchoolSearchPath => $"{_fixture.BaseUrl}/school/search-for-a-school";
-    private string SchoolSearchResultsPath => $"{_fixture.BaseUrl}/school/school/search";  // Doubled!
-    private string SchoolSuggestPath => $"{_fixture.BaseUrl}/school/school/suggest";        // Doubled!
+    private string SchoolSearchPath => $"{_fixture.BaseUrl}/search-for-a-school";
+    private string SchoolSearchResultsPath => $"{_fixture.BaseUrl}/school/search";
+    private string SchoolSuggestPath => $"{_fixture.BaseUrl}/school/suggest";
 
     public SchoolSearchPageTests(WebApplicationSetupFixture fixture)
     {
@@ -119,10 +116,10 @@ public class SchoolSearchPageTests : IClassFixture<WebApplicationSetupFixture>, 
         await _page.Locator("button[name='Search']").ClickAsync();
         await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Note: RedirectToAction creates doubled route /school/school/search
-        await _page.WaitForURLAsync("**/school/school/search?query=Test%20School");
+       
+        await _page.WaitForURLAsync("**/school/search?query=Test%20School");
 
-        _page.Url.Should().Contain("/school/school/search");
+        _page.Url.Should().Contain("/school/search");
         _page.Url.Should().Contain("query=Test");
     }
 
@@ -294,8 +291,7 @@ public class SchoolSearchPageTests : IClassFixture<WebApplicationSetupFixture>, 
         await _page.Locator("input[name='__Query']").PressAsync("Enter");
         await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Note: Doubled route
-        _page.Url.Should().Contain("/school/school/search", "Pressing Enter should submit the form");
+        _page.Url.Should().Contain("/school/search", "Pressing Enter should submit the form");
     }
 
     [Fact]
@@ -488,8 +484,7 @@ public class SchoolSearchPageTests : IClassFixture<WebApplicationSetupFixture>, 
         await _page.Locator("button[name='Search']").ClickAsync();
         await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Note: Doubled route
-        _page.Url.Should().Contain("school/school/search");
+        _page.Url.Should().Contain("school/search");
     }
 
     [Fact]
@@ -501,8 +496,7 @@ public class SchoolSearchPageTests : IClassFixture<WebApplicationSetupFixture>, 
         await _page.Locator("button[name='Search']").ClickAsync();
         await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Note: Doubled route
-        _page.Url.Should().Contain("/school/school/search");
+        _page.Url.Should().Contain("school/search");
     }
 
     [Fact]
@@ -515,8 +509,8 @@ public class SchoolSearchPageTests : IClassFixture<WebApplicationSetupFixture>, 
         await _page.Locator("button[name='Search']").ClickAsync();
         await _page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Note: Doubled route
-        _page.Url.Should().Contain("school/school/search");
+        
+        _page.Url.Should().Contain("school/search");
     }
 
     #endregion
@@ -630,9 +624,7 @@ public class SchoolSearchPageTests : IClassFixture<WebApplicationSetupFixture>, 
         await jsDisabledPage.Locator("input[name='Query']").FillAsync("Test School");
         await jsDisabledPage.Locator("button[name='Search']").ClickAsync();
         await jsDisabledPage.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        // Note: Doubled route
-        jsDisabledPage.Url.Should().Contain("/school/school/search");
+        jsDisabledPage.Url.Should().Contain("/school/search");
 
         await jsDisabledPage.CloseAsync();
         await context.DisposeAsync();

@@ -38,7 +38,6 @@ public class DsiUserService(
             var organisationClaim = principal.FindFirst("organisation")?.Value;
             var organisations = organisationClaim.DeserializeToList<DsiOrganisation>();
 
-            // ✅ Try to fetch from API only if needed and configured
             if (!organisations.Any() && !string.IsNullOrEmpty(userId))
             {
                 try
@@ -52,7 +51,6 @@ public class DsiUserService(
                 }
                 catch (Exception ex)
                 {
-                    // ✅ Don't fail if API call fails - just log warning
                     _logger.LogWarning(ex, "Failed to fetch organisations from API for user {UserId}, using claims only", userId);
                 }
             }
@@ -82,12 +80,10 @@ public class DsiUserService(
             return null;
         }
 
-        // Check if there's a selected organisation in session
         var httpContext = _httpContextAccessor.HttpContext;
         string? selectedOrgId = null;
         if (httpContext?.Session != null)
         {
-            // Fix: ISession does not have GetString, so use TryGetValue and convert to string
             if (httpContext.Session.TryGetValue(OrganisationSessionKey, out var value) && value != null)
             {
                 selectedOrgId = Encoding.UTF8.GetString(value);
@@ -103,7 +99,6 @@ public class DsiUserService(
             }
         }
 
-        // Return the first organisation if none selected
         return user.Organisations.First();
     }
 

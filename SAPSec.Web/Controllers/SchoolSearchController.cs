@@ -6,8 +6,6 @@ using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
-[Route("school")]
-
 [Authorize]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
