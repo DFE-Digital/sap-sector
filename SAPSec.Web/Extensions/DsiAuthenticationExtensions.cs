@@ -66,8 +66,6 @@ public static class DsiAuthenticationExtensions
                         var logger = context.HttpContext.RequestServices
                             .GetRequiredService<ILogger<Program>>();
 
-                        logger.LogInformation("User initiating sign-in to DSI");
-
                         if (!context.HttpContext.Request.Host.Host.Contains("localhost"))
                         {
                             var callbackPath = dsiConfig.CallbackPath;
@@ -134,18 +132,9 @@ public static class DsiAuthenticationExtensions
                                     await userService.SetCurrentOrganisationAsync(
                                         context.Principal!,
                                         user.Organisations[0].Id);
-
-                                    logger.LogInformation(
-                                        "Automatically set organisation {OrgId} for user {UserId}",
-                                        user.Organisations[0].Id, userId);
-                                    context.Properties!.RedirectUri = $"/SchoolHome";
                                 }
                                 else if (user.Organisations.Count > 1)
                                 {
-                                    logger.LogInformation(
-                                        "User {UserId} has {Count} organisations, needs to select one",
-                                        userId, user.Organisations.Count);
-
                                     var returnUrl = context.Properties?.Items["returnUrl"] ?? "/search-for-a-school";
                                     context.Properties!.RedirectUri = $"/search-for-a-school";
                                 }
