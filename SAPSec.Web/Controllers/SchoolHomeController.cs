@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Web.Controllers;
 
@@ -22,17 +23,50 @@ public class SchoolHomeController : Controller
     public async Task<IActionResult> Index()
     {
         var user = await _userService.GetUserFromClaimsAsync(User);
-
         var currentOrg = await _userService.GetCurrentOrganisationAsync(User);
 
-        if (currentOrg?.Category?.Name != "Establishment")
+        if (!HasValidOrganisation(currentOrg))
         {
-            return RedirectToAction("Index", "SchoolSearch");
+            return AccessDenied();
         }
 
-        ViewBag.SchoolName = user.Organisations.FirstOrDefault(o => o.Id == currentOrg?.Id)?.Name ?? "School";
-        ViewBag.UserName = user.Name;
+        if (!IsEstablishment(currentOrg))
+        {
+            return Redirect(Routes.SchoolSearch);
+        }
 
+        SetViewBagProperties(user, currentOrg);
         return View();
+    }
+
+    private static bool HasValidOrganisation(DsiOrganisation? organisation)
+    {
+        return organisation?.Category != null;
+    }
+
+    private static bool IsEstablishment(DsiOrganisation organisation)
+    {
+        return organisation?.Category?.Name == "Establishment";
+    }
+
+    private IActionResult AccessDenied()
+    {
+        return RedirectToAction("StatusCodeError", "Error", new { statusCode = 403 });
+    }
+
+    private void SetViewBagProperties(DsiUser user, DsiOrganisation currentOrg)
+    {
+        ViewBag.SchoolName = GetSchoolName(user, currentOrg);
+        ViewBag.UserName = user.Name;
+    }
+
+    private static string GetSchoolName(DsiUser user, DsiOrganisation currentOrg)
+    {
+        return user.Organisations.FirstOrDefault(o => o.Id == currentOrg.Id)?.Name ?? "School";
+    }
+
+    private static class Routes
+    {
+        public const string SchoolSearch = "/search-for-a-school";
     }
 }

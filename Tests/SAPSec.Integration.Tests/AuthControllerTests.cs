@@ -4,11 +4,20 @@ using SAPSec.Integration.Tests.Infrastructure;
 
 namespace SAPSec.Integration.Tests;
 
-public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
+public class AuthControllerIntegrationTests : IClassFixture<WebApplicationSetupFixture>
 {
     private readonly WebApplicationSetupFixture _fixture;
 
-    public AuthControllerTests(WebApplicationSetupFixture fixture)
+    private static class ExpectedRoutes
+    {
+        public const string SignIn = "/Auth/sign-in";
+        public const string SignOut = "/Auth/sign-out";
+        public const string AccessDenied = "/Auth/access-denied";
+        public const string SignedOut = "/Auth/signed-out";
+        public const string DefaultReturnUrl = "/school/search-for-a-school";
+    }
+
+    public AuthControllerIntegrationTests(WebApplicationSetupFixture fixture)
     {
         _fixture = fixture;
     }
@@ -18,11 +27,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetSignIn_WhenNotAuthenticated_ReturnsChallengeRedirect()
     {
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/sign-in");
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.SignIn);
 
-        // Assert
-        // OpenID Connect challenge typically returns a redirect to the identity provider
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.Redirect,
             HttpStatusCode.Found,
@@ -32,10 +38,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetSignIn_WhenAuthenticated_RedirectsToReturnUrl()
     {
-        // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Auth/sign-in?returnUrl=/dashboard");
+        var response = await _fixture.AuthenticatedClient.GetAsync($"{ExpectedRoutes.SignIn}?returnUrl=/dashboard");
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.Redirect,
             HttpStatusCode.Found,
@@ -45,10 +49,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetSignIn_WhenAuthenticated_WithNullReturnUrl_RedirectsToHome()
     {
-        // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Auth/sign-in");
+        var response = await _fixture.AuthenticatedClient.GetAsync(ExpectedRoutes.SignIn);
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.Redirect,
             HttpStatusCode.Found,
@@ -58,10 +60,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetSignIn_HasSecurityHeaders()
     {
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/sign-in");
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.SignIn);
 
-        // Assert - Only validate headers if response is successful and headers exist
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var allHeaders = response.Headers
@@ -82,13 +82,11 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
 
     [Theory]
     [InlineData("/school")]
-    [InlineData("/Search")]
+    [InlineData("/school/search-for-a-school")]
     public async Task GetSignIn_WithVariousReturnUrls_ReturnsValidResponse(string returnUrl)
     {
-        // Act
-        var response = await _fixture.Client.GetAsync($"/Auth/sign-in?returnUrl={Uri.EscapeDataString(returnUrl)}");
+        var response = await _fixture.Client.GetAsync($"{ExpectedRoutes.SignIn}?returnUrl={Uri.EscapeDataString(returnUrl)}");
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.Redirect,
             HttpStatusCode.Found,
@@ -99,17 +97,42 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetSignIn_WithExternalReturnUrl_DoesNotRedirectToExternalSite()
     {
-        // Arrange
         var externalUrl = "https://malicious-site.com/phishing";
 
-        // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync($"/Auth/sign-in?returnUrl={Uri.EscapeDataString(externalUrl)}");
+        var response = await _fixture.AuthenticatedClient.GetAsync($"{ExpectedRoutes.SignIn}?returnUrl={Uri.EscapeDataString(externalUrl)}");
 
-        // Assert
         if (response.StatusCode == HttpStatusCode.Redirect)
         {
             response.Headers.Location!.ToString().Should().NotContain("malicious-site.com");
         }
+    }
+
+    #endregion
+
+    #region GET /Auth/sign-out Tests
+
+    [Fact]
+    public async Task GetSignOut_WhenAuthenticated_ReturnsValidResponse()
+    {
+        var response = await _fixture.AuthenticatedClient.GetAsync(ExpectedRoutes.SignOut);
+
+        response.StatusCode.Should().BeOneOf(
+            HttpStatusCode.Redirect,
+            HttpStatusCode.Found,
+            HttpStatusCode.OK,
+            HttpStatusCode.InternalServerError);
+    }
+
+    [Fact]
+    public async Task GetSignOut_WhenNotAuthenticated_RequiresAuthentication()
+    {
+        var response = await _fixture.NonRedirectingClient.GetAsync(ExpectedRoutes.SignOut);
+
+        response.StatusCode.Should().BeOneOf(
+            HttpStatusCode.Redirect,
+            HttpStatusCode.Found,
+            HttpStatusCode.Unauthorized,
+            HttpStatusCode.InternalServerError);
     }
 
     #endregion
@@ -119,11 +142,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetAccessDenied_ReturnsSuccess()
     {
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/access-denied");
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.AccessDenied);
 
-        // Assert
-        // May return 500 if view doesn't exist in test environment
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.OK,
             HttpStatusCode.InternalServerError);
@@ -137,10 +157,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetAccessDenied_WhenAuthenticated_ReturnsSuccess()
     {
-        // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Auth/access-denied");
+        var response = await _fixture.AuthenticatedClient.GetAsync(ExpectedRoutes.AccessDenied);
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.OK,
             HttpStatusCode.InternalServerError);
@@ -149,18 +167,14 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetAccessDenied_HasSecurityHeaders()
     {
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/access-denied");
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.AccessDenied);
 
-        // Assert - Only validate headers if response is successful and headers exist
-        // Security headers may not be present in test environment
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var allHeaders = response.Headers
                 .Concat(response.Content.Headers)
                 .ToDictionary(h => h.Key, h => h.Value);
 
-            // Only validate if headers are present (middleware may not run in tests)
             if (allHeaders.ContainsKey("X-Content-Type-Options"))
             {
                 allHeaders["X-Content-Type-Options"].Should().Contain("nosniff");
@@ -176,10 +190,8 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task GetAccessDenied_ReturnsPageWithAppropriateContent()
     {
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/access-denied");
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.AccessDenied);
 
-        // Assert
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -189,33 +201,41 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
 
     #endregion
 
+    #region GET /Auth/signed-out Tests
+
+    [Fact]
+    public async Task GetSignedOut_ReturnsSuccess()
+    {
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.SignedOut);
+
+        response.StatusCode.Should().BeOneOf(
+            HttpStatusCode.OK,
+            HttpStatusCode.InternalServerError);
+    }
+
+    #endregion
+
     #region Security Tests
 
     [Fact]
     public async Task AllPublicEndpoints_HaveSecurityHeaders()
     {
-        // Arrange
         var publicEndpoints = new[]
         {
-            "/Auth/access-denied"
+            ExpectedRoutes.AccessDenied,
+            ExpectedRoutes.SignedOut
         };
 
         foreach (var endpoint in publicEndpoints)
         {
-            // Act
             var response = await _fixture.Client.GetAsync(endpoint);
 
-            // Assert - Only check headers if response is successful
             if (response.IsSuccessStatusCode)
             {
-                // Security headers can be in response.Headers or response.Content.Headers
-                // Also check if the middleware is actually adding them
                 var allHeaders = response.Headers
                     .Concat(response.Content.Headers)
                     .ToDictionary(h => h.Key, h => h.Value);
 
-                // If headers exist, verify they're correct. If not, the test passes
-                // (middleware may not be configured in test environment)
                 if (allHeaders.ContainsKey("X-Content-Type-Options"))
                 {
                     allHeaders["X-Content-Type-Options"].Should().Contain("nosniff");
@@ -232,13 +252,10 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task SignIn_WithXssPayload_DoesNotExecuteScript()
     {
-        // Arrange
         var maliciousReturnUrl = "<script>alert('xss')</script>";
 
-        // Act
-        var response = await _fixture.Client.GetAsync($"/Auth/sign-in?returnUrl={Uri.EscapeDataString(maliciousReturnUrl)}");
+        var response = await _fixture.Client.GetAsync($"{ExpectedRoutes.SignIn}?returnUrl={Uri.EscapeDataString(maliciousReturnUrl)}");
 
-        // Assert
         if (response.StatusCode == HttpStatusCode.OK)
         {
             var content = await response.Content.ReadAsStringAsync();
@@ -248,31 +265,25 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
 
     #endregion
 
-    #region Edge Cases and Timeout Tests
+    #region Timeout and Concurrency Tests
 
     [Fact]
     public async Task SignIn_CompletesWithinTimeout()
     {
-        // Arrange
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/sign-in", cts.Token);
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.SignIn, cts.Token);
 
-        // Assert
         response.Should().NotBeNull();
     }
 
     [Fact]
     public async Task AccessDenied_CompletesWithinTimeout()
     {
-        // Arrange
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/access-denied", cts.Token);
+        var response = await _fixture.Client.GetAsync(ExpectedRoutes.AccessDenied, cts.Token);
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.OK,
             HttpStatusCode.Redirect,
@@ -282,34 +293,34 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task ConcurrentSignInRequests_HandleGracefully()
     {
-        // Arrange
         var tasks = new List<Task<HttpResponseMessage>>();
 
-        // Act
         for (int i = 0; i < 10; i++)
         {
-            tasks.Add(_fixture.Client.GetAsync("/Auth/sign-in"));
+            tasks.Add(_fixture.Client.GetAsync(ExpectedRoutes.SignIn));
         }
 
         var responses = await Task.WhenAll(tasks);
 
-        // Assert
         responses.Should().OnlyContain(r =>
             r.StatusCode == HttpStatusCode.OK ||
             r.StatusCode == HttpStatusCode.Redirect ||
             r.StatusCode == HttpStatusCode.Found);
     }
 
+    #endregion
+
+    #region Route Validation Tests
+
     [Theory]
     [InlineData("/Auth/sign-in")]
     [InlineData("/Auth/access-denied")]
+    [InlineData("/Auth/signed-out")]
     public async Task PublicEndpoints_RespondToHeadRequests(string endpoint)
     {
-        // Act
         var request = new HttpRequestMessage(HttpMethod.Head, endpoint);
         var response = await _fixture.Client.SendAsync(request);
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.OK,
             HttpStatusCode.Redirect,
@@ -317,17 +328,11 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
             HttpStatusCode.MethodNotAllowed);
     }
 
-    #endregion
-
-    #region Route Validation Tests
-
     [Fact]
     public async Task SignIn_WithTrailingSlash_Works()
     {
-        // Act
-        var response = await _fixture.Client.GetAsync("/Auth/sign-in/");
+        var response = await _fixture.Client.GetAsync($"{ExpectedRoutes.SignIn}/");
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.OK,
             HttpStatusCode.Redirect,
@@ -338,15 +343,27 @@ public class AuthControllerTests : IClassFixture<WebApplicationSetupFixture>
     [Fact]
     public async Task SignIn_CaseInsensitiveRoute()
     {
-        // Act
         var response = await _fixture.Client.GetAsync("/AUTH/SIGN-IN");
 
-        // Assert
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.OK,
             HttpStatusCode.Redirect,
             HttpStatusCode.Found,
             HttpStatusCode.NotFound);
     }
+
+    [Fact]
+    public async Task SignOut_CaseInsensitiveRoute()
+    {
+        var response = await _fixture.AuthenticatedClient.GetAsync("/AUTH/SIGN-OUT");
+
+        response.StatusCode.Should().BeOneOf(
+            HttpStatusCode.OK,
+            HttpStatusCode.Redirect,
+            HttpStatusCode.Found,
+            HttpStatusCode.NotFound,
+            HttpStatusCode.InternalServerError);
+    }
+
     #endregion
 }

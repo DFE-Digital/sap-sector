@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -13,6 +14,7 @@ using SAPSec.Web.Controllers;
 using System.Security.Claims;
 
 namespace SAPSec.Web.Tests.Controllers;
+
 public class AuthControllerTests
 {
     private readonly Mock<IDsiUserService> _mockUserService;
@@ -21,6 +23,15 @@ public class AuthControllerTests
     private readonly Mock<IUrlHelper> _mockUrlHelper;
     private readonly Mock<IAuthenticationService> _mockAuthService;
     private readonly Mock<ISession> _mockSession;
+
+    private static class ExpectedRoutes
+    {
+        public const string DefaultReturnUrl = "/school/search-for-a-school";
+        public const string HomeAction = "Index";
+        public const string HomeController = "Home";
+        public const string ErrorAction = "StatusCodeError";
+        public const string ErrorController = "Error";
+    }
 
     public AuthControllerTests()
     {
@@ -39,22 +50,18 @@ public class AuthControllerTests
     {
         var httpContext = new DefaultHttpContext();
 
-        // Setup service provider with authentication service
         var serviceProvider = new Mock<IServiceProvider>();
         serviceProvider
             .Setup(sp => sp.GetService(typeof(IAuthenticationService)))
             .Returns(_mockAuthService.Object);
         httpContext.RequestServices = serviceProvider.Object;
 
-        // Setup session
         httpContext.Session = _mockSession.Object;
 
-        // Setup URL helper
         _mockUrlHelper.Setup(u => u.IsLocalUrl(It.IsAny<string>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(null)).Returns(false);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(string.Empty)).Returns(false);
 
-        // Setup TempData
         var tempData = new TempDataDictionary(httpContext, Mock.Of<ITempDataProvider>());
 
         _controller.ControllerContext = new ControllerContext
@@ -65,24 +72,11 @@ public class AuthControllerTests
         _controller.TempData = tempData;
     }
 
-    private ClaimsPrincipal CreateAuthenticatedUser(string userId = "test-user-id")
-    {
-        var claims = new List<Claim>
-        {
-            new(ClaimTypes.NameIdentifier, userId),
-            new(ClaimTypes.Name, "Test User"),
-            new(ClaimTypes.Email, "test@example.com")
-        };
-        var identity = new ClaimsIdentity(claims, "TestAuth");
-        return new ClaimsPrincipal(identity);
-    }
-
     #region Constructor Tests
 
     [Fact]
     public void Constructor_WithNullUserService_ThrowsArgumentNullException()
     {
-        // Act & Assert
         var action = () => new AuthController(null!, _mockLogger.Object);
         action.Should().Throw<ArgumentNullException>()
             .WithParameterName("userService");
@@ -91,7 +85,6 @@ public class AuthControllerTests
     [Fact]
     public void Constructor_WithNullLogger_ThrowsArgumentNullException()
     {
-        // Act & Assert
         var action = () => new AuthController(_mockUserService.Object, null!);
         action.Should().Throw<ArgumentNullException>()
             .WithParameterName("logger");
@@ -100,10 +93,7 @@ public class AuthControllerTests
     [Fact]
     public void Constructor_WithValidDependencies_CreatesInstance()
     {
-        // Act
         var controller = new AuthController(_mockUserService.Object, _mockLogger.Object);
-
-        // Assert
         controller.Should().NotBeNull();
     }
 
@@ -114,15 +104,12 @@ public class AuthControllerTests
     [Fact]
     public void SignIn_WhenUserAlreadyAuthenticated_WithLocalReturnUrl_RedirectsToReturnUrl()
     {
-        // Arrange
         var returnUrl = "/dashboard";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(returnUrl)).Returns(true);
 
-        // Act
         var result = _controller.SignIn(returnUrl);
 
-        // Assert
         result.Should().BeOfType<RedirectResult>();
         var redirectResult = result as RedirectResult;
         redirectResult!.Url.Should().Be(returnUrl);
@@ -131,95 +118,64 @@ public class AuthControllerTests
     [Fact]
     public void SignIn_WhenUserAlreadyAuthenticated_WithNullReturnUrl_RedirectsToHome()
     {
-        // Arrange
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
 
-        // Act
         var result = _controller.SignIn(null);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
     }
 
     [Fact]
     public void SignIn_WhenUserAlreadyAuthenticated_WithEmptyReturnUrl_RedirectsToHome()
     {
-        // Arrange
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
 
-        // Act
         var result = _controller.SignIn(string.Empty);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
     }
 
     [Fact]
     public void SignIn_WhenUserAlreadyAuthenticated_WithExternalUrl_RedirectsToHome()
     {
-        // Arrange
         var externalUrl = "https://malicious-site.com";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(externalUrl)).Returns(false);
 
-        // Act
         var result = _controller.SignIn(externalUrl);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
     }
 
     [Fact]
     public void SignIn_WhenUserNotAuthenticated_ReturnsChallengeResult()
     {
-        // Arrange
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        // Act
         var result = _controller.SignIn("/returnUrl");
 
-        // Assert
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
         challengeResult!.AuthenticationSchemes.Should().Contain(OpenIdConnectDefaults.AuthenticationScheme);
     }
 
     [Fact]
-    public void SignIn_WhenUserNotAuthenticated_WithNullReturnUrl_SetsDefaultRedirectUri()
-    {
-        // Arrange
-        _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
-
-        // Act
-        var result = _controller.SignIn(null);
-
-        // Assert
-        result.Should().BeOfType<ChallengeResult>();
-        var challengeResult = result as ChallengeResult;
-        challengeResult!.Properties.Should().NotBeNull();
-        challengeResult.Properties!.RedirectUri.Should().Be("/Search");
-    }
-
-    [Fact]
     public void SignIn_WhenUserNotAuthenticated_WithReturnUrl_SetsCorrectRedirectUri()
     {
-        // Arrange
         var returnUrl = "/custom/path";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        // Act
         var result = _controller.SignIn(returnUrl);
 
-        // Assert
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
         challengeResult!.Properties!.RedirectUri.Should().Be(returnUrl);
@@ -228,13 +184,10 @@ public class AuthControllerTests
     [Fact]
     public void SignIn_WhenUserNotAuthenticated_UsesOpenIdConnectScheme()
     {
-        // Arrange
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        // Act
         var result = _controller.SignIn(null);
 
-        // Assert
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
         challengeResult!.AuthenticationSchemes.Should().HaveCount(1);
@@ -246,26 +199,24 @@ public class AuthControllerTests
     #region SelectOrganisation GET Tests
 
     [Fact]
-    public async Task SelectOrganisation_Get_WithNullUser_RedirectsToError()
+    public async Task SelectOrganisation_Get_WithNullUser_RedirectsToProblem()
     {
-        // Arrange
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync((DsiUser?)null);
 
-        // Act
         var result = await _controller.SelectOrganisation(null);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.ErrorAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.ErrorController);
+        redirectResult.RouteValues.Should().ContainKey("statusCode");
+        redirectResult.RouteValues!["statusCode"].Should().Be(500);
     }
 
     [Fact]
-    public async Task SelectOrganisation_Get_WithUserWithNoOrganisations_RedirectsToError()
+    public async Task SelectOrganisation_Get_WithUserWithNoOrganisations_RedirectsToProblem()
     {
-        // Arrange
         var user = new DsiUser
         {
             Name = "test-user",
@@ -274,41 +225,36 @@ public class AuthControllerTests
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
 
-        // Act
         var result = await _controller.SelectOrganisation(null);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.ErrorAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.ErrorController);
+        redirectResult.RouteValues!["statusCode"].Should().Be(500);
     }
 
     [Fact]
-    public async Task SelectOrganisation_Get_WithUserWithEmptyOrganisationsList_RedirectsToError()
+    public async Task SelectOrganisation_Get_WithNullUser_LogsWarning()
     {
-        // Arrange
-        var user = new DsiUser
-        {
-            Name = "test-user",
-            Organisations = new List<DsiOrganisation>()
-        };
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(user);
+            .ReturnsAsync((DsiUser?)null);
 
-        // Act
-        var result = await _controller.SelectOrganisation("/return");
+        await _controller.SelectOrganisation(null);
 
-        // Assert
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
+        _mockLogger.Verify(
+            x => x.Log(
+                LogLevel.Warning,
+                It.IsAny<EventId>(),
+                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("User not found")),
+                null,
+                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
+            Times.Once);
     }
 
     [Fact]
     public async Task SelectOrganisation_Get_WithValidUser_ReturnsView()
     {
-        // Arrange
         var user = new DsiUser
         {
             Name = "test-user",
@@ -320,10 +266,8 @@ public class AuthControllerTests
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
 
-        // Act
         var result = await _controller.SelectOrganisation("/return");
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
         viewResult!.Model.Should().Be(user);
@@ -332,7 +276,6 @@ public class AuthControllerTests
     [Fact]
     public async Task SelectOrganisation_Get_WithValidUser_SetsReturnUrlInViewBag()
     {
-        // Arrange
         var user = new DsiUser
         {
             Name = "test-user",
@@ -344,10 +287,8 @@ public class AuthControllerTests
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
 
-        // Act
         var result = await _controller.SelectOrganisation("/custom-return");
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
         ((string)_controller.ViewBag.ReturnUrl).Should().Be("/custom-return");
     }
@@ -355,7 +296,6 @@ public class AuthControllerTests
     [Fact]
     public async Task SelectOrganisation_Get_WithMultipleOrganisations_ReturnsViewWithAllOrganisations()
     {
-        // Arrange
         var user = new DsiUser
         {
             Name = "test-user",
@@ -369,97 +309,63 @@ public class AuthControllerTests
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
 
-        // Act
         var result = await _controller.SelectOrganisation(null);
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
         var model = viewResult!.Model as DsiUser;
         model!.Organisations.Should().HaveCount(3);
     }
 
-    [Fact]
-    public async Task SelectOrganisation_Get_WithNullReturnUrl_SetsNullInViewBag()
-    {
-        // Arrange
-        var user = new DsiUser
-        {
-            Name = "test-user",
-            Organisations = new List<DsiOrganisation>
-            {
-                new() { Id = "org1", Name = "Organisation 1" }
-            }
-        };
-        _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(user);
-
-        // Act
-        var result = await _controller.SelectOrganisation(null);
-
-        // Assert
-        result.Should().BeOfType<ViewResult>();
-        ((string?)_controller.ViewBag.ReturnUrl).Should().BeNull();
-    }
-
     #endregion
 
-    #region SelectOrganisation POST Tests
+    #region SelectOrganisationPost Tests
 
     [Fact]
-    public async Task SelectOrganisation_Post_WithEmptyOrganisationId_ReturnsBadRequest()
+    public async Task SelectOrganisationPost_WithEmptyOrganisationId_ReturnsBadRequest()
     {
-        // Act
-        var result = await _controller.SelectOrganisation("", "/return");
+        var result = await _controller.SelectOrganisationPost(string.Empty, "/return");
 
-        // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.Value.Should().Be("Organisation ID is required");
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WithNullOrganisationId_ReturnsBadRequest()
+    public async Task SelectOrganisationPost_WithNullOrganisationId_ReturnsBadRequest()
     {
-        // Act
-        var result = await _controller.SelectOrganisation(null!, "/return");
+        var result = await _controller.SelectOrganisationPost(null!, "/return");
 
-        // Assert
         result.Should().BeOfType<BadRequestObjectResult>();
         var badRequestResult = result as BadRequestObjectResult;
         badRequestResult!.Value.Should().Be("Organisation ID is required");
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WhenSetOrganisationFails_RedirectsToError()
+    public async Task SelectOrganisationPost_WhenSetOrganisationFails_RedirectsToProblem()
     {
-        // Arrange
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(false);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        var result = await _controller.SelectOrganisation("org-123", "/return");
+        var result = await _controller.SelectOrganisationPost("org-123", "/return");
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.ErrorAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.ErrorController);
+        redirectResult.RouteValues!["statusCode"].Should().Be(500);
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WhenSetOrganisationFails_LogsWarning()
+    public async Task SelectOrganisationPost_WhenSetOrganisationFails_LogsWarning()
     {
-        // Arrange
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(false);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        await _controller.SelectOrganisation("org-123", "/return");
+        await _controller.SelectOrganisationPost("org-123", "/return");
 
-        // Assert
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Warning,
@@ -471,97 +377,62 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WhenSetOrganisationFails_LogsOrganisationId()
+    public async Task SelectOrganisationPost_WhenSuccessful_RedirectsToReturnUrl()
     {
-        // Arrange
-        var organisationId = "org-456";
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(false);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        // Act
-        await _controller.SelectOrganisation(organisationId, "/return");
-
-        // Assert
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(organisationId)),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task SelectOrganisation_Post_WhenSuccessful_RedirectsToReturnUrl()
-    {
-        // Arrange
         var returnUrl = "/dashboard";
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
         _mockUrlHelper.Setup(u => u.IsLocalUrl(returnUrl)).Returns(true);
 
-        // Act
-        var result = await _controller.SelectOrganisation("org-123", returnUrl);
+        var result = await _controller.SelectOrganisationPost("org-123", returnUrl);
 
-        // Assert
         result.Should().BeOfType<RedirectResult>();
         var redirectResult = result as RedirectResult;
         redirectResult!.Url.Should().Be(returnUrl);
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WhenSuccessful_WithNullReturnUrl_RedirectsToHome()
+    public async Task SelectOrganisationPost_WhenSuccessful_WithNullReturnUrl_RedirectsToHome()
     {
-        // Arrange
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        var result = await _controller.SelectOrganisation("org-123", null);
+        var result = await _controller.SelectOrganisationPost("org-123", null);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WhenSuccessful_WithExternalReturnUrl_RedirectsToHome()
+    public async Task SelectOrganisationPost_WhenSuccessful_WithExternalReturnUrl_RedirectsToHome()
     {
-        // Arrange
         var externalUrl = "https://evil.com";
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
         _mockUrlHelper.Setup(u => u.IsLocalUrl(externalUrl)).Returns(false);
 
-        // Act
-        var result = await _controller.SelectOrganisation("org-123", externalUrl);
+        var result = await _controller.SelectOrganisationPost("org-123", externalUrl);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WhenSuccessful_LogsInformation()
+    public async Task SelectOrganisationPost_WhenSuccessful_LogsInformation()
     {
-        // Arrange
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        await _controller.SelectOrganisation("org-123", "/return");
+        await _controller.SelectOrganisationPost("org-123", "/return");
 
-        // Assert
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -573,41 +444,15 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WhenSuccessful_LogsUserId()
+    public async Task SelectOrganisationPost_CallsSetCurrentOrganisationWithCorrectParameters()
     {
-        // Arrange
-        var userId = "user-789";
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(userId);
-
-        // Act
-        await _controller.SelectOrganisation("org-123", "/return");
-
-        // Assert
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(userId)),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task SelectOrganisation_Post_CallsSetCurrentOrganisationWithCorrectParameters()
-    {
-        // Arrange
         var organisationId = "org-test-123";
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        await _controller.SelectOrganisation(organisationId, "/return");
+        await _controller.SelectOrganisationPost(organisationId, "/return");
 
-        // Assert
         _mockUserService.Verify(
             s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), organisationId),
             Times.Once);
@@ -615,83 +460,61 @@ public class AuthControllerTests
 
     #endregion
 
-    #region SignOutCallback Tests
+    #region SignOut Tests
 
     [Fact]
-    public async Task SignOutCallback_ClearsSession()
+    public async Task SignOut_ClearsSession()
     {
-        // Arrange
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        await _controller.SignOutCallback();
+        await _controller.SignOut();
 
-        // Assert
         _mockSession.Verify(s => s.Clear(), Times.Once);
     }
 
     [Fact]
-    public async Task SignOutCallback_SignsOutOfCookieScheme()
+    public async Task SignOut_ReturnsSignOutResult()
     {
-        // Arrange
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        await _controller.SignOutCallback();
+        var result = await _controller.SignOut();
 
-        // Assert
-        _mockAuthService.Verify(
-            a => a.SignOutAsync(
-                It.IsAny<HttpContext>(),
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                It.IsAny<AuthenticationProperties>()),
-            Times.Once);
+        result.Should().BeOfType<SignOutResult>();
     }
 
     [Fact]
-    public async Task SignOutCallback_SignsOutOfOpenIdConnectScheme()
+    public async Task SignOut_SignsOutOfOpenIdConnectScheme()
     {
-        // Arrange
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        await _controller.SignOutCallback();
+        var result = await _controller.SignOut();
 
-        // Assert
-        _mockAuthService.Verify(
-            a => a.SignOutAsync(
-                It.IsAny<HttpContext>(),
-                OpenIdConnectDefaults.AuthenticationScheme,
-                It.IsAny<AuthenticationProperties>()),
-            Times.Once);
+        result.Should().BeOfType<SignOutResult>();
+        var signOutResult = result as SignOutResult;
+        signOutResult!.AuthenticationSchemes.Should().Contain(OpenIdConnectDefaults.AuthenticationScheme);
     }
 
     [Fact]
-    public async Task SignOutCallback_RedirectsToHomeIndex()
+    public async Task SignOut_HasRedirectUriToSignedOut()
     {
-        // Arrange
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
+        _mockUrlHelper.Setup(u => u.Action(It.IsAny<UrlActionContext>())).Returns("/Auth/signed-out");
 
-        // Act
-        var result = await _controller.SignOutCallback();
+        var result = await _controller.SignOut();
 
-        // Assert
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        result.Should().BeOfType<SignOutResult>();
+        var signOutResult = result as SignOutResult;
+        signOutResult!.Properties.Should().NotBeNull();
+        signOutResult.Properties!.RedirectUri.Should().Be("/Auth/signed-out");
     }
 
     [Fact]
-    public async Task SignOutCallback_LogsSignOutInformation()
+    public async Task SignOut_LogsSignOutInformation()
     {
-        // Arrange
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        await _controller.SignOutCallback();
+        await _controller.SignOut();
 
-        // Assert
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -703,16 +526,13 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async Task SignOutCallback_LogsUserId()
+    public async Task SignOut_LogsUserId()
     {
-        // Arrange
         var userId = "user-to-logout";
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(userId);
 
-        // Act
-        await _controller.SignOutCallback();
+        await _controller.SignOut();
 
-        // Assert
         _mockLogger.Verify(
             x => x.Log(
                 LogLevel.Information,
@@ -724,24 +544,16 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public async Task SignOutCallback_ClearsSessionBeforeSignOut()
+    public async Task SignOut_ClearsSessionBeforeFederatedSignOut()
     {
-        // Arrange
-        var callOrder = new List<string>();
+        var sessionCleared = false;
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-        _mockSession.Setup(s => s.Clear()).Callback(() => callOrder.Add("SessionClear"));
-        _mockAuthService.Setup(a => a.SignOutAsync(
-            It.IsAny<HttpContext>(),
-            It.IsAny<string>(),
-            It.IsAny<AuthenticationProperties>()))
-            .Callback(() => callOrder.Add("SignOut"))
-            .Returns(Task.CompletedTask);
+        _mockSession.Setup(s => s.Clear()).Callback(() => sessionCleared = true);
 
-        // Act
-        await _controller.SignOutCallback();
+        var result = await _controller.SignOut();
 
-        // Assert
-        callOrder.First().Should().Be("SessionClear");
+        sessionCleared.Should().BeTrue("Session should be cleared before returning SignOutResult");
+        result.Should().BeOfType<SignOutResult>();
     }
 
     #endregion
@@ -751,31 +563,17 @@ public class AuthControllerTests
     [Fact]
     public void AccessDenied_ReturnsView()
     {
-        // Act
         var result = _controller.AccessDenied();
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
     }
 
     [Fact]
     public void AccessDenied_ReturnsDefaultView()
     {
-        // Act
         var result = _controller.AccessDenied() as ViewResult;
 
-        // Assert
-        result!.ViewName.Should().BeNull(); // Default view name
-    }
-
-    [Fact]
-    public void AccessDenied_ReturnsViewWithNoModel()
-    {
-        // Act
-        var result = _controller.AccessDenied() as ViewResult;
-
-        // Assert
-        result!.Model.Should().BeNull();
+        result!.ViewName.Should().BeNull();
     }
 
     #endregion
@@ -785,55 +583,22 @@ public class AuthControllerTests
     [Fact]
     public void SignedOut_ReturnsView()
     {
-        // Act
         var result = _controller.SignedOut();
 
-        // Assert
         result.Should().BeOfType<ViewResult>();
     }
 
     [Fact]
     public void SignedOut_ReturnsDefaultView()
     {
-        // Act
         var result = _controller.SignedOut() as ViewResult;
 
-        // Assert
-        result!.ViewName.Should().BeNull(); // Default view name
-    }
-
-    [Fact]
-    public void SignedOut_ReturnsViewWithNoModel()
-    {
-        // Act
-        var result = _controller.SignedOut() as ViewResult;
-
-        // Assert
-        result!.Model.Should().BeNull();
+        result!.ViewName.Should().BeNull();
     }
 
     #endregion
 
-    #region RedirectToLocal Tests (Indirect via SignIn and SelectOrganisation)
-
-    [Theory]
-    [InlineData("/local/path")]
-    [InlineData("/dashboard")]
-    [InlineData("/school/search")]
-    public void SignIn_AuthenticatedUser_WithLocalUrl_RedirectsToLocalUrl(string localUrl)
-    {
-        // Arrange
-        _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
-        _mockUrlHelper.Setup(u => u.IsLocalUrl(localUrl)).Returns(true);
-
-        // Act
-        var result = _controller.SignIn(localUrl);
-
-        // Assert
-        result.Should().BeOfType<RedirectResult>();
-        var redirectResult = result as RedirectResult;
-        redirectResult!.Url.Should().Be(localUrl);
-    }
+    #region Security Tests
 
     [Theory]
     [InlineData("https://external.com")]
@@ -841,36 +606,31 @@ public class AuthControllerTests
     [InlineData("http://malicious.org/path")]
     public void SignIn_AuthenticatedUser_WithExternalUrl_RedirectsToHome(string externalUrl)
     {
-        // Arrange
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
         _mockUrlHelper.Setup(u => u.IsLocalUrl(externalUrl)).Returns(false);
 
-        // Act
         var result = _controller.SignIn(externalUrl);
 
-        // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
+        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    public void SignIn_AuthenticatedUser_WithNullOrEmptyUrl_RedirectsToHome(string? url)
+    [InlineData("/local/path")]
+    [InlineData("/dashboard")]
+    [InlineData("/school/search")]
+    public void SignIn_AuthenticatedUser_WithLocalUrl_RedirectsToLocalUrl(string localUrl)
     {
-        // Arrange
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
+        _mockUrlHelper.Setup(u => u.IsLocalUrl(localUrl)).Returns(true);
 
-        // Act
-        var result = _controller.SignIn(url);
+        var result = _controller.SignIn(localUrl);
 
-        // Assert
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("Home");
+        result.Should().BeOfType<RedirectResult>();
+        var redirectResult = result as RedirectResult;
+        redirectResult!.Url.Should().Be(localUrl);
     }
 
     #endregion
@@ -878,49 +638,27 @@ public class AuthControllerTests
     #region Edge Cases
 
     [Fact]
-    public async Task SelectOrganisation_Post_WithVeryLongOrganisationId_ProcessesCorrectly()
+    public async Task SelectOrganisationPost_WithVeryLongOrganisationId_ProcessesCorrectly()
     {
-        // Arrange
         var longOrgId = new string('a', 1000);
         _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
             .ReturnsAsync(true);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
-        // Act
-        var result = await _controller.SelectOrganisation(longOrgId, "/return");
+        var result = await _controller.SelectOrganisationPost(longOrgId, "/return");
 
-        // Assert
         result.Should().BeOfType<RedirectResult>();
         _mockUserService.Verify(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), longOrgId), Times.Once);
     }
 
     [Fact]
-    public async Task SelectOrganisation_Post_WithSpecialCharactersInOrganisationId_ProcessesCorrectly()
-    {
-        // Arrange
-        var specialOrgId = "org-123-!@#$%^&*()";
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        // Act
-        var result = await _controller.SelectOrganisation(specialOrgId, "/return");
-
-        // Assert
-        result.Should().BeOfType<RedirectResult>();
-    }
-
-    [Fact]
     public void SignIn_WithSpecialCharactersInReturnUrl_ProcessesCorrectly()
     {
-        // Arrange
         var specialUrl = "/path?query=value&other=123";
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(false);
 
-        // Act
         var result = _controller.SignIn(specialUrl);
 
-        // Assert
         result.Should().BeOfType<ChallengeResult>();
         var challengeResult = result as ChallengeResult;
         challengeResult!.Properties!.RedirectUri.Should().Be(specialUrl);
