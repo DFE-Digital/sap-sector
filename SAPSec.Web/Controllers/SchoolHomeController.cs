@@ -46,7 +46,10 @@ public class SchoolHomeController : Controller
 
     private static bool IsEstablishment(Organisation organisation)
     {
-        return organisation?.Category?.Name == "Establishment";
+        return string.Equals(
+        organisation?.Category?.Name,
+        "Establishment",
+        StringComparison.OrdinalIgnoreCase);
     }
 
     private IActionResult AccessDenied()
