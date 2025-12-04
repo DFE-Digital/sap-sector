@@ -229,7 +229,7 @@ public static class DsiAuthenticationExtensions
     private static async Task ProcessValidatedToken(TokenValidatedContext context)
     {
         var userService = context.HttpContext.RequestServices
-            .GetRequiredService<IDsiUserService>();
+            .GetRequiredService<IUserService>();
 
         var user = await userService.GetUserFromClaimsAsync(context.Principal!);
 
@@ -243,8 +243,8 @@ public static class DsiAuthenticationExtensions
 
     private static async Task SetOrganisationBasedOnCount(
         TokenValidatedContext context,
-        IDsiUserService userService,
-        DsiUser user)
+        IUserService userService,
+        User user)
     {
         if (user.Organisations.Count == 1)
         {
@@ -314,13 +314,13 @@ public static class DsiAuthenticationExtensions
     private static void RegisterServices(IServiceCollection services)
     {
         services.AddHttpContextAccessor();
-        services.AddScoped<IDsiUserService, DsiUserService>();
+        services.AddScoped<IUserService, UserService>();
         RegisterDsiApiClient(services);
     }
 
     private static void RegisterDsiApiClient(IServiceCollection services)
     {
-        services.AddHttpClient<IDsiApiService, DsiApiService>(ConfigureDsiApiClient);
+        services.AddHttpClient<IDsiClient, DsiApiService>(ConfigureDsiApiClient);
     }
 
     private static void ConfigureDsiApiClient(IServiceProvider serviceProvider, HttpClient client)

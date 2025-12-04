@@ -11,7 +11,7 @@ namespace SAPSec.Web.Controllers;
 [Route("[controller]")]
 public class AuthController : Controller
 {
-    private readonly IDsiUserService _userService;
+    private readonly IUserService _userService;
     private readonly ILogger<AuthController> _logger;
 
     private static class Routes
@@ -43,7 +43,7 @@ public class AuthController : Controller
     }
 
     public AuthController(
-        IDsiUserService userService,
+        IUserService userService,
         ILogger<AuthController> logger)
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -137,7 +137,7 @@ public class AuthController : Controller
         return _userService.IsAuthenticated(User);
     }
 
-    private static bool HasValidOrganisations(DsiUser? user)
+    private static bool HasValidOrganisations(User? user)
     {
         return user?.Organisations.Any() == true;
     }

@@ -3,10 +3,10 @@ using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Interfaces.Services;
 
-public interface IDsiUserService
+public interface IUserService
 {
-    Task<DsiUser?> GetUserFromClaimsAsync(ClaimsPrincipal principal);
-    Task<DsiOrganisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal);
+    Task<User?> GetUserFromClaimsAsync(ClaimsPrincipal principal);
+    Task<Organisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal);
     Task<bool> SetCurrentOrganisationAsync(ClaimsPrincipal principal, string organisationId);
     string? GetUserId(ClaimsPrincipal principal);
     string? GetUserEmail(ClaimsPrincipal principal);

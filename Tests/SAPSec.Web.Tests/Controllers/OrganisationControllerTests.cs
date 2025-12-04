@@ -13,16 +13,16 @@ namespace SAPSec.Web.Tests.Controllers;
 
 public class OrganisationControllerTests
 {
-    private readonly Mock<IDsiUserService> _mockUserService;
-    private readonly Mock<IDsiApiService> _mockApiService;
+    private readonly Mock<IUserService> _mockUserService;
+    private readonly Mock<IDsiClient> _mockApiService;
     private readonly Mock<ILogger<OrganisationController>> _mockLogger;
     private readonly Mock<IUrlHelper> _mockUrlHelper;
     private readonly OrganisationController _controller;
 
     public OrganisationControllerTests()
     {
-        _mockUserService = new Mock<IDsiUserService>();
-        _mockApiService = new Mock<IDsiApiService>();
+        _mockUserService = new Mock<IUserService>();
+        _mockApiService = new Mock<IDsiClient>();
         _mockLogger = new Mock<ILogger<OrganisationController>>();
         _mockUrlHelper = new Mock<IUrlHelper>();
 
@@ -51,14 +51,14 @@ public class OrganisationControllerTests
         _controller.TempData = tempData;
     }
 
-    private static DsiUser CreateTestUser(string userId = "test-user-id", List<DsiOrganisation>? organisations = null)
+    private static User CreateTestUser(string userId = "test-user-id", List<Organisation>? organisations = null)
     {
-        return new DsiUser
+        return new User
         {
             Name = userId,
             Sub = userId,
             Email = "test@example.com",
-            Organisations = organisations ?? new List<DsiOrganisation>
+            Organisations = organisations ?? new List<Organisation>
             {
                 new() { Id = "org-1", Name = "Organisation One" },
                 new() { Id = "org-2", Name = "Organisation Two" }
@@ -66,9 +66,9 @@ public class OrganisationControllerTests
         };
     }
 
-    private static DsiOrganisation CreateTestOrganisation(string id = "org-1", string name = "Test Organisation")
+    private static Organisation CreateTestOrganisation(string id = "org-1", string name = "Test Organisation")
     {
-        return new DsiOrganisation
+        return new Organisation
         {
             Id = id,
             Name = name
@@ -143,7 +143,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiOrganisation?)null);
+            .ReturnsAsync((Organisation?)null);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
         // Act
@@ -162,7 +162,7 @@ public class OrganisationControllerTests
         // Arrange
         var userId = "user-123";
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiOrganisation?)null);
+            .ReturnsAsync((Organisation?)null);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(userId);
 
         // Act
@@ -185,7 +185,7 @@ public class OrganisationControllerTests
         // Arrange
         var userId = "specific-user-id";
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiOrganisation?)null);
+            .ReturnsAsync((Organisation?)null);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(userId);
 
         // Act
@@ -242,7 +242,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiUser?)null);
+            .ReturnsAsync((User?)null);
 
         // Act
         var result = await _controller.Switch();
@@ -258,7 +258,7 @@ public class OrganisationControllerTests
     public async Task Switch_Get_WhenUserHasNoOrganisations_RedirectsToError()
     {
         // Arrange
-        var user = CreateTestUser(organisations: new List<DsiOrganisation>());
+        var user = CreateTestUser(organisations: new List<Organisation>());
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
 
@@ -276,10 +276,10 @@ public class OrganisationControllerTests
     public async Task Switch_Get_WhenUserHasEmptyOrganisationsList_RedirectsToError()
     {
         // Arrange
-        var user = new DsiUser
+        var user = new User
         {
             Name = "test-user",
-            Organisations = new List<DsiOrganisation>()
+            Organisations = new List<Organisation>()
         };
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
@@ -295,7 +295,7 @@ public class OrganisationControllerTests
     public async Task Switch_Get_WhenUserHasMultipleOrganisations_ReturnsViewWithAllOrganisations()
     {
         // Arrange
-        var user = CreateTestUser(organisations: new List<DsiOrganisation>
+        var user = CreateTestUser(organisations: new List<Organisation>
         {
             new() { Id = "org-1", Name = "Org 1" },
             new() { Id = "org-2", Name = "Org 2" },
@@ -310,7 +310,7 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
-        var model = viewResult!.Model as DsiUser;
+        var model = viewResult!.Model as User;
         model!.Organisations.Should().HaveCount(3);
     }
 
@@ -347,7 +347,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiUser?)null);
+            .ReturnsAsync((User?)null);
 
         // Act
         var result = await _controller.Switch("org-123", null);
@@ -363,7 +363,7 @@ public class OrganisationControllerTests
     public async Task Switch_Post_WhenOrganisationNotInUserList_ReturnsBadRequest()
     {
         // Arrange
-        var user = CreateTestUser(organisations: new List<DsiOrganisation>
+        var user = CreateTestUser(organisations: new List<Organisation>
         {
             new() { Id = "org-1", Name = "Org 1" }
         });
@@ -585,7 +585,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiOrganisation?)null);
+            .ReturnsAsync((Organisation?)null);
 
         // Act
         var result = await _controller.GetCurrent();
@@ -612,7 +612,7 @@ public class OrganisationControllerTests
     public async Task GetCurrent_ReturnsOrganisationWithCorrectProperties()
     {
         // Arrange
-        var organisation = new DsiOrganisation
+        var organisation = new Organisation
         {
             Id = "org-specific",
             Name = "Specific Organisation"
@@ -625,7 +625,7 @@ public class OrganisationControllerTests
 
         // Assert
         var jsonResult = result as JsonResult;
-        var returnedOrg = jsonResult!.Value as DsiOrganisation;
+        var returnedOrg = jsonResult!.Value as Organisation;
         returnedOrg!.Id.Should().Be("org-specific");
         returnedOrg.Name.Should().Be("Specific Organisation");
     }
@@ -682,7 +682,7 @@ public class OrganisationControllerTests
         // Arrange
         var organisationId = "non-existent-org";
         _mockApiService.Setup(s => s.GetOrganisationAsync(organisationId))
-            .ReturnsAsync((DsiOrganisation?)null);
+            .ReturnsAsync((Organisation?)null);
 
         // Act
         var result = await _controller.GetOrganisation(organisationId);
@@ -710,7 +710,7 @@ public class OrganisationControllerTests
     public async Task GetOrganisation_ReturnsOrganisationWithCorrectProperties()
     {
         // Arrange
-        var organisation = new DsiOrganisation
+        var organisation = new Organisation
         {
             Id = "org-api",
             Name = "API Organisation"
@@ -723,7 +723,7 @@ public class OrganisationControllerTests
 
         // Assert
         var jsonResult = result as JsonResult;
-        var returnedOrg = jsonResult!.Value as DsiOrganisation;
+        var returnedOrg = jsonResult!.Value as Organisation;
         returnedOrg!.Id.Should().Be("org-api");
         returnedOrg.Name.Should().Be("API Organisation");
     }
@@ -737,7 +737,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         var specialOrgId = "org-!@#$%";
-        var user = CreateTestUser(organisations: new List<DsiOrganisation>
+        var user = CreateTestUser(organisations: new List<Organisation>
         {
             new() { Id = specialOrgId, Name = "Special Org" }
         });
@@ -773,7 +773,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         var longOrgId = new string('a', 1000);
-        var user = CreateTestUser(organisations: new List<DsiOrganisation>
+        var user = CreateTestUser(organisations: new List<Organisation>
         {
             new() { Id = longOrgId, Name = "Long ID Org" }
         });

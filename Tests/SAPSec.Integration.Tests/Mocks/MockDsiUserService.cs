@@ -4,18 +4,18 @@ using System.Security.Claims;
 
 namespace SAPSec.Integration.Tests.Mocks;
 
-public class MockDsiUserService : IDsiUserService
+public class MockDsiUserService : IUserService
 {
     private string _currentOrganisationId = "org-123";
 
-    private readonly DsiUser _defaultUser = new()
+    private readonly User _defaultUser = new()
     {
         Sub = "test-user-123",
         Email = "test@example.com",
         GivenName = "Test",
         FamilyName = "User",
         Name = "Test User",
-        Organisations = new List<DsiOrganisation>
+        Organisations = new List<Organisation>
         {
             new()
             {
@@ -24,30 +24,30 @@ public class MockDsiUserService : IDsiUserService
                 LegalName = "TEST ORGANISATION LTD",
                 Urn = "123456",
                 Ukprn = "10012345",
-                Category = new DsiCategory { Id = "001", Name = "Establishment" },
-                Type = new DsiType { Id = "34", Name = "Academy Converter" },
-                Status = new DsiStatus { Id = 1, Name = "Open", TagColor = "green" },
+                Category = new Category { Id = "001", Name = "Establishment" },
+                Type = new Core.Model.Type { Id = "34", Name = "Academy Converter" },
+                Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
                 Address = "123 Test Street, Test Town, TS1 1TT",
-                PhaseOfEducation = new DsiPhaseOfEducation { Id = 2, Name = "Primary" }
+                PhaseOfEducation = new PhaseOfEducation { Id = 2, Name = "Primary" }
             }
         }
     };
 
-    public Task<DsiUser?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
+    public Task<User?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
     {
         if (principal?.Identity?.IsAuthenticated != true)
         {
-            return Task.FromResult<DsiUser?>(null);
+            return Task.FromResult<User?>(null);
         }
 
-        return Task.FromResult<DsiUser?>(_defaultUser);
+        return Task.FromResult<User?>(_defaultUser);
     }
 
-    public Task<DsiOrganisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
+    public Task<Organisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
     {
         if (principal?.Identity?.IsAuthenticated != true)
         {
-            return Task.FromResult<DsiOrganisation?>(null);
+            return Task.FromResult<Organisation?>(null);
         }
 
         var org = _defaultUser.Organisations.FirstOrDefault(o => o.Id == _currentOrganisationId)

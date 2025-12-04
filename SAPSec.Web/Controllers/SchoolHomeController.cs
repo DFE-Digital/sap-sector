@@ -8,11 +8,11 @@ namespace SAPSec.Web.Controllers;
 [Authorize]
 public class SchoolHomeController : Controller
 {
-    private readonly IDsiUserService _userService;
+    private readonly IUserService _userService;
     private readonly ILogger<SchoolHomeController> _logger;
 
     public SchoolHomeController(
-        IDsiUserService userService,
+        IUserService userService,
         ILogger<SchoolHomeController> logger)
     {
         _userService = userService ?? throw new ArgumentNullException(nameof(userService));
@@ -39,12 +39,12 @@ public class SchoolHomeController : Controller
         return View();
     }
 
-    private static bool HasValidOrganisation(DsiOrganisation? organisation)
+    private static bool HasValidOrganisation(Organisation? organisation)
     {
         return organisation?.Category != null;
     }
 
-    private static bool IsEstablishment(DsiOrganisation organisation)
+    private static bool IsEstablishment(Organisation organisation)
     {
         return organisation?.Category?.Name == "Establishment";
     }
@@ -54,13 +54,13 @@ public class SchoolHomeController : Controller
         return RedirectToAction("StatusCodeError", "Error", new { statusCode = 403 });
     }
 
-    private void SetViewBagProperties(DsiUser user, DsiOrganisation currentOrg)
+    private void SetViewBagProperties(User user, Organisation currentOrg)
     {
         ViewBag.SchoolName = GetSchoolName(user, currentOrg);
         ViewBag.UserName = user.Name;
     }
 
-    private static string GetSchoolName(DsiUser user, DsiOrganisation currentOrg)
+    private static string GetSchoolName(User user, Organisation currentOrg)
     {
         return user.Organisations.FirstOrDefault(o => o.Id == currentOrg.Id)?.Name ?? "School";
     }

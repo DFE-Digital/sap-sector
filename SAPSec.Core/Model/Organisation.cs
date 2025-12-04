@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SAPSec.Core.Model;
 
-public class DsiOrganisation
+public class Organisation
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
@@ -19,10 +19,10 @@ public class DsiOrganisation
     public string? LegalName { get; set; }
 
     [JsonPropertyName("category")]
-    public DsiCategory? Category { get; set; }
+    public Category? Category { get; set; }
 
     [JsonPropertyName("type")]
-    public DsiType? Type { get; set; }
+    public Type? Type { get; set; }
 
     [JsonPropertyName("urn")]
     public string? Urn { get; set; }
@@ -40,7 +40,7 @@ public class DsiOrganisation
     public string? EstablishmentNumber { get; set; }
 
     [JsonPropertyName("status")]
-    public DsiStatus? Status { get; set; }
+    public Status? Status { get; set; }
 
     [JsonPropertyName("closedOn")]
     public DateTime? ClosedOn { get; set; }
@@ -52,13 +52,13 @@ public class DsiOrganisation
     public string? Telephone { get; set; }
 
     [JsonPropertyName("region")]
-    public DsiRegion? Region { get; set; }
+    public Region? Region { get; set; }
 
     [JsonPropertyName("localAuthority")]
-    public DsiLocalAuthority? LocalAuthority { get; set; }
+    public LocalAuthority? LocalAuthority { get; set; }
 
     [JsonPropertyName("phaseOfEducation")]
-    public DsiPhaseOfEducation? PhaseOfEducation { get; set; }
+    public PhaseOfEducation? PhaseOfEducation { get; set; }
 
     [JsonPropertyName("statutoryLowAge")]
     public int? StatutoryLowAge { get; set; }
@@ -120,5 +120,5 @@ public class DsiOrganisation
     [JsonPropertyName("IsOnAPAR")]
     public string? IsOnApar { get; set; }
 
-    public List<DsiService> Services { get; set; } = new();
+    public List<Service> Services { get; set; } = new();
 }

@@ -7,15 +7,11 @@ using System.Threading.Tasks;
 
 namespace SAPSec.Core.Model;
 
-public class DsiStatus
+public class Region
 {
     [JsonPropertyName("id")]
-    public int Id { get; set; }  
+    public string Id { get; set; } = string.Empty;
 
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
-
-    [JsonPropertyName("tagColor")]
-    public string? TagColor { get; set; } 
 }
-

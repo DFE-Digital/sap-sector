@@ -60,10 +60,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
         builder.ConfigureTestServices(services =>
         {
-            services.RemoveAll<IDsiUserService>();
-            services.RemoveAll<IDsiApiService>();
-            services.AddScoped<IDsiUserService, MockDsiUserService>();
-            services.AddScoped<IDsiApiService, MockDsiApiService>();
+            services.RemoveAll<IUserService>();
+            services.RemoveAll<IDsiClient>();
+            services.AddScoped<IUserService, MockDsiUserService>();
+            services.AddScoped<IDsiClient, MockDsiApiService>();
         });
     }
 

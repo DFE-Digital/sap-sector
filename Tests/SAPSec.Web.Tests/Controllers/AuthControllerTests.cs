@@ -17,7 +17,7 @@ namespace SAPSec.Web.Tests.Controllers;
 
 public class AuthControllerTests
 {
-    private readonly Mock<IDsiUserService> _mockUserService;
+    private readonly Mock<IUserService> _mockUserService;
     private readonly Mock<ILogger<AuthController>> _mockLogger;
     private readonly AuthController _controller;
     private readonly Mock<IUrlHelper> _mockUrlHelper;
@@ -35,7 +35,7 @@ public class AuthControllerTests
 
     public AuthControllerTests()
     {
-        _mockUserService = new Mock<IDsiUserService>();
+        _mockUserService = new Mock<IUserService>();
         _mockLogger = new Mock<ILogger<AuthController>>();
         _mockAuthService = new Mock<IAuthenticationService>();
         _mockUrlHelper = new Mock<IUrlHelper>();
@@ -202,7 +202,7 @@ public class AuthControllerTests
     public async Task SelectOrganisation_Get_WithNullUser_RedirectsToProblem()
     {
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiUser?)null);
+            .ReturnsAsync((User?)null);
 
         var result = await _controller.SelectOrganisation(null);
 
@@ -217,10 +217,10 @@ public class AuthControllerTests
     [Fact]
     public async Task SelectOrganisation_Get_WithUserWithNoOrganisations_RedirectsToProblem()
     {
-        var user = new DsiUser
+        var user = new User
         {
             Name = "test-user",
-            Organisations = new List<DsiOrganisation>()
+            Organisations = new List<Organisation>()
         };
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
             .ReturnsAsync(user);
@@ -238,7 +238,7 @@ public class AuthControllerTests
     public async Task SelectOrganisation_Get_WithNullUser_LogsWarning()
     {
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((DsiUser?)null);
+            .ReturnsAsync((User?)null);
 
         await _controller.SelectOrganisation(null);
 
@@ -255,10 +255,10 @@ public class AuthControllerTests
     [Fact]
     public async Task SelectOrganisation_Get_WithValidUser_ReturnsView()
     {
-        var user = new DsiUser
+        var user = new User
         {
             Name = "test-user",
-            Organisations = new List<DsiOrganisation>
+            Organisations = new List<Organisation>
             {
                 new() { Id = "org1", Name = "Organisation 1" }
             }
@@ -276,10 +276,10 @@ public class AuthControllerTests
     [Fact]
     public async Task SelectOrganisation_Get_WithValidUser_SetsReturnUrlInViewBag()
     {
-        var user = new DsiUser
+        var user = new User
         {
             Name = "test-user",
-            Organisations = new List<DsiOrganisation>
+            Organisations = new List<Organisation>
             {
                 new() { Id = "org1", Name = "Organisation 1" }
             }
@@ -296,10 +296,10 @@ public class AuthControllerTests
     [Fact]
     public async Task SelectOrganisation_Get_WithMultipleOrganisations_ReturnsViewWithAllOrganisations()
     {
-        var user = new DsiUser
+        var user = new User
         {
             Name = "test-user",
-            Organisations = new List<DsiOrganisation>
+            Organisations = new List<Organisation>
             {
                 new() { Id = "org1", Name = "Organisation 1" },
                 new() { Id = "org2", Name = "Organisation 2" },
@@ -313,7 +313,7 @@ public class AuthControllerTests
 
         result.Should().BeOfType<ViewResult>();
         var viewResult = result as ViewResult;
-        var model = viewResult!.Model as DsiUser;
+        var model = viewResult!.Model as User;
         model!.Organisations.Should().HaveCount(3);
     }
 

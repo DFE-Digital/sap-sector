@@ -12,7 +12,7 @@ using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Services;
 
-public class DsiApiService : IDsiApiService
+public class DsiApiService : IDsiClient
 {
     private readonly HttpClient _httpClient;
     private readonly DsiConfiguration _config;
@@ -47,7 +47,7 @@ public class DsiApiService : IDsiApiService
 
     }
 
-    public async Task<DsiUserInfo?> GetUserAsync(string userId)
+    public async Task<UserInfo?> GetUserAsync(string userId)
     {
         try
         {
@@ -66,7 +66,7 @@ public class DsiApiService : IDsiApiService
                 return null;
             }
 
-            return await response.Content.ReadFromJsonAsync<DsiUserInfo>();
+            return await response.Content.ReadFromJsonAsync<UserInfo>();
         }
         catch (Exception ex)
         {
@@ -75,7 +75,7 @@ public class DsiApiService : IDsiApiService
         }
     }
 
-    public async Task<DsiUserInfo?> GetUserByEmailAsync(string email)
+    public async Task<UserInfo?> GetUserByEmailAsync(string email)
     {
         try
         {
@@ -94,7 +94,7 @@ public class DsiApiService : IDsiApiService
                 return null;
             }
 
-            return await response.Content.ReadFromJsonAsync<DsiUserInfo>();
+            return await response.Content.ReadFromJsonAsync<UserInfo>();
         }
         catch (Exception ex)
         {
@@ -103,7 +103,7 @@ public class DsiApiService : IDsiApiService
         }
     }
 
-    public async Task<DsiOrganisation?> GetOrganisationAsync(string organisationId)
+    public async Task<Organisation?> GetOrganisationAsync(string organisationId)
     {
         try
         {
@@ -122,7 +122,7 @@ public class DsiApiService : IDsiApiService
                 return null;
             }
 
-            return await response.Content.ReadFromJsonAsync<DsiOrganisation>();
+            return await response.Content.ReadFromJsonAsync<Organisation>();
         }
         catch (Exception ex)
         {

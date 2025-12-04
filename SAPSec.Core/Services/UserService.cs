@@ -9,17 +9,17 @@ using SAPSec.Core.Services.Helper;
 
 namespace SAPSec.Core.Services;
 
-public class DsiUserService(
-    IDsiApiService dsiApiService,
+public class UserService(
+    IDsiClient dsiApiService,
     IHttpContextAccessor httpContextAccessor,
-    ILogger<DsiUserService> logger) : IDsiUserService
+    ILogger<UserService> logger) : IUserService
 {
-    private readonly IDsiApiService _dsiApiService = dsiApiService ?? throw new ArgumentNullException(nameof(dsiApiService));
+    private readonly IDsiClient _dsiApiService = dsiApiService ?? throw new ArgumentNullException(nameof(dsiApiService));
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-    private readonly ILogger<DsiUserService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<UserService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private const string OrganisationSessionKey = "CurrentOrganisationId";
 
-    public async Task<DsiUser?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
+    public async Task<User?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
     {
         if (principal == null || !principal.Identity?.IsAuthenticated == true)
         {
@@ -35,7 +35,7 @@ public class DsiUserService(
             var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
 
             var organisationClaim = principal.FindFirst("organisation")?.Value;
-            var organisations = organisationClaim.DeserializeToList<DsiOrganisation>();
+            var organisations = organisationClaim.DeserializeToList<Organisation>();
 
             if (!organisations.Any() && !string.IsNullOrEmpty(userId))
             {
@@ -54,7 +54,7 @@ public class DsiUserService(
                 }
             }
 
-            return new DsiUser
+            return new User
             {
                 Sub = userId ?? string.Empty,
                 Email = email ?? string.Empty,
@@ -71,7 +71,7 @@ public class DsiUserService(
         }
     }
 
-    public async Task<DsiOrganisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
+    public async Task<Organisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
     {
         var user = await GetUserFromClaimsAsync(principal);
         if (user == null || !user.Organisations.Any())

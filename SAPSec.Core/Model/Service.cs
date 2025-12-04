@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SAPSec.Core.Model;
 
-public class DsiCategory
+public class Service
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
