@@ -22,8 +22,8 @@ namespace SAPSec.Infrastructure.Repositories.Generic
         public JSONRepository(ILogger<JSONRepository<T>> logger, IHostEnvironment env)
         {
             _logger = logger ?? throw new ArgumentNullException();
-            var basePath = env?.ContentRootPath ?? AppContext.BaseDirectory;
-            _filePath = Path.Combine(basePath, "..\\", "SAPSec.Infrastructure", "Data", "Files");
+            var basePath = AppContext.BaseDirectory;
+            _filePath = Path.Combine(basePath, "Data", "Files");
         }
 
 
