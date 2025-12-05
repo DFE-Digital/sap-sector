@@ -32,7 +32,7 @@ namespace SAPSec.Infrastructure.Repositories
 
         public Establishment GetEstablishment(string urn)
         {
-            return GetAllEstablishments().First(x => x.URN == urn) ?? new Establishment();
+            return GetAllEstablishments().FirstOrDefault(x => x.URN == urn) ?? new Establishment();
         }
 
         public Establishment GetEstablishmentByAnyNumber(string number)

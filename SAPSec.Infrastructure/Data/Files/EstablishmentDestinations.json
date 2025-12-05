@@ -1,0 +1,47 @@
+[
+  {
+    "Id": "100",
+    "AllDest_Tot_Est_Current_Pct": "100",
+    "Education_Tot_Est_Current_Pct": "100",
+    "Employment_Tot_Est_Current_Pct": "0",
+    "Apprentice_Tot_Est_Current_Pct": "0",
+    "AllDest_Tot_Est_Previous_Pct": "100",
+    "Education_Tot_Est_Previous_Pct": "100",
+    "Employment_Tot_Est_Previous_Pct": "0",
+    "Apprentice_Tot_Est_Previous_Pct": "0",
+    "AllDest_Tot_Est_Previous2_Pct": "92",
+    "Education_Tot_Est_Previous2_Pct": "92",
+    "Employment_Tot_Est_Previous2_Pct": "0",
+    "Apprentice_Tot_Est_Previous2_Pct": "0"
+  },
+  {
+    "Id": "101",
+    "AllDest_Tot_Est_Current_Pct": "99",
+    "Education_Tot_Est_Current_Pct": "99",
+    "Employment_Tot_Est_Current_Pct": "0",
+    "Apprentice_Tot_Est_Current_Pct": "0",
+    "AllDest_Tot_Est_Previous_Pct": "100",
+    "Education_Tot_Est_Previous_Pct": "100",
+    "Employment_Tot_Est_Previous_Pct": "0",
+    "Apprentice_Tot_Est_Previous_Pct": "0",
+    "AllDest_Tot_Est_Previous2_Pct": "92",
+    "Education_Tot_Est_Previous2_Pct": "92",
+    "Employment_Tot_Est_Previous2_Pct": "0",
+    "Apprentice_Tot_Est_Previous2_Pct": "0"
+  },
+  {
+    "Id": "102",
+    "AllDest_Tot_Est_Current_Pct": "99",
+    "Education_Tot_Est_Current_Pct": "99",
+    "Employment_Tot_Est_Current_Pct": "0",
+    "Apprentice_Tot_Est_Current_Pct": "0",
+    "AllDest_Tot_Est_Previous_Pct": "99",
+    "Education_Tot_Est_Previous_Pct": "99",
+    "Employment_Tot_Est_Previous_Pct": "0",
+    "Apprentice_Tot_Est_Previous_Pct": "0",
+    "AllDest_Tot_Est_Previous2_Pct": "92",
+    "Education_Tot_Est_Previous2_Pct": "92",
+    "Employment_Tot_Est_Previous2_Pct": "0",
+    "Apprentice_Tot_Est_Previous2_Pct": "0"
+  }
+]

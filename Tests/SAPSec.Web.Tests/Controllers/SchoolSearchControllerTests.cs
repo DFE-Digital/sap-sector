@@ -512,7 +512,7 @@ public class SchoolSearchControllerTests
     {
         var queryPart = "XYZ";
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync([]);
 
         var result = await _controller.Suggest(queryPart);
 

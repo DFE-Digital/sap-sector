@@ -1,0 +1,17 @@
+[
+  {
+    "Id": "100",
+    "Workforce_PupTeaRatio_Est_Current_Num": "16.1",
+    "Workforce_TotPupils_Est_Current_Num": "807"
+  },
+  {
+    "Id": "101",
+    "Workforce_PupTeaRatio_Est_Current_Num": "16.7",
+    "Workforce_TotPupils_Est_Current_Num": "1312"
+  },
+  {
+    "Id": "102",
+    "Workforce_PupTeaRatio_Est_Current_Num": "17.8",
+    "Workforce_TotPupils_Est_Current_Num": "1314"
+  }
+]

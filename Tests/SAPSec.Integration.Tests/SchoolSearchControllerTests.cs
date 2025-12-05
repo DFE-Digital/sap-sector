@@ -78,8 +78,8 @@ public class SchoolSearchControllerIntegrationTests : IClassFixture<WebApplicati
     {
         var formData = new Dictionary<string, string>
         {
-            { "Query", "102848" },
-            { "Urn", "102848" }
+            { "Query", "100" },
+            { "Urn", "100" }
         };
         var content = new FormUrlEncodedContent(formData);
 
@@ -87,7 +87,7 @@ public class SchoolSearchControllerIntegrationTests : IClassFixture<WebApplicati
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("102848");
+        response.Headers.Location!.ToString().Should().Contain("100");
     }
 
     [Fact]
@@ -212,7 +212,7 @@ public class SchoolSearchControllerIntegrationTests : IClassFixture<WebApplicati
         var formData = new Dictionary<string, string>
         {
             { "Query", "Test" },
-            { "Urn", "102848" }
+            { "Urn", "100" }
         };
         var content = new FormUrlEncodedContent(formData);
 
@@ -220,7 +220,7 @@ public class SchoolSearchControllerIntegrationTests : IClassFixture<WebApplicati
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("102848");
+        response.Headers.Location!.ToString().Should().Contain("100");
     }
 
     #endregion
@@ -318,7 +318,7 @@ public class SchoolSearchControllerIntegrationTests : IClassFixture<WebApplicati
     [Fact]
     public async Task GetSchoolDetails_WithValidUrn_ReturnsSuccess()
     {
-        var response = await _fixture.AuthenticatedClient.GetAsync("/school/102848");
+        var response = await _fixture.AuthenticatedClient.GetAsync("/school/100");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
