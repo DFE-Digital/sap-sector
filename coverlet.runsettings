@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          
+          <ExcludeByFile>
+            **/Migrations/**/*.cs,
+            **/Views/**/*.cshtml.cs,
+            **/obj/**/*.cs,
+            **/Program.cs
+          </ExcludeByFile>
+          
+          <ExcludeByAttribute>
+            Obsolete,
+            GeneratedCodeAttribute,
+            CompilerGeneratedAttribute,
+            ExcludeFromCodeCoverageAttribute
+          </ExcludeByAttribute>
+          
+          <Exclude>
+            [*]*.Migrations.*,
+            [*]AspNetCoreGeneratedDocument.*,
+            [*]*ViewStart*,
+            [*]*GlobalUsings*,
+            [*.Tests]*,
+            [*.UI.Tests]*,
+            [*.Integration.Tests]*
+          </Exclude>
+          
+          <Include>
+            [SAPSec.Web]*,
+            [SAPSec.Core]*,
+            [SAPSec.Infrastructure]*
+          </Include>
+          
+          <IncludeTestAssembly>false</IncludeTestAssembly>
+          
+          <SingleHit>false</SingleHit>
+          
+          <UseSourceLink>true</UseSourceLink>
+          
+          <SkipAutoProps>true</SkipAutoProps>
+          
+          <DeterministicReport>true</DeterministicReport>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

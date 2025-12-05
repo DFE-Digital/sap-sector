@@ -5,20 +5,21 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Core.Services.Helper;
 
 namespace SAPSec.Core.Services;
 
-public class DsiUserService(
-    IDsiApiService dsiApiService,
+public class UserService(
+    IDsiClient dsiApiService,
     IHttpContextAccessor httpContextAccessor,
-    ILogger<DsiUserService> logger) : IDsiUserService
+    ILogger<UserService> logger) : IUserService
 {
-    private readonly IDsiApiService _dsiApiService = dsiApiService ?? throw new ArgumentNullException(nameof(dsiApiService));
+    private readonly IDsiClient _dsiApiService = dsiApiService ?? throw new ArgumentNullException(nameof(dsiApiService));
     private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
-    private readonly ILogger<DsiUserService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly ILogger<UserService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private const string OrganisationSessionKey = "CurrentOrganisationId";
 
-    public async Task<DsiUser?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
+    public async Task<User?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
     {
         if (principal == null || !principal.Identity?.IsAuthenticated == true)
         {
@@ -33,37 +34,27 @@ public class DsiUserService(
             var familyName = principal.FindFirst(ClaimTypes.Surname)?.Value ?? string.Empty;
             var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
 
-            // Get organisation data from claims
             var organisationClaim = principal.FindFirst("organisation")?.Value;
-            var organisations = new List<DsiOrganisation>();
+            var organisations = organisationClaim.DeserializeToList<Organisation>();
 
-            if (!string.IsNullOrEmpty(organisationClaim))
+            if (!organisations.Any() && !string.IsNullOrEmpty(userId))
             {
                 try
                 {
-                    var orgData = JsonSerializer.Deserialize<DsiOrganisation[]>(organisationClaim);
-                    if (orgData != null)
+                    _logger.LogInformation("No organisations in claims, fetching from API for user {UserId}", userId);
+                    var userInfo = await _dsiApiService.GetUserAsync(userId);
+                    if (userInfo != null && userInfo.Organisations != null)
                     {
-                        organisations.AddRange(orgData);
+                        organisations = userInfo.Organisations;
                     }
                 }
-                catch (JsonException ex)
+                catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to deserialize organisation claim for user {UserId}", userId);
+                    _logger.LogWarning(ex, "Failed to fetch organisations from API for user {UserId}, using claims only", userId);
                 }
             }
 
-            // If no organisations in claims, fetch from API
-            if (!organisations.Any() && !string.IsNullOrEmpty(userId))
-            {
-                var userInfo = await _dsiApiService.GetUserAsync(userId);
-                if (userInfo != null)
-                {
-                    organisations = userInfo.Organisations;
-                }
-            }
-
-            return new DsiUser
+            return new User
             {
                 Sub = userId ?? string.Empty,
                 Email = email ?? string.Empty,
@@ -80,7 +71,7 @@ public class DsiUserService(
         }
     }
 
-    public async Task<DsiOrganisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
+    public async Task<Organisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
     {
         var user = await GetUserFromClaimsAsync(principal);
         if (user == null || !user.Organisations.Any())
@@ -88,12 +79,10 @@ public class DsiUserService(
             return null;
         }
 
-        // Check if there's a selected organisation in session
         var httpContext = _httpContextAccessor.HttpContext;
         string? selectedOrgId = null;
         if (httpContext?.Session != null)
         {
-            // Fix: ISession does not have GetString, so use TryGetValue and convert to string
             if (httpContext.Session.TryGetValue(OrganisationSessionKey, out var value) && value != null)
             {
                 selectedOrgId = Encoding.UTF8.GetString(value);
@@ -109,7 +98,6 @@ public class DsiUserService(
             }
         }
 
-        // Return the first organisation if none selected
         return user.Organisations.First();
     }
 
@@ -154,4 +142,5 @@ public class DsiUserService(
     {
         return principal?.IsInRole(role) == true;
     }
+
 }

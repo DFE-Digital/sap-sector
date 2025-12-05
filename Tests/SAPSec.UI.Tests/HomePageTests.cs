@@ -49,7 +49,7 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
         var title = await Page.TitleAsync();
 
         // Assert
-        title.Should().Contain("School Profile");
+        title.Should().Contain("Get school improvement insights - Get school improvement insights - GOV.UK");
     }
 
     [Fact]

@@ -1,4 +1,15 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.StaticFiles;
+using SAPSec.Core;
+using SAPSec.Infrastructure;
+using SAPSec.Web.Authentication;
+using SAPSec.Web.Extensions;
+using SAPSec.Web.Middleware;
+using SmartBreadcrumbs.Extensions;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
@@ -16,7 +27,6 @@ using SmartBreadcrumbs.Extensions;
 
 namespace SAPSec.Web;
 
-// ReSharper disable once PartialTypeWithSinglePart
 public partial class Program
 {
     [ExcludeFromCodeCoverage]
@@ -48,18 +58,32 @@ public partial class Program
 
         var config = configBuilder.Build();
 
-        if (!builder.Environment.IsDevelopment())
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
-            builder.Services.AddDsiAuthentication(config);
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedHost
+                                     | ForwardedHeaders.XForwardedProto
+                                     | ForwardedHeaders.XForwardedFor;
+            options.KnownNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
+
+        if (builder.Environment.EnvironmentName == "Testing" || builder.Environment.EnvironmentName == "UITesting" )
+        {
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = "TestScheme";
+                options.DefaultAuthenticateScheme = "TestScheme";
+                options.DefaultChallengeScheme = "TestScheme";
+            })
+            .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
+        }
+        else
+        {
+            builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-        builder.Services.AddDistributedMemoryCache();
 
-        builder.Services.AddLogging(logging =>
-        {
-            logging.AddConsole();
-            logging.AddDebug();
-        });
+        builder.Services.AddDistributedMemoryCache();
 
         builder.Services.AddSession(options =>
         {
@@ -68,6 +92,20 @@ public partial class Program
             options.Cookie.IsEssential = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.Name = ".SAPSec.Session";
+        });
+
+        builder.Services.Configure<CookiePolicyOptions>(options =>
+        {
+            options.CheckConsentNeeded = context => false;
+            options.MinimumSameSitePolicy = SameSiteMode.Lax;
+            options.Secure = CookieSecurePolicy.Always;
+        });
+
+        builder.Services.AddLogging(logging =>
+        {
+            logging.AddConsole();
+            logging.AddDebug();
         });
 
         builder.Services.Configure<RazorViewEngineOptions>(options =>
@@ -84,13 +122,22 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        var dataProtectionPath = builder.Environment.IsDevelopment()
-                                 ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                   : "/keys";
+        if (builder.Environment.EnvironmentName == "Testing" || builder.Environment.EnvironmentName == "UITesting")
+        {
+            builder.Services.AddDataProtection()
+                .UseEphemeralDataProtectionProvider()
+                .SetApplicationName("SAPSec");
+        }
+        else
+        {
+            var dataProtectionPath = builder.Environment.IsDevelopment()
+                                     ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
+                                     : "/keys";
 
-        builder.Services.AddDataProtection()
-               .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-               .SetApplicationName("SAPSec");
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
+                .SetApplicationName("SAPSec");
+        }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         builder.Services.AddCoreDependencies();
@@ -98,7 +145,6 @@ public partial class Program
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
@@ -107,28 +153,22 @@ public partial class Program
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
-
-            app.UseAuthentication();
-            app.UseAuthorization();
-
-            app.UseForwardedHeaders(new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedProto
-            });
         }
+        app.UseForwardedHeaders();
 
-        // Security headers middleware - MUST come before static files
-        app.AddMiddleware(app.Environment.IsDevelopment());
+        app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
+
+        
+        app.UseMiddleware<SecurityHeadersMiddleware>();
+        
 
         app.UseHttpsRedirection();
 
-        // Configure MIME types
         var provider = new FileExtensionContentTypeProvider();
         provider.Mappings[".css"] = "text/css";
         provider.Mappings[".js"] = "application/javascript";
         provider.Mappings[".mjs"] = "application/javascript";
 
-        // Log wwwroot contents on startup for debugging
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
         if(!Directory.Exists(wwwrootPath)) Console.WriteLine( $"WARNING: wwwroot directory not found at {wwwrootPath}");
 
@@ -139,7 +179,6 @@ public partial class Program
             {
                 var path = ctx.Context.Request.Path.Value;
                 var contentType = ctx.Context.Response.ContentType;
-                //Console.WriteLine($"Static file request: {path} -> {contentType ?? "NO CONTENT TYPE"}");
 
                 if (string.IsNullOrEmpty(contentType))
                 {
@@ -153,16 +192,18 @@ public partial class Program
 
         app.UseSession();
 
-        app.MapControllers();
+        app.UseAuthentication();
 
+        app.UseAuthorization();
+
+        app.MapHealthChecks("/healthcheck");
+
+        app.MapControllers();
         app.MapRazorPages();
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
-
-        // Health check endpoints for AKS
-        app.MapHealthChecks("/healthcheck");
 
         app.Run();
     }
