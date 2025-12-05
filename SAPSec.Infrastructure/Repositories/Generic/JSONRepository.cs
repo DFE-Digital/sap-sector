@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SAPSec.Core.Interfaces.Repositories.Generic;
 using System;
@@ -15,13 +16,14 @@ namespace SAPSec.Infrastructure.Repositories.Generic
 {
     public class JSONRepository<T> : IGenericRepository<T> where T : class
     {
-        private readonly string _filePath = Path.Combine(
-            Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), @"Data\Files\");
+        private readonly string _filePath;
         private readonly ILogger<JSONRepository<T>> _logger;
 
-        public JSONRepository(ILogger<JSONRepository<T>> logger)
+        public JSONRepository(ILogger<JSONRepository<T>> logger, IHostEnvironment env)
         {
             _logger = logger ?? throw new ArgumentNullException();
+            var basePath = env?.ContentRootPath ?? AppContext.BaseDirectory;
+            _filePath = Path.Combine(basePath, "..\\", "SAPSec.Infrastructure", "Data", "Files");
         }
 
 
@@ -32,7 +34,7 @@ namespace SAPSec.Infrastructure.Repositories.Generic
                 var fileData = ReadFile(typeof(T).Name);
                 if (!string.IsNullOrWhiteSpace(fileData))
                 {
-                    return JsonConvert.DeserializeObject<IEnumerable<T>>(fileData);
+                    return JsonConvert.DeserializeObject<IEnumerable<T>>(fileData) ?? [];
                 }
             }
             catch (Exception ex)
@@ -40,14 +42,15 @@ namespace SAPSec.Infrastructure.Repositories.Generic
                 _logger.LogError($"Failed to execute generic readall for {typeof(T).Name}! - {ex.Message}, {ex}");
             }
 
-            return default;
+            return [];
         }
 
         private string ReadFile(string fileName)
         {
             try
             {
-                return System.IO.File.ReadAllText($"{_filePath}/{fileName}.json");
+                var fullPath = Path.Combine(_filePath, $"{fileName}.json");
+                return System.IO.File.ReadAllText(fullPath);
             }
             catch (Exception ex)
             {
