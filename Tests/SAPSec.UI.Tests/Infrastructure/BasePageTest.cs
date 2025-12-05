@@ -13,6 +13,7 @@ public abstract class BasePageTest : PageTest
 
         //Uncomment to run tests in headed mode
         //Environment.SetEnvironmentVariable("HEADED", "1");
+
     }
 
     public override BrowserNewContextOptions ContextOptions()

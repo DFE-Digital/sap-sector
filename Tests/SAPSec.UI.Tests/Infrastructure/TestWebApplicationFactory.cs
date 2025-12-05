@@ -17,7 +17,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseUrls("http://127.0.0.1:0", "https://127.0.0.1:0");
 
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment("Testing");
 
         var testDataFilePath = Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-UI-Test-Data.csv");
         if (!File.Exists(testDataFilePath)) throw new FileNotFoundException("Test data file not found", testDataFilePath);
@@ -25,6 +25,16 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         var configurationValues = new Dictionary<string, string?>
         {
             { "Establishments:CsvPath", testDataFilePath }
+			[ConfigKeys.DsiClientId] = TestValues.ClientId,
+            [ConfigKeys.DsiClientSecret] = TestValues.ClientSecret,
+            [ConfigKeys.DsiAuthority] = TestValues.Authority,
+            [ConfigKeys.DsiRequireHttpsMetadata] = "false",
+            [ConfigKeys.DsiValidateIssuer] = "false",
+            [ConfigKeys.DsiValidateAudience] = "false",
+            [ConfigKeys.DsiApiUri] = TestValues.ApiUri,
+            [ConfigKeys.DsiApiSecret] = TestValues.ApiSecret,
+            [ConfigKeys.DsiAudience] = TestValues.Audience,
+            [ConfigKeys.DsiTokenExpiryMinutes] = TestValues.TokenExpiryMinutes
         };
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configurationValues)
@@ -41,6 +51,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             .ConfigureServices(_ =>
             {
                 // Add or replace any services that the application needs during testing.
+				services.RemoveAll<IUserService>();
+		        services.RemoveAll<IDsiClient>();
+				services.AddScoped<IUserService, MockUserService>();
+        		services.AddScoped<IDsiClient, MockDsiClient>();
             });
     }
 
@@ -90,5 +104,20 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             _host?.Dispose();
         }
         base.Dispose(disposing);
+    }
+	private static class TestValues
+    {
+        // Test Data
+        public const string TestDataFolder = "TestData";
+        public const string TestDataFileName = "Establishments-Integration-Test-Data.csv";
+
+        // DSI Test Values
+        public const string ClientId = "test-client-id";
+        public const string ClientSecret = "test-client-secret";
+        public const string Authority = "https://test-oidc.signin.education.gov.uk";
+        public const string ApiUri = "https://test-api.signin.education.gov.uk";
+        public const string ApiSecret = "test-api-secret";
+        public const string Audience = "test-audience";
+        public const string TokenExpiryMinutes = "60";
     }
 }

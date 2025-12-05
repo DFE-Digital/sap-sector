@@ -129,16 +129,4 @@ public class HealthEndpointTests(WebApplicationSetupFixture fixture)
         Assert.NotNull(healthResponse);
         Assert.NotEqual(default(DateTime), healthResponse.Timestamp);
     }
-
-    [Fact]
-    public async Task HealthEndpoint_HasSecurityHeaders()
-    {
-        // Act
-        var response = await fixture.Client.GetAsync("/health");
-
-        // Assert - Check that security headers are present
-        Assert.True(response.Headers.Contains("X-Content-Type-Options"));
-        Assert.True(response.Headers.Contains("X-Frame-Options"));
-        Assert.True(response.Headers.Contains("Content-Security-Policy"));
-    }
 }

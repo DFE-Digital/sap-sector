@@ -26,6 +26,16 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         var configurationValues = new Dictionary<string, string?>
         {
             { "Establishments:CsvPath", testDataFilePath }
+			[ConfigKeys.DsiClientId] = TestValues.ClientId,
+            [ConfigKeys.DsiClientSecret] = TestValues.ClientSecret,
+            [ConfigKeys.DsiAuthority] = TestValues.Authority,
+            [ConfigKeys.DsiRequireHttpsMetadata] = "false",
+            [ConfigKeys.DsiValidateIssuer] = "false",
+            [ConfigKeys.DsiValidateAudience] = "false",
+            [ConfigKeys.DsiApiUri] = TestValues.ApiUri,
+            [ConfigKeys.DsiApiSecret] = TestValues.ApiSecret,
+            [ConfigKeys.DsiAudience] = TestValues.Audience,
+            [ConfigKeys.DsiTokenExpiryMinutes] = TestValues.TokenExpiryMinutes
         };
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configurationValues)
@@ -42,6 +52,10 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             .ConfigureServices(_ =>
             {
                 // Add or replace any services that the application needs during testing.
+				services.RemoveAll<IUserService>();
+		        services.RemoveAll<IDsiClient>();
+				services.AddScoped<IUserService, MockDsiUserService>();
+        		services.AddScoped<IDsiClient, MockDsiApiService>();
             });
     }
 
