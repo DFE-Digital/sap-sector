@@ -1,11 +1,11 @@
-﻿using SAPSec.Infrastructure.Entities;
+﻿using SAPSec.Core.Model;
+using SAPSec.Core.Model.Search;
 
 namespace SAPSec.Core.Interfaces.Services;
 
 public interface ISearchService
 {
-    Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query);
-    Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart);
-    School? SearchByNumber(string schoolNumber);
-    School GetSchoolByUrn(int urn);
+    Task<IReadOnlyList<EstablishmentSearchResult>> SearchAsync(string query);
+    Task<IReadOnlyList<EstablishmentSearchResult>> SuggestAsync(string queryPart);
+    Establishment? SearchByNumber(string schoolNumber);
 }

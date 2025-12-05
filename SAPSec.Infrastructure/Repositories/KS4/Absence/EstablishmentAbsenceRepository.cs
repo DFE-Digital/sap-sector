@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using SAPSec.Core.Entities.KS4.Absence;
-using SAPSec.Core.Entities.KS4.Absence;
 using SAPSec.Core.Interfaces.Repositories.Generic;
 using SAPSec.Core.Interfaces.Repositories.KS4.Absence;
+using SAPSec.Core.Model.KS4.Absence;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -35,4 +35,8 @@
     <Using Include="FluentAssertions" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>

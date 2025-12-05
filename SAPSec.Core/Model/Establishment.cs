@@ -17,9 +17,44 @@ namespace SAPSec.Core.Model
     public class Establishment
     {
         public string URN { get; set; } = string.Empty;
-        public string LAId { get; set; } = string.Empty;
 
-        public EstablishmentMetadata Metadata { get; set; } = new();
+        #region MetaData
+        public int EstablishmentNumber { get; set; }
+        public string EstablishmentName { get; set; } = string.Empty;
+
+        public int? TrustsId { get; set; }
+        public string TrustName { get; set; } = string.Empty;
+
+        public int? AdmissionsPolicyId { get; set; }
+        public string AdmissionPolicy { get; set; } = string.Empty;
+        public string DistrictAdministrativeId { get; set; } = string.Empty;
+        public string DistrictAdministrativeName { get; set; } = string.Empty;
+        public int? PhaseOfEducationId { get; set; }
+        public string PhaseOfEducationName { get; set; } = string.Empty;
+        public int? GenderId { get; set; }
+        public string GenderName { get; set; } = string.Empty;
+        public int? OfficialSixthFormId { get; set; }
+        public int? LAId { get; set; }
+        public string LANAme { get; set; } = string.Empty;
+        public int? ReligiousCharacterId { get; set; }
+        public string ReligiousCharacterName { get; set; } = string.Empty;
+        public string TelephoneNum { get; set; } = string.Empty;
+        public int TotalPupils { get; set; }
+        public int? TypeOfEstablishmentId { get; set; }
+        public string TypeOfEstablishmentName { get; set; } = string.Empty;
+        public int? ResourcedProvision { get; set; }
+        public string ResourcedProvisionName { get; set; } = string.Empty;
+        public int UKPRN { get; set; }
+        public string UrbanRuralId { get; set; } = string.Empty;
+        public string UrbanRuralName { get; set; } = string.Empty;
+        public string Website { get; set; } = string.Empty;
+        public int? Easting { get; set; }
+        public int? Northing { get; set; }
+
+        // Also known as LA/Estab, for obvious reasons
+        public string DfENumber => $"{LAId}/{EstablishmentNumber}";
+
+        #endregion
 
         public EstablishmentPerformance KS4Performance { get; set; } = new();
         public LAPerformance LAPerformance { get; set; } = new();

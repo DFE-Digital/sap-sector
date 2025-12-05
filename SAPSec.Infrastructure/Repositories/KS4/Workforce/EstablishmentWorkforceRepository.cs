@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using SAPSec.Core.Entities;
-using SAPSec.Core.Entities.KS4.Workforce;
 using SAPSec.Core.Interfaces.Repositories.Generic;
 using SAPSec.Core.Interfaces.Repositories.KS4.Workforce;
+using SAPSec.Core.Model.KS4.Workforce;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -11,5 +11,6 @@ namespace SAPSec.Core.Interfaces.Repositories
     {
         IEnumerable<Establishment> GetAllEstablishments();
         Establishment GetEstablishment(string urn);
+        Establishment GetEstablishmentByAnyNumber(string number);
     }
 }

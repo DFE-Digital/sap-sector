@@ -17,8 +17,4 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
-  </ItemGroup>
-
 </Project>
