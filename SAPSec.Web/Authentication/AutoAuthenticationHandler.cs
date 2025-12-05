@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace SAPSec.Web.Authentication;
@@ -9,16 +8,11 @@ namespace SAPSec.Web.Authentication;
 /// <summary>
 /// Automatically authenticates all requests for UI testing
 /// </summary>
-public class AutoAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class AutoAuthenticationHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder) : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    public AutoAuthenticationHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder)
-        : base(options, logger, encoder)
-    {
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var claims = new[]

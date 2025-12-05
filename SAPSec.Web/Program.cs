@@ -17,7 +17,7 @@ using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Web;
 
-public partial class Program
+public class Program
 {
     [ExcludeFromCodeCoverage]
     public static void Main(string[] args)
@@ -41,13 +41,6 @@ public partial class Program
             options.ActiveLiTemplate = " ";
         });
 
-        var configBuilder = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", true, true)
-            .AddUserSecrets<Program>()
-            .AddEnvironmentVariables();
-
-        var config = configBuilder.Build();
-
         builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedHost
@@ -57,7 +50,7 @@ public partial class Program
             options.KnownProxies.Clear();
         });
 
-        if (builder.Environment.EnvironmentName == "Testing" || builder.Environment.EnvironmentName == "UITesting" )
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" )
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -87,7 +80,7 @@ public partial class Program
 
         builder.Services.Configure<CookiePolicyOptions>(options =>
         {
-            options.CheckConsentNeeded = context => false;
+            options.CheckConsentNeeded = _ => false;
             options.MinimumSameSitePolicy = SameSiteMode.Lax;
             options.Secure = CookieSecurePolicy.Always;
         });
@@ -112,7 +105,7 @@ public partial class Program
 
         builder.Services.AddHealthChecks();
 
-        if (builder.Environment.EnvironmentName == "Testing" || builder.Environment.EnvironmentName == "UITesting")
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
         {
             builder.Services.AddDataProtection()
                 .UseEphemeralDataProtectionProvider()
@@ -162,10 +155,15 @@ public partial class Program
 
         app.UseHttpsRedirection();
 
-        var provider = new FileExtensionContentTypeProvider();
-        provider.Mappings[".css"] = "text/css";
-        provider.Mappings[".js"] = "application/javascript";
-        provider.Mappings[".mjs"] = "application/javascript";
+        var provider = new FileExtensionContentTypeProvider
+        {
+            Mappings =
+            {
+                [".css"] = "text/css",
+                [".js"] = "application/javascript",
+                [".mjs"] = "application/javascript"
+            }
+        };
 
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
         if(!Directory.Exists(wwwrootPath)) Console.WriteLine( $"WARNING: wwwroot directory not found at {wwwrootPath}");

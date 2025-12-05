@@ -5,7 +5,8 @@ using Xunit;
 
 namespace SAPSec.UI.Tests;
 
-public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
+[Collection("UITestsCollection")]
+public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
@@ -140,7 +141,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("school/102848");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("This page Displays the School details.");
+        schoolDetails.Should().Contain("School details Test page.");
     }
 
     [Fact]
@@ -156,7 +157,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("school/100273");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("This page Displays the School details.");
+        schoolDetails.Should().Contain("School details Test page.");
     }
 
     #endregion
@@ -217,7 +218,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("school/102848");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("This page Displays the School details.");
+        schoolDetails.Should().Contain("School details Test page.");
     }
 
     [Fact]
@@ -289,7 +290,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("school/100273");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("This page Displays the School details.");
+        schoolDetails.Should().Contain("School details Test page.");
     }
 
     [Fact]
@@ -443,7 +444,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("school/102848");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("This page Displays the School details.");
+        schoolDetails.Should().Contain("School details Test page.");
     }
 
     [Fact]
