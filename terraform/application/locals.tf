@@ -9,7 +9,7 @@ locals {
       authority        = "https://test-oidc.signin.education.gov.uk"
       issuer           = "https://test-oidc.signin.education.gov.uk"
       metadata_address = "https://test-oidc.signin.education.gov.uk/.well-known/openid-configuration"
-      require_https    = "false"
+      require_https    = "true"
     }
     production = {
       api_uri          = "https://api.signin.education.gov.uk"
