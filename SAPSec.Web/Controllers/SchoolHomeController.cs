@@ -6,18 +6,12 @@ using SAPSec.Core.Model;
 namespace SAPSec.Web.Controllers;
 
 [Authorize]
-public class SchoolHomeController : Controller
+public class SchoolHomeController(
+    IUserService userService,
+    ILogger<SchoolHomeController> logger) : Controller
 {
-    private readonly IUserService _userService;
-    private readonly ILogger<SchoolHomeController> _logger;
-
-    public SchoolHomeController(
-        IUserService userService,
-        ILogger<SchoolHomeController> logger)
-    {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-    }
+    private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly ILogger<SchoolHomeController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet]
     public async Task<IActionResult> Index()

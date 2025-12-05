@@ -6,26 +6,15 @@ public class WebApplicationSetupFixture : IAsyncLifetime
 {
     private TestWebApplicationFactory _factory = null!;
 
-    public TestWebApplicationFactory Factory => _factory;
-
-    /// <summary>
-    /// Client that follows redirects - authenticated via "Testing" environment
-    /// </summary>
     public HttpClient Client { get; private set; } = null!;
 
-    /// <summary>
-    /// Client that doesn't follow redirects - authenticated via "Testing" environment
-    /// </summary>
     public HttpClient NonRedirectingClient { get; private set; } = null!;
-
-    /// <summary>
-    /// Alias for NonRedirectingClient - for backward compatibility with tests using AuthenticatedClient
-    /// </summary>
-    public HttpClient AuthenticatedClient => NonRedirectingClient;
 
     public Task InitializeAsync()
     {
         _factory = new TestWebApplicationFactory();
+
+        if(_factory.Server == null) throw new InvalidOperationException("Test Server not started");
 
         // Client that follows redirects
         Client = _factory.CreateClient(new WebApplicationFactoryClientOptions
@@ -41,7 +30,7 @@ public class WebApplicationSetupFixture : IAsyncLifetime
             AllowAutoRedirect = false
         });
 
-        Console.WriteLine($"✅ Fixture initialized with base URL: {_factory.ClientOptions.BaseAddress}");
+        Console.WriteLine($"Fixture initialized with base URL: {_factory.ClientOptions.BaseAddress}");
 
         return Task.CompletedTask;
     }

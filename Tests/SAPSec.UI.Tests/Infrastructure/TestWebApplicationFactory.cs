@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.UI.Tests.Mocks;
 using SAPSec.Web;
-using System.Net.Sockets;
 
 namespace SAPSec.UI.Tests.Infrastructure;
 
@@ -20,184 +18,97 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var port = GetAvailablePort();
+        builder.UseUrls("http://127.0.0.1:0", "https://127.0.0.1:0");
 
-        builder.UseUrls($"https://localhost:{port}");
-        builder.UseEnvironment(Environments.Testing);
+        builder.UseEnvironment("UITests");
 
-        ConfigureApplication(builder);
-        ConfigureTestServices(builder);
+        var testDataFilePath = Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-UI-Test-Data.csv");
+        if (!File.Exists(testDataFilePath)) throw new FileNotFoundException("Test data file not found", testDataFilePath);
+
+        var configurationValues = new Dictionary<string, string?>
+        {
+            { "Establishments:CsvPath", testDataFilePath },
+            { "DsiConfiguration:ClientId", TestValues.ClientId },
+            { "DsiConfiguration:ClientSecret", TestValues.ClientSecret },
+            { "DsiConfiguration:Authority", TestValues.Authority },
+            { "DsiConfiguration:RequireHttpsMetadata", "false" },
+            { "DsiConfiguration:ValidateIssuer", "false" },
+            { "DsiConfiguration:ValidateAudience", "false" },
+            { "DsiConfiguration:ApiUri", TestValues.ApiUri },
+            { "DsiConfiguration:ApiSecret", TestValues.ApiSecret },
+            { "DsiConfiguration:Audience", TestValues.Audience },
+            { "DsiConfiguration:TokenExpiryMinutes", TestValues.TokenExpiryMinutes }
+        };
+        var configuration = new ConfigurationBuilder()
+            .AddInMemoryCollection(configurationValues)
+            .Build();
+
+        builder
+            // This configuration is used during the creation of the application
+            // (e.g. BEFORE WebApplication.CreateBuilder(args) is called in Program.cs).
+            .UseConfiguration(configuration)
+            .ConfigureAppConfiguration(configurationBuilder => { configurationBuilder.AddInMemoryCollection(configurationValues); })
+            .ConfigureServices(services =>
+            {
+                // Add or replace any services that the application needs during testing.
+                services.RemoveAll<IUserService>();
+                services.RemoveAll<IDsiClient>();
+                services.AddScoped<IUserService, MockUserService>();
+                services.AddScoped<IDsiClient, MockDsiClient>();
+            });
     }
 
     protected override IHost CreateHost(IHostBuilder builder)
     {
         builder.UseContentRoot(Directory.GetCurrentDirectory());
 
+        // Create the host for TestServer now before we
+        // modify the builder to use Kestrel instead.
         var testHost = builder.Build();
 
-        _host = CreateKestrelHost(builder);
+        // Modify the host builder to use Kestrel instead
+        // of TestServer so we can listen on a real address.
+        builder.ConfigureWebHost(webHostBuilder => webHostBuilder.UseKestrel());
+
+        // Create and start the Kestrel server before the test server;
+        // otherwise, due to the way the deferred host builder works
+        // for minimal hosting, the server will not get "initialized
+        // enough" for the address to be available.
+        // See https://github.com/dotnet/aspnetcore/issues/33846.
+        _host = builder.Build();
         _host.Start();
 
-        SetBaseAddress();
-
-        testHost.Start();
-        return testHost;
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        _host?.Dispose();
-        base.Dispose(disposing);
-    }
-
-    #region Configuration
-
-    private static void ConfigureApplication(IWebHostBuilder builder)
-    {
-        var configuration = BuildTestConfiguration();
-
-        builder
-            .UseConfiguration(configuration)
-            .ConfigureAppConfiguration(configBuilder =>
-            {
-                configBuilder.AddInMemoryCollection(GetConfigurationValues());
-            });
-    }
-
-    private static IConfiguration BuildTestConfiguration()
-    {
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(GetConfigurationValues())
-            .Build();
-    }
-
-    private static Dictionary<string, string?> GetConfigurationValues()
-    {
-        return new Dictionary<string, string?>
-        {
-            // Test Data
-            [ConfigKeys.EstablishmentsCsvPath] = GetTestDataFilePath(),
-
-            // DSI Configuration
-            [ConfigKeys.DsiClientId] = TestValues.ClientId,
-            [ConfigKeys.DsiClientSecret] = TestValues.ClientSecret,
-            [ConfigKeys.DsiAuthority] = TestValues.Authority,
-            [ConfigKeys.DsiRequireHttpsMetadata] = "false",
-            [ConfigKeys.DsiValidateIssuer] = "false",
-            [ConfigKeys.DsiValidateAudience] = "false",
-            [ConfigKeys.DsiApiUri] = TestValues.ApiUri,
-            [ConfigKeys.DsiApiSecret] = TestValues.ApiSecret,
-            [ConfigKeys.DsiAudience] = TestValues.Audience,
-            [ConfigKeys.DsiTokenExpiryMinutes] = TestValues.TokenExpiryMinutes
-        };
-    }
-
-    private static string GetTestDataFilePath()
-    {
-        var testDataFilePath = Path.Combine(
-            AppContext.BaseDirectory,
-            TestValues.TestDataFolder,
-            TestValues.TestDataFileName);
-
-        if (!File.Exists(testDataFilePath))
-        {
-            throw new FileNotFoundException(
-                $"Test data file not found at: {testDataFilePath}",
-                testDataFilePath);
-        }
-
-        return testDataFilePath;
-    }
-
-    #endregion
-
-    #region Service Configuration
-
-    private static void ConfigureTestServices(IWebHostBuilder builder)
-    {
-        builder.ConfigureTestServices(services =>
-        {
-            RemoveRealServices(services);
-            AddMockServices(services);
-        });
-    }
-
-    private static void RemoveRealServices(IServiceCollection services)
-    {
-        services.RemoveAll<IUserService>();
-        services.RemoveAll<IDsiClient>();
-    }
-
-    private static void AddMockServices(IServiceCollection services)
-    {
-        services.AddScoped<IUserService, MockUserService>();
-        services.AddScoped<IDsiClient, MockDsiClient>();
-    }
-
-    #endregion
-
-    #region Host Configuration
-
-    private static IHost CreateKestrelHost(IHostBuilder builder)
-    {
-        builder.ConfigureWebHost(webHostBuilder => webHostBuilder.UseKestrel());
-        return builder.Build();
-    }
-
-    private void SetBaseAddress()
-    {
-        var server = _host!.Services.GetRequiredService<IServer>();
+        // Extract the selected dynamic port out of the Kestrel server
+        // and assign it onto the client options for convenience so it
+        // "just works" as otherwise it'll be the default http://localhost
+        // URL, which won't route to the Kestrel-hosted HTTP server.
+        var server = _host.Services.GetRequiredService<IServer>();
         var addresses = server.Features.Get<IServerAddressesFeature>();
 
         ClientOptions.BaseAddress = addresses!.Addresses
             .Select(x => new Uri(x))
             .Last();
 
-        Console.WriteLine($"✅ Test server started at: {ClientOptions.BaseAddress}");
+        // Return the host that uses TestServer, rather than the real one.
+        // Otherwise, the internals will complain about the host's server
+        // not being an instance of the concrete type TestServer.
+        // See https://github.com/dotnet/aspnetcore/pull/34702.
+        testHost.Start();
+        return testHost;
     }
 
-    private static int GetAvailablePort()
+    protected override void Dispose(bool disposing)
     {
-        using var listener = new TcpListener(System.Net.IPAddress.Loopback, 0);
-        listener.Start();
-        var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return port;
-    }
+        if (disposing)
+        {
+            _host?.Dispose();
+        }
 
-    #endregion
-
-    #region Constants
-
-    private static class Environments
-    {
-        public const string Testing = "Testing";
-    }
-
-    private static class ConfigKeys
-    {
-        // Establishments
-        public const string EstablishmentsCsvPath = "Establishments:CsvPath";
-
-        // DSI Configuration
-        public const string DsiClientId = "DsiConfiguration:ClientId";
-        public const string DsiClientSecret = "DsiConfiguration:ClientSecret";
-        public const string DsiAuthority = "DsiConfiguration:Authority";
-        public const string DsiRequireHttpsMetadata = "DsiConfiguration:RequireHttpsMetadata";
-        public const string DsiValidateIssuer = "DsiConfiguration:ValidateIssuer";
-        public const string DsiValidateAudience = "DsiConfiguration:ValidateAudience";
-        public const string DsiApiUri = "DsiConfiguration:ApiUri";
-        public const string DsiApiSecret = "DsiConfiguration:ApiSecret";
-        public const string DsiAudience = "DsiConfiguration:Audience";
-        public const string DsiTokenExpiryMinutes = "DsiConfiguration:TokenExpiryMinutes";
+        base.Dispose(disposing);
     }
 
     private static class TestValues
     {
-        // Test Data
-        public const string TestDataFolder = "TestData";
-        public const string TestDataFileName = "Establishments-Integration-Test-Data.csv";
-
         // DSI Test Values
         public const string ClientId = "test-client-id";
         public const string ClientSecret = "test-client-secret";
@@ -207,6 +118,4 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         public const string Audience = "test-audience";
         public const string TokenExpiryMinutes = "60";
     }
-
-    #endregion
 }

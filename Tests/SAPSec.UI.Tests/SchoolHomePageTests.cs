@@ -13,8 +13,6 @@ namespace SAPSec.UI.Tests;
 public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
 {
-    private readonly WebApplicationSetupFixture _fixture = fixture;
-
     private const string SchoolHomePath = "/SchoolHome";
     private const string SchoolSearchPath = "/search-for-a-school";
 
@@ -28,7 +26,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         response.Should().NotBeNull();
         // Accept 200, 302, 301, or 500 (500 may occur if user service not mocked)
-        response!.Status.Should().BeOneOf(200, 302, 301, 500);
+        response.Status.Should().BeOneOf(200, 302, 301, 500);
     }
 
     [Fact]
@@ -235,7 +233,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         var link = Page.Locator(Selectors.ComparePerformanceLink);
         var count = await link.CountAsync();
 
-        count.Should().Be(1, "Should have Compare Performance link");
+        count.Should().Be(2, "Should have Compare Performance link");
     }
 
     [Fact]
@@ -248,7 +246,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         var link = Page.Locator(Selectors.SchoolSearchLink);
         var count = await link.CountAsync();
 
-        count.Should().Be(1, "Should have School Search link");
+        count.Should().Be(2, "Should have School Search link");
     }
 
     [Fact]
@@ -261,7 +259,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         var link = Page.Locator(Selectors.SchoolDetailsLink);
         var count = await link.CountAsync();
 
-        count.Should().Be(1, "Should have School Details link");
+        count.Should().Be(2, "Should have School Details link");
     }
 
     [Fact]
@@ -276,7 +274,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         if (count == 0) return;
 
-        var isEnabled = await link.IsEnabledAsync();
+        var isEnabled = await link.First.IsEnabledAsync();
         isEnabled.Should().BeTrue("Compare Performance link should be clickable");
     }
 
@@ -296,7 +294,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         if (count == 0) return;
 
-        var cardContent = await link.TextContentAsync();
+        var cardContent = await link.First.TextContentAsync();
         cardContent.Should().Contain("Compare", "Compare card should mention comparison");
     }
 
@@ -312,7 +310,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         if (count == 0) return;
 
-        var cardContent = await link.TextContentAsync();
+        var cardContent = await link.GetByText("Connect").TextContentAsync();
         cardContent.Should().Contain("Connect", "Connect card should mention connecting with schools");
     }
 
@@ -328,7 +326,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         if (count == 0) return;
 
-        var cardContent = await link.TextContentAsync();
+        var cardContent = await link.First.TextContentAsync();
         cardContent.Should().Contain("details", "Details card should mention school details");
     }
 
@@ -511,7 +509,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         var link = Page.Locator(Selectors.ComparePerformanceLink);
         if (await link.CountAsync() == 0) return;
 
-        await link.ClickAsync();
+        await link.First.ClickAsync();
         await WaitForPageLoad();
 
         Page.Url.Should().Contain("ComparePerformance",
@@ -528,10 +526,10 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         var link = Page.Locator(Selectors.SchoolSearchLink);
         if (await link.CountAsync() == 0) return;
 
-        await link.ClickAsync();
+        await link.First.ClickAsync();
         await WaitForPageLoad();
 
-        Page.Url.Should().Contain("SchoolSearch",
+        Page.Url.Should().Contain("search-for-a-school",
             "Clicking School Search should navigate to that page");
     }
 
@@ -545,7 +543,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         var link = Page.Locator(Selectors.SchoolDetailsLink);
         if (await link.CountAsync() == 0) return;
 
-        await link.ClickAsync();
+        await link.First.ClickAsync();
         await WaitForPageLoad();
 
         Page.Url.Should().Contain("SchoolDetails",
@@ -633,7 +631,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         // Links
         public const string ComparePerformanceLink = "a[href*='ComparePerformance']";
-        public const string SchoolSearchLink = "a[href*='SchoolSearch']";
+        public const string SchoolSearchLink = "a[href=\"/search-for-a-school\"]";
         public const string SchoolDetailsLink = "a[href*='SchoolDetails']";
     }
 

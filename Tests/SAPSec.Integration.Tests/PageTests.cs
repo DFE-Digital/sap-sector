@@ -3,7 +3,8 @@ using SAPSec.Integration.Tests.Infrastructure;
 
 namespace SAPSec.Integration.Tests;
 
-public class PageTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
+[Collection("IntegrationTestsCollection")]
+public class PageTests(WebApplicationSetupFixture fixture)
 {
     [Fact]
     public async Task HomePage_ReturnsSuccess()

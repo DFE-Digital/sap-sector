@@ -1,30 +1,22 @@
 ﻿using System.Net;
-using System.Net.Http.Json;
 using FluentAssertions;
 using SAPSec.Integration.Tests.Infrastructure;
 
 namespace SAPSec.Integration.Tests;
 
-[Collection("WebApplication")]
-public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicationSetupFixture>
+[Collection("IntegrationTestsCollection")]
+public class OrganisationControllerIntegrationTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
 {
-    private readonly WebApplicationSetupFixture _fixture;
-
-    public OrganisationControllerIntegrationTests(WebApplicationSetupFixture fixture)
-    {
-        _fixture = fixture;
-    }
-
     #region GET /Organisation/details Tests
 
     [Fact]
     public async Task GetDetails_WhenNotAuthenticated_ReturnsUnauthorizedOrRedirect()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/Organisation/details");
+        var response = await fixture.Client.GetAsync("/Organisation/details");
 
         // Assert
-        // Depending on auth setup, may redirect to login or return unauthorized
+        // Depending on auth setup, may redirect to log in or return unauthorised
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.Unauthorized,
             HttpStatusCode.Redirect,
@@ -37,7 +29,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetDetails_WhenAuthenticated_ReturnsSuccessOrRedirect()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/details");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/details");
 
         // Assert
         // May return view with organisation details or redirect to error if no organisation
@@ -52,7 +44,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetDetails_ReturnsHtmlContent()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/details");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/details");
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)
@@ -68,7 +60,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/details", cts.Token);
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/details", cts.Token);
 
         // Assert
         response.Should().NotBeNull();
@@ -82,7 +74,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetSwitch_WhenNotAuthenticated_ReturnsUnauthorizedOrRedirect()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/Organisation/switch");
+        var response = await fixture.Client.GetAsync("/Organisation/switch");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -97,7 +89,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetSwitch_WhenAuthenticated_ReturnsSuccessOrRedirect()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/switch");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/switch");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -111,7 +103,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetSwitch_ReturnsHtmlContent()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/switch");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/switch");
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)
@@ -135,7 +127,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var content = new FormUrlEncodedContent(formData);
 
         // Act
-        var response = await _fixture.Client.PostAsync("/Organisation/switch", content);
+        var response = await fixture.Client.PostAsync("/Organisation/switch", content);
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -159,7 +151,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var content = new FormUrlEncodedContent(formData);
 
         // Act
-        var response = await _fixture.AuthenticatedClient.PostAsync("/Organisation/switch", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/Organisation/switch", content);
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -181,7 +173,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var content = new FormUrlEncodedContent(formData);
 
         // Act
-        var response = await _fixture.AuthenticatedClient.PostAsync("/Organisation/switch", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/Organisation/switch", content);
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -205,7 +197,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var content = new FormUrlEncodedContent(formData);
 
         // Act
-        var response = await _fixture.AuthenticatedClient.PostAsync("/Organisation/switch", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/Organisation/switch", content);
 
         // Assert
         if (response.StatusCode == HttpStatusCode.Redirect)
@@ -222,7 +214,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiCurrent_WhenNotAuthenticated_ReturnsUnauthorizedOrNotFound()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/Organisation/api/current");
+        var response = await fixture.Client.GetAsync("/Organisation/api/current");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -237,7 +229,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiCurrent_WhenAuthenticated_ReturnsJsonOrNotFound()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/api/current");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/api/current");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -249,7 +241,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiCurrent_WhenSuccess_ReturnsJsonContentType()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/api/current");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/api/current");
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)
@@ -262,7 +254,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiCurrent_WhenSuccess_ReturnsValidJson()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/api/current");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/api/current");
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)
@@ -284,7 +276,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiOrganisation_WithValidId_ReturnsJsonOrNotFound()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/Organisation/api/test-org-123");
+        var response = await fixture.Client.GetAsync("/Organisation/api/test-org-123");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -298,7 +290,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiOrganisation_WithEmptyId_ReturnsBadRequestOrNotFound()
     {
         // Act - Note: Empty ID might be interpreted as a different route
-        var response = await _fixture.Client.GetAsync("/Organisation/api/");
+        var response = await fixture.Client.GetAsync("/Organisation/api/");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -312,7 +304,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiOrganisation_WhenSuccess_ReturnsJsonContentType()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/api/test-org-123");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/api/test-org-123");
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)
@@ -325,7 +317,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task GetApiOrganisation_WhenNotFound_ReturnsNotFoundStatus()
     {
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/api/non-existent-org-xyz");
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/api/non-existent-org-xyz");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -341,7 +333,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var orgIdWithSpecialChars = Uri.EscapeDataString("org-123!@#");
 
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync($"/Organisation/api/{orgIdWithSpecialChars}");
+        var response = await fixture.NonRedirectingClient.GetAsync($"/Organisation/api/{orgIdWithSpecialChars}");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -369,7 +361,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         foreach (var route in routes)
         {
             // Act
-            var response = await _fixture.Client.GetAsync(route);
+            var response = await fixture.Client.GetAsync(route);
 
             // Assert
             response.StatusCode.Should().NotBe(HttpStatusCode.NotFound, $"Route {route} should be accessible");
@@ -380,7 +372,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task OrganisationRoutes_WithTrailingSlash_Work()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/Organisation/details/");
+        var response = await fixture.Client.GetAsync("/Organisation/details/");
 
         // Assert
         response.StatusCode.Should().NotBe(HttpStatusCode.MethodNotAllowed);
@@ -390,7 +382,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task OrganisationRoutes_SwitchGet_Exists()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/Organisation/switch");
+        var response = await fixture.Client.GetAsync("/Organisation/switch");
 
         // Assert
         response.StatusCode.Should().NotBe(HttpStatusCode.NotFound);
@@ -400,7 +392,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     public async Task OrganisationRoutes_ApiCurrent_Exists()
     {
         // Act
-        var response = await _fixture.Client.GetAsync("/Organisation/api/current");
+        var response = await fixture.Client.GetAsync("/Organisation/api/current");
 
         // Assert
         response.StatusCode.Should().NotBe(HttpStatusCode.MethodNotAllowed);
@@ -422,7 +414,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var content = new FormUrlEncodedContent(formData);
 
         // Act
-        var response = await _fixture.AuthenticatedClient.PostAsync("/Organisation/switch", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/Organisation/switch", content);
 
         // Assert
         if (response.StatusCode == HttpStatusCode.Redirect)
@@ -438,7 +430,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var xssPayload = "<script>alert('xss')</script>";
 
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync($"/Organisation/details?test={Uri.EscapeDataString(xssPayload)}");
+        var response = await fixture.NonRedirectingClient.GetAsync($"/Organisation/details?test={Uri.EscapeDataString(xssPayload)}");
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)
@@ -455,7 +447,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         var sqlInjection = "'; DROP TABLE Users; --";
 
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync($"/Organisation/api/{Uri.EscapeDataString(sqlInjection)}");
+        var response = await fixture.NonRedirectingClient.GetAsync($"/Organisation/api/{Uri.EscapeDataString(sqlInjection)}");
 
         // Assert
         response.StatusCode.Should().BeOneOf(
@@ -476,7 +468,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/details", cts.Token);
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/details", cts.Token);
 
         // Assert
         response.Should().NotBeNull();
@@ -489,7 +481,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/api/current", cts.Token);
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/api/current", cts.Token);
 
         // Assert
         response.Should().NotBeNull();
@@ -502,7 +494,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
         // Act
-        var response = await _fixture.AuthenticatedClient.GetAsync("/Organisation/api/test-org", cts.Token);
+        var response = await fixture.NonRedirectingClient.GetAsync("/Organisation/api/test-org", cts.Token);
 
         // Assert
         response.Should().NotBeNull();
@@ -517,7 +509,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
     {
         // Arrange
         var tasks = Enumerable.Range(0, 5)
-            .Select(_ => _fixture.AuthenticatedClient.GetAsync("/Organisation/api/current"));
+            .Select(_ => fixture.NonRedirectingClient.GetAsync("/Organisation/api/current"));
 
         // Act
         var responses = await Task.WhenAll(tasks);
@@ -533,9 +525,9 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         // Arrange
         var tasks = new[]
         {
-            _fixture.AuthenticatedClient.GetAsync("/Organisation/details"),
-            _fixture.AuthenticatedClient.GetAsync("/Organisation/switch"),
-            _fixture.AuthenticatedClient.GetAsync("/Organisation/api/current")
+            fixture.NonRedirectingClient.GetAsync("/Organisation/details"),
+            fixture.NonRedirectingClient.GetAsync("/Organisation/switch"),
+            fixture.NonRedirectingClient.GetAsync("/Organisation/api/current")
         };
 
         // Act
@@ -558,7 +550,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act
-        var response = await _fixture.AuthenticatedClient.SendAsync(request);
+        var response = await fixture.NonRedirectingClient.SendAsync(request);
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)
@@ -575,7 +567,7 @@ public class OrganisationControllerIntegrationTests : IClassFixture<WebApplicati
         request.Headers.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
         // Act
-        var response = await _fixture.AuthenticatedClient.SendAsync(request);
+        var response = await fixture.NonRedirectingClient.SendAsync(request);
 
         // Assert
         if (response.StatusCode == HttpStatusCode.OK)

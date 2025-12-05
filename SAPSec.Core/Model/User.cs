@@ -1,6 +1,4 @@
-﻿using System.Text.Json.Serialization;
-
-namespace SAPSec.Core.Model;
+﻿namespace SAPSec.Core.Model;
 
 public class User
 {
