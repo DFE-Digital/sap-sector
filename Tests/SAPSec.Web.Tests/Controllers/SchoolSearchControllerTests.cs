@@ -512,14 +512,14 @@ public class SchoolSearchControllerTests
     {
         var queryPart = "XYZ";
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
-            .ReturnsAsync([]);
+            .ReturnsAsync(new List<EstablishmentSearchResult>());
 
         var result = await _controller.Suggest(queryPart);
 
         result.Should().BeOfType<OkObjectResult>();
 
         var okResult = result as OkObjectResult;
-        var suggestions = okResult!.Value as List<SchoolSearchResult>;
+        var suggestions = okResult!.Value as List<EstablishmentSearchResult>;
         suggestions.Should().BeEmpty();
     }
 
