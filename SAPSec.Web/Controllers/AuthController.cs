@@ -9,10 +9,12 @@ using SAPSec.Core.Model;
 namespace SAPSec.Web.Controllers;
 
 [Route("[controller]")]
-public class AuthController : Controller
+public class AuthController(
+    IUserService userService,
+    ILogger<AuthController> logger) : Controller
 {
-    private readonly IUserService _userService;
-    private readonly ILogger<AuthController> _logger;
+    private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly ILogger<AuthController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     private static class Routes
     {
@@ -40,14 +42,6 @@ public class AuthController : Controller
     private static class ErrorMessages
     {
         public const string OrganisationIdRequired = "Organisation ID is required";
-    }
-
-    public AuthController(
-        IUserService userService,
-        ILogger<AuthController> logger)
-    {
-        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     [HttpGet(Routes.SignIn)]

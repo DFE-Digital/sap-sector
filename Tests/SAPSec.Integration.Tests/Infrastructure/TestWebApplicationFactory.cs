@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Interfaces.Services;
+using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
 
 namespace SAPSec.Integration.Tests.Infrastructure;
@@ -17,7 +20,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseUrls("http://127.0.0.1:0", "https://127.0.0.1:0");
 
-        builder.UseEnvironment("Development");
+        builder.UseEnvironment("IntegrationTests");
 
         var testDataFilePath = Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-Integration-Test-Data.csv");
 
@@ -25,17 +28,17 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
         var configurationValues = new Dictionary<string, string?>
         {
-            { "Establishments:CsvPath", testDataFilePath }
-			[ConfigKeys.DsiClientId] = TestValues.ClientId,
-            [ConfigKeys.DsiClientSecret] = TestValues.ClientSecret,
-            [ConfigKeys.DsiAuthority] = TestValues.Authority,
-            [ConfigKeys.DsiRequireHttpsMetadata] = "false",
-            [ConfigKeys.DsiValidateIssuer] = "false",
-            [ConfigKeys.DsiValidateAudience] = "false",
-            [ConfigKeys.DsiApiUri] = TestValues.ApiUri,
-            [ConfigKeys.DsiApiSecret] = TestValues.ApiSecret,
-            [ConfigKeys.DsiAudience] = TestValues.Audience,
-            [ConfigKeys.DsiTokenExpiryMinutes] = TestValues.TokenExpiryMinutes
+            { "Establishments:CsvPath", testDataFilePath },
+			{ "DsiConfiguration:ClientId", TestValues.ClientId },
+            { "DsiConfiguration:ClientSecret", TestValues.ClientSecret },
+            { "DsiConfiguration:Authority", TestValues.Authority },
+            { "DsiConfiguration:RequireHttpsMetadata", "false" },
+            { "DsiConfiguration:ValidateIssuer", "false" },
+            { "DsiConfiguration:ValidateAudience", "false" },
+            { "DsiConfiguration:ApiUri", TestValues.ApiUri },
+            { "DsiConfiguration:ApiSecret", TestValues.ApiSecret },
+            { "DsiConfiguration:Audience", TestValues.Audience },
+            { "DsiConfiguration:TokenExpiryMinutes", TestValues.TokenExpiryMinutes }
         };
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configurationValues)
@@ -49,7 +52,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             {
                 configurationBuilder.AddInMemoryCollection(configurationValues);
             })
-            .ConfigureServices(_ =>
+            .ConfigureServices(services =>
             {
                 // Add or replace any services that the application needs during testing.
 				services.RemoveAll<IUserService>();
@@ -105,5 +108,17 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             _host?.Dispose();
         }
         base.Dispose(disposing);
+    }
+
+    private static class TestValues
+    {
+        // DSI Test Values
+        public const string ClientId = "test-client-id";
+        public const string ClientSecret = "test-client-secret";
+        public const string Authority = "https://test-oidc.signin.education.gov.uk";
+        public const string ApiUri = "https://test-api.signin.education.gov.uk";
+        public const string ApiSecret = "test-api-secret";
+        public const string Audience = "test-audience";
+        public const string TokenExpiryMinutes = "60";
     }
 }

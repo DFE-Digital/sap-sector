@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace SAPSec.Web.Controllers;
 
 [Controller]
 [Route("/")]
+[AllowAnonymous]
 public class StaticContentController : Controller
 {
     [HttpGet]

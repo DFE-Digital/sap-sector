@@ -4,19 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace SAPSec.Web.Controllers;
 
 [Authorize]
-public class SchoolDetailsController : Controller
+public class SchoolDetailsController(ILogger<SchoolDetailsController> logger) : Controller
 {
-    private readonly ILogger<SchoolDetailsController> _logger;
-
-    public SchoolDetailsController(ILogger<SchoolDetailsController> logger)
-    {
-        _logger = logger;
-    }
-
     [HttpGet]
     public IActionResult Index()
     {
-        _logger.LogInformation("User accessing School Details page");
+        logger.LogInformation("User accessing School Details page");
         return View();
     }
 }

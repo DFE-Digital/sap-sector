@@ -92,7 +92,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
     {
         await Page.GotoAsync(HomePagePath);
 
-        var serviceNameLink = Page.Locator("a.govuk-header__link.govuk-header__service-name");
+        var serviceNameLink = Page.Locator(".govuk-service-navigation__link").First;
         var linkText = await serviceNameLink.TextContentAsync();
         var href = await serviceNameLink.GetAttributeAsync("href");
 

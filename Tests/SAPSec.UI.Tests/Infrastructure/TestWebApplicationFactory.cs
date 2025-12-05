@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Interfaces.Services;
+using SAPSec.UI.Tests.Mocks;
 using SAPSec.Web;
 
 namespace SAPSec.UI.Tests.Infrastructure;
@@ -17,24 +20,24 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
     {
         builder.UseUrls("http://127.0.0.1:0", "https://127.0.0.1:0");
 
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment("UITests");
 
         var testDataFilePath = Path.Combine(AppContext.BaseDirectory, "TestData", "Establishments-UI-Test-Data.csv");
         if (!File.Exists(testDataFilePath)) throw new FileNotFoundException("Test data file not found", testDataFilePath);
 
         var configurationValues = new Dictionary<string, string?>
         {
-            { "Establishments:CsvPath", testDataFilePath }
-			[ConfigKeys.DsiClientId] = TestValues.ClientId,
-            [ConfigKeys.DsiClientSecret] = TestValues.ClientSecret,
-            [ConfigKeys.DsiAuthority] = TestValues.Authority,
-            [ConfigKeys.DsiRequireHttpsMetadata] = "false",
-            [ConfigKeys.DsiValidateIssuer] = "false",
-            [ConfigKeys.DsiValidateAudience] = "false",
-            [ConfigKeys.DsiApiUri] = TestValues.ApiUri,
-            [ConfigKeys.DsiApiSecret] = TestValues.ApiSecret,
-            [ConfigKeys.DsiAudience] = TestValues.Audience,
-            [ConfigKeys.DsiTokenExpiryMinutes] = TestValues.TokenExpiryMinutes
+            { "Establishments:CsvPath", testDataFilePath },
+            { "DsiConfiguration:ClientId", TestValues.ClientId },
+            { "DsiConfiguration:ClientSecret", TestValues.ClientSecret },
+            { "DsiConfiguration:Authority", TestValues.Authority },
+            { "DsiConfiguration:RequireHttpsMetadata", "false" },
+            { "DsiConfiguration:ValidateIssuer", "false" },
+            { "DsiConfiguration:ValidateAudience", "false" },
+            { "DsiConfiguration:ApiUri", TestValues.ApiUri },
+            { "DsiConfiguration:ApiSecret", TestValues.ApiSecret },
+            { "DsiConfiguration:Audience", TestValues.Audience },
+            { "DsiConfiguration:TokenExpiryMinutes", TestValues.TokenExpiryMinutes }
         };
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configurationValues)
@@ -44,17 +47,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             // This configuration is used during the creation of the application
             // (e.g. BEFORE WebApplication.CreateBuilder(args) is called in Program.cs).
             .UseConfiguration(configuration)
-            .ConfigureAppConfiguration(configurationBuilder =>
-            {
-                configurationBuilder.AddInMemoryCollection(configurationValues);
-            })
-            .ConfigureServices(_ =>
+            .ConfigureAppConfiguration(configurationBuilder => { configurationBuilder.AddInMemoryCollection(configurationValues); })
+            .ConfigureServices(services =>
             {
                 // Add or replace any services that the application needs during testing.
-				services.RemoveAll<IUserService>();
-		        services.RemoveAll<IDsiClient>();
-				services.AddScoped<IUserService, MockUserService>();
-        		services.AddScoped<IDsiClient, MockDsiClient>();
+                services.RemoveAll<IUserService>();
+                services.RemoveAll<IDsiClient>();
+                services.AddScoped<IUserService, MockUserService>();
+                services.AddScoped<IDsiClient, MockDsiClient>();
             });
     }
 
@@ -82,8 +82,8 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         // and assign it onto the client options for convenience so it
         // "just works" as otherwise it'll be the default http://localhost
         // URL, which won't route to the Kestrel-hosted HTTP server.
-         var server = _host.Services.GetRequiredService<IServer>();
-         var addresses = server.Features.Get<IServerAddressesFeature>();
+        var server = _host.Services.GetRequiredService<IServer>();
+        var addresses = server.Features.Get<IServerAddressesFeature>();
 
         ClientOptions.BaseAddress = addresses!.Addresses
             .Select(x => new Uri(x))
@@ -103,14 +103,12 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         {
             _host?.Dispose();
         }
+
         base.Dispose(disposing);
     }
-	private static class TestValues
-    {
-        // Test Data
-        public const string TestDataFolder = "TestData";
-        public const string TestDataFileName = "Establishments-Integration-Test-Data.csv";
 
+    private static class TestValues
+    {
         // DSI Test Values
         public const string ClientId = "test-client-id";
         public const string ClientSecret = "test-client-secret";
