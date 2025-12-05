@@ -505,3 +505,4 @@ wwwroot/**/*.min.js
 /TestCoverageReport
 **/wwwroot/*
 **/wwwroot/*
+/coveragereport

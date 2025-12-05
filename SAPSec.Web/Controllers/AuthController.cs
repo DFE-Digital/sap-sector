@@ -4,163 +4,207 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Web.Controllers;
 
 [Route("[controller]")]
-public class AuthController(
-    IDsiUserService userService,
-    ILogger<AuthController> logger) : Controller
+public class AuthController : Controller
 {
-    private readonly IDsiUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-    private readonly ILogger<AuthController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    private readonly IUserService _userService;
+    private readonly ILogger<AuthController> _logger;
 
-    [HttpGet("sign-in")]
+    private static class Routes
+    {
+        public const string SignIn = "sign-in";
+        public const string SignOut = "sign-out";
+        public const string SignedOut = "signed-out";
+        public const string SignOutCallback = "SignOutCallback";
+        public const string SelectOrganisation = "select-organisation";
+        public const string AccessDenied = "access-denied";
+    }
+
+    private static class Defaults
+    {
+        public const string ReturnUrl = "/search-for-a-school";
+    }
+
+    private static class LogMessages
+    {
+        public const string UserSigningOut = "User {UserId} signing out";
+        public const string OrganisationSelected = "User {UserId} selected organisation {OrganisationId}";
+        public const string OrganisationSelectionFailed = "Failed to set organisation {OrganisationId} for user {UserId}";
+        public const string UserNotFound = "User not found or has no organisations";
+    }
+
+    private static class ErrorMessages
+    {
+        public const string OrganisationIdRequired = "Organisation ID is required";
+    }
+
+    public AuthController(
+        IUserService userService,
+        ILogger<AuthController> logger)
+    {
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    [HttpGet(Routes.SignIn)]
     public IActionResult SignIn(string? returnUrl = null)
     {
-        if (_userService.IsAuthenticated(User))
+        if (IsUserAuthenticated())
         {
-            return RedirectToAction("Index");
-        }
-
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = returnUrl,
-            Items = { { "returnUrl", returnUrl ?? "/" } }
-        };
-
-        return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
-    }
-
-    [HttpGet("sign-in-callback")]
-    public async Task<IActionResult> SignInCallback(string? returnUrl = null)
-    {
-        try
-        {
-            var authenticateResult = await HttpContext.AuthenticateAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme);
-
-            if (!authenticateResult.Succeeded)
-            {
-                _logger.LogWarning("Authentication failed");
-                return RedirectToAction("Error", "Home");
-            }
-
-            var user = await _userService.GetUserFromClaimsAsync(User);
-            if (user == null)
-            {
-                _logger.LogWarning("Failed to get user from claims");
-                return RedirectToAction("Error", "Home");
-            }
-
-            _logger.LogInformation(
-                "User {Email} signed in successfully",
-                user.Email);
-
-            // If user has multiple organisations, redirect to organisation selection
-            if (user.Organisations.Count > 1)
-            {
-                return RedirectToAction(
-                    nameof(SelectOrganisation),
-                    new { returnUrl });
-            }
-
-            // If user has one organisation, set it as current
-            if (user.Organisations.Count == 1)
-            {
-                await _userService.SetCurrentOrganisationAsync(
-                    User,
-                    user.Organisations[0].Id);
-            }
-
             return RedirectToLocal(returnUrl);
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error during sign-in callback");
-            return RedirectToAction("Error", "Home");
-        }
+
+        return ChallengeWithRedirect(returnUrl);
     }
 
-    [HttpGet("select-organisation")]
+    [HttpGet(Routes.SelectOrganisation)]
     [Authorize]
     public async Task<IActionResult> SelectOrganisation(string? returnUrl = null)
     {
         var user = await _userService.GetUserFromClaimsAsync(User);
-        if (user == null || !user.Organisations.Any())
+
+        if (!HasValidOrganisations(user))
         {
-            return RedirectToAction("Error", "Home");
+            _logger.LogWarning(LogMessages.UserNotFound);
+            return RedirectToProblem();
         }
 
         ViewBag.ReturnUrl = returnUrl;
         return View(user);
     }
 
-    [HttpPost("select-organisation")]
+    [HttpPost(Routes.SelectOrganisation)]
     [Authorize]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> SelectOrganisation(string organisationId, string? returnUrl = null)
+    public async Task<IActionResult> SelectOrganisationPost(string organisationId, string? returnUrl = null)
     {
         if (string.IsNullOrEmpty(organisationId))
         {
-            return BadRequest("Organisation ID is required");
+            return BadRequest(ErrorMessages.OrganisationIdRequired);
         }
 
         var success = await _userService.SetCurrentOrganisationAsync(User, organisationId);
+
         if (!success)
         {
-            _logger.LogWarning(
-                "Failed to set organisation {OrganisationId} for user {UserId}",
-                organisationId,
-                _userService.GetUserId(User));
-            return RedirectToAction("Error", "Home");
+            LogOrganisationSelectionFailed(organisationId);
+            return RedirectToProblem();
         }
 
-        _logger.LogInformation(
-            "User {UserId} selected organisation {OrganisationId}",
-            _userService.GetUserId(User),
-            organisationId);
-
+        LogOrganisationSelected(organisationId);
         return RedirectToLocal(returnUrl);
     }
 
-    [HttpGet("sign-out")]
+    [HttpGet(Routes.SignOut)]
+    [HttpGet(Routes.SignOutCallback)]
     [Authorize]
-    public async Task<IActionResult> SignOutCallback()
+    public async Task<IActionResult> SignOut()
     {
-        var userId = _userService.GetUserId(User);
+        LogUserSigningOut();
 
-        _logger.LogInformation("User {UserId} signing out", userId);
+        await ClearUserSession();
 
-        // Clear session
-        HttpContext.Session.Clear();
-
-        // Sign out of both the cookie scheme and OIDC
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
 
-        return RedirectToAction("Index", "Home");
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action("SignedOut", "Auth")
+        };
+
+        return SignOut(properties, OpenIdConnectDefaults.AuthenticationScheme);
     }
 
-    [HttpGet("access-denied")]
+    [HttpGet(Routes.AccessDenied)]
     public IActionResult AccessDenied()
     {
         return View();
     }
 
-    [HttpGet("signed-out")]
+    [HttpGet(Routes.SignedOut)]
     public IActionResult SignedOut()
     {
         return View();
     }
 
+    #region Private Helper Methods
+
+    private bool IsUserAuthenticated()
+    {
+        return _userService.IsAuthenticated(User);
+    }
+
+    private static bool HasValidOrganisations(User? user)
+    {
+        return user?.Organisations.Any() == true;
+    }
+
+    private IActionResult ChallengeWithRedirect(string? returnUrl)
+    {
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = returnUrl ?? Defaults.ReturnUrl
+        };
+
+        return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
+    }
+
+    private async Task ClearUserSession()
+    {
+        HttpContext.Session.Clear();
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+        await HttpContext.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme);
+    }
+
     private IActionResult RedirectToLocal(string? returnUrl)
     {
-        if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+        if (IsValidLocalUrl(returnUrl))
         {
-            return Redirect(returnUrl);
+            return Redirect(returnUrl!);
         }
 
+        return RedirectToHome();
+    }
+
+    private bool IsValidLocalUrl(string? url)
+    {
+        return !string.IsNullOrEmpty(url) && Url.IsLocalUrl(url);
+    }
+
+    private IActionResult RedirectToHome()
+    {
         return RedirectToAction("Index", "Home");
     }
+
+    private IActionResult RedirectToProblem()
+    {
+        return RedirectToAction("StatusCodeError", "Error", new { statusCode = 500 });
+    }
+
+    #endregion
+
+    #region Logging Methods
+
+    private void LogUserSigningOut()
+    {
+        var userId = _userService.GetUserId(User);
+        _logger.LogInformation(LogMessages.UserSigningOut, userId);
+    }
+
+    private void LogOrganisationSelected(string organisationId)
+    {
+        var userId = _userService.GetUserId(User);
+        _logger.LogInformation(LogMessages.OrganisationSelected, userId, organisationId);
+    }
+
+    private void LogOrganisationSelectionFailed(string organisationId)
+    {
+        var userId = _userService.GetUserId(User);
+        _logger.LogWarning(LogMessages.OrganisationSelectionFailed, organisationId, userId);
+    }
+
+    #endregion
 }

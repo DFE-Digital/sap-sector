@@ -11,13 +11,4 @@ public static class BreadcrumbNodes
             urn
         }
     };
-
-    // public static MvcBreadcrumbNode SchoolComparison(string urn) => new("Index", "SchoolComparison", PageTitles.Comparison)
-    // {
-    //     RouteValues = new
-    //     {
-    //         urn
-    //     },
-    //     Parent = SchoolHome(urn)
-    // };
 }

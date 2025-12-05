@@ -6,12 +6,12 @@ namespace SAPSec.Web.Controllers;
 [Route("[controller]")]
 //[Authorize]
 public class OrganisationController(
-    IDsiUserService userService,
-    IDsiApiService apiService,
+    IUserService userService,
+    IDsiClient apiService,
     ILogger<OrganisationController> logger) : Controller
 {
-    private readonly IDsiUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-    private readonly IDsiApiService _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
+    private readonly IUserService _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+    private readonly IDsiClient _apiService = apiService ?? throw new ArgumentNullException(nameof(apiService));
     private readonly ILogger<OrganisationController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
     [HttpGet("details")]

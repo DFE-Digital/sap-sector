@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
+[Authorize]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
     ISearchService _searchService) : Controller

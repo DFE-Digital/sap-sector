@@ -34,12 +34,6 @@ data "azurerm_key_vault_secret" "help_uri" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
-data "azurerm_key_vault_secret" "register_uri" {
-  name         = "RegisterUri"
-  key_vault_id = data.azurerm_key_vault.app_key_vault.id
-}
-
-
 
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
@@ -63,7 +57,7 @@ module "application_configuration" {
     DsiConfiguration__ApiUri                = local.dsi_urls.api_uri
     DsiConfiguration__Authority             = local.dsi_urls.authority
     DsiConfiguration__Issuer                = local.dsi_urls.issuer
-    DsiConfiguration__Audience              = "signin.education.gov.uk"
+    DsiConfiguration__Audience              = "SAP"
     DsiConfiguration__MetadataAddress       = local.dsi_urls.metadata_address
     DsiConfiguration__CallbackPath          = "/signin-oidc"
     DsiConfiguration__SignedOutCallbackPath = "/signout-callback-oidc"
@@ -81,7 +75,6 @@ module "application_configuration" {
     DsiConfiguration__ServiceId    = data.azurerm_key_vault_secret.dsi_service_id.value
     DFESignInSettings__SignInUri   = data.azurerm_key_vault_secret.sign_in_url.value
     DFESignInSettings__HelpUri     = data.azurerm_key_vault_secret.help_uri.value
-    DFESignInSettings__RegisterUri = data.azurerm_key_vault_secret.register_uri.value
   }
 }
 

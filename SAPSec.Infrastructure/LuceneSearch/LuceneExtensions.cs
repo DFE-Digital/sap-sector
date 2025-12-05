@@ -12,7 +12,6 @@ public static class LuceneExtensions
 {
     public static void AddLuceneDependencies(this IServiceCollection services)
     {
-        // Lucene shared context and services
         services.AddSingleton<LuceneIndexContext>();
         services.AddSingleton<ILuceneIndexWriter, LuceneIndexWriter>();
         services.AddSingleton<ILuceneIndexReader, LuceneIndexReader>();
