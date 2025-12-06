@@ -133,13 +133,13 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        await Page.Locator("input[name='__Query']").FillAsync("102848");
+        await Page.Locator("input[name='__Query']").FillAsync("100");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/102848");
+        Page.Url.Should().Contain("school/100");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
         schoolDetails.Should().Contain("School details Test page.");
     }
@@ -149,13 +149,13 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        await Page.Locator("input[name='__Query']").FillAsync("Saint Paul Roman Catholic");
+        await Page.Locator("input[name='__Query']").FillAsync("The Henrietta Barnett School");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/100273");
+        Page.Url.Should().Contain("school/100");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
         schoolDetails.Should().Contain("School details Test page.");
     }
@@ -216,7 +216,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/102848");
+        Page.Url.Should().Contain("school/100");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
         schoolDetails.Should().Contain("School details Test page.");
     }
@@ -227,11 +227,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("123456");
+        await Page.Locator("input[name='__Query']").FillAsync("100");
         await Page.WaitForTimeoutAsync(600);
 
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
-        isNumericValue.Should().Be("123456");
+        isNumericValue.Should().Be("100");
     }
 
     [Fact]
@@ -282,13 +282,13 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("204\\3658");
+        await Page.Locator("input[name='__Query']").FillAsync("200\\4752");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/100273");
+        Page.Url.Should().Contain("school/100");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
         schoolDetails.Should().Contain("School details Test page.");
     }
@@ -528,12 +528,12 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        var specialQuery = "St. Mary's & John's School (Primary)";
+        var specialQuery = "The Cool & Awesome School";
         await Page.Locator("input[name='__Query']").FillAsync(specialQuery);
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/search?query=St.%20Mary%27s%20%26%20John%27s%20School%20(Primary)");
+        Page.Url.Should().Contain("school/search?query=The%20Cool%20%26%20Awesome%20School");
     }
 
     [Fact]
