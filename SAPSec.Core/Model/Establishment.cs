@@ -53,6 +53,7 @@ namespace SAPSec.Core.Model
 
         // Also known as LA/Estab, for obvious reasons
         public string DfENumber => $"{LAId}/{EstablishmentNumber}";
+        public string DfENumberSearchable => $"{LAId}{EstablishmentNumber}";
 
         #endregion
 

@@ -41,9 +41,9 @@ public class LuceneSearchService(ILuceneIndexReader indexReader, IEstablishmentS
         var isDfENumber = Regex.IsMatch(schoolNumber, @"^\d+\\|/\d+$");
 
         return isNumber
-            ? _establishmentService.GetEstablishment(schoolNumber)
+            ? _establishmentService.GetEstablishmentByAnyNumber(schoolNumber)
             : isDfENumber
-                ? _establishmentService.GetEstablishment(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty))
+                ? _establishmentService.GetEstablishmentByAnyNumber(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty))
                 : null;
     }
 }

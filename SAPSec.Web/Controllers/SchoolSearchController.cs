@@ -63,13 +63,6 @@ public class SchoolSearchController(
                 return RedirectToAction("Index", "School", new { results[0].Establishment.URN });
             }
 
-
-            var Results2 = results.Select(s => new SchoolSearchResultViewModel
-            {
-                SchoolName = s.Establishment.EstablishmentName,
-                URN = s.Establishment.URN
-            });
-
             return View(new SchoolSearchResultsViewModel
                 {
                     Query = query ?? string.Empty,
@@ -103,7 +96,7 @@ public class SchoolSearchController(
             }
 
             var school = _searchService.SearchByNumber(searchQueryViewModel.Urn);
-            if (school != null)
+            if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
                 {

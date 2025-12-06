@@ -34,7 +34,6 @@
             });
 
             const response = (await res.json());
-            console.log(response);
             if (!response.error) {
                 return response;
             }
@@ -60,6 +59,7 @@
         }
 
         function valueFormatter(item) {
+            console.log(item);
             if (!item?.school) {
                 return "";
             }
