@@ -436,13 +436,13 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchResultsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("102848");
+        await Page.Locator("input[name='__Query']").FillAsync("100");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/102848");
+        Page.Url.Should().Contain("school/100");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
         schoolDetails.Should().Contain("School details Test page.");
     }
@@ -495,7 +495,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         {
             var firstLink = resultLinks.First;
             var href = await firstLink.GetAttributeAsync("href");
-            href.Should().Contain("/school/102848", "Result links should point to school detail pages");
+            href.Should().Contain("/school/100", "Result links should point to school detail pages");
         }
     }
 
@@ -528,12 +528,12 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        var specialQuery = "The Cool & Awesome School";
+        var specialQuery = "wibbly wobbly primary & daycare (primary)";
         await Page.Locator("input[name='__Query']").FillAsync(specialQuery);
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/search?query=The%20Cool%20%26%20Awesome%20School");
+        Page.Url.Should().Contain("school/search?query=wibbly%20wobbly%20primary%20%26%20daycare%20(primary)");
     }
 
     [Fact]
