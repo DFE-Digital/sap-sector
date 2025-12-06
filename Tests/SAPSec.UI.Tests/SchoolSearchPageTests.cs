@@ -216,7 +216,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/100");
+        Page.Url.Should().Contain("school/102");
         var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
         schoolDetails.Should().Contain("School details Test page.");
     }
@@ -495,7 +495,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         {
             var firstLink = resultLinks.First;
             var href = await firstLink.GetAttributeAsync("href");
-            href.Should().Contain("/school/100", "Result links should point to school detail pages");
+            href.Should().Contain("/school/102", "Result links should point to school detail pages");
         }
     }
 
