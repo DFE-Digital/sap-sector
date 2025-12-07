@@ -32,7 +32,7 @@ namespace SAPSec.Infrastructure.Repositories.KS4.Destinations
 
         public LADestinations GetLADestinations(string laCode)
         {
-            return GetAllLADestinations().First(x => x.Id == laCode) ?? new LADestinations();
+            return GetAllLADestinations().FirstOrDefault(x => x.Id == laCode) ?? new LADestinations();
         }
     }
 }

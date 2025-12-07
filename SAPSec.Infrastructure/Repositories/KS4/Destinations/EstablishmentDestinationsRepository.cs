@@ -32,7 +32,7 @@ namespace SAPSec.Infrastructure.Repositories.KS4.Destinations
 
         public EstablishmentDestinations GetEstablishmentDestinations(string urn)
         {
-            return GetAllEstablishmentDestinations().First(x => x.Id == urn) ?? new EstablishmentDestinations();
+            return GetAllEstablishmentDestinations().FirstOrDefault(x => x.Id == urn) ?? new EstablishmentDestinations();
         }
     }
 }

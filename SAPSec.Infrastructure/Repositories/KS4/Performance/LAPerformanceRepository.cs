@@ -32,7 +32,7 @@ namespace SAPSec.Infrastructure.Repositories.KS4.Performance
 
         public LAPerformance GetLAPerformance(string laCode)
         {
-            return GetAllLAPerformance().First(x => x.Id == laCode) ?? new LAPerformance();
+            return GetAllLAPerformance().FirstOrDefault(x => x.Id == laCode) ?? new LAPerformance();
         }
     }
 }

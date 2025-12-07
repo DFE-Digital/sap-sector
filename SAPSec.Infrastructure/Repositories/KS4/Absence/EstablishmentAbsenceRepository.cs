@@ -32,7 +32,7 @@ namespace SAPSec.Infrastructure.Repositories.KS4.Absence
 
         public EstablishmentAbsence GetEstablishmentAbsence(string urn)
         {
-            return GetAllEstablishmentAbsence().First(x => x.Id == urn) ?? new EstablishmentAbsence();
+            return GetAllEstablishmentAbsence().FirstOrDefault(x => x.Id == urn) ?? new EstablishmentAbsence();
         }
     }
 }

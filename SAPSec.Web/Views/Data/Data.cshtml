@@ -1,0 +1,353 @@
+﻿@model SAPSec.Core.Model.Establishment
+
+@*
+    THIS IS EXAMPLE CODE ONLY. NOT TO BE USED IN PRODUCTION.
+    REFLECTION IS BAD.
+
+*@
+
+
+
+
+<div class="govuk-width-container">
+    <main class="govuk-main-wrapper">
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+                <govuk-accordion id="accordion-with-summary-sections" heading-level="3">
+                    <govuk-accordion-item expanded="true">
+                        <govuk-accordion-item-heading>Establishment</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>Establishment Absence</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EstablishmentAbsence.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EstablishmentAbsence)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>Establishment Performance</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.KS4Performance.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.KS4Performance)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>Establishment Destinations</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EstablishmentDestinations.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EstablishmentDestinations)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>Establishment Subject Entries</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.KS4SubjectEntries.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.KS4SubjectEntries)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>Establishment Suspensions</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EstablishmentSuspensions.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EstablishmentSuspensions)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>Establishment Workforce</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.Workforce.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.Workforce)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>LA Destinations</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.LADestinations.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.LADestinations)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>LA Performance</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.LAPerformance.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.LAPerformance)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>LA Destinations</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.LADestinations.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.LADestinations)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>LA Subject Entries</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.LASubjectEntries.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.LASubjectEntries)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>LA Suspensions</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.LASuspensions.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.LASuspensions)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>England Destinations</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EnglandDestinations.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EnglandDestinations)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>England Performance</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EnglandPerformance.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EnglandPerformance)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>England Absence</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EnglandAbsence.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EnglandAbsence)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>England Subject Entries</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EnglandSubjectEntries.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EnglandSubjectEntries)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                    <govuk-accordion-item>
+                        <govuk-accordion-item-heading>England Suspensions</govuk-accordion-item-heading>
+                        <govuk-accordion-item-content>
+                            @foreach (var prop in Model.EnglandSuspensions.GetType().GetProperties())
+                            {
+                                <govuk-summary-list>
+                                    <govuk-summary-list-row>
+                                        <govuk-summary-list-row-key>
+                                            @prop.Name
+                                        </govuk-summary-list-row-key>
+                                        <govuk-summary-list-row-value>
+                                            @prop.GetValue(Model.EnglandSuspensions)
+                                        </govuk-summary-list-row-value>
+                                    </govuk-summary-list-row>
+                                </govuk-summary-list>
+                            }
+                        </govuk-accordion-item-content>
+                    </govuk-accordion-item>
+
+                </govuk-accordion>
+            </div>
+        </div>
+    </main>
+</div>

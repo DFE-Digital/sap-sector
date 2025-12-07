@@ -14,13 +14,13 @@ namespace SAPSec.Core.Model.KS4.Workforce
         /// 
         /// Workforce Pupil Teacher Ratio filtered by Establishment for Current year 
         /// 
-        public double Workforce_PupTeaRatio_Est_Current_Num { get; set; }
+        public double? Workforce_PupTeaRatio_Est_Current_Num { get; set; }
         public string Workforce_PupTeaRatio_Est_Current_Num_Reason { get; set; } = string.Empty;
 
         /// 
         /// Workforce PupIl FTE filtered by Establishment for Current year 
         /// 
-        public double Workforce_TotPupils_Est_Current_Num { get; set; }
+        public double? Workforce_TotPupils_Est_Current_Num { get; set; }
         public string Workforce_TotPupils_Est_Current_Num_Reason { get; set; } = string.Empty;
 
 

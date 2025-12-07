@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SAPPub.Core.Services.KS4.Performance
+namespace SAPSec.Core.Services.KS4.Performance
 {
     public class EstablishmentPerformanceService : IEstablishmentPerformanceService
     {

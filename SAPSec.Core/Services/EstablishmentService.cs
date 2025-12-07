@@ -13,15 +13,15 @@ namespace SAPSec.Core.Services
     public class EstablishmentService : IEstablishmentService
     {
         private readonly IEstablishmentRepository _establishmentRepository;
-        private ILogger<Establishment> _logger;
+        private readonly ILookupService _lookUpService;
 
 
         public EstablishmentService(
             IEstablishmentRepository establishmentRepository,
-            ILogger<Establishment> logger)
+            ILookupService lookUpService)
         {
             _establishmentRepository = establishmentRepository;
-            _logger = logger;
+            _lookUpService = lookUpService;
         }
 
 
@@ -33,12 +33,56 @@ namespace SAPSec.Core.Services
 
         public Establishment GetEstablishment(string urn)
         {
-            return _establishmentRepository.GetEstablishment(urn);
+            var establishment = _establishmentRepository.GetEstablishment(urn);
+            if (!string.IsNullOrWhiteSpace(establishment?.URN))
+            {
+                var allLookups = _lookUpService.GetAllLookups();
+                establishment.TypeOfEstablishmentName = GetLookupByCode(allLookups, "TypeOfEstablishment", establishment.TypeOfEstablishmentId);
+                establishment.AdmissionPolicy = GetLookupByCode(allLookups, "AdmissionsPolicy", establishment.AdmissionsPolicyId);
+                establishment.DistrictAdministrativeName = GetLookupByCode(allLookups, "DistrictAdministrative", establishment.DistrictAdministrativeId);
+                establishment.PhaseOfEducationName = GetLookupByCode(allLookups, "PhaseOfEducation", establishment.PhaseOfEducationId);
+                establishment.GenderName = GetLookupByCode(allLookups, "Gender", establishment.GenderId);
+                establishment.ReligiousCharacterName = GetLookupByCode(allLookups, "ReligiousCharacter", establishment.ReligiousCharacterId);
+                establishment.ResourcedProvisionName = GetLookupByCode(allLookups, "ResourcedProvision", establishment.ResourcedProvision);
+                establishment.UrbanRuralName = GetLookupByCode(allLookups, "UrbanRural", establishment.UrbanRuralId);
+                establishment.TrustName = GetLookupByCode(allLookups, "Trusts", establishment.TrustsId);
+                establishment.LANAme = GetLookupByCode(allLookups, "LA", establishment.LAId);
+                return establishment;
+            }
+            //_logger.LogError($"Error looking up establishment with urn {urn}");
+            throw new Exception("Error in GetEstablishment");
         }
 
         public Establishment GetEstablishmentByAnyNumber(string number)
         {
-            return _establishmentRepository.GetEstablishmentByAnyNumber(number);
+            var establishment = _establishmentRepository.GetEstablishmentByAnyNumber(number);
+            if (!string.IsNullOrWhiteSpace(establishment?.URN))
+            {
+                var allLookups = _lookUpService.GetAllLookups();
+                establishment.TypeOfEstablishmentName = GetLookupByCode(allLookups, "TypeOfEstablishment", establishment.TypeOfEstablishmentId);
+                establishment.AdmissionPolicy = GetLookupByCode(allLookups, "AdmissionsPolicy", establishment.AdmissionsPolicyId);
+                establishment.DistrictAdministrativeName = GetLookupByCode(allLookups, "DistrictAdministrative", establishment.DistrictAdministrativeId);
+                establishment.PhaseOfEducationName = GetLookupByCode(allLookups, "PhaseOfEducation", establishment.PhaseOfEducationId);
+                establishment.GenderName = GetLookupByCode(allLookups, "Gender", establishment.GenderId);
+                establishment.ReligiousCharacterName = GetLookupByCode(allLookups, "ReligiousCharacter", establishment.ReligiousCharacterId);
+                establishment.ResourcedProvisionName = GetLookupByCode(allLookups, "ResourcedProvision", establishment.ResourcedProvision);
+                establishment.UrbanRuralName = GetLookupByCode(allLookups, "UrbanRural", establishment.UrbanRuralId);
+                establishment.TrustName = GetLookupByCode(allLookups, "Trusts", establishment.TrustsId);
+                establishment.LANAme = GetLookupByCode(allLookups, "LA", establishment.LAId);
+                return establishment;
+            }
+            //_logger.LogError($"Error looking up establishment with urn {urn}");
+            throw new Exception("Error in GetEstablishment");
+        }
+
+        private string GetLookupByCode(IEnumerable<Lookup> lookups, string type, string? id)
+        {
+            return lookups.FirstOrDefault(x => x.LookupType == type && x.Id == id)?.Name ?? string.Empty;
+        }
+
+        private string GetLookupByCode(IEnumerable<Lookup> lookups, string type, int? id)
+        {
+            return lookups.FirstOrDefault(x => x.LookupType == type && x.Id == id.ToString())?.Name ?? string.Empty;
         }
     }
 }

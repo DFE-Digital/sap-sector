@@ -32,7 +32,7 @@ namespace SAPSec.Infrastructure.Repositories.KS4.Performance
 
         public EstablishmentPerformance GetEstablishmentPerformance(string urn)
         {
-            return GetAllEstablishmentPerformance().First(x => x.Id == urn) ?? new EstablishmentPerformance();
+            return GetAllEstablishmentPerformance().FirstOrDefault(x => x.Id == urn) ?? new EstablishmentPerformance();
         }
     }
 }

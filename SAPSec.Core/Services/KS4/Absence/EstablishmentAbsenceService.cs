@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SAPPub.Core.Services.KS4.Absence
+namespace SAPSec.Core.Services.KS4.Absence
 {
     public class EstablishmentAbsenceService : IEstablishmentAbsenceService
     {

@@ -2,6 +2,7 @@
 using SAPSec.Core.Model.KS4.Destinations;
 using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Model.KS4.SubjectEntries;
+using SAPSec.Core.Model.KS4.Suspensions;
 using SAPSec.Core.Model.KS4.Workforce;
 using System;
 using System.Collections.Generic;
@@ -69,12 +70,16 @@ namespace SAPSec.Core.Model
         public LADestinations LADestinations { get; set; } = new();
         public EnglandDestinations EnglandDestinations { get; set; } = new();
 
+        public EstablishmentSuspensions EstablishmentSuspensions { get; set; } = new();
+        public LASuspensions LASuspensions { get; set; } = new();
+        public EnglandSuspensions EnglandSuspensions { get; set; } = new();
+
 
         public EstablishmentAbsence EstablishmentAbsence { get; set; } = new();
         public LAAbsence LAAbsence { get; set; } = new();
-        public EnglandAbsence Absence { get; set; } = new(); // Will eventually need one per phase
+        public EnglandAbsence EnglandAbsence { get; set; } = new(); 
 
-        public EstablishmentWorkforce Workforce { get; set; } = new(); // Will eventually need one per phase
+        public EstablishmentWorkforce Workforce { get; set; } = new(); 
 
 
 

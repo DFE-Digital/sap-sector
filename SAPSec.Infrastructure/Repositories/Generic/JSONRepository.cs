@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SAPSec.Core.Interfaces.Repositories.Generic;
 using System;
@@ -19,7 +18,7 @@ namespace SAPSec.Infrastructure.Repositories.Generic
         private readonly string _filePath;
         private readonly ILogger<JSONRepository<T>> _logger;
 
-        public JSONRepository(ILogger<JSONRepository<T>> logger, IHostEnvironment env)
+        public JSONRepository(ILogger<JSONRepository<T>> logger)
         {
             _logger = logger ?? throw new ArgumentNullException();
             var basePath = AppContext.BaseDirectory;

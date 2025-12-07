@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SAPPub.Core.Services.KS4.Destinations
+namespace SAPSec.Core.Services.KS4.Destinations
 {
     public class EnglandDestinationsService : IEnglandDestinationsService
     {
