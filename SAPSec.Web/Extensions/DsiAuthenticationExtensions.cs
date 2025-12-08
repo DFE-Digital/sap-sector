@@ -103,6 +103,10 @@ public static class DsiAuthenticationExtensions
         options.ClientSecret = config.ClientSecret;
         options.ResponseType = OpenIdConnectResponseType.Code;
         options.SaveTokens = true;
+        options.NonceCookie.SameSite = SameSiteMode.None;
+        options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.CorrelationCookie.SameSite = SameSiteMode.None;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
         options.GetClaimsFromUserInfoEndpoint = true;
         options.CallbackPath = new PathString(config.CallbackPath);
         options.SignedOutCallbackPath = new PathString(config.SignedOutCallbackPath);
