@@ -117,6 +117,14 @@ public class Program
             var dataProtectionPath = builder.Environment.IsDevelopment()
                                      ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
                                      : "/keys";
+            try
+            {
+                Directory.CreateDirectory(dataProtectionPath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"WARNING: could not create DataProtection keys directory '{dataProtectionPath}': {ex.Message}");
+            }
 
             builder.Services.AddDataProtection()
                 .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
