@@ -77,12 +77,7 @@
 }
 
 .app-card--clickable {
-    transition: box-shadow 0.2s ease;
     cursor: pointer;
-}
-
-.app-card--clickable:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 /* Image section - colored backgrounds */
@@ -98,14 +93,20 @@
 /* Color variants for image section only */
 .app-card__image--compare {
     background-color: #D4ECEA;
+    max-width:75%;
+    max-height:60%
 }
 
 .app-card__image--connect {
     background-color: #BBD4EA;
+    max-width: 75%;
+    max-height: 60%
 }
 
 .app-card__image--details {
     background-color: #E5E6E7;
+    max-width: 75%;
+    max-height: 60%
 }
 
 .app-card__icon {
