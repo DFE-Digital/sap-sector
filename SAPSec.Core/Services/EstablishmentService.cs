@@ -72,7 +72,7 @@ namespace SAPSec.Core.Services
                 return establishment;
             }
             //_logger.LogError($"Error looking up establishment with urn {urn}");
-            throw new Exception("Error in GetEstablishment");
+            return new Establishment();
         }
 
         private string GetLookupByCode(IEnumerable<Lookup> lookups, string type, string? id)
