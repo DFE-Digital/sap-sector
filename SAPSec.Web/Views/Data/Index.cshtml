@@ -1,0 +1,17 @@
+﻿@model IEnumerable<SAPSec.Core.Model.Establishment>
+
+
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-table__caption--m">Table</caption>
+    <tbody class="govuk-table__body">
+        @foreach (var modelItem in Model)
+        {
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">Establishment Name</th>
+                <td class="govuk-table__cell"><a href="@Url.Action("Data", "Data", new { id = modelItem.URN })" visually-hidden-text="name">@modelItem.EstablishmentName</a></td>
+            </tr>
+        }
+
+    </tbody>
+</table>

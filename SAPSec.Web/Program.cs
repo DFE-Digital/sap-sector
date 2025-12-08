@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
-using SAPSec.Core;
-using SAPSec.Infrastructure;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -15,6 +13,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Localization;
+using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Web;
 
@@ -132,8 +131,16 @@ public class Program
         }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-        builder.Services.AddCoreDependencies();
-        builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
+
+
+
+        // Add relevant dependencies for Lucene Search, implementation through SearchService.
+        builder.Services.AddLuceneDependencies();
+
+        // Service and Repo depencencies.
+        builder.Services.AddDependencies();
+
+        //builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 
         var app = builder.Build();
 

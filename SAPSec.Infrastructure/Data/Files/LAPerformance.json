@@ -1,0 +1,50 @@
+[
+  {
+    "Id": "200",
+    "Attainment8_Tot_LA_Current_Num": "56.5",
+    "EngMaths49_Boy_LA_Current_Pct": "78.6",
+    "EngMaths49_Grl_LA_Current_Pct": "77.5",
+    "EngMaths49_Tot_LA_Current_Pct": "78.1",
+    "EngMaths59_Boy_LA_Current_Pct": "63.6",
+    "EngMaths59_Grl_LA_Current_Pct": "62.2",
+    "EngMaths59_Tot_LA_Current_Pct": "62.9",
+    "EngMaths49_Tot_LA_Previous_Pct": "80.3",
+    "EngMaths59_Tot_LA_Previous_Pct": "66.6",
+    "Prog8_Avg_LA_Previous_Num": "0.61",
+    "Prog8_Avg_LA_Previous2_Num": "256429",
+    "EngMaths49_Tot_LA_Previous2_Pct": "80.1",
+    "EngMaths59_Tot_LA_Previous2_Pct": "66"
+  },
+  {
+    "Id": "201",
+    "Attainment8_Tot_LA_Current_Num": "59.2",
+    "EngMaths49_Boy_LA_Current_Pct": "81.2",
+    "EngMaths49_Grl_LA_Current_Pct": "82.7",
+    "EngMaths49_Tot_LA_Current_Pct": "81.9",
+    "EngMaths59_Boy_LA_Current_Pct": "67.3",
+    "EngMaths59_Grl_LA_Current_Pct": "68.4",
+    "EngMaths59_Tot_LA_Current_Pct": "67.8",
+    "EngMaths49_Tot_LA_Previous_Pct": "82.4",
+    "EngMaths59_Tot_LA_Previous_Pct": "68",
+    "Prog8_Avg_LA_Previous_Num": "0.45",
+    "Prog8_Avg_LA_Previous2_Num": "196465.41",
+    "EngMaths49_Tot_LA_Previous2_Pct": "82.5",
+    "EngMaths59_Tot_LA_Previous2_Pct": "69.2"
+  },
+  {
+    "Id": "202",
+    "Attainment8_Tot_LA_Current_Num": "59.1",
+    "EngMaths49_Boy_LA_Current_Pct": "82",
+    "EngMaths49_Grl_LA_Current_Pct": "82.7",
+    "EngMaths49_Tot_LA_Current_Pct": "82.4",
+    "EngMaths59_Boy_LA_Current_Pct": "68.5",
+    "EngMaths59_Grl_LA_Current_Pct": "69.6",
+    "EngMaths59_Tot_LA_Current_Pct": "69.1",
+    "EngMaths49_Tot_LA_Previous_Pct": "83",
+    "EngMaths59_Tot_LA_Previous_Pct": "70.4",
+    "Prog8_Avg_LA_Previous_Num": "0.65",
+    "Prog8_Avg_LA_Previous2_Num": "110888",
+    "EngMaths49_Tot_LA_Previous2_Pct": "81",
+    "EngMaths59_Tot_LA_Previous2_Pct": "66.7"
+  }
+]

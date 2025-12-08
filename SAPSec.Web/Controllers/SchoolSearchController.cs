@@ -9,7 +9,7 @@ namespace SAPSec.Web.Controllers;
 [Authorize]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
-    ISearchService searchService) : Controller
+    ISearchService _searchService) : Controller
 {
     [HttpGet]
     [Route("search-for-a-school")]
@@ -36,12 +36,12 @@ public class SchoolSearchController(
                 });
             }
 
-            var school = searchService.SearchByNumber(searchQueryViewModel.Urn);
-            if (school != null)
+            var school = _searchService.SearchByNumber(searchQueryViewModel.Urn);
+            if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
                 {
-                    school.Urn
+                    school?.URN
                 });
             }
 
@@ -56,11 +56,11 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { query }))
         {
-            var results = await searchService.SearchAsync(query ?? string.Empty);
+            var results = await _searchService.SearchAsync(query ?? string.Empty);
 
             if (results.Count == 1)
             {
-                return RedirectToAction("Index", "School", new { results[0].School.Urn });
+                return RedirectToAction("Index", "School", new { results[0].Establishment.URN });
             }
 
             return View(new SchoolSearchResultsViewModel
@@ -68,8 +68,8 @@ public class SchoolSearchController(
                     Query = query ?? string.Empty,
                     Results = results.Select(s => new SchoolSearchResultViewModel
                     {
-                        SchoolName = s.School.EstablishmentName,
-                        URN = s.School.Urn.ToString()
+                        SchoolName = s.Establishment.EstablishmentName,
+                        URN = s.Establishment.URN
                     }).ToArray()
                 }
             );
@@ -95,12 +95,12 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", searchQueryViewModel);
             }
 
-            var school = searchService.SearchByNumber(searchQueryViewModel.Urn);
-            if (school != null)
+            var school = _searchService.SearchByNumber(searchQueryViewModel.Urn);
+            if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
                 {
-                    school.Urn
+                    school.URN
                 });
             }
 
@@ -114,7 +114,7 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { queryPart }))
         {
-            var suggestions = await searchService.SuggestAsync(queryPart);
+            var suggestions = await _searchService.SuggestAsync(queryPart);
 
             return Ok(suggestions);
         }

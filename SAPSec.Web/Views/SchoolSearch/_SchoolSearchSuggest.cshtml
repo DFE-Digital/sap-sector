@@ -34,11 +34,10 @@
             });
 
             const response = (await res.json());
-
             if (!response.error) {
                 return response;
             }
-
+            
             return [];
         };
 
@@ -47,8 +46,8 @@
         const templates = {
             inputValue: itemFormatter,
             suggestion: (item) => {
-                if (item?.schoolName) {
-                    return item.schoolName.replace(suggestHighlightRegex, "<b>$1</b>");
+                if (item?.name) {
+                    return item.name.replace(suggestHighlightRegex, "<b>$1</b>");
                 } else {
                     return "";
                 }
@@ -56,10 +55,11 @@
         };
 
         function itemFormatter(item) {
-            return item?.schoolName ? item.schoolName.replace(suggestHighlightRegex, "$1") : "";
+            return item?.name ? item.name.replace(suggestHighlightRegex, "$1") : "";
         }
 
         function valueFormatter(item) {
+            console.log(item);
             if (!item?.school) {
                 return "";
             }

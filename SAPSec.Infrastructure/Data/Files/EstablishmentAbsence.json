@@ -1,0 +1,20 @@
+[
+  {
+    "Id": "100",
+    "Abs_Tot_Est_Current_Pct": "5.26546",
+    "Auth_Tot_Est_Current_Pct": "4.99607",
+    "UnAuth_Tot_Est_Current_Pct": "0.26939"
+  },
+  {
+    "Id": "101",
+    "Abs_Tot_Est_Current_Pct": "3.01256",
+    "Auth_Tot_Est_Current_Pct": "2.89405",
+    "UnAuth_Tot_Est_Current_Pct": "0.11851"
+  },
+  {
+    "Id": "102",
+    "Abs_Tot_Est_Current_Pct": "3.33307",
+    "Auth_Tot_Est_Current_Pct": "2.85316",
+    "UnAuth_Tot_Est_Current_Pct": "0.4799"
+  }
+]
