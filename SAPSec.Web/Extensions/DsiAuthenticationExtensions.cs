@@ -7,6 +7,7 @@ using SAPSec.Core.Configuration;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Services;
+using SAPSec.Web.Errors;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Web.Extensions;
@@ -269,7 +270,27 @@ public static class DsiAuthenticationExtensions
             "DSI remote authentication failure: {Message}",
             context.Failure?.Message);
 
-        RedirectToErrorAndHandle(context);
+        try
+        {
+            var errorStore = context.HttpContext.RequestServices.GetService<IErrorStore>();
+            if (errorStore != null && context.Failure != null)
+            {
+                var id = errorStore.Add(context.Failure);
+                context.Response.Redirect($"/error?errorId={id}");
+            }
+            else
+            {
+                // fallback redirect
+                context.Response.Redirect(Routes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to store DSI remote failure");
+            context.Response.Redirect(Routes.Error);
+        }
+
+        context.HandleResponse();
 
         return Task.CompletedTask;
     }
@@ -283,7 +304,26 @@ public static class DsiAuthenticationExtensions
             "DSI authentication failed: {Message}",
             context.Exception.Message);
 
-        RedirectToErrorAndHandle(context);
+        try
+        {
+            var errorStore = context.HttpContext.RequestServices.GetService<IErrorStore>();
+            if (errorStore != null && context.Exception != null)
+            {
+                var id = errorStore.Add(context.Exception);
+                context.Response.Redirect($"/error?errorId={id}");
+            }
+            else
+            {
+                context.Response.Redirect(Routes.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to store DSI authentication failure");
+            context.Response.Redirect(Routes.Error);
+        }
+
+        context.HandleResponse();
 
         return Task.CompletedTask;
     }
