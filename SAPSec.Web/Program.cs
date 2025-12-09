@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Lucene.Net.Util;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using SAPSec.Core;
@@ -8,13 +10,15 @@ using SAPSec.Infrastructure;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
+using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Net;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Localization;
 
 namespace SAPSec.Web;
 
@@ -42,7 +46,59 @@ public class Program
             options.ActiveLiTemplate = " ";
         });
 
-        builder.Services.Configure<ForwardedHeadersOptions>(options =>
+        builder.Host.UseSerilog((hostContext, services, loggerConfig) =>
+        {
+            loggerConfig.ReadFrom.Configuration(hostContext.Configuration)
+                        .Enrich.FromLogContext()
+                        .Enrich.WithProperty("Environment", hostContext.HostingEnvironment.EnvironmentName)
+                        .Enrich.WithProperty("Application", "SAPSec")
+                        .WriteTo.Console();
+
+            var logitUrl = hostContext.Configuration["LOGIT_HTTP_URL"];
+            var logitUser = hostContext.Configuration["LOGIT_USERNAME"];
+            var logitPass = hostContext.Configuration["LOGIT_PASSWORD"];
+
+            if (!string.IsNullOrWhiteSpace(logitUrl))
+            {
+                try
+                {
+                    var headers = new Dictionary<string, string?>();
+
+                    // ✅ Add Basic Authentication to headers
+                    if (!string.IsNullOrEmpty(logitUser) && !string.IsNullOrEmpty(logitPass))
+                    {
+                        var credentials = $"{logitUser}:{logitPass}";
+                        var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentials));
+                        headers["Authorization"] = $"Basic {basicAuth}";
+                    }
+
+                    // ✅ Add additional headers for better reliability
+                    headers["User-Agent"] = "SAPSec-Serilog/1.0";
+                    headers["Accept"] = "application/json";
+                    headers["Connection"] = "keep-alive";
+
+                    loggerConfig.WriteTo.Http(
+                        requestUri: logitUrl,
+                        period: TimeSpan.FromSeconds(2),
+                        queueLimitBytes: 50_000_000,
+                        textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
+                        batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
+                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information
+                    );
+
+                    Console.WriteLine($"✅ Logit HTTP sink configured: {logitUrl}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"⚠️ Failed to configure Logit HTTP sink: {ex.Message}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("ℹ️ Logit not configured - logging to console only");
+            }
+        });
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedHost
                                      | ForwardedHeaders.XForwardedProto
@@ -51,7 +107,7 @@ public class Program
             options.KnownProxies.Clear();
         });
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" )
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -66,7 +122,6 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-
         builder.Services.AddDistributedMemoryCache();
 
         builder.Services.AddSession(options =>
@@ -74,7 +129,7 @@ public class Program
             options.IdleTimeout = TimeSpan.FromHours(1);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;  // ✅ Changed from Always
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.Name = ".SAPSec.Session";
         });
@@ -83,7 +138,7 @@ public class Program
         {
             options.CheckConsentNeeded = _ => false;
             options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            options.Secure = CookieSecurePolicy.Always;
+            options.Secure = CookieSecurePolicy.SameAsRequest;  // ✅ Changed from Always
         });
 
         builder.Services.AddLogging(logging =>
@@ -123,7 +178,7 @@ public class Program
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"WARNING: could not create DataProtection keys directory '{dataProtectionPath}': {ex.Message}");
+                Console.WriteLine($"⚠️ Could not create DataProtection directory '{dataProtectionPath}': {ex.Message}");
             }
 
             builder.Services.AddDataProtection()
@@ -146,14 +201,11 @@ public class Program
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
+
         app.UseForwardedHeaders();
-
         app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
-
-        
         app.UseMiddleware<SecurityHeadersMiddleware>();
-        
-
+        app.UseCookiePolicy();  
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider
@@ -167,7 +219,8 @@ public class Program
         };
 
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
-        if(!Directory.Exists(wwwrootPath)) Console.WriteLine( $"WARNING: wwwroot directory not found at {wwwrootPath}");
+        if (!Directory.Exists(wwwrootPath))
+            Console.WriteLine($"⚠️ wwwroot directory not found at {wwwrootPath}");
 
         app.UseStaticFiles(new StaticFileOptions
         {
@@ -180,21 +233,17 @@ public class Program
                 if (string.IsNullOrEmpty(contentType))
                 {
                     var ext = Path.GetExtension(path);
-                    Console.WriteLine($"  WARNING: No content type for extension: {ext}");
+                    Console.WriteLine($"⚠️ No content type for extension: {ext}");
                 }
             }
         });
 
         app.UseRouting();
-
         app.UseSession();
-
         app.UseAuthentication();
-
         app.UseAuthorization();
 
         app.MapHealthChecks("/healthcheck");
-
         app.MapControllers();
         app.MapRazorPages();
 
@@ -204,4 +253,5 @@ public class Program
 
         app.Run();
     }
+
 }
