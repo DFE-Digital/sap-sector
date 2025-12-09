@@ -46,6 +46,7 @@ public class Program
             options.ActiveLiTemplate = " ";
         });
 
+
         builder.Host.UseSerilog((hostContext, services, loggerConfig) =>
         {
             loggerConfig.ReadFrom.Configuration(hostContext.Configuration)
@@ -55,50 +56,46 @@ public class Program
                         .WriteTo.Console();
 
             var logitUrl = hostContext.Configuration["LOGIT_HTTP_URL"];
-            var logitUser = hostContext.Configuration["LOGIT_USERNAME"];
-            var logitPass = hostContext.Configuration["LOGIT_PASSWORD"];
+            var logitApiKey = hostContext.Configuration["LOGIT_API_KEY"];
 
             if (!string.IsNullOrWhiteSpace(logitUrl))
             {
                 try
                 {
-                    var headers = new Dictionary<string, string?>();
-
-                    // ✅ Add Basic Authentication to headers
-                    if (!string.IsNullOrEmpty(logitUser) && !string.IsNullOrEmpty(logitPass))
+                    if (!string.IsNullOrEmpty(logitApiKey))
                     {
-                        var credentials = $"{logitUser}:{logitPass}";
-                        var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes(credentials));
-                        headers["Authorization"] = $"Basic {basicAuth}";
+                        var requestUri = $"{logitUrl}?apikey={logitApiKey}";
+
+                        Console.WriteLine($"DEBUG: Request URI = {requestUri}");
+
+                        loggerConfig.WriteTo.Http(
+                            requestUri: requestUri,  
+                            period: TimeSpan.FromSeconds(2),
+                            queueLimitBytes: 50_000_000,
+                            textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
+                            batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
+                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug
+                        );
+
                     }
-
-                    // ✅ Add additional headers for better reliability
-                    headers["User-Agent"] = "SAPSec-Serilog/1.0";
-                    headers["Accept"] = "application/json";
-                    headers["Connection"] = "keep-alive";
-
-                    loggerConfig.WriteTo.Http(
-                        requestUri: logitUrl,
-                        period: TimeSpan.FromSeconds(2),
-                        queueLimitBytes: 50_000_000,
-                        textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
-                        batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
-                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information
-                    );
-
-                    Console.WriteLine($"✅ Logit HTTP sink configured: {logitUrl}");
+                    else
+                    {
+                        Console.WriteLine("⚠️ Logit URL set but no credentials found");
+                    }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"⚠️ Failed to configure Logit HTTP sink: {ex.Message}");
+                    Console.WriteLine($"⚠️ Failed to configure Logit: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 }
             }
             else
             {
-                Console.WriteLine("ℹ️ Logit not configured - logging to console only");
+                Console.WriteLine("ℹ️ Logit not configured - console logging only");
             }
         });
-            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+
+        builder.Services.Configure<ForwardedHeadersOptions>(options =>
         {
             options.ForwardedHeaders = ForwardedHeaders.XForwardedHost
                                      | ForwardedHeaders.XForwardedProto
@@ -129,8 +126,7 @@ public class Program
             options.IdleTimeout = TimeSpan.FromHours(1);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;  // ✅ Changed from Always
-            options.Cookie.SameSite = SameSiteMode.Lax;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;  
             options.Cookie.Name = ".SAPSec.Session";
         });
 
@@ -138,7 +134,7 @@ public class Program
         {
             options.CheckConsentNeeded = _ => false;
             options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            options.Secure = CookieSecurePolicy.SameAsRequest;  // ✅ Changed from Always
+            options.Secure = CookieSecurePolicy.SameAsRequest; 
         });
 
         builder.Services.AddLogging(logging =>
@@ -220,7 +216,6 @@ public class Program
 
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
         if (!Directory.Exists(wwwrootPath))
-            Console.WriteLine($"⚠️ wwwroot directory not found at {wwwrootPath}");
 
         app.UseStaticFiles(new StaticFileOptions
         {
@@ -233,7 +228,7 @@ public class Program
                 if (string.IsNullOrEmpty(contentType))
                 {
                     var ext = Path.GetExtension(path);
-                    Console.WriteLine($"⚠️ No content type for extension: {ext}");
+                    
                 }
             }
         });
