@@ -75,7 +75,7 @@ public class Program
             options.IdleTimeout = TimeSpan.FromHours(1);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.Name = ".SAPSec.Session";
         });
@@ -132,7 +132,7 @@ public class Program
         {
             options.CheckConsentNeeded = _ => false;
             options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            options.Secure = CookieSecurePolicy.Always;
+            options.Secure = CookieSecurePolicy.SameAsRequest;
         });
 
         builder.Services.AddLogging(logging =>
