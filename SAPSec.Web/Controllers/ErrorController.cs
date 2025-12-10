@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Errors;
 
@@ -6,6 +7,7 @@ namespace SAPSec.Web.Controllers;
 
 [Controller]
 [Route("error")]
+[AllowAnonymous]
 public class ErrorController : Controller
 {
     private readonly IConfiguration _configuration;

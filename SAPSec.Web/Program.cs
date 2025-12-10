@@ -8,6 +8,7 @@ using SAPSec.Core;
 using SAPSec.Infrastructure;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
+using SAPSec.Web.Logging;
 using SAPSec.Web.Middleware;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
@@ -91,30 +92,26 @@ public class Program
             var logitUrl = hostContext.Configuration["LOGIT_HTTP_URL"];
             var logitApiKey = hostContext.Configuration["LOGIT_API_KEY"];
 
-            if (!string.IsNullOrWhiteSpace(logitUrl))
+            Console.WriteLine($"DEBUG: LOGIT_HTTP_URL = '{logitUrl ?? "[NULL]"}'");
+            Console.WriteLine($"DEBUG: LOGIT_API_KEY = '{(string.IsNullOrEmpty(logitApiKey) ? "[NULL]" : "[SET]")}'");
+
+            if (!string.IsNullOrWhiteSpace(logitUrl) && !string.IsNullOrEmpty(logitApiKey))
             {
                 try
                 {
-                    if (!string.IsNullOrEmpty(logitApiKey))
-                    {
-                        var requestUri = $"{logitUrl}?apikey={logitApiKey}";
+                    var logitHttpClient = new LogitHttpClient(logitApiKey);
 
-                        Console.WriteLine($"DEBUG: Request URI = {requestUri}");
+                    loggerConfig.WriteTo.Http(
+                        requestUri: logitUrl,
+                        httpClient: logitHttpClient,  
+                        period: TimeSpan.FromSeconds(2),
+                        queueLimitBytes: 50_000_000,
+                        textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
+                        batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
+                        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug
+                    );
 
-                        loggerConfig.WriteTo.Http(
-                            requestUri: requestUri,
-                            period: TimeSpan.FromSeconds(2),
-                            queueLimitBytes: 50_000_000,
-                            textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
-                            batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
-                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug
-                        );
-
-                    }
-                    else
-                    {
-                        Console.WriteLine("⚠️ Logit URL set but no credentials found");
-                    }
+                    Console.WriteLine($"✅ Logit HTTP sink configured with custom client: {logitUrl}");
                 }
                 catch (Exception ex)
                 {
