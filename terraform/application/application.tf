@@ -80,7 +80,7 @@ module "application_configuration" {
     DsiConfiguration__TokenExpiryMinutes    = "60"
   }
   secret_variables = {
-    REDIS_CONNECTION_STRING =  "${module.redis-cache.hostname}:${module.redis-cache.ssl_port},password=${module.redis-cache.primary_access_key},ssl=True,abortConnect=False"
+    REDIS_CONNECTION_STRING =  module.redis-cache.url
     DATABASE_URL = module.postgres.url
     DsiConfiguration__ClientId     = data.azurerm_key_vault_secret.dsi_client_id.value
     DsiConfiguration__ClientSecret = data.azurerm_key_vault_secret.dsi_client_secret.value
