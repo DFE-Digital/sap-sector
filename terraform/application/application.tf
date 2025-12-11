@@ -64,7 +64,6 @@ module "application_configuration" {
     ENVIRONMENT_NAME = var.environment
     PGSSLMODE        = local.postgres_ssl_mode
 
-    DataProtection__KeyVaultKey = "$https://{key_vault_name}.vault.azure.net/keys/dataprotection"
     DsiConfiguration__ServiceName           = "SAP Sector Service"
     DsiConfiguration__ApiUri                = local.dsi_urls.api_uri
     DsiConfiguration__Authority             = local.dsi_urls.authority
@@ -80,7 +79,6 @@ module "application_configuration" {
     DsiConfiguration__TokenExpiryMinutes    = "60"
   }
   secret_variables = {
-    REDIS_CONNECTION_STRING =  module.redis-cache[0].url
     DATABASE_URL = module.postgres.url
     DsiConfiguration__ClientId     = data.azurerm_key_vault_secret.dsi_client_id.value
     DsiConfiguration__ClientSecret = data.azurerm_key_vault_secret.dsi_client_secret.value
