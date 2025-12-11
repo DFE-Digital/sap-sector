@@ -182,6 +182,7 @@ public class Program
                     .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
             }
 
+            Console.WriteLine($"✅ Data Protection: Shared volume ({redisConnection})");
         }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];

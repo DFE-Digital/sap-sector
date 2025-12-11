@@ -80,7 +80,7 @@ module "application_configuration" {
     DsiConfiguration__TokenExpiryMinutes    = "60"
   }
   secret_variables = {
-    REDIS_CONNECTION_STRING = module.redis-cache.url
+    REDIS_CONNECTION_STRING =  "${module.redis-cache.hostname}:${module.redis-cache.ssl_port},password=${module.redis-cache.primary_access_key},ssl=True,abortConnect=False"
     DATABASE_URL = module.postgres.url
     DsiConfiguration__ClientId     = data.azurerm_key_vault_secret.dsi_client_id.value
     DsiConfiguration__ClientSecret = data.azurerm_key_vault_secret.dsi_client_secret.value
@@ -111,17 +111,4 @@ module "web_application" {
   replicas     = var.replicas
 
   send_traffic_to_maintenance_page = var.send_traffic_to_maintenance_page
-}
-
-# temporarily to see what outputs are available
-output "debug_redis_outputs" {
-  value = {
-    uri			  = try(module.redis-cache.uri, "not available")
-    hostname           = try(module.redis-cache.hostname, "not available")
-    ssl_port          = try(module.redis-cache.ssl_port, "not available")
-    primary_key       = try(module.redis-cache.primary_access_key, "not available") 
-    url               = try(module.redis-cache.url, "not available")
-    connection_string = try(module.redis-cache.connection_string, "not available")
-  }
-  sensitive = true
 }
