@@ -112,3 +112,16 @@ module "web_application" {
 
   send_traffic_to_maintenance_page = var.send_traffic_to_maintenance_page
 }
+
+# temporarily to see what outputs are available
+output "debug_redis_outputs" {
+  value = {
+    uri			  = try(module.redis-cache.uri, "not available")
+    hostname           = try(module.redis-cache.hostname, "not available")
+    ssl_port          = try(module.redis-cache.ssl_port, "not available")
+    primary_key       = try(module.redis-cache.primary_access_key, "not available") 
+    url               = try(module.redis-cache.url, "not available")
+    connection_string = try(module.redis-cache.connection_string, "not available")
+  }
+  sensitive = true
+}
