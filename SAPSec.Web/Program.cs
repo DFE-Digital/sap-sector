@@ -11,6 +11,7 @@ using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
+using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
@@ -80,54 +81,6 @@ public class Program
             options.Cookie.Name = ".SAPSec.Session";
         });
 
-        builder.Host.UseSerilog((hostContext, services, loggerConfig) =>
-        {
-            loggerConfig.ReadFrom.Configuration(hostContext.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.WithProperty("Environment", hostContext.HostingEnvironment.EnvironmentName)
-                        .Enrich.WithProperty("Application", "SAPSec")
-                        .WriteTo.Console();
-
-            var logitUrl = hostContext.Configuration["LOGIT_HTTP_URL"];
-            var logitApiKey = hostContext.Configuration["LOGIT_API_KEY"];
-
-            if (!string.IsNullOrWhiteSpace(logitUrl))
-            {
-                try
-                {
-                    if (!string.IsNullOrEmpty(logitApiKey))
-                    {
-                        var requestUri = $"{logitUrl}?apikey={logitApiKey}";
-
-                        Console.WriteLine($"DEBUG: Request URI = {requestUri}");
-
-                        loggerConfig.WriteTo.Http(
-                            requestUri: requestUri,
-                            period: TimeSpan.FromSeconds(2),
-                            queueLimitBytes: 50_000_000,
-                            textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
-                            batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
-                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug
-                        );
-
-                    }
-                    else
-                    {
-                        Console.WriteLine("⚠️ Logit URL set but no credentials found");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"⚠️ Failed to configure Logit: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("ℹ️ Logit not configured - console logging only");
-            }
-        });
-
         builder.Services.Configure<CookiePolicyOptions>(options =>
         {
             options.CheckConsentNeeded = _ => false;
@@ -155,30 +108,6 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
-        {
-            builder.Services.AddDataProtection()
-                .UseEphemeralDataProtectionProvider()
-                .SetApplicationName("SAPSec");
-        }
-        else
-        {
-            var dataProtectionPath = builder.Environment.IsDevelopment()
-                                     ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                     : "/keys";
-            try
-            {
-                Directory.CreateDirectory(dataProtectionPath);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"WARNING: could not create DataProtection keys directory '{dataProtectionPath}': {ex.Message}");
-            }
-
-            builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-                .SetApplicationName("SAPSec");
-        }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         builder.Services.AddCoreDependencies();

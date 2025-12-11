@@ -44,9 +44,10 @@ data "azurerm_key_vault_secret" "logit_api_key" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
-
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
+
+  
 
   namespace              = var.namespace
   environment            = var.environment
@@ -85,8 +86,6 @@ module "application_configuration" {
     DsiConfiguration__ServiceId    = data.azurerm_key_vault_secret.dsi_service_id.value
     DFESignInSettings__SignInUri   = data.azurerm_key_vault_secret.sign_in_url.value
     DFESignInSettings__HelpUri     = data.azurerm_key_vault_secret.help_uri.value
-    LOGIT_HTTP_URL = data.azurerm_key_vault_secret.logit_http_url.value
-    LOGIT_API_KEY  = data.azurerm_key_vault_secret.logit_api_key.value
   }
 }
 
