@@ -88,8 +88,6 @@ module "application_configuration" {
     DsiConfiguration__ServiceId    = data.azurerm_key_vault_secret.dsi_service_id.value
     DFESignInSettings__SignInUri   = data.azurerm_key_vault_secret.sign_in_url.value
     DFESignInSettings__HelpUri     = data.azurerm_key_vault_secret.help_uri.value
-    LOGIT_HTTP_URL = data.azurerm_key_vault_secret.logit_http_url.value
-    LOGIT_API_KEY  = data.azurerm_key_vault_secret.logit_api_key.value
   }
 }
 

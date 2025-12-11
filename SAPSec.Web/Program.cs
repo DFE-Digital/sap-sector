@@ -81,54 +81,6 @@ public class Program
             options.Cookie.Name = ".SAPSec.Session";
         });
 
-        builder.Host.UseSerilog((hostContext, services, loggerConfig) =>
-        {
-            loggerConfig.ReadFrom.Configuration(hostContext.Configuration)
-                        .Enrich.FromLogContext()
-                        .Enrich.WithProperty("Environment", hostContext.HostingEnvironment.EnvironmentName)
-                        .Enrich.WithProperty("Application", "SAPSec")
-                        .WriteTo.Console();
-
-            var logitUrl = hostContext.Configuration["LOGIT_HTTP_URL"];
-            var logitApiKey = hostContext.Configuration["LOGIT_API_KEY"];
-
-            if (!string.IsNullOrWhiteSpace(logitUrl))
-            {
-                try
-                {
-                    if (!string.IsNullOrEmpty(logitApiKey))
-                    {
-                        var requestUri = $"{logitUrl}?apikey={logitApiKey}";
-
-                        Console.WriteLine($"DEBUG: Request URI = {requestUri}");
-
-                        loggerConfig.WriteTo.Http(
-                            requestUri: requestUri,
-                            period: TimeSpan.FromSeconds(2),
-                            queueLimitBytes: 50_000_000,
-                            textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
-                            batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
-                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning
-                        );
-
-                    }
-                    else
-                    {
-                        Console.WriteLine("⚠️ Logit URL set but no credentials found");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"⚠️ Failed to configure Logit: {ex.Message}");
-                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
-                }
-            }
-            else
-            {
-                Console.WriteLine("ℹ️ Logit not configured - console logging only");
-            }
-        });
-
         builder.Services.Configure<CookiePolicyOptions>(options =>
         {
             options.CheckConsentNeeded = _ => false;
@@ -174,6 +126,7 @@ public class Program
         else
         {
             var redisConnection = builder.Configuration["REDIS_CONNECTION_STRING"];
+            Console.WriteLine($"✅ Data Protection: Shared volume ({redisConnection})");
             if (!string.IsNullOrEmpty(redisConnection))
             {
                 var redis = ConnectionMultiplexer.Connect(redisConnection);
