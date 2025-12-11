@@ -107,7 +107,7 @@ public class Program
                             queueLimitBytes: 50_000_000,
                             textFormatter: new Serilog.Formatting.Compact.RenderedCompactJsonFormatter(),
                             batchFormatter: new Serilog.Sinks.Http.BatchFormatters.ArrayBatchFormatter(),
-                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Debug
+                            restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Warning
                         );
 
                     }
@@ -161,23 +161,24 @@ public class Program
                 .UseEphemeralDataProtectionProvider()
                 .SetApplicationName("SAPSec");
         }
-        else
+        else if (builder.Environment.IsDevelopment())
         {
-            var dataProtectionPath = builder.Environment.IsDevelopment()
-                                     ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                     : "/keys";
-            try
-            {
-                Directory.CreateDirectory(dataProtectionPath);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"WARNING: could not create DataProtection keys directory '{dataProtectionPath}': {ex.Message}");
-            }
+            var localPath = Path.Combine(Path.GetTempPath(), "SAPSec-Keys");
+            Directory.CreateDirectory(localPath);
 
             builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
+                .PersistKeysToFileSystem(new DirectoryInfo(localPath))
                 .SetApplicationName("SAPSec");
+        }
+        else
+        {
+            var keysPath = "/mnt/dataprotection";
+
+            builder.Services.AddDataProtection()
+                .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
+                .SetApplicationName("SAPSec");
+
+            Console.WriteLine($"✅ Data Protection: Shared volume ({keysPath})");
         }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];

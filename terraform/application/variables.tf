@@ -103,6 +103,11 @@ locals {
   postgres_ssl_mode = var.enable_postgres_ssl ? "require" : "disable"
 
 }
+variable "azure_location" {
+  description = "Azure region"
+  type        = string
+  default     = "UK South"
+}
 
 variable "enable_logit" { default = true }
 
