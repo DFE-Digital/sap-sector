@@ -108,35 +108,6 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
-        {
-            builder.Services.AddDataProtection()
-                .UseEphemeralDataProtectionProvider()
-                .SetApplicationName("SAPSec");
-        }
-        else if (builder.Environment.IsDevelopment())
-        {
-            var localPath = Path.Combine(Path.GetTempPath(), "SAPSec-Keys");
-            Directory.CreateDirectory(localPath);
-
-            builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(localPath))
-                .SetApplicationName("SAPSec");
-        }
-        else
-        {
-            var redisConnection = builder.Configuration["REDIS_CONNECTION_STRING"];
-            Console.WriteLine($"✅ Data Protection: Shared volume ({redisConnection})");
-            if (!string.IsNullOrEmpty(redisConnection))
-            {
-                var redis = ConnectionMultiplexer.Connect(redisConnection);
-                builder.Services.AddDataProtection()
-                    .SetApplicationName("SAPSec")
-                    .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
-            }
-
-            Console.WriteLine($"✅ Data Protection: Shared volume ({redisConnection})");
-        }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         builder.Services.AddCoreDependencies();
