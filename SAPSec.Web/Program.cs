@@ -11,6 +11,7 @@ using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
+using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
@@ -172,13 +173,15 @@ public class Program
         }
         else
         {
-            var keysPath = "/mnt/dataprotection";
+            var redisConnection = builder.Configuration["REDIS_CONNECTION_STRING"];
+            if (!string.IsNullOrEmpty(redisConnection))
+            {
+                var redis = ConnectionMultiplexer.Connect(redisConnection);
+                builder.Services.AddDataProtection()
+                    .SetApplicationName("SAPSec")
+                    .PersistKeysToStackExchangeRedis(redis, "DataProtection-Keys");
+            }
 
-            builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(keysPath))
-                .SetApplicationName("SAPSec");
-
-            Console.WriteLine($"✅ Data Protection: Shared volume ({keysPath})");
         }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];

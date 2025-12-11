@@ -44,45 +44,10 @@ data "azurerm_key_vault_secret" "logit_api_key" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
-# Create storage account for shared data protection keys
-resource "azurerm_storage_account" "dataprotection" {
-  name                     = "${var.azure_resource_prefix}${var.service_short}keys${var.environment}"
-  resource_group_name      = local.resource_group_name
-  location                 = var.azure_location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version          = "TLS1_2"
-  
-  # Security
-  allow_nested_items_to_be_public = false
-  
-  tags = {
-    Environment = var.environment
-    Purpose     = "DataProtection"
-  }
-}
-
-resource "azurerm_storage_share" "dataprotection" {
-  name                 = "dataprotection-keys"
-  storage_account_name = azurerm_storage_account.dataprotection.name
-  quota                = 1 
-}
-
-# Create Kubernetes secret with storage credentials
-resource "kubernetes_secret" "dataprotection_storage" {
-  metadata {
-    name      = "dataprotection-storage"
-    namespace = var.namespace
-  }
-
-  data = {
-    azurestorageaccountname = azurerm_storage_account.dataprotection.name
-    azurestorageaccountkey  = azurerm_storage_account.dataprotection.primary_access_key
-  }
-}
-
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
+
+  
 
   namespace              = var.namespace
   environment            = var.environment
@@ -99,6 +64,7 @@ module "application_configuration" {
     ENVIRONMENT_NAME = var.environment
     PGSSLMODE        = local.postgres_ssl_mode
 
+    DataProtection__KeyVaultKey = "$https://{key_vault_name}.vault.azure.net/keys/dataprotection"
     DsiConfiguration__ServiceName           = "SAP Sector Service"
     DsiConfiguration__ApiUri                = local.dsi_urls.api_uri
     DsiConfiguration__Authority             = local.dsi_urls.authority
@@ -114,6 +80,7 @@ module "application_configuration" {
     DsiConfiguration__TokenExpiryMinutes    = "60"
   }
   secret_variables = {
+    REDIS_CONNECTION_STRING = module.redis-cache.url
     DATABASE_URL = module.postgres.url
     DsiConfiguration__ClientId     = data.azurerm_key_vault_secret.dsi_client_id.value
     DsiConfiguration__ClientSecret = data.azurerm_key_vault_secret.dsi_client_secret.value
@@ -144,23 +111,4 @@ module "web_application" {
   replicas     = var.replicas
 
   send_traffic_to_maintenance_page = var.send_traffic_to_maintenance_page
-
-  volumes = [
-    {
-      name = "dataprotection-keys"
-      azure_file = {
-        secret_name = kubernetes_secret.dataprotection_storage.metadata[0].name
-        share_name  = azurerm_storage_share.dataprotection.name
-        read_only   = false
-      }
-    }
-  ]
-  
-  volume_mounts = [
-    {
-      name       = "dataprotection-keys"
-      mount_path = "/mnt/dataprotection"
-      read_only  = false
-    }
-  ]
 }

@@ -58,8 +58,6 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN mkdir -p /mnt/dataprotection
-
 ENV ASPNETCORE_URLS=http://+:3000
 
 COPY --from=publish /app/publish .
