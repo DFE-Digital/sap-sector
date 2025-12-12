@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using SAPSec.Core;
@@ -8,13 +9,14 @@ using SAPSec.Infrastructure;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
+using Serilog;
 using SmartBreadcrumbs.Extensions;
+using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Localization;
 
 namespace SAPSec.Web;
 
@@ -51,7 +53,7 @@ public class Program
             options.KnownProxies.Clear();
         });
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" )
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -74,7 +76,7 @@ public class Program
             options.IdleTimeout = TimeSpan.FromHours(1);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.Name = ".SAPSec.Session";
         });
@@ -83,7 +85,7 @@ public class Program
         {
             options.CheckConsentNeeded = _ => false;
             options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            options.Secure = CookieSecurePolicy.Always;
+            options.Secure = CookieSecurePolicy.SameAsRequest;
         });
 
         builder.Services.AddLogging(logging =>
@@ -106,30 +108,6 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
-        {
-            builder.Services.AddDataProtection()
-                .UseEphemeralDataProtectionProvider()
-                .SetApplicationName("SAPSec");
-        }
-        else
-        {
-            var dataProtectionPath = builder.Environment.IsDevelopment()
-                                     ? Path.Combine(Path.GetTempPath(), "SAPSec-Test-Keys")
-                                     : "/keys";
-            try
-            {
-                Directory.CreateDirectory(dataProtectionPath);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"WARNING: could not create DataProtection keys directory '{dataProtectionPath}': {ex.Message}");
-            }
-
-            builder.Services.AddDataProtection()
-                .PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath))
-                .SetApplicationName("SAPSec");
-        }
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         builder.Services.AddCoreDependencies();
@@ -150,9 +128,9 @@ public class Program
 
         app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
 
-        
+
         app.UseMiddleware<SecurityHeadersMiddleware>();
-        
+
 
         app.UseHttpsRedirection();
 
@@ -167,7 +145,7 @@ public class Program
         };
 
         var wwwrootPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot");
-        if(!Directory.Exists(wwwrootPath)) Console.WriteLine( $"WARNING: wwwroot directory not found at {wwwrootPath}");
+        if (!Directory.Exists(wwwrootPath)) Console.WriteLine($"WARNING: wwwroot directory not found at {wwwrootPath}");
 
         app.UseStaticFiles(new StaticFileOptions
         {
