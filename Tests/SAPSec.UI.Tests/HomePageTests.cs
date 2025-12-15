@@ -262,9 +262,11 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
         for (var i = 0; i < count; i++)
         {
             var link = links.Nth(i);
+            var href = await link.GetAttributeAsync("href") ?? "unknown";
             var hasDiscernibleText = await HasAccessibleName(link);
 
-            hasDiscernibleText.Should().BeTrue($"Link {i + 1} should have discernible text");
+            hasDiscernibleText.Should().BeTrue(
+                $"Link {i + 1} (href='{href}') should have discernible text");
         }
     }
 
@@ -379,11 +381,20 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
     {
         await NavigateToHomePage();
 
-        var nav = Page.Locator("nav");
-        if (await nav.CountAsync() > 0)
+        var navElements = Page.Locator("nav");
+        var count = await navElements.CountAsync();
+
+        if (count == 0) return;
+
+        // Analyze each nav element individually
+        for (var i = 0; i < count; i++)
         {
-            var result = await AnalyzeElementAccessibility("nav");
-            AssertNoViolations(result);
+            var nav = navElements.Nth(i);
+            var result = await nav.RunAxe();
+
+            var violations = result.Violations;
+            violations.Should().BeEmpty(
+                $"Navigation element {i + 1} should have no accessibility violations");
         }
     }
 
@@ -413,8 +424,23 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
 
     private async Task<AxeResult> AnalyzeElementAccessibility(string selector)
     {
-        var locator = Page.Locator(selector);
+        var locator = Page.Locator(selector).First;
         return await locator.RunAxe();
+    }
+
+    private async Task AnalyzeAllElementsAccessibility(string selector, string elementDescription)
+    {
+        var elements = Page.Locator(selector);
+        var count = await elements.CountAsync();
+
+        for (var i = 0; i < count; i++)
+        {
+            var element = elements.Nth(i);
+            var result = await element.RunAxe();
+
+            result.Violations.Should().BeEmpty(
+                $"{elementDescription} {i + 1} should have no accessibility violations");
+        }
     }
 
     private static void AssertNoViolations(AxeResult result)
@@ -448,15 +474,41 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
 
     private static async Task<bool> HasAccessibleName(ILocator element)
     {
+        // Check direct text content
         var text = await element.TextContentAsync();
-        var ariaLabel = await element.GetAttributeAsync("aria-label");
-        var ariaLabelledBy = await element.GetAttributeAsync("aria-labelledby");
-        var title = await element.GetAttributeAsync("title");
+        if (!string.IsNullOrWhiteSpace(text)) return true;
 
-        return !string.IsNullOrWhiteSpace(text) ||
-               !string.IsNullOrWhiteSpace(ariaLabel) ||
-               !string.IsNullOrWhiteSpace(ariaLabelledBy) ||
-               !string.IsNullOrWhiteSpace(title);
+        // Check aria-label
+        var ariaLabel = await element.GetAttributeAsync("aria-label");
+        if (!string.IsNullOrWhiteSpace(ariaLabel)) return true;
+
+        // Check aria-labelledby
+        var ariaLabelledBy = await element.GetAttributeAsync("aria-labelledby");
+        if (!string.IsNullOrWhiteSpace(ariaLabelledBy)) return true;
+
+        // Check title attribute
+        var title = await element.GetAttributeAsync("title");
+        if (!string.IsNullOrWhiteSpace(title)) return true;
+
+        // Check for nested image with alt text
+        var img = element.Locator("img[alt]");
+        var imgCount = await img.CountAsync();
+        if (imgCount > 0)
+        {
+            var alt = await img.First.GetAttributeAsync("alt");
+            if (!string.IsNullOrWhiteSpace(alt)) return true;
+        }
+
+        // Check for visually hidden text (screen reader only)
+        var srOnly = element.Locator(".govuk-visually-hidden, .sr-only, .visually-hidden");
+        var srCount = await srOnly.CountAsync();
+        if (srCount > 0)
+        {
+            var srText = await srOnly.First.TextContentAsync();
+            if (!string.IsNullOrWhiteSpace(srText)) return true;
+        }
+
+        return false;
     }
 
     #endregion
