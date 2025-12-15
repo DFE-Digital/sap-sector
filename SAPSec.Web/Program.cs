@@ -9,6 +9,7 @@ using SAPSec.Infrastructure;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
+using SAPSec.Web.Setup;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
 using StackExchange.Redis;
@@ -52,6 +53,8 @@ public class Program
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
         });
+
+        builder.AddDataProtectionServices();
 
         if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
         {
