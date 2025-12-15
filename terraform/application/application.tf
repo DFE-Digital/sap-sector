@@ -34,9 +34,20 @@ data "azurerm_key_vault_secret" "help_uri" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
+data "azurerm_key_vault_secret" "logit_http_url" {
+  name         = "LogitHttpUrl"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
+data "azurerm_key_vault_secret" "logit_api_key" {
+  name         = "LogitApiKey"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
 
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
+
+  
 
   namespace              = var.namespace
   environment            = var.environment

@@ -79,7 +79,7 @@ public static class DsiAuthenticationExtensions
     {
         options.Cookie.Name = CookieSettings.Name;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(config.TokenExpiryMinutes);
         options.SlidingExpiration = true;

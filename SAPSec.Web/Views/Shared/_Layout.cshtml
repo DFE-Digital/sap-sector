@@ -35,17 +35,17 @@
 <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 @await Component.InvokeAsync("Cookies")
 <header class="govuk-header" data-module="govuk-header">
-    <div class="govuk-header__container govuk-width-container">
-        <div class="govuk-header__logo">
-            <a href="/" class="govuk-header__link govuk-header__link--homepage">
-                <img src="~/assets/images/department-for-education_white.png"
-                     alt="Department for Education"
-                     class="govuk-header__logotype" />
-            </a>
-        </div>
-            <div class="govuk-header__content"> </div>
-            <div class="govuk-header__content">
-                @if (User.Identity is { IsAuthenticated: true })
+<div class="govuk-header__container govuk-width-container">
+    <div class="govuk-header__logo">
+        <a href="/" class="govuk-header__link govuk-header__link--homepage">
+            <img src="~/assets/images/department-for-education_white.png"
+                 alt="Department for Education"
+                 class="govuk-header__logotype" />
+        </a>
+    </div>
+    <div class="header-right-wrapper">
+        <div class="govuk-header__content">
+            @if (User.Identity is { IsAuthenticated: true })
             {
                 <nav aria-label="Account navigation">
                     <ul class="govuk-header__navigation">
@@ -58,10 +58,9 @@
                     </ul>
                 </nav>
             }
-                               
-            </div>
+        </div>
     </div>
-       
+</div>       
 </header>
     <section aria-label="Service information" class="govuk-service-navigation" data-module="govuk-service-navigation">
         <div class="govuk-width-container">
@@ -190,6 +189,11 @@
 </footer>
 <script type="module" src="/js/dfefrontend.js" asp-append-version="true"></script>
 <script type="module" src="/js/govuk-frontend.min.js"></script>
+
+<script type="module" add-nonce="true">
+  import { initAll } from '/js/govuk-frontend.min.js'
+  initAll()
+</script>
 
 <script add-nonce="true">
     document.getElementById("js-back-link")?.addEventListener('click', function (ev) {
