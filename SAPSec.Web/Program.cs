@@ -1,22 +1,18 @@
 ﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
+using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
-using Serilog;
 using SmartBreadcrumbs.Extensions;
-using StackExchange.Redis;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Localization;
-using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Web;
 
