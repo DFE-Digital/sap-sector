@@ -98,6 +98,11 @@ variable "replicas" {
   default     = 1
   description = "Number of replicas for the application deployment"
 }
+variable "storage_container_delete_retention_days" {
+  type        = number
+  default     = null
+  description = "Number of days to retain deleted containers"
+}
 
 locals {
   postgres_ssl_mode = var.enable_postgres_ssl ? "require" : "disable"
