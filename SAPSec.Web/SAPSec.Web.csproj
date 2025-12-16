@@ -30,9 +30,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
-     <None Include="..\SAPSec.Infrastructure\Data\Establishments.csv" Link="Data\Establishments.csv">
-    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-  </None>
   </ItemGroup>
+  
+	<ItemGroup>
+		<None Include="..\SAPSec.Infrastructure\Data\Establishments.csv" Link="Data\Establishments.csv">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		</ItemGroup>
     
 </Project>
