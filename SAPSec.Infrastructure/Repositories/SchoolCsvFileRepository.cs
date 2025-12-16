@@ -4,9 +4,32 @@ using SAPSec.Infrastructure.Interfaces;
 
 namespace SAPSec.Infrastructure.Repositories;
 
-public class SchoolCsvFileRepository(string csvPath) : ISchoolRepository
+public class SchoolCsvFileRepository: ISchoolRepository
 {
+    private readonly string _csvPath;
     private IList<School>? _schools;
+
+    public SchoolCsvFileRepository(string csvPath)
+    {
+        if (string.IsNullOrWhiteSpace(csvPath))
+        {
+            _csvPath = string.Empty;
+            return;
+        }
+        var fullPath = Path.GetFullPath(csvPath);
+        if (File.Exists(fullPath))
+        {
+            _csvPath = fullPath;
+            return;
+        }
+        fullPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, csvPath));
+        if (File.Exists(fullPath))
+        {
+            _csvPath = fullPath;
+            return;
+        }
+        _csvPath = csvPath;
+    }
 
     public IList<School> GetAll()
     {
@@ -31,9 +54,9 @@ public class SchoolCsvFileRepository(string csvPath) : ISchoolRepository
 
     private List<School> ParseEstablishments()
     {
-        if (string.IsNullOrWhiteSpace(csvPath) || !File.Exists(csvPath)) return [];
+        if (string.IsNullOrWhiteSpace(_csvPath) || !File.Exists(_csvPath)) return [];
 
-        var sepReader = Sep.Reader(o => o with { HasHeader = true, Unescape = true, DisableColCountCheck = true }).FromFile(csvPath);
+        var sepReader = Sep.Reader(o => o with { HasHeader = true, Unescape = true, DisableColCountCheck = true }).FromFile(_csvPath);
 
         return sepReader.Enumerate((SepReader.Row row, out School school) =>
         {
