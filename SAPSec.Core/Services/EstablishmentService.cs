@@ -43,7 +43,6 @@ namespace SAPSec.Core.Services
                 establishment.PhaseOfEducationName = GetLookupByCode(allLookups, "PhaseOfEducation", establishment.PhaseOfEducationId);
                 establishment.GenderName = GetLookupByCode(allLookups, "Gender", establishment.GenderId);
                 establishment.ReligiousCharacterName = GetLookupByCode(allLookups, "ReligiousCharacter", establishment.ReligiousCharacterId);
-                establishment.ResourcedProvisionName = GetLookupByCode(allLookups, "ResourcedProvision", establishment.ResourcedProvision);
                 establishment.UrbanRuralName = GetLookupByCode(allLookups, "UrbanRural", establishment.UrbanRuralId);
                 establishment.TrustName = GetLookupByCode(allLookups, "Trusts", establishment.TrustsId);
                 establishment.LANAme = GetLookupByCode(allLookups, "LA", establishment.LAId);
@@ -65,7 +64,6 @@ namespace SAPSec.Core.Services
                 establishment.PhaseOfEducationName = GetLookupByCode(allLookups, "PhaseOfEducation", establishment.PhaseOfEducationId);
                 establishment.GenderName = GetLookupByCode(allLookups, "Gender", establishment.GenderId);
                 establishment.ReligiousCharacterName = GetLookupByCode(allLookups, "ReligiousCharacter", establishment.ReligiousCharacterId);
-                establishment.ResourcedProvisionName = GetLookupByCode(allLookups, "ResourcedProvision", establishment.ResourcedProvision);
                 establishment.UrbanRuralName = GetLookupByCode(allLookups, "UrbanRural", establishment.UrbanRuralId);
                 establishment.TrustName = GetLookupByCode(allLookups, "Trusts", establishment.TrustsId);
                 establishment.LANAme = GetLookupByCode(allLookups, "LA", establishment.LAId);

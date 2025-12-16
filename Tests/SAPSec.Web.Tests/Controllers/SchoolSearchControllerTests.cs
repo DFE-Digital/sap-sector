@@ -20,18 +20,18 @@ public class SchoolSearchControllerTests
     private static Establishment FakeEstablishment1 = new()
     {
         URN = "123456",
-        UKPRN = 10,
-        LAId = 100,
-        EstablishmentNumber = 1,
+        UKPRN = "10",
+        LAId = "100",
+        EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment One"
     };
 
     private static Establishment FakeEstablishment2 = new()
     {
         URN = "789456",
-        UKPRN = 10,
-        LAId = 100,
-        EstablishmentNumber = 1,
+        UKPRN = "10",
+        LAId = "100",
+        EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment Two"
     };
 
@@ -335,9 +335,9 @@ public class SchoolSearchControllerTests
         var returnEst = new Establishment
         {
             URN = "100273",
-            UKPRN = 10,
-            LAId = 100,
-            EstablishmentNumber = 1,
+            UKPRN = "10",
+            LAId = "100",
+            EstablishmentNumber = "1",
             EstablishmentName = query
         };
 
@@ -383,7 +383,7 @@ public class SchoolSearchControllerTests
             Urn = "123456"
         };
         _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
-            .Returns(new Establishment { URN = "123456", UKPRN = 10, LAId = 100, EstablishmentNumber = 1, EstablishmentName = "School by Urn" });
+            .Returns(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
 
         var result = _controller.Search(viewModel);
 
@@ -630,8 +630,8 @@ public class SchoolSearchControllerTests
             Urn = "123456"
         };
 
-        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
-            .Returns(new Establishment { URN = "123456", UKPRN = 10, LAId = 100, EstablishmentNumber = 1, EstablishmentName = "School by Urn" });
+        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))  
+            .Returns(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
 
         var result = _controller.Search(viewModel);
 
@@ -664,7 +664,7 @@ public class SchoolSearchControllerTests
         var query = "Unique School";
         var searchResults = new List<EstablishmentSearchResult>
         {
-            new EstablishmentSearchResult("Unique School", new Establishment{ URN = "999999", UKPRN = 10, LAId = 100, EstablishmentNumber = 1, EstablishmentName = "Unique School" })
+            new EstablishmentSearchResult("Unique School", new Establishment{ URN = "999999", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "Unique School" })
         };
 
         _mockSearchService.Setup(s => s.SearchAsync(query))

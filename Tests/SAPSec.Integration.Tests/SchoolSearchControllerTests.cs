@@ -143,8 +143,8 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     {
         var formData = new Dictionary<string, string>
         {
-            { "Query", "100" },
-            { "Urn", "100" }
+            { "Query", "138361" },
+            { "Urn", "138361" }
         };
         var content = new FormUrlEncodedContent(formData);
 
@@ -152,7 +152,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/100");
+        response.Headers.Location!.ToString().Should().Contain("/school/138361");
     }
 
     [Fact]
@@ -161,7 +161,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         var formData = new Dictionary<string, string>
         {
             { "Query", "school" },
-            { "Urn", "100" }
+            { "Urn", "138361" }
         };
         var content = new FormUrlEncodedContent(formData);
 
@@ -169,7 +169,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/100");
+        response.Headers.Location!.ToString().Should().Contain("/school/138361");
     }
 
     #endregion
@@ -258,7 +258,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithSingle_Match_RedirectsToSchoolDetails()
     {
-        var response = await fixture.NonRedirectingClient.GetAsync("/school/search?query=Henrietta%20Barnett");
+        var response = await fixture.NonRedirectingClient.GetAsync("/school/search?query=Notre%20Dame%20High%20School");
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
     }

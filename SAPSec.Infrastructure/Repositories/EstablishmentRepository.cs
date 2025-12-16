@@ -37,7 +37,7 @@ namespace SAPSec.Infrastructure.Repositories
 
         public Establishment GetEstablishmentByAnyNumber(string number)
         {
-            return GetAllEstablishments().FirstOrDefault(x => x.URN == number || x.UKPRN == int.Parse(number) || x.DfENumberSearchable == number) ?? new Establishment();
+            return GetAllEstablishments().FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.DfENumberSearchable == number) ?? new Establishment();
         }
     }
 }

@@ -12,25 +12,25 @@ public class LuceneIndexReaderTests
     private Establishment FakeEstablishmentOne = new()
     {
         URN = "1",
-        UKPRN = 2,
-        LAId = 3,
-        EstablishmentNumber = 4,
+        UKPRN = "2",
+        LAId = "3",
+        EstablishmentNumber = "4",
         EstablishmentName = "Fake School One"
     };
     private Establishment FakeEstablishmentTwo = new()
     {
         URN = "10",
-        UKPRN = 20,
-        LAId = 30,
-        EstablishmentNumber = 40,
+        UKPRN = "20",
+        LAId = "30",
+        EstablishmentNumber = "40",
         EstablishmentName = "Fake School Two"
     };
     private Establishment FakeEstablishmentThree = new()
     {
         URN = "15",
-        UKPRN = 25,
-        LAId = 35,
-        EstablishmentNumber = 45,
+        UKPRN = "25",
+        LAId = "35",
+        EstablishmentNumber = "45",
         EstablishmentName = "Saint Fake School Three"
     };
 
