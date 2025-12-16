@@ -7,6 +7,8 @@ using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
+using SAPSec.Web.Setup;
+using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -48,6 +50,8 @@ public class Program
             options.KnownNetworks.Clear();
             options.KnownProxies.Clear();
         });
+
+        builder.AddDataProtectionServices();
 
         if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
         {
@@ -130,7 +134,7 @@ public class Program
         }
         app.UseForwardedHeaders();
 
-        app.UseStatusCodePagesWithReExecute("/Home/StatusCode", "?code={0}");
+        app.UseStatusCodePagesWithReExecute("/error/{0}");
 
 
         app.UseMiddleware<SecurityHeadersMiddleware>();
