@@ -8,7 +8,6 @@ using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using SAPSec.Web.Setup;
-using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;

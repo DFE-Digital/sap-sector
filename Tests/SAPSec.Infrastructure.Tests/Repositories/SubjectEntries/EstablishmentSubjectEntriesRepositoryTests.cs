@@ -30,8 +30,8 @@ namespace SAPSec.Infrastructure.Tests.Repositories.SubjectEntries
             // Arrange
             var expected = new List<EstablishmentSubjectEntries>
             {
-                new EstablishmentSubjectEntries { Id = "1", Bio49_Sum_Est_Current_Num= 99.99 },
-                new EstablishmentSubjectEntries { Id = "2", Bio49_Sum_Est_Current_Num = 88.88 }
+                new EstablishmentSubjectEntries { Id = "1", Bio4_Sum_Est_Current_Num= 99.99 },
+                new EstablishmentSubjectEntries { Id = "2", Bio4_Sum_Est_Current_Num = 88.88 }
             };
             _mockGenericRepo.Setup(r => r.ReadAll()).Returns(expected);
 
@@ -65,7 +65,7 @@ namespace SAPSec.Infrastructure.Tests.Repositories.SubjectEntries
         public void GetEstablishmentSubjectEntries_ReturnsCorrectItemWhenUrnExists()
         {
             // Arrange
-            var expected = new EstablishmentSubjectEntries { Id = "1", Bio49_Sum_Est_Current_Num = 99.99 };
+            var expected = new EstablishmentSubjectEntries { Id = "1", Bio4_Sum_Est_Current_Num = 99.99 };
             _mockGenericRepo.Setup(r => r.ReadAll()).Returns(new[] { expected });
 
             // Act
@@ -74,7 +74,7 @@ namespace SAPSec.Infrastructure.Tests.Repositories.SubjectEntries
             // Assert
             Assert.NotNull(result);
             Assert.Equal("1", result.Id);
-            Assert.Equal(99.99, result.Bio49_Sum_Est_Current_Num);
+            Assert.Equal(99.99, result.Bio4_Sum_Est_Current_Num);
             _mockGenericRepo.Verify(r => r.ReadAll(), Times.Once);
         }
 

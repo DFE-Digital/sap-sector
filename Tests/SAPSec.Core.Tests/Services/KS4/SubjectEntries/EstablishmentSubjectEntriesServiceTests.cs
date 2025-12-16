@@ -28,8 +28,8 @@ namespace SAPSec.Core.Tests.Services.KS4.SubjectEntries
             // Arrange
             var expectedSubjectEntriess = new List<EstablishmentSubjectEntries>
         {
-            new EstablishmentSubjectEntries { Id = "100",  Bio49_Sum_Est_Current_Num = 99.99},
-            new EstablishmentSubjectEntries { Id = "101", Bio49_Sum_Est_Current_Num = 90.00}
+            new EstablishmentSubjectEntries { Id = "100",  Bio4_Sum_Est_Current_Num = 99.99},
+            new EstablishmentSubjectEntries { Id = "101", Bio4_Sum_Est_Current_Num = 90.00}
         };
 
             _mockRepo.Setup(r => r.GetAllEstablishmentSubjectEntries())
@@ -41,8 +41,8 @@ namespace SAPSec.Core.Tests.Services.KS4.SubjectEntries
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
-            Assert.Contains(result, a => a.Bio49_Sum_Est_Current_Num == 99.99);
-            Assert.Contains(result, a => a.Bio49_Sum_Est_Current_Num == 90.00);
+            Assert.Contains(result, a => a.Bio4_Sum_Est_Current_Num == 99.99);
+            Assert.Contains(result, a => a.Bio4_Sum_Est_Current_Num == 90.00);
         }
 
         [Fact]
@@ -66,7 +66,7 @@ namespace SAPSec.Core.Tests.Services.KS4.SubjectEntries
         {
             // Arrange
             var urn = "100";
-            var expectedSubjectEntries = new EstablishmentSubjectEntries { Id = urn, Bio49_Sum_Est_Current_Num = 100 };
+            var expectedSubjectEntries = new EstablishmentSubjectEntries { Id = urn, Bio4_Sum_Est_Current_Num = 100 };
 
             _mockRepo.Setup(r => r.GetEstablishmentSubjectEntries(urn))
                      .Returns(expectedSubjectEntries);
@@ -77,7 +77,7 @@ namespace SAPSec.Core.Tests.Services.KS4.SubjectEntries
             // Assert
             Assert.NotNull(result);
             Assert.Equal(urn, result.Id);
-            Assert.Equal(100, result.Bio49_Sum_Est_Current_Num);
+            Assert.Equal(100, result.Bio4_Sum_Est_Current_Num);
         }
 
         [Fact]
@@ -92,7 +92,7 @@ namespace SAPSec.Core.Tests.Services.KS4.SubjectEntries
             var result = _service.GetEstablishmentSubjectEntries(urn);
 
             // Assert
-            Assert.Null(result.Bio49_Sum_Est_Current_Num);
+            Assert.Null(result.Bio4_Sum_Est_Current_Num);
         }
 
         [Fact]
