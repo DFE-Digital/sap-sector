@@ -1,0 +1,110 @@
+﻿@model SAPSec.Web.ViewModels.SchoolSearchFilterViewModel
+
+<div class="govuk-grid-column-one-third">
+    <form method="get" action="@Url.Action("Search", "SchoolSearch")">
+        <input type="hidden" name="query" value="@Model.Query" />
+
+        <div class="moj-filter" data-module="moj-filter">
+            <div class="moj-filter__header">
+                <div class="moj-filter__header-title">
+                    <h2 class="govuk-heading-m">Filter</h2>
+                </div>
+            </div>
+
+            <div class="moj-filter__content">
+                @if (Model.SelectedLocalAuthorities?.Any() == true)
+                {
+                    <div class="moj-filter__selected">
+                        <div class="moj-filter__selected-heading">
+                            <div class="moj-filter__heading-title">
+                                <h2 class="govuk-heading-m">Selected filters</h2>
+                            </div>
+                            <div class="moj-filter__heading-action">
+                                <p>
+                                    <a class="govuk-link govuk-link--no-visited-state"
+                                       href="@Url.Action("Search", "SchoolSearch", new { query = Model.Query })">
+                                        Clear filters
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Local authority</h3>
+                        <ul class="moj-filter-tags">
+                            @foreach (var la in Model.SelectedLocalAuthorities)
+                            {
+                                var remainingFilters = Model.SelectedLocalAuthorities.Where(x => x != la).ToArray();
+                                var removeUrl = Url.Action("Search", "SchoolSearch", new
+                                {
+                                    query = Model.Query,
+                                    localAuthorities = remainingFilters
+                                });
+                                <li>
+                                    <a class="moj-filter__tag" href="@removeUrl">
+                                        <span class="govuk-visually-hidden">Remove this filter</span> @la
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <div class="moj-filter__options">
+                    <button type="submit" class="govuk-button" data-module="govuk-button">
+                        Apply filters
+                    </button>
+
+                    @if (Model.LocalAuthorities.Any())
+                    {
+                        <div class="govuk-form-group">
+                            <fieldset class="govuk-fieldset">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                    Location
+                                </legend>
+
+                                <!-- Collapsible filter section -->
+                                <div class="app-filter-section" data-module="app-filter-section">
+                                    <button type="button"
+                                            class="app-filter-section__toggle"
+                                            aria-expanded="true"
+                                            aria-controls="filter-local-authority">
+                                        <span class="app-filter-section__title">Local authority</span>
+                                        <span class="app-filter-section__indicator">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M11.9999 10.5177L17.7928 16.3105L19.207 14.8963L11.9999 7.68923L4.79282 14.8963L6.20703 16.3105L11.9999 10.5177Z" fill="currentColor"></path>
+                                            </svg>
+                                        </span>
+                                    </button>
+
+                                    <div class="app-filter-section__content" id="filter-local-authority">
+                                        <p class="govuk-hint govuk-!-margin-bottom-2">
+                                            Local authority in England where the school is located
+                                        </p>
+                                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                            @foreach (var la in Model.LocalAuthorities)
+                                            {
+                                                var isChecked = Model.SelectedLocalAuthorities?.Contains(la) == true;
+                                                var inputId = $"la-{la.Replace(" ", "-").Replace("(", "").Replace(")", "").ToLower()}";
+                                                <div class="govuk-checkboxes__item">
+                                                    <input class="govuk-checkboxes__input"
+                                                           id="@inputId"
+                                                           name="localAuthorities"
+                                                           type="checkbox"
+                                                           value="@la"
+                                                           @(isChecked ? "checked" : "")>
+                                                    <label class="govuk-label govuk-checkboxes__label" for="@inputId">
+                                                        @la
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -11,16 +11,19 @@
 })
 
 
-<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
-
 <div class="govuk-grid-row">
+    @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
+        {
+        Query = Model.Query,
+        LocalAuthorities = Model.LocalAuthorities,
+        SelectedLocalAuthorities = Model.SelectedLocalAuthorities
+        })
     <div class="govuk-grid-column-two-thirds">
         @if (Model.Results.Length == 0)
         {
             <p id="search-warning" class="govuk-body-s govuk-!-margin-top-1">
                 We couldn't find any schools matching your search criteria.
             </p>
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-6">
         }
         else
         {

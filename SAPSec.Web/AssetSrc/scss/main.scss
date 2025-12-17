@@ -1,6 +1,7 @@
 @import "../../node_modules/govuk-frontend/dist/govuk/index";
 @import "../../node_modules/accessible-autocomplete/dist/accessible-autocomplete.min";
 
+
 //.school-search-suggester-wrapper {
 //    position: relative;
 //    margin-bottom: 4rem;
@@ -209,4 +210,54 @@
     content: "";
     display: block;
     clear: both;
+}
+
+.app-filter-section {
+    border-bottom: 1px solid $govuk-border-colour;
+    margin-bottom: govuk-spacing(3);
+}
+
+.app-filter-section__toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: govuk-spacing(2) 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    @include govuk-font($size: 19);
+
+    &:hover {
+        color: govuk-colour("blue");
+    }
+
+    &:focus {
+        outline: 3px solid govuk-colour("yellow");
+        outline-offset: 0;
+        background-color: govuk-colour("yellow");
+    }
+}
+
+.app-filter-section__title {
+    @include govuk-font($size: 19, $weight: bold);
+}
+
+.app-filter-section__indicator {
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+}
+
+.app-filter-section__toggle[aria-expanded="false"] .app-filter-section__indicator {
+    transform: rotate(180deg);
+}
+
+.app-filter-section__content {
+    padding-bottom: govuk-spacing(3);
+}
+
+.app-filter-section__content[hidden] {
+    display: none;
 }

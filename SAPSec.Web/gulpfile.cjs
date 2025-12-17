@@ -99,6 +99,21 @@ const copyStaticAssets = () =>
         .pipe(gulp.dest("wwwroot/css/"))
     )
     .on("end", () =>
+       gulp
+         .src(["node_modules/@ministryofjustice/frontend/moj/moj-frontend.min.js"])
+         .pipe(gulp.dest("wwwroot/js/"))
+    )
+    .on("end", () =>
+        gulp
+         .src(["node_modules/@ministryofjustice/frontend/moj/moj-frontend.min.css"])
+          .pipe(gulp.dest("wwwroot/css/"))
+    )
+    .on("end", () =>
+        gulp
+         .src(["node_modules/@ministryofjustice/frontend/moj/assets/**/*"], { encoding: false })
+         .pipe(gulp.dest("wwwroot/assets/"))
+    )
+    .on("end", () =>
       gulp
         .src(["AssetSrc/images/*"], { encoding: false })
         .pipe(gulp.dest("wwwroot/assets/images"))
