@@ -58,7 +58,7 @@
                     {
                         <div class="govuk-form-group">
                             <fieldset class="govuk-fieldset">
-                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--m">
+                                <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                     Location
                                 </legend>
 
@@ -66,7 +66,7 @@
                                 <div class="app-filter-section" data-module="app-filter-section">
                                     <button type="button"
                                             class="app-filter-section__toggle"
-                                            aria-expanded="true"
+                                            aria-expanded="false"
                                             aria-controls="filter-local-authority">
                                         <span class="app-filter-section__title">Local authority</span>
                                         <span class="app-filter-section__indicator">
@@ -76,7 +76,7 @@
                                         </span>
                                     </button>
 
-                                    <div class="app-filter-section__content" id="filter-local-authority">
+                                    <div class="app-filter-section__content" id="filter-local-authority" hidden>
                                         <p class="govuk-hint govuk-!-margin-bottom-2">
                                             Local authority in England where the school is located
                                         </p>
@@ -108,3 +108,28 @@
         </div>
     </form>
 </div>
+<script add-nonce="true">
+    (function() {
+        const sections = document.querySelectorAll('[data-module="app-filter-section"]');
+        sections.forEach(section => {
+            const toggle = section.querySelector('.app-filter-section__toggle');
+            const content = section.querySelector('.app-filter-section__content');
+
+            if (toggle && content) {
+                toggle.addEventListener('click', function() {
+                    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+
+                    // Toggle aria-expanded
+                    toggle.setAttribute('aria-expanded', !isExpanded);
+
+                    // Toggle hidden attribute
+                    if (isExpanded) {
+                        content.setAttribute('hidden', '');
+                    } else {
+                        content.removeAttribute('hidden');
+                    }
+                });
+            }
+        });
+    })();
+</script>

@@ -52,13 +52,27 @@ public class SchoolSearchController(
 
     [HttpGet]
     [Route("school/search")]
-    public async Task<IActionResult> Search([FromQuery] string? query)
+    public async Task<IActionResult> Search([FromQuery] string? query, [FromQuery] string[]? localAuthorities)
     {
         using (logger.BeginScope(new { query }))
         {
             var results = await _searchService.SearchAsync(query ?? string.Empty);
 
-            if (results.Count == 1)
+            var allLocalAuthorities = results
+            .Select(s => s.Establishment.LANAme)
+            .Where(la => !string.IsNullOrWhiteSpace(la))
+            .Distinct()
+            .OrderBy(la => la)
+            .ToArray();
+
+            if (localAuthorities != null && localAuthorities.Length > 0)
+            {
+                results = results
+                    .Where(s => localAuthorities.Contains(s.Establishment.LANAme))
+                    .ToList();
+            }
+
+            if (results.Count == 1 && (localAuthorities == null || localAuthorities.Length == 0))
             {
                 return RedirectToAction("Index", "School", new { results[0].Establishment.URN });
             }
@@ -66,13 +80,22 @@ public class SchoolSearchController(
             return View(new SchoolSearchResultsViewModel
                 {
                     Query = query ?? string.Empty,
+                    LocalAuthorities = allLocalAuthorities,
+                    SelectedLocalAuthorities = localAuthorities,
                     Results = results.Select(s => new SchoolSearchResultViewModel
-                    {
-                        SchoolName = s.Establishment.EstablishmentName,
-                        URN = s.Establishment.URN,
-                        LocalAuthority = s.Establishment.LANAme
-                    }).ToArray()
-                }
+                        {
+                            SchoolName = s.Establishment.EstablishmentName,
+                            URN = s.Establishment.URN,
+                            LocalAuthority = s.Establishment.LANAme,
+                            Address = string.Join(", ", new[] 
+                            { 
+                                s.Establishment.AddressStreet, 
+                                s.Establishment.AddressLocality, 
+                                s.Establishment.LANAme, 
+                                s.Establishment.AddressPostcode 
+                            }.Where(x => !string.IsNullOrWhiteSpace(x)))
+                        }).ToArray()
+                    }
             );
         }
     }

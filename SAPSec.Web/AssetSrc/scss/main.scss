@@ -204,8 +204,6 @@
         float: left;
     }
 }
-
-/* Clear floats */
 .govuk-grid-row::after {
     content: "";
     display: block;
@@ -213,7 +211,6 @@
 }
 
 .app-filter-section {
-    border-bottom: 1px solid $govuk-border-colour;
     margin-bottom: govuk-spacing(3);
 }
 
@@ -228,20 +225,24 @@
     cursor: pointer;
     text-align: left;
     @include govuk-font($size: 19);
+    color: govuk-colour("blue");
 
     &:hover {
-        color: govuk-colour("blue");
+        color: govuk-colour("dark-blue");
     }
 
     &:focus {
-        outline: 3px solid govuk-colour("yellow");
-        outline-offset: 0;
-        background-color: govuk-colour("yellow");
+        outline: 2px solid govuk-colour("blue");
+        outline-offset: 2px;
+    }
+
+    &:focus:not(:focus-visible) {
+        outline: none; // Remove outline for mouse clicks, keep for keyboard
     }
 }
 
 .app-filter-section__title {
-    @include govuk-font($size: 19, $weight: bold);
+    @include govuk-font($size: 19);
 }
 
 .app-filter-section__indicator {
