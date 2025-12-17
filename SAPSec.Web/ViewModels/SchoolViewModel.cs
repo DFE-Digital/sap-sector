@@ -1,11 +1,11 @@
-﻿using SAPSec.Infrastructure.Entities;
+﻿using SAPSec.Core.Model;
 
 namespace SAPSec.Web.ViewModels;
 
-public class SchoolViewModel(School school)
+public class SchoolViewModel(Establishment school)
 {
     public string Name => school.EstablishmentName;
-    public string Urn => school.Urn.ToString();
-    public string Ukprn => school.Ukprn.ToString();
+    public string Urn => school.URN;
+    public string Ukprn => school.UKPRN.ToString();
     public string DfENumber => school.DfENumber;
 }
