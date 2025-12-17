@@ -69,7 +69,8 @@ public class SchoolSearchController(
                     Results = results.Select(s => new SchoolSearchResultViewModel
                     {
                         SchoolName = s.Establishment.EstablishmentName,
-                        URN = s.Establishment.URN
+                        URN = s.Establishment.URN,
+                        LocalAuthority = s.Establishment.LANAme
                     }).ToArray()
                 }
             );
