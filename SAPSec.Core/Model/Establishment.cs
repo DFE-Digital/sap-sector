@@ -23,6 +23,18 @@ namespace SAPSec.Core.Model
         public string EstablishmentNumber { get; set; } = string.Empty;
         public string EstablishmentName { get; set; } = string.Empty;
 
+
+        public string HeadteacherTitle { get; set; } = string.Empty;
+        public string HeadteacherFirstName { get; set; } = string.Empty;
+        public string HeadteacherLastName { get; set; } = string.Empty;
+        public string HeadteacherPreferredJobTitle { get; set; } = string.Empty;
+        public string AddressStreet { get; set; } = string.Empty;
+        public string AddressLocality { get; set; } = string.Empty;
+        public string AddressAddress3 { get; set; } = string.Empty;
+        public string AddressTown { get; set; } = string.Empty;
+        public string AddressPostcode { get; set; } = string.Empty;
+
+
         public string? TrustsId { get; set; }
         public string TrustName { get; set; } = string.Empty;
 
