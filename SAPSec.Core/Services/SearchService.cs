@@ -1,56 +1,38 @@
-﻿using System.Text.RegularExpressions;
+﻿using Lucene.Net.Search;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Interfaces.Services.Lucene;
-using SAPSec.Infrastructure.Entities;
-using SAPSec.Infrastructure.Interfaces;
+using SAPSec.Core.Model;
+using SAPSec.Core.Model.Search;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace SAPSec.Core.Services;
-
-public class SearchService(ILuceneIndexReader indexReader, ISchoolRepository schoolRepository) : ISearchService
+namespace SAPSec.Core.Services
 {
-    public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
+    public class SearchService : ISearchService
     {
-        var searchResults = await indexReader.SearchAsync(query);
+        private readonly ISearchRepository _searchRepository;
 
-        var results = new List<SchoolSearchResult>();
-
-        if (searchResults.Count == 0) return results;
-
-        foreach (var (urn, schoolName) in searchResults)
+        public SearchService(ISearchRepository searchRepository)
         {
-            var school = GetSchoolByUrn(urn);
-            results.Add(new SchoolSearchResult(schoolName, school));
+            _searchRepository = searchRepository;
         }
 
-        return results;
-    }
+        public Task<IReadOnlyList<EstablishmentSearchResult>> SearchAsync(string query)
+        {
+            return _searchRepository.SearchAsync(query);
+        }
 
-    public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
-    {
-        var result = await SearchAsync(queryPart);
+        public Establishment? SearchByNumber(string schoolNumber)
+        {
+            return _searchRepository.SearchByNumber(schoolNumber);
+        }
 
-        return result;
-    }
-
-    public School? SearchByNumber(string schoolNumber)
-    {
-        var isNumber = Regex.IsMatch(schoolNumber, @"^\d+$");
-        var isDfENumber = Regex.IsMatch(schoolNumber, @"^\d+\\|/\d+$");
-
-        return isNumber
-            ? GetSchoolByNumberAsync(int.Parse(schoolNumber))
-            : isDfENumber
-                ? GetSchoolByNumberAsync(int.Parse(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty)))
-                : null;
-    }
-
-    public School GetSchoolByUrn(int urn)
-    {
-        return schoolRepository.GetSchoolByUrn(urn);
-    }
-
-    private School? GetSchoolByNumberAsync(int schoolNumber)
-    {
-        return schoolRepository.GetSchoolByNumber(schoolNumber);
+        public Task<IReadOnlyList<EstablishmentSearchResult>> SuggestAsync(string queryPart)
+        {
+            return _searchRepository.SuggestAsync(queryPart);
+        }
     }
 }
