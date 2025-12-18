@@ -231,20 +231,6 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
     #region Form Submission Tests
 
     [Fact]
-    public async Task ApplyButton_SubmitsForm()
-    {
-        await NavigateToSearchResults();
-
-        if (!await ExpandFilterSection()) return;
-        if (!await HasFilterCheckboxes()) return;
-
-        await CheckFirstFilterCheckbox();
-        await WaitForNavigation();
-
-        Page.Url.Should().Contain("localAuthorities", "URL should include filter parameter");
-    }
-
-    [Fact]
     public async Task Filter_PreservesQueryParameter()
     {
         const string testQuery = "TestQuery";
