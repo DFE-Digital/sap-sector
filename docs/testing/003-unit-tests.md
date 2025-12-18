@@ -24,8 +24,7 @@ Dapper query construction logic may be unit tested where practical, but SQL corr
 
 ## Tooling
 
-- xUnit or NUnit
-- FluentAssertions
+- xUnit
 - Mocking only where required to avoid over-mocking
 
 Unit tests run in CI and must pass before changes can be merged.
