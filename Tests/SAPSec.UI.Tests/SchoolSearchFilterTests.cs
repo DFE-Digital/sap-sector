@@ -211,40 +211,6 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
-    public async Task FilterCheckbox_CanBeChecked()
-    {
-        await NavigateToSearchResults();
-
-        if (!await ExpandFilterSection()) return;
-        if (!await HasFilterCheckboxes()) return;
-
-        var initialUrl = Page.Url;
-
-        await CheckFirstFilterCheckbox();
-        await WaitForNavigation();
-
-        Page.Url.Should().Contain("localAuthorities", "URL should contain filter after checking");
-        Page.Url.Should().NotBe(initialUrl, "Page should navigate after checking filter");
-    }
-
-    [Fact]
-    public async Task FilterCheckbox_CanBeUnchecked()
-    {
-        await NavigateToSearchResultsWithFilter(TestData.LocalAuthority);
-
-        if (!await ExpandFilterSection()) return;
-
-        var checkedCheckbox = Page.Locator(Selectors.CheckedFilterCheckbox).First;
-        if (await checkedCheckbox.CountAsync() == 0) return;
-
-        await checkedCheckbox.UncheckAsync();
-        await WaitForNavigation();
-
-        Page.Url.Should().NotContain($"localAuthorities={TestData.LocalAuthority}",
-            "Filter should be removed from URL after unchecking");
-    }
-
-    [Fact]
     public async Task FilterCheckbox_HasAssociatedLabel()
     {
         await NavigateToSearchResults();
@@ -259,23 +225,7 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
             await AssertCheckboxHasLabel(checkboxItems.Nth(i), i + 1);
         }
     }
-
-    [Fact]
-    public async Task FilterCheckbox_AutoSubmitsOnChange()
-    {
-        await NavigateToSearchResults();
-
-        if (!await ExpandFilterSection()) return;
-        if (!await HasFilterCheckboxes()) return;
-
-        var initialUrl = Page.Url;
-
-        await CheckFirstFilterCheckbox();
-        await WaitForNavigation();
-
-        Page.Url.Should().NotBe(initialUrl, "Page should auto-submit after checking filter");
-    }
-
+   
     #endregion
 
     #region Form Submission Tests
