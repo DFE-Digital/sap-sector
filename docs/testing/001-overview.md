@@ -9,12 +9,12 @@ The service is a read-only, data-driven web application built using:
 
 The application supports two user journeys:
 - School users
-- Local Authority (LA) users
+- Group establishment users such as Trust leads or members of a Local Authority (LA).
 
 The main areas of the service are:
 1. Compare school performance
-2. Find/search for a school
-3. Change school context
+2. Find/search for a similar school
+3. View school details
 
 The aim of this strategy is to provide confidence that the service:
 - Works correctly for both journeys
