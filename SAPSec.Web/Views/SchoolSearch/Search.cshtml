@@ -9,15 +9,20 @@
 {
     Query = Model.Query
 })
-
+@{
+    var hasResults = Model.Results.Length > 0;
+}
 
 <div class="govuk-grid-row">
+    @if (hasResults)
+{
     @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
         {
         Query = Model.Query,
         LocalAuthorities = Model.LocalAuthorities,
         SelectedLocalAuthorities = Model.SelectedLocalAuthorities
         })
+}
     <div class="govuk-grid-column-two-thirds">
         @if (Model.Results.Length == 0)
         {

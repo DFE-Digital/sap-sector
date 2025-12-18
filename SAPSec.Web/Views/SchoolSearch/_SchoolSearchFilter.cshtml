@@ -119,10 +119,8 @@
                 toggle.addEventListener('click', function() {
                     const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
 
-                    // Toggle aria-expanded
                     toggle.setAttribute('aria-expanded', !isExpanded);
 
-                    // Toggle hidden attribute
                     if (isExpanded) {
                         content.setAttribute('hidden', '');
                     } else {
