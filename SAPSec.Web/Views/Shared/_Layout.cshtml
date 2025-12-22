@@ -1,5 +1,9 @@
-﻿@using SAPSec.Web.Constants
+﻿@using GovUk.Frontend.AspNetCore
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
+@using SAPSec.Web.Helpers
+@using SAPSec.Web.TagHelpers
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
@@ -27,6 +31,18 @@
     <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true"/>
     <link rel="stylesheet" href="/css/main.css" asp-append-version="true"/>
     @* @await Component.InvokeAsync("Analytics") *@
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin />
+    @*<link rel="stylesheet"
+          href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+          crossorigin />
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+          crossorigin />*@
+
+
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
 <script add-nonce="true">
@@ -216,7 +232,14 @@
         });
     })
 </script>
+@Html.GovUkFrontendScriptImports(Html.ScriptNonce().ToString())
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin></script>
+
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
+        crossorigin></script>
 @await RenderSectionAsync("scripts", false)
 
 </body>

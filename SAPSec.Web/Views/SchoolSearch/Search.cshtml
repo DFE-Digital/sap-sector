@@ -9,22 +9,47 @@
 {
     Query = Model.Query
 })
+
 @{
     var hasResults = Model.Results.Length > 0;
 }
+<style>
+    /* End/right aligned */
+    .toggle-wrap{
+        display:flex;
+        justify-content:flex-end;
+    }
+
+    /* Link layout */
+    .toggle-view-link{
+        display:inline-flex;
+        align-items:center;
+        gap:6px;
+    }
+
+    /* Default: list view => show map icon */
+    .toggle-icon--list{ display:none; }
+
+    /* When map is showing (data-view="map") => show list icon */
+    .toggle-view-link[data-view="map"] .toggle-icon--map{ display:none; }
+    .toggle-view-link[data-view="map"] .toggle-icon--list{ display:inline-flex; }
+
+</style>
 
 <div class="govuk-grid-row">
     @if (hasResults)
-{
-    @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
+    {
+        @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
         {
-        Query = Model.Query,
-        LocalAuthorities = Model.LocalAuthorities,
-        SelectedLocalAuthorities = Model.SelectedLocalAuthorities
+            Query = Model.Query,
+            LocalAuthorities = Model.LocalAuthorities,
+            SelectedLocalAuthorities = Model.SelectedLocalAuthorities
         })
-}
+    }
+
     <div class="govuk-grid-column-two-thirds">
-        @if (Model.Results.Length == 0)
+
+        @if (!hasResults)
         {
             <p id="search-warning" class="govuk-body-s govuk-!-margin-top-1">
                 We couldn't find any schools matching your search criteria.
@@ -32,11 +57,52 @@
         }
         else
         {
-            @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
+            <!-- Toggle link -->
+            @* <p class="govuk-body govuk-!-margin-bottom-3"> *@
+            @*     <a href="#" id="toggleViewLink" class="govuk-link" data-view="list"> *@
+            @*         View on map *@
+            @*     </a> *@
+            @* </p> *@
+            
+            <p class="govuk-body govuk-!-margin-bottom-3 toggle-wrap">
+                <a href="#"
+                   id="toggleViewLink"
+                   class="govuk-link--no-visited-state toggle-view-link"
+                   data-view="list">
+
+                    <!-- MAP (pin) icon: shown when in list view -->
+                    <span class="toggle-icon toggle-icon--map" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                            <path fill="currentColor"
+                                  d="M12 2c-3.86 0-7 3.14-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>
+                        </svg>
+                    </span>
+
+                    <!-- LIST icon: shown when in map view -->
+                    <span class="toggle-icon toggle-icon--list" aria-hidden="true">
+                        <svg width="18" height="18" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                            <path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" fill="currentColor"/>
+                        </svg>
+                    </span>
+
+                    <span class="toggle-text">View on map</span>
+                </a>
+            </p>
+
+            
+            
+            <!-- List view -->
+            <div id="listView">
+                @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
+            </div>
+
+            <!-- Map view (hidden by default) -->
+            <div id="mapView" class="govuk-!-display-none">
+                @await Html.PartialAsync("_SchoolSearchMap", Model.Results)
+            </div>
         }
     </div>
 </div>
-
 
 @await Html.PartialAsync("_SchoolSearchSuggest", new SchoolSearchSuggesterViewModel
 {
@@ -44,3 +110,8 @@
     TargetElementId = nameof(Model.Urn),
     IdFieldName = "urn"
 })
+
+@section Scripts {
+    <script src="~/js/school-search-toggle.js"></script>
+    <script src="~/js/map-schools.js"></script>
+}

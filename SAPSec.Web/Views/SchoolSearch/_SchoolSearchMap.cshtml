@@ -1,0 +1,54 @@
+@using System.Globalization
+@using System.Text.Encodings.Web
+@using System.Text.Json
+@model SAPSec.Web.ViewModels.SchoolSearchResultViewModel[]
+
+@{
+    var inv = CultureInfo.InvariantCulture;
+
+// Parse coords safely (strings -> doubles), skip invalid
+    var schools = Model
+        .Select(s =>
+        {
+            var okLat = double.TryParse(s.Latitude, NumberStyles.Float, inv, out var lat);
+            var okLon = double.TryParse(s.Longitude, NumberStyles.Float, inv, out var lon);
+
+            if (!okLat || !okLon) return null;
+
+            return new
+            {
+                urn = s.URN,
+                name = s.SchoolName,
+                address = s.Address,
+                la = s.LocalAuthority,
+                lat,
+                lon,
+                url = Url.Action("Index", "School", new { urn = s.URN })
+            };
+        })
+        .Where(x => x != null)
+        .ToList();
+
+    var json = JsonSerializer.Serialize(schools, new JsonSerializerOptions
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    });
+}
+
+<p class="govuk-body" id="mapCount"> Showing @schools.Count schools</p>
+<div class="govuk-clearfix">
+    @* <p class="govuk-body govuk-!-text-align-right govuk-!-margin-bottom-2" id="mapCount"> *@
+    @*     Showing @schools.Count schools *@
+    @* </p> *@
+
+    <div id="map"
+         data-fixed-zoom="14"
+         @* data-radius-miles="3" *@
+         @* data-fallback-lat="53.367333" *@
+         @* data-fallback-lon="-1.498417" *@
+         data-schools='@Html.Raw(json)'
+         role="region"
+         aria-label="Map of schools">
+        <div class="map-loading">Loading map…</div>
+    </div>
+</div>

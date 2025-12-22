@@ -4,13 +4,7 @@ using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Model.KS4.SubjectEntries;
 using SAPSec.Core.Model.KS4.Suspensions;
 using SAPSec.Core.Model.KS4.Workforce;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAPSec.Core.Model
 {
@@ -62,6 +56,8 @@ namespace SAPSec.Core.Model
         public string Website { get; set; } = string.Empty;
         public string? Easting { get; set; }
         public string? Northing { get; set; }
+        public string?Latitude { get; set; }
+        public string?Longitude { get; set; }
 
         // Also known as LA/Estab, for obvious reasons
         public string DfENumber => $"{LAId}/{EstablishmentNumber}";
@@ -91,8 +87,5 @@ namespace SAPSec.Core.Model
         public EnglandAbsence EnglandAbsence { get; set; } = new(); 
 
         public EstablishmentWorkforce Workforce { get; set; } = new(); 
-
-
-
     }
 }

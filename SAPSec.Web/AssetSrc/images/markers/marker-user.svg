@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="96" viewBox="0 0 64 96">
+  <defs>
+    <filter id="shadow" x="-20%" y="-10%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Pin body -->
+  <path d="M32 2
+           C16 2 4 14 4 30
+           C4 49 22 62 30 79
+           C31 81 33 81 34 79
+           C42 62 60 49 60 30
+           C60 14 48 2 32 2 Z"
+        fill="#000000" stroke="#ffffff" stroke-width="4" filter="url(#shadow)"/>
+  <!-- Inner emblem background -->
+  <circle cx="32" cy="30" r="18" fill="#111111" stroke="#ffffff" stroke-width="3"/>
+  <circle cx="32" cy="30" r="10" fill="#FF4D80"/>
+</svg>
