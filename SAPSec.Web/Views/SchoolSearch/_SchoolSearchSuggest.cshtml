@@ -46,7 +46,24 @@
         const templates = {
             inputValue: itemFormatter,
             suggestion: (item) => {
+                console.log('Suggestion item:', JSON.stringify(item, null, 2));
                 if (item?.name) {
+                     const schoolName = item.name.replace(suggestHighlightRegex, "<strong>$1</strong>");
+                     const locationParts = [];
+                        if (item.town) {
+                            locationParts.push(item.town);
+                        }
+                        if(item.establishment?.addressStreet){
+                            locationParts.push(item.establishment.addressStreet);
+                        }
+                        if (item.establishment?.addressPostcode) {
+                            locationParts.push(item.establishment.addressPostcode);
+                        }
+                         if (locationParts.length > 0) {
+                           const location = locationParts.join(', ');
+                            return `<span class="autocomplete__option-name">${schoolName}</span>
+                            <span class="autocomplete__option-hint">(${location})</span>`;
+                         }
                     return item.name.replace(suggestHighlightRegex, "<b>$1</b>");
                 } else {
                     return "";
