@@ -7,7 +7,8 @@
 
 @await Html.PartialAsync("_SchoolSearchQuery", new SchoolSearchQueryViewModel
 {
-    Query = Model.Query
+    Query = Model.Query,
+    HasNoResults = !string.IsNullOrWhiteSpace(Model.Query) && Model.Results.Length == 0
 })
 @{
     var hasResults = Model.Results.Length > 0;
@@ -24,15 +25,9 @@
         })
 }
     <div class="govuk-grid-column-two-thirds">
-        @if (Model.Results.Length == 0)
+        @if (hasResults)
         {
-            <p id="search-warning" class="govuk-body-s govuk-!-margin-top-1">
-                We couldn't find any schools matching your search criteria.
-            </p>
-        }
-        else
-        {
-            @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
+           @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
         }
     </div>
 </div>

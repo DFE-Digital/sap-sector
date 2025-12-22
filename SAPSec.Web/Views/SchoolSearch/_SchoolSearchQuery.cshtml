@@ -3,13 +3,32 @@
 @using SAPSec.Web.ViewModels
 @model SAPSec.Web.ViewModels.SchoolSearchQueryViewModel
 @{
-    var hasError = ViewData.ModelState.HasError(nameof(SchoolSearchQueryViewModel.Query));
+    var hasValidationError = ViewData.ModelState.HasError(nameof(SchoolSearchQueryViewModel.Query));
+    var hasNoResults = Model.HasNoResults;
+    var hasError = hasValidationError || hasNoResults;
+    var errorMessage = hasNoResults
+        ? Model.NoResultsErrorMessage
+        : ViewData.ModelState[nameof(SchoolSearchQueryViewModel.Query)]?.Errors.Select(e => e.ErrorMessage).FirstOrDefault();
 }
 @using (Html.BeginForm(FormMethod.Post, true, new { novalidate = "novalidate", role = "search" }))
 {
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            @await Html.PartialAsync("_ErrorSummary")
+            @if (hasError)
+            {
+                <div class="govuk-error-summary" data-module="govuk-error-summary">
+                    <div role="alert">
+                        <h2 class="govuk-error-summary__title">There is a problem</h2>
+                        <div class="govuk-error-summary__body">
+                            <ul class="govuk-list govuk-error-summary__list">
+                                <li>
+                                    <a href="#__@nameof(SchoolSearchQueryViewModel.Query)">@errorMessage</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            }
             <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : string.Empty)">
                 <h1 class="govuk-label-wrapper">
                     <label class="govuk-label govuk-label--xl" for="__@nameof(SchoolSearchQueryViewModel.Query)">
@@ -23,27 +42,25 @@
                 {
                     <p id="@nameof(SchoolSearchQueryViewModel.Query)-error" class="govuk-error-message">
                         <span class="govuk-visually-hidden">Error:</span>
-                        @ViewData.ModelState[nameof(SchoolSearchQueryViewModel.Query)]?.Errors.Select(e => e.ErrorMessage).FirstOrDefault()
+                        @errorMessage
                     </p>
                 }
                 <div class="govuk-input__wrapper">
                     <div class="school-search-suggester-wrapper">
-                        <input
-                            id="@nameof(SchoolSearchQueryViewModel.Query)"
-                            name="@nameof(SchoolSearchQueryViewModel.Query)"
-                            class="govuk-input @(hasError ? "govuk-input--error" : string.Empty)"
-                            value="@Model.Query"
-                            type="text" spellcheck="false"
-                            data-fallback-input="true"
-                            aria-describedby="@nameof(SchoolSearchQueryViewModel.Query)-hint @(hasError ? $"{nameof(SchoolSearchQueryViewModel.Query)}-error" : string.Empty)"/>
+                        <input id="@nameof(SchoolSearchQueryViewModel.Query)"
+                               name="@nameof(SchoolSearchQueryViewModel.Query)"
+                               class="govuk-input @(hasError ? "govuk-input--error" : string.Empty)"
+                               value="@Model.Query"
+                               type="text" spellcheck="false"
+                               data-fallback-input="true"
+                               aria-describedby="@nameof(SchoolSearchQueryViewModel.Query)-hint @(hasError ? $"{nameof(SchoolSearchQueryViewModel.Query)}-error" : string.Empty)" />
                     </div>
                     <div class="govuk-input__suffix govuk-input__suffix__button">
                         <button type="submit" class="govuk-button" data-module="govuk-button" name="Search">
-                            <img
-                                src="/assets/images/icon-search-black.svg"
-                                alt="Search"
-                                height="15"
-                                width="15"/>
+                            <img src="/assets/images/search_black.svg"
+                                 alt="Search"
+                                 height="15"
+                                 width="15" />
                         </button>
                     </div>
                 </div>
