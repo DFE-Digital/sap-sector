@@ -263,3 +263,32 @@
 .app-filter-section__content[hidden] {
     display: none;
 }
+.autocomplete__menu {
+    border: none;
+    border-top: none;
+}
+
+.autocomplete__option {
+    border-bottom: none;
+}
+.app-school-results {
+    margin-top: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.app-school-result {
+    padding: 15px 0;
+    border-bottom: 1px solid #b1b4b6;
+}
+
+.app-school-result a {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 19px;
+    line-height: 1.25;
+}
+
+.app-school-results-count {
+    margin-bottom: 20px;
+}

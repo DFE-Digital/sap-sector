@@ -1,30 +1,23 @@
 @model SAPSec.Web.ViewModels.SchoolSearchResultViewModel[]
 
-<p class="govuk-body">Showing 1-@Model.Length of @Model.Length schools</p>
+<p class="govuk-body govuk-!-margin-bottom-4">Showing <strong>1-@Model.Length</strong> of <strong>@Model.Length</strong> schools</p>
+<hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-top-2 govuk-!-margin-bottom-0">
 
-<ul class="govuk-list">
+<ul class="govuk-list app-school-results">
     @foreach (var result in Model)
     {
-        <li class="govuk-task-list__item govuk-task-list__item--with-link" id="search-result-@result.URN">
-            <div class="govuk-task-list__name-and-hint">
-                <a class="govuk-link govuk-link--no-visited-state govuk-body govuk-!-font-weight-bold"
-                   href="@Url.Action("Index", "School", new { result.URN })"
-                   aria-describedby="school-@result.URN-hint">
-                    @result.SchoolName
-                </a>
-                <br />
-                <dl class="govuk-body-s govuk-!-margin-bottom-0">
-                    <div class="govuk-!-margin-bottom-1">
-                        <dt class="govuk-!-display-inline"><strong>Address:</strong></dt>
-                        <dd class="govuk-!-display-inline govuk-!-margin-left-1">@result.Address</dd>
-                    </div>
-                    <div>
-                        <dt class="govuk-!-display-inline"><strong>Local Authority:</strong></dt>
-                        <dd class="govuk-!-display-inline govuk-!-margin-left-1">@result.LocalAuthority</dd>
-                    </div>
-                </dl>
-            </div>
+        <li class="app-school-result" id="search-result-@result.URN">
+            <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
+               href="@Url.Action("Index", "School", new { result.URN })"
+               aria-describedby="school-@result.URN-hint">
+                @result.SchoolName
+            </a>
+            <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0 app-school-result__la">
+                 @result.Address
+            </p>
+            <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0 app-school-result__la">
+                <strong>Local authority:</strong> @result.LocalAuthority
+            </p>
         </li>
-        
     }
 </ul>
