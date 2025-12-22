@@ -796,7 +796,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        var buttonImage = Page.Locator("button[name='Search'] img[src*='magnify']");
+        var buttonImage = Page.Locator("button[name='Search'] img[src*='icon-search']");
         var count = await buttonImage.CountAsync();
 
         count.Should().Be(1, "Search button should contain magnifying glass icon");
