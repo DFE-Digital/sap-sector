@@ -200,7 +200,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
@@ -223,7 +223,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search((string?)null);
+        var result = await _controller.Search((string?)null, null);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -241,7 +241,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(string.Empty);
+        var result = await _controller.Search(string.Empty, null);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -258,7 +258,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -274,7 +274,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -296,7 +296,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.ControllerName.Should().Be("School");
@@ -310,7 +310,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        await _controller.Search(query);
+        await _controller.Search(query, null);
 
         _mockSearchService.Verify(s => s.SearchAsync(query), Times.Once);
     }
@@ -322,7 +322,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        await _controller.Search(query);
+        await _controller.Search(query, null);
 
         _mockLogger.Verify(x => x.BeginScope(It.IsAny<It.IsAnyType>()), Times.Once);
     }
@@ -344,7 +344,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult> { new EstablishmentSearchResult(query, returnEst) });
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -595,7 +595,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ThrowsAsync(new InvalidOperationException("Service error"));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Search(query));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Search(query, null));
     }
 
     [Fact]
@@ -615,7 +615,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         result.Should().BeOfType<ViewResult>();
         _mockSearchService.Verify(s => s.SearchAsync(query), Times.Once);
@@ -649,7 +649,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -670,7 +670,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        var result = await _controller.Search(query);
+        var result = await _controller.Search(query, null);
 
         result.Should().BeOfType<RedirectToActionResult>();
 

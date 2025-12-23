@@ -9,4 +9,6 @@ public class SchoolSearchResultsViewModel : SchoolSearchQueryViewModel
     public string? SchoolName { get; init; }
 
     public SchoolSearchResultViewModel[] Results { get; set; } = [];
+    public string[] LocalAuthorities { get; set; } = [];
+    public string[]? SelectedLocalAuthorities { get; set; }
 }

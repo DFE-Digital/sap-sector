@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="ProjNET4GeoAPI" Version="1.4.1" />
     <PackageReference Include="Sep" Version="0.11.5" />
   </ItemGroup>
 

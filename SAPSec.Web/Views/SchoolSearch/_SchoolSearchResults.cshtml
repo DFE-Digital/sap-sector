@@ -1,11 +1,30 @@
 @model SAPSec.Web.ViewModels.SchoolSearchResultViewModel[]
 
-<ul class="govuk-list govuk-list--result">
+<p class="govuk-body">Showing 1-@Model.Length of @Model.Length schools</p>
+
+<ul class="govuk-list">
     @foreach (var result in Model)
     {
-        <li id="search-result-@result.URN">
-            <a href="@Url.Action("Index", "School", new { result.URN })"
-               class="govuk-link govuk-link--no-visited-state govuk-heading-s govuk-!-margin-bottom-2">@result.SchoolName</a>
+        <li class="govuk-task-list__item govuk-task-list__item--with-link" id="search-result-@result.URN">
+            <div class="govuk-task-list__name-and-hint">
+                <a class="govuk-link govuk-link--no-visited-state govuk-body govuk-!-font-weight-bold"
+                   href="@Url.Action("Index", "School", new { result.URN })"
+                   aria-describedby="school-@result.URN-hint">
+                    @result.SchoolName
+                </a>
+                <br />
+                <dl class="govuk-body-s govuk-!-margin-bottom-0">
+                    <div class="govuk-!-margin-bottom-1">
+                        <dt class="govuk-!-display-inline"><strong>Address:</strong></dt>
+                        <dd class="govuk-!-display-inline govuk-!-margin-left-1">@result.Address</dd>
+                    </div>
+                    <div>
+                        <dt class="govuk-!-display-inline"><strong>Local Authority:</strong></dt>
+                        <dd class="govuk-!-display-inline govuk-!-margin-left-1">@result.LocalAuthority</dd>
+                    </div>
+                </dl>
+            </div>
         </li>
+        
     }
 </ul>

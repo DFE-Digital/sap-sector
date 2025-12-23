@@ -1,5 +1,9 @@
-﻿@using SAPSec.Web.Constants
+﻿@using GovUk.Frontend.AspNetCore
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
+@using SAPSec.Web.Helpers
+@using SAPSec.Web.TagHelpers
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
@@ -18,6 +22,7 @@
     <meta name="theme-color" content="#0b0c0c">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="icon" sizes="48x48" href="/assets/images/favicon.ico">
+    <link rel="stylesheet" href="/css/moj-frontend.min.css" asp-append-version="true">
     <link rel="icon" sizes="any" href="/assets/images/favicon.svg" type="image/svg+xml">
     <link rel="mask-icon" href="/assets/images/govuk-icon-mask.svg" color="#0b0c0c">
     <link rel="apple-touch-icon" href="/assets/images/govuk-icon-180.png">
@@ -26,6 +31,18 @@
     <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true"/>
     <link rel="stylesheet" href="/css/main.css" asp-append-version="true"/>
     @* @await Component.InvokeAsync("Analytics") *@
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin />
+    @*<link rel="stylesheet"
+          href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css"
+          crossorigin />
+    <link rel="stylesheet"
+          href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css"
+          crossorigin />*@
+
+
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
 <script add-nonce="true">
@@ -90,8 +107,8 @@
                             </li>
                             <li class="govuk-service-navigation__item">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "SchoolSearch")">
-                                    Find schools
+                                href="@Url.Action("Index", "ConnectSchool")">
+                                   Connect
                                 </a>
                             </li>
                             <li class="govuk-service-navigation__item">
@@ -102,7 +119,7 @@
                             </li>
                             <li class="govuk-service-navigation__item">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "ChangeSchool")">
+                                   href="@Url.Action("Index", "SchoolSearch")">
                                     Change school
                                 </a>
                             </li>
@@ -187,19 +204,23 @@
         </div>
     </div>
 </footer>
-<script type="module" src="/js/dfefrontend.js" asp-append-version="true"></script>
-<script type="module" src="/js/govuk-frontend.min.js"></script>
-
-<script type="module" add-nonce="true">
-  import { initAll } from '/js/govuk-frontend.min.js'
-  initAll()
-</script>
-
+    <script src="/js/govuk-frontend.min.js" asp-append-version="true"></script>
+    <script src="/js/moj-frontend.min.js" asp-append-version="true"></script>
+    <script src="/js/dfefrontend.js" asp-append-version="true"></script>
+    <script add-nonce="true">
+        window.GOVUKFrontend.initAll();
+        window.MOJFrontend.initAll();
+    </script>
 <script add-nonce="true">
     document.getElementById("js-back-link")?.addEventListener('click', function (ev) {
         ev.preventDefault();
         history.back();
     });
+            document.querySelectorAll('.moj-filter input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                checkbox.closest('form').submit();
+            });
+        });
     document.querySelectorAll(".app-print-link").forEach((element) => {
         if (element.classList.contains("govuk-visually-hidden")) {
             element.classList.remove("govuk-visually-hidden");
@@ -211,7 +232,14 @@
         });
     })
 </script>
+@Html.GovUkFrontendScriptImports(Html.ScriptNonce().ToString())
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin></script>
+
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"
+        crossorigin></script>
 @await RenderSectionAsync("scripts", false)
 
 </body>

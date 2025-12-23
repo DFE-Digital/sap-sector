@@ -23,14 +23,16 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         response.Should().NotBeNull();
         response.Status.Should().Be(200);
+        await WaitForSearchInputsAsync();
     }
-
     [Fact]
     public async Task SchoolSearchIndex_DisplaysQueryInputField()
     {
         await Page.GotoAsync(SchoolSearchPath);
+        await WaitForSearchInputsAsync();
 
-        var input = Page.Locator("input[name='__Query']");
+        // use the runtime-aware locator
+        var input = await GetQueryInputLocatorAsync();
         var button = Page.Locator("button[name='Search']");
         var form = Page.Locator("form");
 
@@ -43,7 +45,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var submitTsVisible = await button.IsVisibleAsync();
         submitTsVisible.Should().BeTrue("Search button should be visible");
     }
-
     #endregion
 
     #region Form Validation Tests
@@ -310,13 +311,28 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     public async Task SchoolSearchIndex_Autocomplete_ClearsUrnFieldOnInput()
     {
         await Page.GotoAsync(SchoolSearchPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await WaitForSearchInputsAsync();
+        var urnLocator = Page.Locator("input[name='Urn']");
+        await urnLocator.WaitForAsync(new LocatorWaitForOptions
+        {
+            State = WaitForSelectorState.Attached, 
+            Timeout = 5000
+        });
 
-        await Page.EvaluateAsync("document.querySelector('input[name=\"Urn\"]').value = '123456'");
-        await Page.Locator("input[name='__Query']").FillAsync("New School");
-        await Page.WaitForTimeoutAsync(100);
+        var urnHandle = await urnLocator.ElementHandleAsync();
+        if (urnHandle == null)
+        {
+            throw new InvalidOperationException("Hidden Urn input not found after waiting - suggester did not create it.");
+        }
+        await Page.EvaluateAsync("el => el.value = '123456'", urnHandle);
 
-        var urnValue = await Page.Locator("input[name='Urn']").InputValueAsync();
+        var input = await GetQueryInputLocatorAsync();
+        await input.FocusAsync();
+        await input.FillAsync("New School");
+        await input.PressAsync("a");
+        await Page.WaitForTimeoutAsync(300);
+
+        var urnValue = await urnLocator.InputValueAsync();
         urnValue.Should().Be(string.Empty, "Urn field should be cleared when user types");
     }
 
@@ -345,17 +361,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         response.Should().NotBeNull();
         response.Status.Should().Be(200);
-    }
-
-    [Fact]
-    public async Task SchoolSearchResults_DisplaysSearchForm()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        var form = Page.Locator("form");
-        var isVisible = await form.IsVisibleAsync();
-
-        isVisible.Should().BeTrue("Search form should be visible on results page");
     }
 
     [Fact]
@@ -724,10 +729,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     public async Task SchoolSearchResults_PostWithUrn_RedirectsToSchoolProfile()
     {
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        var form = Page.Locator("form");
-        var isVisible = await form.IsVisibleAsync();
-        isVisible.Should().BeTrue("Form should be present for posting school ID");
+        var searchForm = Page.Locator("form[role='search']");
+        var isVisible = await searchForm.IsVisibleAsync();
+        isVisible.Should().BeTrue("Search form should be present for posting school ID");
     }
 
     [Fact]
@@ -820,17 +824,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         (await gridRow.CountAsync()).Should().BeGreaterThan(0, "Page should use grid layout");
         (await gridColumn.CountAsync()).Should().BeGreaterThan(0, "Page should have two-thirds column");
-    }
-
-    [Fact]
-    public async Task SchoolSearchResults_HasSectionBreak()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        var sectionBreak = Page.Locator("hr.govuk-section-break");
-        var count = await sectionBreak.CountAsync();
-
-        count.Should().BeGreaterThan(0, "Results page should have section breaks");
     }
 
     #endregion

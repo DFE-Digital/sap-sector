@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GovUk.Frontend.AspNetCore;
 
 namespace SAPSec.Web;
 
@@ -23,6 +24,12 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        
+        builder.Services.AddGovUkFrontend(options =>
+        {
+            options.Rebrand = true;
+        });
+
 
         builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -173,6 +180,8 @@ public class Program
         app.UseRouting();
 
         app.UseSession();
+        
+        app.UseGovUkFrontend();
 
         app.UseAuthentication();
 
