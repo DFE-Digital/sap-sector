@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace SAPSec.Web.Controllers;
 
 [Authorize]
-public class ChangeSchoolController(ILogger<ChangeSchoolController> logger) : Controller
+public class ConnectSchoolController(ILogger<ConnectSchoolController> logger) : Controller
 {
     [HttpGet]
     public IActionResult Index()

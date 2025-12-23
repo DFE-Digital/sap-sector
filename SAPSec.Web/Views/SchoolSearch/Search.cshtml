@@ -7,24 +7,27 @@
 
 @await Html.PartialAsync("_SchoolSearchQuery", new SchoolSearchQueryViewModel
 {
-    Query = Model.Query
+    Query = Model.Query,
+    HasNoResults = !string.IsNullOrWhiteSpace(Model.Query) && Model.Results.Length == 0
 })
-
-
-<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-bottom-6">
+@{
+    var hasResults = Model.Results.Length > 0;
+}
 
 <div class="govuk-grid-row">
+    @if (hasResults)
+{
+    @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
+        {
+        Query = Model.Query,
+        LocalAuthorities = Model.LocalAuthorities,
+        SelectedLocalAuthorities = Model.SelectedLocalAuthorities
+        })
+}
     <div class="govuk-grid-column-two-thirds">
-        @if (Model.Results.Length == 0)
+        @if (hasResults)
         {
-            <p id="search-warning" class="govuk-body-s govuk-!-margin-top-1">
-                We couldn't find any schools matching your search criteria.
-            </p>
-            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-6">
-        }
-        else
-        {
-            @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
+           @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
         }
     </div>
 </div>

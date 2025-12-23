@@ -23,14 +23,16 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         response.Should().NotBeNull();
         response.Status.Should().Be(200);
+        await WaitForSearchInputsAsync();
     }
 
     [Fact]
     public async Task SchoolSearchIndex_DisplaysQueryInputField()
     {
         await Page.GotoAsync(SchoolSearchPath);
+        await WaitForSearchInputsAsync();
 
-        var input = Page.Locator("input[name='__Query']");
+        var input = await GetQueryInputLocatorAsync();
         var button = Page.Locator("button[name='Search']");
         var form = Page.Locator("form");
 
@@ -310,13 +312,28 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     public async Task SchoolSearchIndex_Autocomplete_ClearsUrnFieldOnInput()
     {
         await Page.GotoAsync(SchoolSearchPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await WaitForSearchInputsAsync();
+        var urnLocator = Page.Locator("input[name='Urn']");
+        await urnLocator.WaitForAsync(new LocatorWaitForOptions
+        {
+            State = WaitForSelectorState.Attached,
+            Timeout = 5000
+        });
 
-        await Page.EvaluateAsync("document.querySelector('input[name=\"Urn\"]').value = '123456'");
-        await Page.Locator("input[name='__Query']").FillAsync("New School");
-        await Page.WaitForTimeoutAsync(100);
+        var urnHandle = await urnLocator.ElementHandleAsync();
+        if (urnHandle == null)
+        {
+            throw new InvalidOperationException("Hidden Urn input not found after waiting - suggester did not create it.");
+        }
+        await Page.EvaluateAsync("el => el.value = '123456'", urnHandle);
 
-        var urnValue = await Page.Locator("input[name='Urn']").InputValueAsync();
+        var input = await GetQueryInputLocatorAsync();
+        await input.FocusAsync();
+        await input.FillAsync("New School");
+        await input.PressAsync("a");
+        await Page.WaitForTimeoutAsync(300);
+
+        var urnValue = await urnLocator.InputValueAsync();
         urnValue.Should().Be(string.Empty, "Urn field should be cleared when user types");
     }
 
@@ -345,17 +362,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         response.Should().NotBeNull();
         response.Status.Should().Be(200);
-    }
-
-    [Fact]
-    public async Task SchoolSearchResults_DisplaysSearchForm()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        var form = Page.Locator("form");
-        var isVisible = await form.IsVisibleAsync();
-
-        isVisible.Should().BeTrue("Search form should be visible on results page");
     }
 
     [Fact]
@@ -411,26 +417,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NumericSearch_NoResults_ShowsErrorMessage()
-    {
-        await Page.GotoAsync(SchoolSearchResultsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        await Page.Locator("input[name='__Query']").FillAsync("123");
-        await Page.WaitForTimeoutAsync(600);
-
-        await Page.Locator("button[name='Search']").ClickAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var errorSummary = Page.Locator(".govuk-error-summary");
-        var isVisible = await errorSummary.IsVisibleAsync();
-        isVisible.Should().BeFalse();
-
-        var warningMessage = await Page.Locator("#search-warning").TextContentAsync();
-        warningMessage.Should().Contain("We couldn't find any schools matching your search criteria.");
-    }
-
-    [Fact]
     public async Task SchoolSearchResults_NumericSearch_ValidResults_RedirectsToSchoolDetailPage()
     {
         await Page.GotoAsync(SchoolSearchResultsPath);
@@ -469,35 +455,18 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_DisplaysWarningMessage()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
-
-        var warningMessage = Page.Locator("#search-warning");
-
-        var isVisible = await warningMessage.IsVisibleAsync();
-        if (isVisible)
-        {
-            var text = await warningMessage.TextContentAsync();
-            text.Should().Contain("couldn't find any schools", "No results message should be displayed");
-        }
-    }
-
-
-    // Todo - Refactor this test, flaky based on data.
-    [Fact]
     public async Task SchoolSearchResults_WithResults_DisplaysSchoolLinks()
     {
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
 
-        var resultLinks = Page.Locator(".govuk-list--result a");
+        var resultLinks = Page.Locator(".app-school-results a");
         var count = await resultLinks.CountAsync();
 
         if (count > 0)
         {
             var firstLink = resultLinks.First;
             var href = await firstLink.GetAttributeAsync("href");
-            href.Should().Contain("/school/147788", "Result links should point to school detail pages");
+            href.Should().Contain("/school/", "Result links should point to school detail pages");
         }
     }
 
@@ -506,7 +475,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
 
-        var resultItems = Page.Locator(".govuk-list--result li");
+        var resultItems = Page.Locator(".app-school-results li");
         var count = await resultItems.CountAsync();
 
         if (count > 0)
@@ -519,6 +488,181 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
             var linkClasses = await link.GetAttributeAsync("class");
             linkClasses.Should().Contain("govuk-link", "Link should have GOV.UK styling");
         }
+    }
+
+    #endregion
+
+    #region No Results Error State Tests
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_ShowsErrorSummary()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var errorSummary = Page.Locator(".govuk-error-summary");
+        var isVisible = await errorSummary.IsVisibleAsync();
+
+        isVisible.Should().BeTrue("Error summary should be visible when no results found");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_ErrorSummaryHasCorrectTitle()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var errorTitle = Page.Locator(".govuk-error-summary__title");
+        var titleText = await errorTitle.TextContentAsync();
+
+        titleText.Should().Contain("There is a problem", "Error summary should have correct title");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_ErrorSummaryHasCorrectMessage()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var errorMessage = Page.Locator(".govuk-error-summary__list li");
+        var messageText = await errorMessage.TextContentAsync();
+
+        messageText.Should().Contain("We could not find any schools matching your search criteria",
+            "Error summary should contain no results message");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_ErrorSummaryLinkPointsToInput()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var errorLink = Page.Locator(".govuk-error-summary__list a");
+        var href = await errorLink.GetAttributeAsync("href");
+
+        href.Should().Contain("#__Query", "Error summary link should point to search input");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_InputHasErrorStyling()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var inputWrapper = Page.Locator(".govuk-form-group--error");
+        var hasErrorStyling = await inputWrapper.CountAsync() > 0;
+
+        hasErrorStyling.Should().BeTrue("Form group should have error styling when no results");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_InlineErrorMessageDisplayed()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var inlineError = Page.Locator(".govuk-error-message");
+        var isVisible = await inlineError.IsVisibleAsync();
+
+        isVisible.Should().BeTrue("Inline error message should be visible when no results");
+
+        var errorText = await inlineError.TextContentAsync();
+        errorText.Should().Contain("We could not find any schools matching your search criteria",
+            "Inline error should contain no results message");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_InputHasErrorClass()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var input = Page.Locator("input.govuk-input--error");
+        var hasErrorClass = await input.CountAsync() > 0;
+
+        hasErrorClass.Should().BeTrue("Input should have error class when no results");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_DoesNotShowResultsList()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var resultsList = Page.Locator(".app-school-results li");
+        var count = await resultsList.CountAsync();
+
+        count.Should().Be(0, "Results list should not be displayed when no results");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_DoesNotShowResultsCount()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var resultsCount = Page.Locator(".app-school-results-count");
+        var count = await resultsCount.CountAsync();
+
+        count.Should().Be(0, "Results count should not be displayed when no results");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_DoesNotShowFilter()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var filterPanel = Page.Locator(".moj-filter");
+        var count = await filterPanel.CountAsync();
+
+        count.Should().Be(0, "Filter panel should not be displayed when no results");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_PreservesSearchQuery()
+    {
+        var searchQuery = "XYZNonExistentSchool999";
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query={searchQuery}");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var input = Page.Locator("input[name='__Query']");
+        var inputValue = await input.InputValueAsync();
+
+        inputValue.Should().Be(searchQuery, "Search query should be preserved in input when no results");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_NumericSearch_NoResults_ShowsErrorSummary()
+    {
+        await Page.GotoAsync(SchoolSearchResultsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await Page.Locator("input[name='__Query']").FillAsync("999999");
+        await Page.WaitForTimeoutAsync(600);
+
+        await Page.Locator("button[name='Search']").ClickAsync();
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var errorSummary = Page.Locator(".govuk-error-summary");
+        var isVisible = await errorSummary.IsVisibleAsync();
+
+        isVisible.Should().BeTrue("Error summary should be visible for numeric search with no results");
+
+        var errorMessage = await errorSummary.Locator(".govuk-error-summary__list li").TextContentAsync();
+        errorMessage.Should().Contain("We could not find any schools matching your search criteria");
+    }
+
+    [Fact]
+    public async Task SchoolSearchResults_WithResults_DoesNotShowErrorSummary()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var errorSummary = Page.Locator(".govuk-error-summary");
+        var count = await errorSummary.CountAsync();
+
+        count.Should().Be(0, "Error summary should not be displayed when results exist");
     }
 
     #endregion
@@ -680,6 +824,18 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         exists.Should().BeGreaterThan(0, "Form should have search role for accessibility");
     }
 
+    [Fact]
+    public async Task SchoolSearchResults_NoResults_ErrorSummaryHasAlertRole()
+    {
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var alertRole = Page.Locator(".govuk-error-summary [role='alert']");
+        var count = await alertRole.CountAsync();
+
+        count.Should().BeGreaterThan(0, "Error summary should have alert role for accessibility");
+    }
+
     #endregion
 
     #region Error Scenarios
@@ -724,10 +880,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     public async Task SchoolSearchResults_PostWithUrn_RedirectsToSchoolProfile()
     {
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        var form = Page.Locator("form");
-        var isVisible = await form.IsVisibleAsync();
-        isVisible.Should().BeTrue("Form should be present for posting school ID");
+        var searchForm = Page.Locator("form[role='search']");
+        var isVisible = await searchForm.IsVisibleAsync();
+        isVisible.Should().BeTrue("Search form should be present for posting school ID");
     }
 
     [Fact]
@@ -792,7 +947,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        var buttonImage = Page.Locator("button[name='Search'] img[src*='magnify']");
+        var buttonImage = Page.Locator("button[name='Search'] img[src*='search_black']");
         var count = await buttonImage.CountAsync();
 
         count.Should().Be(1, "Search button should contain magnifying glass icon");
@@ -803,11 +958,10 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
 
-        var resultsList = Page.Locator(".govuk-list--result");
-        _ = await resultsList.CountAsync();
+        var resultsList = Page.Locator(".app-school-results");
+        var count = await resultsList.CountAsync();
 
-        var pageContent = await Page.ContentAsync();
-        pageContent.Should().Contain("school");
+        count.Should().BeGreaterThan(0, "Results list should be rendered when results exist");
     }
 
     [Fact]
@@ -820,17 +974,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         (await gridRow.CountAsync()).Should().BeGreaterThan(0, "Page should use grid layout");
         (await gridColumn.CountAsync()).Should().BeGreaterThan(0, "Page should have two-thirds column");
-    }
-
-    [Fact]
-    public async Task SchoolSearchResults_HasSectionBreak()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        var sectionBreak = Page.Locator("hr.govuk-section-break");
-        var count = await sectionBreak.CountAsync();
-
-        count.Should().BeGreaterThan(0, "Results page should have section breaks");
     }
 
     #endregion

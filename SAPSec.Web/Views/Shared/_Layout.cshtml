@@ -18,6 +18,7 @@
     <meta name="theme-color" content="#0b0c0c">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link rel="icon" sizes="48x48" href="/assets/images/favicon.ico">
+    <link rel="stylesheet" href="/css/moj-frontend.min.css" asp-append-version="true">
     <link rel="icon" sizes="any" href="/assets/images/favicon.svg" type="image/svg+xml">
     <link rel="mask-icon" href="/assets/images/govuk-icon-mask.svg" color="#0b0c0c">
     <link rel="apple-touch-icon" href="/assets/images/govuk-icon-180.png">
@@ -90,8 +91,8 @@
                             </li>
                             <li class="govuk-service-navigation__item">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "SchoolSearch")">
-                                    Find schools
+                                href="@Url.Action("Index", "ConnectSchool")">
+                                   Connect
                                 </a>
                             </li>
                             <li class="govuk-service-navigation__item">
@@ -102,7 +103,7 @@
                             </li>
                             <li class="govuk-service-navigation__item">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "ChangeSchool")">
+                                   href="@Url.Action("Index", "SchoolSearch")">
                                     Change school
                                 </a>
                             </li>
@@ -187,19 +188,23 @@
         </div>
     </div>
 </footer>
-<script type="module" src="/js/dfefrontend.js" asp-append-version="true"></script>
-<script type="module" src="/js/govuk-frontend.min.js"></script>
-
-<script type="module" add-nonce="true">
-  import { initAll } from '/js/govuk-frontend.min.js'
-  initAll()
-</script>
-
+    <script src="/js/govuk-frontend.min.js" asp-append-version="true"></script>
+    <script src="/js/moj-frontend.min.js" asp-append-version="true"></script>
+    <script src="/js/dfefrontend.js" asp-append-version="true"></script>
+    <script add-nonce="true">
+        window.GOVUKFrontend.initAll();
+        window.MOJFrontend.initAll();
+    </script>
 <script add-nonce="true">
     document.getElementById("js-back-link")?.addEventListener('click', function (ev) {
         ev.preventDefault();
         history.back();
     });
+            document.querySelectorAll('.moj-filter input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                checkbox.closest('form').submit();
+            });
+        });
     document.querySelectorAll(".app-print-link").forEach((element) => {
         if (element.classList.contains("govuk-visually-hidden")) {
             element.classList.remove("govuk-visually-hidden");
