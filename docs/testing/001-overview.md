@@ -46,3 +46,13 @@ Testing is performed across:
 - Review apps
 - Test environment
 - Production (monitoring and smoke checks only)
+
+## Test execution and ownership
+
+This document describes **what** types of testing are performed.
+
+For clarity on **where, when, and by whom** each type of test is executed (including CI, deployment, release, routine testing, external audits, manual testing, DevOps/IaC testing, and load/performance testing), see:
+
+- **`010-test-execution-model.md`**
+
+This provides a lifecycle-based view of test execution and ownership across the service.
