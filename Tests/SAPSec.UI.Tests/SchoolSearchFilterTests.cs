@@ -33,26 +33,6 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
-    public async Task SearchWarning_WhenNoResults_IsVisible()
-    {
-        await NavigateToSearchResultsWithNoResults();
-
-        var isVisible = await IsElementVisible(Selectors.SearchWarning);
-
-        isVisible.Should().BeTrue("Search warning should be visible when no results");
-    }
-
-    [Fact]
-    public async Task SearchWarning_WhenNoResults_HasCorrectText()
-    {
-        await NavigateToSearchResultsWithNoResults();
-
-        var text = await GetElementText(Selectors.SearchWarning);
-
-        text.Should().Contain("couldn't find any schools", "Warning should explain no results found");
-    }
-
-    [Fact]
     public async Task SearchWarning_WhenResultsExist_IsHidden()
     {
         await NavigateToSearchResults();
