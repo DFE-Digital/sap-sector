@@ -291,3 +291,52 @@
 .app-school-results-count {
     margin-bottom: 20px;
 }
+
+@media (max-width: 40.0625em) {
+    .govuk-input-autocomplete {
+        width: 100%;
+        max-width: 100%;
+    }
+    .school-search-suggester-wrapper {
+        width: 100%;
+    }
+    .app-filter-toggle {
+        display: block !important;
+    }
+
+    .app-filter-panel {
+        display: none !important;
+    }
+
+    .app-filter-panel--visible {
+        display: block !important;
+    }
+
+    .moj-filter__options .govuk-button {
+        width: auto !important;
+    }
+
+    .moj-filter {
+        display: block;
+    }
+    .app-school-results-count {
+        margin-top: 20px;
+    }
+}
+.app-filter-toggle {
+    display: none;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.app-filter-toggle__hide {
+    display: none;
+}
+
+.app-filter-toggle[aria-expanded="true"] .app-filter-toggle__show {
+    display: none;
+}
+
+.app-filter-toggle[aria-expanded="true"] .app-filter-toggle__hide {
+    display: inline;
+}
