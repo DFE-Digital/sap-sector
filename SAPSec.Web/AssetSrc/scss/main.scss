@@ -290,6 +290,7 @@
 
 .app-school-results-count {
     margin-bottom: 20px;
+    font-size: 16px;
 }
 
 @media (max-width: 40.0625em) {
@@ -321,6 +322,7 @@
     }
     .app-school-results-count {
         margin-top: 20px;
+        font-size: 14px !important;
     }
 }
 .app-filter-toggle {
@@ -339,4 +341,22 @@
 
 .app-filter-toggle[aria-expanded="true"] .app-filter-toggle__hide {
     display: inline;
+}
+
+.autocomplete__menu {
+    border: none;
+    border-top: none;
+}
+
+.autocomplete__menu:empty,
+.autocomplete__menu[hidden] {
+    display: none;
+}
+
+.autocomplete__menu--visible {
+    display: block;
+}
+
+.autocomplete__menu:not(.autocomplete__menu--visible) {
+    display: none !important;
 }
