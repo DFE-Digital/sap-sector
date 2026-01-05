@@ -35,20 +35,25 @@
     });
 }
 
-<p class="govuk-body" id="mapCount"> Showing @schools.Count schools</p>
+<div class="results-bar govuk-!-margin-bottom-2">
+    <p class="govuk-body govuk-!-margin-bottom-0" id="mapCount">
+        Showing <strong>@Model.Length</strong> schools
+    </p>
+    
+    <div id="mapBarActions"></div>
+</div>
 <div class="govuk-clearfix">
-    @* <p class="govuk-body govuk-!-text-align-right govuk-!-margin-bottom-2" id="mapCount"> *@
-    @*     Showing @schools.Count schools *@
-    @* </p> *@
 
     <div id="map"
          data-fixed-zoom="14"
-         @* data-radius-miles="3" *@
-         @* data-fallback-lat="53.367333" *@
-         @* data-fallback-lon="-1.498417" *@
-         data-schools='@Html.Raw(json)'
          role="region"
          aria-label="Map of schools">
         <div class="map-loading">Loading map…</div>
     </div>
+
+
 </div>
+
+<script type="application/json" id="schools-data">
+@Html.Raw(json)
+</script>

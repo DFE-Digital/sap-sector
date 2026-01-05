@@ -14,28 +14,6 @@
 @{
     var hasResults = Model.Results.Length > 0;
 }
-<style>
-    /* End/right aligned */
-    .toggle-wrap{
-        display:flex;
-        justify-content:flex-end;
-    }
-
-    /* Link layout */
-    .toggle-view-link{
-        display:inline-flex;
-        align-items:center;
-        gap:6px;
-    }
-
-    /* Default: list view => show map icon */
-    .toggle-icon--list{ display:none; }
-
-    /* When map is showing (data-view="map") => show list icon */
-    .toggle-view-link[data-view="map"] .toggle-icon--map{ display:none; }
-    .toggle-view-link[data-view="map"] .toggle-icon--list{ display:inline-flex; }
-
-</style>
 
 <div class="govuk-grid-row">
     @if (hasResults)
@@ -51,43 +29,38 @@
     <div class="govuk-grid-column-two-thirds">
         @if (hasResults)
         {
-            <p class="govuk-body govuk-!-margin-bottom-3 toggle-wrap">
-                <a href="#"
-                   id="toggleViewLink"
-                   class="govuk-link--no-visited-state toggle-view-link"
-                   data-view="list">
+        <div id="toggleWrap" class="results-toggle-wrap">
+            <a href="#"
+               id="toggleViewLink"
+               class="govuk-link govuk-link--no-visited-state toggle-view-link"
+               data-view="list">
 
-                    <!-- MAP (pin) icon: shown when in list view -->
-                    <span class="toggle-icon toggle-icon--map" aria-hidden="true">
-                        <svg width="18" height="18" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-                            <path fill="currentColor"
-                                  d="M12 2c-3.86 0-7 3.14-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>
-                        </svg>
-                    </span>
+            <span class="toggle-icon toggle-icon--map" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <path fill="currentColor"
+                          d="M12 2c-3.86 0-7 3.14-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.86-3.14-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/>
+                </svg>
+            </span>
 
-                    <!-- LIST icon: shown when in map view -->
-                    <span class="toggle-icon toggle-icon--list" aria-hidden="true">
-                        <svg width="18" height="18" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
-                            <path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" fill="currentColor"/>
-                        </svg>
-                    </span>
+                <span class="toggle-icon toggle-icon--list" aria-hidden="true">
+                <svg width="18" height="18" viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+                    <path d="M4 6h16v2H4zM4 11h16v2H4zM4 16h16v2H4z" fill="currentColor"/>
+                </svg>
+            </span>
 
-                    <span class="toggle-text">View on map</span>
-                </a>
-            </p>
+                <span class="toggle-text">View on map</span>
+            </a>
+        </div>
 
-            
-            
-            <!-- List view -->
-            <div id="listView">
-                @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
-            </div>
+        <div id="listView">
+            @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
+        </div>
 
-            <!-- Map view (hidden by default) -->
-            <div id="mapView" class="govuk-!-display-none">
-                @await Html.PartialAsync("_SchoolSearchMap", Model.Results)
-            </div>
+        <div id="mapView" class="govuk-!-display-none">
+            @await Html.PartialAsync("_SchoolSearchMap", Model.Results)
+        </div>
         }
+
     </div>
 </div>
 

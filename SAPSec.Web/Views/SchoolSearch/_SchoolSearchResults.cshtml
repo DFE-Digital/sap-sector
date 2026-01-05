@@ -1,6 +1,14 @@
 @model SAPSec.Web.ViewModels.SchoolSearchResultViewModel[]
 
-<p class="govuk-body govuk-!-margin-bottom-4">Showing <strong>1-@Model.Length</strong> of <strong>@Model.Length</strong> schools</p>
+<div class="results-bar govuk-!-margin-bottom-2">
+    <p class="govuk-body govuk-!-margin-bottom-0" id="resultsCount">
+        Showing <strong>1-@Model.Length</strong> of <strong>@Model.Length</strong> schools
+    </p>
+
+    <!-- Parent view will move the toggle link into here -->
+    <div id="resultsBarActions"></div>
+</div>
+
 <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-top-2 govuk-!-margin-bottom-0">
 
 <ul class="govuk-list app-school-results">
@@ -8,16 +16,20 @@
     {
         <li class="app-school-result" id="search-result-@result.URN">
             <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
-               href="@Url.Action("Index", "School", new { result.URN })"
+               href="@Url.Action("Index", "School", new { urn = result.URN })"
                aria-describedby="school-@result.URN-hint">
                 @result.SchoolName
             </a>
+
             <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0 app-school-result__la">
-                 @result.Address
+                @result.Address
             </p>
+
             <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0 app-school-result__la">
-                <strong>Local authority:</strong> @result.LocalAuthority
+                <strong>Coordinate:</strong> @result.Latitude, @result.Longitude
             </p>
+            
+            
         </li>
     }
 </ul>

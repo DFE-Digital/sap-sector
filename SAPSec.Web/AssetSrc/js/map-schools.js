@@ -2,21 +2,10 @@
     let initialised = false;
     let mapInstance = null;
 
-    // ------------------------------------------------------------
-    // OPTION B: Hardcode schools here (if you removed data-schools)
-    // ------------------------------------------------------------
-    // Comment this out if you are using Option A (data-schools from Razor)
-    const HARDCODED_SCHOOLS = [
-        // Example:
-        // { urn: "12345", name: "Example School", address: "1 High St, Town", la: "Some LA", lat: 53.37, lon: -1.49, url: "/School?urn=12345" },
-    ];
-
     function parseSchools(host) {
-        // If you want hardcoded only, return HARDCODED_SCHOOLS
-        // return HARDCODED_SCHOOLS;
+        const el = document.getElementById("schools-data");
+        const schoolsJson = el ? el.textContent : "[]";
 
-        // Otherwise (Option A) read from data-schools
-        const schoolsJson = host.dataset.schools || "[]";
         try {
             const raw = JSON.parse(schoolsJson);
             return (raw || [])
@@ -37,10 +26,11 @@
                 })
                 .filter(Boolean);
         } catch (e) {
-            console.warn("Could not parse data-schools JSON", e);
+            console.warn("Could not parse schools JSON", e);
             return [];
         }
     }
+
 
     function escapeHtml(str) {
         return String(str ?? "")
@@ -77,7 +67,7 @@
             return;
         }
 
-        // Simple list (name + address). You can style as GOV.UK summary list if you prefer.
+        // Simple list (name + address). 
         listEl.innerHTML = `
       <ul class="govuk-list govuk-list--bullet">
         ${schools
@@ -109,10 +99,6 @@
         const loading = host.querySelector(".map-loading");
         if (loading) loading.remove();
 
-        // Update count
-        const countEl = document.getElementById("mapCount");
-        if (countEl) countEl.textContent = `Showing ${schools.length} schools`;
-
         // Render the visible list (name + address)
         renderSchoolList(schools);
 
@@ -123,7 +109,7 @@
 
         const fixedZoom = parseInt(host.dataset.fixedZoom || "14", 10);
 
-        // Create map (temporary center; we will fitBounds immediately)
+        // Create map 
         mapInstance = L.map(host, { scrollWheelZoom: true }).setView([schools[0].lat, schools[0].lon], fixedZoom);
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
