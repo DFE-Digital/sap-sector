@@ -1,13 +1,23 @@
 ﻿@model SAPSec.Web.ViewModels.SchoolSearchFilterViewModel
 
-<div class="govuk-grid-column-one-third">
-    <form method="get" action="@Url.Action("Search", "SchoolSearch")">
+<div class="govuk-grid-column-one-third app-filter-column">
+    @{
+        var hasSelectedFilters = Model.SelectedLocalAuthorities?.Any() == true;
+        var isExpanded = hasSelectedFilters ? "true" : "false";
+        var panelVisibleClass = hasSelectedFilters ? "app-filter-panel--visible" : "";
+    }
+    <button type="button" class="govuk-button govuk-button--secondary app-filter-toggle" data-module="app-filter-toggle" aria-expanded="@isExpanded" aria-controls="app-filter-panel">
+        <span class="app-filter-toggle__show">Show filters</span>
+        <span class="app-filter-toggle__hide">Hide filters</span>
+    </button>
+
+    <form method="get" action="@Url.Action("Search", "SchoolSearch")" id="app-filter-panel" class="app-filter-panel @panelVisibleClass">
         <input type="hidden" name="query" value="@Model.Query" />
 
-        <div class="moj-filter" data-module="moj-filter">
+        <div class="moj-filter">
             <div class="moj-filter__header">
                 <div class="moj-filter__header-title">
-                    <h2 class="govuk-heading-m">Filter</h2>
+                    <h2 class="govuk-heading-m">Filters</h2>
                 </div>
             </div>
 
@@ -17,7 +27,7 @@
                     <div class="moj-filter__selected">
                         <div class="moj-filter__selected-heading">
                             <div class="moj-filter__heading-title">
-                                <h2 class="govuk-heading-m">Selected filters</h2>
+                                <h2 class="govuk-heading-s">Selected filters</h2>
                             </div>
                             <div class="moj-filter__heading-action">
                                 <p>
@@ -29,7 +39,6 @@
                             </div>
                         </div>
 
-                        <h3 class="govuk-heading-s govuk-!-margin-bottom-0">Local authority</h3>
                         <ul class="moj-filter-tags">
                             @foreach (var la in Model.SelectedLocalAuthorities)
                             {
@@ -62,11 +71,10 @@
                                     Location
                                 </legend>
 
-                                <!-- Collapsible filter section -->
                                 <div class="app-filter-section" data-module="app-filter-section">
                                     <button type="button"
                                             class="app-filter-section__toggle"
-                                            aria-expanded="false"
+                                            aria-expanded="@isExpanded"
                                             aria-controls="filter-local-authority">
                                         <span class="app-filter-section__title">Local authority</span>
                                         <span class="app-filter-section__indicator">
@@ -76,11 +84,11 @@
                                         </span>
                                     </button>
 
-                                    <div class="app-filter-section__content" id="filter-local-authority" hidden>
+                                    <div class="app-filter-section__content" id="filter-local-authority" @(hasSelectedFilters ? "" : "hidden")>
                                         <p class="govuk-hint govuk-!-margin-bottom-2">
                                             Local authority in England where the school is located
                                         </p>
-                                        <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                        <div class="govuk-checkboxes govuk-checkboxes--small">
                                             @foreach (var la in Model.LocalAuthorities)
                                             {
                                                 var isChecked = Model.SelectedLocalAuthorities?.Contains(la) == true;
@@ -108,7 +116,39 @@
         </div>
     </form>
 </div>
+
 <script add-nonce="true">
+    (function() {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFilterProtection);
+        } else {
+            initFilterProtection();
+        }
+
+        function initFilterProtection() {
+            const filterForm = document.getElementById('app-filter-panel');
+            if (!filterForm) return;
+
+            filterForm.onsubmit = function(e) {
+                const activeElement = document.activeElement;
+                const isApplyButton = activeElement &&
+                    activeElement.type === 'submit' &&
+                    activeElement.textContent.includes('Apply');
+
+                if (!isApplyButton) {
+                    e.preventDefault();
+                    return false;
+                }
+            };
+
+            const checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                const newCheckbox = checkbox.cloneNode(true);
+                checkbox.parentNode.replaceChild(newCheckbox, checkbox);
+            });
+        }
+    })();
+
     (function() {
         const sections = document.querySelectorAll('[data-module="app-filter-section"]');
         sections.forEach(section => {
@@ -116,9 +156,10 @@
             const content = section.querySelector('.app-filter-section__content');
 
             if (toggle && content) {
-                toggle.addEventListener('click', function() {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
-
                     toggle.setAttribute('aria-expanded', !isExpanded);
 
                     if (isExpanded) {
@@ -129,5 +170,23 @@
                 });
             }
         });
+
+        const filterToggle = document.querySelector('[data-module="app-filter-toggle"]');
+        const filterPanel = document.getElementById('app-filter-panel');
+
+        if (filterToggle && filterPanel) {
+            filterToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const isExpanded = filterToggle.getAttribute('aria-expanded') === 'true';
+                filterToggle.setAttribute('aria-expanded', !isExpanded);
+
+                if (isExpanded) {
+                    filterPanel.classList.remove('app-filter-panel--visible');
+                } else {
+                    filterPanel.classList.add('app-filter-panel--visible');
+                }
+            });
+        }
     })();
 </script>

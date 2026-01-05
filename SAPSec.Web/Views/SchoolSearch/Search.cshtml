@@ -10,22 +10,21 @@
     Query = Model.Query,
     HasNoResults = !string.IsNullOrWhiteSpace(Model.Query) && Model.Results.Length == 0
 })
-
 @{
     var hasResults = Model.Results.Length > 0;
 }
 
+
 <div class="govuk-grid-row">
     @if (hasResults)
-    {
-        @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
+{
+    @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
         {
-            Query = Model.Query,
-            LocalAuthorities = Model.LocalAuthorities,
-            SelectedLocalAuthorities = Model.SelectedLocalAuthorities
+        Query = Model.Query,
+        LocalAuthorities = Model.LocalAuthorities,
+        SelectedLocalAuthorities = Model.SelectedLocalAuthorities
         })
-    }
-
+}
     <div class="govuk-grid-column-two-thirds">
         @if (hasResults)
         {
