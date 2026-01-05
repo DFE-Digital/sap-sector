@@ -360,3 +360,34 @@
 .autocomplete__menu:not(.autocomplete__menu--visible) {
     display: none !important;
 }
+
+.app-button-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: app-spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes app-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.govuk-button--loading {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.govuk-button--loading .app-button-spinner {
+    display: inline-block;
+}
+
+.govuk-button:not(.govuk-button--loading) .app-button-spinner {
+    display: none;
+}

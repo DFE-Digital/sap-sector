@@ -59,8 +59,9 @@
                 }
 
                 <div class="moj-filter__options">
-                    <button type="submit" class="govuk-button" data-module="govuk-button">
-                        Apply filters
+                    <button type="submit" class="govuk-button" data-module="govuk-button" id="apply-filters-btn">
+                        <span class="app-button-spinner" aria-hidden="true"></span>
+                        <span class="app-button-text">Apply filters</span>
                     </button>
 
                     @if (Model.LocalAuthorities.Any())
@@ -129,6 +130,8 @@
             const filterForm = document.getElementById('app-filter-panel');
             if (!filterForm) return;
 
+            const applyButton = document.getElementById('apply-filters-btn');
+
             filterForm.onsubmit = function(e) {
                 const activeElement = document.activeElement;
                 const isApplyButton = activeElement &&
@@ -138,6 +141,11 @@
                 if (!isApplyButton) {
                     e.preventDefault();
                     return false;
+                }
+
+                if (applyButton) {
+                    applyButton.classList.add('govuk-button--loading');
+                    applyButton.disabled = true;
                 }
             };
 
