@@ -110,6 +110,8 @@ public class SchoolSearchController(
                     SchoolName = s.Establishment.EstablishmentName,
                     URN = s.Establishment.URN,
                     LocalAuthority = s.Establishment.LANAme,
+                    Latitude = s.Establishment.Latitude,
+                    Longitude = s.Establishment.Longitude,
                     Address = string.Join(", ", new[]
                     {
                         s.Establishment.AddressStreet,
