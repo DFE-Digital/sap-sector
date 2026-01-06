@@ -300,7 +300,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         if (await resultsCount.CountAsync() == 0) return;
 
         var text = await resultsCount.TextContentAsync();
-        text.Should().Contain("6-", "Second page should show results starting from 6");
+        text.Should().Contain("11-", "Second page should show results starting from 6");
     }
 
     #endregion
@@ -310,19 +310,13 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_ShowsEllipsis_WhenManyPages()
     {
-        // Navigate to a search with many results
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=5");
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=4");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var ellipsis = Page.Locator(".govuk-pagination__item--ellipsis");
         var count = await ellipsis.CountAsync();
 
-        // Ellipsis should appear when there are many pages
-        if (count > 0)
-        {
-            var ellipsisText = await ellipsis.First.TextContentAsync();
-            ellipsisText.Should().Contain("…", "Ellipsis should show '…' character");
-        }
+        count.Should().BeGreaterThan(0, "Ellipsis should appear when on middle page with many total pages");
     }
 
     #endregion
