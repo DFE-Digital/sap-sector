@@ -1,4 +1,4 @@
-// ReSharper disable MemberCanBePrivate.Global
+using Lucene.Net.Search;
 
 namespace SAPSec.Web.ViewModels;
 

@@ -23,7 +23,8 @@ public class SchoolSearchControllerTests
         UKPRN = "10",
         LAId = "100",
         EstablishmentNumber = "1",
-        EstablishmentName = "Fake Establishment One"
+        EstablishmentName = "Fake Establishment One",
+        LANAme = "Leeds"
     };
 
     private static Establishment FakeEstablishment2 = new()
@@ -32,7 +33,8 @@ public class SchoolSearchControllerTests
         UKPRN = "10",
         LAId = "100",
         EstablishmentNumber = "1",
-        EstablishmentName = "Fake Establishment Two"
+        EstablishmentName = "Fake Establishment Two",
+        LANAme = "Leeds"
     };
 
     public SchoolSearchControllerTests()
@@ -47,10 +49,8 @@ public class SchoolSearchControllerTests
     [Fact]
     public void Index_Get_ReturnsViewResult()
     {
-        // Act
         var result = _controller.Index();
 
-        // Assert
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
     }
@@ -58,10 +58,8 @@ public class SchoolSearchControllerTests
     [Fact]
     public void Index_Get_ReturnsViewWithEmptyViewModel()
     {
-        // Act
         var result = _controller.Index() as ViewResult;
 
-        // Assert
         result.Should().NotBeNull();
         result.Model.Should().NotBeNull();
         result.Model.Should().BeOfType<SchoolSearchQueryViewModel>();
@@ -99,7 +97,7 @@ public class SchoolSearchControllerTests
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
-            Query = "AB" // Too short - minimum is 3 characters
+            Query = "AB"
         };
         _controller.ModelState.AddModelError("Query", "Enter a school name or Urn (minimum 3 characters)");
 
@@ -200,7 +198,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
@@ -223,7 +221,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search((string?)null, null);
+        var result = await _controller.Search((string?)null, null, 1);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -241,7 +239,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(string.Empty, null);
+        var result = await _controller.Search(string.Empty, null, 1);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -258,7 +256,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -274,7 +272,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -296,7 +294,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.ControllerName.Should().Be("School");
@@ -310,7 +308,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        await _controller.Search(query, null);
+        await _controller.Search(query, null, 1);
 
         _mockSearchService.Verify(s => s.SearchAsync(query), Times.Once);
     }
@@ -322,7 +320,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        await _controller.Search(query, null);
+        await _controller.Search(query, null, 1);
 
         _mockLogger.Verify(x => x.BeginScope(It.IsAny<It.IsAnyType>()), Times.Once);
     }
@@ -344,12 +342,250 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult> { new EstablishmentSearchResult(query, returnEst) });
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.RouteValues!["urn"].Should().Be("100273");
+    }
+
+    #endregion
+
+    #region Pagination Tests
+
+    [Fact]
+    public async Task Search_Get_WithDefaultPage_ReturnsFirstPage()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.CurrentPage.Should().Be(1);
+        model.Results.Should().HaveCount(5); // PageSize is 5
+        model.TotalResults.Should().Be(15);
+        model.TotalPages.Should().Be(3);
+    }
+
+    [Fact]
+    public async Task Search_Get_WithPage2_ReturnsSecondPageResults()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 2);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.CurrentPage.Should().Be(2);
+        model.Results.Should().HaveCount(5);
+        model.Results[0].SchoolName.Should().Be("School 6"); // Skip first 5
+    }
+
+    [Fact]
+    public async Task Search_Get_WithLastPage_ReturnsRemainingResults()
+    {
+        var searchResults = CreateFakeSearchResults(12);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 3);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.CurrentPage.Should().Be(3);
+        model.Results.Should().HaveCount(2); // 12 - 10 = 2 remaining
+    }
+
+    [Fact]
+    public async Task Search_Get_WithPageBeyondTotal_RedirectsToLastPage()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 10);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.RouteValues!["page"].Should().Be(3); // Last valid page
+    }
+
+    [Fact]
+    public async Task Search_Get_WithPageZero_TreatsAsPage1()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 0);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.CurrentPage.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Search_Get_WithNegativePage_TreatsAsPage1()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, -5);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.CurrentPage.Should().Be(1);
+    }
+
+    [Fact]
+    public async Task Search_Get_PaginationViewModel_HasCorrectStartItem()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 2);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.Pagination.StartItem.Should().Be(6); // (2-1) * 5 + 1
+    }
+
+    [Fact]
+    public async Task Search_Get_PaginationViewModel_HasCorrectEndItem()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 2);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.Pagination.EndItem.Should().Be(10); // Page 2: items 6-10
+    }
+
+    [Fact]
+    public async Task Search_Get_PaginationViewModel_HasPreviousPage_WhenNotOnFirstPage()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 2);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.Pagination.HasPreviousPage.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Search_Get_PaginationViewModel_HasNoPreviousPage_WhenOnFirstPage()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.Pagination.HasPreviousPage.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Search_Get_PaginationViewModel_HasNextPage_WhenNotOnLastPage()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.Pagination.HasNextPage.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Search_Get_PaginationViewModel_HasNoNextPage_WhenOnLastPage()
+    {
+        var searchResults = CreateFakeSearchResults(15);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 3);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.Pagination.HasNextPage.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task Search_Get_WithFiltersAndPagination_PreservesBothInModel()
+    {
+        var searchResults = CreateFakeSearchResults(15, "Leeds");
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", new[] { "Leeds" }, 2);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.CurrentPage.Should().Be(2);
+        model.SelectedLocalAuthorities.Should().Contain("Leeds");
+        model.Pagination.LocalAuthorities.Should().Contain("Leeds");
+    }
+
+    [Fact]
+    public async Task Search_Get_WithNoResults_ReturnsZeroTotalPages()
+    {
+        _mockSearchService.Setup(s => s.SearchAsync("NonExistent"))
+            .ReturnsAsync(new List<EstablishmentSearchResult>());
+
+        var result = await _controller.Search("NonExistent", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.TotalPages.Should().Be(0);
+        model.TotalResults.Should().Be(0);
+    }
+
+    [Fact]
+    public async Task Search_Get_WithExactlyPageSizeResults_ReturnsSinglePage()
+    {
+        var searchResults = CreateFakeSearchResults(5);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.TotalPages.Should().Be(1);
+        model.Results.Should().HaveCount(5);
     }
 
     #endregion
@@ -595,7 +831,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ThrowsAsync(new InvalidOperationException("Service error"));
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Search(query, null));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Search(query, null, 1));
     }
 
     [Fact]
@@ -615,7 +851,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         result.Should().BeOfType<ViewResult>();
         _mockSearchService.Verify(s => s.SearchAsync(query), Times.Once);
@@ -630,7 +866,7 @@ public class SchoolSearchControllerTests
             Urn = "123456"
         };
 
-        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))  
+        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
             .Returns(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
 
         var result = _controller.Search(viewModel);
@@ -649,7 +885,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(new List<EstablishmentSearchResult>());
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -670,13 +906,36 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(query))
             .ReturnsAsync(searchResults);
 
-        var result = await _controller.Search(query, null);
+        var result = await _controller.Search(query, null, 1);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.ControllerName.Should().Be("School");
         redirectResult.RouteValues!["urn"].Should().Be("999999");
+    }
+
+    #endregion
+
+    #region Helper Methods
+
+    private List<EstablishmentSearchResult> CreateFakeSearchResults(int count, string localAuthority = "Leeds")
+    {
+        var results = new List<EstablishmentSearchResult>();
+        for (int i = 1; i <= count; i++)
+        {
+            var establishment = new Establishment
+            {
+                URN = i.ToString(),
+                UKPRN = "10",
+                LAId = "100",
+                EstablishmentNumber = i.ToString(),
+                EstablishmentName = $"School {i}",
+                LANAme = localAuthority
+            };
+            results.Add(new EstablishmentSearchResult($"School {i}", establishment));
+        }
+        return results;
     }
 
     #endregion
