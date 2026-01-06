@@ -11,7 +11,7 @@ public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
     ISearchService _searchService) : Controller
 {
-    private const int PageSize = 5;
+    private const int PageSize = 10;
 
     [HttpGet]
     [Route("search-for-a-school")]

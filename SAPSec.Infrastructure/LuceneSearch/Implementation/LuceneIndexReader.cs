@@ -7,7 +7,7 @@ namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
 
 public class LuceneIndexReader(LuceneIndexContext context, ILuceneTokeniser luceneTokeniser, ILuceneHighlighter highlighter) : ILuceneIndexReader
 {
-    public async Task<IList<(int urn, string resultText)>> SearchAsync(string query)
+    public async Task<IList<(int urn, string resultText)>> SearchAsync(string query, int maxResults = 10)
     {
         if (string.IsNullOrWhiteSpace(query)) return [];
 
@@ -53,7 +53,7 @@ public class LuceneIndexReader(LuceneIndexContext context, ILuceneTokeniser luce
                 { exactName, Occur.SHOULD }
             };
 
-            var take = 10;
+            var take = maxResults;
 
             var sort = new Sort(SortField.FIELD_SCORE, new SortField(FieldName.EstablishmentNameSort, SortFieldType.STRING, reverse: false));
 

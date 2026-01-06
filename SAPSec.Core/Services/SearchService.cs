@@ -14,6 +14,7 @@ namespace SAPSec.Core.Services
     public class SearchService : ISearchService
     {
         private readonly ISearchRepository _searchRepository;
+        private const int SearchMaxResults = 1000;
 
         public SearchService(ISearchRepository searchRepository)
         {
@@ -22,7 +23,7 @@ namespace SAPSec.Core.Services
 
         public Task<IReadOnlyList<EstablishmentSearchResult>> SearchAsync(string query)
         {
-            return _searchRepository.SearchAsync(query);
+            return _searchRepository.SearchAsync(query, SearchMaxResults);
         }
 
         public Establishment? SearchByNumber(string schoolNumber)

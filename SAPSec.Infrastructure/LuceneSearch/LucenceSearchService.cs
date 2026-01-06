@@ -11,9 +11,9 @@ namespace SAPSec.Infrastructure.LuceneSearch;
 
 public class LuceneSearchService(ILuceneIndexReader indexReader, IEstablishmentService _establishmentService) : ISearchRepository
 {
-    public async Task<IReadOnlyList<EstablishmentSearchResult>> SearchAsync(string query)
+    public async Task<IReadOnlyList<EstablishmentSearchResult>> SearchAsync(string query,int maxResults = 10)
     {
-        var searchResults = await indexReader.SearchAsync(query);
+        var searchResults = await indexReader.SearchAsync(query, maxResults);
 
         var results = new List<EstablishmentSearchResult>();
 

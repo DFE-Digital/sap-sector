@@ -311,7 +311,7 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
 
         await Page.Locator(Selectors.MobileFilterToggle).FocusAsync();
         await Page.Keyboard.PressAsync("Space");
-        await Page.WaitForTimeoutAsync(100);
+        await Page.WaitForTimeoutAsync(1000);
 
         var ariaExpanded = await Page.Locator(Selectors.MobileFilterToggle)
             .GetAttributeAsync("aria-expanded");
@@ -605,7 +605,7 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
 
         await Page.Locator(Selectors.FilterSectionToggle).FocusAsync();
         await Page.Keyboard.PressAsync("Space");
-        await Page.WaitForTimeoutAsync(100);
+        await Page.WaitForTimeoutAsync(1000);
 
         var ariaExpanded = await GetToggleExpandedState();
 

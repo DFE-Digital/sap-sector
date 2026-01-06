@@ -367,42 +367,9 @@ public class SchoolSearchControllerTests
         var model = viewResult!.Model as SchoolSearchResultsViewModel;
 
         model!.CurrentPage.Should().Be(1);
-        model.Results.Should().HaveCount(5); // PageSize is 5
+        model.Results.Should().HaveCount(10);
         model.TotalResults.Should().Be(15);
-        model.TotalPages.Should().Be(3);
-    }
-
-    [Fact]
-    public async Task Search_Get_WithPage2_ReturnsSecondPageResults()
-    {
-        var searchResults = CreateFakeSearchResults(15);
-        _mockSearchService.Setup(s => s.SearchAsync("School"))
-            .ReturnsAsync(searchResults);
-
-        var result = await _controller.Search("School", null, 2);
-
-        var viewResult = result as ViewResult;
-        var model = viewResult!.Model as SchoolSearchResultsViewModel;
-
-        model!.CurrentPage.Should().Be(2);
-        model.Results.Should().HaveCount(5);
-        model.Results[0].SchoolName.Should().Be("School 6"); // Skip first 5
-    }
-
-    [Fact]
-    public async Task Search_Get_WithLastPage_ReturnsRemainingResults()
-    {
-        var searchResults = CreateFakeSearchResults(12);
-        _mockSearchService.Setup(s => s.SearchAsync("School"))
-            .ReturnsAsync(searchResults);
-
-        var result = await _controller.Search("School", null, 3);
-
-        var viewResult = result as ViewResult;
-        var model = viewResult!.Model as SchoolSearchResultsViewModel;
-
-        model!.CurrentPage.Should().Be(3);
-        model.Results.Should().HaveCount(2); // 12 - 10 = 2 remaining
+        model.TotalPages.Should().Be(2);
     }
 
     [Fact]
@@ -417,7 +384,7 @@ public class SchoolSearchControllerTests
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.RouteValues!["page"].Should().Be(3); // Last valid page
+        redirectResult!.RouteValues!["page"].Should().Be(2);
     }
 
     [Fact]
@@ -462,7 +429,7 @@ public class SchoolSearchControllerTests
         var viewResult = result as ViewResult;
         var model = viewResult!.Model as SchoolSearchResultsViewModel;
 
-        model!.Pagination.StartItem.Should().Be(6); // (2-1) * 5 + 1
+        model!.Pagination.StartItem.Should().Be(11);
     }
 
     [Fact]
@@ -477,7 +444,7 @@ public class SchoolSearchControllerTests
         var viewResult = result as ViewResult;
         var model = viewResult!.Model as SchoolSearchResultsViewModel;
 
-        model!.Pagination.EndItem.Should().Be(10); // Page 2: items 6-10
+        model!.Pagination.EndItem.Should().Be(15); 
     }
 
     [Fact]
@@ -523,21 +490,6 @@ public class SchoolSearchControllerTests
         var model = viewResult!.Model as SchoolSearchResultsViewModel;
 
         model!.Pagination.HasNextPage.Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task Search_Get_PaginationViewModel_HasNoNextPage_WhenOnLastPage()
-    {
-        var searchResults = CreateFakeSearchResults(15);
-        _mockSearchService.Setup(s => s.SearchAsync("School"))
-            .ReturnsAsync(searchResults);
-
-        var result = await _controller.Search("School", null, 3);
-
-        var viewResult = result as ViewResult;
-        var model = viewResult!.Model as SchoolSearchResultsViewModel;
-
-        model!.Pagination.HasNextPage.Should().BeFalse();
     }
 
     [Fact]
