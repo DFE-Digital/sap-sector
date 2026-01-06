@@ -2,5 +2,5 @@ namespace SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
 public interface ILuceneIndexReader
 {
-    Task<IList<(int urn, string resultText)>> SearchAsync(string query);
+    Task<IList<(int urn, string resultText)>> SearchAsync(string query, int maxResults = 10);
 }
