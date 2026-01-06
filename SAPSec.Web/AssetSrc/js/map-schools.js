@@ -31,7 +31,6 @@
         }
     }
 
-
     function escapeHtml(str) {
         return String(str ?? "")
             .replaceAll("&", "&amp;")
@@ -67,7 +66,6 @@
             return;
         }
 
-        // Simple list (name + address). 
         listEl.innerHTML = `
       <ul class="govuk-list govuk-list--bullet">
         ${schools
@@ -89,6 +87,7 @@
         const host = document.getElementById("map");
         if (!host) return;
 
+        // If already initialised, just fix sizing (e.g. after tab toggle)
         if (initialised) {
             mapInstance?.invalidateSize(true);
             return;
@@ -99,7 +98,6 @@
         const loading = host.querySelector(".map-loading");
         if (loading) loading.remove();
 
-        // Render the visible list (name + address)
         renderSchoolList(schools);
 
         if (!schools.length) {
@@ -109,33 +107,57 @@
 
         const fixedZoom = parseInt(host.dataset.fixedZoom || "14", 10);
 
-        // Create map 
-        mapInstance = L.map(host, { scrollWheelZoom: true }).setView([schools[0].lat, schools[0].lon], fixedZoom);
+        // Create map
+        mapInstance = L.map(host, { scrollWheelZoom: true }).setView(
+            [schools[0].lat, schools[0].lon],
+            fixedZoom
+        );
 
         L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
             maxZoom: 19,
             attribution: "© OpenStreetMap contributors",
         }).addTo(mapInstance);
 
-        const layer = L.featureGroup().addTo(mapInstance);
+        // Cluster group: blue circles with numbers
+        const clusters = L.markerClusterGroup({
+            showCoverageOnHover: false,
+            spiderfyOnMaxZoom: true,
 
-        // Marker icon (use your existing nearby icon)
+            iconCreateFunction: (cluster) => {
+                const count = cluster.getChildCount();
+
+                let cls = "cluster-yellow";
+                if (count >= 10 && count <= 100) cls = "cluster-orange";
+                if (count > 100) cls = "cluster-red";
+
+                return L.divIcon({
+                    html: `<div><span>${count}</span></div>`,
+                    className: `marker-cluster ${cls}`,
+                    iconSize: L.point(40, 40),
+                });
+            },
+        });
+
+        mapInstance.addLayer(clusters);
+
+
+        // Blue SVG pin at correct size (your svg is 20x25)
         const schoolIcon = L.icon({
-            iconUrl: "/assets/images/markers/marker-school-nearby.svg",
-            iconSize: [36, 54],
-            iconAnchor: [18, 52],
-            popupAnchor: [0, -44],
+            iconUrl: "/assets/images/markers/marker-school.svg",
+            iconSize: [20, 25],
+            iconAnchor: [10, 24],
+            popupAnchor: [0, -22],
         });
 
-        schools.forEach((s) => {
+        // Add markers to clusters
+        for (const s of schools) {
             const ll = L.latLng(s.lat, s.lon);
-            L.marker(ll, { icon: schoolIcon })
-                .bindPopup(popupHtml(s))
-                .addTo(layer);
-        });
+            const m = L.marker(ll, { icon: schoolIcon }).bindPopup(popupHtml(s));
+            clusters.addLayer(m);
+        }
 
-        // Fit bounds to ALL schools
-        const bounds = layer.getBounds();
+        // Fit bounds to all markers (including clusters)
+        const bounds = clusters.getBounds();
         if (bounds.isValid()) {
             mapInstance.fitBounds(bounds.pad(0.1), {
                 padding: [40, 40],
@@ -145,7 +167,7 @@
         }
 
         // Ensure correct render after toggle
-        setTimeout(() => mapInstance.invalidateSize(true), 0);
+        setTimeout(() => mapInstance?.invalidateSize(true), 0);
 
         initialised = true;
     }

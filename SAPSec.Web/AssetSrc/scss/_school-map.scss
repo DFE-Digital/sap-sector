@@ -41,3 +41,47 @@
     }
   }
 }
+
+.marker-cluster {
+  border-radius: 50%;
+}
+
+.marker-cluster div {
+  width: 36px;
+  height: 36px;
+  margin: 2px;
+  border-radius: 50%;
+  line-height: 36px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: #000; /* black number */
+}
+
+/* 2–9 → Cool yellow (blue-friendly) */
+.cluster-yellow {
+  background: rgba(255, 214, 102, 0.35);
+}
+
+.cluster-yellow div {
+  background: #FFD666;
+  color: #1d1d1d; /* dark text for contrast */
+}
+
+/* 10–100 → Orange */
+.cluster-orange {
+  background: rgba(255, 167, 38, 0.45);
+}
+.cluster-orange div {
+  background: #ffa726;
+}
+
+/* 101+ → Red */
+.cluster-red {
+  background: rgba(229, 57, 53, 0.45);
+}
+.cluster-red div {
+  background: #e53935;
+}
+
+
