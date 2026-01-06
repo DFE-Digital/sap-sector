@@ -11,6 +11,8 @@ public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
     ISearchService _searchService) : Controller
 {
+    private const int PageSize = 5;
+
     [HttpGet]
     [Route("search-for-a-school")]
     public IActionResult Index() => View(new SchoolSearchQueryViewModel());
@@ -52,18 +54,23 @@ public class SchoolSearchController(
 
     [HttpGet]
     [Route("school/search")]
-    public async Task<IActionResult> Search([FromQuery] string? query, [FromQuery] string[]? localAuthorities)
+    public async Task<IActionResult> Search(
+        [FromQuery] string? query,
+        [FromQuery] string[]? localAuthorities,
+        [FromQuery] int page = 1)
     {
-        using (logger.BeginScope(new { query }))
+        using (logger.BeginScope(new { query, page }))
         {
+            if (page < 1) page = 1;
+
             var results = await _searchService.SearchAsync(query ?? string.Empty);
 
             var allLocalAuthorities = results
-            .Select(s => s.Establishment.LANAme)
-            .Where(la => !string.IsNullOrWhiteSpace(la))
-            .Distinct()
-            .OrderBy(la => la)
-            .ToArray();
+                .Select(s => s.Establishment.LANAme)
+                .Where(la => !string.IsNullOrWhiteSpace(la))
+                .Distinct()
+                .OrderBy(la => la)
+                .ToArray();
 
             if (localAuthorities != null && localAuthorities.Length > 0)
             {
@@ -77,26 +84,41 @@ public class SchoolSearchController(
                 return RedirectToAction("Index", "School", new { results[0].Establishment.URN });
             }
 
+            var totalResults = results.Count;
+
+            var pagedResults = results
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .ToList();
+
+            var totalPages = (int)Math.Ceiling((double)totalResults / PageSize);
+            if (page > totalPages && totalPages > 0)
+            {
+                return RedirectToAction("Search", new { query, localAuthorities, page = totalPages });
+            }
+
             return View(new SchoolSearchResultsViewModel
+            {
+                Query = query ?? string.Empty,
+                LocalAuthorities = allLocalAuthorities,
+                SelectedLocalAuthorities = localAuthorities ?? Array.Empty<string>(),
+                CurrentPage = page,
+                PageSize = PageSize,
+                TotalResults = totalResults,
+                Results = pagedResults.Select(s => new SchoolSearchResultViewModel
                 {
-                    Query = query ?? string.Empty,
-                    LocalAuthorities = allLocalAuthorities,
-                    SelectedLocalAuthorities = localAuthorities,
-                    Results = results.Select(s => new SchoolSearchResultViewModel
-                        {
-                            SchoolName = s.Establishment.EstablishmentName,
-                            URN = s.Establishment.URN,
-                            LocalAuthority = s.Establishment.LANAme,
-                            Address = string.Join(", ", new[] 
-                            { 
-                                s.Establishment.AddressStreet, 
-                                s.Establishment.AddressLocality, 
-                                s.Establishment.LANAme, 
-                                s.Establishment.AddressPostcode 
-                            }.Where(x => !string.IsNullOrWhiteSpace(x)))
-                        }).ToArray()
-                    }
-            );
+                    SchoolName = s.Establishment.EstablishmentName,
+                    URN = s.Establishment.URN,
+                    LocalAuthority = s.Establishment.LANAme,
+                    Address = string.Join(", ", new[]
+                    {
+                        s.Establishment.AddressStreet,
+                        s.Establishment.AddressLocality,
+                        s.Establishment.LANAme,
+                        s.Establishment.AddressPostcode
+                    }.Where(x => !string.IsNullOrWhiteSpace(x)))
+                }).ToArray()
+            });
         }
     }
 

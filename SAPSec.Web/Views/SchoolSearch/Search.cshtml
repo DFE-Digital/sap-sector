@@ -27,7 +27,14 @@
     <div class="govuk-grid-column-two-thirds">
         @if (hasResults)
         {
-           @await Html.PartialAsync("_SchoolSearchResults", Model.Results, null)
+            @await Html.PartialAsync("_SchoolSearchResults", Model.Results, new ViewDataDictionary(ViewData)
+            {
+                { "StartItem", Model.Pagination.StartItem },
+                { "EndItem", Model.Pagination.EndItem },
+                { "TotalResults", Model.TotalResults }
+            })
+
+        @await Html.PartialAsync("_Pagination", Model.Pagination)
         }
     </div>
 </div>
