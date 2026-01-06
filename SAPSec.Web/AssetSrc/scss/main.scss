@@ -289,7 +289,7 @@
 }
 
 .app-school-results-count {
-    margin-bottom: 20px;
+    margin-bottom: 0;
     font-size: 16px;
 }
 
@@ -320,8 +320,7 @@
     .moj-filter {
         display: block;
     }
-    .app-school-results-count {
-        margin-top: 20px;
+    .app-school-results-count, #mapCount {
         font-size: 14px !important;
     }
 }
@@ -393,26 +392,80 @@
 }
 
 
-.results-bar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+// Results bar for both list and map views
+.results-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
 }
 
+// Line below results bar
+.results-bar + hr.govuk-section-break {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+// Toggle wrapper
 .results-toggle-wrap {
   display: flex;
   justify-content: flex-end;
 }
 
+// Toggle link styling
 .toggle-view-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  white-space: nowrap; // keeps icon + text on one line
+  gap: 8px;
+  color: #0B0C0C;
+  white-space: nowrap;
+  
+  &:visited {
+    color: #0B0C0C;
+  }
+  
+  &:hover {
+    color: #0B0C0C;
+  }
+  
+  &:focus {
+    color: #0B0C0C;
+  }
 }
 
-/* icon switching */
-.toggle-icon--list { display: none; }
-.toggle-view-link[data-view="map"] .toggle-icon--map { display: none; }
-.toggle-view-link[data-view="map"] .toggle-icon--list { display: inline-flex; }
+// Icon containers
+.toggle-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Map icon - 16px wide by 20px high
+.toggle-icon--map svg {
+  width: 16px;
+  height: 20px;
+  color: #0B0C0C;
+  fill: currentColor;
+}
+
+// List icon - 16px wide by 16px high  
+.toggle-icon--list svg {
+  width: 16px;
+  height: 16px;
+  color: #0B0C0C;
+  fill: currentColor;
+}
+
+// Icon switching logic
+.toggle-icon--list { 
+  display: none; 
+}
+
+.toggle-view-link[data-view="map"] {
+  .toggle-icon--map { 
+    display: none; 
+  }
+  .toggle-icon--list { 
+    display: inline-flex; 
+  }
+}

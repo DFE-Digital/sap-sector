@@ -34,23 +34,20 @@
     });
 }
 
-<div class="results-bar govuk-!-margin-bottom-2">
-    <p class="govuk-body govuk-!-margin-bottom-0" id="mapCount">
+<div class="results-bar">
+    <p class="govuk-body app-school-results-count" id="mapCount">
         Showing <strong>@Model.Length</strong> schools
     </p>
     
     <div id="mapBarActions"></div>
 </div>
-<div class="govuk-clearfix">
+<hr class="govuk-section-break govuk-section-break--visible">
 
-    <div id="map"
-         data-fixed-zoom="14"
-         role="region"
-         aria-label="Map of schools">
-        <div class="map-loading">Loading map…</div>
-    </div>
-
-
+<div id="map"
+     data-fixed-zoom="14"
+     role="region"
+     aria-label="Map of schools">
+    <div class="map-loading">Loading map…</div>
 </div>
 
 <script type="application/json" id="schools-data">
