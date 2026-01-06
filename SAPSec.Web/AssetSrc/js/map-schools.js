@@ -87,6 +87,7 @@
         const host = document.getElementById("map");
         if (!host) return;
 
+        // If already initialised, just fix sizing (e.g. after tab toggle)
         if (initialised) {
             mapInstance?.invalidateSize(true);
             return;
