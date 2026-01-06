@@ -98,7 +98,6 @@
         const loading = host.querySelector(".map-loading");
         if (loading) loading.remove();
 
-        // Render the visible list (name + address)
         renderSchoolList(schools);
 
         if (!schools.length) {
