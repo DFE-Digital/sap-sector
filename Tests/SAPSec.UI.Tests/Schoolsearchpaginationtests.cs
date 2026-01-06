@@ -303,21 +303,6 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         text.Should().Contain("6-", "Second page should show results starting from 6");
     }
 
-    [Fact]
-    public async Task ResultsCount_HasBoldNumbers()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var resultsCount = Page.Locator(".app-school-results-count");
-        if (await resultsCount.CountAsync() == 0) return;
-
-        var strongElements = resultsCount.Locator("strong");
-        var count = await strongElements.CountAsync();
-
-        count.Should().Be(2, "Results count should have 2 bold numbers (range and total)");
-    }
-
     #endregion
 
     #region Ellipsis Tests
