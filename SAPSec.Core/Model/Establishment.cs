@@ -62,6 +62,9 @@ namespace SAPSec.Core.Model
         public string Website { get; set; } = string.Empty;
         public string? Easting { get; set; }
         public string? Northing { get; set; }
+        
+        public string? Latitude { get; set; }
+        public string? Longitude { get; set; }
 
         // Also known as LA/Estab, for obvious reasons
         public string DfENumber => $"{LAId}/{EstablishmentNumber}";

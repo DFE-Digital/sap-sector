@@ -20,6 +20,7 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.2.1" />
 		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+		<PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.2.3" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -29,6 +30,26 @@
 
 	<ItemGroup>
 		<Content Include="Data\Files\**\*">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\images\markers\marker-user.svg">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\images\markers\marker-school-nearby.svg">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\images\markers\marker-school-target.svg">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\js\school-search-toggle.js">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\js\map-schools.js">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
 	</ItemGroup>

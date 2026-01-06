@@ -1,6 +1,6 @@
 @import "../../node_modules/govuk-frontend/dist/govuk/index";
 @import "../../node_modules/accessible-autocomplete/dist/accessible-autocomplete.min";
-
+@import "school-map";
 
 //.school-search-suggester-wrapper {
 //    position: relative;
@@ -360,3 +360,28 @@
 .autocomplete__menu:not(.autocomplete__menu--visible) {
     display: none !important;
 }
+
+
+.results-bar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 12px;
+}
+
+.results-toggle-wrap {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.toggle-view-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap; // keeps icon + text on one line
+}
+
+/* icon switching */
+.toggle-icon--list { display: none; }
+.toggle-view-link[data-view="map"] .toggle-icon--map { display: none; }
+.toggle-view-link[data-view="map"] .toggle-icon--list { display: inline-flex; }
