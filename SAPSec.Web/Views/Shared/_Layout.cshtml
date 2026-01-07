@@ -1,9 +1,13 @@
 ﻿@using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
+}
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
-    <meta charset="utf-8"/>
+    <meta charset="utf-8" />
     <title>
         @if (ViewData.ContainsKey(ViewDataKeys.Title))
         {
@@ -23,46 +27,46 @@
     <link rel="mask-icon" href="/assets/images/govuk-icon-mask.svg" color="#0b0c0c">
     <link rel="apple-touch-icon" href="/assets/images/govuk-icon-180.png">
     <link rel="manifest" href="/assets/manifest.json">
-    <link rel="stylesheet" href="/css/accessible-autocomplete.min.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="/css/main.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="/css/accessible-autocomplete.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/css/main.css" asp-append-version="true" />
     @* @await Component.InvokeAsync("Analytics") *@
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
-<script add-nonce="true">
-    document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
-</script>
+    <script add-nonce="true">
+        document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
+    </script>
 
-<a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
-@await Component.InvokeAsync("Cookies")
-<header class="govuk-header" data-module="govuk-header">
-<div class="govuk-header__container govuk-width-container">
-    <div class="govuk-header__logo">
-        <a href="/" class="govuk-header__link govuk-header__link--homepage">
-            <img src="~/assets/images/department-for-education_white.png"
-                 alt="Department for Education"
-                 class="govuk-header__logotype" />
-        </a>
-    </div>
-    <div class="header-right-wrapper">
-        <div class="govuk-header__content">
-            @if (User.Identity is { IsAuthenticated: true })
-            {
-                <nav aria-label="Account navigation">
-                    <ul class="govuk-header__navigation">
-                        <li class="govuk-header__navigation-item">
-                            <a href="@Url.Action("SignOutCallback", "Auth")"
-                               class="govuk-header__link">
-                                Sign out
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            }
+    <a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+    @await Component.InvokeAsync("Cookies")
+    <header class="govuk-header" data-module="govuk-header">
+        <div class="govuk-header__container govuk-width-container">
+            <div class="govuk-header__logo">
+                <a href="/" class="govuk-header__link govuk-header__link--homepage">
+                    <img src="~/assets/images/department-for-education_white.png"
+                         alt="Department for Education"
+                         class="govuk-header__logotype" />
+                </a>
+            </div>
+            <div class="header-right-wrapper">
+                <div class="govuk-header__content">
+                    @if (User.Identity is { IsAuthenticated: true })
+                    {
+                        <nav aria-label="Account navigation">
+                            <ul class="govuk-header__navigation">
+                                <li class="govuk-header__navigation-item">
+                                    <a href="@Url.Action("SignOutCallback", "Auth")"
+                                       class="govuk-header__link">
+                                        Sign out
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
         </div>
-    </div>
-</div>       
-</header>
+    </header>
     <section aria-label="Service information" class="govuk-service-navigation" data-module="govuk-service-navigation">
         <div class="govuk-width-container">
             <div class="govuk-service-navigation__container">
@@ -73,37 +77,41 @@
                                         LayoutConstants.ServiceName,
                                         classes: new[] { "govuk-service-navigation__link" })
                 </span>
-                  @if (User.Identity is { IsAuthenticated: true })
-            {
+                @if (User.Identity is { IsAuthenticated: true })
+                {
                     <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
                         <button type="button"
-                        class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle"
-                        aria-controls="navigation"
-                        hidden>
+                                class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle"
+                                aria-controls="navigation"
+                                hidden>
                             Menu
                         </button>
                         <ul class="govuk-service-navigation__list" id="navigation">
-                            <li class="govuk-service-navigation__item">
+                            <li class="govuk-service-navigation__item @(currentController == "compareperformance" ? "govuk-service-navigation__item--active" : "")">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "ComparePerformance")">
+                                   href="@Url.Action("Index", "ComparePerformance")"
+                                   @(currentController == "compareperformance" ? "aria-current=page" : "")>
                                     Compare performance
                                 </a>
                             </li>
-                            <li class="govuk-service-navigation__item">
+                            <li class="govuk-service-navigation__item @(currentController == "connectschool" ? "govuk-service-navigation__item--active" : "")">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "ConnectSchool")">
-                                   Connect
+                                   href="@Url.Action("Index", "ConnectSchool")"
+                                   @(currentController == "connectschool" ? "aria-current=page" : "")>
+                                    Connect
                                 </a>
                             </li>
-                            <li class="govuk-service-navigation__item">
+                            <li class="govuk-service-navigation__item @(currentController == "school" ? "govuk-service-navigation__item--active" : "")">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "SchoolDetails")">
+                                   href="@Url.Action("Index", "School")"
+                                   @(currentController == "school" ? "aria-current=page" : "")>
                                     School details
                                 </a>
                             </li>
-                            <li class="govuk-service-navigation__item">
+                            <li class="govuk-service-navigation__item @(currentController == "schoolsearch" ? "govuk-service-navigation__item--active" : "")">
                                 <a class="govuk-service-navigation__link"
-                                   href="@Url.Action("Index", "SchoolSearch")">
+                                   href="@Url.Action("Index", "SchoolSearch")"
+                                   @(currentController == "schoolsearch" ? "aria-current=page" : "")>
                                     Change school
                                 </a>
                             </li>
@@ -118,76 +126,73 @@
             @await Component.InvokeAsync("PhaseBanner")
         </div>
     </nav>
-  
-<div class="govuk-width-container app-width-container">
-    <main class="govuk-main-wrapper" id="main-content">
-        @RenderBody()
-    </main>
-</div>
 
-<footer class="govuk-footer" role="contentinfo">
-    <div class="govuk-width-container ">
-        <div class="govuk-footer__meta">
-            <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
-                <h2 class="govuk-visually-hidden">Support links</h2>
-                <ul class="govuk-footer__inline-list govuk-!-display-none-print">
-                    <li class="govuk-footer__inline-list-item">
-                        <a class="govuk-footer__link" href="@Url.Action("Cookies", "StaticContent")">Cookies</a>
-                    </li>
-                    <li class="govuk-footer__inline-list-item">
-                        <a class="govuk-footer__link" href="@Url.Action("Accessibility", "StaticContent")">Accessibility</a>
-                    </li>
-                    <li class="govuk-footer__inline-list-item">
-                        <a class="govuk-footer__link" href="@Url.Action("TermsOfUse", "StaticContent")">Terms of use</a>
-                    </li>
-                    <li class="govuk-footer__inline-list-item">
+    <div class="govuk-width-container app-width-container">
+        <main class="govuk-main-wrapper" id="main-content">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="govuk-footer" role="contentinfo">
+        <div class="govuk-width-container ">
+            <div class="govuk-footer__meta">
+                <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
+                    <h2 class="govuk-visually-hidden">Support links</h2>
+                    <ul class="govuk-footer__inline-list govuk-!-display-none-print">
+                        <li class="govuk-footer__inline-list-item">
+                            <a class="govuk-footer__link" href="@Url.Action("Cookies", "StaticContent")">Cookies</a>
+                        </li>
+                        <li class="govuk-footer__inline-list-item">
+                            <a class="govuk-footer__link" href="@Url.Action("Accessibility", "StaticContent")">Accessibility</a>
+                        </li>
+                        <li class="govuk-footer__inline-list-item">
+                            <a class="govuk-footer__link" href="@Url.Action("TermsOfUse", "StaticContent")">Terms of use</a>
+                        </li>
+                        <li class="govuk-footer__inline-list-item">
+                            <a class="govuk-footer__link"
+                               href="https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers">
+                                Privacy
+                            </a>
+                        </li>
+                        @* <li class="govuk-footer__inline-list-item"> *@
+                        @*     <a class="govuk-footer__link" href="@Url.Action("Index", "DataSource")"> *@
+                        @*         Data Sources *@
+                        @*     </a> *@
+                        @* </li> *@
+                        @* <li class="govuk-footer__inline-list-item"> *@
+                        @*     <a class="govuk-footer__link" href="@Url.Action("Contact", "StaticContent")"> *@
+                        @*         Contact *@
+                        @*     </a> *@
+                        @* </li> *@
+                    </ul>
+                    <svg aria-hidden="true"
+                         focusable="false"
+                         class="govuk-footer__licence-logo"
+                         xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 483.2 195.7"
+                         height="17"
+                         width="41">
+                        <path fill="currentColor"
+                              d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145" />
+                    </svg>
+                    <span class="govuk-footer__licence-description">
+                        All content is available under the
                         <a class="govuk-footer__link"
-                           href="https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers">
-                            Privacy
-                        </a>
-                    </li>
-                    @* <li class="govuk-footer__inline-list-item"> *@
-                    @*     <a class="govuk-footer__link" href="@Url.Action("Index", "DataSource")"> *@
-                    @*         Data Sources *@
-                    @*     </a> *@
-                    @* </li> *@
-                    @* <li class="govuk-footer__inline-list-item"> *@
-                    @*     <a class="govuk-footer__link" href="@Url.Action("Contact", "StaticContent")"> *@
-                    @*         Contact *@
-                    @*     </a> *@
-                    @* </li> *@
-                </ul>
-                <svg
-                    aria-hidden="true"
-                    focusable="false"
-                    class="govuk-footer__licence-logo"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 483.2 195.7"
-                    height="17"
-                    width="41">
-                    <path
-                        fill="currentColor"
-                        d="M421.5 142.8V.1l-50.7 32.3v161.1h112.4v-50.7zm-122.3-9.6A47.12 47.12 0 0 1 221 97.8c0-26 21.1-47.1 47.1-47.1 16.7 0 31.4 8.7 39.7 21.8l42.7-27.2A97.63 97.63 0 0 0 268.1 0c-36.5 0-68.3 20.1-85.1 49.7A98 98 0 0 0 97.8 0C43.9 0 0 43.9 0 97.8s43.9 97.8 97.8 97.8c36.5 0 68.3-20.1 85.1-49.7a97.76 97.76 0 0 0 149.6 25.4l19.4 22.2h3v-87.8h-80l24.3 27.5zM97.8 145c-26 0-47.1-21.1-47.1-47.1s21.1-47.1 47.1-47.1 47.2 21 47.2 47S123.8 145 97.8 145"/>
-                </svg>
-                <span class="govuk-footer__licence-description">
-                    All content is available under the
-                    <a
-                        class="govuk-footer__link"
-                        href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
-                        rel="license">
-                        Open Government Licence v3.0</a>, except where otherwise stated
-                </span>
-            </div>
-            <div class="govuk-footer__meta-item">
-                <a
-                    class="govuk-footer__link govuk-footer__copyright-logo"
-                    href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">
-                    © Crown copyright
-                </a>
+                           href="https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
+                           rel="license">
+                            Open Government Licence v3.0
+                        </a>, except where otherwise stated
+                    </span>
+                </div>
+                <div class="govuk-footer__meta-item">
+                    <a class="govuk-footer__link govuk-footer__copyright-logo"
+                       href="https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/">
+                        © Crown copyright
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
     <script src="/js/govuk-frontend.min.js" asp-append-version="true"></script>
     <script src="/js/moj-frontend.min.js" asp-append-version="true"></script>
     <script src="/js/dfefrontend.js" asp-append-version="true"></script>
@@ -195,29 +200,29 @@
         window.GOVUKFrontend.initAll();
         window.MOJFrontend.initAll();
     </script>
-<script add-nonce="true">
-    document.getElementById("js-back-link")?.addEventListener('click', function (ev) {
-        ev.preventDefault();
-        history.back();
-    });
-            document.querySelectorAll('.moj-filter input[type="checkbox"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                checkbox.closest('form').submit();
-            });
-        });
-    document.querySelectorAll(".app-print-link").forEach((element) => {
-        if (element.classList.contains("govuk-visually-hidden")) {
-            element.classList.remove("govuk-visually-hidden");
-        }
-
-        element.addEventListener("click", function (ev) {
+    <script add-nonce="true">
+        document.getElementById("js-back-link")?.addEventListener('click', function (ev) {
             ev.preventDefault();
-            window.print();
+            history.back();
         });
-    })
-</script>
+                document.querySelectorAll('.moj-filter input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', () => {
+                    checkbox.closest('form').submit();
+                });
+            });
+        document.querySelectorAll(".app-print-link").forEach((element) => {
+            if (element.classList.contains("govuk-visually-hidden")) {
+                element.classList.remove("govuk-visually-hidden");
+            }
 
-@await RenderSectionAsync("scripts", false)
+            element.addEventListener("click", function (ev) {
+                ev.preventDefault();
+                window.print();
+            });
+        })
+    </script>
+
+    @await RenderSectionAsync("scripts", false)
 
 </body>
 </html>

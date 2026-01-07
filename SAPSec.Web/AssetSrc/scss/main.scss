@@ -391,3 +391,9 @@
 .govuk-button:not(.govuk-button--loading) .app-button-spinner {
     display: none;
 }
+.govuk-service-navigation__item--active .govuk-service-navigation__link {
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.5em;
+}

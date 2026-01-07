@@ -1,49 +1,150 @@
 ﻿@model SAPSec.Web.ViewModels.SchoolViewModel
 @{
-    ViewData["Title"] = "Test Page";
+    ViewData["Title"] = $"{Model.Name} - School details";
 }
 
 <div class="govuk-width-container">
+    <a href="@Url.Action("Index", "SchoolSearch")" class="govuk-back-link">Home</a>
+
     <main class="govuk-main-wrapper" id="main-content" role="main">
         <div class="govuk-grid-row">
             <div class="govuk-grid-column-two-thirds">
-                <h1 class="govuk-heading-xl">Test Page for School</h1>
 
-                <p class="govuk-body-l">
-                     School details Test page.
-                </p>
+                <span class="govuk-caption-l">@Model.Name</span>
+                <h1 class="govuk-heading-l">School details</h1>
 
-                <!-- User Information -->
+                @* Location Section *@
+                <h2 class="govuk-heading-m">Location</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Address</dt>
+                        <dd class="govuk-summary-list__value">@Model.Address</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Local authority</dt>
+                        <dd class="govuk-summary-list__value">@Model.LocalAuthority</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Region</dt>
+                        <dd class="govuk-summary-list__value">@Model.Region</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Urban/rural description</dt>
+                        <dd class="govuk-summary-list__value">@Model.UrbanRuralDescription</dd>
+                    </div>
+                </dl>
+
+                @* School Details Section *@
                 <h2 class="govuk-heading-m">School details</h2>
                 <dl class="govuk-summary-list">
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Name</dt>
-                        <dd class="govuk-summary-list__value">@Model.Name</dd>
+                        <dt class="govuk-summary-list__key">ID</dt>
+                        <dd class="govuk-summary-list__value">@Model.Id</dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Urn</dt>
-                        <dd class="govuk-summary-list__value">@Model.Urn</dd>
+                        <dt class="govuk-summary-list__key">Age range</dt>
+                        <dd class="govuk-summary-list__value">@Model.AgeRange</dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Ukprn</dt>
-                        <dd class="govuk-summary-list__value">@Model.Ukprn</dd>
+                        <dt class="govuk-summary-list__key">Gender of entry</dt>
+                        <dd class="govuk-summary-list__value">@Model.GenderOfEntry</dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">DfE Number</dt>
-                        <dd class="govuk-summary-list__value">@Model.DfENumber</dd>
+                        <dt class="govuk-summary-list__key">Phase of education</dt>
+                        <dd class="govuk-summary-list__value">@Model.PhaseOfEducation</dd>
                     </div>
                     <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">View Data </dt>
+                        <dt class="govuk-summary-list__key">School type</dt>
+                        <dd class="govuk-summary-list__value">@Model.SchoolType</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Governance structure</dt>
+                        <dd class="govuk-summary-list__value">@Model.GovernanceStructure</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Academy trust</dt>
                         <dd class="govuk-summary-list__value">
-                            <a href="@Url.Action("Data", "Data", new {id = Model.Urn})" role="button" draggable="false" class="govuk-button govuk-button--start" data-module="govuk-button">
-                                Data!
-                            </a>
+                            @if (Model.IsPartOfTrust)
+                            {
+                                <a href="#" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                                    @Model.AcademyTrust
+                                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                                </a>
+                            }
+                            else
+                            {
+                                @Model.AcademyTrust
+                            }
+                        </dd>
                     </div>
-
-
-
-                    
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Admissions policy</dt>
+                        <dd class="govuk-summary-list__value">@Model.AdmissionsPolicy</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">SEND integrated resource</dt>
+                        <dd class="govuk-summary-list__value">@Model.SendIntegratedResource</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Religious character</dt>
+                        <dd class="govuk-summary-list__value">@Model.ReligiousCharacter</dd>
+                    </div>
                 </dl>
+
+                @* Contact Details Section *@
+                <h2 class="govuk-heading-m">Contact details</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Headteacher/Principal</dt>
+                        <dd class="govuk-summary-list__value">@Model.HeadteacherPrincipal</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Website</dt>
+                        <dd class="govuk-summary-list__value">
+                            @if (Model.HasWebsite)
+                            {
+                                <a href="@Model.WebsiteUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                                    @Model.WebsiteUrl
+                                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                                </a>
+                            }
+                            else
+                            {
+                                @Model.Website
+                            }
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Telephone</dt>
+                        <dd class="govuk-summary-list__value">@Model.Telephone</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Email</dt>
+                        <dd class="govuk-summary-list__value">@Model.Email</dd>
+                    </div>
+                </dl>
+
+                @* Further Information Section *@
+                <h2 class="govuk-heading-m">Further information</h2>
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Ofsted report</dt>
+                        <dd class="govuk-summary-list__value">
+                            @if (Model.HasOfstedReport)
+                            {
+                                <a href="@Model.OfstedReportUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                                    View the latest Ofsted report
+                                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <text>No available data</text>
+                            }
+                        </dd>
+                    </div>
+                </dl>
+
             </div>
         </div>
     </main>
