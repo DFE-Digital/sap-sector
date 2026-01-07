@@ -43,19 +43,19 @@
     function popupHtml(s) {
         const name = escapeHtml(s.name || "School");
         const address = escapeHtml(s.address || "");
-        const la = escapeHtml(s.la || "");
         const url = s.url || "#";
 
         return `
-      <div class="map-popup">
-        <a class="govuk-link govuk-link--no-visited-state" href="${url}">
-          <strong>${name}</strong>
-        </a><br/>
-        <span>${address}</span><br/>
-        <span>${la}</span>
-      </div>
-    `;
+    <div class="map-popup">
+      <a class="govuk-link govuk-link--no-visited-state popup-name" href="${url}">
+        <strong>${name}</strong>
+      </a>
+      <div class="popup-gap"></div>
+      <span class="popup-address">${address}</span>
+    </div>
+  `;
     }
+
 
     function renderSchoolList(schools) {
         const listEl = document.getElementById("schoolList");

@@ -4,7 +4,7 @@
   height: 70vh;        
   min-height: 420px;   
   max-height: 720px;
-  margin-top: 30px; // 30px spacing from line above
+  margin-top: 20px; 
 
   // Prevent map collapsing when hidden then shown
   display: block;
@@ -85,4 +85,26 @@
   background: #e53935;
 }
 
+.map-popup {
+  border-radius: 5px;
+}
+
+/* Desktop default */
+.popup-name,
+.popup-address {
+  font-size: 15px;
+}
+
+/* Gap between name and address */
+.popup-gap {
+  height: 5px;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .popup-name,
+  .popup-address {
+    font-size: 13px;
+  }
+}
 

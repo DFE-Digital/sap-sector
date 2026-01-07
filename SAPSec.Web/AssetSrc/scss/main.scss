@@ -398,6 +398,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  margin-top: 20px;
 }
 
 // Line below results bar
@@ -410,6 +411,7 @@
 .results-toggle-wrap {
   display: flex;
   justify-content: flex-end;
+  font-size: 14px;
 }
 
 // Toggle link styling
@@ -442,16 +444,16 @@
 
 // Map icon - 16px wide by 20px high
 .toggle-icon--map svg {
-  width: 16px;
-  height: 20px;
+  width: 14px;
+  height: 14px;
   color: #0B0C0C;
   fill: currentColor;
 }
 
 // List icon - 16px wide by 16px high  
 .toggle-icon--list svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   color: #0B0C0C;
   fill: currentColor;
 }
