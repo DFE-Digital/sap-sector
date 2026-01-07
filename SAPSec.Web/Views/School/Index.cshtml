@@ -66,7 +66,7 @@
                         <dd class="govuk-summary-list__value">
                             @if (Model.IsPartOfTrust)
                             {
-                                <a href="#" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                                <a href="#" class="govuk-link" aria-label="View Academy Trust" target="_blank" rel="noopener noreferrer">
                                     @Model.AcademyTrust
                                     <span class="govuk-visually-hidden">(opens in a new tab)</span>
                                 </a>
@@ -103,7 +103,7 @@
                         <dd class="govuk-summary-list__value">
                             @if (Model.HasWebsite)
                             {
-                                <a href="@Model.WebsiteUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                                <a href="@Model.WebsiteUrl" class="govuk-link" aria-label="View website" target="_blank" rel="noopener noreferrer">
                                     @Model.WebsiteUrl
                                     <span class="govuk-visually-hidden">(opens in a new tab)</span>
                                 </a>
@@ -132,7 +132,7 @@
                         <dd class="govuk-summary-list__value">
                             @if (Model.HasOfstedReport)
                             {
-                                <a href="@Model.OfstedReportUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                                <a href="@Model.OfstedReportUrl" class="govuk-link" aria-label="View ofsted report" target="_blank" rel="noopener noreferrer">
                                     View the latest Ofsted report
                                     <span class="govuk-visually-hidden">(opens in a new tab)</span>
                                 </a>
