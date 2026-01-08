@@ -47,7 +47,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var resultsCount = Page.Locator(".app-school-results-count");
+        var resultsCount = Page.Locator(".app-school-results-count").First;
         var countText = await resultsCount.TextContentAsync();
 
         if (countText?.Contains("of") == true)
@@ -286,7 +286,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         var resultsCount = Page.Locator(".app-school-results-count");
         if (await resultsCount.CountAsync() == 0) return;
 
-        var text = await resultsCount.TextContentAsync();
+        var text = await resultsCount.First.TextContentAsync();
         text.Should().Contain("1-", "First page should show results starting from 1");
     }
 
@@ -299,7 +299,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         var resultsCount = Page.Locator(".app-school-results-count");
         if (await resultsCount.CountAsync() == 0) return;
 
-        var text = await resultsCount.TextContentAsync();
+        var text = await resultsCount.First.TextContentAsync();
         text.Should().Contain("11-", "Second page should show results starting from 6");
     }
 
