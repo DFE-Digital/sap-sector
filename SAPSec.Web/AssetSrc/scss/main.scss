@@ -398,8 +398,13 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 20px; // mobile
+
+  @media (min-width: 768px) {
+    margin-top: 0; // desktop
+  }
 }
+
 
 // Line below results bar
 .results-bar + hr.govuk-section-break {
@@ -442,7 +447,7 @@
   justify-content: center;
 }
 
-// Map icon - 16px wide by 20px high
+// Map icon 
 .toggle-icon--map svg {
   width: 14px;
   height: 14px;
@@ -450,7 +455,7 @@
   fill: currentColor;
 }
 
-// List icon - 16px wide by 16px high  
+// List icon 
 .toggle-icon--list svg {
   width: 14px;
   height: 14px;
