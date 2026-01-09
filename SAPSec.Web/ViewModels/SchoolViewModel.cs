@@ -117,8 +117,8 @@ public class SchoolViewModel
         if (string.IsNullOrWhiteSpace(_school.AgeRangeLow))
             return NoDataAvailable;
 
-        if (!string.IsNullOrWhiteSpace(_school.AgeRangeHigh))
-            return $"{_school.AgeRangeLow} to {_school.AgeRangeHigh}";
+        if (!string.IsNullOrWhiteSpace(_school.AgeRangeRange))
+            return $"{_school.AgeRangeLow} to {_school.AgeRangeRange}";
 
         return _school.AgeRangeLow;
     }
