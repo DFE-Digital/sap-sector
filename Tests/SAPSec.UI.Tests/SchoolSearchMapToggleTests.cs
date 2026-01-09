@@ -183,7 +183,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
         var toggleText = Page.Locator(".toggle-text");
         var text = await toggleText.TextContentAsync();
 
-        text.Should().Be("View on list", "Toggle text should change to 'View as list' when showing map");
+        text.Should().Be("View as a list", "Toggle text should change to 'View as a list' when showing map");
     }
 
     #endregion
