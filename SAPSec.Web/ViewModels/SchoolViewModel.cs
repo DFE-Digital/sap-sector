@@ -36,8 +36,13 @@ public class SchoolViewModel
     public bool IsPartOfTrust => !string.IsNullOrWhiteSpace(_school.TrustsId)
                                   && !string.IsNullOrWhiteSpace(_school.TrustName);
     public string AdmissionsPolicy => GetValueOrNoData(_school.AdmissionPolicy);
-    public string SendIntegratedResource => FormatSendResource();
     public string ReligiousCharacter => GetValueOrNoData(_school.ReligiousCharacterName);
+
+    // Provision fields
+    public string NurseryProvision => FormatNurseryProvision();
+    public string SixthForm => FormatSixthForm();
+    public string SenUnit => FormatSenUnit();
+    public string ResourcedProvision => FormatResourcedProvision();
 
     // Contact Details Section
     public string HeadteacherPrincipal => FormatHeadteacher();
@@ -46,10 +51,19 @@ public class SchoolViewModel
     public bool HasWebsite => !string.IsNullOrWhiteSpace(_school.Website);
     public string Telephone => GetValueOrNoData(_school.TelephoneNum);
     public string Email => FormatEmail();
-    public bool HasEmail => !string.IsNullOrWhiteSpace(_school.Website); 
+    public bool HasEmail => !string.IsNullOrWhiteSpace(FormatEmailRaw());
+
+    // Further Information Section
     public string OfstedReportUrl => $"https://reports.ofsted.gov.uk/provider/23/{_school.URN}";
     public bool HasOfstedReport => !string.IsNullOrWhiteSpace(_school.URN);
 
+    // Information from other services
+    public string FinancialBenchmarkingUrl => $"https://schools-financial-benchmarking.service.gov.uk/school?urn={_school.URN}";
+    public string GetInformationAboutSchoolsUrl => $"https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{_school.URN}";
+
+    /// <summary>
+    /// Returns the value if not null/empty, otherwise returns "No available data"
+    /// </summary>
     private static string GetValueOrNoData(string? value)
     {
         return string.IsNullOrWhiteSpace(value) ? NoDataAvailable : value;
@@ -100,7 +114,13 @@ public class SchoolViewModel
 
     private string FormatAgeRange()
     {
-        return NoDataAvailable; // e.g., "11 to 16"
+        if (string.IsNullOrWhiteSpace(_school.AgeRangeLow))
+            return NoDataAvailable;
+
+        if (!string.IsNullOrWhiteSpace(_school.AgeRangeHigh))
+            return $"{_school.AgeRangeLow} to {_school.AgeRangeHigh}";
+
+        return _school.AgeRangeLow;
     }
 
     private string FormatHeadteacher()
@@ -130,23 +150,101 @@ public class SchoolViewModel
         return website;
     }
 
+    private string FormatEmailRaw()
+    {
+        // Return raw email if available in the model
+        // You may need to add Email property to Establishment model
+        return string.Empty;
+    }
+
     private string FormatEmail()
     {
+        var email = FormatEmailRaw();
+        return string.IsNullOrWhiteSpace(email) ? NoDataAvailable : email;
+    }
+
+    private string FormatNurseryProvision()
+    {
+        // Check PhaseOfEducation for nursery indication
+        var phase = _school.PhaseOfEducationName?.ToLower() ?? "";
+
+        if (phase.Contains("nursery"))
+            return "Has nursery classes";
+
+        if (phase.Contains("secondary") || phase.Contains("16 plus") || phase.Contains("post-16"))
+            return "Does not have nursery classes";
+
+        if (phase.Contains("primary"))
+            return "Does not have nursery classes";
+
         return NoDataAvailable;
     }
 
-    private string FormatSendResource()
+    private string FormatSixthForm()
     {
-        if (string.IsNullOrWhiteSpace(_school.ResourcedProvision))
-            return NoDataAvailable;
+        // OfficialSixthFormId: 1 = Has sixth form, 2 = Does not have sixth form, 0 = Not applicable
+        return _school.OfficialSixthFormId switch
+        {
+            "1" => "Has a sixth form",
+            "2" => "Does not have a sixth form",
+            "0" => "Does not have a sixth form",
+            _ => NoDataAvailable
+        };
+    }
 
-        return _school.ResourcedProvision;
+    private string FormatSenUnit()
+    {
+        // Check ResourcedProvision field for SEN unit info
+        var provision = _school.ResourcedProvision?.ToLower() ?? "";
+
+        if (provision.Contains("sen unit"))
+            return "Has a SEN unit";
+
+        if (string.IsNullOrWhiteSpace(_school.ResourcedProvision) ||
+            provision == "not applicable" ||
+            provision == "none" ||
+            provision == "")
+            return "Does not have a SEN unit";
+
+        // If there's only resourced provision but no SEN unit mentioned
+        if (provision.Contains("resourced provision") && !provision.Contains("sen unit"))
+            return "Does not have a SEN unit";
+
+        return "Does not have a SEN unit";
+    }
+
+    private string FormatResourcedProvision()
+    {
+        var provision = _school.ResourcedProvision?.ToLower() ?? "";
+
+        if (provision.Contains("resourced provision"))
+            return "Has a resourced provision";
+
+        if (string.IsNullOrWhiteSpace(_school.ResourcedProvision) ||
+            provision == "not applicable" ||
+            provision == "none" ||
+            provision == "")
+            return "Does not have a resourced provision";
+
+        return "Does not have a resourced provision";
     }
 
     private string DetermineGovernanceStructure()
     {
+        // Determine based on TrustsId or TypeOfEstablishment
         if (!string.IsNullOrWhiteSpace(_school.TrustsId))
             return "Multi-academy trust (MAT)";
+
+        // Single academy trust
+        var schoolType = _school.TypeOfEstablishmentName?.ToLower() ?? "";
+        if (schoolType.Contains("academy") && string.IsNullOrWhiteSpace(_school.TrustsId))
+            return "Single-academy trust (SAT)";
+
+        // Maintained school
+        if (schoolType.Contains("community") ||
+            schoolType.Contains("voluntary") ||
+            schoolType.Contains("foundation"))
+            return "Local authority maintained";
 
         return NoDataAvailable;
     }

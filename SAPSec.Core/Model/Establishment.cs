@@ -27,6 +27,9 @@ namespace SAPSec.Core.Model
         public string HeadteacherTitle { get; set; } = string.Empty;
         public string HeadteacherFirstName { get; set; } = string.Empty;
         public string HeadteacherLastName { get; set; } = string.Empty;
+        // Age range
+        public string AgeRangeLow { get; set; } = string.Empty;
+        public string AgeRangeHigh { get; set; } = string.Empty;
         public string HeadteacherPreferredJobTitle { get; set; } = string.Empty;
         public string AddressStreet { get; set; } = string.Empty;
         public string AddressLocality { get; set; } = string.Empty;

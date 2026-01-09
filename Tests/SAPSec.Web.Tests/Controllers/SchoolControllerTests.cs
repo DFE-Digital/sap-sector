@@ -313,22 +313,6 @@ public class SchoolControllerTests
         // Assert
         model!.AdmissionsPolicy.Should().Be("Non-selective");
     }
-
-    [Fact]
-    public void Index_ReturnsViewModel_WithCorrectSendIntegratedResource()
-    {
-        // Arrange
-        _mockEstablishmentService.Setup(s => s.GetEstablishment(It.IsAny<string>()))
-            .Returns(FakeEstablishment);
-
-        // Act
-        var result = _controller.Index("147788") as ViewResult;
-        var model = result!.Model as SchoolViewModel;
-
-        // Assert
-        model!.SendIntegratedResource.Should().Be("Resourced provision");
-    }
-
     [Fact]
     public void Index_ReturnsViewModel_WithCorrectReligiousCharacter()
     {
