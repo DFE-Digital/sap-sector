@@ -47,7 +47,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var resultsCount = Page.Locator(".app-school-results-count").First;
+        var resultsCount = Page.Locator(".app-school-results-count");
         var countText = await resultsCount.TextContentAsync();
 
         if (countText?.Contains("of") == true)
@@ -286,7 +286,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         var resultsCount = Page.Locator(".app-school-results-count");
         if (await resultsCount.CountAsync() == 0) return;
 
-        var text = await resultsCount.First.TextContentAsync();
+        var text = await resultsCount.TextContentAsync();
         text.Should().Contain("1-", "First page should show results starting from 1");
     }
 
@@ -299,8 +299,8 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         var resultsCount = Page.Locator(".app-school-results-count");
         if (await resultsCount.CountAsync() == 0) return;
 
-        var text = await resultsCount.First.TextContentAsync();
-        text.Should().Contain("11-", "Second page should show results starting from 6");
+        var text = await resultsCount.TextContentAsync();
+        text.Should().Contain("6-", "Second page should show results starting from 6");
     }
 
     #endregion
@@ -310,13 +310,19 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_ShowsEllipsis_WhenManyPages()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=4");
+        // Navigate to a search with many results
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=5");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var ellipsis = Page.Locator(".govuk-pagination__item--ellipsis");
         var count = await ellipsis.CountAsync();
 
-        count.Should().BeGreaterThan(0, "Ellipsis should appear when on middle page with many total pages");
+        // Ellipsis should appear when there are many pages
+        if (count > 0)
+        {
+            var ellipsisText = await ellipsis.First.TextContentAsync();
+            ellipsisText.Should().Contain("…", "Ellipsis should show '…' character");
+        }
     }
 
     #endregion

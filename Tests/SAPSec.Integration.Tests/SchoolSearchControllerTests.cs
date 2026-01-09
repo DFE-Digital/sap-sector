@@ -248,7 +248,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_CompletesWithinTimeout()
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(40));
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
         var response = await fixture.Client.GetAsync("/school/search?query=School", cts.Token);
 
