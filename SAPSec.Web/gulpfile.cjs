@@ -122,6 +122,11 @@ const copyStaticAssets = () =>
       gulp
         .src(["AssetSrc/js/*"], { encoding: false })
         .pipe(gulp.dest("wwwroot/js/"))
+    )
+    .on("end", () => 
+        gulp
+        .src(["AssetSrc/leaflet/*"], { encoding: false })
+        .pipe(gulp.dest("wwwroot/assets/leaflet/"))
     );
 
 gulp.task("build-fe", () => {

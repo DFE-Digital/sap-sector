@@ -56,8 +56,18 @@ RUN dotnet publish "./SAPSec.Web.csproj" -c $BUILD_CONFIGURATION -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:${DOTNET_VERSION}-noble AS final
 WORKDIR /app
 
+# Fix security vulnerabilities in base image
+# - gnupg2/gpgv: Out-of-bounds Write (SNYK-UBUNTU2404-GNUPG2-14849555)
+# - zlib1g, libpam*: Previously identified vulnerabilities
 RUN apt-get update && \
-    apt-get upgrade -y zlib1g libpam0g libpam-modules libpam-modules-bin libpam-runtime && \
+    apt-get upgrade -y --no-install-recommends \
+        gnupg2 \
+        gpgv \
+        zlib1g \
+        libpam0g \
+        libpam-modules \
+        libpam-modules-bin \
+        libpam-runtime && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

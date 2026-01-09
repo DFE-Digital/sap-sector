@@ -20,6 +20,7 @@
 		<PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.2.1" />
 		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.2.1" />
 		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+		<PackageReference Include="GovUk.Frontend.AspNetCore" Version="3.2.3" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -31,6 +32,39 @@
 		<Content Include="Data\Files\**\*">
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
+		<Content Update="AssetSrc\images\markers\marker-user.svg">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\images\marker-school-nearby.svg">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\images\marker-school-target.svg">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\js\school-search-toggle.js">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Update="AssetSrc\js\map-schools.js">
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.esm.js" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.esm.js.map" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.js" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.js.map" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.css" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.js" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.js.map" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.markercluster.js" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\MarkerCluster.css" />
+	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\MarkerCluster.js" />
 	</ItemGroup>
     
 </Project>
