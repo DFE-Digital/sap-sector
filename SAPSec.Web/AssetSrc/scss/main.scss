@@ -391,6 +391,17 @@
     display: none;
 }
 
+.results-toggle-wrap {
+  display: none;
+}
+
+.js-enabled .results-toggle-wrap {
+  //display: block;
+  display: flex;
+  justify-content: flex-end;
+  font-size: 16px;
+}
+
 
 // Results bar for both list and map views
 .results-bar {
@@ -414,9 +425,9 @@
 
 // Toggle wrapper
 .results-toggle-wrap {
-  display: flex;
-  justify-content: flex-end;
-  font-size: 14px;
+  //display: flex;
+  //justify-content: flex-end;
+  //font-size: 16px;
 }
 
 // Toggle link styling
@@ -449,16 +460,16 @@
 
 // Map icon 
 .toggle-icon--map svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 20px;
   color: #0B0C0C;
   fill: currentColor;
 }
 
 // List icon 
 .toggle-icon--list svg {
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   color: #0B0C0C;
   fill: currentColor;
 }

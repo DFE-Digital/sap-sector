@@ -3,6 +3,8 @@
     const MAP_SLOT_ID = "mapBarActions";
     const STORAGE_KEY = "schoolSearchView"; // "list" or "map"
 
+    document.documentElement.classList.add('js-enabled');
+
     function mountToggle(where) {
         const slot = document.getElementById(where);
         const wrap = document.getElementById("toggleWrap");
@@ -23,7 +25,7 @@
         listView.classList.add("govuk-!-display-none");
         mapView.classList.remove("govuk-!-display-none");
 
-        setToggleText(toggle, "View on list");
+        setToggleText(toggle, "View as a list");
         toggle.dataset.view = "map";
         toggle.setAttribute("aria-expanded", "true");
 

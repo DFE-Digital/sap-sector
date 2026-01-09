@@ -36,11 +36,11 @@
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
-		<Content Update="AssetSrc\images\markers\marker-school-nearby.svg">
+		<Content Update="AssetSrc\images\marker-school-nearby.svg">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
-		<Content Update="AssetSrc\images\markers\marker-school-target.svg">
+		<Content Update="AssetSrc\images\marker-school-target.svg">
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>

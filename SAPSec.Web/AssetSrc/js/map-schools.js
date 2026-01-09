@@ -143,7 +143,7 @@
 
         // Blue SVG pin at correct size (your svg is 20x25)
         const schoolIcon = L.icon({
-            iconUrl: "/assets/images/markers/marker-school.svg",
+            iconUrl: "/assets/images/marker-school.svg",
             iconSize: [20, 25],
             iconAnchor: [10, 24],
             popupAnchor: [0, -22],
