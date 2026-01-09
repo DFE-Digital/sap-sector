@@ -41,7 +41,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
         var main = Page.Locator("main");
         var count = await main.CountAsync();
 
-        count.Should().Be(2, "Page should have exactly one main landmark");
+        count.Should().Be(1, "Page should have exactly one main landmark");
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
         var main = Page.Locator("main#main-content");
         var count = await main.CountAsync();
 
-        count.Should().Be(2, "Main landmark should have id='main-content' for skip link");
+        count.Should().Be(1, "Main landmark should have id='main-content' for skip link");
     }
 
     #endregion

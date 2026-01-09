@@ -6,12 +6,8 @@
 <div class="govuk-width-container">
     <a href="@Url.Action("Index", "SchoolSearch")" class="govuk-back-link">Home</a>
 
-    <main class="govuk-main-wrapper" id="main-content" role="main">
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-
                 <span class="govuk-caption-l">@Model.Name</span>
-                <h1 class="govuk-heading-l">School details</h1>
+                <h1 class="govuk-heading-xl">School details</h1>
 
                 @* Location Section *@
                 <h2 class="govuk-heading-m">Location</h2>
@@ -66,7 +62,7 @@
                         <dd class="govuk-summary-list__value">
                             @if (Model.IsPartOfTrust)
                             {
-                                <a href="#" class="govuk-link" aria-label="View Academy Trust" target="_blank" rel="noopener noreferrer">
+                                <a href="https://get-information-schools.service.gov.uk/Groups/Group/Details/@Model.AcademyTrustId" class="govuk-link" aria-label="View Academy Trust" target="_blank" rel="noopener noreferrer">
                                     @Model.AcademyTrust
                                     <span class="govuk-visually-hidden">(opens in a new tab)</span>
                                 </a>
@@ -146,6 +142,3 @@
                 </dl>
 
             </div>
-        </div>
-    </main>
-</div>

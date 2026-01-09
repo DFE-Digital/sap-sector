@@ -47,7 +47,6 @@ public class SchoolViewModel
     public string Telephone => GetValueOrNoData(_school.TelephoneNum);
     public string Email => FormatEmail();
     public bool HasEmail => !string.IsNullOrWhiteSpace(_school.Website); 
-
     public string OfstedReportUrl => $"https://reports.ofsted.gov.uk/provider/23/{_school.URN}";
     public bool HasOfstedReport => !string.IsNullOrWhiteSpace(_school.URN);
 

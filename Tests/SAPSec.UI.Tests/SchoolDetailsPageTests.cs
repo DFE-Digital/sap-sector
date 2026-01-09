@@ -568,7 +568,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         var main = Page.Locator("main#main-content");
         var count = await main.CountAsync();
 
-        count.Should().Be(2, "Should have main content landmark");
+        count.Should().Be(1, "Should have main content landmark");
     }
 
     [Fact]
