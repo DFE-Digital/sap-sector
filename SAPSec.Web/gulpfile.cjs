@@ -118,11 +118,6 @@ const copyStaticAssets = () =>
         .src(["AssetSrc/images/*"], { encoding: false })
         .pipe(gulp.dest("wwwroot/assets/images"))
     )
-      .on("end", () =>
-          gulp
-              .src(["AssetSrc/images/**/*"], { encoding: false })
-              .pipe(gulp.dest("wwwroot/assets/images"))
-      )
     .on("end", () =>
       gulp
         .src(["AssetSrc/js/*"], { encoding: false })
