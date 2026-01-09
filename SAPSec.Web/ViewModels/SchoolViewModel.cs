@@ -58,7 +58,7 @@ public class SchoolViewModel
     public bool HasOfstedReport => !string.IsNullOrWhiteSpace(_school.URN);
 
     // Information from other services
-    public string FinancialBenchmarkingUrl => $"https://schools-financial-benchmarking.service.gov.uk/school?urn={_school.URN}";
+    public string FinancialBenchmarkingUrl => $"https://financial-benchmarking-and-insights-tool.education.gov.uk/school/{_school.URN}";
     public string GetInformationAboutSchoolsUrl => $"https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{_school.URN}";
 
     /// <summary>

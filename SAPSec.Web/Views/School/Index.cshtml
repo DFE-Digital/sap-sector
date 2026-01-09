@@ -160,26 +160,51 @@
                             <dd class="govuk-summary-list__value">@Model.Email</dd>
                         </div>
                     </dl>
+    @* Further Information Section *@
+    <h2 class="govuk-heading-m">Further information</h2>
+    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Ofsted report</dt>
+            <dd class="govuk-summary-list__value">
+                @if (Model.HasOfstedReport)
+                {
+                    <a href="@Model.OfstedReportUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                        View the latest Ofsted report
+                        <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                    </a>
+                }
+                else
+                {
+                    <text>No available data</text>
+                }
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Information from other services</dt>
+            <dd class="govuk-summary-list__value">
+                <a href="@Model.FinancialBenchmarkingUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    Financial benchmarking and insights tool (opens in a new tab)
+                </a>
+                <br />
+                <a href="@Model.GetInformationAboutSchoolsUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    Get information about schools (opens in a new tab)
+                </a>
+            </dd>
+        </div>
+    </dl>
 
-                    @* Further Information Section *@
-                    <h2 class="govuk-heading-m">Further information</h2>
-                     <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Ofsted report</dt>
-                            <dd class="govuk-summary-list__value">
-                                @if (Model.HasOfstedReport)
-                                {
-                                    <a href="@Model.OfstedReportUrl" class="govuk-link" aria-label="View ofsted report" target="_blank" rel="noopener noreferrer">
-                                        View the latest Ofsted report
-                                        <span class="govuk-visually-hidden">(opens in a new tab)</span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <text>No available data</text>
-                                }
-                            </dd>
-                        </div>
-                    </dl>
+    @* Data Sources Section *@
+    <details class="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">
+                Data sources
+            </span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body">
+                School information is sourced from <a href="https://get-information-schools.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">Get Information about Schools<span class="govuk-visually-hidden">(opens in a new tab)</span></a>.
+            </p>
+        </div>
+    </details>
 
                 </div>
