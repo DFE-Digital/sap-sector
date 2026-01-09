@@ -4,14 +4,20 @@
 }
 
 <div class="govuk-width-container">
-    <a href="@Url.Action("Index", "SchoolSearch")" class="govuk-back-link">Home</a>
+    <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+            </li>
+        </ol>
+    </nav>
 
                 <span class="govuk-caption-l">@Model.Name</span>
                 <h1 class="govuk-heading-xl">School details</h1>
 
                 @* Location Section *@
                 <h2 class="govuk-heading-m">Location</h2>
-                <dl class="govuk-summary-list">
+                  <dl class="govuk-summary-list govuk-!-margin-bottom-9">
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Address</dt>
                         <dd class="govuk-summary-list__value">@Model.Address</dd>
@@ -32,7 +38,7 @@
 
                 @* School Details Section *@
                 <h2 class="govuk-heading-m">School details</h2>
-                <dl class="govuk-summary-list">
+                 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">ID</dt>
                         <dd class="govuk-summary-list__value">@Model.Id</dd>
@@ -89,7 +95,7 @@
 
                 @* Contact Details Section *@
                 <h2 class="govuk-heading-m">Contact details</h2>
-                <dl class="govuk-summary-list">
+                 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Headteacher/Principal</dt>
                         <dd class="govuk-summary-list__value">@Model.HeadteacherPrincipal</dd>
@@ -122,7 +128,7 @@
 
                 @* Further Information Section *@
                 <h2 class="govuk-heading-m">Further information</h2>
-                <dl class="govuk-summary-list">
+                 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Ofsted report</dt>
                         <dd class="govuk-summary-list__value">
