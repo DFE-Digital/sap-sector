@@ -31,8 +31,6 @@
     <link rel="stylesheet" href="/css/main.css" asp-append-version="true"/>
     @* @await Component.InvokeAsync("Analytics") *@
     
-    <link rel="stylesheet" href="/assets/leaflet/leaflet.css" />
-    <link rel="stylesheet" href="/assets/leaflet/MarkerCluster.css" />
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
 <script add-nonce="true">
@@ -224,8 +222,7 @@
 </script>
 
 
-<script src="/assets/leaflet/leaflet.js"></script>
-<script src="/assets/leaflet/leaflet.markercluster.js"></script>
+
 
 @await RenderSectionAsync("scripts", false)
 

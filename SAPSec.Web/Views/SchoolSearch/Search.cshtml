@@ -13,7 +13,8 @@
 @{
     var hasResults = Model.Results.Length > 0;
 }
-
+<link rel="stylesheet" href="~/css/leaflet.css" />
+<link rel="stylesheet" href="~/css/MarkerCluster.css" />
 <div class="govuk-grid-row">
     @if (hasResults)
     {
@@ -80,4 +81,6 @@
 @section Scripts {
     <script src="~/js/school-search-toggle.js"></script>
     <script src="~/js/map-schools.js"></script>
+    <script src="~/js/leaflet.js"></script>
+    <script src="~/js/leaflet.markercluster.js"></script>
 }

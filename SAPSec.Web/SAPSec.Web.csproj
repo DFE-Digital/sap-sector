@@ -53,18 +53,4 @@
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
 	</ItemGroup>
-
-	<ItemGroup>
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.esm.js" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.esm.js.map" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.js" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet-src.js.map" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.css" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.js" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.js.map" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\leaflet.markercluster.js" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\MarkerCluster.css" />
-	  <_ContentIncludedByDefault Remove="wwwroot\assets\Leaflet\MarkerCluster.js" />
-	</ItemGroup>
-    
 </Project>

@@ -29,109 +29,141 @@ const buildSass = () =>
         .pipe(gulp.dest("wwwroot/css"));
 
 const copyStaticAssets = () =>
-  gulp
-    .src(["node_modules/govuk-frontend/dist/govuk/assets/**/*"], {
-      encoding: false,
-    })
-    .pipe(gulp.dest("wwwroot/assets"))
-    .on("end", () =>
-      gulp
-        .src(
-          ["node_modules/govuk-frontend/dist/govuk/assets/images/favicon.ico"],
-          { encoding: false }
+    gulp
+        .src(["node_modules/govuk-frontend/dist/govuk/assets/**/*"], {
+            encoding: false,
+        })
+        .pipe(gulp.dest("wwwroot/assets"))
+        .on("end", () =>
+            gulp
+                .src(
+                    ["node_modules/govuk-frontend/dist/govuk/assets/images/favicon.ico"],
+                    {encoding: false}
+                )
+                .pipe(gulp.dest("wwwroot/"))
         )
-        .pipe(gulp.dest("wwwroot/"))
-    )
-    .on("end", () =>
-      gulp
-        .src(
-          [
-            "node_modules/govuk-frontend/dist/govuk/assets/images/govuk-icon-180.png",
-          ],
-          { encoding: false }
+        .on("end", () =>
+            gulp
+                .src(
+                    [
+                        "node_modules/govuk-frontend/dist/govuk/assets/images/govuk-icon-180.png",
+                    ],
+                    {encoding: false}
+                )
+                .pipe(rename("apple-touch-icon.png"))
+                .pipe(gulp.dest("wwwroot/"))
+                .pipe(rename("apple-touch-icon-120x120.png"))
+                .pipe(gulp.dest("wwwroot/"))
+                .pipe(rename("apple-touch-icon-precomposed.png"))
+                .pipe(gulp.dest("wwwroot/"))
         )
-        .pipe(rename("apple-touch-icon.png"))
-        .pipe(gulp.dest("wwwroot/"))
-        .pipe(rename("apple-touch-icon-120x120.png"))
-        .pipe(gulp.dest("wwwroot/"))
-        .pipe(rename("apple-touch-icon-precomposed.png"))
-        .pipe(gulp.dest("wwwroot/"))
-    )
-    .on("end", () =>
-      gulp
-        .src(["node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.js*"])
-        .pipe(gulp.dest("wwwroot/js/"))
-    )
-    .on("end", () =>
-      gulp
-        .src(["node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.css"])
-        .pipe(gulp.dest("wwwroot/css/"))
-    )
-    .on("end", () =>
-      gulp
-        .src([
-          "node_modules/lodash.debounce/index.js",
-        ])
-        .pipe(gulp.dest("wwwroot/js/lodash.debounce/"))
-    )
-    .on("end", () =>
-      gulp
-        .src([
-          "node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js*",
-        ])
-        .pipe(gulp.dest("wwwroot/js/"))
-    )
-    .on("end", () =>
-      gulp
-        .src([
-            "node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.css",
-        ])
-        .pipe(gulp.dest("wwwroot/css/"))
-    )
-    .on("end", () =>
-      gulp
-        .src(["node_modules/dfe-frontend/dist/dfefrontend.js"])
-        .pipe(gulp.dest("wwwroot/js/"))
-    )
-    .on("end", () =>
-      gulp
-        .src(["node_modules/dfe-frontend/dist/dfefrontend.css"])
-        .pipe(gulp.dest("wwwroot/css/"))
-    )
-    .on("end", () =>
-       gulp
-         .src(["node_modules/@ministryofjustice/frontend/moj/moj-frontend.min.js"])
-         .pipe(gulp.dest("wwwroot/js/"))
-    )
-    .on("end", () =>
-        gulp
-         .src(["node_modules/@ministryofjustice/frontend/moj/moj-frontend.min.css"])
-          .pipe(gulp.dest("wwwroot/css/"))
-    )
-    .on("end", () =>
-        gulp
-         .src(["node_modules/@ministryofjustice/frontend/moj/assets/**/*"], { encoding: false })
-         .pipe(gulp.dest("wwwroot/assets/"))
-    )
-    .on("end", () =>
-      gulp
-        .src(["AssetSrc/images/*"], { encoding: false })
-        .pipe(gulp.dest("wwwroot/assets/images"))
-    )
-    .on("end", () =>
-      gulp
-        .src(["AssetSrc/js/*"], { encoding: false })
-        .pipe(gulp.dest("wwwroot/js/"))
-    )
-    .on("end", () => 
-        gulp
-        .src(["AssetSrc/leaflet/*"], { encoding: false })
-        .pipe(gulp.dest("wwwroot/assets/leaflet/"))
-    );
+        .on("end", () =>
+            gulp
+                .src(["node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.js*"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/govuk-frontend/dist/govuk/govuk-frontend.min.css"])
+                .pipe(gulp.dest("wwwroot/css/"))
+        )
+        .on("end", () =>
+            gulp
+                .src([
+                    "node_modules/lodash.debounce/index.js",
+                ])
+                .pipe(gulp.dest("wwwroot/js/lodash.debounce/"))
+        )
+        .on("end", () =>
+            gulp
+                .src([
+                    "node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.js*",
+                ])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src([
+                    "node_modules/accessible-autocomplete/dist/accessible-autocomplete.min.css",
+                ])
+                .pipe(gulp.dest("wwwroot/css/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/dfe-frontend/dist/dfefrontend.js"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/dfe-frontend/dist/dfefrontend.css"])
+                .pipe(gulp.dest("wwwroot/css/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/@ministryofjustice/frontend/moj/moj-frontend.min.js"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/@ministryofjustice/frontend/moj/moj-frontend.min.css"])
+                .pipe(gulp.dest("wwwroot/css/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/@ministryofjustice/frontend/moj/assets/**/*"], {encoding: false})
+                .pipe(gulp.dest("wwwroot/assets/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["AssetSrc/images/*"], {encoding: false})
+                .pipe(gulp.dest("wwwroot/assets/images"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["AssetSrc/js/*"], {encoding: false})
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        // --- Leaflet ---
+        .on("end", () =>
+            gulp
+                .src(["node_modules/leaflet/dist/leaflet.js"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/leaflet/dist/leaflet.css"])
+                .pipe(gulp.dest("wwwroot/css/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/leaflet/dist/images/**/*"], {encoding: false})
+                .pipe(gulp.dest("wwwroot/assets/leaflet/images/"))
+        )
+
+        // --- Leaflet MarkerCluster ---
+        .on("end", () =>
+            gulp
+                .src(
+                    [
+                        "node_modules/leaflet.markercluster/dist/leaflet.markercluster.js",
+                    ]
+                )
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(
+                    [
+                        "node_modules/leaflet.markercluster/dist/MarkerCluster.css",
+                        "node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css",
+                    ]
+                )
+                .pipe(gulp.dest("wwwroot/css/"))
+        );
 
 gulp.task("build-fe", () => {
-  return async.series([
-    (next) => buildSass().on("end", next),
-    (next) => copyStaticAssets().on("end", next)
-  ]);
+    return async.series([
+        (next) => buildSass().on("end", next),
+        (next) => copyStaticAssets().on("end", next)
+    ]);
 });

@@ -41,43 +41,12 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
             "default-src 'self'; " +
             "frame-ancestors 'none'; " +
             "form-action 'self' https://test-oidc.signin.education.gov.uk https://oidc.signin.education.gov.uk; " +
-
-            // ✅ Leaflet tiles + your existing telemetry endpoints
-            "connect-src 'self' " +
-            "*.google-analytics.com *.analytics.google.com " +
-            "https://www.compare-school-performance.service.gov.uk " +
-            "https://api.postcodes.io " +
-            "https://*.doubleclick.net " +
-            "https://*.clarity.ms " +
-            "https://c.bing.com " +
-            "https://*.applicationinsights.azure.com/ " +
-            "https://*.visualstudio.com/ " +
-            "https://*.tile.openstreetmap.org; " +   // ✅ optional but fine
-
-            // ✅ Allow OSM tiles as IMG + keep your existing
-            "img-src 'self' data: " +
-            "https://www.googletagmanager.com/ " +
-            "https://*.google-analytics.com " +
-            "https://atlas.microsoft.com " +
-            "https://*.clarity.ms " +
-            "https://c.bing.com " +
-            "https://js.monitor.azure.com/ " +
-            "https://*.tile.openstreetmap.org; " +   // ✅ REQUIRED for map tiles
-
-            // ✅ Leaflet CSS comes from unpkg if you use CDN
-            "style-src 'self' 'unsafe-inline' https://unpkg.com; " +  // ✅ add unpkg            
-
-            // ✅ Leaflet JS comes from unpkg if you use CDN
-            $"script-src 'self' 'nonce-{nonce}' " +
-            "https://www.googletagmanager.com " +
-            "*.google-analytics.com " +
-            "https://*.clarity.ms " +
-            "https://c.bing.com " +
-            "https://js.monitor.azure.com/ " +
-            "https://unpkg.com;"   // ✅ add unpkg
+            "connect-src 'self' *.google-analytics.com *.analytics.google.com https://www.compare-school-performance.service.gov.uk https://api.postcodes.io https://*.doubleclick.net https://*.clarity.ms https://c.bing.com https://*.applicationinsights.azure.com/ https://*.visualstudio.com/; " +
+            "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/ https://*.tile.openstreetmap.org; " +
+            "style-src 'self' 'unsafe-inline'; " +
+            "font-src 'self' data:; " +
+            $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/;"  // ✅ Uses nonce
         );
-
-       
         
         await next(context);
     }
