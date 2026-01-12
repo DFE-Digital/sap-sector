@@ -13,57 +13,59 @@
 @{
     var hasResults = Model.Results.Length > 0;
 }
-<link rel="stylesheet" href="~/css/leaflet.css" />
-<link rel="stylesheet" href="~/css/MarkerCluster.css" />
+<link rel="stylesheet" href="~/css/leaflet.css"/>
+<link rel="stylesheet" href="~/css/MarkerCluster.css"/>
 <div class="govuk-grid-row">
     @if (hasResults)
     {
-    @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
-    {
-    Query = Model.Query,
-    LocalAuthorities = Model.LocalAuthorities,
-    SelectedLocalAuthorities = Model.SelectedLocalAuthorities
-    })
+        @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
+        {
+            Query = Model.Query,
+            LocalAuthorities = Model.LocalAuthorities,
+            SelectedLocalAuthorities = Model.SelectedLocalAuthorities
+        })
     }
 
     <div class="govuk-grid-column-two-thirds">
         @if (hasResults)
         {
-        <div id="toggleWrap" class="results-toggle-wrap">
-            <a href="#" id="toggleViewLink"
-               class="govuk-link govuk-link--no-visited-state toggle-view-link"
-               data-view="list">
+            <div id="toggleWrap" class="results-toggle-wrap">
+                <a href="#" id="toggleViewLink"
+                   class="govuk-link govuk-link--no-visited-state toggle-view-link"
+                   data-view="list">
                 <span class="toggle-icon toggle-icon--map" aria-hidden="true">
                     <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 0C10.1217 0 12.1569 0.821939 13.6572 2.28516C15.1574 3.74836 16 5.73349 16 7.80273C15.9999 13.2707 11.149 17.7918 9.00195 19.5254C8.69354 19.7744 8.53924 19.8991 8.30957 19.9629C8.1312 20.0124 7.86887 20.0123 7.69043 19.9629C7.46118 19.8992 7.30533 19.7735 6.99805 19.5254C4.85092 17.7917 0 13.2697 0 7.80176C8.16397e-05 5.73261 0.842604 3.74829 2.34277 2.28516C3.84304 0.821971 5.87831 3.56645e-05 8 0ZM8 5C6.34331 5 5.00026 6.34337 5 8C5 9.65685 6.34315 11 8 11C9.65665 10.9998 11 9.65671 11 8C10.9997 6.34351 9.65649 5.00024 8 5Z" fill="#0B0C0C"/>
+                        <path
+                            d="M8 0C10.1217 0 12.1569 0.821939 13.6572 2.28516C15.1574 3.74836 16 5.73349 16 7.80273C15.9999 13.2707 11.149 17.7918 9.00195 19.5254C8.69354 19.7744 8.53924 19.8991 8.30957 19.9629C8.1312 20.0124 7.86887 20.0123 7.69043 19.9629C7.46118 19.8992 7.30533 19.7735 6.99805 19.5254C4.85092 17.7917 0 13.2697 0 7.80176C8.16397e-05 5.73261 0.842604 3.74829 2.34277 2.28516C3.84304 0.821971 5.87831 3.56645e-05 8 0ZM8 5C6.34331 5 5.00026 6.34337 5 8C5 9.65685 6.34315 11 8 11C9.65665 10.9998 11 9.65671 11 8C10.9997 6.34351 9.65649 5.00024 8 5Z"
+                            fill="#0B0C0C"/>
                     </svg>
                 </span>
 
-                <span class="toggle-icon toggle-icon--list" aria-hidden="true">
+                    <span class="toggle-icon toggle-icon--list" aria-hidden="true">
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <rect width="16" height="4" fill="#0B0C0C"/>
                         <rect y="6" width="16" height="4" fill="#0B0C0C"/>
                         <rect y="12" width="16" height="4" fill="#0B0C0C"/>
                     </svg></span>
 
-                <span class="toggle-text">View on map</span>
-            </a>
-        </div>
+                    <span class="toggle-text">View on map</span>
+                </a>
+            </div>
 
-        <div id="listView">
-            @await Html.PartialAsync("_SchoolSearchResults", Model.Results, new ViewDataDictionary(ViewData)
-            {
-            { "StartItem", Model.Pagination.StartItem },
-            { "EndItem", Model.Pagination.EndItem },
-            { "TotalResults", Model.TotalResults }
-            })
+            <div id="listView">
+                @await Html.PartialAsync("_SchoolSearchResults", Model.Results, new ViewDataDictionary(ViewData)
+                {
+                    { "StartItem", Model.Pagination.StartItem },
+                    { "EndItem", Model.Pagination.EndItem },
+                    { "TotalResults", Model.TotalResults }
+                })
 
-            @await Html.PartialAsync("_Pagination", Model.Pagination)
-        </div>
+                @await Html.PartialAsync("_Pagination", Model.Pagination)
+            </div>
 
-        <div id="mapView" class="govuk-!-display-none">
-            @await Html.PartialAsync("_SchoolSearchMap", Model.AllResults)
-        </div>
+            <div id="mapView" class="govuk-!-display-none">
+                @await Html.PartialAsync("_SchoolSearchMap", Model.AllResults)
+            </div>
         }
 
     </div>
