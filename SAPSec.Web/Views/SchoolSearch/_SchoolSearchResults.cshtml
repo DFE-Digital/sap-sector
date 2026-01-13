@@ -8,10 +8,15 @@
 
 @if (Model.Length > 0)
 {
-    <p class="govuk-body govuk-!-margin-bottom-4 app-school-results-count">
-        Showing <strong>@startItem-@endItem</strong> of <strong>@totalResults</strong> schools
-    </p>
-    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+    <div class="results-bar">
+        <p class="govuk-body app-school-results-count">
+            Showing <strong>@startItem - @endItem</strong> of <strong>@totalResults</strong> schools
+        </p>
+
+        <!-- Parent view will move the toggle link into here -->
+        <div id="resultsBarActions"></div>
+    </div>
+    <hr class="govuk-section-break govuk-section-break--visible">
     <ul class="govuk-list app-school-results">
         @foreach (var result in Model)
         {

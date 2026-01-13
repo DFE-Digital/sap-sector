@@ -1,5 +1,8 @@
-﻿@using SAPSec.Web.Constants
+﻿@using GovUk.Frontend.AspNetCore
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
+@using SAPSec.Web.TagHelpers
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLower();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString()?.ToLower();
@@ -31,6 +34,7 @@
     <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/main.css" asp-append-version="true" />
     @* @await Component.InvokeAsync("Analytics") *@
+    
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
     <script add-nonce="true">
@@ -225,7 +229,10 @@
         })
     </script>
 
-    @await RenderSectionAsync("scripts", false)
+
+
+
+@await RenderSectionAsync("scripts", false)
 
 </body>
 </html>
