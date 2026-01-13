@@ -35,7 +35,7 @@ public class SchoolViewModel
     public string? AcademyTrustId => _school.TrustsId;
     public bool IsPartOfTrust => !string.IsNullOrWhiteSpace(_school.TrustsId)
                                   && !string.IsNullOrWhiteSpace(_school.TrustName);
-    public bool IsPartOfLocalAuthority => _school.TypeOfEstablishmentId == "01";
+    public bool IsPartOfLocalAuthority => IsLocalAuthorityMaintained();
     public string AdmissionsPolicy => GetValueOrNoData(_school.AdmissionPolicy);
     public string ReligiousCharacter => GetValueOrNoData(_school.ReligiousCharacterName);
 
@@ -231,20 +231,42 @@ public class SchoolViewModel
 
     private string DetermineGovernanceStructure()
     {
-        // Determine based on TrustsId or TypeOfEstablishment
-        if (!string.IsNullOrWhiteSpace(_school.TrustsId))
-            return "Multi-academy trust (MAT)";
+        var typeId = _school.TypeOfEstablishmentId;
+        var typeName = _school.TypeOfEstablishmentName?.ToLower() ?? "";
 
-        // Single academy trust
-        var schoolType = _school.TypeOfEstablishmentName?.ToLower() ?? "";
-        if (schoolType.Contains("academy") && string.IsNullOrWhiteSpace(_school.TrustsId))
+        var academyTypeIds = new[] { "28", "33", "34", "35", "36", "38", "39", "40", "41", "42", "43", "44", "45", "46", "57" };
+
+        if (academyTypeIds.Contains(typeId) || typeName.Contains("academy") || typeName.Contains("free school") || typeName.Contains("studio school") || typeName.Contains("university technical college"))
+        {
+            if (!string.IsNullOrWhiteSpace(_school.TrustsId))
+                return "Multi-academy trust (MAT)";
+
             return "Single-academy trust (SAT)";
+        }
 
-        // Maintained school
-        if (_school.TypeOfEstablishmentId == "01")
-            return "Local Authority (LA)";
+        var laTypeIds = new[] { "1", "2", "3", "5", "7", "12", "14", "15" };
+
+        if (laTypeIds.Contains(typeId))
+            return "Local authority maintained";
+
+        if (typeId == "8")
+            return "Non-maintained special school";
+
+        if (typeId == "10" || typeId == "11")
+            return "Independent";
+
+        if (typeId == "18" || typeId == "29" || typeId == "32")
+            return "Further/Higher education";
+
+        if (!string.IsNullOrWhiteSpace(typeId))
+            return "Other";
 
         return NoDataAvailable;
+    }
+    private bool IsLocalAuthorityMaintained()
+    {
+        var laTypeIds = new[] { "1", "2", "3", "5", "7", "12", "14", "15" };
+        return laTypeIds.Contains(_school.TypeOfEstablishmentId);
     }
 
 }
