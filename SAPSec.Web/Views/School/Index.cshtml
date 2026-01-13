@@ -64,6 +64,8 @@
                         <dt class="govuk-summary-list__key">Governance structure</dt>
                         <dd class="govuk-summary-list__value">@Model.GovernanceStructure</dd>
                     </div>
+                    @if (!Model.IsPartOfLocalAuthority)
+                    {
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Academy trust</dt>
                         <dd class="govuk-summary-list__value">
@@ -80,6 +82,7 @@
                             }
                         </dd>
                     </div>
+                    }
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key">Admissions policy</dt>
                         <dd class="govuk-summary-list__value">@Model.AdmissionsPolicy</dd>

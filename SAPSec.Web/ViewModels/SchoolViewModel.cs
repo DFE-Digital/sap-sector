@@ -35,6 +35,7 @@ public class SchoolViewModel
     public string? AcademyTrustId => _school.TrustsId;
     public bool IsPartOfTrust => !string.IsNullOrWhiteSpace(_school.TrustsId)
                                   && !string.IsNullOrWhiteSpace(_school.TrustName);
+    public bool IsPartOfLocalAuthority => _school.TypeOfEstablishmentId == "01";
     public string AdmissionsPolicy => GetValueOrNoData(_school.AdmissionPolicy);
     public string ReligiousCharacter => GetValueOrNoData(_school.ReligiousCharacterName);
 
@@ -241,11 +242,10 @@ public class SchoolViewModel
             return "Single-academy trust (SAT)";
 
         // Maintained school
-        if (schoolType.Contains("community") ||
-            schoolType.Contains("voluntary") ||
-            schoolType.Contains("foundation"))
-            return "Local authority maintained";
+        if (_school.TypeOfEstablishmentId == "01")
+            return "Local Authority (LA)";
 
         return NoDataAvailable;
     }
+
 }
