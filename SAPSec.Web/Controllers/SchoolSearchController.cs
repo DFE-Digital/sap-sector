@@ -97,6 +97,23 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", new { query, localAuthorities, page = totalPages });
             }
 
+            // Map all results for display
+            var allSchoolsForMap = results.Select(s => new SchoolSearchResultViewModel
+            {
+                SchoolName = s.Establishment.EstablishmentName,
+                URN = s.Establishment.URN,
+                LocalAuthority = s.Establishment.LANAme,
+                Latitude = s.Establishment.Latitude,
+                Longitude = s.Establishment.Longitude,
+                Address = string.Join(", ", new[]
+                {
+                    s.Establishment.AddressStreet,
+                    s.Establishment.AddressLocality,
+                    s.Establishment.LANAme,
+                    s.Establishment.AddressPostcode
+                }.Where(x => !string.IsNullOrWhiteSpace(x)))
+            }).ToArray();
+
             return View(new SchoolSearchResultsViewModel
             {
                 Query = query ?? string.Empty,
@@ -110,6 +127,8 @@ public class SchoolSearchController(
                     SchoolName = s.Establishment.EstablishmentName,
                     URN = s.Establishment.URN,
                     LocalAuthority = s.Establishment.LANAme,
+                    Latitude = s.Establishment.Latitude,
+                    Longitude = s.Establishment.Longitude,
                     Address = string.Join(", ", new[]
                     {
                         s.Establishment.AddressStreet,
@@ -117,7 +136,8 @@ public class SchoolSearchController(
                         s.Establishment.LANAme,
                         s.Establishment.AddressPostcode
                     }.Where(x => !string.IsNullOrWhiteSpace(x)))
-                }).ToArray()
+                }).ToArray(),
+                AllResults = allSchoolsForMap   
             });
         }
     }

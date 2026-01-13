@@ -42,12 +42,12 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
             "frame-ancestors 'none'; " +
             "form-action 'self' https://test-oidc.signin.education.gov.uk https://oidc.signin.education.gov.uk; " +
             "connect-src 'self' *.google-analytics.com *.analytics.google.com https://www.compare-school-performance.service.gov.uk https://api.postcodes.io https://*.doubleclick.net https://*.clarity.ms https://c.bing.com https://*.applicationinsights.azure.com/ https://*.visualstudio.com/; " +
-            "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/; " +
+            "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/ https://*.tile.openstreetmap.org; " +
             "style-src 'self' 'unsafe-inline'; " +
             "font-src 'self' data:; " +
             $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/;"  // ✅ Uses nonce
         );
-
+        
         await next(context);
     }
 

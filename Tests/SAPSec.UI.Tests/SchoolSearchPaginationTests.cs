@@ -47,7 +47,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var resultsCount = Page.Locator(".app-school-results-count");
+        var resultsCount = Page.Locator(".app-school-results-count").First;
         var countText = await resultsCount.TextContentAsync();
 
         if (countText?.Contains("of") == true)
@@ -156,15 +156,24 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_PreviousLink_HasCorrectText()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=2");
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Page.GotoAsync(
+            $"{SchoolSearchResultsPath}?query=School&page=2",
+            new() { WaitUntil = WaitUntilState.DOMContentLoaded }
+        );
+
+        // Wait for either pagination or results count to appear
+        await Page.Locator(".govuk-pagination").WaitForAsync();
 
         var prevLink = Page.Locator(".govuk-pagination__prev");
-        if (await prevLink.CountAsync() == 0) return;
 
-        var linkText = await prevLink.TextContentAsync();
+        if (await prevLink.CountAsync() == 0)
+            return; // pagination not present, nothing to assert
+
+        var linkText = (await prevLink.TextContentAsync())?.Trim();
+
         linkText.Should().Contain("Previous", "Previous link should contain 'Previous' text");
     }
+
 
     [Fact]
     public async Task Pagination_NextLink_HasVisuallyHiddenPageText()
@@ -283,11 +292,11 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var resultsCount = Page.Locator(".app-school-results-count");
+        var resultsCount = Page.Locator(".app-school-results-count").First;
         if (await resultsCount.CountAsync() == 0) return;
 
         var text = await resultsCount.TextContentAsync();
-        text.Should().Contain("1-", "First page should show results starting from 1");
+        text.Should().Contain("1 -", "First page should show results starting from 1");
     }
 
     [Fact]
@@ -296,11 +305,11 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
         await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=2");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var resultsCount = Page.Locator(".app-school-results-count");
+        var resultsCount = Page.Locator(".app-school-results-count").First;
         if (await resultsCount.CountAsync() == 0) return;
 
         var text = await resultsCount.TextContentAsync();
-        text.Should().Contain("11-", "Second page should show results starting from 6");
+        text.Should().Contain("11 -", "Second page should show results starting from 11");
     }
 
     #endregion
@@ -310,7 +319,8 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_ShowsEllipsis_WhenManyPages()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=4");
+        // Navigate to a search with many results
+        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=5");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var ellipsis = Page.Locator(".govuk-pagination__item--ellipsis");

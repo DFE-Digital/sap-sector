@@ -1,5 +1,8 @@
-﻿@using SAPSec.Web.Constants
+﻿@using GovUk.Frontend.AspNetCore
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
+@using SAPSec.Web.TagHelpers
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
@@ -27,6 +30,7 @@
     <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true"/>
     <link rel="stylesheet" href="/css/main.css" asp-append-version="true"/>
     @* @await Component.InvokeAsync("Analytics") *@
+    
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
 <script add-nonce="true">
@@ -216,6 +220,9 @@
         });
     })
 </script>
+
+
+
 
 @await RenderSectionAsync("scripts", false)
 

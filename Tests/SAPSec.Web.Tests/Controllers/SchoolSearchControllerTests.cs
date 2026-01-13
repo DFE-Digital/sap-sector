@@ -24,7 +24,11 @@ public class SchoolSearchControllerTests
         LAId = "100",
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment One",
-        LANAme = "Leeds"
+        LANAme = "Leeds",
+        Easting = "430000",
+        Northing = "433000",
+        Latitude = "53.8",
+        Longitude = "-1.55"
     };
 
     private static Establishment FakeEstablishment2 = new()
@@ -34,7 +38,11 @@ public class SchoolSearchControllerTests
         LAId = "100",
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment Two",
-        LANAme = "Leeds"
+        LANAme = "Leeds",
+        Easting = "430100",
+        Northing = "433100",
+        Latitude = "53.81",
+        Longitude = "-1.54"
     };
 
     public SchoolSearchControllerTests()
@@ -869,6 +877,187 @@ public class SchoolSearchControllerTests
 
     #endregion
 
+    #region AllResults (Map View) Tests
+
+    [Fact]
+    public async Task Search_Get_AllResults_ContainsAllSearchResults()
+    {
+        var searchResults = CreateFakeSearchResults(25);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.AllResults.Should().HaveCount(25, "AllResults should contain all search results for map view");
+        model.Results.Should().HaveCount(10, "Results should contain only paginated results");
+    }
+
+    [Fact]
+    public async Task Search_Get_AllResults_ContainsCorrectData()
+    {
+        var searchResults = CreateFakeSearchResults(3);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.AllResults.Should().HaveCount(3);
+        model.AllResults[0].SchoolName.Should().Be("School 1");
+        model.AllResults[0].URN.Should().Be("1");
+        model.AllResults[1].SchoolName.Should().Be("School 2");
+        model.AllResults[2].SchoolName.Should().Be("School 3");
+    }
+
+    [Fact]
+    public async Task Search_Get_AllResults_RespectsLocalAuthorityFilter()
+    {
+        var leedsResults = CreateFakeSearchResults(5, "Leeds");
+        var manchesterResults = CreateFakeSearchResults(3, "Manchester");
+        var allResults = leedsResults.Concat(manchesterResults).ToList();
+
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(allResults);
+
+        var result = await _controller.Search("School", new[] { "Leeds" }, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.AllResults.Should().HaveCount(5, "AllResults should only contain filtered results");
+        model.AllResults.Should().OnlyContain(s => s.LocalAuthority == "Leeds");
+    }
+
+    [Fact]
+    public async Task Search_Get_AllResults_OnDifferentPages_ContainsSameResults()
+    {
+        var searchResults = CreateFakeSearchResults(25);
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result1 = await _controller.Search("School", null, 1);
+        var result2 = await _controller.Search("School", null, 2);
+
+        var model1 = (result1 as ViewResult)!.Model as SchoolSearchResultsViewModel;
+        var model2 = (result2 as ViewResult)!.Model as SchoolSearchResultsViewModel;
+
+        model1!.AllResults.Should().HaveCount(25);
+        model2!.AllResults.Should().HaveCount(25);
+        model1.AllResults.Should().BeEquivalentTo(model2.AllResults, "AllResults should be same across all pages");
+    }
+
+    [Fact]
+    public async Task Search_Get_AllResults_IsEmpty_WhenNoResults()
+    {
+        _mockSearchService.Setup(s => s.SearchAsync("NonExistent"))
+            .ReturnsAsync(new List<EstablishmentSearchResult>());
+
+        var result = await _controller.Search("NonExistent", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.AllResults.Should().BeEmpty();
+        model.Results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task Search_Get_AllResults_ContainsLatitudeAndLongitude()
+    {
+        var establishment1 = new Establishment
+        {
+            URN = "123",
+            UKPRN = "10",
+            LAId = "100",
+            EstablishmentNumber = "1",
+            EstablishmentName = "Test School",
+            LANAme = "Leeds",
+            Easting = "430000",
+            Northing = "433000",
+            Latitude = "53.8008",
+            Longitude = "-1.5491"
+        };
+        var establishment2 = new Establishment
+        {
+            URN = "456",
+            UKPRN = "10",
+            LAId = "100",
+            EstablishmentNumber = "2",
+            EstablishmentName = "Another School",
+            LANAme = "Leeds",
+            Easting = "430100",
+            Northing = "433100"
+        };
+        var searchResults = new List<EstablishmentSearchResult>
+        {
+            new EstablishmentSearchResult("Test School", establishment1),
+            new EstablishmentSearchResult("Another School", establishment2)
+        };
+
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.AllResults[0].Latitude.Should().Be("53.8008");
+        model.AllResults[0].Longitude.Should().Be("-1.5491");
+    }
+
+    [Fact]
+    public async Task Search_Get_AllResults_ContainsFormattedAddress()
+    {
+        var establishment1 = new Establishment
+        {
+            URN = "123",
+            UKPRN = "10",
+            LAId = "100",
+            EstablishmentNumber = "1",
+            EstablishmentName = "Test School",
+            LANAme = "Leeds",
+            Easting = "430000",
+            Northing = "433000",
+            AddressStreet = "123 Main St",
+            AddressLocality = "City Center",
+            AddressPostcode = "LS1 1AA"
+        };
+        var establishment2 = new Establishment
+        {
+            URN = "456",
+            UKPRN = "10",
+            LAId = "100",
+            EstablishmentNumber = "2",
+            EstablishmentName = "Another School",
+            LANAme = "Leeds",
+            Easting = "430100",
+            Northing = "433100"
+        };
+        var searchResults = new List<EstablishmentSearchResult>
+        {
+            new EstablishmentSearchResult("Test School", establishment1),
+            new EstablishmentSearchResult("Another School", establishment2)
+        };
+
+        _mockSearchService.Setup(s => s.SearchAsync("School"))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search("School", null, 1);
+
+        var viewResult = result as ViewResult;
+        var model = viewResult!.Model as SchoolSearchResultsViewModel;
+
+        model!.AllResults[0].Address.Should().Be("123 Main St, City Center, Leeds, LS1 1AA");
+    }
+
+    #endregion
+
     #region Helper Methods
 
     private List<EstablishmentSearchResult> CreateFakeSearchResults(int count, string localAuthority = "Leeds")
@@ -883,7 +1072,11 @@ public class SchoolSearchControllerTests
                 LAId = "100",
                 EstablishmentNumber = i.ToString(),
                 EstablishmentName = $"School {i}",
-                LANAme = localAuthority
+                LANAme = localAuthority,
+                Easting = (430000 + i).ToString(),
+                Northing = (433000 + i).ToString(),
+                Latitude = (53.8 + (i * 0.01)).ToString(),
+                Longitude = (-1.55 + (i * 0.01)).ToString()
             };
             results.Add(new EstablishmentSearchResult($"School {i}", establishment));
         }
