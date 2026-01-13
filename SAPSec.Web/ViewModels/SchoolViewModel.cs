@@ -154,7 +154,6 @@ public class SchoolViewModel
     private string FormatEmailRaw()
     {
         // Return raw email if available in the model
-        // You may need to add Email property to Establishment model
         return string.Empty;
     }
 
