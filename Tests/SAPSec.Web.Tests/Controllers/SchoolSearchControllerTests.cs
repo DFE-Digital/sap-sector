@@ -892,7 +892,7 @@ public class SchoolSearchControllerTests
         var model = viewResult!.Model as SchoolSearchResultsViewModel;
 
         model!.AllResults.Should().HaveCount(25, "AllResults should contain all search results for map view");
-        model.Results.Should().HaveCount(5, "Results should contain only paginated results");
+        model.Results.Should().HaveCount(10, "Results should contain only paginated results");
     }
 
     [Fact]
