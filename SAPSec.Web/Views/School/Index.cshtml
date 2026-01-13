@@ -2,16 +2,17 @@
     @{
         ViewData["Title"] = $"{Model.Name} - School details";
     }
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolHome")">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
 
-    <div class="govuk-width-container">
-        <nav class="govuk-breadcrumbs" aria-label="Breadcrumb">
-            <ol class="govuk-breadcrumbs__list">
-                <li class="govuk-breadcrumbs__list-item">
-                    <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolHome")">Home</a>
-                </li>
-            </ol>
-        </nav>
-
+    
                     <span class="govuk-caption-l">@Model.Name</span>
                     <h1 class="govuk-heading-xl">School details</h1>
 
@@ -202,9 +203,7 @@
         </summary>
         <div class="govuk-details__text">
             <p class="govuk-body">
-                School information is sourced from <a href="https://get-information-schools.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">Get Information about Schools<span class="govuk-visually-hidden">(opens in a new tab)</span></a>.
+                The data shown is sourced from the <a href="https://get-information-schools.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">Get Information about Schools and from Explore our statistics and data website(opens in a new tab)</a>.
             </p>
         </div>
     </details>
-
-                </div>

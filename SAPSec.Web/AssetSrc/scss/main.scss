@@ -397,3 +397,14 @@
     text-decoration-thickness: 3px;
     text-underline-offset: 0.5em;
 }
+.govuk-breadcrumbs__link,
+.govuk-breadcrumbs__list-item {
+    font-size: 1rem;
+    line-height: 1.25;
+    text-underline-offset: .1578em;
+}
+
+.govuk-breadcrumbs {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
