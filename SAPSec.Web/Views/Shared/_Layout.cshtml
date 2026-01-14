@@ -130,11 +130,11 @@
             @await Component.InvokeAsync("PhaseBanner")
         </div>
     </nav>
-
+    <div class="govuk-width-container">
+        @await RenderSectionAsync("Breadcrumbs", required: false)
+    </div>
     <div class="govuk-width-container app-width-container">
-        <div class="govuk-width-container">
-            @await RenderSectionAsync("Breadcrumbs", required: false)
-        </div>
+       
         <main class="govuk-main-wrapper" id="main-content">
             @RenderBody()
         </main>
