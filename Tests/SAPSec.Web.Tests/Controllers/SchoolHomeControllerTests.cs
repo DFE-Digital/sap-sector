@@ -421,7 +421,7 @@ public class SchoolHomeControllerTests
     {
         public static class Routes
         {
-            public const string SchoolSearch = "/search-for-a-school";
+            public const string SchoolSearch = "/find-a-school";
             public const string ErrorAction = "StatusCodeError";
             public const string ErrorController = "Error";
         }

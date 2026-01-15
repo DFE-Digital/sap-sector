@@ -9,12 +9,12 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
 {
-    #region GET /search-for-a-school (Index) Tests
+    #region GET /find-a-school (Index) Tests
 
     [Fact]
     public async Task GetIndex_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/search-for-a-school");
+        var response = await fixture.Client.GetAsync("/find-a-school");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -23,7 +23,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetIndex_ReturnsPageWithSearchForm()
     {
-        var response = await fixture.Client.GetAsync("/search-for-a-school");
+        var response = await fixture.Client.GetAsync("/find-a-school");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -31,7 +31,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetIndex_HasSecurityHeaders()
     {
-        var response = await fixture.Client.GetAsync("/search-for-a-school");
+        var response = await fixture.Client.GetAsync("/find-a-school");
 
         response.Headers.Should().ContainKey("X-Content-Type-Options");
         response.Headers.Should().ContainKey("X-Frame-Options");
@@ -40,7 +40,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
 
     #endregion
 
-    #region POST /search-for-a-school (Index) Tests
+    #region POST /find-a-school (Index) Tests
 
     [Fact]
     public async Task PostIndex_WithValidQuery_RedirectsToSearch()
@@ -51,11 +51,11 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/search-for-a-school", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/search");
+        response.Headers.Location!.ToString().Should().Contain("/find-a-school");
         response.Headers.Location!.ToString().Should().Contain("query=Test%20School");
     }
 
@@ -68,7 +68,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.Client.PostAsync("/search-for-a-school", content);
+        var response = await fixture.Client.PostAsync("/find-a-school", content);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -84,7 +84,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.Client.PostAsync("/search-for-a-school", content);
+        var response = await fixture.Client.PostAsync("/find-a-school", content);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -100,11 +100,11 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/search-for-a-school", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/search");
+        response.Headers.Location!.ToString().Should().Contain("/find-a-school");
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/search-for-a-school", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
@@ -131,7 +131,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.Client.PostAsync("/search-for-a-school", content);
+        var response = await fixture.Client.PostAsync("/find-a-school", content);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -148,7 +148,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/search-for-a-school", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
@@ -165,7 +165,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/search-for-a-school", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
@@ -174,12 +174,12 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
 
     #endregion
 
-    #region GET /school/search Tests
+    #region GET /find-a-school/search Tests
 
     [Fact]
     public async Task GetSearch_WithValidQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/search?query=Test");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=Test");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -188,7 +188,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithEmptyQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/search?query=");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -196,7 +196,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithoutQueryParameter_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/search");
+        var response = await fixture.Client.GetAsync("/find-a-school/search");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -204,7 +204,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithNullQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/search?query=");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -212,7 +212,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_ReturnsSearchResults()
     {
-        var response = await fixture.Client.GetAsync("/school/search?query=School");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -224,7 +224,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     {
         var longQuery = new string('A', 500); // Very long query
 
-        var response = await fixture.Client.GetAsync($"/school/search?query={longQuery}");
+        var response = await fixture.Client.GetAsync($"/find-a-school/search?query={longQuery}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -232,7 +232,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithSpecialCharacters_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/search?query=St.%20Mary%27s%20%26%20School");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=St.%20Mary%27s%20%26%20School");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -240,7 +240,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithNumericQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/search?query=123456");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=147788");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -250,7 +250,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(40));
 
-        var response = await fixture.Client.GetAsync("/school/search?query=School", cts.Token);
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School", cts.Token);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -258,14 +258,14 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithSingle_Match_RedirectsToSchoolDetails()
     {
-        var response = await fixture.NonRedirectingClient.GetAsync("/school/search?query=Notre%20Dame%20High%20School");
+        var response = await fixture.NonRedirectingClient.GetAsync("/find-a-school/search?query=Notre%20Dame%20High%20School");
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
     }
 
     #endregion
 
-    #region POST /school/search Tests
+    #region POST /find-a-school/search Tests
 
     [Fact]
     public async Task PostSearch_WithValidQuery_RedirectsToSearchGet()
@@ -276,11 +276,11 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/school/search", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/search");
+        response.Headers.Location!.ToString().Should().Contain("/find-a-school/search");
     }
 
     [Fact]
@@ -289,16 +289,15 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         var formData = new Dictionary<string, string>
         {
             { "Query", "Test" },
-            { "Urn", "100" }
+            { "Urn", "147788" }
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/school/search", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school");
-        response.Headers.Location!.ToString().Should().Contain("100");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/147788");
     }
 
     [Fact]
@@ -311,10 +310,10 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/school/search", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/search");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/find-a-school/search");
         response.Headers.Location!.ToString().Should().NotContain("/School/Index");
     }
 
@@ -327,7 +326,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.Client.PostAsync("/school/search", content);
+        var response = await fixture.Client.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         var responseContent = await response.Content.ReadAsStringAsync();
@@ -343,7 +342,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.Client.PostAsync("/school/search", content);
+        var response = await fixture.Client.PostAsync("/find-a-school/search", content);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -356,15 +355,14 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         var formData = new Dictionary<string, string>
         {
             { "Query", "Test School" },
-            { "Urn", "100" }
+            { "Urn", "147788" }
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/school/search", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school");
-        response.Headers.Location!.ToString().Should().Contain("100");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/147788");
     }
 
     [Fact]
@@ -373,25 +371,24 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         var formData = new Dictionary<string, string>
         {
             { "Query", "204/3658" },
-            { "Urn", "100" }
+            { "Urn", "147788" }
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/school/search", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school");
-        response.Headers.Location!.ToString().Should().Contain("100");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/147788");
     }
 
     #endregion
 
-    #region GET /school/suggest Tests
+    #region GET /find-a-school/suggest Tests
 
     [Fact]
     public async Task GetSuggest_WithValidQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/suggest?queryPart=Test");
+        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("application/json");
@@ -400,7 +397,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSuggest_ReturnsJsonArray()
     {
-        var response = await fixture.Client.GetAsync("/school/suggest?queryPart=School");
+        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=School");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -413,7 +410,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSuggest_WithEmptyQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/suggest?queryPart=");
+        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -421,7 +418,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSuggest_WithoutQueryParameter_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/suggest");
+        var response = await fixture.Client.GetAsync("/find-a-school/suggest");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -429,7 +426,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSuggest_WithSpecialCharacters_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/suggest?queryPart=St.%20Mary%27s");
+        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=St.%20Mary%27s");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -437,7 +434,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSuggest_WithShortQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/suggest?queryPart=A");
+        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=A");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -447,7 +444,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-        var response = await fixture.Client.GetAsync("/school/suggest?queryPart=Test", cts.Token);
+        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test", cts.Token);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -455,9 +452,9 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSuggest_MultipleConsecutiveCalls_ReturnsConsistently()
     {
-        var response1 = await fixture.Client.GetAsync("/school/suggest?queryPart=Test");
-        var response2 = await fixture.Client.GetAsync("/school/suggest?queryPart=Test");
-        var response3 = await fixture.Client.GetAsync("/school/suggest?queryPart=Test");
+        var response1 = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
+        var response2 = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
+        var response3 = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
 
         response1.StatusCode.Should().Be(HttpStatusCode.OK);
         response2.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -473,9 +470,9 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     {
         var endpoints = new[]
         {
-            "/search-for-a-school",
-            "/school/search?query=Test",
-            "/school/suggest?queryPart=Test"
+            "/find-a-school",
+            "/find-a-school/search?query=Test",
+            "/find-a-school/suggest?queryPart=Test"
         };
 
         foreach (var endpoint in endpoints)
@@ -492,7 +489,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     {
         var content = new FormUrlEncodedContent(new Dictionary<string, string>());
 
-        var response = await fixture.Client.PostAsync("/search-for-a-school", content);
+        var response = await fixture.Client.PostAsync("/find-a-school", content);
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -502,7 +499,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithUnicodeCharacters_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/search?query=Scköl");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=Scköl");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -517,20 +514,20 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         };
         var content = new FormUrlEncodedContent(formData);
 
-        var response = await fixture.NonRedirectingClient.PostAsync("/school/search", content);
+        var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/search");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/find-a-school/search");
     }
 
     [Theory]
     [InlineData("Test")]
     [InlineData("School Name")]
-    [InlineData("123456")]
+    [InlineData("147788")]
     [InlineData("St. Mary's")]
     public async Task GetSearch_WithVariousQueries_ReturnsSuccess(string query)
     {
-        var response = await fixture.Client.GetAsync($"/school/search?query={Uri.EscapeDataString(query)}");
+        var response = await fixture.Client.GetAsync($"/find-a-school/search?query={Uri.EscapeDataString(query)}");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -540,7 +537,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     {
         var maliciousQuery = "<script>alert('xss')</script>";
 
-        var response = await fixture.Client.GetAsync($"/school/search?query={Uri.EscapeDataString(maliciousQuery)}");
+        var response = await fixture.Client.GetAsync($"/find-a-school/search?query={Uri.EscapeDataString(maliciousQuery)}");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -559,7 +556,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         for (var i = 0; i < 10; i++)
         {
             var content = new FormUrlEncodedContent(formData);
-            tasks.Add(fixture.NonRedirectingClient.PostAsync("/search-for-a-school", content));
+            tasks.Add(fixture.NonRedirectingClient.PostAsync("/find-a-school", content));
         }
 
         var responses = await Task.WhenAll(tasks);

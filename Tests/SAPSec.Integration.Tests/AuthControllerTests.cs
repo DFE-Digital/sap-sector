@@ -73,7 +73,7 @@ public class AuthControllerIntegrationTests(WebApplicationSetupFixture fixture) 
     }
 
     [Theory]
-    [InlineData("/search-for-a-school")]
+    [InlineData("/find-a-school")]
     public async Task GetSignIn_WithVariousReturnUrls_ReturnsValidResponse(string returnUrl)
     {
         var response = await fixture.Client.GetAsync($"{ExpectedRoutes.SignIn}?returnUrl={Uri.EscapeDataString(returnUrl)}");

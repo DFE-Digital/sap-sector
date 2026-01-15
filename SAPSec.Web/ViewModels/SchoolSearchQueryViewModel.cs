@@ -10,7 +10,5 @@ public class SchoolSearchQueryViewModel
 
     public string? Urn { get; set; }
 
-    public string Hint => "Search by name or school ID";
     public bool HasNoResults { get; set; }
-    public string NoResultsErrorMessage => "We could not find any schools matching your search criteria";
 }

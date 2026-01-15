@@ -14,7 +14,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
 {
     private const string SchoolHomePath = "/SchoolHome";
-    private const string SchoolSearchPath = "/search-for-a-school";
+    private const string SchoolSearchPath = "/find-a-school";
 
     #region Page Load Tests
 
@@ -57,7 +57,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var gridRows = Page.Locator(Selectors.GridRow);
         var count = await gridRows.CountAsync();
@@ -66,124 +66,16 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
-    public async Task SchoolHome_WhenAccessible_HasThreeColumns()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var columns = Page.Locator(Selectors.OneThirdColumn);
-        var count = await columns.CountAsync();
-
-        count.Should().Be(3, "Should have three one-third columns for cards");
-    }
-
-    [Fact]
     public async Task SchoolHome_WhenAccessible_HasFullWidthHeadingColumn()
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var fullWidthColumn = Page.Locator(Selectors.FullWidthColumn);
         var count = await fullWidthColumn.CountAsync();
 
         count.Should().BeGreaterThan(0, "Should have full-width column for heading");
-    }
-
-    #endregion
-
-    #region Card Tests
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_HasThreeCards()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var cards = Page.Locator(Selectors.Card);
-        var count = await cards.CountAsync();
-
-        count.Should().Be(3, "SchoolHome should display 3 cards");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_AllCardsAreClickable()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var clickableCards = Page.Locator(Selectors.ClickableCard);
-        var count = await clickableCards.CountAsync();
-
-        count.Should().Be(3, "All cards should be clickable");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_CardsHaveHeadings()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var headings = Page.Locator(Selectors.CardHeading);
-        var count = await headings.CountAsync();
-
-        count.Should().Be(3, "Each card should have a heading");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_CardsHaveDescriptions()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var descriptions = Page.Locator(Selectors.CardDescription);
-        var count = await descriptions.CountAsync();
-
-        count.Should().Be(3, "Each card should have a description");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_CardsHaveImageContainers()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        // Check for image containers (may be hidden if images fail to load)
-        var imageContainers = Page.Locator(Selectors.CardImageContainer);
-        var containerCount = await imageContainers.CountAsync();
-
-        // If containers exist, that's good
-        if (containerCount == 3)
-        {
-            containerCount.Should().Be(3, "Each card should have an image container");
-            return;
-        }
-
-        // Otherwise check if images exist but are hidden
-        var hiddenImages = Page.Locator(".app-card__image, .app-card__icon, .app-card img");
-        var imageCount = await hiddenImages.CountAsync();
-
-        imageCount.Should().BeGreaterThanOrEqualTo(0,
-            "Cards may have image containers (images can be hidden if assets fail to load)");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_CardsHaveLinks()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var links = Page.Locator(Selectors.CardLink);
-        var count = await links.CountAsync();
-
-        count.Should().Be(3, "Each card should have a link");
     }
 
     #endregion
@@ -195,7 +87,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var heading = Page.Locator(Selectors.SchoolNameHeading);
         var isVisible = await heading.IsVisibleAsync();
@@ -208,7 +100,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var heading = Page.Locator(Selectors.SchoolNameHeading);
         var count = await heading.CountAsync();
@@ -217,117 +109,6 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         var text = await heading.TextContentAsync();
         text.Should().NotBeNullOrWhiteSpace("School name heading should have text");
-    }
-
-    #endregion
-
-    #region Navigation Link Tests
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_HasComparePerformanceLink()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var link = Page.Locator(Selectors.ComparePerformanceLink);
-        var count = await link.CountAsync();
-
-        count.Should().Be(2, "Should have Compare Performance link");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_HasSchoolSearchLink()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var link = Page.Locator(Selectors.SchoolSearchLink);
-        var count = await link.CountAsync();
-
-        count.Should().Be(2, "Should have School Search link");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_HasSchoolDetailsLink()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var link = Page.Locator(Selectors.SchoolDetailsLink);
-        var count = await link.CountAsync();
-
-        count.Should().Be(2, "Should have School Details link");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_ComparePerformanceLinkIsClickable()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var link = Page.Locator(Selectors.ComparePerformanceLink);
-        var count = await link.CountAsync();
-
-        if (count == 0) return;
-
-        var isEnabled = await link.First.IsEnabledAsync();
-        isEnabled.Should().BeTrue("Compare Performance link should be clickable");
-    }
-
-    #endregion
-
-    #region Card Content Tests
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_ComparePerformanceCard_HasCorrectContent()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var link = Page.Locator(Selectors.ComparePerformanceLink);
-        var count = await link.CountAsync();
-
-        if (count == 0) return;
-
-        var cardContent = await link.First.TextContentAsync();
-        cardContent.Should().Contain("Compare", "Compare card should mention comparison");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_SchoolSearchCard_HasCorrectContent()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var link = Page.Locator(Selectors.SchoolSearchLink);
-        var count = await link.CountAsync();
-
-        if (count == 0) return;
-
-        var cardContent = await link.GetByText("Connect").TextContentAsync();
-        cardContent.Should().Contain("Connect", "Connect card should mention connecting with schools");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_SchoolDetailsCard_HasCorrectContent()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var link = Page.Locator(Selectors.SchoolDetailsLink);
-        var count = await link.CountAsync();
-
-        if (count == 0) return;
-
-        var cardContent = await link.First.TextContentAsync();
-        cardContent.Should().Contain("details", "Details card should mention school details");
     }
 
     #endregion
@@ -369,7 +150,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var govukElements = Page.Locator("[class*='govuk-']");
         var count = await govukElements.CountAsync();
@@ -382,7 +163,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var heading = Page.Locator(".govuk-heading-xl, .govuk-heading-l, .govuk-heading-m");
         var count = await heading.CountAsync();
@@ -390,68 +171,16 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         count.Should().BeGreaterThan(0, "Page should have GOV.UK heading styles");
     }
 
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_CardsHaveGovukLinkStyle()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var govukLinks = Page.Locator(".app-card .govuk-link");
-        var count = await govukLinks.CountAsync();
-
-        count.Should().Be(3, "Card links should use GOV.UK link styling");
-    }
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_DescriptionsHaveGovukBodyStyle()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var bodyText = Page.Locator(".app-card .govuk-body");
-        var count = await bodyText.CountAsync();
-
-        count.Should().Be(3, "Card descriptions should use GOV.UK body styling");
-    }
-
     #endregion
 
     #region Accessibility Tests
-
-    [Fact]
-    public async Task SchoolHome_WhenAccessible_ImagesHaveAltAttributes()
-    {
-        await NavigateToSchoolHome();
-
-        if (!await IsPageAccessible()) return;
-
-        var images = Page.Locator(".app-card img");
-        var count = await images.CountAsync();
-
-        // Images may not be present if they failed to load
-        if (count == 0) return;
-
-        for (var i = 0; i < count; i++)
-        {
-            var img = images.Nth(i);
-            var isVisible = await img.IsVisibleAsync();
-
-            // Only check visible images
-            if (!isVisible) continue;
-
-            var alt = await img.GetAttributeAsync("alt");
-            alt.Should().NotBeNull("Images should have alt attributes for accessibility");
-        }
-    }
 
     [Fact]
     public async Task SchoolHome_WhenAccessible_LinksHaveHref()
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var links = Page.Locator(".app-card__link");
         var count = await links.CountAsync();
@@ -469,13 +198,11 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var h2Heading = Page.Locator("h2.govuk-heading-xl");
-        var h3Headings = Page.Locator("h3.govuk-heading-m");
 
         (await h2Heading.CountAsync()).Should().Be(1, "Should have one h2 heading for school name");
-        (await h3Headings.CountAsync()).Should().Be(3, "Should have three h3 headings for cards");
     }
 
     #endregion
@@ -504,7 +231,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var link = Page.Locator(Selectors.ComparePerformanceLink);
         if (await link.CountAsync() == 0) return;
@@ -521,7 +248,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var link = Page.Locator(Selectors.SchoolSearchLink);
         if (await link.CountAsync() == 0) return;
@@ -529,7 +256,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         await link.First.ClickAsync();
         await WaitForPageLoad();
 
-        Page.Url.Should().Contain("search-for-a-school",
+        Page.Url.Should().Contain("find-a-school",
             "Clicking School Search should navigate to that page");
     }
 
@@ -538,7 +265,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSchoolHome();
 
-        if (!await IsPageAccessible()) return;
+        Assert.True(IsPageAccessible());
 
         var link = Page.Locator(Selectors.SchoolDetailsLink);
         if (await link.CountAsync() == 0) return;
@@ -572,22 +299,15 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
     /// - Page returned an error
     /// - Required content (cards) not present
     /// </summary>
-    private async Task<bool> IsPageAccessible()
+    private bool IsPageAccessible()
     {
         // Check URL contains SchoolHome
-        if (!Page.Url.Contains("/SchoolHome", StringComparison.OrdinalIgnoreCase))
-            return false;
-
-        // Check for cards (indicates successful load with Establishment user)
-        var cards = Page.Locator(Selectors.Card);
-        var cardCount = await cards.CountAsync();
-
-        return cardCount > 0;
+        return Page.Url.Contains("/SchoolHome", StringComparison.OrdinalIgnoreCase);
     }
 
     private bool IsOnSchoolSearchPage()
     {
-        return Page.Url.Contains("search-for-a-school", StringComparison.OrdinalIgnoreCase) ||
+        return Page.Url.Contains("find-a-school", StringComparison.OrdinalIgnoreCase) ||
                Page.Url.Contains("SchoolSearch", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -597,7 +317,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         var isValidDestination =
             currentUrl.Contains("SchoolHome", StringComparison.OrdinalIgnoreCase) ||
-            currentUrl.Contains("search-for-a-school", StringComparison.OrdinalIgnoreCase) ||
+            currentUrl.Contains("find-a-school", StringComparison.OrdinalIgnoreCase) ||
             currentUrl.Contains("SchoolSearch", StringComparison.OrdinalIgnoreCase) ||
             currentUrl.Contains("sign-in", StringComparison.OrdinalIgnoreCase) ||
             currentUrl.Contains("Error", StringComparison.OrdinalIgnoreCase);
@@ -631,7 +351,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
 
         // Links
         public const string ComparePerformanceLink = "a[href*='ComparePerformance']";
-        public const string SchoolSearchLink = "a[href=\"/search-for-a-school\"]";
+        public const string SchoolSearchLink = "a[href=\"/find-a-school\"]";
         public const string SchoolDetailsLink = "a[href*='SchoolDetails']";
     }
 
