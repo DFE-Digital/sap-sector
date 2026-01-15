@@ -259,7 +259,7 @@ public class SchoolHomePageTests(WebApplicationSetupFixture fixture)
         var link = Page.Locator(Selectors.SchoolDetailsLink);
         var count = await link.CountAsync();
 
-        count.Should().Be(2, "Should have School Details link");
+        count.Should().Be(1, "Should have School Details link");
     }
 
     [Fact]

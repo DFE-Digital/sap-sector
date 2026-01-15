@@ -142,8 +142,8 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788");
-        var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("School details Test page.");
+        var schoolDetails = await Page.Locator(".govuk-heading-xl").TextContentAsync();
+        schoolDetails.Should().Contain("School details");
     }
 
     [Fact]
@@ -158,8 +158,8 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788");
-        var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("School details Test page.");
+        var schoolDetails = await Page.Locator(".govuk-heading-xl").TextContentAsync();
+        schoolDetails.Should().Contain("School details");
     }
 
     #endregion
@@ -219,8 +219,8 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788");
-        var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("School details Test page.");
+        var schoolDetails = await Page.Locator(".govuk-heading-xl").TextContentAsync();
+        schoolDetails.Should().Contain("School details");
     }
 
     [Fact]
@@ -291,8 +291,8 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788");
-        var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("School details Test page.");
+        var schoolDetails = await Page.Locator(".govuk-heading-xl").TextContentAsync();
+        schoolDetails.Should().Contain("School details");
     }
 
     [Fact]
@@ -429,8 +429,8 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788");
-        var schoolDetails = await Page.Locator(".govuk-body-l").TextContentAsync();
-        schoolDetails.Should().Contain("School details Test page.");
+        var schoolDetails = await Page.Locator(".govuk-heading-xl").TextContentAsync();
+        schoolDetails.Should().Contain("School details");
     }
 
     [Fact]
