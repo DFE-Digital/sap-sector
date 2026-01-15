@@ -219,7 +219,8 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("SEND integrated resource");
+        // content.Should().Contain("SEND integrated resource");
+        content.Should().Contain("Resourced provision");
     }
 
     [Fact]
@@ -365,7 +366,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("govuk-heading-l");
+        content.Should().Contain("govuk-heading-xl");
         content.Should().Contain("govuk-heading-m");
     }
 

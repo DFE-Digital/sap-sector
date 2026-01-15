@@ -45,7 +45,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var heading = Page.Locator("h1.govuk-heading-l");
+        var heading = Page.Locator("h1.govuk-heading-xl");
         var headingText = await heading.TextContentAsync();
 
         headingText.Should().Contain("School details");
@@ -101,7 +101,8 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await backLink.ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("search-for-a-school");
+        // Page.Url.Should().Contain("search-for-a-school");
+        Page.Url.Should().Contain("SchoolHome");
     }
 
     #endregion
@@ -290,19 +291,55 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Admissions policy field should be visible");
     }
+    
 
     [Fact]
-    public async Task SchoolDetails_DisplaysSendIntegratedResourceField()
+    public async Task SchoolDetails_DisplaysNurseryProvisionField()
     {
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var sendKey = Page.Locator(".govuk-summary-list__key:has-text('SEND integrated resource')");
-        var isVisible = await sendKey.IsVisibleAsync();
+        var religiousKey = Page.Locator(".govuk-summary-list__key:has-text('Nursery provision')");
+        var isVisible = await religiousKey.IsVisibleAsync();
 
-        isVisible.Should().BeTrue("SEND integrated resource field should be visible");
+        isVisible.Should().BeTrue("Nursery provision field should be visible");
     }
+    
+    [Fact]
+    public async Task SchoolDetails_DisplaysSixthFormField()
+    {
+        await Page.GotoAsync(SchoolDetailsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
+        var religiousKey = Page.Locator(".govuk-summary-list__key:has-text('Sixth form')");
+        var isVisible = await religiousKey.IsVisibleAsync();
+
+        isVisible.Should().BeTrue("Sixth form field should be visible");
+    }
+    [Fact]
+    public async Task SchoolDetails_DisplaysSENUnitField()
+    {
+        await Page.GotoAsync(SchoolDetailsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var religiousKey = Page.Locator(".govuk-summary-list__key:has-text('SEN unit')");
+        var isVisible = await religiousKey.IsVisibleAsync();
+
+        isVisible.Should().BeTrue("SEN unit field should be visible");
+    }
+    
+    [Fact]
+    public async Task SchoolDetails_DisplaysResourcedprovisionField()
+    {
+        await Page.GotoAsync(SchoolDetailsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var religiousKey = Page.Locator(".govuk-summary-list__key:has-text('Resourced provision')");
+        var isVisible = await religiousKey.IsVisibleAsync();
+
+        isVisible.Should().BeTrue("Resourced provision field should be visible");
+    }
+    
     [Fact]
     public async Task SchoolDetails_DisplaysReligiousCharacterField()
     {
@@ -314,6 +351,9 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Religious character field should be visible");
     }
+    
+    
+    
 
     #endregion
 

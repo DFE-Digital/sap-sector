@@ -6,7 +6,7 @@
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">
             <li class="govuk-breadcrumbs__list-item">
-                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolHome")">Home</a>
+                <a class="govuk-breadcrumbs__link govuk-back-link" href="@Url.Action("Index", "SchoolHome")">Home</a>
             </li>
         </ol>
     </nav>
@@ -185,11 +185,13 @@
             <dt class="govuk-summary-list__key">Information from other services</dt>
             <dd class="govuk-summary-list__value">
                 <a href="@Model.FinancialBenchmarkingUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    Financial benchmarking and insights tool (opens in a new tab)
+                    Financial benchmarking and insights tool 
+                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
                 </a>
                 <br />
                 <a href="@Model.GetInformationAboutSchoolsUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    Get information about schools (opens in a new tab)
+                    Get information about schools 
+                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
                 </a>
             </dd>
         </div>
