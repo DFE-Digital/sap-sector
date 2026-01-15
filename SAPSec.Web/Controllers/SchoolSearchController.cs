@@ -7,18 +7,19 @@ using SAPSec.Web.ViewModels;
 namespace SAPSec.Web.Controllers;
 
 [Authorize]
+[Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
     ISearchService _searchService) : Controller
 {
     private const int PageSize = 10;
+    public const string Hint = "Search by name or school ID";
+    public const string NoResultsErrorMessage = "We could not find any schools matching your search criteria";
 
     [HttpGet]
-    [Route("search-for-a-school")]
     public IActionResult Index() => View(new SchoolSearchQueryViewModel());
 
     [HttpPost]
-    [Route("search-for-a-school")]
     public IActionResult Index(SchoolSearchQueryViewModel searchQueryViewModel)
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
@@ -53,7 +54,7 @@ public class SchoolSearchController(
     }
 
     [HttpGet]
-    [Route("school/search")]
+    [Route("search")]
     public async Task<IActionResult> Search(
         [FromQuery] string? query,
         [FromQuery] string[]? localAuthorities,
@@ -137,13 +138,13 @@ public class SchoolSearchController(
                         s.Establishment.AddressPostcode
                     }.Where(x => !string.IsNullOrWhiteSpace(x)))
                 }).ToArray(),
-                AllResults = allSchoolsForMap   
+                AllResults = allSchoolsForMap
             });
         }
     }
 
     [HttpPost]
-    [Route("school/search")]
+    [Route("search")]
     public IActionResult Search(SchoolSearchQueryViewModel searchQueryViewModel)
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
@@ -175,7 +176,7 @@ public class SchoolSearchController(
         }
     }
 
-    [HttpGet("school/suggest")]
+    [HttpGet("suggest")]
     public async Task<IActionResult> Suggest([FromQuery] string queryPart)
     {
         using (logger.BeginScope(new { queryPart }))

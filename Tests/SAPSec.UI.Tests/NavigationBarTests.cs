@@ -237,10 +237,10 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         var menuItems = Page.Locator(".govuk-service-navigation__list .govuk-service-navigation__item");
         var count = await menuItems.CountAsync();
 
-        // Assert - When authenticated, should have 4 menu items
+        // Assert - When authenticated, should have 2 menu items
         if (count > 0)
         {
-            count.Should().Be(4, "Navigation menu should have 4 items when authenticated");
+            count.Should().Be(2, "Navigation menu should have 2 items when authenticated");
         }
     }
 
@@ -588,24 +588,6 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
     #endregion
 
     #region Accessibility Tests
-
-    [Fact]
-    public async Task Header_HasCorrectAriaLabel()
-    {
-        // Arrange
-        await Page.GotoAsync(_fixture.BaseUrl);
-
-        // Act
-        var accountNav = Page.Locator("nav[aria-label='Account navigation']");
-        var count = await accountNav.CountAsync();
-
-        // Assert - Account nav only appears when authenticated
-        if (count > 0)
-        {
-            var ariaLabel = await accountNav.GetAttributeAsync("aria-label");
-            ariaLabel.Should().Be("Account navigation");
-        }
-    }
 
     [Fact]
     public async Task ServiceNav_HasCorrectAriaLabel()

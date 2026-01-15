@@ -1,13 +1,14 @@
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
 @using SAPSec.Web.ViewModels
+@using SAPSec.Web.Controllers
 @model SAPSec.Web.ViewModels.SchoolSearchQueryViewModel
 @{
     var hasValidationError = ViewData.ModelState.HasError(nameof(SchoolSearchQueryViewModel.Query));
     var hasNoResults = Model.HasNoResults;
     var hasError = hasValidationError || hasNoResults;
     var errorMessage = hasNoResults
-        ? Model.NoResultsErrorMessage
+        ? SchoolSearchController.NoResultsErrorMessage
         : ViewData.ModelState[nameof(SchoolSearchQueryViewModel.Query)]?.Errors.Select(e => e.ErrorMessage).FirstOrDefault();
 }
 @using (Html.BeginForm(FormMethod.Post, true, new { novalidate = "novalidate", role = "search" }))
@@ -35,8 +36,10 @@
                         @ViewData[ViewDataKeys.Title]
                     </label>
                 </h1>
+                <p class="govuk-body">Find schools in England to check their performance against similar schools
+                as well as national and local authority averages.</p>
                 <div id="@nameof(SchoolSearchQueryViewModel.Query)-hint" class="govuk-hint">
-                    @Model.Hint
+                    @SchoolSearchController.Hint
                 </div>
                 @if (hasError)
                 {
@@ -59,8 +62,8 @@
                         <button type="submit" class="govuk-button" data-module="govuk-button" name="Search">
                             <img src="/assets/images/search_black.svg"
                                  alt="Search"
-                                 height="15"
-                                 width="15" />
+                                 height="18"
+                                 width="18" />
                         </button>
                     </div>
                 </div>

@@ -28,7 +28,7 @@ public class AuthController(
 
     private static class Defaults
     {
-        public const string ReturnUrl = "/search-for-a-school";
+        public const string ReturnUrl = "/find-a-school";
     }
 
     private static class LogMessages

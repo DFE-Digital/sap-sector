@@ -3,6 +3,9 @@
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
 @using SAPSec.Web.TagHelpers
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+}
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
@@ -48,67 +51,46 @@
                  class="govuk-header__logotype" />
         </a>
     </div>
-    <div class="header-right-wrapper">
-        <div class="govuk-header__content">
-            @if (User.Identity is { IsAuthenticated: true })
-            {
-                <nav aria-label="Account navigation">
-                    <ul class="govuk-header__navigation">
-                        <li class="govuk-header__navigation-item">
-                            <a href="@Url.Action("SignOutCallback", "Auth")"
-                               class="govuk-header__link">
-                                Sign out
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            }
-        </div>
-    </div>
-</div>       
+</div>
 </header>
     <section aria-label="Service information" class="govuk-service-navigation" data-module="govuk-service-navigation">
         <div class="govuk-width-container">
             <div class="govuk-service-navigation__container">
                 <span class="govuk-service-navigation__service-name">
                     @Html.TrackedAnchor(
-                    TrackedLinks.ServiceBanner,
-                                        "/",
-                                        LayoutConstants.ServiceName,
-                                        classes: new[] { "govuk-service-navigation__link" })
+                        TrackedLinks.ServiceBanner,
+                        "/",
+                        LayoutConstants.ServiceName,
+                        classes: new[] { "govuk-service-navigation__link" })
                 </span>
-                  @if (User.Identity is { IsAuthenticated: true })
-            {
+                @if (User.Identity is { IsAuthenticated: true })
+                {
                     <nav aria-label="Menu" class="govuk-service-navigation__wrapper">
                         <button type="button"
-                        class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle"
-                        aria-controls="navigation"
-                        hidden>
+                            class="govuk-service-navigation__toggle govuk-js-service-navigation-toggle"
+                            aria-controls="navigation"
+                            hidden>
                             Menu
                         </button>
                         <ul class="govuk-service-navigation__list" id="navigation">
-                            <li class="govuk-service-navigation__item">
+                            <li class="govuk-service-navigation__item @(currentController == "SchoolSearch" ? "govuk-service-navigation__item--active" : "")">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "ComparePerformance")">
-                                    Compare performance
+                                    aria-current=@(currentController == "SchoolSearch")
+                                    href="@Url.Action("Index", "SchoolSearch")">
+                                    @if (currentController == "SchoolSearch")
+                                    {
+                                        <strong class="govuk-service-navigation__active-fallback">Find a school</strong>
+                                    }
+                                    else
+                                    {
+                                        <text>Find a school</text>
+                                    }
                                 </a>
                             </li>
                             <li class="govuk-service-navigation__item">
                                 <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "ConnectSchool")">
-                                   Connect
-                                </a>
-                            </li>
-                            <li class="govuk-service-navigation__item">
-                                <a class="govuk-service-navigation__link"
-                                href="@Url.Action("Index", "SchoolDetails")">
-                                    School details
-                                </a>
-                            </li>
-                            <li class="govuk-service-navigation__item">
-                                <a class="govuk-service-navigation__link"
-                                   href="@Url.Action("Index", "SchoolSearch")">
-                                    Change school
+                                   href="@Url.Action("SignOutCallback", "Auth")">
+                                    Sign out
                                 </a>
                             </li>
                         </ul>
@@ -195,36 +177,39 @@
     <script src="/js/govuk-frontend.min.js" asp-append-version="true"></script>
     <script src="/js/moj-frontend.min.js" asp-append-version="true"></script>
     <script src="/js/dfefrontend.js" asp-append-version="true"></script>
-    <script add-nonce="true">
-        window.GOVUKFrontend.initAll();
-        window.MOJFrontend.initAll();
+    <script type="module" add-nonce="true">
+        import * as GOVUKFrontend from '/js/govuk-frontend.min.js'
+        import * as MOJFrontend from '/js/moj-frontend.min.js'
+
+        GOVUKFrontend.initAll();
+        MOJFrontend.initAll();
     </script>
-<script add-nonce="true">
-    document.getElementById("js-back-link")?.addEventListener('click', function (ev) {
-        ev.preventDefault();
-        history.back();
-    });
-            document.querySelectorAll('.moj-filter input[type="checkbox"]').forEach(checkbox => {
+    <script add-nonce="true">
+        document.getElementById("js-back-link")?.addEventListener('click', ev => {
+            ev.preventDefault();
+            history.back();
+        });
+
+        document.querySelectorAll('.moj-filter input[type="checkbox"]').forEach(checkbox => {
             checkbox.addEventListener('change', () => {
                 checkbox.closest('form').submit();
             });
         });
-    document.querySelectorAll(".app-print-link").forEach((element) => {
-        if (element.classList.contains("govuk-visually-hidden")) {
-            element.classList.remove("govuk-visually-hidden");
-        }
 
-        element.addEventListener("click", function (ev) {
-            ev.preventDefault();
-            window.print();
-        });
-    })
-</script>
+        document.querySelectorAll(".app-print-link").forEach(element => {
+            if (element.classList.contains("govuk-visually-hidden")) {
+                element.classList.remove("govuk-visually-hidden");
+            }
 
-
-
-
-@await RenderSectionAsync("scripts", false)
+            element.addEventListener("click", ev => {
+                ev.preventDefault();
+                window.print();
+            });
+        })
+    </script>
+    <script src="/js/site.js" asp-append-version="true"></script>
+    
+    @await RenderSectionAsync("scripts", false)
 
 </body>
 </html>

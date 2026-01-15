@@ -62,7 +62,7 @@ public class SchoolHomeControllerIntegrationTests(WebApplicationSetupFixture fix
 
         var isValidDestination =
             currentUrl.Contains("SchoolHome", StringComparison.OrdinalIgnoreCase) ||
-            currentUrl.Contains("search-for-a-school", StringComparison.OrdinalIgnoreCase) ||
+            currentUrl.Contains("find-a-school", StringComparison.OrdinalIgnoreCase) ||
             currentUrl.Contains("sign-in", StringComparison.OrdinalIgnoreCase) ||
             currentUrl.Contains("Error", StringComparison.OrdinalIgnoreCase);
 
@@ -80,7 +80,7 @@ public class SchoolHomeControllerIntegrationTests(WebApplicationSetupFixture fix
             var location = response.Headers.Location?.ToString();
 
             var isValidRedirect =
-                location?.Contains("search-for-a-school") == true ||
+                location?.Contains("find-a-school") == true ||
                 location?.Contains("sign-in") == true ||
                 location?.Contains("Error") == true;
 
@@ -234,70 +234,6 @@ public class SchoolHomeControllerIntegrationTests(WebApplicationSetupFixture fix
             HttpStatusCode.MethodNotAllowed,
             HttpStatusCode.NotFound,
             HttpStatusCode.Redirect);
-    }
-
-    #endregion
-
-    #region View Content Tests
-
-    [Fact]
-    public async Task Index_WhenEstablishment_ContainsCardComponents()
-    {
-        var response = await fixture.Client.GetAsync(SchoolHome);
-
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            content.Should().Contain("app-card");
-        }
-    }
-
-    [Fact]
-    public async Task Index_WhenEstablishment_ContainsComparePerformanceLink()
-    {
-        var response = await fixture.Client.GetAsync(SchoolHome);
-
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            content.Should().Contain("ComparePerformance");
-        }
-    }
-
-    [Fact]
-    public async Task Index_WhenEstablishment_ContainsSchoolSearchLink()
-    {
-        var response = await fixture.Client.GetAsync(SchoolHome);
-
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            content.Should().Contain("/search-for-a-school");
-        }
-    }
-
-    [Fact]
-    public async Task Index_WhenEstablishment_ContainsSchoolDetailsLink()
-    {
-        var response = await fixture.Client.GetAsync(SchoolHome);
-
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            content.Should().Contain("SchoolDetails");
-        }
-    }
-
-    [Fact]
-    public async Task Index_WhenEstablishment_ContainsGovukStyling()
-    {
-        var response = await fixture.Client.GetAsync(SchoolHome);
-
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            content.Should().Contain("govuk-");
-        }
     }
 
     #endregion

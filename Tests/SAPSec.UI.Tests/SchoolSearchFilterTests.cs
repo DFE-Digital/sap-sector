@@ -771,7 +771,7 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
 
     private static class Paths
     {
-        public const string SchoolSearchResults = "/school/search";
+        public const string SchoolSearchResults = "/find-a-school/search";
     }
 
     private static class TestData

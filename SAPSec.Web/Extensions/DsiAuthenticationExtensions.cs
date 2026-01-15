@@ -19,7 +19,7 @@ public static class DsiAuthenticationExtensions
         public const string SignIn = "/Auth/sign-in";
         public const string AccessDenied = "/Auth/access-denied";
         public const string Home = "/";
-        public const string SchoolSearch = "/search-for-a-school";
+        public const string SchoolSearch = "/find-a-school";
         public const string Error = "/error";
     }
 

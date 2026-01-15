@@ -1,79 +1,9 @@
-﻿@{
-
-}
-<div class="govuk-grid-row">
+﻿<div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
         <span class="govuk-caption-xl">Get school improvement insights</span>
         <h2 class="govuk-heading-xl govuk-!-margin-bottom-8">@ViewBag.SchoolName</h2>
     </div>
 </div>
-<div class="govuk-grid-row">
-    <!-- Card 1: Compare Performance -->
-    <div class="govuk-grid-column-one-third">
-        <div class="app-card app-card--clickable">
-            <div class="app-card__image app-card__image--compare">
-                <img src="~/assets/images/compare_icon.svg"
-                     alt="compare"
-                     class="app-card__icon"
-                     onerror="this.style.display='none'">
-            </div>
-            <div class="app-card__content">
-                <h3 class="govuk-heading-m app-card__heading">
-                    <a href="@Url.Action("Index", "ComparePerformance")"
-                       class="govuk-link app-card__link">
-                        Compare this school's performance
-                    </a>
-                </h3>
-                <p class="govuk-body app-card__description">
-                    View how this school's performance compares with similar schools as well as local and national averages.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 2: Connect with Schools -->
-    <div class="govuk-grid-column-one-third">
-        <div class="app-card app-card--clickable">
-            <div class="app-card__image app-card__image--connect">
-                <img src="~/assets/images/connect_icon.svg"
-                     alt="connect"
-                     class="app-card__icon"
-                     onerror="this.style.display='none'">
-            </div>
-            <div class="app-card__content">
-                <h3 class="govuk-heading-m app-card__heading">
-                    <a href="@Url.Action("Index", "SchoolSearch")"
-                       class="govuk-link app-card__link">
-                        Connect with similar schools
-                    </a>
-                </h3>
-                <p class="govuk-body app-card__description">
-                    Find contact details for similar schools with stronger academic performance to connect with.
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Card 3: School Details -->
-    <div class="govuk-grid-column-one-third">
-        <div class="app-card app-card--clickable">
-            <div class="app-card__image app-card__image--details">
-                <img src="~/assets/images/details_icon.svg"
-                     alt="details"
-                     class="app-card__icon"
-                     onerror="this.style.display='none'">
-            </div>
-            <div class="app-card__content">
-                <h3 class="govuk-heading-m app-card__heading">
-                    <a href="@Url.Action("Index", "SchoolDetails")"
-                       class="govuk-link app-card__link">
-                        School details
-                    </a>
-                </h3>
-                <p class="govuk-body app-card__description">
-                    View information about this school.
-                </p>
-            </div>
-        </div>
-    </div>
-</div>
+<p class="govuk-body">This is a legacy page from the old design. This page should redirect to the user's school pulled from their DSI Organisation, however
+    users are not currently assigned valid Organisations in DSI. Once this has been fixed this page will disappear.</p>
+<p class="govuk-body">For now, <a href="/school/138337">click here to view a school page</a>.</p>

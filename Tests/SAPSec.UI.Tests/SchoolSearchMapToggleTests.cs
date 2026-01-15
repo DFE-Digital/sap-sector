@@ -8,7 +8,7 @@ namespace SAPSec.UI.Tests;
 [Collection("UITestsCollection")]
 public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolSearchResultsPath = "/school/search";
+    private const string SchoolSearchResultsPath = "/find-a-school/search";
 
     #region Toggle Button Tests
 
