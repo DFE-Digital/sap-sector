@@ -254,7 +254,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("Headteacher/Principal");
+        content.Should().Contain("Headteacher / Principal");
     }
 
     [Fact]

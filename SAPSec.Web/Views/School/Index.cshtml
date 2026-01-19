@@ -40,16 +40,8 @@
 <h2 class="govuk-heading-m">School details</h2>
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">URN</dt>
-        <dd class="govuk-summary-list__value">@Model.Urn.Display()</dd>
-    </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">DfE number</dt>
-        <dd class="govuk-summary-list__value">@Model.DfENumber.Display()</dd>
-    </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">UKPRN</dt>
-        <dd class="govuk-summary-list__value">@Model.Ukprn.Display()</dd>
+        <dt class="govuk-summary-list__key">ID</dt>
+        <dd class="govuk-summary-list__value">URN: @Model.Urn.Display(), DfE number:@Model.DfENumber.Display(), UKPRN: @Model.Ukprn.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Age range</dt>
@@ -68,7 +60,7 @@
         <dd class="govuk-summary-list__value">@Model.SchoolType.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Governance</dt>
+        <dt class="govuk-summary-list__key">Governance structure</dt>
         <dd class="govuk-summary-list__value">@Model.GovernanceStructure.Display()</dd>
     </div>
 
