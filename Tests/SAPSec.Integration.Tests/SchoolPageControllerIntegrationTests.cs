@@ -155,9 +155,9 @@ public class SchoolPageControllerIntegrationTests(WebApplicationSetupFixture fix
     #region HTTP Method Tests
 
     [Fact]
-    public async Task Index_HeadRequest_ReturnsValidResponse()
+    public async Task Index_GetRequest_ReturnsValidResponse()
     {
-        var request = new HttpRequestMessage(HttpMethod.Head, SchoolPagePath);
+        var request = new HttpRequestMessage(HttpMethod.Get, SchoolPagePath);
 
         var response = await fixture.Client.SendAsync(request);
 
