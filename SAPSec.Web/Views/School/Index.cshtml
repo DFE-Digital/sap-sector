@@ -1,6 +1,9 @@
 ﻿@using SAPSec.Core.Model
 @using SAPSec.Web.Helpers
 @model SchoolDetails
+@{
+    ViewData["Title"] = $"{Model.Name} - School details";
+}
 
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
