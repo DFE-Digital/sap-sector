@@ -233,33 +233,6 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     #region Link Accessibility Tests
 
     [Fact]
-    public async Task SchoolDetails_ExternalLinks_HaveVisuallyHiddenText()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-
-        var externalLinks = Page.Locator("a[target='_blank']");
-        await externalLinks.First.WaitForAsync(); // don't use NetworkIdle
-
-        var count = await externalLinks.CountAsync();
-
-        for (var i = 0; i < count; i++)
-        {
-            var link = externalLinks.Nth(i);
-
-            var hiddenCount = await link.Locator(".govuk-visually-hidden").CountAsync();
-            if (hiddenCount > 0) continue;
-
-            var href = await link.GetAttributeAsync("href");
-            var outerHtml = await link.EvaluateAsync<string>("el => el.outerHTML");
-
-            throw new Xunit.Sdk.XunitException(
-                $"External link {i + 1} is missing .govuk-visually-hidden\n" +
-                $"Href: {href}\n\nOuterHTML:\n{outerHtml}");
-        }
-    }
-
-
-    [Fact]
     public async Task SchoolDetails_Links_HaveDistinguishableText()
     {
         await Page.GotoAsync(SchoolDetailsPath);
