@@ -22,12 +22,11 @@ public static class BreadcrumbNodes
     {
         return new BreadcrumbNode
         {
-            Title = "School details",
             Url = $"/school/{urn}",
             Parent = new BreadcrumbNode
             {
-                Title = "Home",
-                Url = "/"
+                Title = "SchoolHome",
+                Url = "/SchoolHome"
             }
         };
     }

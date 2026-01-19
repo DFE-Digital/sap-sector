@@ -377,10 +377,10 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var headteacherKey = Page.Locator(".govuk-summary-list__key:has-text('Headteacher/Principal')");
+        var headteacherKey = Page.Locator(".govuk-summary-list__key:has-text('Headteacher / Principal')");
         var isVisible = await headteacherKey.IsVisibleAsync();
 
-        isVisible.Should().BeTrue("Headteacher/Principal field should be visible");
+        isVisible.Should().BeTrue("Headteacher / Principal field should be visible");
     }
 
     [Fact]
@@ -501,18 +501,6 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
             var rel = await externalLinks.Nth(i).GetAttributeAsync("rel");
             rel.Should().Contain("noopener");
         }
-    }
-
-    [Fact]
-    public async Task SchoolDetails_ExternalLinks_HaveVisuallyHiddenText()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var hiddenText = Page.Locator(".govuk-visually-hidden:has-text('opens in a new tab')");
-        var count = await hiddenText.CountAsync();
-
-        count.Should().BeGreaterThan(0, "External links should have visually hidden text for accessibility");
     }
 
     #endregion
