@@ -1,0 +1,117 @@
+﻿using Microsoft.Extensions.Logging;
+using SAPSec.Core.Interfaces.Rules;
+using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Mappers;
+using SAPSec.Core.Model;
+
+namespace SAPSec.Core.Services;
+
+/// <summary>
+/// Service that applies business rules to create SchoolDetails.
+/// Follows Dependency Inversion - depends on abstractions (IBusinessRule).
+/// Follows Single Responsibility - orchestrates mapping and rules, doesn't contain logic.
+/// </summary>
+public sealed class SchoolDetailsService : ISchoolDetailsService
+{
+    private readonly IEstablishmentService _establishmentService;
+    private readonly IBusinessRule<GovernanceType> _governanceRule;
+    private readonly IBusinessRule<bool> _nurseryProvisionRule;
+    private readonly IBusinessRule<bool> _sixthFormRule;
+    private readonly IBusinessRule<bool> _senUnitRule;
+    private readonly IBusinessRule<bool> _resourcedProvisionRule;
+    private readonly ILogger<SchoolDetailsService> _logger;
+
+    public SchoolDetailsService(
+        IEstablishmentService establishmentService,
+        IBusinessRule<GovernanceType> governanceRule,
+        IBusinessRule<bool> nurseryProvisionRule,
+        IBusinessRule<bool> sixthFormRule,
+        IBusinessRule<bool> senUnitRule,
+        IBusinessRule<bool> resourcedProvisionRule,
+        ILogger<SchoolDetailsService> logger)
+    {
+        _establishmentService = establishmentService;
+        _governanceRule = governanceRule;
+        _nurseryProvisionRule = nurseryProvisionRule;
+        _sixthFormRule = sixthFormRule;
+        _senUnitRule = senUnitRule;
+        _resourcedProvisionRule = resourcedProvisionRule;
+        _logger = logger;
+    }
+
+    public SchoolDetails GetByUrn(string urn)
+    {
+        var establishment = _establishmentService.GetEstablishment(urn);
+        return MapToSchoolDetails(establishment);
+    }
+
+    public SchoolDetails? TryGetByUrn(string urn)
+    {
+        try
+        {
+            return GetByUrn(urn);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "School not found for URN: {Urn}", urn);
+            return null;
+        }
+    }
+
+    public SchoolDetails? GetByIdentifier(string identifier)
+    {
+        var establishment = _establishmentService.GetEstablishmentByAnyNumber(identifier);
+
+        if (string.IsNullOrWhiteSpace(establishment?.URN))
+        {
+            return null;
+        }
+
+        return MapToSchoolDetails(establishment);
+    }
+
+    private SchoolDetails MapToSchoolDetails(Establishment establishment)
+    {
+        return new SchoolDetails
+        {
+            // Identifiers
+            Name = DataMapper.MapRequiredString(establishment.EstablishmentName),
+            Urn = DataMapper.MapRequiredString(establishment.URN),
+            DfENumber = DataMapper.MapDfENumber(establishment.DfENumber),
+            Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
+
+            // Location
+            Address = DataMapper.MapAddress(establishment),
+            LocalAuthorityName = DataMapper.MapString(establishment.LANAme),
+            LocalAuthorityCode = DataMapper.MapRequiredString(establishment.LAId),
+            Region = DataMapper.MapString(establishment.DistrictAdministrativeName),
+            UrbanRuralDescription = DataMapper.MapString(establishment.UrbanRuralName),
+
+            // School characteristics
+            AgeRangeLow = DataMapper.MapAge(establishment.AgeRangeLow),
+            AgeRangeHigh = DataMapper.MapAge(establishment.AgeRangeRange),
+            GenderOfEntry = DataMapper.MapString(establishment.GenderName),
+            PhaseOfEducation = DataMapper.MapString(establishment.PhaseOfEducationName),
+            SchoolType = DataMapper.MapString(establishment.TypeOfEstablishmentName),
+            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionPolicy),
+            ReligiousCharacter = DataMapper.MapString(establishment.ReligiousCharacterName),
+
+            // Governance - business rule
+            GovernanceStructure = _governanceRule.Evaluate(establishment),
+            AcademyTrustName = DataMapper.MapTrustName(establishment),
+            AcademyTrustId = DataMapper.MapTrustId(establishment.TrustsId),
+
+            // Provisions - business rules
+            HasNurseryProvision = _nurseryProvisionRule.Evaluate(establishment),
+            HasSixthForm = _sixthFormRule.Evaluate(establishment),
+            HasSenUnit = _senUnitRule.Evaluate(establishment),
+            HasResourcedProvision = _resourcedProvisionRule.Evaluate(establishment),
+
+            // Contact
+            HeadteacherName = DataMapper.MapHeadteacher(establishment),
+            Website = DataMapper.MapWebsite(establishment.Website),
+            Telephone = DataMapper.MapString(establishment.TelephoneNum),
+            Email = DataWithAvailability<string>.NotAvailable()
+        };
+    }
+}

@@ -1,7 +1,7 @@
-﻿    @model SAPSec.Web.ViewModels.SchoolViewModel
-    @{
-        ViewData["Title"] = $"{Model.Name} - School details";
-    }
+﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Helpers
+@model SchoolDetails
+
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">
@@ -11,202 +11,213 @@
         </ol>
     </nav>
 }
-                    <span class="govuk-caption-l">@Model.Name</span>
-                    <h1 class="govuk-heading-xl">School details</h1>
 
-                    @* Location Section *@
-                    <h2 class="govuk-heading-m">Location</h2>
-                      <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Address</dt>
-                            <dd class="govuk-summary-list__value">@Model.Address</dd>
-                        </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Local authority</dt>
-                            <dd class="govuk-summary-list__value">@Model.LocalAuthority</dd>
-                        </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Region</dt>
-                            <dd class="govuk-summary-list__value">@Model.Region</dd>
-                        </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Urban/rural description</dt>
-                            <dd class="govuk-summary-list__value">@Model.UrbanRuralDescription</dd>
-                        </div>
-                    </dl>
+<span class="govuk-caption-l">@Model.Name.Display()</span>
+<h1 class="govuk-heading-xl">School details</h1>
 
-                @* School Details Section *@
-                <h2 class="govuk-heading-m">School details</h2>
-                <dl class="govuk-summary-list">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">ID</dt>
-                        <dd class="govuk-summary-list__value">@Model.Id</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Age range</dt>
-                        <dd class="govuk-summary-list__value">@Model.AgeRange</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Gender of entry</dt>
-                        <dd class="govuk-summary-list__value">@Model.GenderOfEntry</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Phase of education</dt>
-                        <dd class="govuk-summary-list__value">@Model.PhaseOfEducation</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">School type</dt>
-                        <dd class="govuk-summary-list__value">@Model.SchoolType</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Governance structure</dt>
-                        <dd class="govuk-summary-list__value">@Model.GovernanceStructure</dd>
-                    </div>
-                    @if (!Model.IsPartOfLocalAuthority)
-                    {
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Academy trust</dt>
-                        <dd class="govuk-summary-list__value">
-                            @if (Model.IsPartOfTrust)
-                            {
-                                <a href="https://get-information-schools.service.gov.uk/Groups/Group/Details/@Model.AcademyTrustId" class="govuk-link" target="_blank" rel="noopener noreferrer">
-                                    @Model.AcademyTrust
-                                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
-                                </a>
-                            }
-                            else
-                            {
-                                @Model.AcademyTrust
-                            }
-                        </dd>
-                    </div>
-                    }
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Admissions policy</dt>
-                        <dd class="govuk-summary-list__value">@Model.AdmissionsPolicy</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Religious character</dt>
-                        <dd class="govuk-summary-list__value">@Model.ReligiousCharacter</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Nursery provision</dt>
-                        <dd class="govuk-summary-list__value">@Model.NurseryProvision</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Sixth form</dt>
-                        <dd class="govuk-summary-list__value">@Model.SixthForm</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">SEN unit</dt>
-                        <dd class="govuk-summary-list__value">@Model.SenUnit</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Resourced provision</dt>
-                        <dd class="govuk-summary-list__value">@Model.ResourcedProvision</dd>
-                    </div>
-                </dl>
+@* Location Section *@
+<h2 class="govuk-heading-m">Location</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Address</dt>
+        <dd class="govuk-summary-list__value">@Model.Address.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Local authority</dt>
+        <dd class="govuk-summary-list__value">@Model.LocalAuthorityName.DisplayWithCode(Model.LocalAuthorityCode)</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Region</dt>
+        <dd class="govuk-summary-list__value">@Model.Region.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Urban/rural description</dt>
+        <dd class="govuk-summary-list__value">@Model.UrbanRuralDescription.Display()</dd>
+    </div>
+</dl>
 
-        @* SEN unit and resourced provision details component *@
-        <details class="govuk-details govuk-!-margin-bottom-9">
-            <summary class="govuk-details__summary">
-                <span class="govuk-details__summary-text">
-                    What is a SEN unit or resourced provision?
-                </span>
-            </summary>
-            <div class="govuk-details__text">
-                <p class="govuk-body">
-                    SEN (special educational needs) units and resourced provisions are specialist provisions in mainstream schools formally recognised by the local authority.
-                </p>
-                <p class="govuk-body">
-                    In SEN units pupils are taught within separate classes for at least half of their time.
-                </p>
-                <p class="govuk-body">
-                    In resourced provisions pupils are taught within mainstream classes for at least half of their time, but have access to a base and specialist facilities around the school.
-                </p>
-                <p class="govuk-body">
-                    They are both for pupils with SEN, who typically have education, health, and care (EHC) plans.
-                </p>
-            </div>
-        </details>
+@* School Details Section *@
+<h2 class="govuk-heading-m">School details</h2>
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">URN</dt>
+        <dd class="govuk-summary-list__value">@Model.Urn.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">DfE number</dt>
+        <dd class="govuk-summary-list__value">@Model.DfENumber.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">UKPRN</dt>
+        <dd class="govuk-summary-list__value">@Model.Ukprn.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Age range</dt>
+        <dd class="govuk-summary-list__value">@Model.AgeRangeLow.DisplayAgeRange(Model.AgeRangeHigh)</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Gender of entry</dt>
+        <dd class="govuk-summary-list__value">@Model.GenderOfEntry.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Phase of education</dt>
+        <dd class="govuk-summary-list__value">@Model.PhaseOfEducation.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">School type</dt>
+        <dd class="govuk-summary-list__value">@Model.SchoolType.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Governance</dt>
+        <dd class="govuk-summary-list__value">@Model.GovernanceStructure.Display()</dd>
+    </div>
 
-                    @* Contact Details Section *@
-                    <h2 class="govuk-heading-m">Contact details</h2>
-                     <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Headteacher/Principal</dt>
-                            <dd class="govuk-summary-list__value">@Model.HeadteacherPrincipal</dd>
-                        </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Website</dt>
-                            <dd class="govuk-summary-list__value">
-                                @if (Model.HasWebsite)
-                                {
-                                    <a href="@Model.WebsiteUrl" class="govuk-link" aria-label="View website" target="_blank" rel="noopener noreferrer">
-                                        @Model.WebsiteUrl
-                                        <span class="govuk-visually-hidden">(opens in a new tab)</span>
-                                    </a>
-                                }
-                                else
-                                {
-                                    @Model.Website
-                                }
-                            </dd>
-                        </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Telephone</dt>
-                            <dd class="govuk-summary-list__value">@Model.Telephone</dd>
-                        </div>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Email</dt>
-                            <dd class="govuk-summary-list__value">@Model.Email</dd>
-                        </div>
-                    </dl>
-    @* Further Information Section *@
-    <h2 class="govuk-heading-m">Further information</h2>
-    <dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    @if (Model.AcademyTrustName.IsAvailable)
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Academy trust</dt>
+            <dd class="govuk-summary-list__value">
+                <a href="https://get-information-schools.service.gov.uk/Groups/Group/Details/@Model.AcademyTrustId.Value"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    @Model.AcademyTrustName.Value (opens in a new tab)
+                </a>
+            </dd>
+        </div>
+    }
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Admissions policy</dt>
+        <dd class="govuk-summary-list__value">@Model.AdmissionsPolicy.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Religious character</dt>
+        <dd class="govuk-summary-list__value">@Model.ReligiousCharacter.Display()</dd>
+    </div>
+
+    @* Provision fields - content editors can change the text here *@
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Nursery provision</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.HasNurseryProvision.DisplayAs("Has nursery classes", "Does not have nursery classes")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Sixth form</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.HasSixthForm.DisplayAs("Has a sixth form", "Does not have a sixth form")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">SEN unit</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.HasSenUnit.DisplayAs("Has a SEN unit", "Does not have a SEN unit")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Resourced provision</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.HasResourcedProvision.DisplayAs("Has a resourced provision", "Does not have a resourced provision")
+        </dd>
+    </div>
+</dl>
+
+@* SEN Unit explanation *@
+<details class="govuk-details govuk-!-margin-bottom-9">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+            What is a SEN unit or resourced provision?
+        </span>
+    </summary>
+    <div class="govuk-details__text">
+        <p class="govuk-body">
+            SEN (special educational needs) units and resourced provisions are specialist provisions in mainstream schools formally recognised by the local authority.
+        </p>
+        <p class="govuk-body">
+            In SEN units pupils are taught within separate classes for at least half of their time.
+        </p>
+        <p class="govuk-body">
+            In resourced provisions pupils are taught within mainstream classes for at least half of their time, but have access to a base and specialist facilities around the school.
+        </p>
+        <p class="govuk-body">
+            They are both for pupils with SEN, who typically have education, health, and care (EHC) plans.
+        </p>
+    </div>
+</details>
+
+@* Contact Section *@
+<h2 class="govuk-heading-m">Contact details</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Headteacher / Principal</dt>
+        <dd class="govuk-summary-list__value">@Model.HeadteacherName.Display()</dd>
+    </div>
+    @if (Model.Website.IsAvailable)
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Website</dt>
+            <dd class="govuk-summary-list__value">
+                <a href="@Model.Website.Value" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    @Model.Website.Value (opens in a new tab)
+                </a>
+            </dd>
+        </div>
+    }
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Telephone</dt>
+        <dd class="govuk-summary-list__value">@Model.Telephone.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Email</dt>
+        <dd class="govuk-summary-list__value">@Model.Email.Display()</dd>
+    </div>
+</dl>
+
+@* Further Information Section *@
+<h2 class="govuk-heading-m">Further information</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    @if (Model.Urn.IsAvailable)
+    {
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Ofsted report</dt>
             <dd class="govuk-summary-list__value">
-                @if (Model.HasOfstedReport)
-                {
-                    <a href="@Model.OfstedReportUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
-                        View the latest Ofsted report
-                        <span class="govuk-visually-hidden">(opens in a new tab)</span>
-                    </a>
-                }
-                else
-                {
-                    <text>No available data</text>
-                }
+                <a href="https://reports.ofsted.gov.uk/provider/23/@Model.Urn.Value"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    View the latest Ofsted report (opens in a new tab)
+                </a>
             </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Information from other services</dt>
             <dd class="govuk-summary-list__value">
-                <a href="@Model.FinancialBenchmarkingUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    Financial benchmarking and insights tool 
-                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.Urn.Value"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    Financial benchmarking and insights tool (opens in a new tab)
                 </a>
                 <br />
-                <a href="@Model.GetInformationAboutSchoolsUrl" class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    Get information about schools 
-                    <span class="govuk-visually-hidden">(opens in a new tab)</span>
+                <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/@Model.Urn.Value"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    Get information about schools (opens in a new tab)
                 </a>
             </dd>
         </div>
-    </dl>
+    }
+</dl>
 
-    @* Data Sources Section *@
-    <details class="govuk-details">
-        <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">
-                Data sources
-            </span>
-        </summary>
-        <div class="govuk-details__text">
-            <p class="govuk-body">
-            The data shown is sourced from the <a href="https://get-information-schools.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">Get Information about schools </a> website and from <a href="https://explore-education-statistics.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">Explore our statistics and data</a> website.
-            </p>
-        </div>
-    </details>
+@* Data sources *@
+<details class="govuk-details">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Data sources</span>
+    </summary>
+    <div class="govuk-details__text">
+        <p class="govuk-body">
+            The data shown is sourced from
+            <a href="https://get-information-schools.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                Get Information about Schools (opens in a new tab)
+            </a>
+            and from
+            <a href="https://explore-education-statistics.service.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">
+                Explore education statistics (opens in a new tab)
+            </a>.
+        </p>
+    </div>
+</details>

@@ -20,6 +20,7 @@ using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Model.KS4.SubjectEntries;
 using SAPSec.Core.Model.KS4.Suspensions;
 using SAPSec.Core.Model.KS4.Workforce;
+using SAPSec.Core.Rules;
 using SAPSec.Core.Services;
 using SAPSec.Core.Services.KS4.Absence;
 using SAPSec.Core.Services.KS4.Destinations;
@@ -124,6 +125,29 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<ISearchRepository, LuceneSearchService>();
 
             services.AddSingleton<ISearchService, SearchService>();
+
+            // Register business rules as singletons (they're stateless)
+            services.AddSingleton<GovernanceRule>();
+            services.AddSingleton<NurseryProvisionRule>();
+            services.AddSingleton<SixthFormRule>();
+            services.AddSingleton<SenUnitRule>();
+            services.AddSingleton<ResourcedProvisionRule>();
+
+            // Register SchoolDetailsService with explicit rule dependencies
+            services.AddScoped<ISchoolDetailsService>(provider =>
+            {
+                var establishmentService = provider.GetRequiredService<IEstablishmentService>();
+                var logger = provider.GetRequiredService<ILogger<SchoolDetailsService>>();
+
+                return new SchoolDetailsService(
+                    establishmentService,
+                    provider.GetRequiredService<GovernanceRule>(),
+                    provider.GetRequiredService<NurseryProvisionRule>(),
+                    provider.GetRequiredService<SixthFormRule>(),
+                    provider.GetRequiredService<SenUnitRule>(),
+                    provider.GetRequiredService<ResourcedProvisionRule>(),
+                    logger);
+            });
         }
     }
 }
