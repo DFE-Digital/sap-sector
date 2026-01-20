@@ -256,18 +256,6 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
         linkTexts.Should().NotContain("read more", "Links should not use 'read more' text alone");
     }
 
-    [Fact]
-    public async Task SchoolDetails_BackLink_HasCorrectRole()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var backLink = Page.Locator(".govuk-back-link");
-        var tagName = await backLink.EvaluateAsync<string>("el => el.tagName.toLowerCase()");
-
-        tagName.Should().Be("a", "Back link should be an anchor element");
-    }
-
     #endregion
 
     #region Summary List Accessibility Tests

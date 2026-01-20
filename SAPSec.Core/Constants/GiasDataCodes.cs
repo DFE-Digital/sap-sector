@@ -2,9 +2,9 @@
 
 /// <summary>
 /// GIAS special data codes indicating data availability/quality.
-/// These codes appear in GIAS data fields to indicate special states.
+/// These codes appear in EES data fields to indicate special states.
 /// </summary>
-public static class GiasDataCodes
+public static class EesDataCodes
 {
     /// <summary>Data has been redacted (withheld for privacy)</summary>
     public const string Redacted = "c";

@@ -73,7 +73,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var backLink = Page.Locator(".govuk-back-link");
+        var backLink = Page.Locator(".govuk-breadcrumbs__link");
         var isVisible = await backLink.IsVisibleAsync();
 
         isVisible.Should().BeTrue("Back link should be visible");
@@ -85,7 +85,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var backLink = Page.Locator(".govuk-back-link");
+        var backLink = Page.Locator(".govuk-breadcrumbs__link");
         var linkText = await backLink.TextContentAsync();
 
         linkText.Should().Contain("Home");
@@ -97,7 +97,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var backLink = Page.Locator(".govuk-back-link");
+        var backLink = Page.Locator(".govuk-breadcrumbs__link");
         await backLink.ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 

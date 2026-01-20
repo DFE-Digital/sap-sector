@@ -19,17 +19,17 @@ public static class DataMapper
             return DataAvailability.NotAvailable<string>();
         }
 
-        if (GiasDataCodes.IsRedacted(value))
+        if (EesDataCodes.IsRedacted(value))
         {
             return DataAvailability.Redacted<string>();
         }
 
-        if (GiasDataCodes.IsNotApplicable(value))
+        if (EesDataCodes.IsNotApplicable(value))
         {
             return DataAvailability.NotApplicable<string>();
         }
 
-        if (GiasDataCodes.IsNotAvailable(value))
+        if (EesDataCodes.IsNotAvailable(value))
         {
             return DataAvailability.NotAvailable<string>();
         }
