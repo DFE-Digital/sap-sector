@@ -18,7 +18,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
     // Rules instantiated directly - they are stateless pure functions
     private readonly GovernanceRule _governanceRule = new();
     private readonly NurseryProvisionRule _nurseryProvisionRule = new();
-    private readonly Sixthformrules _sixthFormRule = new();
+    private readonly SixthFormRule _sixthFormRule = new();
     private readonly SenUnitRule _senUnitRule = new();
     private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
 
