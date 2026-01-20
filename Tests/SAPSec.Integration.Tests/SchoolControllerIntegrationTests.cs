@@ -344,7 +344,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("govuk-back-link");
+        content.Should().Contain("govuk-breadcrumbs__link");
     }
 
     [Fact]
