@@ -23,10 +23,10 @@ public static class DisplayHelpers
     {
         return data.Availability switch
         {
-            DataAvailability.Available => data.Value ?? NotAvailableText,
-            DataAvailability.Redacted => RedactedText,
-            DataAvailability.NotApplicable => NotApplicableText,
-            DataAvailability.Low => data.Value ?? NotAvailableText,
+            DataAvailabilityStatus.Available => data.Value ?? NotAvailableText,
+            DataAvailabilityStatus.Redacted => RedactedText,
+            DataAvailabilityStatus.NotApplicable => NotApplicableText,
+            DataAvailabilityStatus.Low => data.Value ?? NotAvailableText,
             _ => NotAvailableText
         };
     }
@@ -41,9 +41,9 @@ public static class DisplayHelpers
     {
         return data.Availability switch
         {
-            DataAvailability.Available => data.Value ? trueText : falseText,
-            DataAvailability.NotApplicable => NotApplicableText,
-            DataAvailability.Redacted => RedactedText,
+            DataAvailabilityStatus.Available => data.Value ? trueText : falseText,
+            DataAvailabilityStatus.NotApplicable => NotApplicableText,
+            DataAvailabilityStatus.Redacted => RedactedText,
             _ => NotAvailableText
         };
     }
@@ -54,7 +54,7 @@ public static class DisplayHelpers
     /// </summary>
     public static string Display(this DataWithAvailability<GovernanceType> data)
     {
-        if (data.Availability != DataAvailability.Available)
+        if (data.Availability != DataAvailabilityStatus.Available)
         {
             return NotAvailableText;
         }

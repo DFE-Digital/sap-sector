@@ -168,44 +168,44 @@ public class SchoolControllerTests
     {
         return new SchoolDetails
         {
-            // Identifiers
-            Name = DataWithAvailability<string>.Available(name),
-            Urn = DataWithAvailability<string>.Available(urn),
-            DfENumber = DataWithAvailability<string>.Available("373/1234"),
-            Ukprn = DataWithAvailability<string>.Available("10012345"),
+            // Identifiers - Using new DataAvailability factory
+            Name = DataAvailability.Available(name),
+            Urn = DataAvailability.Available(urn),
+            DfENumber = DataAvailability.Available("373/1234"),
+            Ukprn = DataAvailability.Available("10012345"),
 
             // Location
-            Address = DataWithAvailability<string>.Available("123 Test Street, Sheffield, S1 1AA"),
-            LocalAuthorityName = DataWithAvailability<string>.Available("Sheffield"),
-            LocalAuthorityCode = DataWithAvailability<string>.Available("373"),
-            Region = DataWithAvailability<string>.Available("Yorkshire"),
-            UrbanRuralDescription = DataWithAvailability<string>.Available("Urban"),
+            Address = DataAvailability.Available("123 Test Street, Sheffield, S1 1AA"),
+            LocalAuthorityName = DataAvailability.Available("Sheffield"),
+            LocalAuthorityCode = DataAvailability.Available("373"),
+            Region = DataAvailability.Available("Yorkshire"),
+            UrbanRuralDescription = DataAvailability.Available("Urban"),
 
             // School characteristics
-            AgeRangeLow = DataWithAvailability<int>.Available(11),
-            AgeRangeHigh = DataWithAvailability<int>.Available(18),
-            GenderOfEntry = DataWithAvailability<string>.Available("Mixed"),
-            PhaseOfEducation = DataWithAvailability<string>.Available("Secondary"),
-            SchoolType = DataWithAvailability<string>.Available("Academy converter"),
-            AdmissionsPolicy = DataWithAvailability<string>.Available("Non-selective"),
-            ReligiousCharacter = DataWithAvailability<string>.Available("None"),
+            AgeRangeLow = DataAvailability.Available(11),
+            AgeRangeHigh = DataAvailability.Available(18),
+            GenderOfEntry = DataAvailability.Available("Mixed"),
+            PhaseOfEducation = DataAvailability.Available("Secondary"),
+            SchoolType = DataAvailability.Available("Academy converter"),
+            AdmissionsPolicy = DataAvailability.Available("Non-selective"),
+            ReligiousCharacter = DataAvailability.Available("None"),
 
             // Governance
-            GovernanceStructure = DataWithAvailability<GovernanceType>.Available(GovernanceType.MultiAcademyTrust),
-            AcademyTrustName = DataWithAvailability<string>.Available("Test Trust"),
-            AcademyTrustId = DataWithAvailability<string>.Available("5001"),
+            GovernanceStructure = DataAvailability.Available(GovernanceType.MultiAcademyTrust),
+            AcademyTrustName = DataAvailability.Available("Test Trust"),
+            AcademyTrustId = DataAvailability.Available("5001"),
 
             // Provisions
-            HasNurseryProvision = DataWithAvailability<bool>.Available(false),
-            HasSixthForm = DataWithAvailability<bool>.Available(true),
-            HasSenUnit = DataWithAvailability<bool>.Available(false),
-            HasResourcedProvision = DataWithAvailability<bool>.Available(false),
+            HasNurseryProvision = DataAvailability.Available(false),
+            HasSixthForm = DataAvailability.Available(true),
+            HasSenUnit = DataAvailability.Available(false),
+            HasResourcedProvision = DataAvailability.Available(false),
 
             // Contact
-            HeadteacherName = DataWithAvailability<string>.Available("Mr John Smith"),
-            Website = DataWithAvailability<string>.Available("https://www.testacademy.org.uk"),
-            Telephone = DataWithAvailability<string>.Available("0114 123 4567"),
-            Email = DataWithAvailability<string>.NotAvailable()
+            HeadteacherName = DataAvailability.Available("Mr John Smith"),
+            Website = DataAvailability.Available("https://www.testacademy.org.uk"),
+            Telephone = DataAvailability.Available("0114 123 4567"),
+            Email = DataAvailability.NotAvailable<string>()
         };
     }
 

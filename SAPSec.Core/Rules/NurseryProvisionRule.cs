@@ -16,27 +16,27 @@ public sealed class NurseryProvisionRule : IBusinessRule<bool>
 
         if (string.IsNullOrWhiteSpace(phase))
         {
-            return DataWithAvailability<bool>.NotAvailable();
+            return DataAvailability.NotAvailable<bool>();
         }
 
         // Nursery phase schools have nursery provision
         if (PhaseOfEducationValues.IndicatesNursery(phase))
         {
-            return DataWithAvailability<bool>.Available(true);
+            return DataAvailability.Available(true);
         }
 
         // All-through schools - we can't determine without more data
         if (PhaseOfEducationValues.IsIndeterminate(phase))
         {
-            return DataWithAvailability<bool>.NotAvailable();
+            return DataAvailability.NotAvailable<bool>();
         }
 
         // Secondary, post-16, and primary schools don't have nursery
         if (PhaseOfEducationValues.IndicatesNoNursery(phase))
         {
-            return DataWithAvailability<bool>.Available(false);
+            return DataAvailability.Available(false);
         }
 
-        return DataWithAvailability<bool>.NotAvailable();
+        return DataAvailability.NotAvailable<bool>();
     }
 }

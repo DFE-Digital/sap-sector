@@ -1,61 +1,94 @@
 ﻿namespace SAPSec.Core.Constants;
 
 /// <summary>
-/// Constants for PhaseOfEducation values and indicators.
+/// Phase of education values and helper methods.
+/// Used to determine provisions like nursery.
 /// </summary>
 public static class PhaseOfEducationValues
 {
-    /// <summary>Indicators that a school has nursery provision</summary>
-    public static readonly string[] NurseryIndicators = { "nursery" };
+    #region Phase Patterns
 
-    /// <summary>Indicators that a school definitely doesn't have nursery</summary>
-    public static readonly string[] NoNurseryIndicators =
+    /// <summary>Patterns that indicate nursery provision</summary>
+    private static readonly string[] NurseryPatterns =
     {
-        "secondary",
+        "Nursery"
+    };
+
+    /// <summary>Patterns that indicate no nursery provision</summary>
+    private static readonly string[] NoNurseryPatterns =
+    {
+        "Primary",
+        "Secondary",
         "16 plus",
-        "post-16",
+        "Post-16",
         "16-19"
     };
 
-    /// <summary>Indicators where nursery status is indeterminate</summary>
-    public static readonly string[] IndeterminateIndicators = { "all-through" };
+    /// <summary>Patterns where nursery provision is indeterminate</summary>
+    private static readonly string[] IndeterminatePatterns =
+    {
+        "All-through",
+        "All through",
+        "Middle"
+    };
 
-    /// <summary>Primary phase indicator</summary>
-    public const string Primary = "primary";
+    #endregion
+
+    #region Helper Methods
 
     /// <summary>
     /// Checks if the phase indicates nursery provision.
+    /// Uses case-insensitive comparison.
     /// </summary>
     public static bool IndicatesNursery(string? phase)
     {
         if (string.IsNullOrWhiteSpace(phase))
             return false;
 
-        var lower = phase.ToLower();
-        return NurseryIndicators.Any(lower.Contains);
+        foreach (var pattern in NurseryPatterns)
+        {
+            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
     /// Checks if the phase indicates no nursery provision.
+    /// Uses case-insensitive comparison.
     /// </summary>
     public static bool IndicatesNoNursery(string? phase)
     {
         if (string.IsNullOrWhiteSpace(phase))
             return false;
 
-        var lower = phase.ToLower();
-        return NoNurseryIndicators.Any(lower.Contains) || lower.Contains(Primary);
+        foreach (var pattern in NoNurseryPatterns)
+        {
+            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
-    /// Checks if the nursery status is indeterminate for this phase.
+    /// Checks if the phase is indeterminate for nursery provision.
+    /// Uses case-insensitive comparison.
     /// </summary>
     public static bool IsIndeterminate(string? phase)
     {
         if (string.IsNullOrWhiteSpace(phase))
-            return true;
+            return false;
 
-        var lower = phase.ToLower();
-        return IndeterminateIndicators.Any(lower.Contains);
+        foreach (var pattern in IndeterminatePatterns)
+        {
+            if (phase.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
+
+    #endregion
 }

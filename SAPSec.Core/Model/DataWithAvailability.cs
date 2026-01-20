@@ -8,48 +8,24 @@
 public sealed record DataWithAvailability<T>
 {
     public T? Value { get; }
-    public DataAvailability Availability { get; }
+    public DataAvailabilityStatus Availability { get; }
 
-    private DataWithAvailability(T? value, DataAvailability availability)
+    internal DataWithAvailability(T? value, DataAvailabilityStatus availability)
     {
         Value = value;
         Availability = availability;
     }
 
-    #region Factory Methods - Open for extension via new factory methods
-
-    /// <summary>Creates an available value</summary>
-    public static DataWithAvailability<T> Available(T value)
-        => new(value, DataAvailability.Available);
-
-    /// <summary>Creates a not available value</summary>
-    public static DataWithAvailability<T> NotAvailable()
-        => new(default, DataAvailability.NotAvailable);
-
-    /// <summary>Creates a not applicable value</summary>
-    public static DataWithAvailability<T> NotApplicable()
-        => new(default, DataAvailability.NotApplicable);
-
-    /// <summary>Creates a redacted value</summary>
-    public static DataWithAvailability<T> Redacted()
-        => new(default, DataAvailability.Redacted);
-
-    /// <summary>Creates a low quality value</summary>
-    public static DataWithAvailability<T> Low(T value)
-        => new(value, DataAvailability.Low);
-
-    #endregion
-
     #region Query Methods
 
     /// <summary>Returns true if data is available</summary>
-    public bool IsAvailable => Availability == DataAvailability.Available;
+    public bool IsAvailable => Availability == DataAvailabilityStatus.Available;
 
     /// <summary>Returns true if data has a usable value (Available or Low quality)</summary>
-    public bool HasValue => Availability is DataAvailability.Available or DataAvailability.Low;
+    public bool HasValue => Availability is DataAvailabilityStatus.Available or DataAvailabilityStatus.Low;
 
     /// <summary>Returns true if data is explicitly marked as not applicable</summary>
-    public bool IsNotApplicable => Availability == DataAvailability.NotApplicable;
+    public bool IsNotApplicable => Availability == DataAvailabilityStatus.NotApplicable;
 
     #endregion
 
@@ -57,7 +33,6 @@ public sealed record DataWithAvailability<T>
 
     /// <summary>
     /// Maps the value to a new type while preserving availability.
-    /// Follows functor pattern.
     /// </summary>
     public DataWithAvailability<TResult> Map<TResult>(Func<T, TResult> mapper)
     {
@@ -65,13 +40,13 @@ public sealed record DataWithAvailability<T>
         {
             return Availability switch
             {
-                DataAvailability.Redacted => DataWithAvailability<TResult>.Redacted(),
-                DataAvailability.NotApplicable => DataWithAvailability<TResult>.NotApplicable(),
-                _ => DataWithAvailability<TResult>.NotAvailable()
+                DataAvailabilityStatus.Redacted => DataAvailability.Redacted<TResult>(),
+                DataAvailabilityStatus.NotApplicable => DataAvailability.NotApplicable<TResult>(),
+                _ => DataAvailability.NotAvailable<TResult>()
             };
         }
 
-        return DataWithAvailability<TResult>.Available(mapper(Value));
+        return DataAvailability.Available(mapper(Value));
     }
 
     /// <summary>

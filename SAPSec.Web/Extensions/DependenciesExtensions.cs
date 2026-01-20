@@ -126,28 +126,8 @@ namespace SAPSec.Web.Extensions
 
             services.AddSingleton<ISearchService, SearchService>();
 
-            // Register business rules as singletons (they're stateless)
-            services.AddSingleton<GovernanceRule>();
-            services.AddSingleton<NurseryProvisionRule>();
-            services.AddSingleton<SixthFormRule>();
-            services.AddSingleton<SenUnitRule>();
-            services.AddSingleton<ResourcedProvisionRule>();
-
             // Register SchoolDetailsService with explicit rule dependencies
-            services.AddScoped<ISchoolDetailsService>(provider =>
-            {
-                var establishmentService = provider.GetRequiredService<IEstablishmentService>();
-                var logger = provider.GetRequiredService<ILogger<SchoolDetailsService>>();
-
-                return new SchoolDetailsService(
-                    establishmentService,
-                    provider.GetRequiredService<GovernanceRule>(),
-                    provider.GetRequiredService<NurseryProvisionRule>(),
-                    provider.GetRequiredService<SixthFormRule>(),
-                    provider.GetRequiredService<SenUnitRule>(),
-                    provider.GetRequiredService<ResourcedProvisionRule>(),
-                    logger);
-            });
+            services.AddScoped<ISchoolDetailsService, SchoolDetailsService>();
         }
     }
 }

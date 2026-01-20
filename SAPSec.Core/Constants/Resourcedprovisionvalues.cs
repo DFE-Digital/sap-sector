@@ -1,53 +1,71 @@
 ﻿namespace SAPSec.Core.Constants;
 
 /// <summary>
-/// Constants for ResourcedProvision field values.
+/// Resourced provision field values and helper methods.
+/// Used to determine SEN unit and resourced provision status.
 /// </summary>
 public static class ResourcedProvisionValues
 {
-    /// <summary>Indicates school has a SEN unit</summary>
-    public const string SenUnit = "sen unit";
+    #region Provision Patterns
 
-    /// <summary>Indicates school has resourced provision</summary>
-    public const string ResourcedProvision = "resourced provision";
+    /// <summary>Pattern indicating SEN unit</summary>
+    private const string SenUnitPattern = "SEN unit";
 
-    /// <summary>No provision available</summary>
-    public const string NotApplicable = "not applicable";
+    /// <summary>Pattern indicating resourced provision</summary>
+    private const string ResourcedProvisionPattern = "resourced provision";
 
-    /// <summary>No provision</summary>
-    public const string None = "none";
+    /// <summary>Values indicating no provision</summary>
+    private static readonly string[] NoProvisionValues =
+    {
+        "Not applicable",
+        "None"
+    };
+
+    #endregion
+
+    #region Helper Methods
 
     /// <summary>
-    /// Checks if the provision value indicates no provision.
+    /// Checks if the provision field indicates a SEN unit.
+    /// Uses case-insensitive comparison.
     /// </summary>
-    public static bool IsNoProvision(string? value)
+    public static bool HasSenUnit(string? provision)
     {
-        if (string.IsNullOrWhiteSpace(value))
+        if (string.IsNullOrWhiteSpace(provision))
+            return false;
+
+        return provision.Contains(SenUnitPattern, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks if the provision field indicates resourced provision.
+    /// Uses case-insensitive comparison.
+    /// </summary>
+    public static bool HasResourcedProvision(string? provision)
+    {
+        if (string.IsNullOrWhiteSpace(provision))
+            return false;
+
+        return provision.Contains(ResourcedProvisionPattern, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Checks if the provision field indicates no provision.
+    /// Uses case-insensitive comparison.
+    /// </summary>
+    public static bool IsNoProvision(string? provision)
+    {
+        if (string.IsNullOrWhiteSpace(provision))
             return true;
 
-        var lower = value.ToLower();
-        return lower is NotApplicable or None;
+        foreach (var value in NoProvisionValues)
+        {
+            if (provision.Contains(value, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
-    /// <summary>
-    /// Checks if the provision value indicates a SEN unit.
-    /// </summary>
-    public static bool HasSenUnit(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        return value.ToLower().Contains(SenUnit);
-    }
-
-    /// <summary>
-    /// Checks if the provision value indicates resourced provision.
-    /// </summary>
-    public static bool HasResourcedProvision(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-            return false;
-
-        return value.ToLower().Contains(ResourcedProvision);
-    }
+    #endregion
 }

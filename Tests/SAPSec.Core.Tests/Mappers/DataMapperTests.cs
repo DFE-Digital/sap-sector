@@ -1,5 +1,7 @@
-﻿using SAPSec.Core.Mappers;
+﻿using FluentAssertions;
+using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
+using Xunit;
 
 namespace SAPSec.Core.Tests.Mappers;
 
@@ -28,7 +30,7 @@ public class DataMapperTests
         var result = DataMapper.MapString(value);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     [Fact]
@@ -38,7 +40,7 @@ public class DataMapperTests
         var result = DataMapper.MapString("c");
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.Redacted);
+        result.Availability.Should().Be(DataAvailabilityStatus.Redacted);
     }
 
     [Fact]
@@ -48,7 +50,7 @@ public class DataMapperTests
         var result = DataMapper.MapString("C");
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.Redacted);
+        result.Availability.Should().Be(DataAvailabilityStatus.Redacted);
     }
 
     [Fact]
@@ -58,7 +60,7 @@ public class DataMapperTests
         var result = DataMapper.MapString("z");
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotApplicable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     [Fact]
@@ -68,7 +70,7 @@ public class DataMapperTests
         var result = DataMapper.MapString("x");
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     #endregion
@@ -107,7 +109,7 @@ public class DataMapperTests
         var result = DataMapper.MapRequiredString(value);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     #endregion
@@ -132,7 +134,7 @@ public class DataMapperTests
         var result = DataMapper.MapDfENumber("/");
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     [Theory]
@@ -144,7 +146,7 @@ public class DataMapperTests
         var result = DataMapper.MapDfENumber(value);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     #endregion
@@ -177,7 +179,7 @@ public class DataMapperTests
         var result = DataMapper.MapAge(value);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     #endregion
@@ -249,7 +251,7 @@ public class DataMapperTests
         var result = DataMapper.MapAddress(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     [Fact]
@@ -267,7 +269,7 @@ public class DataMapperTests
         var result = DataMapper.MapAddress(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     [Fact]
@@ -358,7 +360,7 @@ public class DataMapperTests
         var result = DataMapper.MapHeadteacher(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     #endregion
@@ -400,7 +402,7 @@ public class DataMapperTests
         var result = DataMapper.MapWebsite(value);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     #endregion
@@ -439,7 +441,7 @@ public class DataMapperTests
         var result = DataMapper.MapTrustName(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotApplicable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     [Fact]
@@ -456,7 +458,7 @@ public class DataMapperTests
         var result = DataMapper.MapTrustName(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotApplicable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     [Fact]
@@ -473,7 +475,7 @@ public class DataMapperTests
         var result = DataMapper.MapTrustName(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     #endregion
@@ -501,7 +503,7 @@ public class DataMapperTests
         var result = DataMapper.MapTrustId(trustId);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotApplicable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     #endregion

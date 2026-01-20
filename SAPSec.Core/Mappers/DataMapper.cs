@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Mappers;
 
@@ -15,16 +16,25 @@ public static class DataMapper
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return DataWithAvailability<string>.NotAvailable();
+            return DataAvailability.NotAvailable<string>();
         }
 
-        return value.ToLower() switch
+        if (GiasDataCodes.IsRedacted(value))
         {
-            "c" => DataWithAvailability<string>.Redacted(),
-            "z" => DataWithAvailability<string>.NotApplicable(),
-            "x" => DataWithAvailability<string>.NotAvailable(),
-            _ => DataWithAvailability<string>.Available(value)
-        };
+            return DataAvailability.Redacted<string>();
+        }
+
+        if (GiasDataCodes.IsNotApplicable(value))
+        {
+            return DataAvailability.NotApplicable<string>();
+        }
+
+        if (GiasDataCodes.IsNotAvailable(value))
+        {
+            return DataAvailability.NotAvailable<string>();
+        }
+
+        return DataAvailability.Available(value);
     }
 
     /// <summary>
@@ -33,8 +43,8 @@ public static class DataMapper
     public static DataWithAvailability<string> MapRequiredString(string? value)
     {
         return string.IsNullOrWhiteSpace(value)
-            ? DataWithAvailability<string>.NotAvailable()
-            : DataWithAvailability<string>.Available(value);
+            ? DataAvailability.NotAvailable<string>()
+            : DataAvailability.Available(value);
     }
 
     /// <summary>
@@ -43,8 +53,8 @@ public static class DataMapper
     public static DataWithAvailability<string> MapDfENumber(string? value)
     {
         return string.IsNullOrWhiteSpace(value) || value == "/"
-            ? DataWithAvailability<string>.NotAvailable()
-            : DataWithAvailability<string>.Available(value);
+            ? DataAvailability.NotAvailable<string>()
+            : DataAvailability.Available(value);
     }
 
     /// <summary>
@@ -54,12 +64,12 @@ public static class DataMapper
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return DataWithAvailability<int>.NotAvailable();
+            return DataAvailability.NotAvailable<int>();
         }
 
         return int.TryParse(value, out var age)
-            ? DataWithAvailability<int>.Available(age)
-            : DataWithAvailability<int>.NotAvailable();
+            ? DataAvailability.Available(age)
+            : DataAvailability.NotAvailable<int>();
     }
 
     /// <summary>
@@ -76,8 +86,8 @@ public static class DataMapper
         AddIfNotEmpty(parts, establishment.AddressPostcode);
 
         return parts.Count == 0
-            ? DataWithAvailability<string>.NotAvailable()
-            : DataWithAvailability<string>.Available(string.Join(", ", parts));
+            ? DataAvailability.NotAvailable<string>()
+            : DataAvailability.Available(string.Join(", ", parts));
     }
 
     /// <summary>
@@ -92,8 +102,8 @@ public static class DataMapper
         AddIfNotEmpty(parts, establishment.HeadteacherLastName);
 
         return parts.Count == 0
-            ? DataWithAvailability<string>.NotAvailable()
-            : DataWithAvailability<string>.Available(string.Join(" ", parts));
+            ? DataAvailability.NotAvailable<string>()
+            : DataAvailability.Available(string.Join(" ", parts));
     }
 
     /// <summary>
@@ -103,17 +113,18 @@ public static class DataMapper
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            return DataWithAvailability<string>.NotAvailable();
+            return DataAvailability.NotAvailable<string>();
         }
 
         var website = value.Trim();
 
-        if (!website.StartsWith("http://") && !website.StartsWith("https://"))
+        if (!website.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !website.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
             website = $"https://{website}";
         }
 
-        return DataWithAvailability<string>.Available(website);
+        return DataAvailability.Available(website);
     }
 
     /// <summary>
@@ -123,12 +134,12 @@ public static class DataMapper
     {
         if (string.IsNullOrWhiteSpace(establishment.TrustsId))
         {
-            return DataWithAvailability<string>.NotApplicable();
+            return DataAvailability.NotApplicable<string>();
         }
 
         return string.IsNullOrWhiteSpace(establishment.TrustName)
-            ? DataWithAvailability<string>.NotAvailable()
-            : DataWithAvailability<string>.Available(establishment.TrustName);
+            ? DataAvailability.NotAvailable<string>()
+            : DataAvailability.Available(establishment.TrustName);
     }
 
     /// <summary>
@@ -137,8 +148,8 @@ public static class DataMapper
     public static DataWithAvailability<string> MapTrustId(string? trustId)
     {
         return string.IsNullOrWhiteSpace(trustId)
-            ? DataWithAvailability<string>.NotApplicable()
-            : DataWithAvailability<string>.Available(trustId);
+            ? DataAvailability.NotApplicable<string>()
+            : DataAvailability.Available(trustId);
     }
 
     private static void AddIfNotEmpty(List<string> parts, string? value)

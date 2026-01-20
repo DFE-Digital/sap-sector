@@ -6,6 +6,6 @@ public static class ViewDataKeys
     public const string Title = nameof(Title);
     public const string UseJsBackLink = nameof(UseJsBackLink);
     public const string BreadcrumbNode = nameof(BreadcrumbNode);
-    public const string SchoolUrn = "SchoolUrn";
-    public const string SchoolName = "SchoolName";
+    public const string SchoolUrn = nameof(SchoolUrn);
+    public const string SchoolName = nameof(SchoolName);
 }

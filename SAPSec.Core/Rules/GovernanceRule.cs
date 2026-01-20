@@ -1,9 +1,6 @@
 ﻿using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
-using GovernanceType = SAPSec.Core.Model.GovernanceType;
-
-namespace SAPSec.Core.Rules;
 
 /// <summary>
 /// Business rule: Determines governance structure based on establishment type and trust membership.
@@ -14,59 +11,57 @@ public sealed class GovernanceRule : IBusinessRule<GovernanceType>
     public DataWithAvailability<GovernanceType> Evaluate(Establishment establishment)
     {
         var typeId = establishment.TypeOfEstablishmentId;
-        var typeName = establishment.TypeOfEstablishmentName?.ToLower() ?? "";
+        var typeName = establishment.TypeOfEstablishmentName;
         var hasTrust = !string.IsNullOrWhiteSpace(establishment.TrustsId);
 
         // Academy/Free school types
         if (IsAcademyType(typeId, typeName))
         {
             return hasTrust
-                ? DataWithAvailability<GovernanceType>.Available(GovernanceType.MultiAcademyTrust)
-                : DataWithAvailability<GovernanceType>.Available(GovernanceType.SingleAcademyTrust);
+                ? DataAvailability.Available(GovernanceType.MultiAcademyTrust)
+                : DataAvailability.Available(GovernanceType.SingleAcademyTrust);
         }
 
         // Local Authority maintained
         if (EstablishmentTypeClassification.IsLocalAuthorityMaintained(typeId))
         {
-            return DataWithAvailability<GovernanceType>.Available(GovernanceType.LocalAuthorityMaintained);
+            return DataAvailability.Available(GovernanceType.LocalAuthorityMaintained);
         }
 
         // Non-maintained special school
         if (EstablishmentTypeClassification.IsNonMaintainedSpecialSchool(typeId))
         {
-            return DataWithAvailability<GovernanceType>.Available(GovernanceType.NonMaintainedSpecialSchool);
+            return DataAvailability.Available(GovernanceType.NonMaintainedSpecialSchool);
         }
 
         // Independent
         if (EstablishmentTypeClassification.IsIndependent(typeId))
         {
-            return DataWithAvailability<GovernanceType>.Available(GovernanceType.Independent);
+            return DataAvailability.Available(GovernanceType.Independent);
         }
 
         // Further/Higher education
         if (EstablishmentTypeClassification.IsFurtherEducation(typeId))
         {
-            return DataWithAvailability<GovernanceType>.Available(GovernanceType.FurtherHigherEducation);
+            return DataAvailability.Available(GovernanceType.FurtherHigherEducation);
         }
 
         // Has a type but doesn't match known categories
         if (!string.IsNullOrWhiteSpace(typeId))
         {
-            return DataWithAvailability<GovernanceType>.Available(GovernanceType.Other);
+            return DataAvailability.Available(GovernanceType.Other);
         }
 
-        return DataWithAvailability<GovernanceType>.NotAvailable();
+        return DataAvailability.NotAvailable<GovernanceType>();
     }
 
-    private static bool IsAcademyType(string? typeId, string typeName)
+    private static bool IsAcademyType(string? typeId, string? typeName)
     {
+        // First check by ID (preferred)
         if (EstablishmentTypeClassification.IsAcademy(typeId))
             return true;
 
-        // Fallback to name-based detection
-        return typeName.Contains("academy") ||
-               typeName.Contains("free school") ||
-               typeName.Contains("studio school") ||
-               typeName.Contains("university technical college");
+        // Fallback to name-based detection (case-insensitive)
+        return EstablishmentTypeClassification.IsAcademyByName(typeName);
     }
 }

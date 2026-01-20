@@ -17,16 +17,16 @@ public sealed class SenUnitRule : IBusinessRule<bool>
         // Empty or explicitly no provision
         if (ResourcedProvisionValues.IsNoProvision(provision))
         {
-            return DataWithAvailability<bool>.Available(false);
+            return DataAvailability.Available(false);
         }
 
         // Check for SEN unit
         if (ResourcedProvisionValues.HasSenUnit(provision))
         {
-            return DataWithAvailability<bool>.Available(true);
+            return DataAvailability.Available(true);
         }
 
         // Has some provision data but no SEN unit mentioned
-        return DataWithAvailability<bool>.Available(false);
+        return DataAvailability.Available(false);
     }
 }

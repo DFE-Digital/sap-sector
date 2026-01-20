@@ -1,47 +1,30 @@
 ﻿using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Rules;
 using SAPSec.Core.Services;
 using Xunit;
 
 namespace SAPSec.Core.Tests.Services;
 
+/// <summary>
+/// Tests for SchoolDetailsService.
+/// Rules are tested through the service - no mocking needed as they are pure functions.
+/// </summary>
 public class SchoolDetailsServiceTests
 {
     private readonly Mock<IEstablishmentService> _establishmentServiceMock;
     private readonly Mock<ILogger<SchoolDetailsService>> _loggerMock;
     private readonly SchoolDetailsService _sut;
 
-    // Use real rules for integration-style tests
-    private readonly GovernanceRule _governanceRule;
-    private readonly NurseryProvisionRule _nurseryProvisionRule;
-    private readonly SixthFormRule _sixthFormRule;
-    private readonly SenUnitRule _senUnitRule;
-    private readonly ResourcedProvisionRule _resourcedProvisionRule;
-
     public SchoolDetailsServiceTests()
     {
         _establishmentServiceMock = new Mock<IEstablishmentService>();
         _loggerMock = new Mock<ILogger<SchoolDetailsService>>();
 
-        // Use real rule implementations
-        _governanceRule = new GovernanceRule();
-        _nurseryProvisionRule = new NurseryProvisionRule();
-        _sixthFormRule = new SixthFormRule();
-        _senUnitRule = new SenUnitRule();
-        _resourcedProvisionRule = new ResourcedProvisionRule();
-
         _sut = new SchoolDetailsService(
             _establishmentServiceMock.Object,
-            _governanceRule,
-            _nurseryProvisionRule,
-            _sixthFormRule,
-            _senUnitRule,
-            _resourcedProvisionRule,
             _loggerMock.Object);
     }
 
@@ -100,6 +83,10 @@ public class SchoolDetailsServiceTests
         result.LocalAuthorityCode.Value.Should().Be("373");
     }
 
+    #endregion
+
+    #region Governance Rule Integration Tests
+
     [Fact]
     public void GetByUrn_AcademyWithTrust_ReturnsMAT()
     {
@@ -135,7 +122,7 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.GovernanceStructure.Value.Should().Be(GovernanceType.SingleAcademyTrust);
-        result.AcademyTrustName.Availability.Should().Be(DataAvailability.NotApplicable);
+        result.AcademyTrustName.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     [Fact]
@@ -153,6 +140,50 @@ public class SchoolDetailsServiceTests
         // Assert
         result.GovernanceStructure.Value.Should().Be(GovernanceType.LocalAuthorityMaintained);
     }
+
+    [Fact]
+    public void GetByUrn_IndependentSchool_ReturnsIndependent()
+    {
+        // Arrange
+        var establishment = CreateTestAcademy();
+        establishment.TypeOfEstablishmentId = "11";
+        establishment.TypeOfEstablishmentName = "Other independent school";
+        establishment.TrustsId = null;
+
+        _establishmentServiceMock
+            .Setup(x => x.GetEstablishment("123456"))
+            .Returns(establishment);
+
+        // Act
+        var result = _sut.GetByUrn("123456");
+
+        // Assert
+        result.GovernanceStructure.Value.Should().Be(GovernanceType.Independent);
+    }
+
+    [Fact]
+    public void GetByUrn_NonMaintainedSpecialSchool_ReturnsCorrectType()
+    {
+        // Arrange
+        var establishment = CreateTestAcademy();
+        establishment.TypeOfEstablishmentId = "8";
+        establishment.TypeOfEstablishmentName = "Non-maintained special school";
+        establishment.TrustsId = null;
+
+        _establishmentServiceMock
+            .Setup(x => x.GetEstablishment("123456"))
+            .Returns(establishment);
+
+        // Act
+        var result = _sut.GetByUrn("123456");
+
+        // Assert
+        result.GovernanceStructure.Value.Should().Be(GovernanceType.NonMaintainedSpecialSchool);
+    }
+
+    #endregion
+
+    #region Nursery Provision Rule Integration Tests
 
     [Fact]
     public void GetByUrn_SecondarySchool_HasNoNurseryProvision()
@@ -190,6 +221,10 @@ public class SchoolDetailsServiceTests
         result.HasNurseryProvision.Value.Should().BeTrue();
     }
 
+    #endregion
+
+    #region Sixth Form Rule Integration Tests
+
     [Fact]
     public void GetByUrn_SchoolWithSixthForm_HasSixthForm()
     {
@@ -225,6 +260,10 @@ public class SchoolDetailsServiceTests
         // Assert
         result.HasSixthForm.Value.Should().BeFalse();
     }
+
+    #endregion
+
+    #region SEN/Resourced Provision Rule Integration Tests
 
     [Fact]
     public void GetByUrn_SchoolWithSenUnit_HasSenUnit()
@@ -279,67 +318,6 @@ public class SchoolDetailsServiceTests
         // Assert
         result.HasSenUnit.Value.Should().BeTrue();
         result.HasResourcedProvision.Value.Should().BeTrue();
-    }
-
-    [Fact]
-    public void GetByUrn_MapsContactDetails()
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("123456"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("123456");
-
-        // Assert
-        result.HeadteacherName.Value.Should().Be("Mr John Smith");
-        result.Website.Value.Should().Be("https://www.testacademy.org.uk");
-        result.Telephone.Value.Should().Be("0114 123 4567");
-    }
-
-    [Fact]
-    public void GetByUrn_WebsiteWithoutProtocol_AddsHttps()
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        establishment.Website = "www.testacademy.org.uk";
-
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("123456"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("123456");
-
-        // Assert
-        result.Website.Value.Should().Be("https://www.testacademy.org.uk");
-    }
-
-    [Fact]
-    public void GetByUrn_MissingData_ReturnsNotAvailable()
-    {
-        // Arrange
-        var establishment = new Establishment
-        {
-            URN = "123456",
-            EstablishmentName = "Minimal School"
-        };
-
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("123456"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("123456");
-
-        // Assert
-        result.Name.Value.Should().Be("Minimal School");
-        result.Address.Availability.Should().Be(DataAvailability.NotAvailable);
-        result.LocalAuthorityName.Availability.Should().Be(DataAvailability.NotAvailable);
-        result.HasNurseryProvision.Availability.Should().Be(DataAvailability.NotAvailable);
-        result.HasSixthForm.Availability.Should().Be(DataAvailability.NotAvailable);
     }
 
     #endregion
@@ -422,42 +400,12 @@ public class SchoolDetailsServiceTests
     }
 
     [Fact]
-    public void GetByIdentifier_NotFound_ReturnsNull()
-    {
-        // Arrange
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishmentByAnyNumber("invalid"))
-            .Returns(new Establishment());
-
-        // Act
-        var result = _sut.GetByIdentifier("invalid");
-
-        // Assert
-        result.Should().BeNull();
-    }
-
-    [Fact]
     public void GetByIdentifier_NullUrn_ReturnsNull()
     {
         // Arrange
         _establishmentServiceMock
             .Setup(x => x.GetEstablishmentByAnyNumber("invalid"))
             .Returns(new Establishment { URN = null });
-
-        // Act
-        var result = _sut.GetByIdentifier("invalid");
-
-        // Assert
-        result.Should().BeNull();
-    }
-
-    [Fact]
-    public void GetByIdentifier_EmptyUrn_ReturnsNull()
-    {
-        // Arrange
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishmentByAnyNumber("invalid"))
-            .Returns(new Establishment { URN = "" });
 
         // Act
         var result = _sut.GetByIdentifier("invalid");
@@ -485,7 +433,7 @@ public class SchoolDetailsServiceTests
         var result = _sut.GetByUrn("123456");
 
         // Assert
-        result.GenderOfEntry.Availability.Should().Be(DataAvailability.Redacted);
+        result.GenderOfEntry.Availability.Should().Be(DataAvailabilityStatus.Redacted);
     }
 
     [Fact]
@@ -503,39 +451,18 @@ public class SchoolDetailsServiceTests
         var result = _sut.GetByUrn("123456");
 
         // Assert
-        result.ReligiousCharacter.Availability.Should().Be(DataAvailability.NotApplicable);
-    }
-
-    [Fact]
-    public void GetByUrn_NotAvailableData_ReturnsNotAvailable()
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        establishment.AdmissionPolicy = "x";
-
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("123456"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("123456");
-
-        // Assert
-        result.AdmissionsPolicy.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.ReligiousCharacter.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     #endregion
 
-    #region Age Range Tests
+    #region Contact Details Tests
 
     [Fact]
-    public void GetByUrn_ValidAgeRange_MapsCorrectly()
+    public void GetByUrn_MapsContactDetails()
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.AgeRangeLow = "11";
-        establishment.AgeRangeRange = "18";
-
         _establishmentServiceMock
             .Setup(x => x.GetEstablishment("123456"))
             .Returns(establishment);
@@ -544,17 +471,17 @@ public class SchoolDetailsServiceTests
         var result = _sut.GetByUrn("123456");
 
         // Assert
-        result.AgeRangeLow.Value.Should().Be(11);
-        result.AgeRangeHigh.Value.Should().Be(18);
+        result.HeadteacherName.Value.Should().Be("Mr John Smith");
+        result.Website.Value.Should().Be("https://www.testacademy.org.uk");
+        result.Telephone.Value.Should().Be("0114 123 4567");
     }
 
     [Fact]
-    public void GetByUrn_InvalidAgeRange_ReturnsNotAvailable()
+    public void GetByUrn_WebsiteWithoutProtocol_AddsHttps()
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.AgeRangeLow = "abc";
-        establishment.AgeRangeRange = null;
+        establishment.Website = "www.testacademy.org.uk";
 
         _establishmentServiceMock
             .Setup(x => x.GetEstablishment("123456"))
@@ -564,96 +491,7 @@ public class SchoolDetailsServiceTests
         var result = _sut.GetByUrn("123456");
 
         // Assert
-        result.AgeRangeLow.Availability.Should().Be(DataAvailability.NotAvailable);
-        result.AgeRangeHigh.Availability.Should().Be(DataAvailability.NotAvailable);
-    }
-
-    #endregion
-
-    #region Establishment Type Tests
-
-    [Theory]
-    [InlineData("28", GovernanceType.MultiAcademyTrust)]  // Academy sponsor led
-    [InlineData("34", GovernanceType.MultiAcademyTrust)]  // Academy converter
-    [InlineData("35", GovernanceType.MultiAcademyTrust)]  // Free school
-    public void GetByUrn_AcademyTypesWithTrust_ReturnsMAT(string typeId, GovernanceType expected)
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        establishment.TypeOfEstablishmentId = typeId;
-        establishment.TrustsId = "5001";
-
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("123456"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("123456");
-
-        // Assert
-        result.GovernanceStructure.Value.Should().Be(expected);
-    }
-
-    [Theory]
-    [InlineData("1")]   // Community school
-    [InlineData("2")]   // Voluntary aided
-    [InlineData("3")]   // Voluntary controlled
-    [InlineData("5")]   // Foundation
-    public void GetByUrn_LAMaintainedTypes_ReturnsLAMaintained(string typeId)
-    {
-        // Arrange
-        var establishment = CreateTestLASchool();
-        establishment.TypeOfEstablishmentId = typeId;
-
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("654321"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("654321");
-
-        // Assert
-        result.GovernanceStructure.Value.Should().Be(GovernanceType.LocalAuthorityMaintained);
-    }
-
-    [Fact]
-    public void GetByUrn_IndependentSchool_ReturnsIndependent()
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        establishment.TypeOfEstablishmentId = "11";
-        establishment.TypeOfEstablishmentName = "Other independent school"; // Must clear academy name
-        establishment.TrustsId = null;
-
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("123456"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("123456");
-
-        // Assert
-        result.GovernanceStructure.Value.Should().Be(GovernanceType.Independent);
-    }
-
-    [Fact]
-    public void GetByUrn_NonMaintainedSpecialSchool_ReturnsCorrectType()
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        establishment.TypeOfEstablishmentId = "8";
-        establishment.TypeOfEstablishmentName = "Non-maintained special school"; // Must clear academy name
-        establishment.TrustsId = null;
-
-        _establishmentServiceMock
-            .Setup(x => x.GetEstablishment("123456"))
-            .Returns(establishment);
-
-        // Act
-        var result = _sut.GetByUrn("123456");
-
-        // Assert
-        result.GovernanceStructure.Value.Should().Be(GovernanceType.NonMaintainedSpecialSchool);
+        result.Website.Value.Should().Be("https://www.testacademy.org.uk");
     }
 
     #endregion

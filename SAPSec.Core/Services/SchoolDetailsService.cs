@@ -1,41 +1,32 @@
 ﻿using Microsoft.Extensions.Logging;
-using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
+using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Services;
 
 /// <summary>
-/// Service that applies business rules to create SchoolDetails.
-/// Follows Dependency Inversion - depends on abstractions (IBusinessRule).
-/// Follows Single Responsibility - orchestrates mapping and rules, doesn't contain logic.
+/// Service that maps establishment data to SchoolDetails.
+/// Business rules are applied internally - no need for DI as they are pure functions.
 /// </summary>
 public sealed class SchoolDetailsService : ISchoolDetailsService
 {
     private readonly IEstablishmentService _establishmentService;
-    private readonly IBusinessRule<GovernanceType> _governanceRule;
-    private readonly IBusinessRule<bool> _nurseryProvisionRule;
-    private readonly IBusinessRule<bool> _sixthFormRule;
-    private readonly IBusinessRule<bool> _senUnitRule;
-    private readonly IBusinessRule<bool> _resourcedProvisionRule;
     private readonly ILogger<SchoolDetailsService> _logger;
+
+    // Rules instantiated directly - they are stateless pure functions
+    private readonly GovernanceRule _governanceRule = new();
+    private readonly NurseryProvisionRule _nurseryProvisionRule = new();
+    private readonly SixthFormRule _sixthFormRule = new();
+    private readonly SenUnitRule _senUnitRule = new();
+    private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
 
     public SchoolDetailsService(
         IEstablishmentService establishmentService,
-        IBusinessRule<GovernanceType> governanceRule,
-        IBusinessRule<bool> nurseryProvisionRule,
-        IBusinessRule<bool> sixthFormRule,
-        IBusinessRule<bool> senUnitRule,
-        IBusinessRule<bool> resourcedProvisionRule,
         ILogger<SchoolDetailsService> logger)
     {
         _establishmentService = establishmentService;
-        _governanceRule = governanceRule;
-        _nurseryProvisionRule = nurseryProvisionRule;
-        _sixthFormRule = sixthFormRule;
-        _senUnitRule = senUnitRule;
-        _resourcedProvisionRule = resourcedProvisionRule;
         _logger = logger;
     }
 
@@ -111,7 +102,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             HeadteacherName = DataMapper.MapHeadteacher(establishment),
             Website = DataMapper.MapWebsite(establishment.Website),
             Telephone = DataMapper.MapString(establishment.TelephoneNum),
-            Email = DataWithAvailability<string>.NotAvailable()
+            Email = DataAvailability.NotAvailable<string>()
         };
     }
 }

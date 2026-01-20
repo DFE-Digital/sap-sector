@@ -45,7 +45,7 @@ public class SixthFormRuleTests
         var result = _sut.Evaluate(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotApplicable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     [Theory]
@@ -61,6 +61,6 @@ public class SixthFormRuleTests
         var result = _sut.Evaluate(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 }

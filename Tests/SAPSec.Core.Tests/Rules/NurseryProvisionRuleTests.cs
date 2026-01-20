@@ -47,7 +47,7 @@ public class NurseryProvisionRuleTests
         var result = _sut.Evaluate(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class NurseryProvisionRuleTests
         var result = _sut.Evaluate(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailability.NotAvailable);
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 }
 
