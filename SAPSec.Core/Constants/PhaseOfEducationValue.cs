@@ -4,7 +4,7 @@
 /// Phase of education values and helper methods.
 /// Used to determine provisions like nursery.
 /// </summary>
-public static class PhaseOfEducationValues
+public static class PhaseOfEducationValue
 {
     #region Phase Patterns
 
