@@ -4,7 +4,7 @@
 /// Resourced provision field values and helper methods.
 /// Used to determine SEN unit and resourced provision status.
 /// </summary>
-public static class ResourcedProvisionValue
+public static class ResourcedProvisionValues
 {
     #region Provision Patterns
 

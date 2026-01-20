@@ -15,13 +15,13 @@ public sealed class ResourcedProvisionRule : IBusinessRule<bool>
         var provision = establishment.ResourcedProvision;
 
         // Empty or explicitly no provision
-        if (ResourcedProvisionValue.IsNoProvision(provision))
+        if (ResourcedProvisionValues.IsNoProvision(provision))
         {
             return DataAvailability.Available(false);
         }
 
         // Check for resourced provision
-        if (ResourcedProvisionValue.HasResourcedProvision(provision))
+        if (ResourcedProvisionValues.HasResourcedProvision(provision))
         {
             return DataAvailability.Available(true);
         }
