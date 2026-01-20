@@ -12,13 +12,13 @@ namespace SAPSec.Core.Tests.Services;
 /// Tests for SchoolDetailsService.
 /// Rules are tested through the service - no mocking needed as they are pure functions.
 /// </summary>
-public class SchoolDetailsServiceTests
+public class SchoolDetailsServiceTest
 {
     private readonly Mock<IEstablishmentService> _establishmentServiceMock;
     private readonly Mock<ILogger<SchoolDetailsService>> _loggerMock;
     private readonly SchoolDetailsService _sut;
 
-    public SchoolDetailsServiceTests()
+    public SchoolDetailsServiceTest()
     {
         _establishmentServiceMock = new Mock<IEstablishmentService>();
         _loggerMock = new Mock<ILogger<SchoolDetailsService>>();
