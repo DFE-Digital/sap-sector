@@ -1,30 +1,39 @@
-﻿using Microsoft.AspNetCore.Http.Extensions;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Extensions;
-using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
+/// <summary>
+/// Controller for school details pages.
+/// Single Responsibility: HTTP handling and view selection only.
+/// </summary>
 [Route("school/{urn}")]
-public class SchoolController(IEstablishmentService _establishmentService, ILogger<SchoolController> _logger) : Controller
+public class SchoolController : Controller
 {
+    private readonly ISchoolDetailsService _schoolDetailsService;
+    private readonly ILogger<SchoolController> _logger;
+
+    public SchoolController(
+        ISchoolDetailsService schoolDetailsService,
+        ILogger<SchoolController> logger)
+    {
+        _schoolDetailsService = schoolDetailsService;
+        _logger = logger;
+    }
+
     [HttpGet]
     public IActionResult Index(string urn)
     {
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        var school = _schoolDetailsService.TryGetByUrn(urn);
 
-        var school = _establishmentService.GetEstablishment(urn);
-        if (school != null)
+        if (school is null)
         {
-            var viewModel = new SchoolViewModel(school);
-            return View(viewModel);
+            _logger.LogInformation("School with URN {Urn} was not found", urn);
+            return NotFound();
         }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
-            return RedirectToAction("Error");
-        }
+
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        return View(school);
     }
 }

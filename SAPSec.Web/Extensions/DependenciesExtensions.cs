@@ -20,6 +20,7 @@ using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Model.KS4.SubjectEntries;
 using SAPSec.Core.Model.KS4.Suspensions;
 using SAPSec.Core.Model.KS4.Workforce;
+using SAPSec.Core.Rules;
 using SAPSec.Core.Services;
 using SAPSec.Core.Services.KS4.Absence;
 using SAPSec.Core.Services.KS4.Destinations;
@@ -124,6 +125,9 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<ISearchRepository, LuceneSearchService>();
 
             services.AddSingleton<ISearchService, SearchService>();
+
+            // Register SchoolDetailsService with explicit rule dependencies
+            services.AddScoped<ISchoolDetailsService, SchoolDetailsService>();
         }
     }
 }

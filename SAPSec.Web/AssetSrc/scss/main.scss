@@ -483,3 +483,26 @@
     display: inline-flex; 
   }
 }
+.govuk-service-navigation__item--active .govuk-service-navigation__link {
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 0.5em;
+}
+.govuk-breadcrumbs__link,
+.govuk-breadcrumbs__list-item {
+    font-size: 16px;
+    line-height: 1.25;
+    text-underline-offset: .1578em;
+}
+
+.govuk-breadcrumbs {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+@media (max-width: 40.0625rem) {
+    .govuk-breadcrumbs {
+        margin-right: 15px;
+    }
+}
