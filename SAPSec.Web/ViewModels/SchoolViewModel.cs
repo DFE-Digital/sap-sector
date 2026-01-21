@@ -2,10 +2,7 @@
 
 namespace SAPSec.Web.ViewModels;
 
-public class SchoolViewModel(Establishment school)
+public class SchoolViewModel
 {
-    public string Name => school.EstablishmentName;
-    public string Urn => school.URN;
-    public string Ukprn => school.UKPRN.ToString();
-    public string DfENumber => school.DfENumber;
+
 }

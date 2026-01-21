@@ -4,11 +4,39 @@ namespace SAPSec.Web.Constants;
 
 public static class BreadcrumbNodes
 {
-    public static MvcBreadcrumbNode SchoolHome(string? urn) => new("Index", "School", PageTitles.SchoolHome)
+    /// <summary>
+    /// Creates a breadcrumb node for the school home page.
+    /// </summary>
+    public static BreadcrumbNode SchoolHome(string urn)
     {
-        RouteValues = new
+        return new BreadcrumbNode
         {
-            urn
-        }
-    };
+            Title = "Home",
+            Url = $"/school/{urn}"
+        };
+    }
+    /// <summary>
+    /// Creates a breadcrumb node for the school details page.
+    /// </summary>
+    public static BreadcrumbNode SchoolDetails(string urn, string schoolName)
+    {
+        return new BreadcrumbNode
+        {
+            Url = $"/school/{urn}",
+            Parent = new BreadcrumbNode
+            {
+                Title = "SchoolHome",
+                Url = "/SchoolHome"
+            }
+        };
+    }
+}
+/// <summary>
+/// Represents a breadcrumb navigation node.
+/// </summary>
+public class BreadcrumbNode
+{
+    public string Title { get; init; } = string.Empty;
+    public string Url { get; init; } = string.Empty;
+    public BreadcrumbNode? Parent { get; init; }
 }
