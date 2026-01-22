@@ -1,10 +1,12 @@
-﻿@model SAPSec.Web.ViewModels.SchoolViewModel
+﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Helpers
+@model SchoolDetails
 @{
     Layout = "_Layout";
     ViewData["Title"] = "KS4 headline measures";
 }
 
-<span class="govuk-caption-l">@Model.Name</span>
+<span class="govuk-caption-l">@Model.Name.Display()</span>
 <h1 class="govuk-heading-l">@ViewData["Title"]</h1>
 
 <p class="govuk-body">

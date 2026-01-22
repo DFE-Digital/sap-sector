@@ -1,9 +1,20 @@
-﻿@model SAPSec.Web.ViewModels.SchoolViewModel
+﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Helpers
+@model SchoolDetails
 @{
     Layout = "Views/Shared/_Layout";
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var routeAttributes = new Dictionary<string, string> { { "urn", Model.Urn } };
+    var routeAttributes = new Dictionary<string, string> { { "urn", Model.Urn.Display() } };
+}
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolHome")">Home</a>
+            </li>
+        </ol>
+    </nav>
 }
 
 <div class="govuk-grid-row">
