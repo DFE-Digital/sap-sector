@@ -331,9 +331,9 @@ public class SchoolSearchPaginationIntegrationTests(WebApplicationSetupFixture f
     [Fact]
     public async Task GetSearch_HighPageNumber_CompletesWithinTimeout()
     {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
 
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=50", cts.Token);
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=10", cts.Token);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

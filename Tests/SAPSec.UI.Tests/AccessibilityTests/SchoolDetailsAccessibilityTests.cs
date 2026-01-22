@@ -9,7 +9,7 @@ namespace SAPSec.UI.Tests.AccessibilityTests;
 [Collection("UITestsCollection")]
 public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolDetailsPath = "/school/147788";
+    private const string SchoolDetailsPath = "/school/147788/school-details";
 
     #region Axe Core Accessibility Tests
 
@@ -446,7 +446,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
         var title = await Page.TitleAsync();
 
         title.Should().NotBeNullOrWhiteSpace("Page should have a title");
-        title.Should().Contain("School details", "Title should describe the page content");
+        title.Should().Contain("Bradfield School - Get school improvement insights - GOV.UK", "Title should describe the page content");
     }
 
     [Fact]

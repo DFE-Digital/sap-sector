@@ -10,7 +10,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SchoolDetailsPath = "/school/147788";
+    private const string SchoolDetailsPath = "/school/147788/school-details";
     private const string SchoolSearchPath = "/search-for-a-school";
 
     #region Page Load Tests
@@ -501,34 +501,6 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
             var rel = await externalLinks.Nth(i).GetAttributeAsync("rel");
             rel.Should().Contain("noopener");
         }
-    }
-
-    #endregion
-
-    #region Navigation Tab Tests
-
-    [Fact]
-    public async Task SchoolDetails_SchoolDetailsTab_IsActive()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var activeTab = Page.Locator(".govuk-service-navigation__item--active");
-        var activeTabText = await activeTab.TextContentAsync();
-
-        activeTabText.Should().Contain("School details");
-    }
-
-    [Fact]
-    public async Task SchoolDetails_SchoolDetailsTab_HasAriaCurrent()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var activeLink = Page.Locator(".govuk-service-navigation__item--active a");
-        var ariaCurrent = await activeLink.GetAttributeAsync("aria-current");
-
-        ariaCurrent.Should().Be("page");
     }
 
     #endregion
