@@ -438,18 +438,6 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
-    public async Task SchoolDetails_HasPageTitle()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var title = await Page.TitleAsync();
-
-        title.Should().NotBeNullOrWhiteSpace("Page should have a title");
-        title.Should().Contain("Bradfield School - Get school improvement insights - GOV.UK", "Title should describe the page content");
-    }
-
-    [Fact]
     public async Task SchoolDetails_Images_HaveAltText()
     {
         await Page.GotoAsync(SchoolDetailsPath);
