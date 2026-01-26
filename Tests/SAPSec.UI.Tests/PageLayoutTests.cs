@@ -98,7 +98,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
 
         (await serviceNameLink.IsVisibleAsync()).Should().BeTrue();
         linkText.Should().Be(LayoutConstants.ServiceName);
-        href.Should().Be("/");
+        href.Should().Be("/find-a-school");
     }
 
     #endregion
