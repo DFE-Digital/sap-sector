@@ -36,7 +36,8 @@
                         @ViewData[ViewDataKeys.Title]
                     </label>
                 </h1>
-                <p class="govuk-body">Find schools in England to check their performance against similar schools
+                <p class="govuk-body govuk-heading-m govuk-!-padding-top-6">
+                    Find schools in England to check their performance against similar schools
                 as well as national and local authority averages.</p>
                 <div id="@nameof(SchoolSearchQueryViewModel.Query)-hint" class="govuk-hint">
                     @SchoolSearchController.Hint
@@ -48,7 +49,7 @@
                         @errorMessage
                     </p>
                 }
-                <div class="govuk-input__wrapper">
+                <div class="govuk-input__wrapper govuk-heading-m govuk-!-padding-top-6">
                     <div class="school-search-suggester-wrapper">
                         <input id="@nameof(SchoolSearchQueryViewModel.Query)"
                                name="@nameof(SchoolSearchQueryViewModel.Query)"
