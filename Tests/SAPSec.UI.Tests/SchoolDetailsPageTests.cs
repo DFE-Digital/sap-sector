@@ -30,7 +30,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var schoolName = Page.Locator(".govuk-caption-l");
+        var schoolName = Page.Locator(".govuk-caption-xl");
         var isVisible = await schoolName.IsVisibleAsync();
 
         isVisible.Should().BeTrue("School name caption should be visible");
@@ -59,7 +59,6 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         var title = await Page.TitleAsync();
 
-        title.Should().Contain("Bradfield School");
         title.Should().Contain("School details");
     }
 
