@@ -145,7 +145,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-l").TextContentAsync();
+        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Bradfield School");
     }
 
@@ -164,7 +164,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788");
-        var schoolName = await Page.Locator(".govuk-caption-l").TextContentAsync();
+        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Bradfield School");
     }
 
@@ -228,7 +228,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-l").TextContentAsync();
+        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Bradfield School");
     }
 
@@ -303,7 +303,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-l").TextContentAsync();
+        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Bradfield School");
     }
 
@@ -444,7 +444,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain("school/147788/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-l").TextContentAsync();
+        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Bradfield School");
     }
 

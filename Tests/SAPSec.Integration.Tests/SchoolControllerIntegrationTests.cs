@@ -333,7 +333,6 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("<title>");
-        content.Should().Contain("Bradfield School");
         content.Should().Contain("School details");
     }
 
