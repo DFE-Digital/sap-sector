@@ -337,7 +337,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
 
         // Assert
         var url = new Uri(Page.Url);
-        url.AbsolutePath.Should().Be("/");
+        url.AbsolutePath.Should().Be("/find-a-school");
     }
 
     [Fact]
@@ -353,7 +353,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
 
         // Assert
         var url = new Uri(Page.Url);
-        url.AbsolutePath.Should().Be("/");
+        url.AbsolutePath.Should().Be("/find-a-school");
 
     }
 
