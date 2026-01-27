@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAP Data Platform – Operational Runbook</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+        :root {
+            --govuk-blue: #1d70b8;
+            --govuk-black: #0b0c0c;
+            --govuk-grey: #f3f2f1;
+            --govuk-border: #b1b4b6;
+            --govuk-dark-grey: #505a5f;
+            --code-bg: #1e1e1e;
+            --code-fg: #e5e5e5;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #0b0c0c;
+            line-height: 1.6;
+        }
+
+        .govuk-header {
+            background: var(--govuk-black);
+            color: #fff;
+            padding: 10px 30px;
+        }
+
+            .govuk-header strong {
+                font-size: 1.1rem;
+            }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 2.2rem;
+        }
+
+        h2 {
+            border-bottom: 4px solid var(--govuk-blue);
+            padding-bottom: .4rem;
+            margin-top: 2.5rem;
+        }
+
+        h3 {
+            margin-top: 1.8rem;
+        }
+
+        .callout {
+            background: var(--govuk-grey);
+            border-left: 6px solid var(--govuk-blue);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        .warning {
+            border-left-color: #d4351c;
+        }
+
+        .success {
+            border-left-color: #00703c;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-fg);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: Consolas, Menlo, Monaco, monospace;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            border: 1px solid var(--govuk-border);
+            padding: .6rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: var(--govuk-grey);
+        }
+
+        svg {
+            max-width: 100%;
+            margin: 1.5rem 0;
+        }
+
+        .small {
+            font-size: .95rem;
+            color: var(--govuk-dark-grey);
+        }
+
+        .govuk-footer {
+            background: var(--govuk-grey);
+            border-top: 1px solid var(--govuk-border);
+            padding: 2rem;
+            font-size: .9rem;
+            color: var(--govuk-dark-grey);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="govuk-header">
+        <strong>👑 GOV.UK – Department for Education</strong>
+    </header>
+
+    <main>
+
+        <h1>SAP Data Platform – Operational Runbook</h1>
+        <p><strong>Audience:</strong> Data engineers, platform operators, on-call support</p>
+
+        <div class="callout success">
+            <strong>Purpose:</strong> This runbook explains how to run, validate, troubleshoot, and recover the SAP data pipeline.
+        </div>
+
+        <h2>End-to-end pipeline overview</h2>
+
+        <svg viewBox="0 0 980 280" aria-label="Operational pipeline overview">
+            <rect x="20" y="40" width="210" height="60" fill="#1d70b8" />
+            <text x="125" y="75" fill="white" text-anchor="middle">Source CSVs</text>
+
+            <rect x="260" y="40" width="220" height="60" fill="#1d70b8" />
+            <text x="370" y="65" fill="white" text-anchor="middle">Cleaning step</text>
+            <text x="370" y="85" fill="white" text-anchor="middle">(*.clean.csv)</text>
+
+            <rect x="510" y="40" width="220" height="60" fill="#1d70b8" />
+            <text x="620" y="65" fill="white" text-anchor="middle">Raw tables</text>
+            <text x="620" y="85" fill="white" text-anchor="middle">(Postgres)</text>
+
+            <rect x="760" y="40" width="200" height="60" fill="#1d70b8" />
+            <text x="860" y="75" fill="white" text-anchor="middle">Materialized views</text>
+
+            <rect x="260" y="140" width="220" height="50" fill="#f3f2f1" stroke="#b1b4b6" />
+            <text x="370" y="170" fill="#0b0c0c" text-anchor="middle">GenerateRawTables.cs</text>
+
+            <rect x="760" y="140" width="200" height="50" fill="#f3f2f1" stroke="#b1b4b6" />
+            <text x="860" y="170" fill="#0b0c0c" text-anchor="middle">GenerateViews.cs</text>
+
+            <line x1="230" y1="70" x2="260" y2="70" stroke="black" />
+            <line x1="480" y1="70" x2="510" y2="70" stroke="black" />
+            <line x1="730" y1="70" x2="760" y2="70" stroke="black" />
+            <line x1="370" y1="140" x2="370" y2="100" stroke="black" />
+            <line x1="860" y1="140" x2="860" y2="100" stroke="black" />
+        </svg>
+
+        <h2>Standard run procedure</h2>
+
+        <h3>1. Prepare source data</h3>
+        <ul>
+            <li>Obtain latest CSV extracts from official sources</li>
+            <li>Store them in the agreed input directory</li>
+            <li>Do not manually edit raw CSVs</li>
+        </ul>
+
+        <h3>2. Clean CSV files</h3>
+        <p>The cleaning process ensures CSVs are safe for Postgres ingestion.</p>
+
+        <div class="callout">
+            If CSV cleaning fails, do <strong>not</strong> proceed to raw table generation.
+        </div>
+
+        <h3>3. Generate raw tables</h3>
+        <p><code>GenerateRawTables.cs</code> performs the following:</p>
+        <ul>
+            <li>Creates raw tables in Postgres</li>
+            <li>Uses hashed table naming to avoid length limits</li>
+            <li>Loads cleaned CSVs into raw tables</li>
+        </ul>
+
+<pre>
+raw_202425_performance_3979aec1
+</pre>
+
+        <h3>4. Generate materialized views</h3>
+        <p><code>GenerateViews.cs</code>:</p>
+        <ul>
+            <li>Drops existing materialized views</li>
+            <li>Creates new ones driven entirely by datamap.csv</li>
+            <li>Ensures 1 row per entity</li>
+        </ul>
+
+        <h3>5. Integrity checks</h3>
+
+<pre>
+SELECT COUNT(*) FROM v_establishment;
+</pre>
+
+        <p>Joined integrity queries must return the same count.</p>
+
+        <h2>Common issues and recovery</h2>
+
+        <h3>Raw table missing</h3>
+        <div class="callout warning">
+            <strong>Fix:</strong> Verify table mappings and rerun raw table generation.
+        </div>
+
+        <h3>View slow to query</h3>
+        <div class="callout success">
+            <strong>Resolution:</strong> Materialized views eliminate runtime aggregation.
+        </div>
+
+        <h2>Safe rerun order</h2>
+
+<pre>
+1. Clean CSVs
+2. GenerateRawTables.cs
+3. GenerateViews.cs
+4. Run integrity checks
+</pre>
+
+        <h2>Change management</h2>
+        <ul>
+            <li>Update datamap.csv</li>
+            <li>Regenerate raw tables</li>
+            <li>Regenerate views</li>
+            <li>Re-run integrity checks</li>
+        </ul>
+
+    </main>
+
+    <footer class="govuk-footer">
+        <p>© Crown copyright</p>
+        <p>Department for Education</p>
+    </footer>
+
+</body>
+</html>

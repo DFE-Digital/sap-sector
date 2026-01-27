@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAP Data Platform – Developer Guide</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --govuk-blue: #1d70b8;
+            --govuk-black: #0b0c0c;
+            --govuk-grey: #f3f2f1;
+            --govuk-border: #b1b4b6;
+            --code-bg: #1e1e1e;
+            --code-fg: #e5e5e5;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial,Helvetica,sans-serif;
+            line-height: 1.6;
+            color: #0b0c0c;
+        }
+
+        .govuk-header {
+            background: var(--govuk-black);
+            color: #fff;
+            padding: 10px 30px;
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            margin-top: 0;
+        }
+
+        h1, h2 {
+            border-bottom: 4px solid var(--govuk-blue);
+            padding-bottom: .4rem;
+        }
+
+        pre {
+            background: var(--code-bg);
+            color: var(--code-fg);
+            padding: 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: Consolas,Menlo,Monaco,monospace;
+        }
+
+        .callout {
+            background: var(--govuk-grey);
+            border-left: 6px solid var(--govuk-blue);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+
+        svg {
+            margin: 1.5rem 0;
+            max-width: 100%;
+        }
+
+        .govuk-footer {
+            background: var(--govuk-grey);
+            border-top: 1px solid var(--govuk-border);
+            padding: 2rem;
+            font-size: .9rem;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 1rem 0;
+        }
+
+        th, td {
+            border: 1px solid var(--govuk-border);
+            padding: .6rem;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background: var(--govuk-grey);
+        }
+    </style>
+</head>
+<body>
+    <header class="govuk-header"><strong>👑 GOV.UK – Department for Education</strong></header>
+
+    <main>
+        <h1>SAP Data Platform – Developer Guide</h1>
+
+        <section>
+            <h2>Architecture</h2>
+
+            <svg viewBox="0 0 980 300" aria-label="Architecture diagram">
+                <rect x="20" y="40" width="210" height="60" fill="#1d70b8" />
+                <text x="125" y="75" fill="white" text-anchor="middle">Source CSVs</text>
+                <rect x="260" y="40" width="220" height="60" fill="#1d70b8" />
+                <text x="370" y="65" fill="white" text-anchor="middle">Cleaned CSVs</text>
+                <text x="370" y="85" fill="white" text-anchor="middle">(*.clean.csv)</text>
+                <rect x="510" y="40" width="220" height="60" fill="#1d70b8" />
+                <text x="620" y="65" fill="white" text-anchor="middle">Raw tables</text>
+                <text x="620" y="85" fill="white" text-anchor="middle">(raw_*)</text>
+                <rect x="760" y="40" width="200" height="60" fill="#1d70b8" />
+                <text x="860" y="75" fill="white" text-anchor="middle">Materialized views</text>
+
+                <rect x="260" y="140" width="220" height="50" fill="#f3f2f1" stroke="#b1b4b6" />
+                <text x="370" y="170" fill="#0b0c0c" text-anchor="middle">GenerateRawTables.cs</text>
+                <rect x="760" y="140" width="200" height="50" fill="#f3f2f1" stroke="#b1b4b6" />
+                <text x="860" y="170" fill="#0b0c0c" text-anchor="middle">GenerateViews.cs</text>
+
+                <line x1="230" y1="70" x2="260" y2="70" stroke="black" />
+                <line x1="480" y1="70" x2="510" y2="70" stroke="black" />
+                <line x1="730" y1="70" x2="760" y2="70" stroke="black" />
+                <line x1="370" y1="140" x2="370" y2="100" stroke="black" />
+                <line x1="860" y1="140" x2="860" y2="100" stroke="black" />
+            </svg>
+
+            <div class="callout">
+                <strong>Two generators:</strong>
+                <ul>
+                    <li><code>GenerateRawTables.cs</code> → creates & loads raw tables from cleaned CSVs</li>
+                    <li><code>GenerateViews.cs</code> → creates materialized views from raw tables using <code>datamap.csv</code></li>
+                </ul>
+            </div>
+        </section>
+
+        <section>
+            <h2>GenerateRawTables.cs</h2>
+            <p>
+                This generator is responsible for the “landing zone” inside Postgres.
+                It should be safe to re-run, and it should produce deterministic table names.
+            </p>
+
+            <table>
+                <tr><th>Responsibility</th><th>Notes</th></tr>
+                <tr>
+                    <td>Create raw tables</td>
+                    <td>
+                        Creates one table per dataset file. Columns are created from cleaned CSV headers.
+                        A hash-based suffix is used to avoid name-length collisions.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Bulk load</td>
+                    <td>
+                        Loads data from <code>*.clean.csv</code> (or equivalent cleaned output).
+                        Prefer Postgres <code>COPY</code> semantics for performance.
+                    </td>
+                </tr>
+                <tr>
+                    <td>Idempotency</td>
+                    <td>
+                        Should support drop-and-recreate (or truncate-and-reload) to keep raw tables consistent.
+                    </td>
+                </tr>
+            </table>
+
+<pre>
+Example outputs:
+- raw_202425_performance_3979aec1
+- raw_edubasealldata_20251022_a1b2c3d4
+</pre>
+        </section>
+
+        <section>
+            <h2>Cleaning step (before raw loading)</h2>
+            <p>
+                The cleaning step ensures:
+            </p>
+            <ul>
+                <li>headers become valid Postgres identifiers (or consistently quoted)</li>
+                <li>broken rows / malformed quoting are fixed</li>
+                <li>encoding is normalised (e.g. UTF-8)</li>
+                <li>numeric columns can be safely parsed by downstream <code>clean_int</code> / <code>clean_numeric</code></li>
+            </ul>
+
+            <div class="callout">
+                If your ingestion pipeline currently uses <code>*.clean.cs</code> to produce cleaned output,
+                GenerateRawTables should treat that cleaned output as the source of truth for column names.
+            </div>
+        </section>
+
+        <section>
+            <h2>GenerateViews.cs</h2>
+            <p>
+                GenerateViews creates one materialized view per model (e.g. establishment performance, LA performance, etc.).
+                It uses CASE-WHEN aggregation inside grouped CTEs to avoid expensive full outer joins.
+            </p>
+
+            <ul>
+                <li>Groups by <code>FileName</code> (one CTE per raw table)</li>
+                <li>Aggregates per entity id column (URN/LA/England)</li>
+                <li>Coalesces properties only across the sources that actually contain them</li>
+                <li>Drops and recreates materialized views on regeneration</li>
+            </ul>
+
+<pre>
+Key SQL pattern:
+WITH src_1 AS (... GROUP BY "Id"),
+     src_2 AS (... GROUP BY "Id")
+SELECT
+  COALESCE(src_1."Id", src_2."Id") AS "Id",
+  COALESCE(src_1."SomeProp", src_2."SomeProp") AS "SomeProp"
+FROM src_1
+LEFT JOIN src_2 ON src_2."Id" = src_1."Id";
+</pre>
+        </section>
+
+        <section>
+            <h2>Operational workflow</h2>
+<pre>
+1) Obtain source CSV extracts
+2) Run cleaning step → produces *.clean.csv (or equivalent)
+3) Run GenerateRawTables.cs → creates & loads raw_* tables
+4) Run GenerateViews.cs → produces materialized views
+5) Refresh materialized views after load
+</pre>
+        </section>
+
+        <section>
+            <h2>Performance notes</h2>
+            <ul>
+                <li>Raw tables should have an index on the entity id column (URN/LA code)</li>
+                <li>If filters are frequently used, composite indexes including filter columns can help</li>
+                <li>Materialized views trade storage for query speed; refresh time is the main cost</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="govuk-footer">
+        <p>© Crown copyright</p>
+        <p>Department for Education</p>
+    </footer>
+</body>
+</html>
