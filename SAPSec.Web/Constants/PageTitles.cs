@@ -3,6 +3,7 @@ namespace SAPSec.Web.Constants;
 public static class PageTitles
 {
     public const string TermsOfUse = "Terms of use";
+    public const string Cookies = "Cookies";
     public const string PrivacyPolicy = "Privacy Policy";
     public const string ServiceHome = "Get school improvement insights";
     public const string ErrorNotFound = "Page not found";
