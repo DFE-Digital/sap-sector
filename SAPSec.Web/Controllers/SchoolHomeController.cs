@@ -30,6 +30,7 @@ public class SchoolHomeController(
         }
 
         SetViewBagProperties(user, currentOrg);
+
         return View();
     }
 
@@ -41,9 +42,9 @@ public class SchoolHomeController(
     private static bool IsEstablishment(Organisation organisation)
     {
         return string.Equals(
-        organisation?.Category?.Name,
-        "Establishment",
-        StringComparison.OrdinalIgnoreCase);
+            organisation?.Category?.Name,
+            "Establishment",
+            StringComparison.OrdinalIgnoreCase);
     }
 
     private IActionResult AccessDenied()
@@ -64,6 +65,6 @@ public class SchoolHomeController(
 
     private static class Routes
     {
-        public const string SchoolSearch = "/search-for-a-school";
+        public const string SchoolSearch = "/find-a-school";
     }
 }

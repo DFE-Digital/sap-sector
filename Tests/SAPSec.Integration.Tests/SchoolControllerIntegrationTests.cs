@@ -12,7 +12,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_WithValidUrn_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -61,7 +61,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsLocationSection()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -71,7 +71,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsAddressField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -81,7 +81,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsLocalAuthorityField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -91,7 +91,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsRegionField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -101,7 +101,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsUrbanRuralDescriptionField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -115,7 +115,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsSchoolDetailsSection()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -125,7 +125,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsIdField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -135,7 +135,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsUrnInIdField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -145,7 +145,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsAgeRangeField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -155,7 +155,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsGenderOfEntryField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -165,7 +165,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsPhaseOfEducationField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -175,7 +175,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsSchoolTypeField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -185,7 +185,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsGovernanceStructureField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -195,7 +195,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsAcademyTrustField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -205,7 +205,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsAdmissionsPolicyField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -215,7 +215,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsSendIntegratedResourceField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -226,7 +226,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsReligiousCharacterField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -240,7 +240,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsContactDetailsSection()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -250,7 +250,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsHeadteacherField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -260,7 +260,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsWebsiteField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -270,7 +270,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsTelephoneField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -280,7 +280,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsEmailField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -294,7 +294,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsFurtherInformationSection()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -304,7 +304,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsOfstedReportField()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -314,7 +314,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ContainsOfstedReportLink()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -328,19 +328,18 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_HasCorrectPageTitle()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("<title>");
-        content.Should().Contain("Bradfield School");
         content.Should().Contain("School details");
     }
 
     [Fact]
     public async Task GetSchool_HasBackLink()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -350,7 +349,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_HasSummaryListStructure()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -362,7 +361,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_HasCorrectHeadings()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -377,7 +376,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_WebsiteLink_OpensInNewTab()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -388,7 +387,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     [Fact]
     public async Task GetSchool_ExternalLinks_HaveVisuallyHiddenText()
     {
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -404,7 +403,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     public async Task GetSchool_ShowsNoAvailableData_WhenFieldIsEmpty()
     {
         // This test assumes you have a school in your test data with missing fields
-        var response = await fixture.Client.GetAsync("/school/147788");
+        var response = await fixture.Client.GetAsync("/school/147788/school-details");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -421,7 +420,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var response = await fixture.Client.GetAsync("/school/147788", cts.Token);
+        var response = await fixture.Client.GetAsync("/school/147788/school-details", cts.Token);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }

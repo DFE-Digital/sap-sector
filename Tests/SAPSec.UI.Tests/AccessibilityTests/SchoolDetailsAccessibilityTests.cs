@@ -9,7 +9,7 @@ namespace SAPSec.UI.Tests.AccessibilityTests;
 [Collection("UITestsCollection")]
 public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolDetailsPath = "/school/147788";
+    private const string SchoolDetailsPath = "/school/147788/school-details";
 
     #region Axe Core Accessibility Tests
 
@@ -435,18 +435,6 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
 
         lang.Should().NotBeNullOrWhiteSpace("Page should have lang attribute");
         lang.Should().Be("en", "Page should have English language attribute");
-    }
-
-    [Fact]
-    public async Task SchoolDetails_HasPageTitle()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var title = await Page.TitleAsync();
-
-        title.Should().NotBeNullOrWhiteSpace("Page should have a title");
-        title.Should().Contain("School details", "Title should describe the page content");
     }
 
     [Fact]

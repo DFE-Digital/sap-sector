@@ -25,8 +25,8 @@ public static class BreadcrumbNodes
             Url = $"/school/{urn}",
             Parent = new BreadcrumbNode
             {
-                Title = "SchoolHome",
-                Url = "/SchoolHome"
+                Title = "Home",
+                Url = $"/school/{urn}"
             }
         };
     }

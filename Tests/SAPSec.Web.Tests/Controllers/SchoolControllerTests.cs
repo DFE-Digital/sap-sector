@@ -1,9 +1,13 @@
-﻿using FluentAssertions;
+﻿using Castle.Core.Logging;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Search;
+using SAPSec.Core.Services;
+using SAPSec.Infrastructure.Entities;
 using SAPSec.Web.Controllers;
 using Xunit;
 

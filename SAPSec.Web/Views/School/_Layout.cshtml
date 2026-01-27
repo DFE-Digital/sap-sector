@@ -1,0 +1,109 @@
+﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Helpers
+@model SchoolDetails
+@{
+    Layout = "Views/Shared/_Layout";
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    var routeAttributes = new Dictionary<string, string> { { "urn", Model.Urn.Display() } };
+}
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolHome")">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
+
+<div class="govuk-grid-row">
+    <div class="app-side-navigation-container">
+        <nav class="app-side-navigation"
+             aria-label="Side" 
+             role="navigation">
+            <button class="app-side-navigation__button" 
+                    data-label-hide="Hide navigation" 
+                    data-label-show="Show navigation" 
+                    aria-expanded="false"
+                    aria-controls="side-navigation">
+                <span class="app-side-navigation__section-toggle-focus">
+                    <span class="app-side-navigation__chevron app-side-navigation__chevron--down"></span>
+                    <span class="app-side-navigation__section-toggle-text">Show navigation</span>
+                </span>
+            </button>
+
+            <ul id="side-navigation" class="app-side-navigation__list app-side-navigation--mobile">
+                @{
+                    string selected(string type, bool condition) => condition 
+                        ? $"app-side-navigation__{type}--selected" 
+                        : "";
+                }
+                <li class="app-side-navigation__item @selected("item", currentAction == "Index")">
+                    <a href=@Url.Action("Index", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentAction == "Index")">
+                        Overview
+                    </a>
+                </li>
+                <li class="app-side-navigation__item @selected("item", currentAction == "Ks4HeadlineMeasures")">
+                    <a href=@Url.Action("Ks4HeadlineMeasures", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentAction == "Ks4HeadlineMeasures")">
+                        KS4 headline measures
+                    </a>
+                </li>
+                <li class="app-side-navigation__item @selected("item", currentAction == "Ks4CoreSubjects")">
+                    <a href=@Url.Action("Ks4CoreSubjects", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentAction == "Ks4CoreSubjects")">
+                        KS4 core subjects
+                    </a>
+                </li>
+                <li class="app-side-navigation__item @selected("item", currentAction == "Attendance")">
+                    <a href=@Url.Action("Attendance", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentAction == "Attendance")">
+                        Attendance
+                    </a>
+                </li>
+                <li class="app-side-navigation__item @selected("item", currentAction == "ViewSimilarSchools")">
+                    <a href=@Url.Action("ViewSimilarSchools", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentAction == "ViewSimilarSchools")">
+                        View similar schools
+                    </a>
+                </li>
+                <li class="app-side-navigation__item @selected("item", currentAction == "SchoolDetails")">
+                    <a href=@Url.Action("SchoolDetails", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentAction == "SchoolDetails")">
+                        School details
+                    </a>
+                </li>
+                <li class="app-side-navigation__item @selected("item", currentAction == "WhatIsASimilarSchool")">
+                    <a href=@Url.Action("WhatIsASimilarSchool", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentAction == "WhatIsASimilarSchool")">
+                        What is a similar school?
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="app-body-container-with-side-navigation">
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    <script add-nonce="true">
+        let sideNavButton = document.querySelector('.app-side-navigation__button');
+        sideNavButton.addEventListener('click', ev => {
+            ev.preventDefault();
+            let expanded = sideNavButton.getAttribute("aria-expanded") === "false";
+            sideNavButton.setAttribute("aria-expanded", expanded);
+            sideNavButton.querySelector('.app-side-navigation__section-toggle-text').innerHTML = expanded
+                ? sideNavButton.dataset.labelHide
+                : sideNavButton.dataset.labelShow;
+            sideNavButton.querySelector('.app-side-navigation__chevron').classList
+                .toggle("app-side-navigation__chevron--down");
+            document.querySelector('.app-side-navigation__list').classList
+                .toggle("app-side-navigation--mobile");
+        })
+    </script>
+}

@@ -150,6 +150,7 @@ public class SchoolSearchControllerTests
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
+        redirectResult!.ActionName.Should().Be("Search");
         redirectResult!.RouteValues!["query"].Should().Be("ABC");
     }
 
@@ -174,7 +175,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithNumericSearch_RedirectsToSchoolDetails()
+    public void Index_Post_WithNumericResults_RedirectsToSchoolDetails()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -452,7 +453,7 @@ public class SchoolSearchControllerTests
         var viewResult = result as ViewResult;
         var model = viewResult!.Model as SchoolSearchResultsViewModel;
 
-        model!.Pagination.EndItem.Should().Be(15); 
+        model!.Pagination.EndItem.Should().Be(15);
     }
 
     [Fact]

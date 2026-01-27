@@ -25,7 +25,7 @@ public class AuthControllerTests
 
     private static class ExpectedRoutes
     {
-        public const string DefaultReturnUrl = "/school/search-for-a-school";
+        public const string DefaultReturnUrl = "/find-a-school";
         public const string HomeAction = "Index";
         public const string HomeController = "Home";
         public const string ErrorAction = "StatusCodeError";
@@ -619,7 +619,7 @@ public class AuthControllerTests
     [Theory]
     [InlineData("/local/path")]
     [InlineData("/dashboard")]
-    [InlineData("/school/search")]
+    [InlineData("/find-a-school/search")]
     public void SignIn_AuthenticatedUser_WithLocalUrl_RedirectsToLocalUrl(string localUrl)
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
