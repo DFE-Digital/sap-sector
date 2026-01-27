@@ -19,6 +19,10 @@
     <None Remove="DataMap\CleanedFiles\202425_performance_tables_schools_provisional.clean.csv" />
     <None Remove="DataMap\CleanedFiles\202425_subject_local_authority_pupil_entriesachievements_provisional.clean.csv" />
     <None Remove="DataMap\CleanedFiles\202425_subject_school_all_exam_entriesgrades_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\2026-01-13_off_sen_primary_sim_sch_grps.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\2026-01-13_off_sen_primary_sim_sch_var_vals.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\2026-01-13_off_sen_secondary_sim_sch_grps.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\2026-01-13_off_sen_secondary_sim_sch_var_vals.clean.csv" />
     <None Remove="DataMap\CleanedFiles\2223_la_char_data_revised.clean.csv" />
     <None Remove="DataMap\CleanedFiles\2223_subject_pupil_level_la_data_revised.clean.csv" />
     <None Remove="DataMap\CleanedFiles\edubasealldata20251022.clean.csv" />
@@ -47,6 +51,10 @@
     <None Remove="DataMap\SourceFiles\202425_performance_tables_schools_provisional.csv" />
     <None Remove="DataMap\SourceFiles\202425_subject_local_authority_pupil_entriesachievements_provisional.csv" />
     <None Remove="DataMap\SourceFiles\202425_subject_school_all_exam_entriesgrades_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\2026-01-13_off_sen_primary_sim_sch_grps.csv" />
+    <None Remove="DataMap\SourceFiles\2026-01-13_off_sen_primary_sim_sch_var_vals.csv" />
+    <None Remove="DataMap\SourceFiles\2026-01-13_off_sen_secondary_sim_sch_grps.csv" />
+    <None Remove="DataMap\SourceFiles\2026-01-13_off_sen_secondary_sim_sch_var_vals.csv" />
     <None Remove="DataMap\SourceFiles\2223_la_char_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\2223_subject_pupil_level_la_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\edubasealldata20251022.csv" />
@@ -77,6 +85,11 @@
     <None Remove="Sql\03_v_la_destinations.sql" />
     <None Remove="Sql\03_v_la_performance.sql" />
     <None Remove="Sql\04_indexes.sql" />
+    <None Remove="Sql\50_v_similar_schools_primary_groups.sql" />
+    <None Remove="Sql\50_v_similar_schools_primary_values.sql" />
+    <None Remove="Sql\50_v_similar_schools_secondary_groups.sql" />
+    <None Remove="Sql\50_v_similar_schools_secondary_values.sql" />
+    <None Remove="Sql\51_similar_schools_indexes.sql" />
     <None Remove="Sql\run_all.sql" />
     <None Remove="Sql\tablemapping.csv" />
   </ItemGroup>

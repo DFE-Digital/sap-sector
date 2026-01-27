@@ -57,6 +57,20 @@ internal class Program
         // -------------------------------------------------
         new GenerateIndexes(sqlDir).Run();
 
+        // -------------------------------------------------
+        // 50. Generate similar schools views
+        // -------------------------------------------------
+        new GenerateSimilarSchoolsViews(
+            dataMaps,
+            tableMappingPath,
+            sqlDir
+        ).Run();
+
+        // -------------------------------------------------
+        // 51. Generate similar schools indexes
+        // -------------------------------------------------
+        new GenerateSimilarSchoolsIndexes(sqlDir).Run();
+
         Console.WriteLine("Run Complete.");
 
         // Optional: avoid blocking in CI

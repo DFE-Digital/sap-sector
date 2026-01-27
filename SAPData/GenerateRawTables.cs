@@ -67,8 +67,8 @@ public class GenerateRawTables
 
         Console.WriteLine($"Processing: {datasetKey}");
 
-        using var reader = new StreamReader(csvPath, Encoding.UTF8, true);
-        using var writer = new StreamWriter(cleanCsvPath, false, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
+        using var reader = new StreamReader(csvPath, Encoding.UTF8, false);
+        using var writer = new StreamWriter(cleanCsvPath, false, new UTF8Encoding(false));
 
         // -----------------------------
         // Header

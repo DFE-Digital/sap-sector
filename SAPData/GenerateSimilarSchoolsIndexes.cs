@@ -2,23 +2,23 @@
 
 namespace SAPData;
 
-public class GenerateIndexes
+public class GenerateSimilarSchoolsIndexes
 {
     private readonly string _sqlDir;
 
-    public GenerateIndexes(string sqlDir)
+    public GenerateSimilarSchoolsIndexes(string sqlDir)
     {
         _sqlDir = sqlDir;
     }
 
     public void Run()
     {
-        string outputPath = Path.Combine(_sqlDir, "04_indexes.sql");
+        string outputPath = Path.Combine(_sqlDir, "51_similar_schools_indexes.sql");
 
         var sb = new StringBuilder();
 
         sb.AppendLine("-- ================================================================");
-        sb.AppendLine("-- 04_indexes.sql");
+        sb.AppendLine("-- 51_similar_schools_indexes.sql");
         sb.AppendLine("-- Indexes for materialized views (AUTO-GENERATED)");
         sb.AppendLine("-- ================================================================");
         sb.AppendLine();
@@ -29,20 +29,10 @@ public class GenerateIndexes
         // View → column mapping (EXACT column names)
         var indexes = new Dictionary<string, string>
         {
-            // England
-            { "v_england_destinations", "\"Id\"" },
-            { "v_england_performance",  "\"Id\"" },
-
-            // Establishment
-            { "v_establishment",              "\"URN\"" },
-            { "v_establishment_absence",      "\"Id\"" },
-            { "v_establishment_destinations", "\"Id\"" },
-            { "v_establishment_performance",  "\"Id\"" },
-            { "v_establishment_workforce",    "\"Id\"" },
-
-            // Local Authority
-            { "v_la_destinations", "\"Id\"" },
-            { "v_la_performance",  "\"Id\"" }
+            { "v_similar_schools_primary_groups",   "\"urn\"" },
+            { "v_similar_schools_primary_values",   "\"urn\"" },
+            { "v_similar_schools_secondary_groups", "\"urn\"" },
+            { "v_similar_schools_secondary_values", "\"urn\"" },
         };
 
         foreach (var kvp in indexes)
