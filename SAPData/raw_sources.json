@@ -1,0 +1,65 @@
+[
+  {
+    "Type": "All establishment",
+    "Subtype": "Metadata",
+    "Year": "Current",
+    "SourceOrg": "GIAS",
+    "DataSetId": "",
+    "Url": "__SECRET_URL__",
+    "FileType": "csv"
+  },
+  {
+    "Type": "All establishment",
+    "Subtype": "Links",
+    "Year": "Current",
+    "SourceOrg": "GIAS",
+    "DataSetId": "",
+    "Url": "__SECRET_ESTABLISHMENT_LINKS_URL__",
+    "FileType": "csv"
+  },
+  {
+    "Type": "Academy sponsor and trust",
+    "Subtype": "Links",
+    "Year": "Current",
+    "SourceOrg": "GIAS",
+    "DataSetId": "",
+    "Url": "__SECRET_MAT_LINKS_URL__",
+    "FileType": "zip"
+  },
+  {
+    "Type": "KS4_Performance",
+    "Subtype": "Performance",
+    "Year": "Current",
+    "SourceOrg": "EES",
+    "DataSetId": "b3e19901-5d2b-b676-bb4c-e60937d74725",
+    "Url": "",
+    "FileType": "csv"
+  },
+  {
+    "Type": "KS4_Performance",
+    "Subtype": "Performance_2",
+    "Year": "Current",
+    "SourceOrg": "EES",
+    "DataSetId": "19e39901-a96c-be76-b9c2-6af54ae076d2",
+    "Url": "",
+    "FileType": "csv"
+  },
+  {
+    "Type": "KS4_Performance",
+    "Subtype": "SubjectEntries",
+    "Year": "Current",
+    "SourceOrg": "EES",
+    "DataSetId": "1ae39901-c621-a274-a84b-393929221b9f",
+    "Url": "",
+    "FileType": "csv"
+  },
+  {
+    "Type": "KS4_Performance",
+    "Subtype": "SubjectEntries_2",
+    "Year": "Current",
+    "SourceOrg": "EES",
+    "DataSetId": "1ae39901-b462-df76-b108-640a078d7944",
+    "Url": "",
+    "FileType": "csv"
+  }
+]

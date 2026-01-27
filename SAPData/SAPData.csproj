@@ -1,0 +1,104 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="DataMap\CleanedFiles\1a_absence_3term_school.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\1_absence_3term_nat_reg_la.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\2022-2023_england_ks4final.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202324_la_char_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202324_performance_tables_schools_final.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202324_subject_pupil_level_la_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202324_subject_school_all_exam_entriesgrades_final.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_performance_tables_schools_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_subject_local_authority_pupil_entriesachievements_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_subject_school_all_exam_entriesgrades_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\2223_la_char_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\2223_subject_pupil_level_la_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\edubasealldata20251022.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ees_ks4_inst_202223.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ees_ks4_la_202223.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ees_ks4_nat_202223.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\england_ks4underlying_entriesandgrades_2.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\exc_nat_region_la.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\exc_school.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\GIAS.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202122_inst_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202122_la_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202122_nat_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202223_inst_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202223_la_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202223_nat_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\workforce_ptrs_2010_2024_sch.clean.csv" />
+    <None Remove="DataMap\SourceFiles\1a_absence_3term_school.csv" />
+    <None Remove="DataMap\SourceFiles\1_absence_3term_nat_reg_la.csv" />
+    <None Remove="DataMap\SourceFiles\2022-2023_england_ks4final.csv" />
+    <None Remove="DataMap\SourceFiles\202324_la_char_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\202324_performance_tables_schools_final.csv" />
+    <None Remove="DataMap\SourceFiles\202324_subject_pupil_level_la_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\202324_subject_school_all_exam_entriesgrades_final.csv" />
+    <None Remove="DataMap\SourceFiles\202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\202425_performance_tables_schools_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\202425_subject_local_authority_pupil_entriesachievements_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\202425_subject_school_all_exam_entriesgrades_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\2223_la_char_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\2223_subject_pupil_level_la_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\edubasealldata20251022.csv" />
+    <None Remove="DataMap\SourceFiles\ees_ks4_inst_202223.csv" />
+    <None Remove="DataMap\SourceFiles\ees_ks4_la_202223.csv" />
+    <None Remove="DataMap\SourceFiles\ees_ks4_nat_202223.csv" />
+    <None Remove="DataMap\SourceFiles\england_ks4underlying_entriesandgrades_2.csv" />
+    <None Remove="DataMap\SourceFiles\exc_nat_region_la.csv" />
+    <None Remove="DataMap\SourceFiles\exc_school.csv" />
+    <None Remove="DataMap\SourceFiles\GIAS.CSV" />
+    <None Remove="DataMap\SourceFiles\ks4_dm_ud_202122_inst_rev.csv" />
+    <None Remove="DataMap\SourceFiles\ks4_dm_ud_202122_la_rev.csv" />
+    <None Remove="DataMap\SourceFiles\ks4_dm_ud_202122_nat_rev.csv" />
+    <None Remove="DataMap\SourceFiles\ks4_dm_ud_202223_inst_rev.csv" />
+    <None Remove="DataMap\SourceFiles\ks4_dm_ud_202223_la_rev.csv" />
+    <None Remove="DataMap\SourceFiles\ks4_dm_ud_202223_nat_rev.csv" />
+    <None Remove="DataMap\SourceFiles\workforce_ptrs_2010_2024_sch.csv" />
+    <None Remove="Sql\01_create_raw_tables.sql" />
+    <None Remove="Sql\02_copy_into_raw.sql" />
+    <None Remove="Sql\02_copy_into_raw_local.sql" />
+    <None Remove="Sql\03_v_england_destinations.sql" />
+    <None Remove="Sql\03_v_england_performance.sql" />
+    <None Remove="Sql\03_v_establishment.sql" />
+    <None Remove="Sql\03_v_establishment_absence.sql" />
+    <None Remove="Sql\03_v_establishment_destinations.sql" />
+    <None Remove="Sql\03_v_establishment_performance.sql" />
+    <None Remove="Sql\03_v_establishment_workforce.sql" />
+    <None Remove="Sql\03_v_la_destinations.sql" />
+    <None Remove="Sql\03_v_la_performance.sql" />
+    <None Remove="Sql\04_indexes.sql" />
+    <None Remove="Sql\run_all.sql" />
+    <None Remove="Sql\tablemapping.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="Dapper" Version="2.1.66" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="DataMap\CleanedFiles\placeholder.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="DataMap\datamap.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Hashes\placeholder.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Sql\00_cleanup.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
