@@ -20,4 +20,10 @@ public class StaticContentController : Controller
     {
         return View();
     }
+
+    [Route("cookies")]
+    public IActionResult Cookies()
+    {
+        return View();
+    }
 }
