@@ -5,11 +5,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SAPSec.Core.Interfaces.Services
+namespace SAPSec.Core.Interfaces.Services;
+public interface ILookupService
 {
-    public interface ILookupService
-    {
-        IEnumerable<Lookup> GetAllLookups();
-        Lookup GetLookup(string urn);
-    }
+    /// <summary>
+    /// Gets a lookup value by type and ID. Uses cached dictionary for O(1) lookup.
+    /// </summary>
+    /// <param name="lookupType">The lookup type (use LookupTypes constants)</param>
+    /// <param name="id">The lookup ID</param>
+    /// <returns>The lookup name, or empty string if not found</returns>
+    string GetLookupValue(string lookupType, string? id);
 }
