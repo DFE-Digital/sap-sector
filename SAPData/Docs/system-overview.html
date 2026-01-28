@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SAP Data Platform – Overview</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        :root {
+            --govuk-blue: #1d70b8;
+            --govuk-black: #0b0c0c;
+            --govuk-grey: #f3f2f1;
+            --govuk-dark-grey: #505a5f;
+            --govuk-border: #b1b4b6;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial,Helvetica,sans-serif;
+            color: var(--govuk-black);
+            line-height: 1.6;
+        }
+
+        .govuk-header {
+            background: var(--govuk-black);
+            color: #fff;
+            padding: 10px 30px;
+        }
+
+        .govuk-header__logo {
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .govuk-header__crown {
+            font-size: 1.5rem;
+            margin-right: 8px;
+        }
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-top: 0;
+        }
+
+        h2 {
+            border-bottom: 4px solid var(--govuk-blue);
+            padding-bottom: .4rem;
+            margin-top: 2.2rem;
+        }
+
+        .panel {
+            background: var(--govuk-grey);
+            padding: 1.5rem;
+            border-left: 6px solid var(--govuk-blue);
+            margin: 1.5rem 0;
+        }
+
+        .small {
+            color: var(--govuk-dark-grey);
+            font-size: .95rem;
+        }
+
+        svg {
+            max-width: 100%;
+            margin: 1.5rem 0;
+        }
+
+        .govuk-footer {
+            background: var(--govuk-grey);
+            border-top: 1px solid var(--govuk-border);
+            padding: 2rem;
+            font-size: .9rem;
+            color: var(--govuk-dark-grey);
+        }
+    </style>
+</head>
+<body>
+    <header class="govuk-header">
+        <div class="govuk-header__logo"><span class="govuk-header__crown">👑</span>GOV.UK – Department for Education</div>
+    </header>
+
+    <main>
+        <h1>SAP Data Platform</h1>
+        <p><strong>Stakeholder Overview</strong></p>
+
+        <section>
+            <h2>What this platform does</h2>
+            <p>
+                The SAP Data Platform turns national education datasets (CSV extracts) into a consistent set of
+                queryable datasets (database tables and materialized views) used by dashboards, APIs and analytics.
+            </p>
+            <div class="panel">
+                <strong>Key outcome:</strong> users see one consistent “version of the truth” for school, LA and England measures,
+                with fast query performance.
+            </div>
+        </section>
+
+        <section>
+            <h2>End-to-end data flow</h2>
+
+            <svg viewBox="0 0 980 280" aria-label="Data flow diagram">
+                <rect x="20" y="40" width="210" height="60" fill="#1d70b8" />
+                <text x="125" y="75" fill="white" text-anchor="middle">Source CSVs</text>
+                <rect x="260" y="40" width="220" height="60" fill="#1d70b8" />
+                <text x="370" y="65" fill="white" text-anchor="middle">Cleaning step</text>
+                <text x="370" y="85" fill="white" text-anchor="middle">(*.clean.csv)</text>
+                <rect x="510" y="40" width="220" height="60" fill="#1d70b8" />
+                <text x="620" y="65" fill="white" text-anchor="middle">Raw tables</text>
+                <text x="620" y="85" fill="white" text-anchor="middle">(Postgres)</text>
+                <rect x="760" y="40" width="200" height="60" fill="#1d70b8" />
+                <text x="860" y="75" fill="white" text-anchor="middle">Materialized views</text>
+
+                <rect x="260" y="140" width="220" height="50" fill="#f3f2f1" stroke="#b1b4b6" />
+                <text x="370" y="170" fill="#0b0c0c" text-anchor="middle">GenerateRawTables.cs</text>
+                <rect x="760" y="140" width="200" height="50" fill="#f3f2f1" stroke="#b1b4b6" />
+                <text x="860" y="170" fill="#0b0c0c" text-anchor="middle">GenerateViews.cs</text>
+
+                <line x1="230" y1="70" x2="260" y2="70" stroke="black" />
+                <line x1="480" y1="70" x2="510" y2="70" stroke="black" />
+                <line x1="730" y1="70" x2="760" y2="70" stroke="black" />
+
+                <line x1="370" y1="140" x2="370" y2="100" stroke="black" />
+                <line x1="860" y1="140" x2="860" y2="100" stroke="black" />
+            </svg>
+
+            <p class="small">
+                GenerateRawTables.cs is responsible for turning cleaned CSVs into raw database tables. GenerateViews.cs turns those raw tables into
+                query-ready materialized views.
+            </p>
+        </section>
+
+        <section>
+            <h2>Step 1: Cleaning the CSVs</h2>
+            <p>
+                CSV files are cleaned before loading into the database. This step ensures data types, quoting, and headers are consistent,
+                and prevents broken imports caused by commas, encoding issues, or mixed numeric/text values.
+            </p>
+            <ul>
+                <li>Input: published CSV extracts</li>
+                <li>Output: cleaned CSVs (for safe bulk load)</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Step 2: Creating and populating raw tables (GenerateRawTables.cs)</h2>
+            <p>
+                GenerateRawTables.cs creates one raw table per dataset (using a consistent naming strategy),
+                then bulk-loads the cleaned CSV rows into that table.
+            </p>
+            <ul>
+                <li>Creates tables with columns matching the cleaned CSV headers</li>
+                <li>Uses a predictable, hashed suffix naming convention to avoid name-length issues</li>
+                <li>Loads data from cleaned CSVs into Postgres efficiently (bulk import)</li>
+            </ul>
+            <div class="panel">
+                <strong>Why raw tables exist:</strong> they preserve the source structure, provide traceability, and act as stable inputs for downstream views.
+            </div>
+        </section>
+
+        <section>
+            <h2>Step 3: Producing query-ready outputs (GenerateViews.cs)</h2>
+            <p>
+                GenerateViews.cs aggregates raw tables into materialized views (for example by school URN, LA code, or England level),
+                providing fast, consistent access for applications and reporting.
+            </p>
+            <ul>
+                <li>Applies filters and mapping rules defined in <code>datamap.csv</code></li>
+                <li>Creates materialized views to guarantee fast query performance</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Operational notes</h2>
+            <ul>
+                <li>Refreshing materialized views is required after loading new raw data</li>
+                <li>Raw tables provide auditability and can be used to troubleshoot unexpected figures</li>
+            </ul>
+        </section>
+
+    </main>
+
+    <footer class="govuk-footer">
+        <p>© Crown copyright</p>
+        <p>Department for Education</p>
+    </footer>
+</body>
+</html>
