@@ -21,66 +21,10 @@ public class LookupServiceTests
         _mockLogger = new Mock<ILogger<LookupService>>();
         _service = new LookupService(_mockRepo.Object, _mockLogger.Object);
     }
+    private LookupService CreateService() =>
+    new LookupService(_mockRepo.Object, _mockLogger.Object);
 
     #region GetAllLookups Tests
-
-    [Fact]
-    public void GetAllLookups_ShouldReturnAllItems()
-    {
-        // Arrange
-        var expectedLookups = new List<Lookup>
-        {
-            new Lookup { Id = "100", Name = "Test One", LookupType = "Testing" },
-            new Lookup { Id = "101", Name = "Test Two", LookupType = "Testing" }
-        };
-        _mockRepo.Setup(r => r.GetAllLookups()).Returns(expectedLookups);
-
-        // Act
-        var result = _service.GetAllLookups();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal(2, result.Count());
-        Assert.Contains(result, a => a.Name == "Test One");
-        Assert.Contains(result, a => a.Name == "Test Two");
-    }
-
-    [Fact]
-    public void GetAllLookups_ShouldReturnEmpty_WhenNoData()
-    {
-        // Arrange
-        _mockRepo.Setup(r => r.GetAllLookups()).Returns(new List<Lookup>());
-
-        // Act
-        var result = _service.GetAllLookups();
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
-    }
-
-    [Fact]
-    public void GetAllLookups_ShouldCacheResults_AndNotCallRepositoryAgain()
-    {
-        // Arrange
-        var expectedLookups = new List<Lookup>
-        {
-            new Lookup { Id = "100", Name = "Test One", LookupType = "Testing" }
-        };
-        _mockRepo.Setup(r => r.GetAllLookups()).Returns(expectedLookups);
-
-        // Act
-        var result1 = _service.GetAllLookups();
-        var result2 = _service.GetAllLookups();
-
-        // Assert
-        _mockRepo.Verify(r => r.GetAllLookups(), Times.Once);
-        Assert.Equal(result1.Count(), result2.Count());
-    }
-
-    #endregion
-
-    #region GetLookupValue Tests
 
     [Fact]
     public void GetLookupValue_ShouldReturnCorrectName_WhenLookupExists()
@@ -93,9 +37,10 @@ public class LookupServiceTests
             new Lookup { Id = "1", Name = "Mixed", LookupType = LookupTypes.Gender }
         };
         _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
 
         // Act
-        var result = _service.GetLookupValue(LookupTypes.PhaseOfEducation, "1");
+        var result = service.GetLookupValue(LookupTypes.PhaseOfEducation, "1");
 
         // Assert
         Assert.Equal("Primary", result);
@@ -110,9 +55,10 @@ public class LookupServiceTests
             new Lookup { Id = "1", Name = "Primary", LookupType = LookupTypes.PhaseOfEducation }
         };
         _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
 
         // Act
-        var result = _service.GetLookupValue(LookupTypes.PhaseOfEducation, "999");
+        var result = service.GetLookupValue(LookupTypes.PhaseOfEducation, "999");
 
         // Assert
         Assert.Equal(string.Empty, result);
@@ -127,9 +73,10 @@ public class LookupServiceTests
             new Lookup { Id = "1", Name = "Primary", LookupType = LookupTypes.PhaseOfEducation }
         };
         _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
 
         // Act
-        var result = _service.GetLookupValue(LookupTypes.PhaseOfEducation, null);
+        var result = service.GetLookupValue(LookupTypes.PhaseOfEducation, null);
 
         // Assert
         Assert.Equal(string.Empty, result);
@@ -144,9 +91,10 @@ public class LookupServiceTests
             new Lookup { Id = "1", Name = "Primary", LookupType = LookupTypes.PhaseOfEducation }
         };
         _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
 
         // Act
-        var result = _service.GetLookupValue(LookupTypes.PhaseOfEducation, "   ");
+        var result = service.GetLookupValue(LookupTypes.PhaseOfEducation, "   ");
 
         // Assert
         Assert.Equal(string.Empty, result);
@@ -162,10 +110,11 @@ public class LookupServiceTests
             new Lookup { Id = "1", Name = "Mixed", LookupType = LookupTypes.Gender }
         };
         _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
 
         // Act
-        var phaseResult = _service.GetLookupValue(LookupTypes.PhaseOfEducation, "1");
-        var genderResult = _service.GetLookupValue(LookupTypes.Gender, "1");
+        var phaseResult = service.GetLookupValue(LookupTypes.PhaseOfEducation, "1");
+        var genderResult = service.GetLookupValue(LookupTypes.Gender, "1");
 
         // Assert
         Assert.Equal("Primary", phaseResult);
@@ -174,76 +123,27 @@ public class LookupServiceTests
 
     #endregion
 
-    #region GetLookupsByType Tests
+    #region Caching Tests
 
     [Fact]
-    public void GetLookupsByType_ShouldReturnAllLookupsOfType()
+    public void GetLookupValue_ShouldCacheResults_AndNotCallRepositoryAgain()
     {
         // Arrange
         var lookups = new List<Lookup>
         {
-            new Lookup { Id = "1", Name = "Primary", LookupType = LookupTypes.PhaseOfEducation },
-            new Lookup { Id = "2", Name = "Secondary", LookupType = LookupTypes.PhaseOfEducation },
-            new Lookup { Id = "1", Name = "Mixed", LookupType = LookupTypes.Gender }
+            new Lookup { Id = "1", Name = "Test", LookupType = "Testing" }
         };
         _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
 
         // Act
-        var result = _service.GetLookupsByType(LookupTypes.PhaseOfEducation);
+        var result1 = service.GetLookupValue("Testing", "1");
+        var result2 = service.GetLookupValue("Testing", "1");
 
         // Assert
-        Assert.Equal(2, result.Count);
-        Assert.All(result, l => Assert.Equal(LookupTypes.PhaseOfEducation, l.LookupType));
-    }
-
-    [Fact]
-    public void GetLookupsByType_ShouldReturnEmptyList_WhenTypeDoesNotExist()
-    {
-        // Arrange
-        var lookups = new List<Lookup>
-        {
-            new Lookup { Id = "1", Name = "Primary", LookupType = LookupTypes.PhaseOfEducation }
-        };
-        _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
-
-        // Act
-        var result = _service.GetLookupsByType("NonExistentType");
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Empty(result);
-    }
-
-    #endregion
-
-    #region ClearCache Tests
-
-    [Fact]
-    public void ClearCache_ShouldForceReloadOnNextAccess()
-    {
-        // Arrange
-        var initialLookups = new List<Lookup>
-        {
-            new Lookup { Id = "1", Name = "Initial", LookupType = "Testing" }
-        };
-        var updatedLookups = new List<Lookup>
-        {
-            new Lookup { Id = "1", Name = "Updated", LookupType = "Testing" }
-        };
-
-        _mockRepo.SetupSequence(r => r.GetAllLookups())
-                 .Returns(initialLookups)
-                 .Returns(updatedLookups);
-
-        // Act
-        var initialResult = _service.GetLookupValue("Testing", "1");
-        _service.ClearCache();
-        var updatedResult = _service.GetLookupValue("Testing", "1");
-
-        // Assert
-        Assert.Equal("Initial", initialResult);
-        Assert.Equal("Updated", updatedResult);
-        _mockRepo.Verify(r => r.GetAllLookups(), Times.Exactly(2));
+        _mockRepo.Verify(r => r.GetAllLookups(), Times.Once);
+        Assert.Equal("Test", result1);
+        Assert.Equal("Test", result2);
     }
 
     #endregion
@@ -256,9 +156,10 @@ public class LookupServiceTests
         // Arrange
         _mockRepo.Setup(r => r.GetAllLookups())
                  .Throws(new Exception("Database error"));
+        var service = CreateService();
 
         // Act & Assert
-        var ex = Assert.Throws<Exception>(() => _service.GetLookupValue("Testing", "1"));
+        var ex = Assert.Throws<Exception>(() => service.GetLookupValue("Testing", "1"));
         Assert.Equal("Database error", ex.Message);
     }
 
@@ -275,10 +176,11 @@ public class LookupServiceTests
             new Lookup { Id = "1", Name = "Test", LookupType = "Testing" }
         };
         _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
 
         // Act
         var tasks = Enumerable.Range(0, 100)
-            .Select(_ => Task.Run(() => _service.GetLookupValue("Testing", "1")))
+            .Select(_ => Task.Run(() => service.GetLookupValue("Testing", "1")))
             .ToArray();
 
         var results = await Task.WhenAll(tasks);
@@ -288,5 +190,42 @@ public class LookupServiceTests
         _mockRepo.Verify(r => r.GetAllLookups(), Times.Once);
     }
 
+    #endregion
+
+    #region Edge Cases
+
+    [Fact]
+    public void GetLookupValue_ShouldHandleEmptyRepository()
+    {
+        // Arrange
+        _mockRepo.Setup(r => r.GetAllLookups()).Returns(new List<Lookup>());
+        var service = CreateService();
+
+        // Act
+        var result = service.GetLookupValue("Testing", "1");
+
+        // Assert
+        Assert.Equal(string.Empty, result);
+    }
+
+    [Fact]
+    public void GetLookupValue_ShouldSkipLookupsWithNullTypeOrId()
+    {
+        // Arrange
+        var lookups = new List<Lookup>
+        {
+            new Lookup { Id = null, Name = "BadId", LookupType = "Testing" },
+            new Lookup { Id = "1", Name = "BadType", LookupType = null },
+            new Lookup { Id = "2", Name = "Valid", LookupType = "Testing" }
+        };
+        _mockRepo.Setup(r => r.GetAllLookups()).Returns(lookups);
+        var service = CreateService();
+
+        // Act
+        var result = service.GetLookupValue("Testing", "2");
+
+        // Assert
+        Assert.Equal("Valid", result);
+    }
     #endregion
 }

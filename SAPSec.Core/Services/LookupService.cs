@@ -13,15 +13,7 @@ public class LookupService : ILookupService
 {
     private readonly ILookupRepository _lookupRepository;
     private readonly ILogger<LookupService> _logger;
-
-    private readonly object _cacheLock = new();
-    private volatile bool _isCacheLoaded;
-
-    private readonly ConcurrentDictionary<(string Type, string Id), string> _lookupDictionary = new();
-
-    private readonly ConcurrentDictionary<string, List<Lookup>> _lookupsByType = new();
-
-    private List<Lookup> _allLookups = new();
+    private readonly Lazy<Dictionary<(string Type, string Id), string>> _lookupCache;
 
     public LookupService(
         ILookupRepository lookupRepository,
@@ -29,6 +21,9 @@ public class LookupService : ILookupService
     {
         _lookupRepository = lookupRepository;
         _logger = logger;
+        _lookupCache = new Lazy<Dictionary<(string Type, string Id), string>>(
+            LoadCache,
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
     /// <summary>
@@ -39,99 +34,30 @@ public class LookupService : ILookupService
         if (string.IsNullOrWhiteSpace(id))
             return string.Empty;
 
-        EnsureCacheLoaded();
-
-        return _lookupDictionary.TryGetValue((lookupType, id), out var name)
+        return _lookupCache.Value.TryGetValue((lookupType, id), out var name)
             ? name
             : string.Empty;
     }
 
-    /// <summary>
-    /// Gets all lookups of a specific type
-    /// </summary>
-    public IReadOnlyList<Lookup> GetLookupsByType(string lookupType)
+    private Dictionary<(string Type, string Id), string> LoadCache()
     {
-        EnsureCacheLoaded();
+        _logger.LogInformation("Loading lookup cache...");
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        return _lookupsByType.TryGetValue(lookupType, out var lookups)
-            ? lookups.AsReadOnly()
-            : Array.Empty<Lookup>();
-    }
+        var lookups = _lookupRepository.GetAllLookups();
 
-    /// <summary>
-    /// Gets all lookups (backwards compatibility - prefer GetLookupValue for performance)
-    /// </summary>
-    public IEnumerable<Lookup> GetAllLookups()
-    {
-        EnsureCacheLoaded();
-        return _allLookups;
-    }
+        var cache = lookups
+            .Where(l => !string.IsNullOrWhiteSpace(l.LookupType) && !string.IsNullOrWhiteSpace(l.Id))
+            .ToDictionary(
+                l => (l.LookupType, l.Id),
+                l => l.Name ?? string.Empty);
 
-    /// <summary>
-    /// Clears the cache (useful for testing or when data changes)
-    /// </summary>
-    public void ClearCache()
-    {
-        lock (_cacheLock)
-        {
-            _lookupDictionary.Clear();
-            _lookupsByType.Clear();
-            _allLookups.Clear();
-            _isCacheLoaded = false;
-            _logger.LogInformation("Lookup cache cleared");
-        }
-    }
+        stopwatch.Stop();
+        _logger.LogInformation(
+            "Lookup cache loaded: {Count} lookups in {ElapsedMs}ms",
+            cache.Count,
+            stopwatch.ElapsedMilliseconds);
 
-    private void EnsureCacheLoaded()
-    {
-        if (_isCacheLoaded)
-            return;
-
-        lock (_cacheLock)
-        {
-            if (_isCacheLoaded)
-                return;
-
-            LoadCache();
-            _isCacheLoaded = true;
-        }
-    }
-
-    private void LoadCache()
-    {
-        try
-        {
-            _logger.LogInformation("Loading lookup cache...");
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-
-            var lookups = _lookupRepository.GetAllLookups().ToList();
-            _allLookups = lookups;
-
-            foreach (var lookup in lookups)
-            {
-                if (string.IsNullOrWhiteSpace(lookup.LookupType) || string.IsNullOrWhiteSpace(lookup.Id))
-                    continue;
-
-                _lookupDictionary[(lookup.LookupType, lookup.Id)] = lookup.Name ?? string.Empty;
-
-                if (!_lookupsByType.ContainsKey(lookup.LookupType))
-                {
-                    _lookupsByType[lookup.LookupType] = new List<Lookup>();
-                }
-                _lookupsByType[lookup.LookupType].Add(lookup);
-            }
-
-            stopwatch.Stop();
-            _logger.LogInformation(
-                "Lookup cache loaded: {Count} lookups, {TypeCount} types in {ElapsedMs}ms",
-                lookups.Count,
-                _lookupsByType.Count,
-                stopwatch.ElapsedMilliseconds);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error loading lookup cache");
-            throw;
-        }
+        return cache;
     }
 }
