@@ -10,33 +10,34 @@ namespace SAPData.Models
 
     public class DataMapRow
     {
-        public string Range { get; set; }                // e.g., SCHOOL
-        public string Ref { get; set; }                 // e.g., 24_KS4_AT8_TOT
-        public string PropertyName { get; set; }
-        public string PropertyDescription { get; set; }
-        public string Source { get; set; }             // e.g., EES
-        public string Type { get; set; }           // e.g., KS4_Performance
-        public string Subtype { get; set; }            // e.g., Performance
-        public string Year { get; set; }               // e.g., 2024-2025
-        public string YearDesc { get; set; }
-        public string FileName { get; set; }           // e.g., 202425_performance_tables_schools_provisional.csv
-        public string Field { get; set; }              // e.g., attainment8_average
-        public string DataType { get; set; }           // e.g., int
-        public string RecordFilterBy { get; set; }     // e.g., URN
-        public string Filter { get; set; }             // e.g., breakdown
-        public string FilterValue { get; set; }        // e.g., Total
-        public string Filter2 { get; set; }            // optional
-        public string Filter2Value { get; set; }       // optional
-        public string Filter3 { get; set; }            // optional
-        public string Filter3Value { get; set; }       // optional
+        public string Range { get; set; } = "";               // e.g., SCHOOL
+        public string Ref { get; set; } = "";               // e.g., 24_KS4_AT8_TOT
+        public string PropertyName { get; set; } = "";
+        public string PropertyDescription { get; set; } = "";
+        public string Source { get; set; } = "";             // e.g., EES
+        public string Type { get; set; } = "";           // e.g., KS4_Performance
+        public string Subtype { get; set; } = "";            // e.g., Performance
+        public string Year { get; set; } = "";               // e.g., 2024-2025
+        public string YearDesc { get; set; } = "";
+        public string FileName { get; set; } = "";           // e.g., 202425_performance_tables_schools_provisional.csv
+        public string Field { get; set; } = "";              // e.g., attainment8_average
+        public string DataType { get; set; } = "";           // e.g., int
+        public string RecordFilterBy { get; set; } = "";     // e.g., URN
+        public string Filter { get; set; } = "";             // e.g., breakdown
+        public string FilterValue { get; set; } = "";        // e.g., Total
+        public string Filter2 { get; set; } = "";            // optional
+        public string Filter2Value { get; set; } = "";       // optional
+        public string Filter3 { get; set; } = "";            // optional
+        public string Filter3Value { get; set; } = "";       // optional
 
-        public string Filter4 { get; set; }            // optional
-        public string Filter4Value { get; set; }       // optional
-        public string Filter5 { get; set; }            // optional
-        public string Filter5Value { get; set; }       // optional
-        public string ShouldBeNormalised { get; set; }   // e.g., No -> false
-        public string NormalisedLookup { get; set; }   // optional
-        public string CompoundFields { get; set; }
+        public string Filter4 { get; set; } = "";            // optional
+        public string Filter4Value { get; set; } = "";       // optional
+        public string Filter5 { get; set; } = "";            // optional
+        public string Filter5Value { get; set; } = "";       // optional
+        public string ShouldBeNormalised { get; set; } = "";   // e.g., No -> false
+        public string NormalisedLookup { get; set; } = "";   // optional
+        public string CompoundFields { get; set; } = "";
+        public string IgnoreMapping { get; set; } = "";
 
     }
 
@@ -71,6 +72,7 @@ namespace SAPData.Models
             Map(m => m.ShouldBeNormalised).Name("ShouldBeNormalised");
             Map(m => m.NormalisedLookup).Name("NormalisedLookup");
             Map(m => m.CompoundFields).Name("CompoundFields");
+            Map(m => m.IgnoreMapping).Name("IgnoreMapping");
         }
 
 
@@ -78,7 +80,7 @@ namespace SAPData.Models
 
     public class DataMapLookup
     {
-        public string Key { get; set; }
-        public string Value { get; set; }
+        public string Key { get; set; } = "";
+        public string Value { get; set; } = "";
     }
 }

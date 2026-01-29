@@ -16,9 +16,13 @@
     <None Remove="DataMap\CleanedFiles\202324_subject_pupil_level_la_data_revised.clean.csv" />
     <None Remove="DataMap\CleanedFiles\202324_subject_school_all_exam_entriesgrades_final.clean.csv" />
     <None Remove="DataMap\CleanedFiles\202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional_v1.0.clean.csv" />
     <None Remove="DataMap\CleanedFiles\202425_performance_tables_schools_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_performance_tables_schools_provisional_v1.0.clean.csv" />
     <None Remove="DataMap\CleanedFiles\202425_subject_local_authority_pupil_entriesachievements_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_subject_local_authority_pupil_entriesachievements_provisional_v1.0.clean.csv" />
     <None Remove="DataMap\CleanedFiles\202425_subject_school_all_exam_entriesgrades_provisional.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\202425_subject_school_all_exam_entriesgrades_provisional_v1.0.clean.csv" />
     <None Remove="DataMap\CleanedFiles\2026-01-13_off_sen_primary_sim_sch_grps.clean.csv" />
     <None Remove="DataMap\CleanedFiles\2026-01-13_off_sen_primary_sim_sch_var_vals.clean.csv" />
     <None Remove="DataMap\CleanedFiles\2026-01-13_off_sen_secondary_sim_sch_grps.clean.csv" />
@@ -26,6 +30,7 @@
     <None Remove="DataMap\CleanedFiles\2223_la_char_data_revised.clean.csv" />
     <None Remove="DataMap\CleanedFiles\2223_subject_pupil_level_la_data_revised.clean.csv" />
     <None Remove="DataMap\CleanedFiles\edubasealldata20251022.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\edubasealldata20260129.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ees_ks4_inst_202223.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ees_ks4_la_202223.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ees_ks4_nat_202223.clean.csv" />
@@ -33,24 +38,57 @@
     <None Remove="DataMap\CleanedFiles\exc_nat_region_la.clean.csv" />
     <None Remove="DataMap\CleanedFiles\exc_school.clean.csv" />
     <None Remove="DataMap\CleanedFiles\GIAS.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\grouplinks_edubaseallacademiesandfree20260129.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202122_inst_rev.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202122_la_rev.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202122_nat_rev.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202223_inst_rev.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202223_la_rev.clean.csv" />
     <None Remove="DataMap\CleanedFiles\ks4_dm_ud_202223_nat_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\links_edubasealldata20260129.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_1a_absence_3term_school.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_1_absence_3term_nat_reg_la.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_2022-2023_england_ks4final.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_202324_la_char_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_202324_performance_tables_schools_final.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_202324_subject_pupil_level_la_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_202324_subject_school_all_exam_entriesgrades_final.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_2026-01-13_off_sen_primary_sim_sch_grps.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_2026-01-13_off_sen_primary_sim_sch_var_vals.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_2026-01-13_off_sen_secondary_sim_sch_grps.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_2026-01-13_off_sen_secondary_sim_sch_var_vals.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_2223_la_char_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_2223_subject_pupil_level_la_data_revised.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ees_ks4_inst_202223.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ees_ks4_la_202223.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ees_ks4_nat_202223.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_england_ks4underlying_entriesandgrades_2.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_exc_nat_region_la.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_exc_school.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ks4_dm_ud_202122_inst_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ks4_dm_ud_202122_la_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ks4_dm_ud_202122_nat_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ks4_dm_ud_202223_inst_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ks4_dm_ud_202223_la_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_ks4_dm_ud_202223_nat_rev.clean.csv" />
+    <None Remove="DataMap\CleanedFiles\manual_workforce_ptrs_2010_2024_sch.clean.csv" />
     <None Remove="DataMap\CleanedFiles\workforce_ptrs_2010_2024_sch.clean.csv" />
     <None Remove="DataMap\SourceFiles\1a_absence_3term_school.csv" />
     <None Remove="DataMap\SourceFiles\1_absence_3term_nat_reg_la.csv" />
+    <None Remove="DataMap\SourceFiles\1_absence_3term_nat_reg_la.zip" />
     <None Remove="DataMap\SourceFiles\2022-2023_england_ks4final.csv" />
     <None Remove="DataMap\SourceFiles\202324_la_char_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\202324_performance_tables_schools_final.csv" />
     <None Remove="DataMap\SourceFiles\202324_subject_pupil_level_la_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\202324_subject_school_all_exam_entriesgrades_final.csv" />
     <None Remove="DataMap\SourceFiles\202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional_v1.0.csv" />
     <None Remove="DataMap\SourceFiles\202425_performance_tables_schools_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\202425_performance_tables_schools_provisional_v1.0.csv" />
     <None Remove="DataMap\SourceFiles\202425_subject_local_authority_pupil_entriesachievements_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\202425_subject_local_authority_pupil_entriesachievements_provisional_v1.0.csv" />
     <None Remove="DataMap\SourceFiles\202425_subject_school_all_exam_entriesgrades_provisional.csv" />
+    <None Remove="DataMap\SourceFiles\202425_subject_school_all_exam_entriesgrades_provisional_v1.0.csv" />
     <None Remove="DataMap\SourceFiles\2026-01-13_off_sen_primary_sim_sch_grps.csv" />
     <None Remove="DataMap\SourceFiles\2026-01-13_off_sen_primary_sim_sch_var_vals.csv" />
     <None Remove="DataMap\SourceFiles\2026-01-13_off_sen_secondary_sim_sch_grps.csv" />
@@ -58,6 +96,7 @@
     <None Remove="DataMap\SourceFiles\2223_la_char_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\2223_subject_pupil_level_la_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\edubasealldata20251022.csv" />
+    <None Remove="DataMap\SourceFiles\edubasealldata20260129.csv" />
     <None Remove="DataMap\SourceFiles\ees_ks4_inst_202223.csv" />
     <None Remove="DataMap\SourceFiles\ees_ks4_la_202223.csv" />
     <None Remove="DataMap\SourceFiles\ees_ks4_nat_202223.csv" />
@@ -65,12 +104,41 @@
     <None Remove="DataMap\SourceFiles\exc_nat_region_la.csv" />
     <None Remove="DataMap\SourceFiles\exc_school.csv" />
     <None Remove="DataMap\SourceFiles\GIAS.CSV" />
+    <None Remove="DataMap\SourceFiles\grouplinks_edubaseallacademiesandfree20260129.csv" />
     <None Remove="DataMap\SourceFiles\ks4_dm_ud_202122_inst_rev.csv" />
     <None Remove="DataMap\SourceFiles\ks4_dm_ud_202122_la_rev.csv" />
     <None Remove="DataMap\SourceFiles\ks4_dm_ud_202122_nat_rev.csv" />
     <None Remove="DataMap\SourceFiles\ks4_dm_ud_202223_inst_rev.csv" />
     <None Remove="DataMap\SourceFiles\ks4_dm_ud_202223_la_rev.csv" />
     <None Remove="DataMap\SourceFiles\ks4_dm_ud_202223_nat_rev.csv" />
+    <None Remove="DataMap\SourceFiles\links_edubasealldata20260129.csv" />
+    <None Remove="DataMap\SourceFiles\manual_1a_absence_3term_school.csv" />
+    <None Remove="DataMap\SourceFiles\manual_1_absence_3term_nat_reg_la.csv" />
+    <None Remove="DataMap\SourceFiles\manual_2022-2023_england_ks4final.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202324_la_char_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202324_performance_tables_schools_final.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202324_subject_pupil_level_la_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202324_subject_school_all_exam_entriesgrades_final.csv" />
+    <None Remove="DataMap\SourceFiles\manual_2026-01-13_off_sen_primary_sim_sch_grps.csv" />
+    <None Remove="DataMap\SourceFiles\manual_2026-01-13_off_sen_primary_sim_sch_var_vals.csv" />
+    <None Remove="DataMap\SourceFiles\manual_2026-01-13_off_sen_secondary_sim_sch_grps.csv" />
+    <None Remove="DataMap\SourceFiles\manual_2026-01-13_off_sen_secondary_sim_sch_var_vals.csv" />
+    <None Remove="DataMap\SourceFiles\manual_2223_la_char_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\manual_2223_subject_pupil_level_la_data_revised.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ees_ks4_inst_202223.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ees_ks4_la_202223.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ees_ks4_nat_202223.csv" />
+    <None Remove="DataMap\SourceFiles\manual_england_ks4underlying_entriesandgrades_2.csv" />
+    <None Remove="DataMap\SourceFiles\manual_exc_nat_region_la.csv" />
+    <None Remove="DataMap\SourceFiles\manual_exc_school.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ks4_dm_ud_202122_inst_rev.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ks4_dm_ud_202122_la_rev.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ks4_dm_ud_202122_nat_rev.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ks4_dm_ud_202223_inst_rev.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ks4_dm_ud_202223_la_rev.csv" />
+    <None Remove="DataMap\SourceFiles\manual_ks4_dm_ud_202223_nat_rev.csv" />
+    <None Remove="DataMap\SourceFiles\manual_workforce_ptrs_2010_2024_sch.csv" />
+    <None Remove="DataMap\SourceFiles\versions.json" />
     <None Remove="DataMap\SourceFiles\workforce_ptrs_2010_2024_sch.csv" />
     <None Remove="Sql\01_create_raw_tables.sql" />
     <None Remove="Sql\02_copy_into_raw.sql" />
@@ -80,18 +148,20 @@
     <None Remove="Sql\03_v_establishment.sql" />
     <None Remove="Sql\03_v_establishment_absence.sql" />
     <None Remove="Sql\03_v_establishment_destinations.sql" />
+    <None Remove="Sql\03_v_establishment_group_links.sql" />
+    <None Remove="Sql\03_v_establishment_links.sql" />
     <None Remove="Sql\03_v_establishment_performance.sql" />
+    <None Remove="Sql\03_v_establishment_subject_entries.sql" />
     <None Remove="Sql\03_v_establishment_workforce.sql" />
     <None Remove="Sql\03_v_la_destinations.sql" />
     <None Remove="Sql\03_v_la_performance.sql" />
+    <None Remove="Sql\03_v_la_subject_entries.sql" />
     <None Remove="Sql\04_indexes.sql" />
     <None Remove="Sql\50_v_similar_schools_primary_groups.sql" />
     <None Remove="Sql\50_v_similar_schools_primary_values.sql" />
     <None Remove="Sql\50_v_similar_schools_secondary_groups.sql" />
     <None Remove="Sql\50_v_similar_schools_secondary_values.sql" />
     <None Remove="Sql\51_similar_schools_indexes.sql" />
-    <None Remove="Sql\run_all.sql" />
-    <None Remove="Sql\tablemapping.csv" />
   </ItemGroup>
 
   <ItemGroup>
@@ -109,9 +179,15 @@
     <None Update="Hashes\placeholder.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="raw_sources.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Sql\00_cleanup.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+	<None Update="Sql\run_all.sql">
+	  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
 </Project>

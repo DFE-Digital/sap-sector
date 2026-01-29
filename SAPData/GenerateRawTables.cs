@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace SAPData;
 
@@ -14,7 +15,7 @@ public class GenerateRawTables
     private readonly string _cleanDir;
     private readonly string _sqlDir;
 
-    private readonly Dictionary<string, string> _tableMappings = new();
+    private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
 
     public GenerateRawTables(string inputDir, string cleanDir, string sqlDir)
     {
@@ -47,6 +48,9 @@ public class GenerateRawTables
         File.WriteAllText(Path.Combine(_sqlDir, "02_copy_into_raw.sql"), copySql.ToString(), utf8NoBom);
         File.WriteAllText(Path.Combine(_sqlDir, "02_copy_into_raw_local.sql"), copyLocalSql.ToString(), utf8NoBom);
 
+        // Add alias rows BEFORE writing tablemapping.csv
+        AddLegacyAliasesFromRawSources();
+
         WriteTableMappings();
 
         Console.WriteLine("RAW table creation scripts generated.");
@@ -58,17 +62,32 @@ public class GenerateRawTables
         StringBuilder copySql,
         StringBuilder copyLocalSql)
     {
-        string datasetKey = Path.GetFileNameWithoutExtension(csvPath);
-        string tableName = GenerateShortTableName(datasetKey);
+        // fileKey is the actual CSV name (without extension) in your input dir.
+        // This MAY include manual_ prefix (because the blob is stored that way).
+        string fileKey = Path.GetFileNameWithoutExtension(csvPath);
 
-        _tableMappings[datasetKey] = tableName;
+        // logicalKey is the dataset identity used by DataMap / GenerateViews (no manual_ prefix)
+        bool isManual = fileKey.StartsWith("manual_", StringComparison.OrdinalIgnoreCase);
+        string logicalKey = isManual ? fileKey["manual_".Length..] : fileKey;
 
-        string cleanCsvPath = Path.Combine(_cleanDir, datasetKey + ".clean.csv");
+        // Physical table name: prefix-free, based on logical identity (stable)
+        string tableName = GenerateShortTableName(logicalKey);
 
-        Console.WriteLine($"Processing: {datasetKey}");
+        // Map BOTH keys to the same physical table
+        // - DataMap will use logicalKey
+        // - Any direct lookups / legacy scripts may still use fileKey
+        if (_tableMappings.ContainsKey(logicalKey))
+            Console.WriteLine($"WARNING: Duplicate logical dataset key detected: {logicalKey} (existing table '{_tableMappings[logicalKey]}', new '{tableName}')");
 
-        using var reader = new StreamReader(csvPath, Encoding.UTF8, false);
-        using var writer = new StreamWriter(cleanCsvPath, false, new UTF8Encoding(false));
+        _tableMappings[logicalKey] = tableName;
+        _tableMappings[fileKey] = tableName;
+
+        string cleanCsvPath = Path.Combine(_cleanDir, fileKey + ".clean.csv");
+
+        Console.WriteLine($"Processing: {fileKey}");
+
+        using var reader = new StreamReader(csvPath, Encoding.UTF8, true);
+        using var writer = new StreamWriter(cleanCsvPath, false, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false));
 
         // -----------------------------
         // Header
@@ -95,13 +114,11 @@ public class GenerateRawTables
 
             if (row.Count < columnCount)
             {
-                // Pad missing trailing columns
                 while (row.Count < columnCount)
                     row.Add("");
             }
             else if (row.Count > columnCount)
             {
-                // Truncate overflow safely
                 row = row.Take(columnCount).ToList();
             }
 
@@ -141,6 +158,155 @@ public class GenerateRawTables
     }
 
     // =====================================================
+    // ALIASING: raw_sources.json FileName -> raw table
+    // =====================================================
+    private void AddLegacyAliasesFromRawSources()
+    {
+        var rawSourcesPath = Path.Combine("SAPData", "raw_sources.json");
+        var manifestPath = Path.Combine(_inputDir, "versions.json");
+
+        if (!File.Exists(rawSourcesPath))
+        {
+            Console.WriteLine($"Alias mapping skipped: raw_sources.json not found at {rawSourcesPath}");
+            return;
+        }
+
+        if (!File.Exists(manifestPath))
+        {
+            Console.WriteLine($"Alias mapping skipped: versions.json not found in input dir ({manifestPath})");
+            return;
+        }
+
+        Dictionary<string, ManifestEntry> manifest;
+        try
+        {
+            manifest = LoadManifest(manifestPath);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Alias mapping skipped: failed to parse versions.json. {ex.Message}");
+            return;
+        }
+
+        RawSourceEntry[] sources;
+        try
+        {
+            sources = JsonSerializer.Deserialize<RawSourceEntry[]>(File.ReadAllText(rawSourcesPath))
+                      ?? Array.Empty<RawSourceEntry>();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Alias mapping skipped: failed to parse raw_sources.json. {ex.Message}");
+            return;
+        }
+
+        foreach (var s in sources)
+        {
+            if (string.IsNullOrWhiteSpace(s.Type) ||
+                string.IsNullOrWhiteSpace(s.Subtype) ||
+                string.IsNullOrWhiteSpace(s.Year) ||
+                string.IsNullOrWhiteSpace(s.SourceOrg) ||
+                string.IsNullOrWhiteSpace(s.FileName))
+            {
+                continue;
+            }
+
+            var baseKey = MakeKey($"{s.Type}_{s.Subtype}_{s.Year}");
+
+            // Resolve which datasetKey exists in _tableMappings
+            // - GIAS: baseKey
+            // - EES: baseKey_v{eesLatestVersion} (from manifest)
+            string? actualDatasetKey = null;
+
+            if (s.SourceOrg.Equals("GIAS", StringComparison.OrdinalIgnoreCase))
+            {
+                actualDatasetKey = baseKey;
+            }
+            else if (s.SourceOrg.Equals("EES", StringComparison.OrdinalIgnoreCase))
+            {
+                if (manifest.TryGetValue(baseKey, out var me) && !string.IsNullOrWhiteSpace(me.EesLatestVersion))
+                {
+                    actualDatasetKey = $"{baseKey}_v{me.EesLatestVersion}";
+                }
+                else
+                {
+                    // Fallback: pick any mapping that matches baseKey_v*
+                    actualDatasetKey = _tableMappings.Keys
+                        .FirstOrDefault(k => k.StartsWith(baseKey + "_v", StringComparison.OrdinalIgnoreCase));
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(actualDatasetKey))
+                continue;
+
+            if (!_tableMappings.TryGetValue(actualDatasetKey, out var rawTable))
+                continue;
+
+            // Convert FileName pattern to exact legacy key for mapping
+            var legacyKey = s.FileName.Trim();
+
+            if (legacyKey.Contains("YYYYmmDD", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!manifest.TryGetValue(baseKey, out var me) || string.IsNullOrWhiteSpace(me.LastSuccessDate))
+                    continue;
+
+                legacyKey = legacyKey.Replace("YYYYmmDD", me.LastSuccessDate, StringComparison.OrdinalIgnoreCase);
+            }
+
+            // Alias row: legacyKey -> rawTable
+            _tableMappings[legacyKey] = rawTable;
+        }
+    }
+
+    private static Dictionary<string, ManifestEntry> LoadManifest(string path)
+    {
+        using var doc = JsonDocument.Parse(File.ReadAllText(path));
+        var root = doc.RootElement;
+
+        var result = new Dictionary<string, ManifestEntry>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var prop in root.EnumerateObject())
+        {
+            var key = prop.Name;
+            var obj = prop.Value;
+
+            string? lastSuccessDate = null;
+            string? eesLatestVersion = null;
+
+            if (obj.ValueKind == JsonValueKind.Object)
+            {
+                if (obj.TryGetProperty("lastSuccessDate", out var d) && d.ValueKind == JsonValueKind.String)
+                    lastSuccessDate = d.GetString();
+
+                if (obj.TryGetProperty("eesLatestVersion", out var v) && v.ValueKind == JsonValueKind.String)
+                    eesLatestVersion = v.GetString();
+            }
+
+            result[key] = new ManifestEntry(lastSuccessDate, eesLatestVersion);
+        }
+
+        return result;
+    }
+
+    private sealed record ManifestEntry(string? LastSuccessDate, string? EesLatestVersion);
+
+    private sealed record RawSourceEntry(
+        string? Type,
+        string? Subtype,
+        string? Year,
+        string? SourceOrg,
+        string? FileName
+    );
+
+    private static string MakeKey(string composite)
+    {
+        return new string(composite
+            .Select(c => char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == '.' ? c : '_')
+            .ToArray())
+            .ToLowerInvariant();
+    }
+
+    // =====================================================
     // TABLE MAPPING
     // =====================================================
     private void WriteTableMappings()
@@ -148,7 +314,7 @@ public class GenerateRawTables
         string mappingPath = Path.Combine(_sqlDir, "tablemapping.csv");
 
         using var writer = new StreamWriter(mappingPath, false, Encoding.UTF8);
-        foreach (var kvp in _tableMappings.OrderBy(k => k.Key))
+        foreach (var kvp in _tableMappings.OrderBy(k => k.Key, StringComparer.OrdinalIgnoreCase))
         {
             writer.WriteLine($"{kvp.Key},{kvp.Value}");
         }
@@ -159,25 +325,40 @@ public class GenerateRawTables
     // =====================================================
     // HELPERS
     // =====================================================
-    private static string GenerateShortTableName(string datasetKey)
+    private static string GenerateShortTableName(string logicalKey)
     {
         using var sha1 = SHA1.Create();
-        var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(datasetKey));
-        string shortHash = BitConverter.ToString(hash).Replace("-", "").Substring(0, 8).ToLowerInvariant();
 
-        string prefix = Sanitise(datasetKey);
-        if (prefix.Length > 18)
-            prefix = prefix.Substring(0, 18);
+        var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(logicalKey));
+        string shortHash = BitConverter
+            .ToString(hash)
+            .Replace("-", "")
+            .Substring(0, 10)
+            .ToLowerInvariant();
 
-        return $"raw_{prefix}_{shortHash}";
+        string baseName = Sanitise(logicalKey);
+
+        if (baseName.Length > 20)
+            baseName = baseName.Substring(0, 20);
+
+        // Always prefix raw tables with t_
+        // (so cleanup can safely target t_% and names never start with a digit)
+        return $"t_{baseName}_{shortHash}";
     }
-
 
     private static string Sanitise(string input)
     {
-        return input
-            .Trim()
-            .Replace("-", "_");
+        var sb = new StringBuilder();
+
+        foreach (var c in input.Trim())
+        {
+            if (char.IsLetterOrDigit(c) || c == '_')
+                sb.Append(c);
+            else
+                sb.Append('_');
+        }
+
+        return sb.ToString().ToLowerInvariant();
     }
 
 
@@ -231,5 +412,4 @@ public class GenerateRawTables
 
         return value;
     }
-
 }

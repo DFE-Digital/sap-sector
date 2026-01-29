@@ -10,12 +10,16 @@
 \ir 03_v_england_destinations.sql
 \ir 03_v_england_performance.sql
 \ir 03_v_establishment.sql
+\ir 03_v_establishment_links.sql
+\ir 03_v_establishment_group_links.sql
+\ir 03_v_establishment_subject_entries.sql
 \ir 03_v_establishment_absence.sql
 \ir 03_v_establishment_destinations.sql
 \ir 03_v_establishment_performance.sql
 \ir 03_v_establishment_workforce.sql
 \ir 03_v_la_destinations.sql
 \ir 03_v_la_performance.sql
+\ir 03_v_la_subject_entries.sql
 \ir 04_indexes.sql
 --\ir 05_validation.sql
 \ir 50_v_similar_schools_secondary_groups.sql

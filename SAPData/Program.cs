@@ -71,6 +71,7 @@ internal class Program
         // -------------------------------------------------
         new GenerateSimilarSchoolsIndexes(sqlDir).Run();
 
+
         Console.WriteLine("Run Complete.");
 
         // Optional: avoid blocking in CI
