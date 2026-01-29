@@ -428,7 +428,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         await Page.GotoAsync(_fixture.BaseUrl);
 
         // Act
-        var cookiesLink = Page.Locator(".govuk-footer__link[href*='Cookies']");
+        var cookiesLink = Page.Locator(".govuk-footer__link[href*='cookies']");
         var isVisible = await cookiesLink.IsVisibleAsync();
 
         // Assert
