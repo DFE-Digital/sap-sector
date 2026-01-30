@@ -55,7 +55,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
         type.Should().Be("image/svg+xml");
 
         // Check mask-icon
-        var maskIconHref =  await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("href");
+        var maskIconHref = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("href");
         var maskIconColor = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("color");
         maskIconHref.Should().Be("/assets/images/govuk-icon-mask.svg");
         maskIconColor.Should().Be("#0b0c0c");
@@ -112,7 +112,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
 
         var footerLinks = new Dictionary<string, string>
         {
-            { "Cookies", "/StaticContent/Cookies" },
+            { "Cookies", "/cookies" },
             { "Accessibility", "/accessibility" },
             { "Terms of use", "/terms-of-use" },
             { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" }
