@@ -1,0 +1,651 @@
+name: School Profile Data Ingestion Pipeline
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"   # every day at 06:00 UTC
+
+permissions:
+  contents: write
+  id-token: write   # required if using OIDC with azure/login
+
+jobs:
+  ingest:
+    name: Ingest Raw Data & Build Warehouse
+    runs-on: ubuntu-latest
+    environment: test
+
+    env:
+      # Blob (currently from GitHub secrets)
+      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+      AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
+
+      # Sensitive source URLs (THREE endpoints in GitHub secrets)
+      SENSITIVE_DATASET_URL: ${{ secrets.SENSITIVE_DATASET_URL }}
+      SENSITIVE_ESTABLISHMENT_LINKS_URL: ${{ secrets.SENSITIVE_ESTABLISHMENT_LINKS_URL }}
+      SENSITIVE_MAT_LINKS_URL: ${{ secrets.SENSITIVE_MAT_LINKS_URL }}
+
+
+      # Konduit / AKS settings (also in GitHub secrets)
+      AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+      AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+      AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
+      KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
+
+    steps:
+      # ==============================
+      # 1. Checkout repo
+      # ==============================
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      # ==============================
+      # 2. Install dependencies
+      # ==============================
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            postgresql-client \
+            powershell \
+            unzip
+
+      - name: Install .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Install Azure CLI
+        run: |
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+      # ==============================
+      # 3. Azure login (needed for az aks get-credentials)
+      # ==============================
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # ==============================
+      # 4. AKS access + konduit install
+      # ==============================
+      - name: Install kubectl (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="v1.29.8"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client=true
+
+      - name: Install kubelogin (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBELOGIN_VERSION="v0.1.6"
+          curl -fsSLo kubelogin.zip "https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip"
+          unzip -q kubelogin.zip
+          sudo install -m 0755 bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
+          kubelogin --version
+
+      - name: Configure AKS credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
+          kubelogin convert-kubeconfig -l azurecli
+
+      - name: Download konduit.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
+            -o "$GITHUB_WORKSPACE/konduit.sh"
+          chmod +x "$GITHUB_WORKSPACE/konduit.sh"
+          ls -la "$GITHUB_WORKSPACE/konduit.sh"
+
+      # ==============================
+      # 5. Ensure Blob container exists (idempotent)
+      # ==============================
+      - name: Ensure Blob container exists
+        shell: pwsh
+        run: |
+          az storage container create `
+            --name $env:AZURE_STORAGE_CONTAINER `
+            --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+            --public-access off | Out-Null
+
+      # ==============================
+      # 6. Download source data and store latest versions in Blob
+      #
+      # LOGIC
+      # - GIAS: 3 sensitive URLs, resolved by yyyyMMdd backtracking.
+      #   * Url field in raw_sources.json contains a secret *token* that maps to an env var secret.
+      #   * One GIAS file is a ZIP and must be UNZIPPED before upload.
+      # - EES: only versioned API datasets are in raw_sources.json (DataSetId set, Url blank).
+      # - Unversioned/historical dataset files are manually uploaded as a one-off exercise and stored in BLOB storage.
+      #
+      # Tracks state in versions.json
+      # Outputs:
+      #   changed=True/False
+      #   latest_files={ key : filename }
+      # ==============================
+      - name: Version datasets from raw_sources.json and upload to Blob
+        id: version
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $conn = $env:AZURE_STORAGE_CONNECTION_STRING
+          $container = $env:AZURE_STORAGE_CONTAINER
+          $manifestBlobName = "versions.json"
+
+          $sourcesPathRepo = "SAPData/raw_sources.json"
+          if (-not (Test-Path $sourcesPathRepo)) {
+            throw "Could not find $sourcesPathRepo in the repo."
+          }
+
+          # Separate working dir (do NOT mix with generator input dir)
+          $workDir = "SAPData/Work/Versioning"
+          New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+
+          # -----------------------------
+          # Load sources (robust: array or single object)
+          # -----------------------------
+          $sourcesRaw = Get-Content $sourcesPathRepo -Raw | ConvertFrom-Json
+          if ($null -eq $sourcesRaw) { throw "raw_sources.json parsed to null." }
+          if ($sourcesRaw -isnot [System.Array]) { $sourcesRaw = @($sourcesRaw) }
+
+          # Normalize to objects with stable key + metadata
+          $sources = @()
+          foreach ($s in $sourcesRaw) {
+            $type     = [string]$s.Type
+            $sub      = [string]$s.Subtype
+            $year     = [string]$s.Year
+            $u        = [string]$s.Url
+            $org      = [string]$s.SourceOrg
+            $dsid     = [string]$s.DataSetId
+            $fileType = ([string]$s.FileType).ToLowerInvariant()
+            $fileName = [string]$s.FileName
+
+            if ([string]::IsNullOrWhiteSpace($type) -or
+                [string]::IsNullOrWhiteSpace($sub)  -or
+                [string]::IsNullOrWhiteSpace($year) -or
+                [string]::IsNullOrWhiteSpace($org)) {
+              throw "Each entry in raw_sources.json must include Type, Subtype, Year, SourceOrg. Offending entry: $($s | ConvertTo-Json -Compress)"
+            }
+
+            if ([string]::IsNullOrWhiteSpace($fileName)) {
+              throw "Each entry in raw_sources.json must include FileName. Offending entry: $($s | ConvertTo-Json -Compress)"
+            }
+
+            if ([string]::IsNullOrWhiteSpace($fileType)) { $fileType = "csv" }
+            if ($fileType -ne "csv" -and $fileType -ne "zip") {
+              throw "FileType must be 'csv' or 'zip'. Offending entry: $($s | ConvertTo-Json -Compress)"
+            }
+
+            # Stable internal key for manifest tracking (NOT used for final blob names)
+            $composite = "${type}_${sub}_${year}"
+            $safeKey = ($composite -replace '[^a-zA-Z0-9_\-\.]', '_').ToLowerInvariant()
+
+            $sources += [pscustomobject]@{
+              key       = $safeKey
+              url       = $u
+              type      = $type
+              subtype   = $sub
+              year      = $year
+              sourceOrg = $org
+              dataSetId = $dsid
+              fileType  = $fileType
+              fileName  = $fileName
+            }
+          }
+
+          if ($sources.Count -eq 0) { throw "No sources found in raw_sources.json" }
+          Write-Host "Loaded $($sources.Count) sources."
+
+          # Load manifest from Blob (if present)
+          $manifestPath = Join-Path $workDir "versions.json"
+          $manifest = @{}
+
+          $manifestExists = az storage blob exists `
+            --container-name $container `
+            --name $manifestBlobName `
+            --connection-string $conn | ConvertFrom-Json
+
+          if ($manifestExists.exists -eq $true) {
+            az storage blob download `
+              --container-name $container `
+              --name $manifestBlobName `
+              --file $manifestPath `
+              --connection-string $conn `
+              --overwrite true | Out-Null
+
+            $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json -AsHashtable
+          }
+
+          # -----------------------------
+          # Helpers
+          # -----------------------------
+          function Get-LondonDateYyyyMmDd([int]$daysAgo = 0) {
+            $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Europe/London")
+            $nowLondon = [TimeZoneInfo]::ConvertTime([DateTimeOffset]::UtcNow, $tz).DateTime.Date
+            return $nowLondon.AddDays(-$daysAgo).ToString("yyyyMMdd")
+          }
+
+          function Try-Head([string]$testUrl) {
+            try {
+              $h = Invoke-WebRequest -Method Head -Uri $testUrl -UseBasicParsing
+              return @{
+                ok   = $true
+                etag = $h.Headers.ETag
+                len  = $h.Headers.'Content-Length'
+                lm   = $h.Headers.'Last-Modified'
+              }
+            } catch {
+              return @{ ok = $false; etag = $null; len = $null; lm = $null }
+            }
+          }
+
+          function Try-RangeGet([string]$testUrl) {
+            try {
+              $g = Invoke-WebRequest -Method Get -Uri $testUrl -Headers @{ Range = "bytes=0-0" } -UseBasicParsing
+              return @{
+                ok   = $true
+                etag = $g.Headers.ETag
+                len  = $g.Headers.'Content-Length'
+                lm   = $g.Headers.'Last-Modified'
+              }
+            } catch {
+              return @{ ok = $false; etag = $null; len = $null; lm = $null }
+            }
+          }
+
+          function Get-EnvVarRequired([string]$name) {
+            $v = [Environment]::GetEnvironmentVariable($name)
+            if ([string]::IsNullOrWhiteSpace($v)) {
+              throw "Required environment variable/secret '$name' is not set."
+            }
+            return $v
+          }
+
+          function Resolve-GiasTemplateFromToken([string]$token) {
+            if ([string]::IsNullOrWhiteSpace($token)) { throw "GIAS Url token was blank." }
+
+            $t = $token.Trim()
+            switch ($t) {
+              "__SECRET_URL__" { return Get-EnvVarRequired "SENSITIVE_DATASET_URL" }
+              "__SECRET_ESTABLISHMENT_LINKS_URL__" { return Get-EnvVarRequired "SENSITIVE_ESTABLISHMENT_LINKS_URL" }
+              "__SECRET_MAT_LINKS_URL__" { return Get-EnvVarRequired "SENSITIVE_MAT_LINKS_URL" }
+              default { throw "Unknown GIAS secret token '$t'. Add a mapping in Resolve-GiasTemplateFromToken()." }
+            }
+          }
+
+          function Get-FirstFileFromZip([string]$zipPath, [string]$outDir) {
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            if (-not (Test-Path $zipPath)) { throw "Zip not found: $zipPath" }
+
+            $zip = [System.IO.Compression.ZipFile]::OpenRead($zipPath)
+            try {
+              $entries = @($zip.Entries | Where-Object { -not [string]::IsNullOrWhiteSpace($_.Name) })
+              if ($entries.Count -eq 0) { throw "Zip contains no files: $zipPath" }
+
+              $pick = $entries | Where-Object { $_.Name.ToLowerInvariant().EndsWith(".csv") } | Select-Object -First 1
+              if (-not $pick) { $pick = $entries | Select-Object -First 1 }
+
+              New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+              $dest = Join-Path $outDir $pick.Name
+
+              $destParent = Split-Path $dest -Parent
+              if ($destParent) { New-Item -ItemType Directory -Force -Path $destParent | Out-Null }
+
+              [System.IO.Compression.ZipFileExtensions]::ExtractToFile($pick, $dest, $true)
+              return $dest
+            } finally {
+              $zip.Dispose()
+            }
+          }
+
+          # -----------------------------
+          # Main loop
+          # -----------------------------
+          $anyChanged = $false
+          $manifestChanged = $false
+          $latestFiles = @{}
+
+          foreach ($src in $sources) {
+            $key         = [string]$src.key
+            $org         = [string]$src.sourceOrg
+            $dsid        = [string]$src.dataSetId
+            $urlToken    = [string]$src.url
+            $fileType    = [string]$src.fileType
+            $fileNameTpl = [string]$src.fileName
+
+            if (-not $manifest.ContainsKey($key)) {
+              $manifest[$key] = @{ latest = 0; lastSignature = ""; lastFileName = "" }
+              $manifestChanged = $true
+            }
+
+            $prevSig = [string]$manifest[$key].lastSignature
+            $latest  = [int]$manifest[$key].latest
+
+            $forcedSignature = $null
+            $signature = $null
+            $finalName = $null
+            $downloadUrl = $null
+
+            $hasUrlToken = -not [string]::IsNullOrWhiteSpace($urlToken)
+            $hasDsid     = -not [string]::IsNullOrWhiteSpace($dsid)
+
+            # -------------------------------------------------
+            # Branch A: GIAS (dated URL probing)
+            # -------------------------------------------------
+            if ($org -eq "GIAS") {
+              if (-not $hasUrlToken) { throw "GIAS entry '$key' must include Url token (e.g. __SECRET_URL__)." }
+
+              $template = Resolve-GiasTemplateFromToken $urlToken
+              if ($template -notmatch "\{fileDatePostfix\}") {
+                throw "GIAS secret template for '$key' must include {fileDatePostfix} placeholder."
+              }
+
+              if ($fileNameTpl -notmatch "YYYYmmDD") {
+                throw "GIAS FileName for '$key' must contain 'YYYYmmDD' (e.g. edubasealldataYYYYmmDD)."
+              }
+
+              $maxLookbackDays = 30
+              if ($manifest[$key].ContainsKey("lastSuccessDate")) {
+                $lastSuccess = [string]$manifest[$key].lastSuccessDate
+                if ($lastSuccess -match '^\d{8}$') {
+                  $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Europe/London")
+                  $nowLondon = [TimeZoneInfo]::ConvertTime([DateTimeOffset]::UtcNow, $tz).DateTime.Date
+                  $lastDt = [DateTime]::ParseExact($lastSuccess, "yyyyMMdd", [System.Globalization.CultureInfo]::InvariantCulture)
+                  $d = [int]($nowLondon - $lastDt).TotalDays
+                  if ($d -gt 0) { $maxLookbackDays = [Math]::Min([Math]::Max($d, 1), 90) }
+                }
+              }
+
+              $resolvedDate = $null
+              $resolvedUrl  = $null
+              $resolvedHdr  = $null
+
+              for ($i = 0; $i -le $maxLookbackDays; $i++) {
+                $d = Get-LondonDateYyyyMmDd -daysAgo $i
+                $candidate = $template.Replace("{fileDatePostfix}", $d)
+
+                $hdr = Try-Head $candidate
+                if (-not $hdr.ok) { $hdr = Try-RangeGet $candidate }
+
+                if ($hdr.ok) {
+                  $resolvedDate = $d
+                  $resolvedUrl  = $candidate
+                  $resolvedHdr  = $hdr
+                  break
+                }
+              }
+
+              if (-not $resolvedUrl) {
+                throw "GIAS file not found for today or last $maxLookbackDays days (URL hidden)."
+              }
+
+              $downloadUrl = $resolvedUrl
+              $manifest[$key].lastSuccessDate = $resolvedDate
+
+              # Name blob from raw_sources.FileName:
+              $resolvedBase = $fileNameTpl.Replace("YYYYmmDD", $resolvedDate)
+              $finalName = "${resolvedBase}.csv"
+
+              # Signature includes date + headers so same-date updates can be detected
+              $parts = @("giasDate:$resolvedDate")
+              if ($resolvedHdr.etag) { $parts += "etag:$($resolvedHdr.etag)" }
+              if ($resolvedHdr.lm)   { $parts += "lm:$($resolvedHdr.lm)" }
+              if ($resolvedHdr.len)  { $parts += "len:$($resolvedHdr.len)" }
+              $forcedSignature = ($parts -join "|")
+            }
+
+            # -------------------------------------------------
+            # Branch B: EES versioned API
+            # -------------------------------------------------
+            if (-not $finalName -and $org -eq "EES") {
+              if (-not $hasDsid -or $hasUrlToken) {
+                throw "Invalid EES config for '$key': must have DataSetId set AND Url blank."
+              }
+
+              $versionsUrl = "https://api.education.gov.uk/statistics/v1/data-sets/$dsid/versions"
+              $versions = Invoke-WebRequest -Uri $versionsUrl -UseBasicParsing |
+                Select-Object -ExpandProperty Content | ConvertFrom-Json
+
+              $published = @($versions.results | Where-Object { $_.status -eq "Published" })
+              if ($published.Count -eq 0) { throw "No Published versions returned for datasetId '$dsid'." }
+
+              $latestPub = $published | Sort-Object { [DateTimeOffset]$_.published } -Descending | Select-Object -First 1
+              $dataSetVersion = [string]$latestPub.version
+
+              $downloadUrl = "https://api.education.gov.uk/statistics/v1/data-sets/$dsid/csv?dataSetVersion=$dataSetVersion"
+              $forcedSignature = "ees:$dsid|version:$dataSetVersion"
+
+              $finalName = "${fileNameTpl}_v${dataSetVersion}.csv"
+              $manifest[$key].eesLatestVersion = $dataSetVersion
+            }
+
+            if (-not $finalName) {
+              throw "Unsupported source config for '$key'. SourceOrg must be GIAS or EES."
+            }
+
+            if ([string]::IsNullOrWhiteSpace($downloadUrl)) {
+              throw "Internal error: downloadUrl not resolved for '$key'."
+            }
+
+            $signature = $forcedSignature
+            if ([string]::IsNullOrWhiteSpace($signature)) {
+              throw "Internal error: forced signature missing for '$key'."
+            }
+
+            $isChanged = ($latest -eq 0) -or ($signature -ne $prevSig)
+
+            if ($isChanged) {
+              $oldBlobName = [string]$manifest[$key].lastFileName
+
+              # -----------------------------
+              # Download -> (optional unzip) -> upload
+              # -----------------------------
+              $tmpDownloadPath = Join-Path $workDir "${key}.download"
+              if ($org -eq "GIAS" -and $fileType -eq "zip") {
+                $tmpDownloadPath = "${tmpDownloadPath}.zip"
+              } else {
+                $tmpDownloadPath = "${tmpDownloadPath}.csv"
+              }
+
+              Write-Host "Downloading ${key} to: $tmpDownloadPath"
+              Invoke-WebRequest -Uri $downloadUrl -OutFile $tmpDownloadPath -UseBasicParsing
+
+              if (-not (Test-Path $tmpDownloadPath)) {
+                throw "Download failed; file not found: $tmpDownloadPath"
+              }
+
+              $uploadPath = $tmpDownloadPath
+              if ($fileType -eq "zip") {
+                $unzDir = Join-Path $workDir "${key}.unzipped"
+                $uploadPath = Get-FirstFileFromZip -zipPath $tmpDownloadPath -outDir $unzDir
+
+                if (-not (Test-Path $uploadPath)) {
+                  throw "Zip extraction failed; extracted file not found: $uploadPath"
+                }
+              }
+
+              Write-Host "Uploading ${key} -> ${finalName} (from $uploadPath)"
+              az storage blob upload `
+                --container-name $container `
+                --name $finalName `
+                --file "$uploadPath" `
+                --connection-string $conn `
+                --overwrite | Out-Null
+
+              # delete previous version (only after successful upload)
+              if (-not [string]::IsNullOrWhiteSpace($oldBlobName) -and
+                  -not ($oldBlobName.Equals($finalName, [StringComparison]::OrdinalIgnoreCase))) {
+
+                $oldExists = az storage blob exists `
+                  --container-name $container `
+                  --name $oldBlobName `
+                  --connection-string $conn | ConvertFrom-Json
+
+                if ($oldExists.exists -eq $true) {
+                  Write-Host "Deleting old blob for ${key}: ${oldBlobName}"
+                  az storage blob delete `
+                    --container-name $container `
+                    --name $oldBlobName `
+                    --connection-string $conn | Out-Null
+                }
+              }
+
+              $anyChanged = $true
+              $manifest[$key].latest = ($latest + 1)
+              $manifest[$key].lastSignature = $signature
+              $manifest[$key].lastFileName = $finalName
+              $latestFiles[$key] = $finalName
+
+              # IMPORTANT: only say UPDATED after success
+              Write-Host "UPDATED: ${key} -> ${finalName}"
+            }
+            else {
+              $lastFile = [string]$manifest[$key].lastFileName
+              if ([string]::IsNullOrWhiteSpace($lastFile)) { $lastFile = $finalName }
+              $latestFiles[$key] = $lastFile
+              Write-Host "UNCHANGED: ${key} remains ${lastFile}"
+            }
+          }
+
+          # Upload manifest if anything changed OR we updated manifest metadata
+          if ($anyChanged -or $manifestChanged) {
+            $json = $manifest | ConvertTo-Json -Depth 30
+            [System.IO.File]::WriteAllText($manifestPath, $json, (New-Object System.Text.UTF8Encoding($false)))
+
+            az storage blob upload `
+              --container-name $container `
+              --name $manifestBlobName `
+              --file "$manifestPath" `
+              --connection-string $conn `
+              --overwrite | Out-Null
+          }
+
+          # Outputs
+          "changed=$anyChanged" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          $latestFilesJson = ($latestFiles | ConvertTo-Json -Depth 10 -Compress)
+          "latest_files=$latestFilesJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+
+      # ==============================
+      # 7. Download generator inputs from Blob Storage
+      #    - Downloads:
+      #        (A) ALL manual_* blobs (canonical manual uploads)
+      #        (B) ONLY the LATEST managed blobs (from step 6 output latest_files)
+      #    - Skips everything else (old managed versions, legacy leftovers, stray blobs)
+      # ==============================
+      - name: Download generator inputs from Blob Storage (manual_* + latest managed only)
+        shell: pwsh
+        env:
+          LATEST_FILES: ${{ steps.version.outputs.latest_files }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          $rawDir = "SAPData/DataMap/SourceFiles"
+          New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
+          Get-ChildItem -Path $rawDir -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
+
+          # ---- Load latest managed filenames from step 6 output ----
+          $latest = $env:LATEST_FILES | ConvertFrom-Json -AsHashtable
+          if (-not $latest -or $latest.Keys.Count -eq 0) { throw "LATEST_FILES output was empty." }
+
+          $latestManagedFiles = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
+          foreach ($k in $latest.Keys) {
+            $fn = [string]$latest[$k]
+            if ([string]::IsNullOrWhiteSpace($fn)) { throw "LATEST_FILES contained an empty filename for key '$k'" }
+            [void]$latestManagedFiles.Add($fn)
+          }
+
+          # ---- List all blobs in container ----
+          $blobNamesJson = az storage blob list `
+            --container-name $env:AZURE_STORAGE_CONTAINER `
+            --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+            --query "[].name" -o json
+
+          $blobNames = $blobNamesJson | ConvertFrom-Json
+          if ($blobNames -isnot [System.Array]) { $blobNames = @($blobNames) }
+          if (-not $blobNames -or $blobNames.Count -eq 0) {
+            throw "No blobs found in container '$($env:AZURE_STORAGE_CONTAINER)'."
+          }
+
+          # ---- Decide what to download ----
+          # Rule:
+          #   - Download if blob is manual_* (canonical manual uploads)
+          #   - Download if blob is exactly one of the latest managed filenames
+          #   - Otherwise skip
+          $toDownload = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
+
+          foreach ($blob in $blobNames) {
+            if ([string]::IsNullOrWhiteSpace($blob)) { continue }
+
+            $lower = $blob.ToLowerInvariant()
+
+            if ($lower.StartsWith("manual_")) {
+              [void]$toDownload.Add($blob)
+              continue
+            }
+
+            if ($latestManagedFiles.Contains($blob)) {
+              [void]$toDownload.Add($blob)
+              continue
+            }
+          }
+
+          # Safety: ensure all latest managed files are included
+          foreach ($mf in $latestManagedFiles) { [void]$toDownload.Add($mf) }
+
+          if ($toDownload.Count -eq 0) { throw "No blobs selected for download." }
+
+          Write-Host "Downloading $($toDownload.Count) blobs (manual_* + latest managed only)"
+          foreach ($blob in $toDownload) {
+            $dest = Join-Path $rawDir $blob
+
+            az storage blob download `
+              --container-name $env:AZURE_STORAGE_CONTAINER `
+              --name $blob `
+              --file $dest `
+              --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+              --overwrite true | Out-Null
+          }
+
+          Write-Host "Downloaded files:"
+          $files = Get-ChildItem -Path $rawDir -File | Sort-Object Name
+          $files | Select-Object Name, Length | Format-Table -AutoSize
+
+      # ==============================
+      # 8. Build + Run SQL generator
+      # ==============================
+      - name: Build SQL Generator
+        run: |
+          dotnet build SAPSec.sln --configuration Release
+
+      - name: Generate SQL Scripts
+        run: |
+          dotnet run --configuration Release --project SAPData/SAPData.csproj
+          echo "Generated SQL scripts."
+
+      # ==============================
+      # 9. Run ETL via konduit (private DB)
+      # ==============================
+      - name: Run ETL pipeline via konduit
+        working-directory: SAPData/Sql
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo "Running ETL via konduit"
+          ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
+          "$GITHUB_WORKSPACE/konduit.sh" -n "${AKS_NAMESPACE}" -t 7200 -x \
+            -i "$GITHUB_WORKSPACE/SAPData/Sql/run_all.sql" \
+            "${KONDUIT_APP_NAME}" -- psql
