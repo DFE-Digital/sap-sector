@@ -65,6 +65,21 @@ jobs:
     name: Run Unit & Integration Tests with Coverage
     if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
 
     steps:
     - name: Check out repository
@@ -113,6 +128,9 @@ jobs:
       env:
         HEADED: 0
         PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
+        
+        TEST_DB: Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres
+        TEST_DB_NAME: sapsec_test
       run: |
         TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
 

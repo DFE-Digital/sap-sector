@@ -15,6 +15,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GovUk.Frontend.AspNetCore;
+using Npgsql;
 
 namespace SAPSec.Web;
 
@@ -115,9 +116,14 @@ public class Program
 
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
+        builder.Services.AddSingleton<NpgsqlDataSource>(sp =>
+        {
+            var config = sp.GetRequiredService<IConfiguration>();
+            var connectionString = config.GetConnectionString("Postgres");
 
-
-
+            return NpgsqlDataSource.Create(connectionString);
+        });
+        
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
         builder.Services.AddLuceneDependencies();
 
