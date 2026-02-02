@@ -129,6 +129,10 @@ jobs:
         HEADED: 0
         PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
         
+        # This fixes "Host can't be null" when Program.cs calls GetConnectionString("Postgres")
+        ConnectionStrings__Postgres: Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres
+
+        # Your PostgresFixture uses these
         TEST_DB: Host=localhost;Port=5432;Database=postgres;Username=postgres;Password=postgres
         TEST_DB_NAME: sapsec_test
       run: |
