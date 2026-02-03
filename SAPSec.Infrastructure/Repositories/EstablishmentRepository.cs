@@ -1,70 +1,38 @@
-﻿using Dapper;
-using Microsoft.Extensions.Logging;
-using Npgsql;
-using SAPSec.Core.Interfaces.Repositories;
+﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Model;
+using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Interfaces.Repositories.Generic;
 
 namespace SAPSec.Infrastructure.Repositories
 {
     public class EstablishmentRepository : IEstablishmentRepository
     {
-        private readonly ILogger<EstablishmentRepository> _logger;
-        private readonly NpgsqlDataSource _dataSource;
+        private readonly IGenericRepository<Establishment> _establishmentMetadataRepository;
+        private ILogger<Establishment> _logger;
 
         public EstablishmentRepository(
-            ILogger<EstablishmentRepository> logger,
-            NpgsqlDataSource dataSource)
+            IGenericRepository<Establishment> establishmentMetadataRepository, 
+            ILogger<Establishment> logger)
         {
+            _establishmentMetadataRepository = establishmentMetadataRepository;
             _logger = logger;
-            _dataSource = dataSource;
         }
+
 
         public IEnumerable<Establishment> GetAllEstablishments()
         {
-            using var conn = _dataSource.OpenConnection();
-            
-            const string sql = """
-                SELECT *
-                FROM public.v_establishment;
-            """;
-
-            return conn.Query<Establishment>(sql).ToList();
+            return _establishmentMetadataRepository.ReadAll() ?? [];
         }
+
 
         public Establishment GetEstablishment(string urn)
         {
-            if (string.IsNullOrWhiteSpace(urn))
-                return new Establishment();
-
-            using var conn = _dataSource.OpenConnection();
-            
-            const string sql = """
-                SELECT *
-                FROM public.v_establishment
-               WHERE "URN" = @urn
-                LIMIT 1;
-            """;
-
-            return conn.QuerySingleOrDefault<Establishment>(sql, new { urn }) ?? new Establishment();
+            return GetAllEstablishments().FirstOrDefault(x => x.URN == urn) ?? new Establishment();
         }
 
         public Establishment GetEstablishmentByAnyNumber(string number)
         {
-            if (string.IsNullOrWhiteSpace(number))
-                return new Establishment();
-
-            using var conn = _dataSource.OpenConnection();
-            
-            const string sql = """
-                SELECT *
-                FROM public.v_establishment
-               WHERE "URN" = @number
-                      OR "UKPRN" = @number
-                      OR "DfENumberSearchable" = @number
-                LIMIT 1;
-            """;
-
-            return conn.QuerySingleOrDefault<Establishment>(sql, new { number }) ?? new Establishment();
+            return GetAllEstablishments().FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.DfENumberSearchable == number) ?? new Establishment();
         }
     }
 }

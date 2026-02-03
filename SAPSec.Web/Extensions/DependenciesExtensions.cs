@@ -49,7 +49,7 @@ namespace SAPSec.Web.Extensions
 
 
             services.AddSingleton<IGenericRepository<Establishment>, JSONRepository<Establishment>>();
-            services.AddSingleton<IEstablishmentRepository, EstablishmentRepository>();
+            services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
 
             services.AddSingleton<IGenericRepository<EstablishmentPerformance>, JSONRepository<EstablishmentPerformance>>();

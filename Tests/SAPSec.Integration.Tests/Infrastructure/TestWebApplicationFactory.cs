@@ -6,7 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Infrastructure.Repositories;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
 
@@ -59,6 +61,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 		        services.RemoveAll<IDsiClient>();
 				services.AddScoped<IUserService, MockDsiUserService>();
         		services.AddScoped<IDsiClient, MockDsiApiService>();
+                
+                services.AddScoped<IEstablishmentRepository, EstablishmentRepository>();
+
             });
     }
 

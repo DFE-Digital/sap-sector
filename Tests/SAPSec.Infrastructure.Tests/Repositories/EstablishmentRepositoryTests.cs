@@ -1,145 +1,92 @@
-﻿using Dapper;
-using Microsoft.Extensions.Logging.Abstractions;
+﻿using Microsoft.Extensions.Logging;
+using Moq;
 using SAPSec.Core.Model;
+using SAPSec.Core.Interfaces.Repositories.Generic;
 using SAPSec.Infrastructure.Repositories;
 
 namespace SAPSec.Infrastructure.Tests.Repositories
 {
-
-    public class EstablishmentRepositoryTests : IClassFixture<PostgresFixture>
+    public class EstablishmentRepositoryTests
     {
-        private readonly PostgresFixture _fx;
+        private readonly Mock<IGenericRepository<Establishment>> _mockGenericRepo;
+        private readonly Mock<ILogger<Establishment>> _mockLogger;
+        private readonly EstablishmentRepository _sut;
 
-        public EstablishmentRepositoryTests(PostgresFixture fx)
+        public EstablishmentRepositoryTests()
         {
-            _fx = fx;
+            _mockGenericRepo = new Mock<IGenericRepository<Establishment>>();
+            _mockLogger = new Mock<ILogger<Establishment>>();
+            _sut = new EstablishmentRepository(_mockGenericRepo.Object, _mockLogger.Object);
         }
 
         [Fact]
-        public async Task GetAllEstablishments_ReturnsAllItemsFromDatabase()
+        public void GetAllEstablishments_ReturnsAllItemsFromGenericRepository()
         {
-            await _fx.ResetAsync();
-            await SeedAsync(
+            // Arrange
+            var expected = new List<Establishment>
+            {
                 new Establishment { URN = "1", EstablishmentName = "One" },
-                new Establishment { URN = "2", EstablishmentName = "Two" });
+                new Establishment { URN = "2", EstablishmentName = "Two" }
+            };
+            _mockGenericRepo.Setup(r => r.ReadAll()).Returns(expected);
 
-            var sut = CreateSut();
+            // Act
+            var result = _sut.GetAllEstablishments();
 
-            var result = sut.GetAllEstablishments().ToList();
-
+            // Assert
             Assert.NotNull(result);
-            Assert.Equal(2, result.Count);
+            Assert.Equal(2, result.Count());
             Assert.Contains(result, e => e.URN == "1");
             Assert.Contains(result, e => e.URN == "2");
+            _mockGenericRepo.Verify(r => r.ReadAll(), Times.Once);
         }
 
         [Fact]
-        public async Task GetAllEstablishments_ReturnsEmptyWhenDatabaseHasNoRows()
+        public void GetAllEstablishments_ReturnsEmptyWhenGenericRepositoryReturnsNull()
         {
-            await _fx.ResetAsync();
+            // Arrange
+            _mockGenericRepo.Setup(r => r.ReadAll()).Returns((IEnumerable<Establishment>?)null);
 
-            var sut = CreateSut();
+            // Act
+            var result = _sut.GetAllEstablishments();
 
-            var result = sut.GetAllEstablishments().ToList();
-
+            // Assert
             Assert.NotNull(result);
             Assert.Empty(result);
+            _mockGenericRepo.Verify(r => r.ReadAll(), Times.Once);
         }
 
         [Fact]
-        public async Task GetEstablishment_ReturnsCorrectItemWhenUrnExists()
+        public void GetEstablishment_ReturnsCorrectItemWhenUrnExists()
         {
-            await _fx.ResetAsync();
-            await SeedAsync(new Establishment { URN = "123", EstablishmentName = "Found" });
+            // Arrange
+            var expected = new Establishment { URN = "123", EstablishmentName = "Found" };
+            _mockGenericRepo.Setup(r => r.ReadAll()).Returns(new[] { expected });
 
-            var sut = CreateSut();
+            // Act
+            var result = _sut.GetEstablishment("123");
 
-            var result = sut.GetEstablishment("123");
-
+            // Assert
             Assert.NotNull(result);
             Assert.Equal("123", result.URN);
             Assert.Equal("Found", result.EstablishmentName);
+            _mockGenericRepo.Verify(r => r.ReadAll(), Times.Once);
         }
 
         [Fact]
-        public async Task GetEstablishment_ReturnsNewEstablishmentWhenUrnDoesNotExist()
+        public void GetEstablishment_ReturnsNewEstablishmentWhenUrnDoesNotExist()
         {
-            await _fx.ResetAsync();
-            await SeedAsync(new Establishment { URN = "111", EstablishmentName = "Something" });
+            // Arrange
+            _mockGenericRepo.Setup(r => r.ReadAll()).Returns(Enumerable.Empty<Establishment>());
 
-            var sut = CreateSut();
+            // Act
+            var result = _sut.GetEstablishment("999");
 
-            var result = sut.GetEstablishment("999");
-
+            // Assert
             Assert.NotNull(result);
-
-            // Matches your repo behavior: returns new Establishment() when not found
-            Assert.True(string.IsNullOrEmpty(result.URN));
-            Assert.True(string.IsNullOrEmpty(result.EstablishmentName));
-        }
-
-        [Theory]
-        [InlineData("URN-1")]
-        [InlineData("UKPRN-1")]
-        [InlineData("DFE-1")]
-        public async Task GetEstablishmentByAnyNumber_ReturnsMatch(string input)
-        {
-            await _fx.ResetAsync();
-            await SeedRawAsync(
-                urn: "URN-1",
-                ukprn: "UKPRN-1",
-                dfe: "DFE-1",
-                name: "AnyNumber Match");
-
-            var sut = CreateSut();
-
-            var result = sut.GetEstablishmentByAnyNumber(input);
-
-            Assert.NotNull(result);
-            Assert.Equal("URN-1", result.URN);
-            Assert.Equal("AnyNumber Match", result.EstablishmentName);
-        }
-
-        private EstablishmentRepository CreateSut()
-        {
-            return new EstablishmentRepository(
-                NullLogger<EstablishmentRepository>.Instance,
-                _fx.DataSource);
-        }
-
-        /// <summary>
-        /// Seeds the base table and refreshes the materialized view so repository reads see the new rows.
-        /// </summary>
-        private async Task SeedAsync(params Establishment[] rows)
-        {
-            await using var conn = await _fx.DataSource.OpenConnectionAsync();
-
-            const string sql = """
-                INSERT INTO public.establishment("URN","EstablishmentName")
-                VALUES (@URN, @EstablishmentName);
-
-                REFRESH MATERIALIZED VIEW public.v_establishment;
-            """;
-
-            await conn.ExecuteAsync(sql, rows);
-            await _fx.RefreshAsync();
-        }
-
-        /// <summary>
-        /// Seeds all columns used by GetEstablishmentByAnyNumber and refreshes the MV.
-        /// </summary>
-        private async Task SeedRawAsync(string urn, string ukprn, string dfe, string name)
-        {
-            await using var conn = await _fx.DataSource.OpenConnectionAsync();
-
-            const string sql = """
-                INSERT INTO public.establishment("URN","UKPRN","DfENumberSearchable","EstablishmentName")
-                VALUES (@urn,@ukprn,@dfe,@name);
-
-                REFRESH MATERIALIZED VIEW public.v_establishment;
-            """;
-
-            await conn.ExecuteAsync(sql, new { urn, ukprn, dfe, name });
+            // When not found the repository returns a new Establishment (defaults are empty strings / zeros)
+            Assert.Equal(string.Empty, result.URN);
+            _mockGenericRepo.Verify(r => r.ReadAll(), Times.Once);
         }
     }
 }

@@ -116,10 +116,20 @@ public class Program
 
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
+        
         builder.Services.AddSingleton<NpgsqlDataSource>(sp =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
+
             var connectionString = config.GetConnectionString("Postgres");
+
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new InvalidOperationException(
+                    "Connection string 'ConnectionStrings:Postgres' is not configured. " +
+                    "Set it via User Secrets (local dev) or environment variable " +
+                    "'ConnectionStrings__Postgres' (CI / containers).");
+            }
 
             return NpgsqlDataSource.Create(connectionString);
         });

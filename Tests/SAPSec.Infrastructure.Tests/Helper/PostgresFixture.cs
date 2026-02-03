@@ -109,7 +109,7 @@ namespace SAPSec.Infrastructure.Tests.Repositories
 
                 CREATE TABLE public.establishment (
                   "URN" TEXT PRIMARY KEY,
-                  "UKPRN" TEXT NULL,
+                  "UKPRN" INTEGER NULL,
                   "DfENumberSearchable" TEXT NULL,
                   "EstablishmentName" TEXT NULL
                 );
