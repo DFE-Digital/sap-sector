@@ -116,7 +116,9 @@ public class Program
 
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-        
+
+        if (builder.Environment.IsDevelopment())
+        {
         builder.Services.AddSingleton<NpgsqlDataSource>(sp =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
@@ -133,12 +135,13 @@ public class Program
 
             return NpgsqlDataSource.Create(connectionString);
         });
+        }
         
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
-        builder.Services.AddDependencies();
+        builder.Services.AddDependencies(builder.Environment);
 
         //builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 

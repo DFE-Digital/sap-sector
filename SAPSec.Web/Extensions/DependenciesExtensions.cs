@@ -44,12 +44,22 @@ namespace SAPSec.Web.Extensions
     [ExcludeFromCodeCoverage]
     public static class DependenciesExtensions
     {
-        public static void AddDependencies(this IServiceCollection services)
+        public static void AddDependencies(this IServiceCollection services, IHostEnvironment env)
         {
 
 
             services.AddSingleton<IGenericRepository<Establishment>, JSONRepository<Establishment>>();
             services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
+            if (env.IsDevelopment())
+            {
+                // Local/dev implementation
+                services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
+            }
+            else
+            {
+                // Release/prod implementation
+                services.AddSingleton<IEstablishmentRepository, EstablishmentRepository>();
+            }
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
 
             services.AddSingleton<IGenericRepository<EstablishmentPerformance>, JSONRepository<EstablishmentPerformance>>();
