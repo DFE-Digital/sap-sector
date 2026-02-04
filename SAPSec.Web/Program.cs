@@ -16,6 +16,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using GovUk.Frontend.AspNetCore;
 using Npgsql;
+using SAPSec.Infrastructure.Extensions;
 
 namespace SAPSec.Web;
 
@@ -116,26 +117,13 @@ public class Program
 
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-
-        if (builder.Environment.IsDevelopment())
+        
+        if (!builder.Environment.IsEnvironment("IntegrationTests") &&
+            !builder.Environment.IsEnvironment("UITests"))
         {
-        builder.Services.AddSingleton<NpgsqlDataSource>(sp =>
-        {
-            var config = sp.GetRequiredService<IConfiguration>();
-
-            var connectionString = config.GetConnectionString("Postgres");
-
-            if (string.IsNullOrWhiteSpace(connectionString))
-            {
-                throw new InvalidOperationException(
-                    "Connection string 'ConnectionStrings:Postgres' is not configured. " +
-                    "Set it via User Secrets (local dev) or environment variable " +
-                    "'ConnectionStrings__Postgres' (CI / containers).");
-            }
-
-            return NpgsqlDataSource.Create(connectionString);
-        });
+            builder.Services.AddPostgresqlDependencies(builder.Configuration);
         }
+        
         
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
         builder.Services.AddLuceneDependencies();

@@ -49,17 +49,6 @@ namespace SAPSec.Web.Extensions
 
 
             services.AddSingleton<IGenericRepository<Establishment>, JSONRepository<Establishment>>();
-            services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
-            if (env.IsDevelopment())
-            {
-                // Local/dev implementation
-                services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
-            }
-            else
-            {
-                // Release/prod implementation
-                services.AddSingleton<IEstablishmentRepository, EstablishmentRepository>();
-            }
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
 
             services.AddSingleton<IGenericRepository<EstablishmentPerformance>, JSONRepository<EstablishmentPerformance>>();
