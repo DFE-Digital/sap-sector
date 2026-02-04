@@ -129,7 +129,7 @@ public class Program
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
-        builder.Services.AddDependencies(builder.Environment);
+        builder.Services.AddDependencies();
 
         //builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 

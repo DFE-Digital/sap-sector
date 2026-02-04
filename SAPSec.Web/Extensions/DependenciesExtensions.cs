@@ -44,7 +44,7 @@ namespace SAPSec.Web.Extensions
     [ExcludeFromCodeCoverage]
     public static class DependenciesExtensions
     {
-        public static void AddDependencies(this IServiceCollection services, IHostEnvironment env)
+        public static void AddDependencies(this IServiceCollection services)
         {
 
 
