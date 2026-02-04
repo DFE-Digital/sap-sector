@@ -1,3 +1,3 @@
-﻿namespace SAPSec.Infrastructure.Entities;
+﻿//namespace SAPSec.Infrastructure.Entities;
 
-public record SchoolSearchResult(string SchoolName, School School);
+//public record SchoolSearchResult(string SchoolName, School School);

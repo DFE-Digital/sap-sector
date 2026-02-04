@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Interfaces.Repositories;
+﻿using SAPSec.Core.Features.SchoolSearch;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Repositories.Generic;
 using SAPSec.Core.Interfaces.Repositories.KS4.Absence;
 using SAPSec.Core.Interfaces.Repositories.KS4.Destinations;
@@ -122,9 +123,9 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<ILookupRepository, LookupRepository>();
             services.AddSingleton<ILookupService, LookupService>();
 
-            services.AddSingleton<ISearchRepository, LuceneSearchService>();
+            services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
 
-            services.AddSingleton<ISearchService, SearchService>();
+            services.AddSingleton<ISchoolSearchService, SchoolSearchService>();
 
             // Register SchoolDetailsService with explicit rule dependencies
             services.AddScoped<ISchoolDetailsService, SchoolDetailsService>();

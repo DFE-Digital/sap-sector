@@ -1,11 +1,11 @@
 ﻿using Lucene.Net.Index;
 using Lucene.Net.Search;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Infrastructure.Entities;
-using SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
-namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
+namespace SAPSec.Infrastructure.LuceneSearch;
 
-public class LuceneIndexReader(LuceneIndexContext context, ILuceneTokeniser luceneTokeniser, ILuceneHighlighter highlighter) : ILuceneIndexReader
+public class LuceneShoolSearchIndexReader(LuceneIndexContext context, LuceneTokeniser luceneTokeniser, LuceneHighlighter highlighter) : ISchoolSearchIndexReader
 {
     public async Task<IList<(int urn, string resultText)>> SearchAsync(string query, int maxResults = 10)
     {

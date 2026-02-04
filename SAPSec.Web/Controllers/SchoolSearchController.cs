@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 
@@ -10,7 +10,7 @@ namespace SAPSec.Web.Controllers;
 [Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
-    ISearchService _searchService) : Controller
+    ISchoolSearchService _searchService) : Controller
 {
     private const int PageSize = 10;
     public const string Hint = "Search by name or school ID";
@@ -67,7 +67,7 @@ public class SchoolSearchController(
             var results = await _searchService.SearchAsync(query ?? string.Empty);
 
             var allLocalAuthorities = results
-                .Select(s => s.Establishment.LANAme)
+                .Select(s => s.LANAme)
                 .Where(la => !string.IsNullOrWhiteSpace(la))
                 .Distinct()
                 .OrderBy(la => la)
@@ -76,13 +76,13 @@ public class SchoolSearchController(
             if (localAuthorities != null && localAuthorities.Length > 0)
             {
                 results = results
-                    .Where(s => localAuthorities.Contains(s.Establishment.LANAme))
+                    .Where(s => localAuthorities.Contains(s.LANAme))
                     .ToList();
             }
 
             if (results.Count == 1 && (localAuthorities == null || localAuthorities.Length == 0))
             {
-                return RedirectToAction("Index", "School", new { results[0].Establishment.URN });
+                return RedirectToAction("Index", "School", new { results[0].URN });
             }
 
             var totalResults = results.Count;
@@ -101,17 +101,17 @@ public class SchoolSearchController(
             // Map all results for display
             var allSchoolsForMap = results.Select(s => new SchoolSearchResultViewModel
             {
-                SchoolName = s.Establishment.EstablishmentName,
-                URN = s.Establishment.URN,
-                LocalAuthority = s.Establishment.LANAme,
-                Latitude = s.Establishment.Latitude,
-                Longitude = s.Establishment.Longitude,
+                SchoolName = s.EstablishmentName,
+                URN = s.URN,
+                LocalAuthority = s.LANAme,
+                Latitude = s.Latitude,
+                Longitude = s.Longitude,
                 Address = string.Join(", ", new[]
                 {
-                    s.Establishment.AddressStreet,
-                    s.Establishment.AddressLocality,
-                    s.Establishment.LANAme,
-                    s.Establishment.AddressPostcode
+                    s.AddressStreet,
+                    s.AddressLocality,
+                    s.LANAme,
+                    s.AddressPostcode
                 }.Where(x => !string.IsNullOrWhiteSpace(x)))
             }).ToArray();
 
@@ -125,17 +125,17 @@ public class SchoolSearchController(
                 TotalResults = totalResults,
                 Results = pagedResults.Select(s => new SchoolSearchResultViewModel
                 {
-                    SchoolName = s.Establishment.EstablishmentName,
-                    URN = s.Establishment.URN,
-                    LocalAuthority = s.Establishment.LANAme,
-                    Latitude = s.Establishment.Latitude,
-                    Longitude = s.Establishment.Longitude,
+                    SchoolName = s.EstablishmentName,
+                    URN = s.URN,
+                    LocalAuthority = s.LANAme,
+                    Latitude = s.Latitude,
+                    Longitude = s.Longitude,
                     Address = string.Join(", ", new[]
                     {
-                        s.Establishment.AddressStreet,
-                        s.Establishment.AddressLocality,
-                        s.Establishment.LANAme,
-                        s.Establishment.AddressPostcode
+                        s.AddressStreet,
+                        s.AddressLocality,
+                        s.LANAme,
+                        s.AddressPostcode
                     }.Where(x => !string.IsNullOrWhiteSpace(x)))
                 }).ToArray(),
                 AllResults = allSchoolsForMap

@@ -1,10 +1,9 @@
 ﻿using Lucene.Net.Analysis.Synonym;
 using Lucene.Net.Util;
-using SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
-namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
+namespace SAPSec.Infrastructure.LuceneSearch;
 
-public class LuceneSynonymMapBuilder : ILuceneSynonymMapBuilder
+public class LuceneSynonymMapBuilder
 {
     private static readonly List<string[]> SynonymGroups =
     [

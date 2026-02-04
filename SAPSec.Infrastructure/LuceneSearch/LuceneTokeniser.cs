@@ -1,10 +1,9 @@
 ﻿using Lucene.Net.Analysis.TokenAttributes;
 using SAPSec.Infrastructure.Entities;
-using SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
-namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
+namespace SAPSec.Infrastructure.LuceneSearch;
 
-public class LuceneTokeniser(LuceneIndexContext context) : ILuceneTokeniser
+public class LuceneTokeniser(LuceneIndexContext context)
 {
     public IEnumerable<string> Tokenise(string finalText)
     {
