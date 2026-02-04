@@ -46,8 +46,6 @@ namespace SAPSec.Web.Extensions
     {
         public static void AddDependencies(this IServiceCollection services)
         {
-
-
             services.AddSingleton<IGenericRepository<Establishment>, JSONRepository<Establishment>>();
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
 

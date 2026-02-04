@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Npgsql;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
+using SAPSec.Infrastructure.Factories;
 
 
 namespace SAPSec.Infrastructure.Repositories;
@@ -10,19 +11,17 @@ namespace SAPSec.Infrastructure.Repositories;
 public class PostgresEstablishmentRepository : IEstablishmentRepository
 {
     private readonly ILogger<PostgresEstablishmentRepository> _logger;
-    private readonly NpgsqlDataSource _dataSource;
+    private readonly NpgsqlDataSourceFactory _factory;
 
-    public PostgresEstablishmentRepository(
-        ILogger<PostgresEstablishmentRepository> logger,
-        NpgsqlDataSource dataSource)
+    public PostgresEstablishmentRepository(ILogger<PostgresEstablishmentRepository> logger, NpgsqlDataSourceFactory factory)
     {
         _logger = logger;
-        _dataSource = dataSource;
+        _factory = factory;
     }
 
     public IEnumerable<Establishment> GetAllEstablishments()
     {
-        using var conn = _dataSource.OpenConnection();
+        using var conn = _factory.Create().OpenConnection();
 
         const string sql = """
                                SELECT *
@@ -37,7 +36,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         if (string.IsNullOrWhiteSpace(urn))
             return new Establishment();
 
-        using var conn = _dataSource.OpenConnection();
+        using var conn = _factory.Create().OpenConnection();
 
         const string sql = """
                                SELECT *
@@ -54,7 +53,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         if (string.IsNullOrWhiteSpace(number))
             return new Establishment();
 
-        using var conn = _dataSource.OpenConnection();
+        using var conn = _factory.Create().OpenConnection();
 
         int? ukprn = int.TryParse(number, out var k) ? k : (int?)null;
 

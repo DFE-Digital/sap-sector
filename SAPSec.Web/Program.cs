@@ -118,11 +118,7 @@ public class Program
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
         
-        if (!builder.Environment.IsEnvironment("IntegrationTests") &&
-            !builder.Environment.IsEnvironment("UITests"))
-        {
-            builder.Services.AddPostgresqlDependencies(builder.Configuration);
-        }
+        builder.Services.AddPostgresqlDependencies();
         
         
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
