@@ -9,21 +9,17 @@ The rationale for this approach is documented in ADRs.
 ## Branching
 
 - `main` is always deployable
-- Feature branches use the format:
-    - `feature/<short-description>`
-    - `bugfix/<short-description>`
-    - `chore/<short-description>`
 
+- feature/{trello-id}-{trello-description}
+  * e.g. feature/1001-let-users-login-with-azure-credentials
+  
+- bug/{trello-id}-{trello-description}
+  * e.g. bug/1002-azure-login-not-working-for-scunthorpe-la
 ---
 
 ## Commits
 
-Follow Conventional Commits:
-- `feat:`
-- `fix:`
-- `chore:`
-- `docs:`
-- `test:`
+Commits should be descriptive and inline with the changes.
 
 ---
 
