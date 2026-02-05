@@ -67,6 +67,7 @@ public class Program
 
             foreach (var row in ReadCsvFile<TRow, TMapping>(csvFile))
             {
+                // Skip rows for schools not in our data set
                 if (!allUrns.Contains(row.Urn))
                 {
                     continue;
@@ -88,27 +89,35 @@ public class Program
 
             foreach (var row in ReadCsvFile<TRow, TMapping>(csvFile))
             {
+                // Skip rows for schools not in our data set
                 if (!allUrns.Contains(row.Urn))
                 {
                     continue;
                 }
 
+                // For every new school reset the set of neighbour URNs
+                // (assumes CSV file rows are grouped by URN)
                 if (currentUrn != row.Urn)
                 {
                     currentUrn = row.Urn;
                     neighbours = new();
                 }
 
+                // If neighbour URN is not in our data set, map it to a URN that is in our dataset
                 if (!allUrns.Contains(row.NeighbourUrn))
                 {
+                    // If we've already mapped this URN, use that, otherwise pick the next unmapped one
+                    // that isn't already in our neighbour set
                     if (!urnLookup.ContainsKey(row.NeighbourUrn))
                     {
                         urnLookup[row.NeighbourUrn] = allUrns.Except([currentUrn, .. neighbours]).First();
                     }
 
                     row.NeighbourUrn = urnLookup[row.NeighbourUrn];
-                    neighbours.Add(row.NeighbourUrn);
                 }
+
+                // Update neighbours
+                neighbours.Add(row.NeighbourUrn);
 
                 results.Add(row);
             }
@@ -120,21 +129,15 @@ public class Program
             where TRow : ISimilarSchoolsRow
             where TMapping : ClassMap<TRow>
         {
-            Console.WriteLine($"Converting: {csvFile}");
+            Console.WriteLine($"Reading: {csvFile}");
 
             using (var reader = new StreamReader(csvFile))
             using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
             {
                 csv.Context.RegisterClassMap<TMapping>();
-                var rows = csv.GetRecords<TRow>();
 
-                foreach (var row in rows)
+                foreach (var row in csv.GetRecords<TRow>())
                 {
-                    if (!allUrns.Contains(row.Urn))
-                    {
-                        continue;
-                    }
-
                     yield return row;
                 }
             }
