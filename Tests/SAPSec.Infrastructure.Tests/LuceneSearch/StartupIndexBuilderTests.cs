@@ -2,10 +2,7 @@
 using Moq;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Infrastructure.Entities;
-using SAPSec.Infrastructure.Interfaces;
 using SAPSec.Infrastructure.LuceneSearch;
-using SAPSec.Infrastructure.LuceneSearch.Implementation;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
 

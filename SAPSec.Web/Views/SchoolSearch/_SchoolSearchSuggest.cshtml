@@ -53,11 +53,11 @@
                         if (item.town) {
                             locationParts.push(item.town);
                         }
-                        if(item.establishment?.addressStreet){
-                            locationParts.push(item.establishment.addressStreet);
+                        if(item.addressStreet){
+                            locationParts.push(item.addressStreet);
                         }
-                        if (item.establishment?.addressPostcode) {
-                            locationParts.push(item.establishment.addressPostcode);
+                        if (item.addressPostcode) {
+                            locationParts.push(item.addressPostcode);
                         }
                          if (locationParts.length > 0) {
                            const location = locationParts.join(', ');

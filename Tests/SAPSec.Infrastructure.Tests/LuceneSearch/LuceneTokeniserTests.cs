@@ -1,4 +1,4 @@
-﻿using SAPSec.Infrastructure.LuceneSearch.Implementation;
+﻿using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
 

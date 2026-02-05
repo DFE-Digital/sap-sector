@@ -2,11 +2,10 @@
 using Lucene.Net.Util;
 using SAPSec.Core.Model;
 using SAPSec.Infrastructure.Entities;
-using SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
-namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
+namespace SAPSec.Infrastructure.LuceneSearch;
 
-public class LuceneIndexWriter(LuceneIndexContext context) : ILuceneIndexWriter
+public class LuceneIndexWriter(LuceneIndexContext context)
 {
     private static readonly FieldType TermVectorFieldType = new FieldType(TextField.TYPE_STORED)
     {

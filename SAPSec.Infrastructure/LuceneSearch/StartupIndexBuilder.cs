@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Interfaces;
-using SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 
-public class StartupIndexBuilder(ILogger<StartupIndexBuilder> logger, ILuceneIndexWriter writer, IEstablishmentService establishmentService) : IHostedService
+public class StartupIndexBuilder(ILogger<StartupIndexBuilder> logger, LuceneIndexWriter writer, IEstablishmentService establishmentService) : IHostedService
 {
     public Task StartAsync(CancellationToken cancellationToken)
     {

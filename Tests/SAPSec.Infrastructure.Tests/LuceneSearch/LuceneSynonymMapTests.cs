@@ -1,13 +1,12 @@
 ﻿using SAPSec.Core.Model;
-using SAPSec.Infrastructure.Entities;
-using SAPSec.Infrastructure.LuceneSearch.Implementation;
+using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
 
 public class LuceneSynonymMapTests
 {
     private readonly LuceneIndexWriter _writer;
-    private readonly LuceneIndexReader _sut;
+    private readonly LuceneShoolSearchIndexReader _sut;
 
     public LuceneSynonymMapTests()
     {
@@ -15,7 +14,7 @@ public class LuceneSynonymMapTests
         _writer = new LuceneIndexWriter(ctx);
         var tokeniser = new LuceneTokeniser(ctx);
         var hlt = new LuceneHighlighter();
-        _sut = new LuceneIndexReader(ctx, tokeniser, hlt);
+        _sut = new LuceneShoolSearchIndexReader(ctx, tokeniser, hlt);
     }
 
     [Theory]

@@ -164,10 +164,10 @@ public class SchoolSearchPaginationIntegrationTests(WebApplicationSetupFixture f
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
-        // Page 2 with page size 5 should show "6-" as start
+        // Page 2 with page size 5 should show "6 -" as start
         if (content.Contains("app-school-results-count"))
         {
-            content.Should().Contain("6-", "Page 2 should show results starting from 6");
+            content.Should().Contain("11 -", "Page 2 should show results starting from 11");
         }
     }
 

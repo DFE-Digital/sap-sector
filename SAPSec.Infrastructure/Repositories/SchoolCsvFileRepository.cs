@@ -4,7 +4,7 @@ using SAPSec.Infrastructure.Interfaces;
 
 namespace SAPSec.Infrastructure.Repositories;
 
-public class SchoolCsvFileRepository: ISchoolRepository
+public class SchoolCsvFileRepository : ISchoolRepository
 {
     private readonly string _csvPath;
     private IList<School>? _schools;

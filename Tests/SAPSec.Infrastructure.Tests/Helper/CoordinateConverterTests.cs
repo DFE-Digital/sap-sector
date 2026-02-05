@@ -1,5 +1,5 @@
 using FluentAssertions;
-using SAPSec.Infrastructure.Helper;
+using SAPSec.Core.Features.SchoolSearch;
 
 namespace SAPSec.Infrastructure.Tests.Helper;
 

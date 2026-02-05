@@ -1,7 +1,7 @@
 ﻿using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
-using SAPSec.Infrastructure.LuceneSearch.Implementation;
+using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
 

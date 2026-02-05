@@ -4,11 +4,10 @@ using Lucene.Net.Analysis.En;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Analysis.Synonym;
 using Lucene.Net.Util;
-using SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
-namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
+namespace SAPSec.Infrastructure.LuceneSearch;
 
-public class LuceneTokenAnalyzer(LuceneVersion version, ILuceneSynonymMapBuilder luceneSynonymMapBuilder, bool enableSynonym) : Analyzer
+public class LuceneTokenAnalyzer(LuceneVersion version, LuceneSynonymMapBuilder luceneSynonymMapBuilder, bool enableSynonym) : Analyzer
 {
     private readonly SynonymMap _synonymMap = luceneSynonymMapBuilder.BuildSynonymMap();
 

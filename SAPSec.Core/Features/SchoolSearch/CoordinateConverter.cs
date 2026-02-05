@@ -2,7 +2,7 @@ using GeoUK.Coordinates;
 using GeoUK.Ellipsoids;
 using GeoUK.Projections;
 
-namespace SAPSec.Infrastructure.Helper;
+namespace SAPSec.Core.Features.SchoolSearch;
 
 public static class CoordinateConverter
 {
@@ -22,6 +22,6 @@ public static class CoordinateConverter
         // 3) Cartesian -> Latitude/Longitude (WGS84)
         LatitudeLongitude wgsLatLon = GeoUK.Convert.ToLatitudeLongitude(new Wgs84(), etrs89Cartesian);
 
-        return (Latitude: wgsLatLon.Latitude, Longitude: wgsLatLon.Longitude);
+        return (wgsLatLon.Latitude, wgsLatLon.Longitude);
     }
 }

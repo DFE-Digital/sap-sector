@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Search;
 using SAPSec.Infrastructure.Entities;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
@@ -14,7 +13,7 @@ namespace SAPSec.Web.Tests.Controllers;
 public class SchoolSearchControllerTests
 {
     private readonly Mock<ILogger<SchoolSearchController>> _mockLogger;
-    private readonly Mock<ISearchService> _mockSearchService;
+    private readonly Mock<ISchoolSearchService> _mockSearchService;
     private readonly SchoolSearchController _controller;
 
     private static Establishment FakeEstablishment1 = new()
@@ -48,7 +47,7 @@ public class SchoolSearchControllerTests
     public SchoolSearchControllerTests()
     {
         _mockLogger = new Mock<ILogger<SchoolSearchController>>();
-        _mockSearchService = new Mock<ISearchService>();
+        _mockSearchService = new Mock<ISchoolSearchService>();
         _controller = new SchoolSearchController(_mockLogger.Object, _mockSearchService.Object);
     }
 
@@ -198,10 +197,10 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithValidQuery_ReturnsViewWithResults()
     {
         var query = "Fake Establishment";
-        var searchResults = new List<EstablishmentSearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new EstablishmentSearchResult("Fake Establishment One", FakeEstablishment1),
-            new EstablishmentSearchResult("Fake Establishment Two", FakeEstablishment2)
+            SchoolSearchResult.FromNameAndEstablishment("Fake Establishment One", FakeEstablishment1),
+            SchoolSearchResult.FromNameAndEstablishment("Fake Establishment Two", FakeEstablishment2)
         };
 
         _mockSearchService.Setup(s => s.SearchAsync(query))
@@ -228,7 +227,7 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithNullQuery_SearchesWithEmptyString()
     {
         _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search((string?)null, null, 1);
 
@@ -246,7 +245,7 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithEmptyQuery_ReturnsEmptyResults()
     {
         _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search(string.Empty, null, 1);
 
@@ -263,7 +262,7 @@ public class SchoolSearchControllerTests
     {
         var query = "   ";
         _mockSearchService.Setup(s => s.SearchAsync(query))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search(query, null, 1);
 
@@ -279,7 +278,7 @@ public class SchoolSearchControllerTests
     {
         var query = "Nonexistent School";
         _mockSearchService.Setup(s => s.SearchAsync(query))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search(query, null, 1);
 
@@ -295,9 +294,9 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithURNQuery_ReturnsMatchingSchool()
     {
         var query = "123456";
-        var searchResults = new List<EstablishmentSearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new EstablishmentSearchResult("School by Urn", FakeEstablishment1)
+            SchoolSearchResult.FromNameAndEstablishment("School by Urn", FakeEstablishment1)
         };
 
         _mockSearchService.Setup(s => s.SearchAsync(query))
@@ -315,7 +314,7 @@ public class SchoolSearchControllerTests
     {
         var query = "Test School";
         _mockSearchService.Setup(s => s.SearchAsync(query))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         await _controller.Search(query, null, 1);
 
@@ -327,7 +326,7 @@ public class SchoolSearchControllerTests
     {
         var query = "Test School";
         _mockSearchService.Setup(s => s.SearchAsync(query))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         await _controller.Search(query, null, 1);
 
@@ -349,7 +348,7 @@ public class SchoolSearchControllerTests
         };
 
         _mockSearchService.Setup(s => s.SearchAsync(query))
-            .ReturnsAsync(new List<EstablishmentSearchResult> { new EstablishmentSearchResult(query, returnEst) });
+            .ReturnsAsync(new List<SchoolSearchResult> { SchoolSearchResult.FromNameAndEstablishment(query, returnEst) });
 
         var result = await _controller.Search(query, null, 1);
 
@@ -522,7 +521,7 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithNoResults_ReturnsZeroTotalPages()
     {
         _mockSearchService.Setup(s => s.SearchAsync("NonExistent"))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search("NonExistent", null, 1);
 
@@ -675,10 +674,10 @@ public class SchoolSearchControllerTests
     public async Task Suggest_WithValidQueryPart_ReturnsOkWithSuggest()
     {
         var queryPart = "Test";
-        var suggestions = new List<EstablishmentSearchResult>
+        var suggestions = new List<SchoolSearchResult>
         {
-            new EstablishmentSearchResult("Test School 1", FakeEstablishment1),
-            new EstablishmentSearchResult("Test School 2", FakeEstablishment2)
+            SchoolSearchResult.FromNameAndEstablishment("Test School 1", FakeEstablishment1),
+            SchoolSearchResult.FromNameAndEstablishment("Test School 2", FakeEstablishment2)
         };
 
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
@@ -697,7 +696,7 @@ public class SchoolSearchControllerTests
     {
         var queryPart = "Test";
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         await _controller.Suggest(queryPart);
 
@@ -709,14 +708,14 @@ public class SchoolSearchControllerTests
     {
         var queryPart = "XYZ";
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Suggest(queryPart);
 
         result.Should().BeOfType<OkObjectResult>();
 
         var okResult = result as OkObjectResult;
-        var suggestions = okResult!.Value as List<EstablishmentSearchResult>;
+        var suggestions = okResult!.Value as List<SchoolSearchResult>;
         suggestions.Should().BeEmpty();
     }
 
@@ -725,7 +724,7 @@ public class SchoolSearchControllerTests
     {
         var queryPart = string.Empty;
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Suggest(queryPart);
 
@@ -738,7 +737,7 @@ public class SchoolSearchControllerTests
     {
         string? queryPart = null;
         _mockSearchService.Setup(s => s.SuggestAsync(It.IsAny<string>()))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Suggest(queryPart!);
 
@@ -749,10 +748,10 @@ public class SchoolSearchControllerTests
     public async Task Suggest_WithSingleCharacter_ReturnsResults()
     {
         var queryPart = "A";
-        var suggestions = new List<EstablishmentSearchResult>
+        var suggestions = new List<SchoolSearchResult>
         {
-            new EstablishmentSearchResult("Test School 1", FakeEstablishment1),
-            new EstablishmentSearchResult("Test School 2", FakeEstablishment2)
+            SchoolSearchResult.FromNameAndEstablishment("Test School 1", FakeEstablishment1),
+            SchoolSearchResult.FromNameAndEstablishment("Test School 2", FakeEstablishment2)
         };
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
             .ReturnsAsync(suggestions);
@@ -769,7 +768,7 @@ public class SchoolSearchControllerTests
     public async Task Suggest_WithSpecialCharacters_CallsService()
     {
         var queryPart = "St. * + Mary's";
-        var suggestions = new List<EstablishmentSearchResult> { new EstablishmentSearchResult("St. Mary's School", FakeEstablishment1) };
+        var suggestions = new List<SchoolSearchResult> { SchoolSearchResult.FromNameAndEstablishment("St. Mary's School", FakeEstablishment1) };
         _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
             .ReturnsAsync(suggestions);
 
@@ -810,7 +809,7 @@ public class SchoolSearchControllerTests
     {
         var query = new string('A', 1000);
         _mockSearchService.Setup(s => s.SearchAsync(query))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search(query, null, 1);
 
@@ -844,7 +843,7 @@ public class SchoolSearchControllerTests
     {
         var query = "Test     School";
         _mockSearchService.Setup(s => s.SearchAsync(query))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search(query, null, 1);
 
@@ -859,9 +858,9 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithSingleResult_ReturnsCorrectly()
     {
         var query = "Unique School";
-        var searchResults = new List<EstablishmentSearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new EstablishmentSearchResult("Unique School", new Establishment{ URN = "999999", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "Unique School" })
+            SchoolSearchResult.FromNameAndEstablishment("Unique School", new Establishment{ URN = "999999", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "Unique School" })
         };
 
         _mockSearchService.Setup(s => s.SearchAsync(query))
@@ -956,7 +955,7 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_AllResults_IsEmpty_WhenNoResults()
     {
         _mockSearchService.Setup(s => s.SearchAsync("NonExistent"))
-            .ReturnsAsync(new List<EstablishmentSearchResult>());
+            .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search("NonExistent", null, 1);
 
@@ -994,10 +993,10 @@ public class SchoolSearchControllerTests
             Easting = "430100",
             Northing = "433100"
         };
-        var searchResults = new List<EstablishmentSearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new EstablishmentSearchResult("Test School", establishment1),
-            new EstablishmentSearchResult("Another School", establishment2)
+            SchoolSearchResult.FromNameAndEstablishment("Test School", establishment1),
+            SchoolSearchResult.FromNameAndEstablishment("Another School", establishment2)
         };
 
         _mockSearchService.Setup(s => s.SearchAsync("School"))
@@ -1040,10 +1039,10 @@ public class SchoolSearchControllerTests
             Easting = "430100",
             Northing = "433100"
         };
-        var searchResults = new List<EstablishmentSearchResult>
+        var searchResults = new List<SchoolSearchResult>
         {
-            new EstablishmentSearchResult("Test School", establishment1),
-            new EstablishmentSearchResult("Another School", establishment2)
+            SchoolSearchResult.FromNameAndEstablishment("Test School", establishment1),
+            SchoolSearchResult.FromNameAndEstablishment("Another School", establishment2)
         };
 
         _mockSearchService.Setup(s => s.SearchAsync("School"))
@@ -1061,9 +1060,9 @@ public class SchoolSearchControllerTests
 
     #region Helper Methods
 
-    private List<EstablishmentSearchResult> CreateFakeSearchResults(int count, string localAuthority = "Leeds")
+    private List<SchoolSearchResult> CreateFakeSearchResults(int count, string localAuthority = "Leeds")
     {
-        var results = new List<EstablishmentSearchResult>();
+        var results = new List<SchoolSearchResult>();
         for (int i = 1; i <= count; i++)
         {
             var establishment = new Establishment
@@ -1079,7 +1078,7 @@ public class SchoolSearchControllerTests
                 Latitude = (53.8 + (i * 0.01)).ToString(),
                 Longitude = (-1.55 + (i * 0.01)).ToString()
             };
-            results.Add(new EstablishmentSearchResult($"School {i}", establishment));
+            results.Add(SchoolSearchResult.FromNameAndEstablishment($"School {i}", establishment));
         }
         return results;
     }

@@ -1,11 +1,10 @@
 ﻿using Lucene.Net.Search;
 using Lucene.Net.Search.Highlight;
 using Lucene.Net.Util;
-using SAPSec.Infrastructure.LuceneSearch.Interfaces;
 
-namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
+namespace SAPSec.Infrastructure.LuceneSearch;
 
-public class LuceneHighlighter : ILuceneHighlighter
+public class LuceneHighlighter
 {
     private const string PreTag = "*";
     private const string PostTag = "*";

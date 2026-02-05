@@ -5,7 +5,7 @@ using Lucene.Net.Store;
 using Lucene.Net.Util;
 using Directory = Lucene.Net.Store.Directory;
 
-namespace SAPSec.Infrastructure.LuceneSearch.Implementation;
+namespace SAPSec.Infrastructure.LuceneSearch;
 
 public sealed class LuceneIndexContext : IDisposable
 {
