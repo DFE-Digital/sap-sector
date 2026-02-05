@@ -7,7 +7,6 @@ using SAPSec.Core.Model;
 using SAPSec.Infrastructure.Repositories;
 using SAPSec.Infrastructure.Repositories.Generic;
 using System.Globalization;
-using static Lucene.Net.Util.Fst.Util;
 
 namespace SapSec.SimilarSchoolsJsonGenerator;
 
@@ -15,7 +14,7 @@ public class Program
 {
     public static void Main(string[] args)
     {
-        string baseDir = FindProjectDirectoryDownwards("SapSec.SimilarSchoolsJsonGenerator.csproj");
+        string baseDir = FindProjectDirectoryDownwards("SapSec.SimilarSchoolsJsonGenerator");
 
         string sourceFilesDir = Path.Combine(baseDir, "SourceFiles");
         string outputFilesDir = Path.Combine(baseDir, "OutputFiles");
@@ -149,8 +148,9 @@ public class Program
         }
     }
 
-    private static string FindProjectDirectoryDownwards(string projectFileName)
+    private static string FindProjectDirectoryDownwards(string projectName)
     {
+        var projectFileName = $"{projectName}.csproj";
         var startDir = Directory.GetCurrentDirectory();
 
         // Fast path: if we're already in the project directory.
@@ -187,7 +187,7 @@ public class Program
                         .FirstOrDefault(p =>
                             string.Equals(
                                 new DirectoryInfo(Path.GetDirectoryName(p)!).Name,
-                                "SapSec.SimilarSchoolsJsonGenerator",
+                                projectName,
                                 StringComparison.OrdinalIgnoreCase))
                         ?? fallbackMatches[0];
 
@@ -205,7 +205,7 @@ public class Program
             .FirstOrDefault(p =>
                 string.Equals(
                     new DirectoryInfo(Path.GetDirectoryName(p)!).Name,
-                    "SapSec.SimilarSchoolsJsonGenerator",
+                    projectName,
                     StringComparison.OrdinalIgnoreCase))
             ?? matches[0];
 
