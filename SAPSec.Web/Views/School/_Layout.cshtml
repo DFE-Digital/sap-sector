@@ -1,11 +1,13 @@
 ﻿@using SAPSec.Core.Model
 @using SAPSec.Web.Helpers
-@model SchoolDetails
+@{
+    var school = ViewData["SchoolDetails"] as SAPSec.Core.Model.SchoolDetails;
+}
 @{
     Layout = "Views/Shared/_Layout";
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var routeAttributes = new Dictionary<string, string> { { "urn", Model.Urn.Display() } };
+    var routeAttributes = new Dictionary<string, string> { { "urn", school.Urn.Display() } };
 }
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
