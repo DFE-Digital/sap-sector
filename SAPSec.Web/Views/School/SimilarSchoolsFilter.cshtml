@@ -49,12 +49,16 @@
                             </div>
                         </div>
 
-                        <ul class="moj-filter-tags">
-                            @foreach (var tag in GetActiveFilterTags(filters))
-                            {
-                                <li><span class="moj-filter__tag">@tag</span></li>
-                            }
-                        </ul>
+                       <ul class="moj-filter-tags">
+    @foreach (var tag in GetFilterTagsWithRemoveUrls())
+    {
+        <li>
+            <a class="moj-filter__tag" href="@tag.RemoveUrl">
+                <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
+            </a>
+        </li>
+    }
+</ul>
                     </div>
                 }
 
@@ -203,23 +207,86 @@
 </div>
 
 @functions {
-    List<string> GetActiveFilterTags(SimilarSchoolsFilterViewModel f)
+    List<(string Label, string RemoveUrl)> GetFilterTagsWithRemoveUrls()
     {
-        var tags = new List<string>();
-        if (!string.IsNullOrEmpty(f.Distance)) tags.Add(f.Distance);
-        tags.AddRange(f.SelectedRegions);
-        tags.AddRange(f.SelectedUrbanOrRural);
-        tags.AddRange(f.SelectedPhaseOfEducation);
-        if (!string.IsNullOrEmpty(f.SchoolCapacityInUse)) tags.Add(f.SchoolCapacityInUse);
-        if (!string.IsNullOrEmpty(f.NurseryProvision)) tags.Add($"Nursery: {f.NurseryProvision}");
-        if (!string.IsNullOrEmpty(f.SixthForm)) tags.Add($"Sixth form: {f.SixthForm}");
-        tags.AddRange(f.SelectedAdmissionsPolicy);
-        tags.AddRange(f.SelectedGovernanceStructure);
-        tags.AddRange(f.SelectedResourcedProvisionType);
-        tags.AddRange(f.SelectedGenderOfEntry);
-        if (!string.IsNullOrEmpty(f.OverallAbsenceRate)) tags.Add($"Absence: {f.OverallAbsenceRate}");
-        if (!string.IsNullOrEmpty(f.PersistentAbsenceRate)) tags.Add($"Persistent absence: {f.PersistentAbsenceRate}");
+        var tags = new List<(string Label, string RemoveUrl)>();
+        var f = Model.Filters;
+
+        AddSingleTag(tags, f.Distance, "distance");
+        AddSingleTag(tags, f.SchoolCapacityInUse, "schoolCapacityInUse");
+        AddSingleTag(tags, f.NurseryProvision, "nurseryProvision", "Nursery");
+        AddSingleTag(tags, f.SixthForm, "sixthForm", "Sixth form");
+        AddSingleTag(tags, f.OverallAbsenceRate, "overallAbsenceRate", "Absence");
+        AddSingleTag(tags, f.PersistentAbsenceRate, "persistentAbsenceRate", "Persistent absence");
+
+        AddMultiTags(tags, f.SelectedRegions, "selectedRegions");
+        AddMultiTags(tags, f.SelectedUrbanOrRural, "selectedUrbanOrRural");
+        AddMultiTags(tags, f.SelectedPhaseOfEducation, "selectedPhaseOfEducation");
+        AddMultiTags(tags, f.SelectedAdmissionsPolicy, "selectedAdmissionsPolicy");
+        AddMultiTags(tags, f.SelectedGovernanceStructure, "selectedGovernanceStructure");
+        AddMultiTags(tags, f.SelectedResourcedProvisionType, "selectedResourcedProvisionType");
+        AddMultiTags(tags, f.SelectedGenderOfEntry, "selectedGenderOfEntry");
+
         return tags;
+    }
+
+    void AddSingleTag(List<(string, string)> tags, string? value, string paramName, string? prefix = null)
+    {
+        if (string.IsNullOrEmpty(value)) return;
+
+        var label = prefix != null ? $"{prefix}: {value}" : value;
+        var qs = BuildQueryStringWithout(paramName, value);
+        var removeUrl = Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn }) + qs;
+        tags.Add((label, removeUrl));
+    }
+
+    void AddMultiTags(List<(string, string)> tags, List<string> values, string paramName)
+    {
+        foreach (var val in values)
+        {
+            var qs = BuildQueryStringWithout(paramName, val);
+            var removeUrl = Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn }) + qs;
+            tags.Add((val, removeUrl));
+        }
+    }
+
+    string BuildQueryStringWithout(string excludeParam, string excludeValue)
+    {
+        var f = Model.Filters;
+        var parts = new List<string>();
+
+        parts.Add($"sortBy={Uri.EscapeDataString(Model.SortBy)}");
+
+        void AddSingle(string? value, string name)
+        {
+            if (!string.IsNullOrEmpty(value) && !(name == excludeParam && value == excludeValue))
+                parts.Add($"{name}={Uri.EscapeDataString(value)}");
+        }
+
+        void AddMulti(List<string> values, string name)
+        {
+            foreach (var v in values)
+            {
+                if (name == excludeParam && v == excludeValue) continue;
+                parts.Add($"{name}={Uri.EscapeDataString(v)}");
+            }
+        }
+
+        AddSingle(f.Distance, "distance");
+        AddMulti(f.SelectedRegions, "selectedRegions");
+        AddMulti(f.SelectedUrbanOrRural, "selectedUrbanOrRural");
+        AddMulti(f.SelectedPhaseOfEducation, "selectedPhaseOfEducation");
+        AddSingle(f.SchoolCapacityInUse, "schoolCapacityInUse");
+        AddSingle(f.NurseryProvision, "nurseryProvision");
+        AddSingle(f.SixthForm, "sixthForm");
+        AddMulti(f.SelectedAdmissionsPolicy, "selectedAdmissionsPolicy");
+        AddMulti(f.SelectedGovernanceStructure, "selectedGovernanceStructure");
+        AddMulti(f.SelectedResourcedProvisionType, "selectedResourcedProvisionType");
+        AddMulti(f.SelectedGenderOfEntry, "selectedGenderOfEntry");
+        AddSingle(f.OverallAbsenceRate, "overallAbsenceRate");
+        AddSingle(f.PersistentAbsenceRate, "persistentAbsenceRate");
+
+        return parts.Count > 1 ? "?" + string.Join("&", parts) : "";
     }
 }
 
