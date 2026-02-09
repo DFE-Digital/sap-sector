@@ -4,7 +4,8 @@
     Layout = "_Layout";
     ViewData["Title"] = "View similar schools";
 }
-
+<link rel="stylesheet" href="~/css/leaflet.css"/>
+<link rel="stylesheet" href="~/css/MarkerCluster.css"/>
 <span class="govuk-caption-xl">@Model.EstablishmentName</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
@@ -23,38 +24,46 @@
 
     @* ── Right column: Sort + Results + Pagination ── *@
     <div class="govuk-grid-column-two-thirds">
+        
+        <div id="toggleWrap" class="results-toggle-wrap">
+            <a href="#" id="toggleViewLink"
+               class="govuk-link govuk-link--no-visited-state toggle-view-link"
+               data-view="list">
+                <span class="toggle-icon toggle-icon--map" aria-hidden="true">
+                    <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M8 0C10.1217 0 12.1569 0.821939 13.6572 2.28516C15.1574 3.74836 16 5.73349 16 7.80273C15.9999 13.2707 11.149 17.7918 9.00195 19.5254C8.69354 19.7744 8.53924 19.8991 8.30957 19.9629C8.1312 20.0124 7.86887 20.0123 7.69043 19.9629C7.46118 19.8992 7.30533 19.7735 6.99805 19.5254C4.85092 17.7917 0 13.2697 0 7.80176C8.16397e-05 5.73261 0.842604 3.74829 2.34277 2.28516C3.84304 0.821971 5.87831 3.56645e-05 8 0ZM8 5C6.34331 5 5.00026 6.34337 5 8C5 9.65685 6.34315 11 8 11C9.65665 10.9998 11 9.65671 11 8C10.9997 6.34351 9.65649 5.00024 8 5Z"
+                            fill="#0B0C0C"/>
+                    </svg>
+                </span>
 
-        @* Sort dropdown *@
-        <div class="govuk-form-group govuk-!-margin-bottom-4">
-            <label class="govuk-label govuk-!-display-inline govuk-!-font-weight-bold" for="sort-by">Sort by</label>
-            <select class="govuk-select" id="sort-by" name="sortBy" form="similar-schools-filter-form">
-                @foreach (var option in FilterOptions.SortOptions)
-                {
-                    <option value="@option" selected="@(option == Model.SortBy ? "selected" : null)">@option</option>
-                }
-            </select>
+                <span class="toggle-icon toggle-icon--list" aria-hidden="true">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect width="16" height="4" fill="#0B0C0C"/>
+                        <rect y="6" width="16" height="4" fill="#0B0C0C"/>
+                        <rect y="12" width="16" height="4" fill="#0B0C0C"/>
+                    </svg></span>
+
+                <span class="toggle-text">View on map</span>
+            </a>
         </div>
 
-        @* Results count + View on map *@
-        <div class="results-bar">
-            <p class="govuk-body app-school-results-count" style="display:inline">
-                Showing <strong>@Model.ShowingFrom-@Model.ShowingTo</strong> of <strong>@Model.TotalResults</strong> similar schools
-            </p>
-            <span class="govuk-!-margin-left-4">
-                <a href="#" class="govuk-link govuk-link--no-visited-state">
-                    <span aria-hidden="true">📍</span> View on map
-                </a>
-            </span>
+        
+        <div  id="listView">
+            @* Results list *@
+            <partial name="SimilarSchoolsResults" model="Model" />
+
+            @* Pagination *@
+            @if (Model.TotalPages > 1)
+            {
+                <partial name="SimilarSchoolsPagination" model="Model" />
+            }
+        </div>
+        
+        <div id="mapView" class="govuk-!-display-none">
+            <partial name="SimilarSchoolsMap" model="Model" />
         </div>
 
-        @* Results list *@
-        <partial name="SimilarSchoolsResults" model="Model" />
-
-        @* Pagination *@
-        @if (Model.TotalPages > 1)
-        {
-            <partial name="SimilarSchoolsPagination" model="Model" />
-        }
     </div>
 </div>
 
@@ -69,3 +78,10 @@
         }
     })();
 </script>
+
+@section Scripts {
+    <script src="~/js/school-search-toggle.js"></script>
+    <script src="~/js/map-schools.js"></script>
+    <script src="~/js/leaflet.js"></script>
+    <script src="~/js/leaflet.markercluster.js"></script>
+}

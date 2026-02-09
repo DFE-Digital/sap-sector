@@ -3,6 +3,26 @@
 
 @if (Model.Schools.Any())
 {
+    @* Sort dropdown *@
+    <div class="govuk-form-group govuk-!-margin-bottom-4">
+        <label class="govuk-label govuk-!-display-inline govuk-!-font-weight-bold" for="sort-by">Sort by</label>
+        <select class="govuk-select" id="sort-by" name="sortBy" form="similar-schools-filter-form">
+            @foreach (var option in FilterOptions.SortOptions)
+            {
+                <option value="@option" selected="@(option == Model.SortBy ? "selected" : null)">@option</option>
+            }
+        </select>
+    </div>  
+    
+    <div class="results-bar">
+        <p class="govuk-body app-school-results-count">
+            Showing <strong>@Model.ShowingFrom-@Model.ShowingTo</strong> of <strong>@Model.TotalResults</strong> similar schools
+        </p>
+
+        <!-- Parent view will move the toggle link into here -->
+        <div id="resultsBarActions"></div>
+    </div>
+    
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
 
     <ul class="govuk-list app-school-results">

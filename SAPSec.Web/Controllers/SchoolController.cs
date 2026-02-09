@@ -124,7 +124,8 @@ public class SchoolController : Controller
             SortBy = sortBy,
             CurrentPage = page,
             PageSize = pageSize,
-            TotalResults = filtered.Count
+            TotalResults = filtered.Count,
+            MapSchools = allSchools
         };
 
         return View(viewModel);

@@ -91,6 +91,7 @@
         @RenderBody()
     </div>
 </div>
+@await RenderSectionAsync("Scripts", required: false)
 
 @section Scripts {
     <script add-nonce="true">
