@@ -30,7 +30,7 @@
         {
             <li class="app-school-result" id="similar-school-@school.Urn">
                 <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
-                   href="@Url.Action("Index", "School", new { urn = school.Urn })">
+                   href="@Url.Action("Index", "SimilarSchoolsComparison", new { urn = @Model.Urn ,comparisonUrn = school.Urn })">
                     @school.EstablishmentName
                 </a>
                 <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
