@@ -1,2 +1,4 @@
 ---
 EXAMPLE_KEY: example value 1
+Lucene:
+  EnableStartupIndexBuilder: false

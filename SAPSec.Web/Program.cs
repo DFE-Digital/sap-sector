@@ -122,7 +122,8 @@ public class Program
         
         
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
-        builder.Services.AddLuceneDependencies();
+        var enableStartupIndexBuilder = builder.Configuration.GetValue("Lucene:EnableStartupIndexBuilder", true);
+        builder.Services.AddLuceneDependencies(enableStartupIndexBuilder);
 
         // Service and Repo depencencies.
         builder.Services.AddDependencies();
