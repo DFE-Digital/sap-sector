@@ -104,13 +104,6 @@ variable "storage_container_delete_retention_days" {
   description = "Number of days to retain deleted containers"
 }
 
-variable "database_url_override" {
-  type        = string
-  default     = null
-  sensitive   = true
-  description = "Optional override for DATABASE_URL (e.g. shared test/staging database)"
-}
-
 locals {
   postgres_ssl_mode = var.enable_postgres_ssl ? "require" : "disable"
 

@@ -25,7 +25,4 @@ locals {
   key_vault_name = "${var.azure_resource_prefix}-${var.service_short}-${var.config_short}-app-kv"
   
   resource_group_name = "${var.azure_resource_prefix}-${var.service_short}-${var.config_short}-rg"
-
-  database_url = coalesce(var.database_url_override, module.postgres.url)
-  dotnet_connection_string = coalesce(var.database_url_override, module.postgres.dotnet_connection_string)
 }
