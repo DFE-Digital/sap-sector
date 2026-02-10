@@ -138,6 +138,7 @@ public static class FilterOptions
     {
         "Attainment 8",
         "School name",
+        "Similarity",
         "Distance",
         "Overall absence rate",
         "Persistent absence rate"

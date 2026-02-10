@@ -50,6 +50,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -67,6 +68,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -97,7 +99,13 @@ public class SchoolController : Controller
         //   1. Query v_similar_schools_secondary_groups WHERE urn = {urn}
         //   2. Join with v_similar_schools_secondary_values ON neighbour_urn = urn
         //   3. Join with v_establishment ON neighbour_urn = urn
-        var allSchools = MockSimilarSchoolsData.GetSimilarSchools(int.Parse(urn));
+        if (!int.TryParse(urn, out var urnValue))
+        {
+            _logger.LogInformation("{Urn} was not a valid integer on School Controller", urn);
+            return RedirectToAction("Error");
+        }
+
+        var allSchools = MockSimilarSchoolsData.GetSimilarSchools(urnValue);
 
         // Apply filters
         var filtered = ApplyFilters(allSchools, filters);
@@ -108,24 +116,20 @@ public class SchoolController : Controller
         // Pagination
         const int pageSize = 10;
         var totalResults = filtered.Count;
-        var pagedSchools = filtered
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToList();
 
         var viewModel = new SimilarSchoolsPageViewModel
         {
             // SchoolDetails base properties (from the looked-up school)
             EstablishmentName = school.Name.Display(),
             PhaseOfEducation = school.PhaseOfEducation.Display(),
-            Urn = int.Parse(urn),
+            Urn = urnValue,
             Schools = filtered.Skip((page - 1) * pageSize).Take(pageSize).ToList(),
             Filters = filters,
             SortBy = sortBy,
             CurrentPage = page,
             PageSize = pageSize,
             TotalResults = filtered.Count,
-            MapSchools = allSchools
+            MapSchools = filtered
         };
 
         return View(viewModel);
@@ -139,6 +143,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -156,6 +161,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -173,6 +179,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -191,6 +198,20 @@ public class SchoolController : Controller
         var result = schools.AsEnumerable();
 
         // Location filters
+        if (!string.IsNullOrEmpty(filters.Distance))
+        {
+            // TODO: Replace with actual distance-in-miles filtering once data is available.
+            result = filters.Distance switch
+            {
+                "Within 5 miles" => result.Where(s => s.Dist <= 0.2),
+                "Within 10 miles" => result.Where(s => s.Dist <= 0.4),
+                "Within 25 miles" => result.Where(s => s.Dist <= 0.6),
+                "Within 50 miles" => result.Where(s => s.Dist <= 0.8),
+                "Within 100 miles" => result.Where(s => s.Dist <= 1.0),
+                _ => result
+            };
+        }
+
         if (filters.SelectedRegions.Any())
         {
             result = result.Where(s =>
@@ -228,6 +249,26 @@ public class SchoolController : Controller
             result = result.Where(s => s.HasNurseryProvision == hasNursery);
         }
 
+        if (!string.IsNullOrEmpty(filters.SchoolCapacityInUse))
+        {
+            result = result.Where(s =>
+            {
+                if (!s.SchoolCapacity.HasValue || s.SchoolCapacity == 0) return false;
+                if (!s.NumberOfPupils.HasValue) return false;
+
+                var usagePct = (double)s.NumberOfPupils.Value / s.SchoolCapacity.Value * 100.0;
+
+                return filters.SchoolCapacityInUse switch
+                {
+                    "Under 50%" => usagePct < 50,
+                    "50% to 75%" => usagePct >= 50 && usagePct < 75,
+                    "75% to 100%" => usagePct >= 75 && usagePct <= 100,
+                    "Over 100%" => usagePct > 100,
+                    _ => true
+                };
+            });
+        }
+
         if (filters.SelectedAdmissionsPolicy.Any())
         {
             result = result.Where(s =>
@@ -238,6 +279,12 @@ public class SchoolController : Controller
         {
             result = result.Where(s =>
                 filters.SelectedGovernanceStructure.Contains(s.TypeOfEstablishment ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        if (filters.SelectedResourcedProvisionType.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedResourcedProvisionType.Contains(s.ResourcedProvisionType ?? string.Empty, StringComparer.OrdinalIgnoreCase));
         }
 
         // Attendance filters
@@ -276,6 +323,7 @@ public class SchoolController : Controller
         {
             "Attainment 8" => schools.OrderByDescending(s => s.Att8Scr).ToList(),
             "School name" => schools.OrderBy(s => s.EstablishmentName).ToList(),
+            "Distance" => schools.OrderBy(s => s.Dist).ToList(),
             "Similarity" => schools.OrderBy(s => s.Rank).ToList(),
             "Overall absence rate" => schools.OrderBy(s => s.OverallAbsenceRate).ToList(),
             "Persistent absence rate" => schools.OrderBy(s => s.PersistentAbsenceRate).ToList(),
