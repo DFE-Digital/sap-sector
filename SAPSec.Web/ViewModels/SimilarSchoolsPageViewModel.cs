@@ -12,6 +12,7 @@ public class SimilarSchoolsPageViewModel
     public string EstablishmentName { get; set; } = string.Empty;
     public string PhaseOfEducation { get; set; } = string.Empty;
     public List<SimilarSchoolViewModel> Schools { get; set; } = new();
+    public List<SimilarSchoolViewModel> MapSchools { get; set; } = new();
     public SimilarSchoolsFilterViewModel Filters { get; set; } = new();
     public string SortBy { get; set; } = "Attainment 8";
     public int CurrentPage { get; set; } = 1;

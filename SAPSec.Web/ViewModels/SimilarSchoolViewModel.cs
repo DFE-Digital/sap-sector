@@ -45,6 +45,9 @@ public class SimilarSchoolViewModel
     public int? SchoolCapacity { get; set; }
     public double? OverallAbsenceRate { get; set; }
     public double? PersistentAbsenceRate { get; set; }
+    
+    public string? Latitude { get; set; }
+    public string? Longitude { get; set; }
 
     public string FullAddress
     {

@@ -27,7 +27,8 @@ public static class MockSimilarSchoolsData
                 Region = "Yorkshire and The Humber", UrbanOrRural = "Urban",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-                SchoolCapacity = 1200, OverallAbsenceRate = 5.2, PersistentAbsenceRate = 12.1
+                SchoolCapacity = 1200, OverallAbsenceRate = 5.2, PersistentAbsenceRate = 12.1,
+                Latitude = "53.381129", Longitude = "-1.470085"
             },
             new()
             {
@@ -42,7 +43,8 @@ public static class MockSimilarSchoolsData
                 Region = "East Midlands", UrbanOrRural = "Rural",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-                SchoolCapacity = 800, OverallAbsenceRate = 4.8, PersistentAbsenceRate = 10.3
+                SchoolCapacity = 800, OverallAbsenceRate = 4.8, PersistentAbsenceRate = 10.3,
+                Latitude = "53.213600", Longitude = "-1.675500"
             },
             new()
             {
@@ -57,7 +59,8 @@ public static class MockSimilarSchoolsData
                 Region = "North West", UrbanOrRural = "Rural",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = false, HasNurseryProvision = false, ResourcedProvisionType = "Resourced provision",
-                SchoolCapacity = 600, OverallAbsenceRate = 6.1, PersistentAbsenceRate = 14.2
+                SchoolCapacity = 600, OverallAbsenceRate = 6.1, PersistentAbsenceRate = 14.2,
+                Latitude = "54.601000", Longitude = "-3.137000"
             },
             new()
             {
@@ -72,7 +75,8 @@ public static class MockSimilarSchoolsData
                 Region = "East of England", UrbanOrRural = "Urban",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-                SchoolCapacity = 950, OverallAbsenceRate = 4.5, PersistentAbsenceRate = 9.8
+                SchoolCapacity = 950, OverallAbsenceRate = 4.5, PersistentAbsenceRate = 9.8,
+                Latitude = "52.246300", Longitude = "0.711100"
             },
             new()
             {
@@ -87,7 +91,8 @@ public static class MockSimilarSchoolsData
                 Region = "North East", UrbanOrRural = "Rural",
                 AdmissionsPolicy = "Non-selective", Gender = "Mixed",
                 HasSixthForm = false, HasNurseryProvision = false, ResourcedProvisionType = "None",
-                SchoolCapacity = 700, OverallAbsenceRate = 5.8, PersistentAbsenceRate = 13.5
+                SchoolCapacity = 700, OverallAbsenceRate = 5.8, PersistentAbsenceRate = 13.5,
+                Latitude = "55.413700", Longitude = "-1.706500"
             },
             new()
             {
@@ -102,7 +107,8 @@ public static class MockSimilarSchoolsData
                 Region = "South East", UrbanOrRural = "Urban",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = true, HasNurseryProvision = true, ResourcedProvisionType = "None",
-                SchoolCapacity = 1100, OverallAbsenceRate = 3.9, PersistentAbsenceRate = 8.2
+                SchoolCapacity = 1100, OverallAbsenceRate = 3.9, PersistentAbsenceRate = 8.2,
+                Latitude = "50.757700", Longitude = "-1.544300"
             },
             new()
             {
@@ -117,7 +123,8 @@ public static class MockSimilarSchoolsData
                 Region = "West Midlands", UrbanOrRural = "Rural",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "SEN unit",
-                SchoolCapacity = 850, OverallAbsenceRate = 4.2, PersistentAbsenceRate = 9.1
+                SchoolCapacity = 850, OverallAbsenceRate = 4.2, PersistentAbsenceRate = 9.1,
+                Latitude = "52.111600", Longitude = "-2.325100"
             },
             new()
             {
@@ -132,7 +139,8 @@ public static class MockSimilarSchoolsData
                 Region = "North East", UrbanOrRural = "Rural",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = false, HasNurseryProvision = false, ResourcedProvisionType = "None",
-                SchoolCapacity = 750, OverallAbsenceRate = 5.5, PersistentAbsenceRate = 12.8
+                SchoolCapacity = 750, OverallAbsenceRate = 5.5, PersistentAbsenceRate = 12.8,
+                Latitude = "54.968000", Longitude = "-2.104000"
             },
             new()
             {
@@ -147,7 +155,8 @@ public static class MockSimilarSchoolsData
                 Region = "South East", UrbanOrRural = "Urban",
                 AdmissionsPolicy = "Non-selective", Gender = "Mixed",
                 HasSixthForm = false, HasNurseryProvision = false, ResourcedProvisionType = "None",
-                SchoolCapacity = 900, OverallAbsenceRate = 6.8, PersistentAbsenceRate = 15.9
+                SchoolCapacity = 900, OverallAbsenceRate = 6.8, PersistentAbsenceRate = 15.9,
+                Latitude = "51.191000", Longitude = "0.273000"
             },
             new()
             {
@@ -162,8 +171,10 @@ public static class MockSimilarSchoolsData
                 Region = "Yorkshire and The Humber", UrbanOrRural = "Urban",
                 AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
                 HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-                SchoolCapacity = 1050, OverallAbsenceRate = 4.6, PersistentAbsenceRate = 10.5
+                SchoolCapacity = 1050, OverallAbsenceRate = 4.6, PersistentAbsenceRate = 10.5,
+                Latitude = "53.992100", Longitude = "-1.541800"
             },
+
 
             // Rank 11-20
             new() { Urn = urn, NeighbourUrn = 100285, Dist = 0.4950, Rank = 11, Ks2Rp = 106.10, Ks2Mp = 105.30, PpPerc = 31.40, PercentEal = 19.80, Polar4QuintilePupils = 3, PStability = 89.10, IdaciPupils = 0.215, PercentSchSupport = 14.50, NumberOfPupils = 880, PercentStatementOrEhp = 1.90, Att8Scr = 44.8, EstablishmentName = "Brookside Community School", Street = "Riverside Walk", Town = "Shrewsbury", County = "Shropshire", Postcode = "SY1 2AB", PhaseOfEducation = "Secondary", TypeOfEstablishment = "Community school", Region = "West Midlands", UrbanOrRural = "Urban", AdmissionsPolicy = "Comprehensive", Gender = "Mixed", HasSixthForm = true, HasNurseryProvision = true, ResourcedProvisionType = "Resourced provision", SchoolCapacity = 880, OverallAbsenceRate = 5.4, PersistentAbsenceRate = 11.7 },
