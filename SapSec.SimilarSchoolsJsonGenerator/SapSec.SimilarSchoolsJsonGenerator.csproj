@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="OutputFiles\SimilarSchoolsPrimaryGroupsRow.json" />
+    <None Remove="OutputFiles\SimilarSchoolsPrimaryValuesRow.json" />
+    <None Remove="OutputFiles\SimilarSchoolsSecondaryGroupsRow.json" />
+    <None Remove="OutputFiles\SimilarSchoolsSecondaryValuesRow.json" />
+    <None Remove="SourceFiles\manual_2026-01-13_off_sen_primary_sim_sch_grps.csv" />
+    <None Remove="SourceFiles\manual_2026-01-13_off_sen_primary_sim_sch_var_vals.csv" />
+    <None Remove="SourceFiles\manual_2026-01-13_off_sen_secondary_sim_sch_grps.csv" />
+    <None Remove="SourceFiles\manual_2026-01-13_off_sen_secondary_sim_sch_var_vals.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="8.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

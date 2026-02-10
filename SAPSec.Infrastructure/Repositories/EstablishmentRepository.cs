@@ -2,11 +2,6 @@
 using SAPSec.Core.Model;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Repositories.Generic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAPSec.Infrastructure.Repositories
 {
