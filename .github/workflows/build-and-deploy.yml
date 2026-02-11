@@ -1,656 +1,265 @@
-name: School Data Ingestion Pipeline
+name: Build and Deploy
+concurrency: build_and_deploy_${{ github.ref_name }}
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 6 * * *"   # every day at 06:00 UTC
+    inputs:
+      environment:
+        description: "Deploy environment"
+        required: true
+        type: choice
+        default: review
+        options:
+          - review
+          - test
+          - production
+      docker-image-tag:
+        description: "Docker image tag to deploy (optional)"
+        required: true
+        type: string
+      pull-request-number:
+        description: "Pull request number (required for review environment)"
+        required: false
+        type: string
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+    types: [opened, reopened, synchronize, labeled]
 
-permissions:
-  contents: write
-  id-token: write   # required if using OIDC with azure/login
+env:
+  TERRAFORM_BASE: terraform/application
+  HEALTHCHECK_CMD: 'healthcheck'
 
 jobs:
-  ingest:
-    name: Ingest Raw Data & Build Warehouse
-    runs-on: ubuntu-latest
-    environment: test
-
+  build:
+    name: Build
+    if: ${{ github.event_name != 'workflow_dispatch' }}
     env:
-      # Blob (currently from GitHub secrets)
-      AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-      AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
-
-      # Sensitive source URLs (THREE endpoints in GitHub secrets)
-      SENSITIVE_DATASET_URL: ${{ secrets.SENSITIVE_DATASET_URL }}
-      SENSITIVE_ESTABLISHMENT_LINKS_URL: ${{ secrets.SENSITIVE_ESTABLISHMENT_LINKS_URL }}
-      SENSITIVE_MAT_LINKS_URL: ${{ secrets.SENSITIVE_MAT_LINKS_URL }}
-
-
-      # Konduit / AKS settings (also in GitHub secrets)
-      AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
-      AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
-      AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
-      KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
+      DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector
+    outputs:
+      docker-image-tag: ${{ steps.build-image.outputs.tag }}
+    permissions:
+      packages: write
+      pull-requests: write
+    runs-on: ubuntu-latest
 
     steps:
-      # ==============================
-      # 1. Checkout repo
-      # ==============================
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          persist-credentials: true
+      - uses: actions/checkout@v4
+        name: Checkout
 
-      # ==============================
-      # 2. Install dependencies
-      # ==============================
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            postgresql-client \
-            powershell \
-            unzip
-      - name: Install .NET SDK
+      - name: Build and push docker image
+        id: build-image
+        uses: DFE-Digital/github-actions/build-docker-image@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          context: .
+          docker-repository: ${{ env.DOCKER_REPOSITORY }}
+          max-cache: true
+          reuse-cache: true
+          snyk-token: ${{ secrets.SNYK_TOKEN }}
+
+  test:
+    name: Run Unit & Integration Tests with Coverage
+    if: ${{ github.event_name != 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: 8.0.x
 
-      - name: Install Azure CLI
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Debug --no-restore
+
+      - name: Install Playwright
+        working-directory: Tests/SAPSec.UI.Tests
         run: |
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-      # ==============================
-      # 3. Azure login (needed for az aks get-credentials)
-      # ==============================
-      - name: Azure login (OIDC)
-        uses: azure/login@v2
+          dotnet tool install --global Microsoft.Playwright.CLI
+          export PATH="$PATH:/root/.dotnet/tools"
+          playwright install --with-deps chromium
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
-      # ==============================
-      # 4. AKS access + konduit install
-      # ==============================
-      - name: Install kubectl (pinned)
-        shell: bash
+      - name: build frontend assets
+        working-directory: SAPSec.Web
         run: |
-          set -euo pipefail
-          KUBECTL_VERSION="v1.29.8"
-          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
-          sudo install -m 0755 kubectl /usr/local/bin/kubectl
-          kubectl version --client=true
-      - name: Install kubelogin (pinned)
-        shell: bash
-        run: |
-          set -euo pipefail
-          KUBELOGIN_VERSION="v0.1.6"
-          curl -fsSLo kubelogin.zip "https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip"
-          unzip -q kubelogin.zip
-          sudo install -m 0755 bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
-          kubelogin --version
-      - name: Configure AKS credentials
-        shell: bash
-        run: |
-          set -euo pipefail
-          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
-          kubelogin convert-kubeconfig -l azurecli
-      - name: Download konduit.sh
-        shell: bash
-        run: |
-          set -euo pipefail
-          curl -fsSL https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
-            -o "$GITHUB_WORKSPACE/konduit.sh"
-          chmod +x "$GITHUB_WORKSPACE/konduit.sh"
-          ls -la "$GITHUB_WORKSPACE/konduit.sh"
-      # ==============================
-      # 5. Ensure Blob container exists (idempotent)
-      # ==============================
-      - name: Ensure Blob container exists
-        shell: pwsh
-        run: |
-          az storage container create `
-            --name $env:AZURE_STORAGE_CONTAINER `
-            --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
-            --public-access off | Out-Null
-      # ==============================
-      # 6. Download source data and store latest versions in Blob
-      #
-      # LOGIC
-      # - GIAS: 3 sensitive URLs, resolved by yyyyMMdd backtracking.
-      #   * Url field in raw_sources.json contains a secret *token* that maps to an env var secret.
-      #   * One GIAS file is a ZIP and must be UNZIPPED before upload.
-      # - EES: only versioned API datasets are in raw_sources.json (DataSetId set, Url blank).
-      # - Unversioned/historical dataset files are manually uploaded as a one-off exercise and stored in BLOB storage.
-      #
-      # Tracks state in versions.json
-      # Outputs:
-      #   changed=True/False
-      #   latest_files={ key : filename }
-      #
-      # - Retries for downloads and Azure blob operations.
-      # ==============================
-      - name: Version datasets from raw_sources.json and upload to Blob
-        id: version
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = "Stop"
-          $conn = $env:AZURE_STORAGE_CONNECTION_STRING
-          $container = $env:AZURE_STORAGE_CONTAINER
-          $manifestBlobName = "versions.json"
-          $sourcesPathRepo = "SAPData/raw_sources.json"
-          if (-not (Test-Path $sourcesPathRepo)) { throw "Could not find $sourcesPathRepo in the repo." }
-          $workDir = "SAPData/Work/Versioning"
-          New-Item -ItemType Directory -Force -Path $workDir | Out-Null
-          $reportPath = Join-Path $workDir "step6_report.json"
-          $report = [System.Collections.Generic.List[object]]::new()
-          # -----------------------------
-          # Helpers (retries + reporting)
-          # -----------------------------
-          function Invoke-WithRetry([scriptblock]$Action, [int]$MaxAttempts = 5, [int]$InitialDelaySeconds = 2, [string]$Label = "operation") {
-            $attempt = 0
-            $delay = $InitialDelaySeconds
-            while ($true) {
-              try {
-                $attempt++
-                return & $Action
-              } catch {
-                if ($attempt -ge $MaxAttempts) {
-                  throw "Failed $Label after $attempt attempts. Last error: $($_.Exception.Message)"
-                }
-                Write-Host "Retrying $Label (attempt $attempt/$MaxAttempts). Waiting ${delay}s. Error: $($_.Exception.Message)"
-                Start-Sleep -Seconds $delay
-                $delay = [Math]::Min($delay * 2, 30)
-              }
-            }
-          }
-          function Write-Report([string]$key, [string]$org, [string]$status, [string]$finalName, [string]$sig, [string]$resolved, [string]$message = "") {
-            $report.Add([pscustomobject]@{
-              key = $key
-              sourceOrg = $org
-              status = $status
-              finalName = $finalName
-              signature = $sig
-              resolved = $resolved
-              message = $message
-              utcTime = [DateTime]::UtcNow.ToString("o")
-            })
-          }
-          # For safe logging - never print the actual secret URL template.
-          function Mask-GiasUrl([string]$urlToken, [string]$resolvedDate, [string]$extension) {
-            $t = if ([string]::IsNullOrWhiteSpace($urlToken)) { "GIAS" } else { $urlToken.Trim() }
-            $ext = if ([string]::IsNullOrWhiteSpace($extension)) { "" } else { $extension.Trim() }
-            return "${t}:{fileDatePostfix}=${resolvedDate}${ext}"
-          }
-          # -----------------------------
-          # Load sources
-          # -----------------------------
-          $sourcesRaw = Get-Content $sourcesPathRepo -Raw | ConvertFrom-Json
-          if ($null -eq $sourcesRaw) { throw "raw_sources.json parsed to null." }
-          if ($sourcesRaw -isnot [System.Array]) { $sourcesRaw = @($sourcesRaw) }
-          $sources = @()
-          foreach ($s in $sourcesRaw) {
-            $type     = [string]$s.Type
-            $sub      = [string]$s.Subtype
-            $year     = [string]$s.Year
-            $u        = [string]$s.Url
-            $org      = [string]$s.SourceOrg
-            $dsid     = [string]$s.DataSetId
-            $fileType = ([string]$s.FileType).ToLowerInvariant()
-            $fileName = [string]$s.FileName
-            if ([string]::IsNullOrWhiteSpace($type) -or
-                [string]::IsNullOrWhiteSpace($sub)  -or
-                [string]::IsNullOrWhiteSpace($year) -or
-                [string]::IsNullOrWhiteSpace($org)) {
-              throw "Each entry in raw_sources.json must include Type, Subtype, Year, SourceOrg. Offending entry: $($s | ConvertTo-Json -Compress)"
-            }
-            if ([string]::IsNullOrWhiteSpace($fileName)) {
-              throw "Each entry in raw_sources.json must include FileName. Offending entry: $($s | ConvertTo-Json -Compress)"
-            }
-            if ([string]::IsNullOrWhiteSpace($fileType)) { $fileType = "csv" }
-            if ($fileType -ne "csv" -and $fileType -ne "zip") {
-              throw "FileType must be 'csv' or 'zip'. Offending entry: $($s | ConvertTo-Json -Compress)"
-            }
-            $composite = "${type}_${sub}_${year}"
-            $safeKey = ($composite -replace '[^a-zA-Z0-9_\-\.]', '_').ToLowerInvariant()
-            $sources += [pscustomobject]@{
-              key       = $safeKey
-              url       = $u
-              type      = $type
-              subtype   = $sub
-              year      = $year
-              sourceOrg = $org
-              dataSetId = $dsid
-              fileType  = $fileType
-              fileName  = $fileName
-            }
-          }
-          if ($sources.Count -eq 0) { throw "No sources found in raw_sources.json" }
-          Write-Host "Loaded $($sources.Count) sources."
-          # -----------------------------
-          # Load manifest from Blob (if present)
-          # -----------------------------
-          $manifestPath = Join-Path $workDir "versions.json"
-          $manifest = @{}
-          $manifestExists = Invoke-WithRetry {
-            az storage blob exists `
-              --container-name $container `
-              --name $manifestBlobName `
-              --connection-string $conn | ConvertFrom-Json
-          } -Label "blob exists (versions.json)"
-          if ($manifestExists.exists -eq $true) {
-            Invoke-WithRetry {
-              az storage blob download `
-                --container-name $container `
-                --name $manifestBlobName `
-                --file "$manifestPath" `
-                --connection-string $conn `
-                --overwrite true | Out-Null
-            } -Label "download versions.json"
-            $manifest = Get-Content $manifestPath -Raw | ConvertFrom-Json -AsHashtable
-          }
-          # -----------------------------
-          # Helpers
-          # -----------------------------
-          function Get-LondonDateYyyyMmDd([int]$daysAgo = 0) {
-            $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Europe/London")
-            $nowLondon = [TimeZoneInfo]::ConvertTime([DateTimeOffset]::UtcNow, $tz).DateTime.Date
-            return $nowLondon.AddDays(-$daysAgo).ToString("yyyyMMdd")
-          }
-          # Probe existence via Range GET only (no HEAD, no retries, and no URL logging)
-          function Try-RangeProbe([string]$testUrl) {
-            try {
-              $g = Invoke-WithRetry { Invoke-WebRequest -Method Get -Uri $testUrl -Headers @{ Range = "bytes=0-0" } -UseBasicParsing } -MaxAttempts 3 -InitialDelaySeconds 1 -Label "Range GET $testUrl"
-              return @{ ok = $true; etag = $g.Headers.ETag; len = $g.Headers.'Content-Length'; lm = $g.Headers.'Last-Modified' }
-            } catch {
-              return @{ ok = $false; etag = $null; len = $null; lm = $null }
-            }
-          }
-          function Get-EnvVarRequired([string]$name) {
-            $v = [Environment]::GetEnvironmentVariable($name)
-            if ([string]::IsNullOrWhiteSpace($v)) { throw "Required environment variable/secret '$name' is not set." }
-            return $v
-          }
-          function Resolve-GiasTemplateFromToken([string]$token) {
-            if ([string]::IsNullOrWhiteSpace($token)) { throw "GIAS Url token was blank." }
-            $t = $token.Trim()
-            switch ($t) {
-              "__SECRET_URL__" { return Get-EnvVarRequired "SENSITIVE_DATASET_URL" }
-              "__SECRET_ESTABLISHMENT_LINKS_URL__" { return Get-EnvVarRequired "SENSITIVE_ESTABLISHMENT_LINKS_URL" }
-              "__SECRET_MAT_LINKS_URL__" { return Get-EnvVarRequired "SENSITIVE_MAT_LINKS_URL" }
-              default { throw "Unknown GIAS secret token '$t'. Add a mapping in Resolve-GiasTemplateFromToken()." }
-            }
-          }
-          function Get-FirstFileFromZip([string]$zipPath, [string]$outDir) {
-            Add-Type -AssemblyName System.IO.Compression.FileSystem
-            if (-not (Test-Path $zipPath)) { throw "Zip not found: $zipPath" }
-            $zip = [System.IO.Compression.ZipFile]::OpenRead($zipPath)
-            try {
-              $entries = @($zip.Entries | Where-Object { -not [string]::IsNullOrWhiteSpace($_.Name) })
-              if ($entries.Count -eq 0) { throw "Zip contains no files: $zipPath" }
-              $pick = $entries | Where-Object { $_.Name.ToLowerInvariant().EndsWith(".csv") } | Select-Object -First 1
-              if (-not $pick) { $pick = $entries | Select-Object -First 1 }
-              New-Item -ItemType Directory -Force -Path $outDir | Out-Null
-              $dest = Join-Path $outDir $pick.Name
-              $destParent = Split-Path $dest -Parent
-              if ($destParent) { New-Item -ItemType Directory -Force -Path $destParent | Out-Null }
-              [System.IO.Compression.ZipFileExtensions]::ExtractToFile($pick, $dest, $true)
-              return $dest
-            } finally {
-              $zip.Dispose()
-            }
-          }
-          # -----------------------------
-          # Main loop
-          # -----------------------------
-          $anyChanged = $false
-          $manifestChanged = $false
-          $latestFiles = @{}
-          try {
-            foreach ($src in $sources) {
-              $key         = [string]$src.key
-              $org         = [string]$src.sourceOrg
-              $dsid        = [string]$src.dataSetId
-              $urlToken    = [string]$src.url
-              $fileType    = [string]$src.fileType
-              $fileNameTpl = [string]$src.fileName
-              $resolvedInfo = ""
-              $finalName = $null
-              $downloadUrl = $null
-              $forcedSignature = $null
-              try {
-                if (-not $manifest.ContainsKey($key)) {
-                  $manifest[$key] = @{ latest = 0; lastSignature = ""; lastFileName = "" }
-                  $manifestChanged = $true
-                }
-                $prevSig = [string]$manifest[$key].lastSignature
-                $latest  = [int]$manifest[$key].latest
-                $hasUrlToken = -not [string]::IsNullOrWhiteSpace($urlToken)
-                $hasDsid     = -not [string]::IsNullOrWhiteSpace($dsid)
-                # -----------------------------
-                # GIAS
-                # -----------------------------
-                if ($org -eq "GIAS") {
-                  if (-not $hasUrlToken) { throw "GIAS entry '$key' must include Url token (e.g. __SECRET_URL__)." }
-                  $template = Resolve-GiasTemplateFromToken $urlToken
-                  if ($template -notmatch "\{fileDatePostfix\}") { throw "GIAS secret template for '$key' must include {fileDatePostfix} placeholder." }
-                  if ($fileNameTpl -notmatch "YYYYmmDD") { throw "GIAS FileName for '$key' must contain 'YYYYmmDD'." }
-                  $maxLookbackDays = 30
-                  if ($manifest[$key].ContainsKey("lastSuccessDate")) {
-                    $lastSuccess = [string]$manifest[$key].lastSuccessDate
-                    if ($lastSuccess -match '^\d{8}$') {
-                      $tz = [TimeZoneInfo]::FindSystemTimeZoneById("Europe/London")
-                      $nowLondon = [TimeZoneInfo]::ConvertTime([DateTimeOffset]::UtcNow, $tz).DateTime.Date
-                      $lastDt = [DateTime]::ParseExact($lastSuccess, "yyyyMMdd", [System.Globalization.CultureInfo]::InvariantCulture)
-                      $d = [int]($nowLondon - $lastDt).TotalDays
-                      if ($d -gt 0) { $maxLookbackDays = [Math]::Min([Math]::Max($d, 1), 90) }
-                    }
-                  }
-                  $resolvedDate = $null
-                  $resolvedUrl  = $null
-                  $resolvedHdr  = $null
-                  for ($i = 0; $i -le $maxLookbackDays; $i++) {
-                    $d = Get-LondonDateYyyyMmDd -daysAgo $i
-                    $candidate = $template.Replace("{fileDatePostfix}", $d)
-                    # Probe existence via Range GET only (quiet, no retries, and does not print URLs)
-                    $hdr = Try-RangeProbe $candidate
-                    if ($hdr.ok) {
-                      $resolvedDate = $d
-                      $resolvedUrl  = $candidate
-                      $resolvedHdr  = $hdr
-                      break
-                    }
-                  }
-                  if (-not $resolvedUrl) { throw "GIAS file not found for today or last $maxLookbackDays days (URL hidden)." }
-                  $downloadUrl = $resolvedUrl
-                  $manifest[$key].lastSuccessDate = $resolvedDate
-                  $resolvedBase = $fileNameTpl.Replace("YYYYmmDD", $resolvedDate)
-                  $finalName = "${resolvedBase}.csv"
-                  $parts = @("giasDate:$resolvedDate")
-                  if ($resolvedHdr.etag) { $parts += "etag:$($resolvedHdr.etag)" }
-                  if ($resolvedHdr.lm)   { $parts += "lm:$($resolvedHdr.lm)" }
-                  if ($resolvedHdr.len)  { $parts += "len:$($resolvedHdr.len)" }
-                  $forcedSignature = ($parts -join "|")
-                  # IMPORTANT: never log $downloadUrl or $template
-                  $resolvedInfo = Mask-GiasUrl -urlToken $urlToken -resolvedDate $resolvedDate -extension (".${fileType}")
-                }
-                # -----------------------------
-                # EES
-                # -----------------------------
-                if (-not $finalName -and $org -eq "EES") {
-                  if (-not $hasDsid -or $hasUrlToken) { throw "Invalid EES config for '$key': must have DataSetId set AND Url blank." }
-                  $versionsUrl = "https://api.education.gov.uk/statistics/v1/data-sets/$dsid/versions"
-                  $versions = Invoke-WithRetry {
-                    Invoke-WebRequest -Uri $versionsUrl -UseBasicParsing |
-                      Select-Object -ExpandProperty Content | ConvertFrom-Json
-                  } -Label "EES versions $dsid"
-                  $published = @($versions.results | Where-Object { $_.status -eq "Published" })
-                  if ($published.Count -eq 0) { throw "No Published versions returned for datasetId '$dsid'." }
-                  $latestPub = $published | Sort-Object { [DateTimeOffset]$_.published } -Descending | Select-Object -First 1
-                  $dataSetVersion = [string]$latestPub.version
-                  $downloadUrl = "https://api.education.gov.uk/statistics/v1/data-sets/$dsid/csv?dataSetVersion=$dataSetVersion"
-                  $forcedSignature = "ees:$dsid|version:$dataSetVersion"
-                  $finalName = "${fileNameTpl}_v${dataSetVersion}.csv"
-                  $manifest[$key].eesLatestVersion = $dataSetVersion
-                  $resolvedInfo = "version:$dataSetVersion"
-                }
-                if (-not $finalName) { throw "Unsupported source config for '$key'. SourceOrg must be GIAS or EES." }
-                if ([string]::IsNullOrWhiteSpace($downloadUrl)) { throw "Internal error: downloadUrl not resolved for '$key'." }
-                if ([string]::IsNullOrWhiteSpace($forcedSignature)) { throw "Internal error: forced signature missing for '$key'." }
-                $signature = $forcedSignature
-                $isChanged = ($latest -eq 0) -or ($signature -ne [string]$manifest[$key].lastSignature)
-                if ($isChanged) {
-                  $oldBlobName = [string]$manifest[$key].lastFileName
-                  $tmpDownloadPath = Join-Path $workDir "${key}.download"
-                  if ($org -eq "GIAS" -and $fileType -eq "zip") { $tmpDownloadPath = "${tmpDownloadPath}.zip" }
-                  else { $tmpDownloadPath = "${tmpDownloadPath}.csv" }
-                  # IMPORTANT: do not print $downloadUrl
-                  Write-Host "Downloading ${key} from $resolvedInfo to: $tmpDownloadPath"
-                  Invoke-WithRetry { Invoke-WebRequest -Uri $downloadUrl -OutFile $tmpDownloadPath -UseBasicParsing } -Label "download $key"
-                  if (-not (Test-Path $tmpDownloadPath)) { throw "Download failed; file not found: $tmpDownloadPath" }
-                  $uploadPath = $tmpDownloadPath
-                  if ($fileType -eq "zip") {
-                    $unzDir = Join-Path $workDir "${key}.unzipped"
-                    $uploadPath = Get-FirstFileFromZip -zipPath $tmpDownloadPath -outDir $unzDir
-                    if (-not (Test-Path $uploadPath)) { throw "Zip extraction failed; extracted file not found: $uploadPath" }
-                  }
-                  Write-Host "Uploading ${key} -> ${finalName} (from $uploadPath)"
-                  Invoke-WithRetry {
-                    az storage blob upload `
-                      --container-name $container `
-                      --name $finalName `
-                      --file "$uploadPath" `
-                      --connection-string $conn `
-                      --overwrite | Out-Null
-                  } -Label "upload $finalName"
-                  if (-not [string]::IsNullOrWhiteSpace($oldBlobName) -and -not ($oldBlobName.Equals($finalName, [StringComparison]::OrdinalIgnoreCase))) {
-                    $oldExists = Invoke-WithRetry {
-                      az storage blob exists `
-                        --container-name $container `
-                        --name $oldBlobName `
-                        --connection-string $conn | ConvertFrom-Json
-                    } -Label "exists $oldBlobName"
-                    if ($oldExists.exists -eq $true) {
-                      Write-Host "Deleting old blob for ${key}: ${oldBlobName}"
-                      Invoke-WithRetry {
-                        az storage blob delete `
-                          --container-name $container `
-                          --name $oldBlobName `
-                          --connection-string $conn | Out-Null
-                      } -Label "delete $oldBlobName"
-                    }
-                  }
-                  $anyChanged = $true
-                  $manifest[$key].latest = ($latest + 1)
-                  $manifest[$key].lastSignature = $signature
-                  $manifest[$key].lastFileName = $finalName
-                  $latestFiles[$key] = $finalName
-                  Write-Host "UPDATED: ${key} -> ${finalName}"
-                  Write-Report -key $key -org $org -status "updated" -finalName $finalName -sig $signature -resolved $resolvedInfo
-                } else {
-                  $lastFile = [string]$manifest[$key].lastFileName
-                  if ([string]::IsNullOrWhiteSpace($lastFile)) { $lastFile = $finalName }
-                  $latestFiles[$key] = $lastFile
-                  Write-Host "UNCHANGED: ${key} remains ${lastFile}"
-                  Write-Report -key $key -org $org -status "unchanged" -finalName $lastFile -sig $signature -resolved $resolvedInfo
-                }
-              } catch {
-                Write-Report -key $key -org $org -status "failed" -finalName ($finalName ?? "") -sig ($forcedSignature ?? "") -resolved ($resolvedInfo ?? "") -message $_.Exception.Message
-                throw
-              }
-            }
-          } finally {
-            $reportJson = $report | ConvertTo-Json -Depth 10
-            [System.IO.File]::WriteAllText($reportPath, $reportJson, (New-Object System.Text.UTF8Encoding($false)))
-            Write-Host "Wrote Step 6 report: $reportPath"
-          }
-          if ($anyChanged -or $manifestChanged) {
-            $json = $manifest | ConvertTo-Json -Depth 30
-            [System.IO.File]::WriteAllText($manifestPath, $json, (New-Object System.Text.UTF8Encoding($false)))
-            Invoke-WithRetry {
-              az storage blob upload `
-                --container-name $container `
-                --name $manifestBlobName `
-                --file "$manifestPath" `
-                --connection-string $conn `
-                --overwrite | Out-Null
-            } -Label "upload versions.json"
-          }
-          "changed=$anyChanged" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          $latestFilesJson = ($latestFiles | ConvertTo-Json -Depth 10 -Compress)
-          "latest_files=$latestFilesJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-      # ==============================
-      # 6b. Upload the report
-      # ==============================
+          npm ci
+          npm run build-fe
+          
+          echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
+          mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
+          cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
+          
+          echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="       
+          mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
+          cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
 
-      - name: Upload Step 6 report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: step6-report
-          path: SAPData/Work/Versioning/step6_report.json
-          if-no-files-found: warn
-
-      # ==============================
-      # 7. Download generator inputs from Blob Storage
-      #    - Downloads:
-      #        (A) ALL manual_* blobs (canonical manual uploads)
-      #        (B) ONLY the LATEST managed blobs (from step 6 output latest_files)
-      #    - Skips everything else (old managed versions, legacy leftovers, stray blobs)
-      # ==============================
-      - name: Download generator inputs from Blob Storage (manual_* + latest managed only)
-        shell: pwsh
+      - name: Run All Tests with Coverage
         env:
-          LATEST_FILES: ${{ steps.version.outputs.latest_files }}
+          HEADED: 0
+          PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
         run: |
-          $ErrorActionPreference = "Stop"
-          $rawDir = "SAPData/DataMap/SourceFiles"
-          New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
-          Get-ChildItem -Path $rawDir -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
-          # ---- Load latest managed filenames from step 6 output ----
-          $latest = $env:LATEST_FILES | ConvertFrom-Json -AsHashtable
-          if (-not $latest -or $latest.Keys.Count -eq 0) { throw "LATEST_FILES output was empty." }
-          $latestManagedFiles = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
-          foreach ($k in $latest.Keys) {
-            $fn = [string]$latest[$k]
-            if ([string]::IsNullOrWhiteSpace($fn)) { throw "LATEST_FILES contained an empty filename for key '$k'" }
-            [void]$latestManagedFiles.Add($fn)
-          }
-          # ---- List all blobs in container ----
-          $blobNamesJson = az storage blob list `
-            --container-name $env:AZURE_STORAGE_CONTAINER `
-            --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
-            --query "[].name" -o json
-          $blobNames = $blobNamesJson | ConvertFrom-Json
-          if ($blobNames -isnot [System.Array]) { $blobNames = @($blobNames) }
-          if (-not $blobNames -or $blobNames.Count -eq 0) {
-            throw "No blobs found in container '$($env:AZURE_STORAGE_CONTAINER)'."
-          }
-          # ---- Decide what to download ----
-          # Rule:
-          #   - Download if blob is manual_* (canonical manual uploads)
-          #   - Download if blob is exactly one of the latest managed filenames
-          #   - Otherwise skip
-          $toDownload = New-Object System.Collections.Generic.HashSet[string]([StringComparer]::OrdinalIgnoreCase)
-          foreach ($blob in $blobNames) {
-            if ([string]::IsNullOrWhiteSpace($blob)) { continue }
-            $lower = $blob.ToLowerInvariant()
-            if ($lower.StartsWith("manual_")) {
-              [void]$toDownload.Add($blob)
-              continue
-            }
-            if ($latestManagedFiles.Contains($blob)) {
-              [void]$toDownload.Add($blob)
-              continue
-            }
-          }
-          # Safety: ensure all latest managed files are included
-          foreach ($mf in $latestManagedFiles) { [void]$toDownload.Add($mf) }
-          if ($toDownload.Count -eq 0) { throw "No blobs selected for download." }
-          Write-Host "Downloading $($toDownload.Count) blobs (manual_* + latest managed only)"
-          foreach ($blob in $toDownload) {
-            $dest = Join-Path $rawDir $blob
-            az storage blob download `
-              --container-name $env:AZURE_STORAGE_CONTAINER `
-              --name $blob `
-              --file $dest `
-              --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
-              --overwrite true | Out-Null
-          }
-          Write-Host "Downloaded files:"
-          $files = Get-ChildItem -Path $rawDir -File | Sort-Object Name
-          $files | Select-Object Name, Length | Format-Table -AutoSize
-      # ==============================
-      # 8. Build + Run SQL generator
-      # ==============================
-      - name: Build SQL Generator
-        run: |
-          dotnet build SAPSec.sln --configuration Release
-      - name: Generate SQL Scripts
-        run: |
-          dotnet run --configuration Release --project SAPData/SAPData.csproj
-          echo "Generated SQL scripts."
-      # ==============================
-      # 9. Run ETL via konduit (private DB) WITH RETRY on transient disconnects
-      # ==============================
-      - name: Run ETL pipeline via konduit (retry on transient DB disconnect)
-        working-directory: SAPData/Sql
-        shell: bash
-        run: |
-          set -euo pipefail
-          echo "Running ETL via konduit (psql) with retry on transient disconnects"
-          ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
-          max_attempts=3
-          delay=10
-          log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
-          attempt=1
-          while [ $attempt -le $max_attempts ]; do
-            echo "ETL attempt $attempt/$max_attempts"
-            set +e
-            "$GITHUB_WORKSPACE/konduit.sh" \
-              -n "${AKS_NAMESPACE}" \
-              -t 7200 \
-              -x \
-              -i "$GITHUB_WORKSPACE/SAPData/Sql/run_all.sql" \
-              "${KONDUIT_APP_NAME}" -- psql 2>&1 | tee "$log_file"
-            exit_code=${PIPESTATUS[0]}
-            set -e
-            if [ $exit_code -eq 0 ]; then
-              echo "ETL succeeded on attempt $attempt"
-              exit 0
-            fi
-            if grep -Eqi \
-              "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected" \
-              "$log_file"; then
-              echo "Detected transient DB disconnect. Retrying after ${delay}s..."
-              sleep $delay
-              delay=$((delay * 2))
-              if [ $delay -gt 120 ]; then delay=120; fi
-              attempt=$((attempt + 1))
-              continue
-            fi
-            echo "ETL failed with exit code $exit_code (not classified as transient)."
-            exit $exit_code
+          TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
+          
+          for proj in $TEST_PROJECTS; do
+            echo "=== Running tests in $proj ==="
+          
+            dotnet test "$proj" \
+              --no-build \
+              --configuration Debug \
+              --results-directory "TestResults" \
+              --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
+              /p:CollectCoverage=true \
+              /p:CoverletOutputFormat=cobertura \
+              /p:DeterministicReport=true \
+              /p:UseSourceLink=true \
+              /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*' \
+              /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
+              --verbosity normal
           done
-          if [ $exit_code -ne 0 ]; then
-            echo "ETL failed after $max_attempts attempts."
-            exit 2
-          fi
-      # ==============================
-      # 10. Create & upload DB backup (used to restore db in review app env)
-      # ==============================
-      - name: Create + upload review seed DB backup
-        shell: bash
+      
+      #Example of how to exclude tests from coverage https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
+
+      - name: Upload Test Result Files
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: "**/TestResults/**/*"
+          retention-days: 5
+
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          reporter: 'dotnet-trx'
+          path: "**/TestResults/**/*.trx"
+          name: 'Test Results'
+
+      - name: merge coverage files
         run: |
-          set -euo pipefail
-          TODAY=$(TZ=Europe/London date +"%F")
-          LOCAL_FILE="sapsec_review_seed_${TODAY}.sql.gz"
-          # Only ever keep this single blob in storage
-          LATEST_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
-          echo "Creating DB dump -> ${LOCAL_FILE}"
-          echo "AKS_NAMESPACE=${AKS_NAMESPACE}"
-          echo "KONDUIT_APP_NAME=${KONDUIT_APP_NAME}"
-          set +e
-          "$GITHUB_WORKSPACE/konduit.sh" \
-            -n "${AKS_NAMESPACE}" \
-            -t 7200 \
-            -x \
-            "${KONDUIT_APP_NAME}" -- \
-            pg_dump --format=plain --no-owner --no-privileges 2> konduit_pg_dump.log | gzip -c > "${LOCAL_FILE}"
-          exit_code=${PIPESTATUS[0]}
-          set -e
-          if [ $exit_code -ne 0 ]; then
-            echo "konduit/pg_dump failed with exit code ${exit_code}"
-            exit $exit_code
-          fi
-          ls -lh "${LOCAL_FILE}"
-          echo "Uploading (overwriting) ${LATEST_BLOB} in container ${AZURE_STORAGE_CONTAINER}"
-          az storage blob upload \
-            --container-name "${AZURE_STORAGE_CONTAINER}" \
-            --name "${LATEST_BLOB}" \
-            --file "${LOCAL_FILE}" \
-            --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
-            --overwrite true >/dev/null
-          echo "Seed backup uploaded:"
-          echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
-          echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
+          dotnet tool install -g dotnet-coverage
+          dotnet coverage merge --reports $(find Tests -name "coverage.cobertura.xml") -f cobertura -o coverage-results/coverage.xml
+
+      - name: Generate Coverage Report
+        uses: clearlyip/code-coverage-report-action@v6
+        id: code_coverage_report_action
+        if: ${{ github.actor != 'dependabot[bot]'}}
+        with:
+          filename: "coverage-results/coverage.xml"
+          fail_on_negative_difference: true
+          only_list_changed_files: true
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
+        with:
+          recreate: true
+          path: code-coverage-results.md
+
+  deploy-review-app:
+    name: Deployment To Review
+    concurrency:
+      group: deploy_review_${{ github.event.pull_request.number || github.run_id }}
+      cancel-in-progress: true
+    if: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'deploy') }}
+    needs: [build]
+    environment:
+      name: review
+      url: ${{ steps.deploy_review.outputs.environment_url }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Deploy App to Review
+        id: deploy_review
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: review
+          pr-number: ${{ github.event.pull_request.number }}
+          sha: ${{ needs.build.outputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          db-seed: false
+          smoke-test: false
+
+  deploy:
+    name: Deploy environments
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    environment:
+      name: ${{ matrix.environment }}
+      url: ${{ steps.deploy_app.outputs.environment_url }}
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: write
+    strategy:
+      max-parallel: 1
+      matrix:
+        environment: [test, production]
+
+    steps:
+      - name: Deploy app to ${{ matrix.environment }}
+        id: deploy_app
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: ${{ matrix.environment }}
+          sha: ${{ needs.build.outputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          smoke-test: false
+
+  manual_deploy:
+    name: Manual deploy
+    concurrency:
+      group: deploy_manual_${{ inputs.environment }}_${{ inputs.pull-request-number || github.run_id }}
+      cancel-in-progress: true
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    environment:
+      name: ${{ inputs.environment }}
+      url: ${{ steps.deploy_manual.outputs.environment_url }}
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: write
+
+    steps:
+      - name: Deploy app to ${{ inputs.environment }}
+        id: deploy_manual
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: ${{ inputs.environment }}
+          pr-number: ${{ inputs.pull-request-number }}
+          sha: ${{ inputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          smoke-test: false
