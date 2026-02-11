@@ -271,7 +271,7 @@ jobs:
           AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
         run: |
           set -euo pipefail
-          BACKUP_BLOB="db-backups/sappub_review_seed_latest.sql.gz"
+          BACKUP_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
           BACKUP_FILE="seed.sql.gz"
 
           az storage blob download \
