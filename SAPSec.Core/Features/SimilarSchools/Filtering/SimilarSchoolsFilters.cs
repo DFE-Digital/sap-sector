@@ -1,14 +1,15 @@
 ﻿using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filterValues, SimilarSchool currentSchool)
 {
-    private Dictionary<string, ISimilarSchoolsFilter> _filters = new(StringComparer.InvariantCultureIgnoreCase)
+    private Dictionary<string, ISimilarSchoolsFilter> _filters = new List<ISimilarSchoolsFilter>
     {
-        ["Distance"] = new SimilarSchoolsDistanceFilter(currentSchool),
-        ["UrbanRural"] = new SimilarSchoolsUrbanRuralFilter(),
-    };
+        new SimilarSchoolsDistanceFilter(currentSchool),
+        new SimilarSchoolsUrbanRuralFilter(currentSchool),
+    }.ToDictionary(f => f.Key, StringComparer.InvariantCultureIgnoreCase);
 
     public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
     {
@@ -29,22 +30,25 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
         return filteredItems;
     }
 
-    public IDictionary<string, IEnumerable<FilterOption>> GetPossibleOptions(IEnumerable<SimilarSchool> items)
+    public IReadOnlyCollection<SimilarSchoolsAvailableFilter> AsAvailableFilters(IEnumerable<SimilarSchool> items)
     {
-        var possibleOptions = new Dictionary<string, IEnumerable<FilterOption>>();
+        var availableFilters = new List<SimilarSchoolsAvailableFilter>();
 
         foreach (var (key, filter) in _filters)
         {
             var values = filterValues.ContainsKey(key) ? filterValues[key] : [];
 
-            possibleOptions[key] = _filters[key] switch
+            if (filter is ISimilarSchoolsMultiValueFilter mvf)
             {
-                ISimilarSchoolsMultiValueFilter mvf => mvf.GetPossibleOptions(items, values),
-                ISimilarSchoolsSingleValueFilter svf => svf.GetPossibleOptions(items, values.LastOrDefault()),
-                _ => []
-            };
+                availableFilters.Add(mvf.AsAvailableFilter(items, values));
+            }
+
+            if (filter is ISimilarSchoolsSingleValueFilter svf)
+            {
+                availableFilters.Add(svf.AsAvailableFilter(items, values.LastOrDefault()));
+            }
         }
 
-        return possibleOptions;
+        return availableFilters;
     }
 }

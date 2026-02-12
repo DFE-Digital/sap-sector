@@ -4,6 +4,7 @@ using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
@@ -36,11 +37,7 @@ public class FindSimilarSchools(ISimilarSchoolsSecondaryRepository repository)
         return new(
             currentSchool.Name,
             sorting.GetPossibleOptions(request.SortBy).ToList().AsReadOnly(),
-            filters.GetPossibleOptions(similarSchools)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => (IReadOnlyCollection<FilterOption>)kvp.Value.ToList().AsReadOnly())
-                .AsReadOnly(),
+            filters.AsAvailableFilters(similarSchools),
             new PagedCollection<SimilarSchoolResult>(allResults, request.Page, ItemsPerPage),
             allResults
         );
@@ -56,6 +53,18 @@ public record FindSimilarSchoolsRequest(
 public record FindSimilarSchoolsResponse(
     string SchoolName,
     IReadOnlyCollection<SortOption> SortOptions,
-    IReadOnlyDictionary<string, IReadOnlyCollection<FilterOption>> FilterOptions,
+    IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
     IPagedCollection<SimilarSchoolResult> ResultsPage,
     IReadOnlyCollection<SimilarSchoolResult> AllResults);
+
+public record SimilarSchoolsAvailableFilter(
+    string Key,
+    string Name,
+    FilterType Type,
+    IReadOnlyCollection<FilterOption> Options,
+    string? CurrentSchoolValue);
+
+public record SimilarSchoolResult(
+    SimilarSchool SimilarSchool,
+    GeographicCoordinates? Coordinates,
+    SortOptionValue<DataWithAvailability<decimal>> SortValue);

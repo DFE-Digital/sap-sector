@@ -10,42 +10,45 @@
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
 <h2 class="govuk-heading-m">Sort options</h2>
-
+<p>Click an option to sort</p>
 <ul>
     @foreach (var o in Model.SortOptions)
     {
         if (o.Selected)
         {
-            <li><strong>@o.Key: @o.Name @(o.Selected ? "(selected)" : "")</strong></li>
+            <li><strong>@o.Name @(o.Selected ? "(selected)" : "")</strong></li>
         }
         else
         {
-            <li>@o.Key: @o.Name</li>
+            <li><a href="?sort=@o.Key">@o.Name</a></li>
         }
     }
 </ul>
 
 <h2 class="govuk-heading-m">Filter options</h2>
+<p>Click an option to filter</p>
 
 <ul>
-    @foreach (var (key, options) in Model.FilterOptions)
+    @foreach (var filter in Model.FilterOptions)
     {
         <li>
-            @key
+            @filter.Name
 
             <ul>
-            @foreach (var o in options)
+            @foreach (var o in filter.Options)
             {
                 if (o.Selected)
                 {
-                    <li><strong>@o.Key: @o.Name @(o.Selected ? "(selected)" : "")</strong></li>
+                    <li><strong>@o.Name @(o.Selected ? "(selected)" : "")</strong></li>
                 }
                 else
                 {
-                    <li>@o.Key: @o.Name</li>
+                    <li><a href="?@filter.Key=@o.Key">@o.Name</a></li>
                 }
             }
             </ul>
+
+            This school: @filter.CurrentSchoolValue
         </li>
     }
 </ul>

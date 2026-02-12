@@ -84,7 +84,7 @@ namespace SAPSec.Core.Tests.Services
 
             IEnumerable<string> urns = ["123456"];
             _mockRepo.Setup(r => r.GetEstablishmentsAsync(urns))
-                     .ReturnsAsync(expectedDestinations);
+                     .ReturnsAsync([FakeEstablishmentOne]);
 
             // Act
             var result = await _service.GetEstablishmentsAsync(urns);

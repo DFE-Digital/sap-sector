@@ -1,9 +1,14 @@
 ﻿using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimilarSchoolsFilter, ISimilarSchoolsSingleValueFilter
+public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimilarSchoolsSingleValueFilter
 {
+    public string Key => "dist";
+    public string Name => "Distance";
+    public FilterType Type => FilterType.SingleValue;
+
     public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
@@ -28,7 +33,14 @@ public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimila
             });
     }
 
-    public IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, string? value)
+    public SimilarSchoolsAvailableFilter AsAvailableFilter(IEnumerable<SimilarSchool> items, string? value) => new(
+        Key,
+        Name,
+        Type,
+        GetPossibleOptions(items, value).ToList().AsReadOnly(),
+        null);
+
+    private IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, string? value)
     {
         if (currentSchool.Coordinates == null)
         {

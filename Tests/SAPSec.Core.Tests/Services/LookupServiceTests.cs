@@ -159,8 +159,8 @@ public class LookupServiceTests
         var service = CreateService();
 
         // Act & Assert
-        var ex = await Assert.ThrowsAsync<Exception>(async () => await service.GetLookupValueAsync("Testing", "1"));
-        Assert.Equal("Database error", ex.Message);
+        var ex = await Assert.ThrowsAsync<AggregateException>(async () => await service.GetLookupValueAsync("Testing", "1"));
+        Assert.Equal("One or more errors occurred. (Database error)", ex.Message);
     }
 
     #endregion

@@ -101,8 +101,13 @@ public static class DataMapper
     /// <summary>
     /// Maps trust ID, returning NotApplicable if no trust.
     /// </summary>
-    public static DataWithAvailability<string> MapTrustId(string? trustId) =>
-        DataWithAvailability.FromStringWithoutCodes(trustId);
+    public static DataWithAvailability<string> MapTrustId(string? trustId)
+    {
+        return string.IsNullOrWhiteSpace(trustId)
+            ? DataWithAvailability.NotApplicable<string>()
+            : DataWithAvailability.Available(trustId);
+    }
+
 
     private static void AddIfNotEmpty(List<string> parts, string? value)
     {

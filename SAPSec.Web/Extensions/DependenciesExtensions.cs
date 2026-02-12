@@ -30,7 +30,6 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<ILookupService, LookupService>();
 
             services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
-
             services.AddSingleton<ISchoolSearchService, SchoolSearchService>();
 
             // Register SchoolDetailsService with explicit rule dependencies
