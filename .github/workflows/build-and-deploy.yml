@@ -290,14 +290,14 @@ jobs:
           set -euo pipefail
           PR_NUMBER="${{ github.event.pull_request.number }}"
           AKS_NAMESPACE="$(jq -r '.namespace' terraform/application/config/review.tfvars.json)"
-          APP_NAME="$(kubectl -n "${AKS_NAMESPACE}" get deploy -o name | grep "pr-${PR_NUMBER}" | head -n1 | sed 's#deployment.apps/##')"
-          : "${APP_NAME:?APP_NAME not found for PR ${PR_NUMBER}}"
+          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
           BACKUP_FILE="seed.sql.gz"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
           
+          kubectl -n "${AKS_NAMESPACE}" get deploy -o name | grep "pr-${PR_NUMBER}" || true
           kubectl -n "${AKS_NAMESPACE}" get deployment "${APP_NAME}"
 
           "$GITHUB_WORKSPACE/konduit.sh" \
