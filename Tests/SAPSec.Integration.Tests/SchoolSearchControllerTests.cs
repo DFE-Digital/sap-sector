@@ -259,7 +259,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithSingle_Match_RedirectsToSchoolDetails()
     {
-        var response = await fixture.NonRedirectingClient.GetAsync("/find-a-school/search?query=Notre%20Dame%20High%20School");
+        var response = await fixture.NonRedirectingClient.GetAsync("/find-a-school/search?query=Notre%20Dame%20High%20School,%20Norwich");
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
     }

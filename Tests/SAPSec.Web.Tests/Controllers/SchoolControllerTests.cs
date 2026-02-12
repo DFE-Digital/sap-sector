@@ -24,7 +24,7 @@ public class SchoolControllerTests
     #region Index Action Tests
 
     [Fact]
-    public void Index_ValidUrn_ReturnsViewWithSchoolDetails()
+    public async Task Index_ValidUrn_ReturnsViewWithSchoolDetails()
     {
         // Arrange
         var urn = "123456";
@@ -35,7 +35,7 @@ public class SchoolControllerTests
             .ReturnsAsync(schoolDetails);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
@@ -45,7 +45,7 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public void Index_ValidUrn_SetsBreadcrumbInViewData()
+    public async Task Index_ValidUrn_SetsBreadcrumbInViewData()
     {
         // Arrange
         var urn = "123456";
@@ -56,7 +56,7 @@ public class SchoolControllerTests
             .ReturnsAsync(schoolDetails);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
@@ -64,7 +64,7 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public void Index_SchoolNotFound_ReturnsNotFound()
+    public async Task Index_SchoolNotFound_ReturnsNotFound()
     {
         // Arrange
         var urn = "999999";
@@ -74,7 +74,7 @@ public class SchoolControllerTests
             .ReturnsAsync((SchoolDetails?)null);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -108,7 +108,7 @@ public class SchoolControllerTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void Index_InvalidUrn_ReturnsNotFound(string? urn)
+    public async Task Index_InvalidUrn_ReturnsNotFound(string? urn)
     {
         // Arrange
         _schoolDetailsServiceMock
@@ -116,7 +116,7 @@ public class SchoolControllerTests
             .ReturnsAsync((SchoolDetails?)null);
 
         // Act
-        var result = _sut.Index(urn!);
+        var result = await _sut.Index(urn!);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -141,7 +141,7 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public void Index_ReturnsDefaultView()
+    public async Task Index_ReturnsDefaultView()
     {
         // Arrange
         var urn = "123456";
@@ -152,7 +152,7 @@ public class SchoolControllerTests
             .ReturnsAsync(schoolDetails);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
