@@ -186,9 +186,11 @@ jobs:
     permissions:
       id-token: write
       pull-requests: write
+
     env:
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
       AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+
       KONDUIT_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
@@ -208,8 +210,8 @@ jobs:
           db-seed: false
           smoke-test: false
 
-      # ---------------------------
-      # REVIEW APP DATABASE SEED (PR)
+ # ---------------------------
+      # REVIEW APP DATABASE DEPLOYMENT (PR)
       # ---------------------------
       - name: Checkout (needed for workspace consistency)
         uses: actions/checkout@v4
@@ -262,13 +264,13 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
             -o "$GITHUB_WORKSPACE/konduit.sh"
           chmod +x "$GITHUB_WORKSPACE/konduit.sh"
-          ls -la "$GITHUB_WORKSPACE/konduit.sh"
+          ls -la "$GITHUB_WORKSPACE/konduit.sh"         
 
       - name: Download seed backup from Blob
         shell: bash
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
+          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }} 
         run: |
           set -euo pipefail
           BACKUP_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
@@ -286,19 +288,17 @@ jobs:
       - name: Restore backup into PR review DB
         continue-on-error: true
         shell: bash
+        env:
+          AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
         run: |
           set -euo pipefail
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          AKS_NAMESPACE="$(jq -r '.namespace' terraform/application/config/review.tfvars.json)"
-          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          APP_NAME="get-school-improvement-insights-${PR_NUMBER}"
           BACKUP_FILE="seed.sql.gz"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
-          
-          kubectl -n "${AKS_NAMESPACE}" get deploy -o name | grep "pr-${PR_NUMBER}" || true
-          kubectl -n "${AKS_NAMESPACE}" get deployment "${APP_NAME}"
 
           "$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
@@ -306,6 +306,7 @@ jobs:
             -x \
             -i "${BACKUP_FILE}" -c \
             "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X
+
 
   deploy:
     name: Deploy environments
