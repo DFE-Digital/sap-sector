@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Core.Model.KS4.Performance
 {
@@ -11,356 +6,302 @@ namespace SAPSec.Core.Model.KS4.Performance
     public class EstablishmentPerformance
     {
         public string Id { get; set; } = string.Empty;
-        /// 
-        ///Attainment 8 Boys filtered by Establishment for Current year 
-        /// 
-        public double? Attainment8_Boy_Est_Current_Num { get; set; }
-        public string Attainment8_Boy_Est_Current_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Disadvantaged filtered by Establishment for Current year 
-        /// 
-        public double? Attainment8_Dis_Est_Current_Num { get; set; }
-        public string Attainment8_Dis_Est_Current_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 EAL - English as additional language filtered by Establishment for Current year 
-        /// 
-        public double? Attainment8_EAL_Est_Current_Num { get; set; }
-        public string Attainment8_EAL_Est_Current_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Girls filtered by Establishment for Current year 
-        /// 
-        public double? Attainment8_Grl_Est_Current_Num { get; set; }
-        public string Attainment8_Grl_Est_Current_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Not disadvantaged filtered by Establishment for Current year 
-        /// 
-        public double? Attainment8_NDi_Est_Current_Num { get; set; }
-        public string Attainment8_NDi_Est_Current_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Non-Mobile filtered by Establishment for Current year 
-        /// 
-        public double? Attainment8_NMo_Est_Current_Num { get; set; }
-        public string Attainment8_NMo_Est_Current_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Total filtered by Establishment for Current year 
-        /// 
-        public double? Attainment8_Tot_Est_Current_Num { get; set; }
-        public string Attainment8_Tot_Est_Current_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Boys filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths49_Boy_Est_Current_Pct { get; set; }
-        public string EngMaths49_Boy_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Disadvantaged filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths49_Dis_Est_Current_Pct { get; set; }
-        public string EngMaths49_Dis_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 EAL - English as additional language filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths49_EAL_Est_Current_Pct { get; set; }
-        public string EngMaths49_EAL_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Girls filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths49_Grl_Est_Current_Pct { get; set; }
-        public string EngMaths49_Grl_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Not disadvantaged filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths49_NDi_Est_Current_Pct { get; set; }
-        public string EngMaths49_NDi_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Non-Mobile filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths49_NMo_Est_Current_Pct { get; set; }
-        public string EngMaths49_NMo_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Total filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths49_Tot_Est_Current_Pct { get; set; }
-        public string EngMaths49_Tot_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Boys filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths59_Boy_Est_Current_Pct { get; set; }
-        public string EngMaths59_Boy_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Disadvantaged filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths59_Dis_Est_Current_Pct { get; set; }
-        public string EngMaths59_Dis_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 EAL - English as additional language filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths59_EAL_Est_Current_Pct { get; set; }
-        public string EngMaths59_EAL_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Girls filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths59_Grl_Est_Current_Pct { get; set; }
-        public string EngMaths59_Grl_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Not disadvantaged filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths59_NDi_Est_Current_Pct { get; set; }
-        public string EngMaths59_NDi_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Non-Mobile filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths59_NMo_Est_Current_Pct { get; set; }
-        public string EngMaths59_NMo_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Total filtered by Establishment for Current year 
-        /// 
-        public double? EngMaths59_Tot_Est_Current_Pct { get; set; }
-        public string EngMaths59_Tot_Est_Current_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Boys filtered by Establishment for Previous year 
-        /// 
-        public double? Attainment8_Boy_Est_Previous_Num { get; set; }
-        public string Attainment8_Boy_Est_Previous_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Disadvantaged filtered by Establishment for Previous year 
-        /// 
-        public double? Attainment8_Dis_Est_Previous_Num { get; set; }
-        public string Attainment8_Dis_Est_Previous_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 EAL - English as additional language filtered by Establishment for Previous year 
-        /// 
-        public double? Attainment8_EAL_Est_Previous_Num { get; set; }
-        public string Attainment8_EAL_Est_Previous_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Girls filtered by Establishment for Previous year 
-        /// 
-        public double? Attainment8_Grl_Est_Previous_Num { get; set; }
-        public string Attainment8_Grl_Est_Previous_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Non-Mobile filtered by Establishment for Previous year 
-        /// 
-        public double? Attainment8_NMo_Est_Previous_Num { get; set; }
-        public string Attainment8_NMo_Est_Previous_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Total filtered by Establishment for Previous year 
-        /// 
-        public double? Attainment8_Tot_Est_Previous_Num { get; set; }
-        public string Attainment8_Tot_Est_Previous_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Boys filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths49_Boy_Est_Previous_Pct { get; set; }
-        public string EngMaths49_Boy_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Disadvantaged filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths49_Dis_Est_Previous_Pct { get; set; }
-        public string EngMaths49_Dis_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 EAL - English as additional language filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths49_EAL_Est_Previous_Pct { get; set; }
-        public string EngMaths49_EAL_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Girls filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths49_Grl_Est_Previous_Pct { get; set; }
-        public string EngMaths49_Grl_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Non-Mobile filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths49_NMo_Est_Previous_Pct { get; set; }
-        public string EngMaths49_NMo_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Total filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths49_Tot_Est_Previous_Pct { get; set; }
-        public string EngMaths49_Tot_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Boys filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths59_Boy_Est_Previous_Pct { get; set; }
-        public string EngMaths59_Boy_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Disadvantaged filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths59_Dis_Est_Previous_Pct { get; set; }
-        public string EngMaths59_Dis_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 EAL - English as additional language filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths59_EAL_Est_Previous_Pct { get; set; }
-        public string EngMaths59_EAL_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Girls filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths59_Grl_Est_Previous_Pct { get; set; }
-        public string EngMaths59_Grl_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Non-Mobile filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths59_NMo_Est_Previous_Pct { get; set; }
-        public string EngMaths59_NMo_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Total filtered by Establishment for Previous year 
-        /// 
-        public double? EngMaths59_Tot_Est_Previous_Pct { get; set; }
-        public string EngMaths59_Tot_Est_Previous_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Boys filtered by Establishment for Previous2 year 
-        /// 
-        public double? Attainment8_Boy_Est_Previous2_Num { get; set; }
-        public string Attainment8_Boy_Est_Previous2_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Disadvantaged filtered by Establishment for Previous2 year 
-        /// 
-        public double? Attainment8_Dis_Est_Previous2_Num { get; set; }
-        public string Attainment8_Dis_Est_Previous2_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 EAL - English as additional language filtered by Establishment for Previous2 year 
-        /// 
-        public double? Attainment8_EAL_Est_Previous2_Num { get; set; }
-        public string Attainment8_EAL_Est_Previous2_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Girls filtered by Establishment for Previous2 year 
-        /// 
-        public double? Attainment8_Grl_Est_Previous2_Num { get; set; }
-        public string Attainment8_Grl_Est_Previous2_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Not disadvantaged filtered by Establishment for Previous2 year 
-        /// 
-        public double? Attainment8_NDi_Est_Previous2_Num { get; set; }
-        public string Attainment8_NDi_Est_Previous2_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Non-Mobile filtered by Establishment for Previous2 year 
-        /// 
-        public double? Attainment8_NMo_Est_Previous2_Num { get; set; }
-        public string Attainment8_NMo_Est_Previous2_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///Attainment 8 Total filtered by Establishment for Previous2 year 
-        /// 
-        public double? Attainment8_Tot_Est_Previous2_Num { get; set; }
-        public string Attainment8_Tot_Est_Previous2_Num_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Boys filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths49_Boy_Est_Previous2_Pct { get; set; }
-        public string EngMaths49_Boy_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Disadvantaged filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths49_Dis_Est_Previous2_Pct { get; set; }
-        public string EngMaths49_Dis_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 EAL - English as additional language filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths49_EAL_Est_Previous2_Pct { get; set; }
-        public string EngMaths49_EAL_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Girls filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths49_Grl_Est_Previous2_Pct { get; set; }
-        public string EngMaths49_Grl_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Mobile filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths49_Mob_Est_Previous2_Pct { get; set; }
-        public string EngMaths49_Mob_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 4 to 9 Total filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths49_Tot_Est_Previous2_Pct { get; set; }
-        public string EngMaths49_Tot_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Boys filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths59_Boy_Est_Previous2_Pct { get; set; }
-        public string EngMaths59_Boy_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Disadvantaged filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths59_Dis_Est_Previous2_Pct { get; set; }
-        public string EngMaths59_Dis_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 EAL - English as additional language filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths59_EAL_Est_Previous2_Pct { get; set; }
-        public string EngMaths59_EAL_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Girls filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths59_Grl_Est_Previous2_Pct { get; set; }
-        public string EngMaths59_Grl_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Mobile filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths59_Mob_Est_Previous2_Pct { get; set; }
-        public string EngMaths59_Mob_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-        /// 
-        ///English and Maths grades 5 to 9 Total filtered by Establishment for Previous2 year 
-        /// 
-        public double? EngMaths59_Tot_Est_Previous2_Pct { get; set; }
-        public string EngMaths59_Tot_Est_Previous2_Pct_Reason { get; set; } = string.Empty;
-
-
-
-
+        public string LAId { get; set; } = string.Empty;
+        public string LAName { get; set; } = string.Empty;
+        public string RegionId { get; set; } = string.Empty;
+        public string RegionName { get; set; } = string.Empty;
+        public string Attainment8_Boy_Est_Current_Num { get; set; } = string.Empty;
+        public string Attainment8_Boy_Est_Previous_Num { get; set; } = string.Empty;
+        public string Attainment8_Boy_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Attainment8_Dis_Est_Current_Num { get; set; } = string.Empty;
+        public string Attainment8_Dis_Est_Previous_Num { get; set; } = string.Empty;
+        public string Attainment8_Dis_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Attainment8_EAL_Est_Current_Num { get; set; } = string.Empty;
+        public string Attainment8_EAL_Est_Previous_Num { get; set; } = string.Empty;
+        public string Attainment8_EAL_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Attainment8_Grl_Est_Current_Num { get; set; } = string.Empty;
+        public string Attainment8_Grl_Est_Previous_Num { get; set; } = string.Empty;
+        public string Attainment8_Grl_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Attainment8_NDi_Est_Current_Num { get; set; } = string.Empty;
+        public string Attainment8_NDi_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Attainment8_NMo_Est_Current_Num { get; set; } = string.Empty;
+        public string Attainment8_NMo_Est_Previous_Num { get; set; } = string.Empty;
+        public string Attainment8_NMo_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Attainment8_Tot_Est_Current_Num { get; set; } = string.Empty;
+        public string Attainment8_Tot_Est_Previous_Num { get; set; } = string.Empty;
+        public string Attainment8_Tot_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio4_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio4_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio4_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio49_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio49_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio49_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio5_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio5_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio5_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio59_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio59_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio59_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio6_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio6_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio6_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio7_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio7_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio7_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio79_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio79_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio79_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio8_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio8_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio8_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Bio9_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Bio9_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Bio9_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem4_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem4_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem4_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem49_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem49_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem49_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem5_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem5_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem5_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem59_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem59_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem59_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem6_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem6_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem6_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem7_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem7_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem7_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem79_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem79_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem79_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem8_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem8_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem8_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Chem9_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Chem9_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Chem9_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci43_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci43_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci43_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci44_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci44_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci44_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci49_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci49_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci49_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci54_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci54_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci54_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci55_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci55_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci55_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci59_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci59_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci59_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci65_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci65_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci65_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci66_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci66_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci66_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci76_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci76_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci76_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci77_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci77_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci77_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci79_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci79_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci79_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci87_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci87_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci87_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci88_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci88_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci88_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci98_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci98_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci98_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string CombSci99_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string CombSci99_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string CombSci99_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang4_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang4_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang4_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang49_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang49_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang49_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang5_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang5_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang5_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang59_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang59_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang59_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang6_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang6_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang6_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang7_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang7_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang7_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang79_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang79_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang79_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang8_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang8_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang8_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLang9_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLang9_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLang9_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit4_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit4_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit4_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit49_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit49_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit49_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit5_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit5_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit5_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit59_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit59_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit59_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit6_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit6_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit6_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit7_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit7_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit7_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit79_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit79_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit79_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit8_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit8_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit8_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngLit9_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string EngLit9_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngLit9_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string EngMaths49_Boy_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths49_Boy_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Boy_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths49_Boy_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Boy_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Dis_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths49_Dis_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Dis_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths49_Dis_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Dis_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths49_EAL_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths49_EAL_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths49_EAL_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths49_EAL_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths49_EAL_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Grl_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths49_Grl_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Grl_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths49_Grl_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Grl_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Mob_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths49_NDi_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths49_NDi_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths49_NMo_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths49_NMo_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths49_NMo_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths49_NMo_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Tot_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths49_Tot_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Tot_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths49_Tot_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths49_Tot_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Boy_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths59_Boy_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Boy_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths59_Boy_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Boy_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Dis_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths59_Dis_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Dis_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths59_Dis_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Dis_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths59_EAL_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths59_EAL_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths59_EAL_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths59_EAL_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths59_EAL_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Grl_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths59_Grl_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Grl_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths59_Grl_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Grl_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Mob_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string EngMaths59_NDi_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths59_NDi_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths59_NMo_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths59_NMo_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths59_NMo_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths59_NMo_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Tot_Est_Current_Num { get; set; } = string.Empty;
+        public string EngMaths59_Tot_Est_Current_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Tot_Est_Previous_Num { get; set; } = string.Empty;
+        public string EngMaths59_Tot_Est_Previous_Pct { get; set; } = string.Empty;
+        public string EngMaths59_Tot_Est_Previous2_Pct { get; set; } = string.Empty;
+        public string Maths4_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths4_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths4_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths49_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths49_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths49_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths5_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths5_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths5_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths59_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths59_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths59_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths6_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths6_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths6_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths7_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths7_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths7_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths79_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths79_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths79_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths8_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths8_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths8_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Maths9_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Maths9_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Maths9_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics4_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics4_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics4_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics49_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics49_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics49_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics5_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics5_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics5_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics59_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics59_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics59_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics6_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics6_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics6_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics7_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics7_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics7_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics79_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics79_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics79_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics8_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics8_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics8_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Physics9_Sum_Est_Current_Num { get; set; } = string.Empty;
+        public string Physics9_Sum_Est_Previous_Num { get; set; } = string.Empty;
+        public string Physics9_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+        public string Prog8_Tot_Est_Previous_Num { get; set; } = string.Empty;
+        public string Prog8_Tot_Est_Previous2_Num { get; set; } = string.Empty;
     }
 }

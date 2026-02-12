@@ -25,12 +25,12 @@ namespace SAPSec.Core.Features.SchoolSearch
             name,
             establishment.URN,
             establishment.EstablishmentName,
-            establishment.AddressStreet,
-            establishment.AddressLocality,
-            establishment.AddressAddress3,
-            establishment.AddressTown,
-            establishment.AddressPostcode,
-            establishment.LANAme,
+            establishment.Street,
+            establishment.Locality,
+            establishment.Address3,
+            establishment.Town,
+            establishment.Postcode,
+            establishment.LAName,
             establishment.Latitude,
             establishment.Longitude);
     }

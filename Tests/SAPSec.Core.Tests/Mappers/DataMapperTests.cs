@@ -192,10 +192,10 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            AddressStreet = "123 Test Street",
-            AddressLocality = "Test Area",
-            AddressTown = "Sheffield",
-            AddressPostcode = "S1 1AA"
+            Street = "123 Test Street",
+            Locality = "Test Area",
+            Town = "Sheffield",
+            Postcode = "S1 1AA"
         };
 
         // Act
@@ -212,8 +212,8 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            AddressTown = "Sheffield",
-            AddressPostcode = "S1 1AA"
+            Town = "Sheffield",
+            Postcode = "S1 1AA"
         };
 
         // Act
@@ -230,7 +230,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            AddressPostcode = "S1 1AA"
+            Postcode = "S1 1AA"
         };
 
         // Act
@@ -260,9 +260,9 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            AddressStreet = "",
-            AddressTown = "  ",
-            AddressPostcode = null
+            Street = "",
+            Town = "  ",
+            Postcode = null
         };
 
         // Act
@@ -278,11 +278,11 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            AddressStreet = "123 Street",
-            AddressLocality = "Locality",
-            AddressAddress3 = "District",
-            AddressTown = "Sheffield",
-            AddressPostcode = "S1 1AA"
+            Street = "123 Street",
+            Locality = "Locality",
+            Address3 = "District",
+            Town = "Sheffield",
+            Postcode = "S1 1AA"
         };
 
         // Act

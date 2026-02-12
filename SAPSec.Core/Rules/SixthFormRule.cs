@@ -14,10 +14,10 @@ public sealed class SixthFormRule : IBusinessRule<bool>
     {
         return establishment.OfficialSixthFormId switch
         {
-            SixthFormCodes.HasSixthForm => DataAvailability.Available(true),
-            SixthFormCodes.NoSixthForm => DataAvailability.Available(false),
-            SixthFormCodes.NotApplicable => DataAvailability.NotApplicable<bool>(),
-            _ => DataAvailability.NotAvailable<bool>()
+            SixthFormCodes.HasSixthForm => DataWithAvailability.Available(true),
+            SixthFormCodes.NoSixthForm => DataWithAvailability.Available(false),
+            SixthFormCodes.NotApplicable => DataWithAvailability.NotApplicable<bool>(),
+            _ => DataWithAvailability.NotAvailable<bool>()
         };
     }
 }

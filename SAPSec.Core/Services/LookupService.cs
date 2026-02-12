@@ -1,8 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
-using System.Collections.Concurrent;
 
 namespace SAPSec.Core.Services;
 
@@ -29,14 +27,14 @@ public class LookupService : ILookupService
     /// <summary>
     /// Gets a lookup value by type and ID. Uses cached dictionary for O(1) lookup.
     /// </summary>
-    public string GetLookupValue(string lookupType, string? id)
+    public Task<string> GetLookupValueAsync(string lookupType, string? id)
     {
         if (string.IsNullOrWhiteSpace(id))
-            return string.Empty;
+            return Task.FromResult(string.Empty);
 
-        return _lookupCache.Value.TryGetValue((lookupType, id), out var name)
+        return Task.FromResult(_lookupCache.Value.TryGetValue((lookupType, id), out var name)
             ? name
-            : string.Empty;
+            : string.Empty);
     }
 
     private Dictionary<(string Type, string Id), string> LoadCache()
@@ -44,7 +42,9 @@ public class LookupService : ILookupService
         _logger.LogInformation("Loading lookup cache...");
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        var lookups = _lookupRepository.GetAllLookups();
+        var lookupsTask = Task.Run(_lookupRepository.GetAllLookupsAsync);
+        lookupsTask.Wait();
+        var lookups = lookupsTask.Result;
 
         var cache = lookups
             .Where(l => !string.IsNullOrWhiteSpace(l.LookupType) && !string.IsNullOrWhiteSpace(l.Id))

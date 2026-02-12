@@ -20,7 +20,7 @@ public class SchoolSearchController(
     public IActionResult Index() => View(new SchoolSearchQueryViewModel());
 
     [HttpPost]
-    public IActionResult Index(SchoolSearchQueryViewModel searchQueryViewModel)
+    public async Task<IActionResult> Index(SchoolSearchQueryViewModel searchQueryViewModel)
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
@@ -39,7 +39,7 @@ public class SchoolSearchController(
                 });
             }
 
-            var school = _searchService.SearchByNumber(searchQueryViewModel.Urn);
+            var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
@@ -145,7 +145,7 @@ public class SchoolSearchController(
 
     [HttpPost]
     [Route("search")]
-    public IActionResult Search(SchoolSearchQueryViewModel searchQueryViewModel)
+    public async Task<IActionResult> Search(SchoolSearchQueryViewModel searchQueryViewModel)
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
@@ -162,7 +162,7 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", searchQueryViewModel);
             }
 
-            var school = _searchService.SearchByNumber(searchQueryViewModel.Urn);
+            var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new

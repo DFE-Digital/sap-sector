@@ -6,5 +6,5 @@ public interface ISchoolSearchService
 {
     Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query);
     Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart);
-    Establishment? SearchByNumber(string schoolNumber);
+    Task<Establishment?> SearchByNumberAsync(string schoolNumber);
 }

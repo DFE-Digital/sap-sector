@@ -1,16 +1,12 @@
 ﻿using SAPSec.Core.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAPSec.Core.Interfaces.Services
 {
     public interface IEstablishmentService
     {
-        IEnumerable<Establishment> GetAllEstablishments();
-        Establishment GetEstablishment(string urn);
-        Establishment GetEstablishmentByAnyNumber(string number);
+        Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync();
+        Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns);
+        Task<Establishment> GetEstablishmentAsync(string urn);
+        Task<Establishment> GetEstablishmentByAnyNumberAsync(string number);
     }
 }

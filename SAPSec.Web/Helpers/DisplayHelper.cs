@@ -19,14 +19,32 @@ public static class DisplayHelpers
     /// <summary>
     /// Renders a string value with appropriate fallback for unavailable data.
     /// </summary>
-    public static string Display(this DataWithAvailability<string> data)
+    public static string Display(this DataWithAvailability<int> data, string format) =>
+        data.Display(v => v.ToString(format));
+
+    /// <summary>
+    /// Renders a string value with appropriate fallback for unavailable data.
+    /// </summary>
+    public static string Display(this DataWithAvailability<decimal> data, string format) =>
+        data.Display(v => v.ToString(format));
+
+    /// <summary>
+    /// Renders a string value with appropriate fallback for unavailable data.
+    /// </summary>
+    public static string Display<T>(this DataWithAvailability<T> data) =>
+        data.Display(v => v?.ToString());
+
+    /// <summary>
+    /// Renders a string value with appropriate fallback for unavailable data.
+    /// </summary>
+    public static string Display<T>(this DataWithAvailability<T> data, Func<T?, string?> valueToString)
     {
         return data.Availability switch
         {
-            DataAvailabilityStatus.Available => data.Value ?? NotAvailableText,
+            DataAvailabilityStatus.Available => valueToString(data.Value) ?? NotAvailableText,
             DataAvailabilityStatus.Redacted => RedactedText,
             DataAvailabilityStatus.NotApplicable => NotApplicableText,
-            DataAvailabilityStatus.Low => data.Value ?? NotAvailableText,
+            DataAvailabilityStatus.Low => valueToString(data.Value) ?? NotAvailableText,
             _ => NotAvailableText
         };
     }

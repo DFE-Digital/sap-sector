@@ -1,9 +1,8 @@
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Infrastructure.Factories;
-using SAPSec.Infrastructure.Repositories;
+using SAPSec.Infrastructure.Repositories.Postgres;
 
 namespace SAPSec.Infrastructure.Extensions;
 
@@ -15,6 +14,7 @@ public static class PostgresDependenciesExtensions
 
         // Always default to Postgres in the app
         services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
+        services.AddSingleton<ISimilarSchoolsSecondaryRepository, PostgresSimilarSchoolsSecondaryRepository>();
 
         return services;
     }

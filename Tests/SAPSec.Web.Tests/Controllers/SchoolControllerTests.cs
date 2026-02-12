@@ -24,18 +24,18 @@ public class SchoolControllerTests
     #region Index Action Tests
 
     [Fact]
-    public void Index_ValidUrn_ReturnsViewWithSchoolDetails()
+    public async Task Index_ValidUrn_ReturnsViewWithSchoolDetails()
     {
         // Arrange
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrn(urn))
-            .Returns(schoolDetails);
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync(schoolDetails);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
@@ -45,18 +45,18 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public void Index_ValidUrn_SetsBreadcrumbInViewData()
+    public async Task Index_ValidUrn_SetsBreadcrumbInViewData()
     {
         // Arrange
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrn(urn))
-            .Returns(schoolDetails);
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync(schoolDetails);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
@@ -64,17 +64,17 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public void Index_SchoolNotFound_ReturnsNotFound()
+    public async Task Index_SchoolNotFound_ReturnsNotFound()
     {
         // Arrange
         var urn = "999999";
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrn(urn))
-            .Returns((SchoolDetails?)null);
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync((SchoolDetails?)null);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -87,8 +87,8 @@ public class SchoolControllerTests
         var urn = "999999";
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrn(urn))
-            .Returns((SchoolDetails?)null);
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync((SchoolDetails?)null);
 
         // Act
         _sut.Index(urn);
@@ -108,15 +108,15 @@ public class SchoolControllerTests
     [InlineData("")]
     [InlineData(" ")]
     [InlineData(null)]
-    public void Index_InvalidUrn_ReturnsNotFound(string? urn)
+    public async Task Index_InvalidUrn_ReturnsNotFound(string? urn)
     {
         // Arrange
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrn(It.IsAny<string>()))
-            .Returns((SchoolDetails?)null);
+            .Setup(x => x.TryGetByUrnAsync(It.IsAny<string>()))
+            .ReturnsAsync((SchoolDetails?)null);
 
         // Act
-        var result = _sut.Index(urn!);
+        var result = await _sut.Index(urn!);
 
         // Assert
         result.Should().BeOfType<NotFoundResult>();
@@ -130,29 +130,29 @@ public class SchoolControllerTests
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrn(urn))
-            .Returns(schoolDetails);
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync(schoolDetails);
 
         // Act
         _sut.Index(urn);
 
         // Assert
-        _schoolDetailsServiceMock.Verify(x => x.TryGetByUrn(urn), Times.Once);
+        _schoolDetailsServiceMock.Verify(x => x.TryGetByUrnAsync(urn), Times.Once);
     }
 
     [Fact]
-    public void Index_ReturnsDefaultView()
+    public async Task Index_ReturnsDefaultView()
     {
         // Arrange
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrn(urn))
-            .Returns(schoolDetails);
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync(schoolDetails);
 
         // Act
-        var result = _sut.Index(urn);
+        var result = await _sut.Index(urn);
 
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
@@ -168,43 +168,43 @@ public class SchoolControllerTests
         return new SchoolDetails
         {
             // Identifiers - Using new DataAvailability factory
-            Name = DataAvailability.Available(name),
-            Urn = DataAvailability.Available(urn),
-            DfENumber = DataAvailability.Available("373/1234"),
-            Ukprn = DataAvailability.Available("10012345"),
+            Name = DataWithAvailability.Available(name),
+            Urn = DataWithAvailability.Available(urn),
+            DfENumber = DataWithAvailability.Available("373/1234"),
+            Ukprn = DataWithAvailability.Available("10012345"),
 
             // Location
-            Address = DataAvailability.Available("123 Test Street, Sheffield, S1 1AA"),
-            LocalAuthorityName = DataAvailability.Available("Sheffield"),
-            LocalAuthorityCode = DataAvailability.Available("373"),
-            Region = DataAvailability.Available("Yorkshire"),
-            UrbanRuralDescription = DataAvailability.Available("Urban"),
+            Address = DataWithAvailability.Available("123 Test Street, Sheffield, S1 1AA"),
+            LocalAuthorityName = DataWithAvailability.Available("Sheffield"),
+            LocalAuthorityCode = DataWithAvailability.Available("373"),
+            Region = DataWithAvailability.Available("Yorkshire"),
+            UrbanRuralDescription = DataWithAvailability.Available("Urban"),
 
             // School characteristics
-            AgeRangeLow = DataAvailability.Available(11),
-            AgeRangeHigh = DataAvailability.Available(18),
-            GenderOfEntry = DataAvailability.Available("Mixed"),
-            PhaseOfEducation = DataAvailability.Available("Secondary"),
-            SchoolType = DataAvailability.Available("Academy converter"),
-            AdmissionsPolicy = DataAvailability.Available("Non-selective"),
-            ReligiousCharacter = DataAvailability.Available("None"),
+            AgeRangeLow = DataWithAvailability.Available(11),
+            AgeRangeHigh = DataWithAvailability.Available(18),
+            GenderOfEntry = DataWithAvailability.Available("Mixed"),
+            PhaseOfEducation = DataWithAvailability.Available("Secondary"),
+            SchoolType = DataWithAvailability.Available("Academy converter"),
+            AdmissionsPolicy = DataWithAvailability.Available("Non-selective"),
+            ReligiousCharacter = DataWithAvailability.Available("None"),
 
             // Governance
-            GovernanceStructure = DataAvailability.Available(GovernanceType.MultiAcademyTrust),
-            AcademyTrustName = DataAvailability.Available("Test Trust"),
-            AcademyTrustId = DataAvailability.Available("5001"),
+            GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
+            AcademyTrustName = DataWithAvailability.Available("Test Trust"),
+            AcademyTrustId = DataWithAvailability.Available("5001"),
 
             // Provisions
-            HasNurseryProvision = DataAvailability.Available(false),
-            HasSixthForm = DataAvailability.Available(true),
-            HasSenUnit = DataAvailability.Available(false),
-            HasResourcedProvision = DataAvailability.Available(false),
+            HasNurseryProvision = DataWithAvailability.Available(false),
+            HasSixthForm = DataWithAvailability.Available(true),
+            HasSenUnit = DataWithAvailability.Available(false),
+            HasResourcedProvision = DataWithAvailability.Available(false),
 
             // Contact
-            HeadteacherName = DataAvailability.Available("Mr John Smith"),
-            Website = DataAvailability.Available("https://www.testacademy.org.uk"),
-            Telephone = DataAvailability.Available("0114 123 4567"),
-            Email = DataAvailability.NotAvailable<string>()
+            HeadteacherName = DataWithAvailability.Available("Mr John Smith"),
+            Website = DataWithAvailability.Available("https://www.testacademy.org.uk"),
+            Telephone = DataWithAvailability.Available("0114 123 4567"),
+            Email = DataWithAvailability.NotAvailable<string>()
         };
     }
 

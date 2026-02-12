@@ -18,41 +18,41 @@ public sealed class GovernanceRule : IBusinessRule<GovernanceType>
         if (IsAcademyType(typeId, typeName))
         {
             return hasTrust
-                ? DataAvailability.Available(GovernanceType.MultiAcademyTrust)
-                : DataAvailability.Available(GovernanceType.SingleAcademyTrust);
+                ? DataWithAvailability.Available(GovernanceType.MultiAcademyTrust)
+                : DataWithAvailability.Available(GovernanceType.SingleAcademyTrust);
         }
 
         // Local Authority maintained
         if (EstablishmentTypeClassification.IsLocalAuthorityMaintained(typeId))
         {
-            return DataAvailability.Available(GovernanceType.LocalAuthorityMaintained);
+            return DataWithAvailability.Available(GovernanceType.LocalAuthorityMaintained);
         }
 
         // Non-maintained special school
         if (EstablishmentTypeClassification.IsNonMaintainedSpecialSchool(typeId))
         {
-            return DataAvailability.Available(GovernanceType.NonMaintainedSpecialSchool);
+            return DataWithAvailability.Available(GovernanceType.NonMaintainedSpecialSchool);
         }
 
         // Independent
         if (EstablishmentTypeClassification.IsIndependent(typeId))
         {
-            return DataAvailability.Available(GovernanceType.Independent);
+            return DataWithAvailability.Available(GovernanceType.Independent);
         }
 
         // Further/Higher education
         if (EstablishmentTypeClassification.IsFurtherEducation(typeId))
         {
-            return DataAvailability.Available(GovernanceType.FurtherHigherEducation);
+            return DataWithAvailability.Available(GovernanceType.FurtherHigherEducation);
         }
 
         // Has a type but doesn't match known categories
         if (!string.IsNullOrWhiteSpace(typeId))
         {
-            return DataAvailability.Available(GovernanceType.Other);
+            return DataWithAvailability.Available(GovernanceType.Other);
         }
 
-        return DataAvailability.NotAvailable<GovernanceType>();
+        return DataWithAvailability.NotAvailable<GovernanceType>();
     }
 
     private static bool IsAcademyType(string? typeId, string? typeName)

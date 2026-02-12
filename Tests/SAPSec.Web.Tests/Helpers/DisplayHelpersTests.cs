@@ -13,7 +13,7 @@ public class DisplayHelpersTests
     public void Display_AvailableString_ReturnsValue()
     {
         // Arrange
-        var data = DataAvailability.Available("Test Value");
+        var data = DataWithAvailability.Available("Test Value");
 
         // Act
         var result = data.Display();
@@ -26,7 +26,7 @@ public class DisplayHelpersTests
     public void Display_NotAvailableString_ReturnsDefaultText()
     {
         // Arrange
-        var data = DataAvailability.NotAvailable<string>();
+        var data = DataWithAvailability.NotAvailable<string>();
 
         // Act
         var result = data.Display();
@@ -39,7 +39,7 @@ public class DisplayHelpersTests
     public void Display_RedactedString_ReturnsRedactedText()
     {
         // Arrange
-        var data = DataAvailability.Redacted<string>();
+        var data = DataWithAvailability.Redacted<string>();
 
         // Act
         var result = data.Display();
@@ -52,7 +52,7 @@ public class DisplayHelpersTests
     public void Display_NotApplicableString_ReturnsNotApplicableText()
     {
         // Arrange
-        var data = DataAvailability.NotApplicable<string>();
+        var data = DataWithAvailability.NotApplicable<string>();
 
         // Act
         var result = data.Display();
@@ -65,7 +65,7 @@ public class DisplayHelpersTests
     public void Display_LowQualityString_ReturnsValue()
     {
         // Arrange
-        var data = DataAvailability.Low("Low Quality Value");
+        var data = DataWithAvailability.Low("Low Quality Value");
 
         // Act
         var result = data.Display();
@@ -78,7 +78,7 @@ public class DisplayHelpersTests
     public void Display_AvailableStringWithNullValue_ReturnsDefaultText()
     {
         // Arrange - This shouldn't happen in practice, but testing defensively
-        var data = DataAvailability.Available<string>(null!);
+        var data = DataWithAvailability.Available<string>(null!);
 
         // Act
         var result = data.Display();
@@ -95,7 +95,7 @@ public class DisplayHelpersTests
     public void DisplayAs_TrueValue_ReturnsTrueText()
     {
         // Arrange
-        var data = DataAvailability.Available(true);
+        var data = DataWithAvailability.Available(true);
 
         // Act
         var result = data.DisplayAs("Has it", "Does not have it");
@@ -108,7 +108,7 @@ public class DisplayHelpersTests
     public void DisplayAs_FalseValue_ReturnsFalseText()
     {
         // Arrange
-        var data = DataAvailability.Available(false);
+        var data = DataWithAvailability.Available(false);
 
         // Act
         var result = data.DisplayAs("Has it", "Does not have it");
@@ -121,7 +121,7 @@ public class DisplayHelpersTests
     public void DisplayAs_NotAvailable_ReturnsDefaultText()
     {
         // Arrange
-        var data = DataAvailability.NotAvailable<bool>();
+        var data = DataWithAvailability.NotAvailable<bool>();
 
         // Act
         var result = data.DisplayAs("Has it", "Does not have it");
@@ -134,7 +134,7 @@ public class DisplayHelpersTests
     public void DisplayAs_NotApplicable_ReturnsNotApplicableText()
     {
         // Arrange
-        var data = DataAvailability.NotApplicable<bool>();
+        var data = DataWithAvailability.NotApplicable<bool>();
 
         // Act
         var result = data.DisplayAs("Has it", "Does not have it");
@@ -147,7 +147,7 @@ public class DisplayHelpersTests
     public void DisplayAs_Redacted_ReturnsRedactedText()
     {
         // Arrange
-        var data = DataAvailability.Redacted<bool>();
+        var data = DataWithAvailability.Redacted<bool>();
 
         // Act
         var result = data.DisplayAs("Has it", "Does not have it");
@@ -171,7 +171,7 @@ public class DisplayHelpersTests
     public void Display_GovernanceType_ReturnsCorrectText(GovernanceType type, string expected)
     {
         // Arrange
-        var data = DataAvailability.Available(type);
+        var data = DataWithAvailability.Available(type);
 
         // Act
         var result = data.Display();
@@ -184,7 +184,7 @@ public class DisplayHelpersTests
     public void Display_GovernanceTypeNotAvailable_ReturnsDefaultText()
     {
         // Arrange
-        var data = DataAvailability.NotAvailable<GovernanceType>();
+        var data = DataWithAvailability.NotAvailable<GovernanceType>();
 
         // Act
         var result = data.Display();
@@ -201,8 +201,8 @@ public class DisplayHelpersTests
     public void DisplayAgeRange_BothAvailable_ReturnsRange()
     {
         // Arrange
-        var low = DataAvailability.Available(11);
-        var high = DataAvailability.Available(18);
+        var low = DataWithAvailability.Available(11);
+        var high = DataWithAvailability.Available(18);
 
         // Act
         var result = low.DisplayAgeRange(high);
@@ -215,8 +215,8 @@ public class DisplayHelpersTests
     public void DisplayAgeRange_OnlyLowAvailable_ReturnsLowOnly()
     {
         // Arrange
-        var low = DataAvailability.Available(11);
-        var high = DataAvailability.NotAvailable<int>();
+        var low = DataWithAvailability.Available(11);
+        var high = DataWithAvailability.NotAvailable<int>();
 
         // Act
         var result = low.DisplayAgeRange(high);
@@ -229,8 +229,8 @@ public class DisplayHelpersTests
     public void DisplayAgeRange_LowNotAvailable_ReturnsDefaultText()
     {
         // Arrange
-        var low = DataAvailability.NotAvailable<int>();
-        var high = DataAvailability.Available(18);
+        var low = DataWithAvailability.NotAvailable<int>();
+        var high = DataWithAvailability.Available(18);
 
         // Act
         var result = low.DisplayAgeRange(high);
@@ -243,8 +243,8 @@ public class DisplayHelpersTests
     public void DisplayAgeRange_BothNotAvailable_ReturnsDefaultText()
     {
         // Arrange
-        var low = DataAvailability.NotAvailable<int>();
-        var high = DataAvailability.NotAvailable<int>();
+        var low = DataWithAvailability.NotAvailable<int>();
+        var high = DataWithAvailability.NotAvailable<int>();
 
         // Act
         var result = low.DisplayAgeRange(high);
@@ -257,8 +257,8 @@ public class DisplayHelpersTests
     public void DisplayAgeRange_ZeroValues_ReturnsRange()
     {
         // Arrange
-        var low = DataAvailability.Available(0);
-        var high = DataAvailability.Available(5);
+        var low = DataWithAvailability.Available(0);
+        var high = DataWithAvailability.Available(5);
 
         // Act
         var result = low.DisplayAgeRange(high);
@@ -275,8 +275,8 @@ public class DisplayHelpersTests
     public void DisplayWithCode_BothAvailable_ReturnsNameWithCode()
     {
         // Arrange
-        var name = DataAvailability.Available("Sheffield");
-        var code = DataAvailability.Available("373");
+        var name = DataWithAvailability.Available("Sheffield");
+        var code = DataWithAvailability.Available("373");
 
         // Act
         var result = name.DisplayWithCode(code);
@@ -289,8 +289,8 @@ public class DisplayHelpersTests
     public void DisplayWithCode_OnlyNameAvailable_ReturnsNameOnly()
     {
         // Arrange
-        var name = DataAvailability.Available("Sheffield");
-        var code = DataAvailability.NotAvailable<string>();
+        var name = DataWithAvailability.Available("Sheffield");
+        var code = DataWithAvailability.NotAvailable<string>();
 
         // Act
         var result = name.DisplayWithCode(code);
@@ -303,8 +303,8 @@ public class DisplayHelpersTests
     public void DisplayWithCode_NameNotAvailable_ReturnsDefaultText()
     {
         // Arrange
-        var name = DataAvailability.NotAvailable<string>();
-        var code = DataAvailability.Available("373");
+        var name = DataWithAvailability.NotAvailable<string>();
+        var code = DataWithAvailability.Available("373");
 
         // Act
         var result = name.DisplayWithCode(code);
@@ -317,8 +317,8 @@ public class DisplayHelpersTests
     public void DisplayWithCode_BothNotAvailable_ReturnsDefaultText()
     {
         // Arrange
-        var name = DataAvailability.NotAvailable<string>();
-        var code = DataAvailability.NotAvailable<string>();
+        var name = DataWithAvailability.NotAvailable<string>();
+        var code = DataWithAvailability.NotAvailable<string>();
 
         // Act
         var result = name.DisplayWithCode(code);
@@ -335,7 +335,7 @@ public class DisplayHelpersTests
     public void Display_NurseryProvision_HasNursery()
     {
         // Arrange
-        var data = DataAvailability.Available(true);
+        var data = DataWithAvailability.Available(true);
 
         // Act
         var result = data.DisplayAs("Has nursery classes", "Does not have nursery classes");
@@ -348,7 +348,7 @@ public class DisplayHelpersTests
     public void Display_NurseryProvision_NoNursery()
     {
         // Arrange
-        var data = DataAvailability.Available(false);
+        var data = DataWithAvailability.Available(false);
 
         // Act
         var result = data.DisplayAs("Has nursery classes", "Does not have nursery classes");
@@ -361,7 +361,7 @@ public class DisplayHelpersTests
     public void Display_SixthForm_HasSixthForm()
     {
         // Arrange
-        var data = DataAvailability.Available(true);
+        var data = DataWithAvailability.Available(true);
 
         // Act
         var result = data.DisplayAs("Has a sixth form", "Does not have a sixth form");
@@ -374,7 +374,7 @@ public class DisplayHelpersTests
     public void Display_SenUnit_HasSenUnit()
     {
         // Arrange
-        var data = DataAvailability.Available(true);
+        var data = DataWithAvailability.Available(true);
 
         // Act
         var result = data.DisplayAs("Has a SEN unit", "Does not have a SEN unit");

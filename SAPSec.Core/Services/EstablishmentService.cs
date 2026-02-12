@@ -18,72 +18,77 @@ public class EstablishmentService : IEstablishmentService
         _lookupService = lookupService;
     }
 
-    public IEnumerable<Establishment> GetAllEstablishments()
+    public async Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
     {
-        return _establishmentRepository.GetAllEstablishments();
+        return await _establishmentRepository.GetAllEstablishmentsAsync();
     }
 
-    public Establishment GetEstablishment(string urn)
+    public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns)
     {
-        var establishment = _establishmentRepository.GetEstablishment(urn);
+        return await _establishmentRepository.GetEstablishmentsAsync(urns);
+    }
+
+    public async Task<Establishment> GetEstablishmentAsync(string urn)
+    {
+        var establishment = await _establishmentRepository.GetEstablishmentAsync(urn);
 
         if (!string.IsNullOrWhiteSpace(establishment?.URN))
         {
-            EnrichEstablishment(establishment);
+            await EnrichEstablishment(establishment);
             return establishment;
         }
 
         throw new Exception("Error in GetEstablishment");
     }
 
-    public Establishment GetEstablishmentByAnyNumber(string number)
+    public async Task<Establishment> GetEstablishmentByAnyNumberAsync(string number)
     {
-        var establishment = _establishmentRepository.GetEstablishmentByAnyNumber(number);
+        var establishment = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(number);
 
         if (!string.IsNullOrWhiteSpace(establishment?.URN))
         {
-            EnrichEstablishment(establishment);
+            await EnrichEstablishment(establishment);
             return establishment;
         }
 
         return new Establishment();
     }
 
-    private void EnrichEstablishment(Establishment establishment)
+    private async Task EnrichEstablishment(Establishment establishment)
     {
-        establishment.TypeOfEstablishmentName = _lookupService.GetLookupValue(
+        establishment.TypeOfEstablishmentName = await _lookupService.GetLookupValueAsync(
             LookupTypes.TypeOfEstablishment,
             establishment.TypeOfEstablishmentId);
 
-        establishment.AdmissionPolicy = _lookupService.GetLookupValue(
+        establishment.AdmissionPolicy = await _lookupService.GetLookupValueAsync(
             LookupTypes.AdmissionsPolicy,
             establishment.AdmissionsPolicyId);
 
-        establishment.DistrictAdministrativeName = _lookupService.GetLookupValue(
+        establishment.DistrictAdministrativeName = await _lookupService.GetLookupValueAsync(
             LookupTypes.DistrictAdministrative,
             establishment.DistrictAdministrativeId);
 
-        establishment.PhaseOfEducationName = _lookupService.GetLookupValue(
+        establishment.PhaseOfEducationName = await _lookupService.GetLookupValueAsync(
             LookupTypes.PhaseOfEducation,
             establishment.PhaseOfEducationId);
 
-        establishment.GenderName = _lookupService.GetLookupValue(
+        establishment.GenderName = await _lookupService.GetLookupValueAsync(
             LookupTypes.Gender,
             establishment.GenderId);
 
-        establishment.ReligiousCharacterName = _lookupService.GetLookupValue(
+        establishment.ReligiousCharacterName = await _lookupService.GetLookupValueAsync(
             LookupTypes.ReligiousCharacter,
             establishment.ReligiousCharacterId);
 
-        establishment.UrbanRuralName = _lookupService.GetLookupValue(
+        establishment.UrbanRuralName = await _lookupService.GetLookupValueAsync(
             LookupTypes.UrbanRural,
             establishment.UrbanRuralId);
 
-        establishment.TrustName = _lookupService.GetLookupValue(
+        establishment.TrustName = await _lookupService.GetLookupValueAsync(
             LookupTypes.Trusts,
             establishment.TrustsId);
 
-        establishment.LANAme = _lookupService.GetLookupValue(
+        establishment.LAName = await _lookupService.GetLookupValueAsync(
             LookupTypes.LA,
             establishment.LAId);
     }
