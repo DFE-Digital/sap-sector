@@ -3,16 +3,17 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SapSec.SimilarSchoolsJsonGenerator.Models;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using SAPSec.Infrastructure.Repositories;
-using SAPSec.Infrastructure.Repositories.Generic;
+using SAPSec.Infrastructure.Repositories.Json;
 using System.Globalization;
 
 namespace SapSec.SimilarSchoolsJsonGenerator;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         string baseDir = FindProjectDirectoryDownwards("SapSec.SimilarSchoolsJsonGenerator");
 
@@ -25,10 +26,10 @@ public class Program
         });
 
         var logger1 = factory.CreateLogger<Establishment>();
-        var logger2 = factory.CreateLogger<JSONRepository<Establishment>>();
+        var logger2 = factory.CreateLogger<JsonFile<Establishment>>();
 
-        var establishmentRepository = new EstablishmentRepository(new JSONRepository<Establishment>(logger2), logger1);
-        var establishments = establishmentRepository.GetAllEstablishments();
+        var establishmentRepository = new JsonEstablishmentRepository(new JsonFile<Establishment>(logger2), logger1);
+        var establishments = await establishmentRepository.GetAllEstablishmentsAsync();
         var allUrns = establishments.Select(e => e.URN).ToList();
         Dictionary<string, string> urnLookup = new();
 
@@ -68,7 +69,7 @@ public class Program
             foreach (var row in ReadCsvFile<TRow, TMapping>(csvFile))
             {
                 // Skip rows for schools not in our data set
-                if (!allUrns.Contains(row.Urn))
+                if (!allUrns.Contains(row.URN))
                 {
                     continue;
                 }
@@ -90,34 +91,34 @@ public class Program
             foreach (var row in ReadCsvFile<TRow, TMapping>(csvFile))
             {
                 // Skip rows for schools not in our data set
-                if (!allUrns.Contains(row.Urn))
+                if (!allUrns.Contains(row.URN))
                 {
                     continue;
                 }
 
                 // For every new school reset the set of neighbour URNs
                 // (assumes CSV file rows are grouped by URN)
-                if (currentUrn != row.Urn)
+                if (currentUrn != row.URN)
                 {
-                    currentUrn = row.Urn;
+                    currentUrn = row.URN;
                     neighbours = new();
                 }
 
                 // If neighbour URN is not in our data set, map it to a URN that is in our dataset
-                if (!allUrns.Contains(row.NeighbourUrn))
+                if (!allUrns.Contains(row.NeighbourURN))
                 {
                     // If we've already mapped this URN, use that, otherwise pick the next unmapped one
                     // that isn't already in our neighbour set
-                    if (!urnLookup.ContainsKey(row.NeighbourUrn))
+                    if (!urnLookup.ContainsKey(row.NeighbourURN))
                     {
-                        urnLookup[row.NeighbourUrn] = allUrns.Except([currentUrn, .. neighbours]).First();
+                        urnLookup[row.NeighbourURN] = allUrns.Except([currentUrn, .. neighbours]).First();
                     }
 
-                    row.NeighbourUrn = urnLookup[row.NeighbourUrn];
+                    row.NeighbourURN = urnLookup[row.NeighbourURN];
                 }
 
                 // Update neighbours
-                neighbours.Add(row.NeighbourUrn);
+                neighbours.Add(row.NeighbourURN);
 
                 results.Add(row);
             }

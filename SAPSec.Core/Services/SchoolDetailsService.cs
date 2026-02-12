@@ -30,17 +30,18 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
         _logger = logger;
     }
 
-    public SchoolDetails GetByUrn(string urn)
+    public async Task<SchoolDetails> GetByUrnAsync(string urn)
     {
-        var establishment = _establishmentService.GetEstablishment(urn);
+        var establishment = await _establishmentService.GetEstablishmentAsync(urn);
+
         return MapToSchoolDetails(establishment);
     }
 
-    public SchoolDetails? TryGetByUrn(string urn)
+    public async Task<SchoolDetails?> TryGetByUrnAsync(string urn)
     {
         try
         {
-            return GetByUrn(urn);
+            return await GetByUrnAsync(urn);
         }
         catch (Exception ex)
         {
@@ -49,9 +50,9 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
         }
     }
 
-    public SchoolDetails? GetByIdentifier(string identifier)
+    public async Task<SchoolDetails?> GetByIdentifierAsync(string identifier)
     {
-        var establishment = _establishmentService.GetEstablishmentByAnyNumber(identifier);
+        var establishment = await _establishmentService.GetEstablishmentByAnyNumberAsync(identifier);
 
         if (string.IsNullOrWhiteSpace(establishment?.URN))
         {
@@ -73,7 +74,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
 
             // Location
             Address = DataMapper.MapAddress(establishment),
-            LocalAuthorityName = DataMapper.MapString(establishment.LANAme),
+            LocalAuthorityName = DataMapper.MapString(establishment.LAName),
             LocalAuthorityCode = DataMapper.MapRequiredString(establishment.LAId),
             Region = DataMapper.MapString(establishment.DistrictAdministrativeName),
             UrbanRuralDescription = DataMapper.MapString(establishment.UrbanRuralName),
@@ -102,7 +103,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             HeadteacherName = DataMapper.MapHeadteacher(establishment),
             Website = DataMapper.MapWebsite(establishment.Website),
             Telephone = DataMapper.MapString(establishment.TelephoneNum),
-            Email = DataAvailability.NotAvailable<string>()
+            Email = DataWithAvailability.NotAvailable<string>()
         };
     }
 }

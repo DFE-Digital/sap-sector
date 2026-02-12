@@ -3,12 +3,7 @@ using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Services;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAPSec.Core.Tests.Services
 {
@@ -39,10 +34,8 @@ namespace SAPSec.Core.Tests.Services
             PhaseOfEducationName = "Secondary School"
         };
 
-
-
         [Fact]
-        public void GetAllEstablishment_ShouldReturnAllItems()
+        public async Task GetAllEstablishments_ShouldReturnAllItems()
         {
             // Arrange
             var expectedDestinations = new List<Establishment>
@@ -51,11 +44,11 @@ namespace SAPSec.Core.Tests.Services
                 FakeEstablishmentTwo
             };
 
-            _mockRepo.Setup(r => r.GetAllEstablishments())
-                     .Returns(expectedDestinations);
+            _mockRepo.Setup(r => r.GetAllEstablishmentsAsync())
+                     .ReturnsAsync(expectedDestinations);
 
             // Act
-            var result = _service.GetAllEstablishments();
+            var result = await _service.GetAllEstablishmentsAsync();
 
             // Assert
             Assert.NotNull(result);
@@ -65,33 +58,71 @@ namespace SAPSec.Core.Tests.Services
         }
 
         [Fact]
-        public void GetAllEstablishment_ShouldReturnEmpty_WhenNoData()
+        public async Task GetAllEstablishments_ShouldReturnEmpty_WhenNoData()
         {
             // Arrange
-            _mockRepo.Setup(r => r.GetAllEstablishments())
-                     .Returns(new List<Establishment>());
+            _mockRepo.Setup(r => r.GetAllEstablishmentsAsync())
+                     .ReturnsAsync(new List<Establishment>());
 
             // Act
-            var result = _service.GetAllEstablishments();
+            var result = await _service.GetAllEstablishmentsAsync();
 
             // Assert
             Assert.NotNull(result);
             Assert.Empty(result);
         }
 
+        [Fact]
+        public async Task GetEstablishments_ShouldReturnSubset()
+        {
+            // Arrange
+            var expectedDestinations = new List<Establishment>
+            {
+                FakeEstablishmentOne,
+                FakeEstablishmentTwo
+            };
+
+            IEnumerable<string> urns = ["123456"];
+            _mockRepo.Setup(r => r.GetEstablishmentsAsync(urns))
+                     .ReturnsAsync(expectedDestinations);
+
+            // Act
+            var result = await _service.GetEstablishmentsAsync(urns);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(1, result.Count());
+            Assert.Contains(result, a => a.URN == "123456");
+        }
 
         [Fact]
-        public void GetEstablishment_ShouldReturnCorrectItem_WhenUrnExists()
+        public async Task GetEstablishment_ShouldReturnEmpty_WhenNoData()
+        {
+            // Arrange
+            IEnumerable<string> urns = ["123456"];
+            _mockRepo.Setup(r => r.GetEstablishmentsAsync(urns))
+                     .ReturnsAsync(new List<Establishment>());
+
+            // Act
+            var result = await _service.GetEstablishmentsAsync(urns);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Empty(result);
+        }
+
+        [Fact]
+        public async Task GetEstablishment_ShouldReturnCorrectItem_WhenUrnExists()
         {
             // Arrange
             var urn = "123456";
             var expectedDestinations = FakeEstablishmentOne;
 
-            _mockRepo.Setup(r => r.GetEstablishment(urn))
-                     .Returns(expectedDestinations);
+            _mockRepo.Setup(r => r.GetEstablishmentAsync(urn))
+                     .ReturnsAsync(expectedDestinations);
 
             // Act
-            var result = _service.GetEstablishment(urn);
+            var result = await _service.GetEstablishmentAsync(urn);
 
             // Assert
             Assert.NotNull(result);
@@ -101,28 +132,28 @@ namespace SAPSec.Core.Tests.Services
         }
 
         [Fact]
-        public void GetEstablishment_ShouldThrowError_WhenUrnDoesNotExist()
+        public async Task GetEstablishment_ShouldThrowError_WhenUrnDoesNotExist()
         {
             // Arrange
             var urn = "99999";
-            _mockRepo.Setup(r => r.GetEstablishment(urn))
-                     .Throws(new Exception("Error in GetEstablishment"));
+            _mockRepo.Setup(r => r.GetEstablishmentAsync(urn))
+                     .Throws(new Exception("Error in GetEstablishmentAsync"));
 
             // Act & Assert
-            var ex = Assert.Throws<Exception>(() => _service.GetEstablishment(urn));
-            Assert.Equal("Error in GetEstablishment", ex.Message);
+            var ex = await Assert.ThrowsAsync<Exception>(async () => await _service.GetEstablishmentAsync(urn));
+            Assert.Equal("Error in GetEstablishmentAsync", ex.Message);
         }
 
         [Fact]
-        public void GetEstablishment_ShouldThrowException_WhenRepositoryThrows()
+        public async Task GetEstablishment_ShouldThrowException_WhenRepositoryThrows()
         {
             // Arrange
             var urn = "error";
-            _mockRepo.Setup(r => r.GetEstablishment(urn))
+            _mockRepo.Setup(r => r.GetEstablishmentAsync(urn))
                      .Throws(new Exception("Database error"));
 
             // Act & Assert
-            var ex = Assert.Throws<Exception>(() => _service.GetEstablishment(urn));
+            var ex = await Assert.ThrowsAsync<Exception>(async () => await _service.GetEstablishmentAsync(urn));
             Assert.Equal("Database error", ex.Message);
         }
     }

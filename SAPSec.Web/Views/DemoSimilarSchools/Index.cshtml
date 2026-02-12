@@ -1,0 +1,105 @@
+﻿@using SAPSec.Web.Helpers
+@using SAPSec.Web.ViewModels
+@model DemoSimilarSchoolsViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "View similar schools";
+}
+
+<span class="govuk-caption-xl">@Model.Name</span>
+<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+<h2 class="govuk-heading-m">Sort options</h2>
+
+<ul>
+    @foreach (var o in Model.SortOptions)
+    {
+        if (o.Selected)
+        {
+            <li><strong>@o.Key: @o.Name @(o.Selected ? "(selected)" : "")</strong></li>
+        }
+        else
+        {
+            <li>@o.Key: @o.Name</li>
+        }
+    }
+</ul>
+
+<h2 class="govuk-heading-m">Filter options</h2>
+
+<ul>
+    @foreach (var (key, options) in Model.FilterOptions)
+    {
+        <li>
+            @key
+
+            <ul>
+            @foreach (var o in options)
+            {
+                if (o.Selected)
+                {
+                    <li><strong>@o.Key: @o.Name @(o.Selected ? "(selected)" : "")</strong></li>
+                }
+                else
+                {
+                    <li>@o.Key: @o.Name</li>
+                }
+            }
+            </ul>
+        </li>
+    }
+</ul>
+
+<h2 class="govuk-heading-m">Page @Model.ResultsPage.CurrentPage results</h2>
+
+<ul>
+    @foreach (var result in Model.ResultsPage)
+    {
+        <li>
+            <a href="demo-similar-schools/@result.URN">@result.Name</a>
+
+            <ul>
+                <li>URN: @result.URN</li>
+                <li>Name: @result.Name</li>
+                <li>Street: @result.Street</li>
+                <li>Locality: @result.Locality</li>
+                <li>Address3: @result.Address3</li>
+                <li>Town: @result.Town</li>
+                <li>Postcode: @result.Postcode</li>
+                <li>LA Name: @result.LAName</li>
+                <li>Latitude: @result.Latitude</li>
+                <li>Longitude: @result.Longitude</li>
+                <li>UrbanRuralId: @result.UrbanRuralId</li>
+                <li>UrbanRuralName: @result.UrbanRuralName</li>
+                <li>SortValue: @result.SortValue</li>
+            </ul>
+        </li>
+    }
+</ul>
+
+<h2 class="govuk-heading-m">All results</h2>
+
+<ul>
+    @foreach (var result in Model.AllResults)
+    {
+        <li>
+            <a href="demo-similar-schools/@result.URN">@result.Name</a>
+
+            <ul>
+                <li>URN: @result.URN</li>
+                <li>Name: @result.Name</li>
+                <li>Street: @result.Street</li>
+                <li>Locality: @result.Locality</li>
+                <li>Address3: @result.Address3</li>
+                <li>Town: @result.Town</li>
+                <li>Postcode: @result.Postcode</li>
+                <li>LA Name: @result.LAName</li>
+                <li>Latitude: @result.Latitude</li>
+                <li>Longitude: @result.Longitude</li>
+                <li>UrbanRuralId: @result.UrbanRuralId</li>
+                <li>UrbanRuralName: @result.UrbanRuralName</li>
+                <li>SortValue: @result.SortValue</li>
+            </ul>
+        </li>
+    }
+</ul>
