@@ -18,11 +18,11 @@ namespace SAPSec.Web.Extensions
         public static void AddDependencies(this IServiceCollection services)
         {
             // JSON files
-            services.AddSingleton<JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
-            services.AddSingleton<JsonFile<SimilarSchoolsSecondaryValuesRow>>();
-            services.AddSingleton<JsonFile<Establishment>>();
-            services.AddSingleton<JsonFile<EstablishmentPerformance>>();
-            services.AddSingleton<JsonFile<Lookup>>();
+            services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsRow>, JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
+            services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
+            services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
+            services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
+            services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
 
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
 
