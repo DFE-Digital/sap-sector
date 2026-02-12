@@ -6,11 +6,11 @@ namespace SAPSec.Infrastructure.Repositories.Json
 {
     public class LookupRepository : ILookupRepository
     {
-        private readonly JsonFile<Lookup> _lookupMetadataRepository;
+        private readonly IJsonFile<Lookup> _lookupMetadataRepository;
         private ILogger<Lookup> _logger;
 
         public LookupRepository(
-            JsonFile<Lookup> lookupMetadataRepository,
+            IJsonFile<Lookup> lookupMetadataRepository,
             ILogger<Lookup> logger)
         {
             _lookupMetadataRepository = lookupMetadataRepository;

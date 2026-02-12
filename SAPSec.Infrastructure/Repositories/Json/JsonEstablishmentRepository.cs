@@ -6,11 +6,11 @@ namespace SAPSec.Infrastructure.Repositories.Json
 {
     public class JsonEstablishmentRepository : IEstablishmentRepository
     {
-        private readonly JsonFile<Establishment> _establishmentMetadataRepository;
+        private readonly IJsonFile<Establishment> _establishmentMetadataRepository;
         private ILogger<Establishment> _logger;
 
         public JsonEstablishmentRepository(
-            JsonFile<Establishment> establishmentMetadataRepository,
+            IJsonFile<Establishment> establishmentMetadataRepository,
             ILogger<Establishment> logger)
         {
             _establishmentMetadataRepository = establishmentMetadataRepository;

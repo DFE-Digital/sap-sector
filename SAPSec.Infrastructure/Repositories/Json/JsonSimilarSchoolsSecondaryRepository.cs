@@ -8,16 +8,16 @@ namespace SAPSec.Infrastructure.Repositories;
 
 public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
 {
-    private readonly JsonFile<SimilarSchoolsSecondaryGroupsRow> _similarSchoolsGroupsRepository;
-    private readonly JsonFile<SimilarSchoolsSecondaryValuesRow> _similarSchoolsValuesRepository;
-    private readonly JsonFile<Establishment> _establishmentRepository;
-    private readonly JsonFile<EstablishmentPerformance> _establishmentPerformanceRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryGroupsRow> _similarSchoolsGroupsRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryValuesRow> _similarSchoolsValuesRepository;
+    private readonly IJsonFile<Establishment> _establishmentRepository;
+    private readonly IJsonFile<EstablishmentPerformance> _establishmentPerformanceRepository;
 
     public JsonSimilarSchoolsSecondaryRepository(
-        JsonFile<SimilarSchoolsSecondaryGroupsRow> similarSchoolsGroupsRepository,
-        JsonFile<SimilarSchoolsSecondaryValuesRow> similarSchoolsValuesRepository,
-        JsonFile<Establishment> establishmentRepository,
-        JsonFile<EstablishmentPerformance> establishmentPerformanceRepository)
+        IJsonFile<SimilarSchoolsSecondaryGroupsRow> similarSchoolsGroupsRepository,
+        IJsonFile<SimilarSchoolsSecondaryValuesRow> similarSchoolsValuesRepository,
+        IJsonFile<Establishment> establishmentRepository,
+        IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository)
     {
         _similarSchoolsGroupsRepository = similarSchoolsGroupsRepository;
         _similarSchoolsValuesRepository = similarSchoolsValuesRepository;

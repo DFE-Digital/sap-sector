@@ -7,13 +7,13 @@ namespace SAPSec.Infrastructure.Tests.Repositories
 {
     public class LookupRepositoryTests
     {
-        private readonly Mock<JsonFile<Lookup>> _mockGenericRepo;
+        private readonly Mock<IJsonFile<Lookup>> _mockGenericRepo;
         private readonly Mock<ILogger<Lookup>> _mockLogger;
         private readonly LookupRepository _sut;
 
         public LookupRepositoryTests()
         {
-            _mockGenericRepo = new Mock<JsonFile<Lookup>>();
+            _mockGenericRepo = new Mock<IJsonFile<Lookup>>();
             _mockLogger = new Mock<ILogger<Lookup>>();
             _sut = new LookupRepository(_mockGenericRepo.Object, _mockLogger.Object);
         }

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace SAPSec.Infrastructure.Repositories.Json
 {
-    public class JsonFile<T> where T : class
+    public class JsonFile<T> : IJsonFile<T> where T : class
     {
         private readonly string _filePath;
         private readonly ILogger<JsonFile<T>> _logger;

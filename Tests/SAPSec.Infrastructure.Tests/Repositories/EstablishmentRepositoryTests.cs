@@ -7,13 +7,13 @@ namespace SAPSec.Infrastructure.Tests.Repositories
 {
     public class EstablishmentRepositoryTests
     {
-        private readonly Mock<JsonFile<Establishment>> _mockGenericRepo;
+        private readonly Mock<IJsonFile<Establishment>> _mockGenericRepo;
         private readonly Mock<ILogger<Establishment>> _mockLogger;
         private readonly JsonEstablishmentRepository _sut;
 
         public EstablishmentRepositoryTests()
         {
-            _mockGenericRepo = new Mock<JsonFile<Establishment>>();
+            _mockGenericRepo = new Mock<IJsonFile<Establishment>>();
             _mockLogger = new Mock<ILogger<Establishment>>();
             _sut = new JsonEstablishmentRepository(_mockGenericRepo.Object, _mockLogger.Object);
         }
@@ -41,10 +41,10 @@ namespace SAPSec.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        public async Task GetAllEstablishments_ReturnsEmptyWhenGenericRepositoryReturnsNull()
+        public async Task GetAllEstablishments_ReturnsEmptyWhenGenericRepositoryReturnsEmpty()
         {
             // Arrange
-            _mockGenericRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync((IEnumerable<Establishment>?)null);
+            _mockGenericRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync([]);
 
             // Act
             var result = await _sut.GetAllEstablishmentsAsync();
@@ -78,10 +78,10 @@ namespace SAPSec.Infrastructure.Tests.Repositories
         }
 
         [Fact]
-        public async Task GetEstablishments_ReturnsEmptyWhenGenericRepositoryReturnsNull()
+        public async Task GetEstablishments_ReturnsEmptyWhenGenericRepositoryIsEmpty()
         {
             // Arrange
-            _mockGenericRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync((IEnumerable<Establishment>?)null);
+            _mockGenericRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync([]);
 
             // Act
             IEnumerable<string> urns = ["1"];
