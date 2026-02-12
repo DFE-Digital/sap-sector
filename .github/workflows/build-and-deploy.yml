@@ -286,17 +286,23 @@ jobs:
       - name: Restore backup into PR review DB
         continue-on-error: true
         shell: bash
-        env:
-          AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
         run: |
           set -euo pipefail
           PR_NUMBER="${{ github.event.pull_request.number }}"
-          APP_NAME="sap-sec-pr-${PR_NUMBER}"
+          BASE_APP_NAME="${KONDUIT_APP_NAME:-get-school-improvement-insights}"
+          if [[ "${BASE_APP_NAME}" == *"-pr-"* ]]; then
+            APP_NAME="${BASE_APP_NAME}"
+          else
+            APP_NAME="${BASE_APP_NAME}-pr-${PR_NUMBER}"
+          fi
+          AKS_NAMESPACE="$(jq -r '.namespace' terraform/application/config/review.tfvars.json)"
           BACKUP_FILE="seed.sql.gz"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
+          
+          kubectl -n "${AKS_NAMESPACE}" get deployment "${APP_NAME}"
 
           "$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
