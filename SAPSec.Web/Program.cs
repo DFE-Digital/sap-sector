@@ -118,11 +118,11 @@ public class Program
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
-        builder.Services.AddLuceneDependencies();
+
 
 
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
-        builder.Services.AddLuceneDependencies(enableStartupIndexBuilder);
+        builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
         builder.Services.AddDependencies();
