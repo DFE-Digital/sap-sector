@@ -195,6 +195,24 @@ jobs:
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
     steps:
+      - name: Deploy App to Review
+        id: deploy_review
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: review
+          pr-number: ${{ github.event.pull_request.number }}
+          sha: ${{ needs.build.outputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          db-seed: false
+          smoke-test: false
+
+ # ---------------------------
+      # REVIEW APP DATABASE DEPLOYMENT (PR)
+      # ---------------------------
       - name: Checkout (needed for workspace consistency)
         uses: actions/checkout@v4
 
@@ -239,6 +257,15 @@ jobs:
           az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
           kubelogin convert-kubeconfig -l azurecli
 
+      - name: Download konduit.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
+            -o "$GITHUB_WORKSPACE/konduit.sh"
+          chmod +x "$GITHUB_WORKSPACE/konduit.sh"
+          ls -la "$GITHUB_WORKSPACE/konduit.sh"         
+
       - name: Download seed backup from Blob
         shell: bash
         env:
@@ -258,56 +285,27 @@ jobs:
 
           ls -lh "${BACKUP_FILE}"
 
-      - name: Restore backup into Postgres (pre-deploy)
+      - name: Restore backup into PR review DB
+        continue-on-error: true
         shell: bash
+        env:
+          AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
         run: |
           set -euo pipefail
-          AKS_NAMESPACE="$(jq -r '.namespace' terraform/application/config/review.tfvars.json)"
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
           BACKUP_FILE="seed.sql.gz"
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
 
-          SECRET_NAME="$(kubectl -n "${AKS_NAMESPACE}" get secret -o json | jq -r '.items[] | select(.data["ConnectionStrings__PostgresConnectionString"]) | .metadata.name' | head -n1)"
-          : "${SECRET_NAME:?Postgres connection string secret not found in ${AKS_NAMESPACE}}"
-          CONN_B64="$(kubectl -n "${AKS_NAMESPACE}" get secret "${SECRET_NAME}" -o jsonpath='{.data.ConnectionStrings__PostgresConnectionString}')"
-          CONN_STR="$(echo "${CONN_B64}" | base64 -d)"
-          DB_NAME="$(echo "${CONN_STR}" | sed -n 's/.*[; ]Database=\\([^;]*\\).*/\\1/p')"
-          if [[ -z "${DB_NAME}" ]]; then
-            DB_NAME="$(echo "${CONN_STR}" | sed -n 's#.*://[^/]*/\\([^?]*\\).*#\\1#p')"
-          fi
-          : "${DB_NAME:?Database name not found in connection string}"
-
-          echo "Using DB: ${DB_NAME}"
-
-          PG_POD="$(kubectl -n "${AKS_NAMESPACE}" get pod -o name | grep -i postgres | head -n1)"
-          : "${PG_POD:?Postgres pod not found in ${AKS_NAMESPACE}}"
-
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            kubectl -n "${AKS_NAMESPACE}" exec -i "${PG_POD}" -- psql -U postgres -d "${DB_NAME}" <<'SQL'
-            DROP SCHEMA public CASCADE;
-            CREATE SCHEMA public;
-            GRANT ALL ON SCHEMA public TO public;
-            SQL
-          fi
-
-          zcat "${BACKUP_FILE}" | kubectl -n "${AKS_NAMESPACE}" exec -i "${PG_POD}" -- psql -U postgres -d "${DB_NAME}"
-
-      - name: Deploy App to Review
-        id: deploy_review
-        uses: DFE-Digital/github-actions/deploy-to-aks@master
-        with:
-          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          environment: review
-          pr-number: ${{ github.event.pull_request.number }}
-          sha: ${{ needs.build.outputs.docker-image-tag }}
-          terraform-base: ${{ env.TERRAFORM_BASE }}
-          healthcheck: ${{ env.HEALTHCHECK_CMD }}
-          db-seed: false
-          smoke-test: false
+          "$GITHUB_WORKSPACE/konduit.sh" \
+            -n "${AKS_NAMESPACE}" \
+            -t 7200 \
+            -x \
+            -i "${BACKUP_FILE}" -c \
+            "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X
 
 
   deploy:
