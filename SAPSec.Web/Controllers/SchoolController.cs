@@ -2,6 +2,8 @@
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Services;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Helpers;
+using SAPSec.Web.MockData;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
@@ -36,6 +38,7 @@ public class SchoolController : Controller
         }
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
         return View(school);
     }
 
@@ -47,6 +50,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -64,6 +68,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -75,19 +80,59 @@ public class SchoolController : Controller
 
     [HttpGet]
     [Route("view-similar-schools")]
-    public IActionResult ViewSimilarSchools(string urn)
+    public IActionResult ViewSimilarSchools(
+        string urn,
+        [FromQuery] SimilarSchoolsFilterViewModel filters,
+        [FromQuery] string sortBy = "Attainment 8",
+        [FromQuery] int page = 1)
     {
         var school = _schoolDetailsService.TryGetByUrn(urn);
-        if (school != null)
+        if (school is null)
         {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-            return View(school);
-        }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
+            _logger.LogInformation("{Urn} was not found on School Controller", urn);
             return RedirectToAction("Error");
         }
+
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
+        // TODO: Replace with actual database queries:
+        //   1. Query v_similar_schools_secondary_groups WHERE urn = {urn}
+        //   2. Join with v_similar_schools_secondary_values ON neighbour_urn = urn
+        //   3. Join with v_establishment ON neighbour_urn = urn
+        if (!int.TryParse(urn, out var urnValue))
+        {
+            _logger.LogInformation("{Urn} was not a valid integer on School Controller", urn);
+            return RedirectToAction("Error");
+        }
+
+        var allSchools = MockSimilarSchoolsData.GetSimilarSchools(urnValue);
+
+        // Apply filters
+        var filtered = ApplyFilters(allSchools, filters);
+
+        // Apply sort
+        filtered = ApplySort(filtered, sortBy);
+
+        // Pagination
+        const int pageSize = 10;
+        var totalResults = filtered.Count;
+
+        var viewModel = new SimilarSchoolsPageViewModel
+        {
+            // SchoolDetails base properties (from the looked-up school)
+            EstablishmentName = school.Name.Display(),
+            PhaseOfEducation = school.PhaseOfEducation.Display(),
+            Urn = urnValue,
+            Schools = filtered.Skip((page - 1) * pageSize).Take(pageSize).ToList(),
+            Filters = filters,
+            SortBy = sortBy,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalResults = filtered.Count,
+            MapSchools = filtered
+        };
+
+        return View(viewModel);
     }
 
     [HttpGet]
@@ -98,6 +143,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -115,6 +161,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -132,6 +179,7 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
         else
@@ -141,4 +189,150 @@ public class SchoolController : Controller
         }
     }
 
+    #region Similar Schools - Private Helpers
+
+    private static List<SimilarSchoolViewModel> ApplyFilters(
+        List<SimilarSchoolViewModel> schools,
+        SimilarSchoolsFilterViewModel filters)
+    {
+        var result = schools.AsEnumerable();
+
+        // Location filters
+        if (!string.IsNullOrEmpty(filters.Distance))
+        {
+            // TODO: Replace with actual distance-in-miles filtering once data is available.
+            result = filters.Distance switch
+            {
+                "Within 5 miles" => result.Where(s => s.Dist <= 0.2),
+                "Within 10 miles" => result.Where(s => s.Dist <= 0.4),
+                "Within 25 miles" => result.Where(s => s.Dist <= 0.6),
+                "Within 50 miles" => result.Where(s => s.Dist <= 0.8),
+                "Within 100 miles" => result.Where(s => s.Dist <= 1.0),
+                _ => result
+            };
+        }
+
+        if (filters.SelectedRegions.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedRegions.Contains(s.Region ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        if (filters.SelectedUrbanOrRural.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedUrbanOrRural.Contains(s.UrbanOrRural ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        // School characteristics
+        if (filters.SelectedPhaseOfEducation.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedPhaseOfEducation.Contains(s.PhaseOfEducation ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        if (filters.SelectedGenderOfEntry.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedGenderOfEntry.Contains(s.Gender ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        if (!string.IsNullOrEmpty(filters.SixthForm))
+        {
+            var hasSixthForm = filters.SixthForm == "Yes";
+            result = result.Where(s => s.HasSixthForm == hasSixthForm);
+        }
+
+        if (!string.IsNullOrEmpty(filters.NurseryProvision))
+        {
+            var hasNursery = filters.NurseryProvision == "Yes";
+            result = result.Where(s => s.HasNurseryProvision == hasNursery);
+        }
+
+        if (!string.IsNullOrEmpty(filters.SchoolCapacityInUse))
+        {
+            result = result.Where(s =>
+            {
+                if (!s.SchoolCapacity.HasValue || s.SchoolCapacity == 0) return false;
+                if (!s.NumberOfPupils.HasValue) return false;
+
+                var usagePct = (double)s.NumberOfPupils.Value / s.SchoolCapacity.Value * 100.0;
+
+                return filters.SchoolCapacityInUse switch
+                {
+                    "Under 50%" => usagePct < 50,
+                    "50% to 75%" => usagePct >= 50 && usagePct < 75,
+                    "75% to 100%" => usagePct >= 75 && usagePct <= 100,
+                    "Over 100%" => usagePct > 100,
+                    _ => true
+                };
+            });
+        }
+
+        if (filters.SelectedAdmissionsPolicy.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedAdmissionsPolicy.Contains(s.AdmissionsPolicy ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        if (filters.SelectedGovernanceStructure.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedGovernanceStructure.Contains(s.TypeOfEstablishment ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        if (filters.SelectedResourcedProvisionType.Any())
+        {
+            result = result.Where(s =>
+                filters.SelectedResourcedProvisionType.Contains(s.ResourcedProvisionType ?? string.Empty, StringComparer.OrdinalIgnoreCase));
+        }
+
+        // Attendance filters
+        if (!string.IsNullOrEmpty(filters.OverallAbsenceRate))
+        {
+            result = filters.OverallAbsenceRate switch
+            {
+                "Below 3%" => result.Where(s => s.OverallAbsenceRate < 3),
+                "3% to 5%" => result.Where(s => s.OverallAbsenceRate >= 3 && s.OverallAbsenceRate < 5),
+                "5% to 7%" => result.Where(s => s.OverallAbsenceRate >= 5 && s.OverallAbsenceRate < 7),
+                "Above 7%" => result.Where(s => s.OverallAbsenceRate >= 7),
+                _ => result
+            };
+        }
+
+        if (!string.IsNullOrEmpty(filters.PersistentAbsenceRate))
+        {
+            result = filters.PersistentAbsenceRate switch
+            {
+                "Below 3%" => result.Where(s => s.PersistentAbsenceRate < 3),
+                "3% to 5%" => result.Where(s => s.PersistentAbsenceRate >= 3 && s.PersistentAbsenceRate < 5),
+                "5% to 7%" => result.Where(s => s.PersistentAbsenceRate >= 5 && s.PersistentAbsenceRate < 7),
+                "Above 7%" => result.Where(s => s.PersistentAbsenceRate >= 7),
+                _ => result
+            };
+        }
+
+        return result.ToList();
+    }
+
+    private static List<SimilarSchoolViewModel> ApplySort(
+        List<SimilarSchoolViewModel> schools,
+        string sortBy)
+    {
+        return sortBy switch
+        {
+            "Attainment 8" => schools.OrderByDescending(s => s.Att8Scr).ToList(),
+            "School name" => schools.OrderBy(s => s.EstablishmentName).ToList(),
+            "Distance" => schools.OrderBy(s => s.Dist).ToList(),
+            "Similarity" => schools.OrderBy(s => s.Rank).ToList(),
+            "Overall absence rate" => schools.OrderBy(s => s.OverallAbsenceRate).ToList(),
+            "Persistent absence rate" => schools.OrderBy(s => s.PersistentAbsenceRate).ToList(),
+            _ => schools.OrderBy(s => s.Rank).ToList()
+        };
+    }
+    #endregion
+    private void SetSchoolViewData(Core.Model.SchoolDetails school)
+    {
+        ViewData["SchoolDetails"] = school;
+    }
 }

@@ -1,0 +1,58 @@
+@using System.Globalization
+@using System.Text.Encodings.Web
+@using System.Text.Json
+@model SAPSec.Web.ViewModels.SimilarSchoolsPageViewModel
+
+@{
+    
+var inv = CultureInfo.InvariantCulture;
+    
+var schools = Model.MapSchools
+    .Select(s =>
+    {
+        var okLat = double.TryParse(s.Latitude, NumberStyles.Float, inv, out var lat);
+        var okLon = double.TryParse(s.Longitude, NumberStyles.Float, inv, out var lon);
+
+        if (!okLat || !okLon) return null;
+
+        return new
+        {
+            urn = s.Urn,
+            name = s.EstablishmentName,
+            address = s.FullAddress,
+            la = "",
+            lat,
+            lon,
+            url = Url.Action("Index", "School", new { urn = s.Urn })
+        };
+    })
+    .Where(x => x != null)
+    .ToList();
+
+var json = JsonSerializer.Serialize(schools, new JsonSerializerOptions
+{
+    Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+});
+}
+
+    
+<div class="results-bar">
+    <p class="govuk-body app-school-results-count" id="mapCount">
+        Showing <strong>@Model.TotalResults</strong> similar schools
+    </p>
+    
+    <div id="mapBarActions"></div>
+</div>
+
+<hr class="govuk-section-break govuk-section-break--visible">
+
+<div id="map"
+     data-fixed-zoom="14"
+     role="region"
+     aria-label="Map of schools">
+    <div class="map-loading">Loading map…</div>
+</div>
+
+<script type="application/json" id="schools-data">
+@Html.Raw(json)
+</script>

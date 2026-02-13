@@ -187,6 +187,13 @@ jobs:
       id-token: write
       pull-requests: write
 
+    env:
+      AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+      AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+
+      KONDUIT_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
+      KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
+
     steps:
       - name: Deploy App to Review
         id: deploy_review
@@ -202,6 +209,104 @@ jobs:
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
           db-seed: false
           smoke-test: false
+
+ # ---------------------------
+      # REVIEW APP DATABASE DEPLOYMENT (PR)
+      # ---------------------------
+      - name: Checkout (needed for workspace consistency)
+        uses: actions/checkout@v4
+
+      - name: Install Azure CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubectl (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="v1.29.8"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client=true
+
+      - name: Install kubelogin (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBELOGIN_VERSION="v0.1.6"
+          curl -fsSLo kubelogin.zip "https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip"
+          unzip -q kubelogin.zip
+          sudo install -m 0755 bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
+          kubelogin --version
+
+      - name: Configure AKS credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          : "${AKS_RESOURCE_GROUP:?AKS_RESOURCE_GROUP is not set}"
+          : "${AKS_CLUSTER_NAME:?AKS_CLUSTER_NAME is not set}"
+          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
+          kubelogin convert-kubeconfig -l azurecli
+
+      - name: Download konduit.sh
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
+            -o "$GITHUB_WORKSPACE/konduit.sh"
+          chmod +x "$GITHUB_WORKSPACE/konduit.sh"
+          ls -la "$GITHUB_WORKSPACE/konduit.sh"         
+
+      - name: Download seed backup from Blob
+        shell: bash
+        env:
+          AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
+          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }} 
+        run: |
+          set -euo pipefail
+          BACKUP_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
+          BACKUP_FILE="seed.sql.gz"
+
+          az storage blob download \
+            --container-name "${AZURE_STORAGE_CONTAINER}" \
+            --name "${BACKUP_BLOB}" \
+            --file "${BACKUP_FILE}" \
+            --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
+            --overwrite true
+
+          ls -lh "${BACKUP_FILE}"
+
+      - name: Restore backup into PR review DB
+        continue-on-error: true
+        shell: bash
+        env:
+          AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          BACKUP_FILE="seed.sql.gz"
+          : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
+
+          ls -lh "${BACKUP_FILE}"
+          gzip -t "${BACKUP_FILE}"
+
+          "$GITHUB_WORKSPACE/konduit.sh" \
+            -n "${AKS_NAMESPACE}" \
+            -t 7200 \
+            -x \
+            -i "${BACKUP_FILE}" -c \
+            "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X
+
 
   deploy:
     name: Deploy environments

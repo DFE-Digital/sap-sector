@@ -1,0 +1,362 @@
+﻿@using SAPSec.Web.ViewModels
+@model SimilarSchoolsPageViewModel
+
+@{
+    var filters = Model.Filters;
+    var hasActiveFilters = filters.HasActiveFilters;
+    var isExpanded = hasActiveFilters ? "true" : "false";
+    var panelVisibleClass = hasActiveFilters ? "app-filter-panel--visible" : "";
+}
+
+<div class="govuk-grid-column-one-third app-filter-column">
+    <button type="button" class="govuk-button govuk-button--secondary app-filter-toggle"
+            data-module="app-filter-toggle"
+            aria-expanded="@isExpanded"
+            aria-controls="similar-schools-filter-form">
+        <span class="app-filter-toggle__show">Show filters</span>
+        <span class="app-filter-toggle__hide">Hide filters</span>
+    </button>
+
+    <form method="get"
+          action="@Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })"
+          id="similar-schools-filter-form"
+          class="app-filter-panel @panelVisibleClass">
+
+        <div class="moj-filter">
+            <div class="moj-filter__header">
+                <div class="moj-filter__header-title">
+                    <h2 class="govuk-heading-m">Filters</h2>
+                </div>
+            </div>
+
+            <div class="moj-filter__content">
+
+                @* ── Selected filter tags + Clear filters ── *@
+                @if (hasActiveFilters)
+                {
+                    <div class="moj-filter__selected">
+                        <div class="moj-filter__selected-heading">
+                            <div class="moj-filter__heading-title">
+                                <h2 class="govuk-heading-s">Selected filters</h2>
+                            </div>
+                            <div class="moj-filter__heading-action">
+                                <p>
+                                    <a class="govuk-link govuk-link--no-visited-state"
+                                       href="@Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })">
+                                        Clear filters
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                       <ul class="moj-filter-tags">
+    @foreach (var tag in GetFilterTagsWithRemoveUrls())
+    {
+        <li>
+            <a class="moj-filter__tag" href="@tag.RemoveUrl">
+                <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
+            </a>
+        </li>
+    }
+</ul>
+                    </div>
+                }
+
+                <div class="moj-filter__options">
+                    <button type="submit" class="govuk-button" data-module="govuk-button" id="apply-filters-btn">
+                        <span class="app-button-spinner" aria-hidden="true"></span>
+                        <span class="app-button-text">Apply filters</span>
+                    </button>
+
+                    @* ═══════════════════════════════ *@
+                    @* LOCATION                        *@
+                    @* ═══════════════════════════════ *@
+                    <fieldset class="govuk-fieldset">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Location</legend>
+
+                        @* Distance (single-select / radio) *@
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Distance", Name = "distance",
+                                     Options = FilterOptions.Distances,
+                                     SelectedValues = string.IsNullOrEmpty(filters.Distance)
+                                         ? new List<string>()
+                                         : new List<string> { filters.Distance },
+                                     IsSingleSelect = true
+                                 }' />
+
+                        @* Region (multi-select / checkboxes) *@
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Region", Name = "selectedRegions",
+                                     Options = FilterOptions.Regions,
+                                     SelectedValues = filters.SelectedRegions
+                                 }' />
+
+                        @* Urban or rural *@
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Urban or rural", Name = "selectedUrbanOrRural",
+                                     Options = FilterOptions.UrbanOrRural,
+                                     SelectedValues = filters.SelectedUrbanOrRural
+                                 }' />
+                    </fieldset>
+
+                    @* ═══════════════════════════════ *@
+                    @* SCHOOL CHARACTERISTICS           *@
+                    @* ═══════════════════════════════ *@
+                    <fieldset class="govuk-fieldset govuk-!-margin-top-4">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">School characteristics</legend>
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Phase of education", Name = "selectedPhaseOfEducation",
+                                     Options = FilterOptions.PhasesOfEducation,
+                                     SelectedValues = filters.SelectedPhaseOfEducation
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "School capacity in use", Name = "schoolCapacityInUse",
+                                     Options = FilterOptions.SchoolCapacityInUse,
+                                     SelectedValues = string.IsNullOrEmpty(filters.SchoolCapacityInUse)
+                                         ? new List<string>()
+                                         : new List<string> { filters.SchoolCapacityInUse },
+                                     IsSingleSelect = true
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Nursery provision", Name = "nurseryProvision",
+                                     Options = FilterOptions.NurseryProvision,
+                                     SelectedValues = string.IsNullOrEmpty(filters.NurseryProvision)
+                                         ? new List<string>()
+                                         : new List<string> { filters.NurseryProvision },
+                                     IsSingleSelect = true
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Sixth form", Name = "sixthForm",
+                                     Options = FilterOptions.SixthForm,
+                                     SelectedValues = string.IsNullOrEmpty(filters.SixthForm)
+                                         ? new List<string>()
+                                         : new List<string> { filters.SixthForm },
+                                     IsSingleSelect = true
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Admissions policy", Name = "selectedAdmissionsPolicy",
+                                     Options = FilterOptions.AdmissionsPolicies,
+                                     SelectedValues = filters.SelectedAdmissionsPolicy
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Governance structure", Name = "selectedGovernanceStructure",
+                                     Options = FilterOptions.GovernanceStructures,
+                                     SelectedValues = filters.SelectedGovernanceStructure
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Type of resourced provision", Name = "selectedResourcedProvisionType",
+                                     Options = FilterOptions.ResourcedProvisionTypes,
+                                     SelectedValues = filters.SelectedResourcedProvisionType
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Gender of entry", Name = "selectedGenderOfEntry",
+                                     Options = FilterOptions.GendersOfEntry,
+                                     SelectedValues = filters.SelectedGenderOfEntry
+                                 }' />
+                    </fieldset>
+
+                    @* ═══════════════════════════════ *@
+                    @* ATTENDANCE                       *@
+                    @* ═══════════════════════════════ *@
+                    <fieldset class="govuk-fieldset govuk-!-margin-top-4">
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Attendance</legend>
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Overall absence rate", Name = "overallAbsenceRate",
+                                     Options = FilterOptions.AbsenceRates,
+                                     SelectedValues = string.IsNullOrEmpty(filters.OverallAbsenceRate)
+                                         ? new List<string>()
+                                         : new List<string> { filters.OverallAbsenceRate },
+                                     IsSingleSelect = true
+                                 }' />
+
+                        <partial name="SimilarSchoolsFilterSection"
+                                 model='new FilterCheckboxGroupModel {
+                                     Legend = "Persistent absence rate", Name = "persistentAbsenceRate",
+                                     Options = FilterOptions.AbsenceRates,
+                                     SelectedValues = string.IsNullOrEmpty(filters.PersistentAbsenceRate)
+                                         ? new List<string>()
+                                         : new List<string> { filters.PersistentAbsenceRate },
+                                     IsSingleSelect = true
+                                 }' />
+                    </fieldset>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@functions {
+    List<(string Label, string RemoveUrl)> GetFilterTagsWithRemoveUrls()
+    {
+        var tags = new List<(string Label, string RemoveUrl)>();
+        var f = Model.Filters;
+
+        AddSingleTag(tags, f.Distance, "distance");
+        AddSingleTag(tags, f.SchoolCapacityInUse, "schoolCapacityInUse");
+        AddSingleTag(tags, f.NurseryProvision, "nurseryProvision", "Nursery");
+        AddSingleTag(tags, f.SixthForm, "sixthForm", "Sixth form");
+        AddSingleTag(tags, f.OverallAbsenceRate, "overallAbsenceRate", "Absence");
+        AddSingleTag(tags, f.PersistentAbsenceRate, "persistentAbsenceRate", "Persistent absence");
+
+        AddMultiTags(tags, f.SelectedRegions, "selectedRegions");
+        AddMultiTags(tags, f.SelectedUrbanOrRural, "selectedUrbanOrRural");
+        AddMultiTags(tags, f.SelectedPhaseOfEducation, "selectedPhaseOfEducation");
+        AddMultiTags(tags, f.SelectedAdmissionsPolicy, "selectedAdmissionsPolicy");
+        AddMultiTags(tags, f.SelectedGovernanceStructure, "selectedGovernanceStructure");
+        AddMultiTags(tags, f.SelectedResourcedProvisionType, "selectedResourcedProvisionType");
+        AddMultiTags(tags, f.SelectedGenderOfEntry, "selectedGenderOfEntry");
+
+        return tags;
+    }
+
+    void AddSingleTag(List<(string, string)> tags, string? value, string paramName, string? prefix = null)
+    {
+        if (string.IsNullOrEmpty(value)) return;
+
+        var label = prefix != null ? $"{prefix}: {value}" : value;
+        var qs = BuildQueryStringWithout(paramName, value);
+        var removeUrl = Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn }) + qs;
+        tags.Add((label, removeUrl));
+    }
+
+    void AddMultiTags(List<(string, string)> tags, List<string> values, string paramName)
+    {
+        foreach (var val in values)
+        {
+            var qs = BuildQueryStringWithout(paramName, val);
+            var removeUrl = Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn }) + qs;
+            tags.Add((val, removeUrl));
+        }
+    }
+
+    string BuildQueryStringWithout(string excludeParam, string excludeValue)
+    {
+        var f = Model.Filters;
+        var parts = new List<string>();
+
+        parts.Add($"sortBy={Uri.EscapeDataString(Model.SortBy)}");
+
+        void AddSingle(string? value, string name)
+        {
+            if (!string.IsNullOrEmpty(value) && !(name == excludeParam && value == excludeValue))
+                parts.Add($"{name}={Uri.EscapeDataString(value)}");
+        }
+
+        void AddMulti(List<string> values, string name)
+        {
+            foreach (var v in values)
+            {
+                if (name == excludeParam && v == excludeValue) continue;
+                parts.Add($"{name}={Uri.EscapeDataString(v)}");
+            }
+        }
+
+        AddSingle(f.Distance, "distance");
+        AddMulti(f.SelectedRegions, "selectedRegions");
+        AddMulti(f.SelectedUrbanOrRural, "selectedUrbanOrRural");
+        AddMulti(f.SelectedPhaseOfEducation, "selectedPhaseOfEducation");
+        AddSingle(f.SchoolCapacityInUse, "schoolCapacityInUse");
+        AddSingle(f.NurseryProvision, "nurseryProvision");
+        AddSingle(f.SixthForm, "sixthForm");
+        AddMulti(f.SelectedAdmissionsPolicy, "selectedAdmissionsPolicy");
+        AddMulti(f.SelectedGovernanceStructure, "selectedGovernanceStructure");
+        AddMulti(f.SelectedResourcedProvisionType, "selectedResourcedProvisionType");
+        AddMulti(f.SelectedGenderOfEntry, "selectedGenderOfEntry");
+        AddSingle(f.OverallAbsenceRate, "overallAbsenceRate");
+        AddSingle(f.PersistentAbsenceRate, "persistentAbsenceRate");
+
+        return parts.Count > 1 ? "?" + string.Join("&", parts) : "";
+    }
+}
+
+<script add-nonce="true">
+    (function () {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFilterProtection);
+        } else {
+            initFilterProtection();
+        }
+
+        function initFilterProtection() {
+            var filterForm = document.getElementById('similar-schools-filter-form');
+            if (!filterForm) return;
+
+            var applyButton = document.getElementById('apply-filters-btn');
+
+            filterForm.onsubmit = function (e) {
+                var activeElement = document.activeElement;
+                var isApplyButton = activeElement &&
+                    activeElement.type === 'submit' &&
+                    activeElement.textContent.indexOf('Apply') > -1;
+
+                if (!isApplyButton) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (applyButton) {
+                    applyButton.classList.add('govuk-button--loading');
+                    applyButton.disabled = true;
+                }
+            };
+
+            var checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(function (cb) {
+                var clone = cb.cloneNode(true);
+                cb.parentNode.replaceChild(clone, cb);
+            });
+        }
+    })();
+
+    (function () {
+        var sections = document.querySelectorAll('[data-module="app-filter-section"]');
+        sections.forEach(function (section) {
+            var toggle = section.querySelector('.app-filter-section__toggle');
+            var content = section.querySelector('.app-filter-section__content');
+            if (toggle && content) {
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var expanded = toggle.getAttribute('aria-expanded') === 'true';
+                    toggle.setAttribute('aria-expanded', !expanded);
+                    expanded ? content.setAttribute('hidden', '') : content.removeAttribute('hidden');
+                });
+            }
+        });
+
+        var filterToggle = document.querySelector('[data-module="app-filter-toggle"]');
+        var filterPanel = document.getElementById('similar-schools-filter-form');
+        if (filterToggle && filterPanel) {
+            filterToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var expanded = filterToggle.getAttribute('aria-expanded') === 'true';
+                filterToggle.setAttribute('aria-expanded', !expanded);
+                expanded
+                    ? filterPanel.classList.remove('app-filter-panel--visible')
+                    : filterPanel.classList.add('app-filter-panel--visible');
+            });
+        }
+    })();
+</script>
