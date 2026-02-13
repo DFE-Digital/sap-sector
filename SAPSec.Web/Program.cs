@@ -125,6 +125,7 @@ public class Program
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
+        builder.Services.AddPostgresqlDependencies();
         builder.Services.AddDependencies();
 
         //builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
