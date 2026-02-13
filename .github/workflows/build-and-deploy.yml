@@ -269,7 +269,7 @@ jobs:
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
 
-          SECRET_NAME="$(kubectl -n "${AKS_NAMESPACE}" get secret -o json | jq -r '.items[] | select(.data[\"ConnectionStrings__PostgresConnectionString\"]) | .metadata.name' | head -n1)"
+          SECRET_NAME="$(kubectl -n "${AKS_NAMESPACE}" get secret -o json | jq -r '.items[] | select(.data["ConnectionStrings__PostgresConnectionString"]) | .metadata.name' | head -n1)"
           : "${SECRET_NAME:?Postgres connection string secret not found in ${AKS_NAMESPACE}}"
           CONN_B64="$(kubectl -n "${AKS_NAMESPACE}" get secret "${SECRET_NAME}" -o jsonpath='{.data.ConnectionStrings__PostgresConnectionString}')"
           CONN_STR="$(echo "${CONN_B64}" | base64 -d)"
