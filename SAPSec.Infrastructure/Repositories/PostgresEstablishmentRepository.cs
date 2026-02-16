@@ -24,11 +24,17 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         using var conn = _factory.Create().OpenConnection();
 
         const string sql = """
-                               SELECT *
+                               SELECT "URN",
+                                      "EstablishmentName",
+                                      "Street" AS "AddressStreet",
+                                      "Postcode" AS "AddressPostcode"
                                FROM public.v_establishment;
                            """;
 
-        return conn.Query<Establishment>(sql).ToList();
+        foreach (var establishment in conn.Query<Establishment>(sql, buffered: false))
+        {
+            yield return establishment;
+        }
     }
 
     public Establishment GetEstablishment(string urn)
@@ -39,7 +45,12 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         using var conn = _factory.Create().OpenConnection();
 
         const string sql = """
-                               SELECT *
+                               SELECT *,
+                                      "Street" AS "AddressStreet",
+                                      "Locality" AS "AddressLocality",
+                                      "Address3" AS "AddressAddress3",
+                                      "Town" AS "AddressTown",
+                                      "Postcode" AS "AddressPostcode"
                                FROM public.v_establishment
                               WHERE "URN" = @urn
                                LIMIT 1;
@@ -59,7 +70,12 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
 
         //Missing Field "DfENumberSearchable" in database
         const string sql = """
-                               SELECT *
+                               SELECT *,
+                                      "Street" AS "AddressStreet",
+                                      "Locality" AS "AddressLocality",
+                                      "Address3" AS "AddressAddress3",
+                                      "Town" AS "AddressTown",
+                                      "Postcode" AS "AddressPostcode"
                                FROM public.v_establishment
                                WHERE "URN" = @number
                                   OR (@ukprn IS NOT NULL AND "UKPRN" = @ukprn)
