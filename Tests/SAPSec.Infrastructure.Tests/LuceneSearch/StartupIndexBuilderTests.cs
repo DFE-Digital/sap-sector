@@ -28,19 +28,24 @@ public class StartupIndexBuilderTests
 
     private sealed class DummyRepo : IEstablishmentService
     {
-        public IEnumerable<Establishment> GetAllEstablishments()
+        public Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
         {
-            return [];
+            return Task.FromResult<IReadOnlyCollection<Establishment>>([]);
         }
 
-        public Establishment GetEstablishment(string urn)
+        public Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns)
         {
-            return null!;
+            return Task.FromResult<IReadOnlyCollection<Establishment>>([]);
         }
 
-        public Establishment GetEstablishmentByAnyNumber(string number)
+        public Task<Establishment> GetEstablishmentAsync(string urn)
         {
-            return null!;
+            return Task.FromResult<Establishment>(null!);
+        }
+
+        public Task<Establishment> GetEstablishmentByAnyNumberAsync(string number)
+        {
+            return Task.FromResult<Establishment>(null!);
         }
     }
 }
