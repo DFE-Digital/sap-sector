@@ -1,19 +1,25 @@
 @using SAPSec.Web.ViewModels
-@{
-    var Data = ViewData["ComparisonSchool"] as SimilarSchoolsComparisonViewModel;
-}
+@using System.Linq
+
 @{
     Layout = "Views/Shared/_Layout";
 
-    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
-    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var routeAttributes = new Dictionary<string, object>
+    var comparisonModel = ViewData["ComparisonSchool"] as SimilarSchoolsComparisonViewModel;
+    var mainSchool = comparisonModel?.SimilarSchoolViewModels?.FirstOrDefault(s => !s.IsComparedSchool);
+    var comparedSchool = comparisonModel?.SimilarSchoolViewModels?.FirstOrDefault(s => s.IsComparedSchool);
+
+    var currentController = (string?)ViewContext.RouteData.Values["controller"];
+    var currentAction = (string?)ViewContext.RouteData.Values["action"];
+
+    var routeValues = new Dictionary<string, object>();
+
+    if (mainSchool is not null && comparedSchool is not null)
     {
-        { "urn", Data.School.Urn },
-        { "comparisonUrn", Data.CompareSchool.Urn }
-    };
-    
+        routeValues["urn"] = mainSchool.Urn;
+        routeValues["comparisonUrn"] = comparedSchool.Urn;
+    }
 }
+
 
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
@@ -23,7 +29,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Url.Action("ViewSimilarSchools", "School", new { urn = @Data.School.Urn})">
+                   href="@Url.Action("ViewSimilarSchools", "School", new { urn = @mainSchool.Urn})">
                     View similar schools
                 </a>
             </li>
@@ -35,7 +41,7 @@
     @* LEFT: back link alone *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Url.Action("ViewSimilarSchools", "School", new { urn = @Data.School.Urn })">
+           href="@Url.Action("ViewSimilarSchools", "School", new { urn = @mainSchool.Urn })">
             Back
         </a>
     </div>
@@ -47,7 +53,7 @@
     <div class="app-body-container-with-side-navigation">
 
         <span class="govuk-caption-l govuk-!-font-size-27">
-            @Data.School.EstablishmentName
+            @mainSchool.EstablishmentName
         </span>
 
         <span class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold">
@@ -55,7 +61,7 @@
         </span>
 
         <h1 class="govuk-heading-xl govuk-!-font-size-50 govuk-!-font-weight-bold">
-            @Data.CompareSchool.EstablishmentName
+            @comparedSchool.EstablishmentName
         </h1>
 
         <nav class="moj-sub-navigation moj-sub-navigation--inline"
@@ -64,7 +70,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "Index")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Index", "SimilarSchoolsComparison", routeAttributes)"
+                       href="@Url.Action("Index", "SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "Index" ? "page" : null)">
                         Similarity
                     </a>
@@ -72,7 +78,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "Ks4HeadlineMeasures")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Ks4HeadlineMeasures", "SimilarSchoolsComparison", routeAttributes)"
+                       href="@Url.Action("Ks4HeadlineMeasures", "SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "Ks4HeadlineMeasures" ? "page" : null)">
                         KS4 headline measures
                     </a>
@@ -80,7 +86,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "Ks4CoreSubjects")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Ks4CoreSubjects","SimilarSchoolsComparison", routeAttributes)"
+                       href="@Url.Action("Ks4CoreSubjects","SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "Ks4CoreSubjects" ? "page" : null)">
                         KS4 core subjects
                     </a>
@@ -88,7 +94,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "Attendance")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Attendance","SimilarSchoolsComparison", routeAttributes)"
+                       href="@Url.Action("Attendance","SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "Attendance" ? "page" : null)">
                         Attendance
                     </a>
@@ -96,7 +102,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "SchoolDetails")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("SchoolDetails","SimilarSchoolsComparison", routeAttributes)"
+                       href="@Url.Action("SchoolDetails","SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
                         School details
                     </a>

@@ -46,6 +46,8 @@ public class SimilarSchoolViewModel
     public double? OverallAbsenceRate { get; set; }
     public double? PersistentAbsenceRate { get; set; }
     
+    public int? Easting { get; set; }
+    public int? Northing { get; set; }
     public string? Latitude { get; set; }
     public string? Longitude { get; set; }
 
@@ -58,4 +60,5 @@ public class SimilarSchoolViewModel
             return string.Join(", ", parts);
         }
     }
+    public bool IsComparedSchool { get; set; } = false;
 }

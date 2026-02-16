@@ -8,34 +8,74 @@ namespace SAPSec.Web.Controllers;
 [Route("school/{urn}/view-similar-schools/{comparisonUrn}")]
 public class SimilarSchoolsComparisonController : Controller
 {
+    private readonly ISchoolDetailsService _schoolDetailsService;
+    private readonly ILogger<SimilarSchoolsComparisonController> _logger;
+
+    public SimilarSchoolsComparisonController(ISchoolDetailsService schoolDetailsService)
+    {
+        _schoolDetailsService = schoolDetailsService;
+    }
+    
     [HttpGet]
     public IActionResult Index(string urn, string comparisonUrn)
     {
-        var comparisonSchool = GetMockCompareSchool(int.Parse(comparisonUrn));
-        var school = GetMockSchool(int.Parse(urn));
-
-        var model = new SimilarSchoolsComparisonViewModel()
+        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
         {
-            School = school,
-            CompareSchool = comparisonSchool
+            return BadRequest("Invalid URN.");
+        }
+
+        var mainSchool = GetMockSchool(mainUrn);
+        var comparedSchool = GetMockCompareSchool(compareUrn);
+
+        if (mainSchool is null || comparedSchool is null)
+        {
+            return NotFound();
+        }
+
+        comparedSchool.IsComparedSchool = true;
+
+        var model = new SimilarSchoolsComparisonViewModel
+        {
+            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
+            {
+                mainSchool,
+                comparedSchool
+            }
         };
 
         SetComparisonSchoolViewData(model);
+
         return View(model);
     }
+
     
     
     [HttpGet]
     [Route("Ks4HeadlineMeasures")]
     public IActionResult Ks4HeadlineMeasures(string urn, string comparisonUrn)
     {
-        var comparisonSchool = GetMockCompareSchool(int.Parse(comparisonUrn));
-        var school = GetMockSchool(int.Parse(urn));
-
-        var model = new SimilarSchoolsComparisonViewModel()
+        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
         {
-            School = school,
-            CompareSchool = comparisonSchool
+            return BadRequest("Invalid URN.");
+        }
+
+        var mainSchool = GetMockSchool(mainUrn);
+        var comparedSchool = GetMockCompareSchool(compareUrn);
+
+        if (mainSchool is null || comparedSchool is null)
+        {
+            return NotFound();
+        }
+
+        comparedSchool.IsComparedSchool = true;
+
+        var model = new SimilarSchoolsComparisonViewModel
+        {
+            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
+            {
+                mainSchool,
+                comparedSchool
+            }
         };
 
         SetComparisonSchoolViewData(model);
@@ -46,13 +86,28 @@ public class SimilarSchoolsComparisonController : Controller
     [Route("Ks4CoreSubjects")]
     public IActionResult Ks4CoreSubjects(string urn, string comparisonUrn)
     {
-        var comparisonSchool = GetMockCompareSchool(int.Parse(comparisonUrn));
-        var school = GetMockSchool(int.Parse(urn));
-
-        var model = new SimilarSchoolsComparisonViewModel()
+        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
         {
-            School = school,
-            CompareSchool = comparisonSchool
+            return BadRequest("Invalid URN.");
+        }
+
+        var mainSchool = GetMockSchool(mainUrn);
+        var comparedSchool = GetMockCompareSchool(compareUrn);
+
+        if (mainSchool is null || comparedSchool is null)
+        {
+            return NotFound();
+        }
+
+        comparedSchool.IsComparedSchool = true;
+
+        var model = new SimilarSchoolsComparisonViewModel
+        {
+            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
+            {
+                mainSchool,
+                comparedSchool
+            }
         };
 
         SetComparisonSchoolViewData(model);
@@ -63,16 +118,31 @@ public class SimilarSchoolsComparisonController : Controller
     [Route("attendance")]
     public IActionResult Attendance(string urn, string comparisonUrn)
     {
-        var comparisonSchool = GetMockCompareSchool(int.Parse(comparisonUrn));
-        var school = GetMockSchool(int.Parse(urn));
-
-        var model = new SimilarSchoolsComparisonViewModel()
+        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
         {
-            School = school,
-            CompareSchool = comparisonSchool
-        };
+            return BadRequest("Invalid URN.");
+        }
 
+        var mainSchool = GetMockSchool(mainUrn);
+        var comparedSchool = GetMockCompareSchool(compareUrn);
+
+        if (mainSchool is null || comparedSchool is null)
+        {
+            return NotFound();
+        }
+
+        comparedSchool.IsComparedSchool = true;
+
+        var model = new SimilarSchoolsComparisonViewModel
+        {
+            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
+            {
+                mainSchool,
+                comparedSchool
+            }
+        };
         SetComparisonSchoolViewData(model);
+
         return View(model);
     }
 
@@ -80,18 +150,40 @@ public class SimilarSchoolsComparisonController : Controller
     [Route("SchoolDetails")]
     public IActionResult SchoolDetails(string urn, string comparisonUrn)
     {
-        var comparisonSchool = GetMockCompareSchool(int.Parse(comparisonUrn));
-        var school = GetMockSchool(int.Parse(urn));
+        if (!TryParseUrns(urn, comparisonUrn, out var mainUrn, out var compareUrn))
+            return BadRequest("Invalid URN.");
 
-        var model = new SimilarSchoolsComparisonViewModel()
+        var mainSchool = GetMockSchool(mainUrn);
+        var comparedSchool = GetMockCompareSchool(compareUrn);
+
+        var comparedDetails = _schoolDetailsService.TryGetByUrn(compareUrn.ToString());
+        if (comparedDetails is null)
+            return NotFound();
+
+        comparedSchool.IsComparedSchool = true;
+        
+        var distanceText = DistanceFormatter.DistanceMilesOrNoData(
+            mainSchool.Easting, mainSchool.Northing,
+            comparedSchool.Easting, comparedSchool.Northing
+        );
+
+        var model = new SimilarSchoolsComparisonViewModel
         {
-            School = school,
-            CompareSchool = comparisonSchool
+            SimilarSchoolViewModels = new List<SimilarSchoolViewModel> { mainSchool, comparedSchool },
+            comparedSchoolDetails = comparedDetails,
+            DistanceBetweenSchools = distanceText
         };
-
         SetComparisonSchoolViewData(model);
+
         return View(model);
     }
+
+    private static bool TryParseUrns(string urn, string comparisonUrn, out int mainUrn, out int compareUrn)
+    {
+        compareUrn = 0;
+        return int.TryParse(urn, out mainUrn) && int.TryParse(comparisonUrn, out compareUrn);
+    }
+
 
     private void SetComparisonSchoolViewData(SimilarSchoolsComparisonViewModel data)
     {
@@ -113,7 +205,9 @@ public class SimilarSchoolsComparisonController : Controller
             Region = "Yorkshire and The Humber", UrbanOrRural = "Urban",
             AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
             HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-            SchoolCapacity = 1200, OverallAbsenceRate = 5.2, PersistentAbsenceRate = 12.1
+            SchoolCapacity = 1200, OverallAbsenceRate = 5.2, PersistentAbsenceRate = 12.1,
+            Latitude = "51.191000", Longitude = "0.273000",
+            Easting = 435000, Northing = 385000
         };
     }
 
@@ -132,7 +226,9 @@ public class SimilarSchoolsComparisonController : Controller
             Region = "East Midlands", UrbanOrRural = "Rural",
             AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
             HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-            SchoolCapacity = 800, OverallAbsenceRate = 4.8, PersistentAbsenceRate = 10.3
+            SchoolCapacity = 800, OverallAbsenceRate = 4.8, PersistentAbsenceRate = 10.3,
+            Latitude = "54.968000", Longitude = "-2.104000",
+            Easting = 438500, Northing = 388200
         };
     }
 }

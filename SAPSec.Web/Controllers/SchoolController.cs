@@ -49,6 +49,7 @@ public class SchoolController : Controller
         var school = _schoolDetailsService.TryGetByUrn(urn);
         if (school != null)
         {
+            SetSchoolViewData(school);
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
             return View(school);
         }
