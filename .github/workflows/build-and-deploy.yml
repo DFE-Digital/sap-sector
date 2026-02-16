@@ -10,9 +10,9 @@ on:
         type: choice
         default: review
         options:
-        - review
-        - test
-        - production
+          - review
+          - test
+          - production
       docker-image-tag:
         description: "Docker image tag to deploy (optional)"
         required: true
@@ -22,11 +22,11 @@ on:
         required: false
         type: string
   push:
-   branches:
-    - main
+    branches:
+      - main
   pull_request:
     branches:
-    - main
+      - main
     types: [opened, reopened, synchronize, labeled]
 
 env:
@@ -47,19 +47,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-      name: Checkout
+      - uses: actions/checkout@v4
+        name: Checkout
 
-    - name: Build and push docker image
-      id: build-image
-      uses: DFE-Digital/github-actions/build-docker-image@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        context: .
-        docker-repository: ${{ env.DOCKER_REPOSITORY }}
-        max-cache: true
-        reuse-cache: true
-        snyk-token: ${{ secrets.SNYK_TOKEN }}
+      - name: Build and push docker image
+        id: build-image
+        uses: DFE-Digital/github-actions/build-docker-image@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          context: .
+          docker-repository: ${{ env.DOCKER_REPOSITORY }}
+          max-cache: true
+          reuse-cache: true
+          snyk-token: ${{ secrets.SNYK_TOKEN }}
 
   test:
     name: Run Unit & Integration Tests with Coverage
@@ -67,110 +67,110 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Check out repository
-      uses: actions/checkout@v4
+      - name: Check out repository
+        uses: actions/checkout@v4
 
-    - name: Set up .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+      - name: Restore dependencies
+        run: dotnet restore
 
-    - name: Build solution
-      run: dotnet build --configuration Debug --no-restore
+      - name: Build solution
+        run: dotnet build --configuration Debug --no-restore
 
-    - name: Install Playwright
-      working-directory: Tests/SAPSec.UI.Tests
-      run: |
-        dotnet tool install --global Microsoft.Playwright.CLI
-        export PATH="$PATH:/root/.dotnet/tools"
-        playwright install --with-deps chromium
+      - name: Install Playwright
+        working-directory: Tests/SAPSec.UI.Tests
+        run: |
+          dotnet tool install --global Microsoft.Playwright.CLI
+          export PATH="$PATH:/root/.dotnet/tools"
+          playwright install --with-deps chromium
 
-    - name: Setup Node
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
-        cache-dependency-path: '**/package-lock.json'
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
 
-    - name: build frontend assets
-      working-directory: SAPSec.Web
-      run: |
-        npm ci
-        npm run build-fe
-        
-        echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
-        mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
-        cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
-        
-        echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="       
-        mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
-        cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
+      - name: build frontend assets
+        working-directory: SAPSec.Web
+        run: |
+          npm ci
+          npm run build-fe
+          
+          echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
+          mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
+          cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
+          
+          echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="       
+          mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
+          cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
 
-    - name: Run All Tests with Coverage
-      env:
-        HEADED: 0
-        PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
-      run: |
-        TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
+      - name: Run All Tests with Coverage
+        env:
+          HEADED: 0
+          PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
+        run: |
+          TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
+          
+          for proj in $TEST_PROJECTS; do
+            echo "=== Running tests in $proj ==="
+          
+            dotnet test "$proj" \
+              --no-build \
+              --configuration Debug \
+              --results-directory "TestResults" \
+              --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
+              /p:CollectCoverage=true \
+              /p:CoverletOutputFormat=cobertura \
+              /p:DeterministicReport=true \
+              /p:UseSourceLink=true \
+              /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*' \
+              /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
+              --verbosity normal
+          done
+      
+      #Example of how to exclude tests from coverage https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
 
-        for proj in $TEST_PROJECTS; do
-          echo "=== Running tests in $proj ==="
+      - name: Upload Test Result Files
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: "**/TestResults/**/*"
+          retention-days: 5
 
-          dotnet test "$proj" \
-            --no-build \
-            --configuration Debug \
-            --results-directory "TestResults" \
-            --logger "trx;LogFileName=$(basename "$proj" .csproj).trx" \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura \
-            /p:DeterministicReport=true \
-            /p:UseSourceLink=true \
-            /p:Exclude='[*]AspNetCoreGeneratedDocument.*%2c[*]AspNetCore.Views.*' \
-            /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
-            --verbosity normal
-        done
+      - name: Publish Test Results
+        uses: dorny/test-reporter@v2
+        if: always()
+        with:
+          reporter: 'dotnet-trx'
+          path: "**/TestResults/**/*.trx"
+          name: 'Test Results'
 
-#Example of how to exclude tests from coverage https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
+      - name: merge coverage files
+        run: |
+          dotnet tool install -g dotnet-coverage
+          dotnet coverage merge --reports $(find Tests -name "coverage.cobertura.xml") -f cobertura -o coverage-results/coverage.xml
 
-    - name: Upload Test Result Files
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: test-results
-        path: "**/TestResults/**/*"
-        retention-days: 5
+      - name: Generate Coverage Report
+        uses: clearlyip/code-coverage-report-action@v6
+        id: code_coverage_report_action
+        if: ${{ github.actor != 'dependabot[bot]'}}
+        with:
+          filename: "coverage-results/coverage.xml"
+          fail_on_negative_difference: true
+          only_list_changed_files: true
 
-    - name: Publish Test Results
-      uses: dorny/test-reporter@v2
-      if: always()
-      with:
-        reporter: 'dotnet-trx'
-        path: "**/TestResults/**/*.trx"
-        name: 'Test Results'
-
-    - name: merge coverage files
-      run: |
-        dotnet tool install -g dotnet-coverage
-        dotnet coverage merge --reports $(find Tests -name "coverage.cobertura.xml") -f cobertura -o coverage-results/coverage.xml
-
-    - name: Generate Coverage Report
-      uses: clearlyip/code-coverage-report-action@v6
-      id: code_coverage_report_action
-      if: ${{ github.actor != 'dependabot[bot]'}}
-      with:
-        filename: "coverage-results/coverage.xml"
-        fail_on_negative_difference: true
-        only_list_changed_files: true
-
-    - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2
-      if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
-      with:
-        recreate: true
-        path: code-coverage-results.md
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
+        with:
+          recreate: true
+          path: code-coverage-results.md
 
   deploy-review-app:
     name: Deployment To Review
@@ -188,20 +188,20 @@ jobs:
       pull-requests: write
 
     steps:
-    - name: Deploy App to Review
-      id: deploy_review
-      uses: DFE-Digital/github-actions/deploy-to-aks@master
-      with:
-        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        environment: review
-        pr-number: ${{ github.event.pull_request.number }}
-        sha: ${{ needs.build.outputs.docker-image-tag }}
-        terraform-base: ${{ env.TERRAFORM_BASE }}
-        healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        db-seed: false
-        smoke-test: false
+      - name: Deploy App to Review
+        id: deploy_review
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: review
+          pr-number: ${{ github.event.pull_request.number }}
+          sha: ${{ needs.build.outputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          db-seed: false
+          smoke-test: false
 
   deploy:
     name: Deploy environments
@@ -220,19 +220,19 @@ jobs:
         environment: [test, production]
 
     steps:
-    - name: Deploy app to ${{ matrix.environment }}
-      id: deploy_app
-      uses: DFE-Digital/github-actions/deploy-to-aks@master
-      with:
-        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        environment: ${{ matrix.environment }}
-        sha: ${{ needs.build.outputs.docker-image-tag }}
-        terraform-base: ${{ env.TERRAFORM_BASE }}
-        healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
-        smoke-test: false
+      - name: Deploy app to ${{ matrix.environment }}
+        id: deploy_app
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: ${{ matrix.environment }}
+          sha: ${{ needs.build.outputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          smoke-test: false
 
   manual_deploy:
     name: Manual deploy
@@ -249,17 +249,17 @@ jobs:
       pull-requests: write
 
     steps:
-    - name: Deploy app to ${{ inputs.environment }}
-      id: deploy_manual
-      uses: DFE-Digital/github-actions/deploy-to-aks@master
-      with:
-        azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        environment: ${{ inputs.environment }}
-        pr-number: ${{ inputs.pull-request-number }}
-        sha: ${{ inputs.docker-image-tag }}
-        terraform-base: ${{ env.TERRAFORM_BASE }}
-        healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
-        smoke-test: false
+      - name: Deploy app to ${{ inputs.environment }}
+        id: deploy_manual
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: ${{ inputs.environment }}
+          pr-number: ${{ inputs.pull-request-number }}
+          sha: ${{ inputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          smoke-test: false

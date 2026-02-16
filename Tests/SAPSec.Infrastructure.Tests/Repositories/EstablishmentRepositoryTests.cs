@@ -3,11 +3,6 @@ using Moq;
 using SAPSec.Core.Model;
 using SAPSec.Core.Interfaces.Repositories.Generic;
 using SAPSec.Infrastructure.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAPSec.Infrastructure.Tests.Repositories
 {

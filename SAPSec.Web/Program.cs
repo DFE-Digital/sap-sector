@@ -15,6 +15,8 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using GovUk.Frontend.AspNetCore;
+using Npgsql;
+using SAPSec.Infrastructure.Extensions;
 
 namespace SAPSec.Web;
 
@@ -115,9 +117,10 @@ public class Program
 
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-
-
-
+        
+        builder.Services.AddPostgresqlDependencies();
+        
+        
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
         builder.Services.AddLuceneDependencies();
 
