@@ -123,7 +123,7 @@ public class SchoolController : Controller
             CurrentFilters = ExtractCurrentFilters(Request.Query),
             SortBy = coreSortBy,
             CurrentPage = response.ResultsPage.CurrentPage,
-            PageSize = response.ResultsPage.PageSize,
+            PageSize = response.ResultsPage.ItemsPerPage,
             TotalResults = response.AllResults.Count
         };
 
@@ -184,7 +184,7 @@ public class SchoolController : Controller
             .Where(kvp => kvp.Key != "sortBy" && kvp.Key != "page")
             .ToDictionary(
                 kvp => kvp.Key,
-                kvp => kvp.Value.AsEnumerable(),
+                kvp => kvp.Value.Where(v => !string.IsNullOrWhiteSpace(v))!.Select(v => v!),
                 StringComparer.InvariantCultureIgnoreCase);
     }
     private static Dictionary<string, List<string>> ExtractCurrentFilters(IQueryCollection query)
@@ -193,7 +193,7 @@ public class SchoolController : Controller
         foreach (var (key, values) in query)
         {
             if (key == "sortBy" || key == "page") continue;
-            result[key] = values.ToList();
+            result[key] = values.Where(v => !string.IsNullOrWhiteSpace(v)).Select(v => v!).ToList();
         }
 
         return result;

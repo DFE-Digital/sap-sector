@@ -8,7 +8,7 @@ namespace SAPSec.UI.Tests;
 [Collection("UITestsCollection")]
 public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SimilarSchoolsPath = "/school/147788/view-similar-schools";
+    private const string SimilarSchoolsPath = "/school/108088/view-similar-schools";
 
     [Fact]
     public async Task SimilarSchoolsPage_LoadsSuccessfully()

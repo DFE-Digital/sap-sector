@@ -7,9 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Model;
+using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Infrastructure.Repositories.Json;
+using SAPSec.Infrastructure.Repositories;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
 
@@ -63,7 +66,16 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 				services.AddScoped<IUserService, MockDsiUserService>();
         		services.AddScoped<IDsiClient, MockDsiApiService>();
                 
+                services.RemoveAll<IEstablishmentRepository>();
+                services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
+
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsRow>, JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
+                services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
+                services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
+
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
+                services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
 
             });
     }
