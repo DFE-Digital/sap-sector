@@ -20,10 +20,10 @@
     <form method="get"
           action="@Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })"
           id="similar-schools-filter-form"
-          class="app-filter-panel @panelVisibleClass">
+          class="app-filter-panel app-filter-panel--similar @panelVisibleClass">
 
         <div class="moj-filter">
-            <div class="moj-filter__header">
+            <div class="moj-filter__header app-filter-header-divider">
                 <div class="moj-filter__header-title">
                     <h2 class="govuk-heading-m">Filters</h2>
                 </div>
@@ -35,7 +35,7 @@
                 @if (hasActiveFilters)
                 {
                     <div class="moj-filter__selected">
-                        <div class="moj-filter__selected-heading">
+                        <div class="moj-filter__selected-heading app-selected-filters-divider">
                             <div class="moj-filter__heading-title">
                                 <h2 class="govuk-heading-s">Selected filters</h2>
                             </div>
