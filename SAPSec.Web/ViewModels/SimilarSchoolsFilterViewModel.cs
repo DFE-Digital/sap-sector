@@ -41,11 +41,11 @@ public static class FilterOptions
 {
     public static readonly List<string> Distances = new()
     {
-        "Within 5 miles",
-        "Within 10 miles",
-        "Within 25 miles",
-        "Within 50 miles",
-        "Within 100 miles"
+        "Up to 5 miles",
+        "Up to 10 miles",
+        "Up to 25 miles",
+        "Up to 50 miles",
+        "Up to 100 miles"
     };
 
     public static readonly List<string> Regions = new()
@@ -137,10 +137,13 @@ public static class FilterOptions
     public static readonly List<string> SortOptions = new()
     {
         "Attainment 8",
-        "School name",
-        "Similarity",
-        "Distance",
-        "Overall absence rate",
-        "Persistent absence rate"
+        "English and maths GCSEs (Grade 5 and above)",
+        "English language GCSE (Grade 5 and above)",
+        "English literature GCSE (Grade 5 and above)",
+        "Mathematics GCSE (Grade 5 and above)",
+        "Combined science (double award) GCSE (Grade 5-5 and above)",
+        "Biology GCSE (Grade 5 and above)",
+        "Chemistry GCSE (Grade 5 and above)",
+        "Physics GCSE (Grade 5 and above)"
     };
 } 

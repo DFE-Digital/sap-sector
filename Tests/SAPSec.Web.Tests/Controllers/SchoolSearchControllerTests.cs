@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Model;
-using SAPSec.Infrastructure.Entities;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
@@ -23,7 +22,7 @@ public class SchoolSearchControllerTests
         LAId = "100",
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment One",
-        LANAme = "Leeds",
+        LAName = "Leeds",
         Easting = "430000",
         Northing = "433000",
         Latitude = "53.8",
@@ -37,7 +36,7 @@ public class SchoolSearchControllerTests
         LAId = "100",
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment Two",
-        LANAme = "Leeds",
+        LAName = "Leeds",
         Easting = "430100",
         Northing = "433100",
         Latitude = "53.81",
@@ -81,14 +80,14 @@ public class SchoolSearchControllerTests
     #region Index POST Tests
 
     [Fact]
-    public void Index_Post_WithValidQuery_RedirectsToSearch()
+    public async Task Index_Post_WithValidQuery_RedirectsToSearch()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School"
         };
 
-        var result = _controller.Index(viewModel);
+        var result = await _controller.Index(viewModel);
 
         result.Should().NotBeNull();
         result.Should().BeOfType<RedirectToActionResult>();
@@ -100,7 +99,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithInvalidShortQuery_ReturnsViewWithModelError()
+    public async Task Index_Post_WithInvalidShortQuery_ReturnsViewWithModelError()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -108,7 +107,7 @@ public class SchoolSearchControllerTests
         };
         _controller.ModelState.AddModelError("Query", "Enter a school name or Urn (minimum 3 characters)");
 
-        var result = _controller.Index(viewModel);
+        var result = await _controller.Index(viewModel);
 
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
@@ -118,7 +117,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithEmptyQuery_ReturnsViewWithModelError()
+    public async Task Index_Post_WithEmptyQuery_ReturnsViewWithModelError()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -126,7 +125,7 @@ public class SchoolSearchControllerTests
         };
         _controller.ModelState.AddModelError("Query", "Enter a school name or Urn to start a search");
 
-        var result = _controller.Index(viewModel);
+        var result = await _controller.Index(viewModel);
 
         result.Should().NotBeNull();
         result.Should().BeOfType<ViewResult>();
@@ -137,14 +136,14 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithThreeCharQuery_RedirectsToSearch()
+    public async Task Index_Post_WithThreeCharQuery_RedirectsToSearch()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "ABC"
         };
 
-        var result = _controller.Index(viewModel);
+        var result = await _controller.Index(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -154,7 +153,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithQueryAndUln_RedirectsToSchoolDetails()
+    public async Task Index_Post_WithQueryAndUln_RedirectsToSchoolDetails()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -162,10 +161,10 @@ public class SchoolSearchControllerTests
             Urn = "123456"
         };
 
-        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
-            .Returns(FakeEstablishment1);
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Urn))
+            .ReturnsAsync(FakeEstablishment1);
 
-        var result = _controller.Index(viewModel);
+        var result = await _controller.Index(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -174,14 +173,14 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Index_Post_WithNumericResults_RedirectsToSchoolDetails()
+    public async Task Index_Post_WithNumericResults_RedirectsToSchoolDetails()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "123/123"
         };
 
-        var result = _controller.Index(viewModel);
+        var result = await _controller.Index(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -553,7 +552,7 @@ public class SchoolSearchControllerTests
     #region Search POST Tests
 
     [Fact]
-    public void Search_Post_WithValidQueryAndNoUrn_RedirectsToSearchGet()
+    public async Task Search_Post_WithValidQueryAndNoUrn_RedirectsToSearchGet()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -561,7 +560,7 @@ public class SchoolSearchControllerTests
             Urn = null
         };
 
-        var result = _controller.Search(viewModel);
+        var result = await _controller.Search(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -571,17 +570,17 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithUrn_RedirectsToSchoolController()
+    public async Task Search_Post_WithUrn_RedirectsToSchoolController()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
             Query = "Test School",
             Urn = "123456"
         };
-        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
-            .Returns(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Urn))
+            .ReturnsAsync(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
 
-        var result = _controller.Search(viewModel);
+        var result = await _controller.Search(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -593,7 +592,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithWhitespaceUrn_RedirectsToSearchGet()
+    public async Task Search_Post_WithWhitespaceUrn_RedirectsToSearchGet()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -601,7 +600,7 @@ public class SchoolSearchControllerTests
             Urn = "   "
         };
 
-        var result = _controller.Search(viewModel);
+        var result = await _controller.Search(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -611,7 +610,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithEmptyUrn_RedirectsToSearchGet()
+    public async Task Search_Post_WithEmptyUrn_RedirectsToSearchGet()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -619,7 +618,7 @@ public class SchoolSearchControllerTests
             Urn = string.Empty
         };
 
-        var result = _controller.Search(viewModel);
+        var result = await _controller.Search(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -628,7 +627,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithInvalidShorQuery_ReturnsViewWithResultsViewModel()
+    public async Task Search_Post_WithInvalidShorQuery_ReturnsViewWithResultsViewModel()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -636,7 +635,7 @@ public class SchoolSearchControllerTests
         };
         _controller.ModelState.AddModelError("Query", "Enter a school name or Urn (minimum 3 characters)");
 
-        var result = _controller.Search(viewModel);
+        var result = await _controller.Search(viewModel);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -649,7 +648,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithInvalidModelStateAndNullQuery_ReturnsViewWithEmptyQuery()
+    public async Task Search_Post_WithInvalidModelStateAndNullQuery_ReturnsViewWithEmptyQuery()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -657,7 +656,7 @@ public class SchoolSearchControllerTests
         };
         _controller.ModelState.AddModelError("Query", "Enter a school name or Urn to start a search");
 
-        var result = _controller.Search(viewModel);
+        var result = await _controller.Search(viewModel);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -818,7 +817,7 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public void Search_Post_WithBothUrnAndQuery_PrioritizesUrn()
+    public async Task Search_Post_WithBothUrnAndQuery_PrioritizesUrn()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
@@ -826,10 +825,10 @@ public class SchoolSearchControllerTests
             Urn = "123456"
         };
 
-        _mockSearchService.Setup(s => s.SearchByNumber(viewModel.Urn))
-            .Returns(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Urn))
+            .ReturnsAsync(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
 
-        var result = _controller.Search(viewModel);
+        var result = await _controller.Search(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
@@ -976,7 +975,7 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "1",
             EstablishmentName = "Test School",
-            LANAme = "Leeds",
+            LAName = "Leeds",
             Easting = "430000",
             Northing = "433000",
             Latitude = "53.8008",
@@ -989,7 +988,7 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "2",
             EstablishmentName = "Another School",
-            LANAme = "Leeds",
+            LAName = "Leeds",
             Easting = "430100",
             Northing = "433100"
         };
@@ -1021,12 +1020,12 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "1",
             EstablishmentName = "Test School",
-            LANAme = "Leeds",
+            LAName = "Leeds",
             Easting = "430000",
             Northing = "433000",
-            AddressStreet = "123 Main St",
-            AddressLocality = "City Center",
-            AddressPostcode = "LS1 1AA"
+            Street = "123 Main St",
+            Locality = "City Center",
+            Postcode = "LS1 1AA"
         };
         var establishment2 = new Establishment
         {
@@ -1035,7 +1034,7 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "2",
             EstablishmentName = "Another School",
-            LANAme = "Leeds",
+            LAName = "Leeds",
             Easting = "430100",
             Northing = "433100"
         };
@@ -1072,7 +1071,7 @@ public class SchoolSearchControllerTests
                 LAId = "100",
                 EstablishmentNumber = i.ToString(),
                 EstablishmentName = $"School {i}",
-                LANAme = localAuthority,
+                LAName = localAuthority,
                 Easting = (430000 + i).ToString(),
                 Northing = (433000 + i).ToString(),
                 Latitude = (53.8 + (i * 0.01)).ToString(),

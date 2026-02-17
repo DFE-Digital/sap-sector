@@ -72,6 +72,12 @@
                         View similar schools
                     </a>
                 </li>
+                <li class="app-side-navigation__item @selected("item", currentController == "DemoSimilarSchools")">
+                    <a href=@Url.Action("Index", "DemoSimilarSchools", routeAttributes) 
+                        class="app-side-navigation__link @selected("link", currentController == "DemoSimilarSchools")">
+                        View (DEMO) similar schools
+                    </a>
+                </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "SchoolDetails")">
                     <a href=@Url.Action("SchoolDetails", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "SchoolDetails")">

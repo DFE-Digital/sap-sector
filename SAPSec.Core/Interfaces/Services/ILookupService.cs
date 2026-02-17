@@ -14,5 +14,5 @@ public interface ILookupService
     /// <param name="lookupType">The lookup type (use LookupTypes constants)</param>
     /// <param name="id">The lookup ID</param>
     /// <returns>The lookup name, or empty string if not found</returns>
-    string GetLookupValue(string lookupType, string? id);
+    Task<string> GetLookupValueAsync(string lookupType, string? id);
 }

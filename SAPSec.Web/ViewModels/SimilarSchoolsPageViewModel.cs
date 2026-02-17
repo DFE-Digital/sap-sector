@@ -13,8 +13,10 @@ public class SimilarSchoolsPageViewModel
     public string PhaseOfEducation { get; set; } = string.Empty;
     public List<SimilarSchoolViewModel> Schools { get; set; } = new();
     public List<SimilarSchoolViewModel> MapSchools { get; set; } = new();
-    public SimilarSchoolsFilterViewModel Filters { get; set; } = new();
-    public string SortBy { get; set; } = "Attainment 8";
+    public IReadOnlyCollection<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> FilterOptions { get; set; } = [];
+    public IReadOnlyCollection<SAPSec.Core.Features.Sorting.SortOption> SortOptions { get; set; } = [];
+    public Dictionary<string, List<string>> CurrentFilters { get; set; } = new(StringComparer.InvariantCultureIgnoreCase);
+    public string SortBy { get; set; } = "Att8";
     public int CurrentPage { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public int TotalResults { get; set; }
