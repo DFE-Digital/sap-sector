@@ -5,40 +5,39 @@
 @using SAPSec.Web.ViewModels
 @model SimilarSchoolsComparisonViewModel
 @{
-    var mainSchool = Model.SimilarSchoolViewModels.FirstOrDefault(s => !s.IsComparedSchool);
-    var comparedSchool = Model.SimilarSchoolViewModels.FirstOrDefault(s => s.IsComparedSchool);
-
-    ViewData["Title"] = mainSchool is not null && comparedSchool is not null
-        ? $"{mainSchool.Urn} Compare {comparedSchool.Urn}"
-        : "School comparison";
-
+    
     Layout = "_Layout";
 
     var inv = CultureInfo.InvariantCulture;
 
-    var schools = Model.SimilarSchoolViewModels
-        .Select(s =>
+    var schools = new[]
+    {
+        new
         {
-            var okLat = double.TryParse(s.Latitude, NumberStyles.Float, inv, out var lat);
-            var okLon = double.TryParse(s.Longitude, NumberStyles.Float, inv, out var lon);
+            urn = "", 
+            name = Model.Name,
+            address = "", 
+            la = "",
+            lat = Model.CurrentSchoolLatitude,
+            lon = Model.CurrentSchoolLongitude,
+            url = "#", 
+            isMain = true,
+            isComparedSchool = false
+        },
+        new
+        {
+            urn = "",
+            name = Model.SimilarSchoolName,
+            address = "",
+            la = "",
+            lat = Model.SimilarSchoolLatitude,
+            lon = Model.SimilarSchoolLongitude,
+            url = "#", 
+            isMain = false,
+            isComparedSchool = true
+        }
+    }.ToList();
 
-            if (!okLat || !okLon) return null;
-
-            return new
-            {
-                urn = s.Urn,
-                name = s.EstablishmentName,
-                address = s.FullAddress,
-                la = "",
-                lat,
-                lon,
-                url = Url.Action("Index", "School", new { urn = s.Urn }),
-                isComparedSchool =s.IsComparedSchool
-                    
-            };
-        })
-        .Where(x => x != null)
-        .ToList();
 
     var json = JsonSerializer.Serialize(schools, new JsonSerializerOptions
     {
@@ -71,7 +70,7 @@
                     class="school-marker-icon"
                 />
                 <span class="govuk-!-margin-left-2">
-                @comparedSchool?.EstablishmentName
+                @Model.SimilarSchoolName
                 </span>
             </span>
 
@@ -82,7 +81,7 @@
                     class="school-marker-icon"
                 />
                 <span class="govuk-!-margin-left-2">
-                @mainSchool?.EstablishmentName
+                @Model.Name
                 </span>
             </span>
         </div>
@@ -104,31 +103,31 @@
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Headteacher/Principal</dt>
-                <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.HeadteacherName.Display()</dd>
+                <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.HeadteacherName.Display()</dd>
             </div>
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Website</dt>
                 <dd class="govuk-summary-list__value">
                     <a class="govuk-link"
-                       href="@Model.comparedSchoolDetails.Website.Value"
+                       href="@Model.SimilarSchoolDetails.Website.Value"
                        target="_blank"
                        rel="noopener noreferrer">
-                        @Model.comparedSchoolDetails.Website.Value (opens in a new tab)
+                        @Model.SimilarSchoolDetails.Website.Value (opens in a new tab)
                     </a>
                 </dd>
             </div>
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Telephone</dt>
-                <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.Telephone.Display()</dd>
+                <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Telephone.Display()</dd>
             </div>
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Email</dt>
                 <dd class="govuk-summary-list__value">
-                    <a class="govuk-link" href="mailto:@Model.comparedSchoolDetails.Email.Display()">
-                        @Model.comparedSchoolDetails.Email.Display()
+                    <a class="govuk-link" href="mailto:@Model.SimilarSchoolDetails.Email.Display()">
+                        @Model.SimilarSchoolDetails.Email.Display()
                     </a>
                 </dd>
             </div>
@@ -143,23 +142,23 @@
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Distance between school</dt>
-        <dd class="govuk-summary-list__value">@Model.DistanceBetweenSchools</dd>
+        <dd class="govuk-summary-list__value">@Model.Distance.ToString("F2") miles</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Address</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.Address.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Address.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Local authority</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.LocalAuthorityName.DisplayWithCode(Model.comparedSchoolDetails.LocalAuthorityCode)</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.LocalAuthorityName.DisplayWithCode(Model.SimilarSchoolDetails.LocalAuthorityCode)</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Region</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.Region.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Region.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Urban/rural description</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.UrbanRuralDescription.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.UrbanRuralDescription.Display()</dd>
     </div>
 </dl>
 
@@ -168,39 +167,39 @@
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">ID</dt>
-        <dd class="govuk-summary-list__value">URN: @Model.comparedSchoolDetails.Urn.Display(), DfE
-            number:@Model.comparedSchoolDetails.DfENumber.Display(),
-            UKPRN: @Model.comparedSchoolDetails.Ukprn.Display()</dd>
+        <dd class="govuk-summary-list__value">URN: @Model.SimilarSchoolDetails.Urn.Display(), DfE
+            number:@Model.SimilarSchoolDetails.DfENumber.Display(),
+            UKPRN: @Model.SimilarSchoolDetails.Ukprn.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Age range</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.AgeRangeLow.DisplayAgeRange(Model.comparedSchoolDetails.AgeRangeHigh)</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.AgeRangeLow.DisplayAgeRange(Model.SimilarSchoolDetails.AgeRangeHigh)</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Gender of entry</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.GenderOfEntry.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.GenderOfEntry.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Phase of education</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.PhaseOfEducation.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.PhaseOfEducation.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">School type</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.SchoolType.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.SchoolType.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Governance structure</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.GovernanceStructure.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.GovernanceStructure.Display()</dd>
     </div>
 
-    @if (Model.comparedSchoolDetails.AcademyTrustName.IsAvailable)
+    @if (Model.SimilarSchoolDetails.AcademyTrustName.IsAvailable)
     {
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Academy trust</dt>
             <dd class="govuk-summary-list__value">
-                <a href="https://get-information-schools.service.gov.uk/Groups/Group/Details/@Model.comparedSchoolDetails.AcademyTrustId.Value"
+                <a href="https://get-information-schools.service.gov.uk/Groups/Group/Details/@Model.SimilarSchoolDetails.AcademyTrustId.Value"
                    class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    @Model.comparedSchoolDetails.AcademyTrustName.Value (opens in a new tab)
+                    @Model.SimilarSchoolDetails.AcademyTrustName.Value (opens in a new tab)
                 </a>
             </dd>
         </div>
@@ -208,36 +207,36 @@
 
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Admissions policy</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.AdmissionsPolicy.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.AdmissionsPolicy.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Religious character</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.ReligiousCharacter.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.ReligiousCharacter.Display()</dd>
     </div>
 
     @* Provision fields - content editors can change the text here *@
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Nursery provision</dt>
         <dd class="govuk-summary-list__value">
-            @Model.comparedSchoolDetails.HasNurseryProvision.DisplayAs("Has nursery classes", "Does not have nursery classes")
+            @Model.SimilarSchoolDetails.HasNurseryProvision.DisplayAs("Has nursery classes", "Does not have nursery classes")
         </dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Sixth form</dt>
         <dd class="govuk-summary-list__value">
-            @Model.comparedSchoolDetails.HasSixthForm.DisplayAs("Has a sixth form", "Does not have a sixth form")
+            @Model.SimilarSchoolDetails.HasSixthForm.DisplayAs("Has a sixth form", "Does not have a sixth form")
         </dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">SEN unit</dt>
         <dd class="govuk-summary-list__value">
-            @Model.comparedSchoolDetails.HasSenUnit.DisplayAs("Has a SEN unit", "Does not have a SEN unit")
+            @Model.SimilarSchoolDetails.HasSenUnit.DisplayAs("Has a SEN unit", "Does not have a SEN unit")
         </dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Resourced provision</dt>
         <dd class="govuk-summary-list__value">
-            @Model.comparedSchoolDetails.HasResourcedProvision.DisplayAs("Has a resourced provision", "Does not have a resourced provision")
+            @Model.SimilarSchoolDetails.HasResourcedProvision.DisplayAs("Has a resourced provision", "Does not have a resourced provision")
         </dd>
     </div>
 </dl>
@@ -272,39 +271,39 @@
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Headteacher / Principal</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.HeadteacherName.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.HeadteacherName.Display()</dd>
     </div>
-    @if (Model.comparedSchoolDetails.Website.IsAvailable)
+    @if (Model.SimilarSchoolDetails.Website.IsAvailable)
     {
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Website</dt>
             <dd class="govuk-summary-list__value">
-                <a href="@Model.comparedSchoolDetails.Website.Value" class="govuk-link" target="_blank"
+                <a href="@Model.SimilarSchoolDetails.Website.Value" class="govuk-link" target="_blank"
                    rel="noopener noreferrer">
-                    @Model.comparedSchoolDetails.Website.Value (opens in a new tab)
+                    @Model.SimilarSchoolDetails.Website.Value (opens in a new tab)
                 </a>
             </dd>
         </div>
     }
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Telephone</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.Telephone.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Telephone.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Email</dt>
-        <dd class="govuk-summary-list__value">@Model.comparedSchoolDetails.Email.Display()</dd>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Email.Display()</dd>
     </div>
 </dl>
 
 @* Further Information Section *@
 <h2 class="govuk-heading-m">Further information</h2>
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-    @if (Model.comparedSchoolDetails.Urn.IsAvailable)
+    @if (Model.SimilarSchoolDetails.Urn.IsAvailable)
     {
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Ofsted report</dt>
             <dd class="govuk-summary-list__value">
-                <a href="https://reports.ofsted.gov.uk/provider/23/@Model.comparedSchoolDetails.Urn.Value"
+                <a href="https://reports.ofsted.gov.uk/provider/23/@Model.SimilarSchoolDetails.Urn.Value"
                    class="govuk-link" target="_blank" rel="noopener noreferrer">
                     View the latest Ofsted report (opens in a new tab)
                 </a>
@@ -313,12 +312,12 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Information from other services</dt>
             <dd class="govuk-summary-list__value">
-                <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.comparedSchoolDetails.Urn.Value"
+                <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.SimilarSchoolDetails.Urn.Value"
                    class="govuk-link" target="_blank" rel="noopener noreferrer">
                     Financial benchmarking and insights tool (opens in a new tab)
                 </a>
                 <br/>
-                <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/@Model.comparedSchoolDetails.Urn.Value"
+                <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/@Model.SimilarSchoolDetails.Urn.Value"
                    class="govuk-link" target="_blank" rel="noopener noreferrer">
                     Get information about schools (opens in a new tab)
                 </a>

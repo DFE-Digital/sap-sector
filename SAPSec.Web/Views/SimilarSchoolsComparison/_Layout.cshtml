@@ -5,19 +5,14 @@
     Layout = "Views/Shared/_Layout";
 
     var comparisonModel = ViewData["ComparisonSchool"] as SimilarSchoolsComparisonViewModel;
-    var mainSchool = comparisonModel?.SimilarSchoolViewModels?.FirstOrDefault(s => !s.IsComparedSchool);
-    var comparedSchool = comparisonModel?.SimilarSchoolViewModels?.FirstOrDefault(s => s.IsComparedSchool);
-
+    
     var currentController = (string?)ViewContext.RouteData.Values["controller"];
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
 
     var routeValues = new Dictionary<string, object>();
-
-    if (mainSchool is not null && comparedSchool is not null)
-    {
-        routeValues["urn"] = mainSchool.Urn;
-        routeValues["comparisonUrn"] = comparedSchool.Urn;
-    }
+    
+    routeValues["urn"] = comparisonModel.Urn;
+    routeValues["similarSchoolUrn"] = comparisonModel.SimilarSchoolUrn;
 }
 
 
@@ -29,7 +24,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Url.Action("ViewSimilarSchools", "School", new { urn = @mainSchool.Urn})">
+                   href="@Url.Action("ViewSimilarSchools", "School", new { urn = @comparisonModel.Urn })">
                     View similar schools
                 </a>
             </li>
@@ -41,11 +36,11 @@
     @* LEFT: back link alone *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Url.Action("ViewSimilarSchools", "School", new { urn = @mainSchool.Urn })">
+           href="@Url.Action("ViewSimilarSchools", "School", new { urn = @comparisonModel.Urn })">
             Back
         </a>
     </div>
-    
+
     @{
         string selected(bool condition)
             => condition ? "moj-sub-navigation__item--selected" : "";
@@ -53,7 +48,7 @@
     <div class="app-body-container-with-side-navigation">
 
         <span class="govuk-caption-l govuk-!-font-size-27">
-            @mainSchool.EstablishmentName
+            @comparisonModel.Name
         </span>
 
         <span class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold">
@@ -61,7 +56,7 @@
         </span>
 
         <h1 class="govuk-heading-xl govuk-!-font-size-50 govuk-!-font-weight-bold">
-            @comparedSchool.EstablishmentName
+            @comparisonModel.SimilarSchoolName
         </h1>
 
         <nav class="moj-sub-navigation moj-sub-navigation--inline"
@@ -86,7 +81,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "Ks4CoreSubjects")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Ks4CoreSubjects","SimilarSchoolsComparison", routeValues)"
+                       href="@Url.Action("Ks4CoreSubjects", "SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "Ks4CoreSubjects" ? "page" : null)">
                         KS4 core subjects
                     </a>
@@ -94,7 +89,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "Attendance")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Attendance","SimilarSchoolsComparison", routeValues)"
+                       href="@Url.Action("Attendance", "SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "Attendance" ? "page" : null)">
                         Attendance
                     </a>
@@ -102,7 +97,7 @@
 
                 <li class="moj-sub-navigation__item @selected(currentAction == "SchoolDetails")">
                     <a class="moj-sub-navigation__link"
-                       href="@Url.Action("SchoolDetails","SimilarSchoolsComparison", routeValues)"
+                       href="@Url.Action("SchoolDetails", "SimilarSchoolsComparison", routeValues)"
                        aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
                         School details
                     </a>
@@ -111,7 +106,7 @@
             </ul>
         </nav>
 
-        
+
         <div class="govuk-!-margin-top-6">
             @RenderBody()
         </div>

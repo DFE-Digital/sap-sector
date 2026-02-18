@@ -2,8 +2,7 @@
 @model SimilarSchoolsPageViewModel
 
 @{
-    var filters = Model.Filters;
-    var hasActiveFilters = filters.HasActiveFilters;
+    var hasActiveFilters = Model.FilterOptions.Any(f => f.Options.Any(o => o.Selected));
     var isExpanded = hasActiveFilters ? "true" : "false";
     var panelVisibleClass = hasActiveFilters ? "app-filter-panel--visible" : "";
 }
@@ -20,10 +19,10 @@
     <form method="get"
           action="@Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })"
           id="similar-schools-filter-form"
-          class="app-filter-panel @panelVisibleClass">
+          class="app-filter-panel app-filter-panel--similar @panelVisibleClass">
 
         <div class="moj-filter">
-            <div class="moj-filter__header">
+            <div class="moj-filter__header app-filter-header-divider">
                 <div class="moj-filter__header-title">
                     <h2 class="govuk-heading-m">Filters</h2>
                 </div>
@@ -50,9 +49,13 @@
                         </div>
 
                         <ul class="moj-filter-tags">
-                            @foreach (var tag in GetActiveFilterTags(filters))
+                            @foreach (var tag in GetFilterTagsWithRemoveUrls())
                             {
-                                <li><span class="moj-filter__tag">@tag</span></li>
+                                <li>
+                                    <a class="moj-filter__tag" href="@tag.RemoveUrl">
+                                        <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
+                                    </a>
+                                </li>
                             }
                         </ul>
                     </div>
@@ -64,137 +67,12 @@
                         <span class="app-button-text">Apply filters</span>
                     </button>
 
-                    @* ═══════════════════════════════ *@
-                    @* LOCATION                        *@
-                    @* ═══════════════════════════════ *@
                     <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Location</legend>
-
-                        @* Distance (single-select / radio) *@
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Distance", Name = "distance",
-                                     Options = FilterOptions.Distances,
-                                     SelectedValues = string.IsNullOrEmpty(filters.Distance)
-                                         ? new List<string>()
-                                         : new List<string> { filters.Distance },
-                                     IsSingleSelect = true
-                                 }' />
-
-                        @* Region (multi-select / checkboxes) *@
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Region", Name = "selectedRegions",
-                                     Options = FilterOptions.Regions,
-                                     SelectedValues = filters.SelectedRegions
-                                 }' />
-
-                        @* Urban or rural *@
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Urban or rural", Name = "selectedUrbanOrRural",
-                                     Options = FilterOptions.UrbanOrRural,
-                                     SelectedValues = filters.SelectedUrbanOrRural
-                                 }' />
-                    </fieldset>
-
-                    @* ═══════════════════════════════ *@
-                    @* SCHOOL CHARACTERISTICS           *@
-                    @* ═══════════════════════════════ *@
-                    <fieldset class="govuk-fieldset govuk-!-margin-top-4">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">School characteristics</legend>
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Phase of education", Name = "selectedPhaseOfEducation",
-                                     Options = FilterOptions.PhasesOfEducation,
-                                     SelectedValues = filters.SelectedPhaseOfEducation
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "School capacity in use", Name = "schoolCapacityInUse",
-                                     Options = FilterOptions.SchoolCapacityInUse,
-                                     SelectedValues = string.IsNullOrEmpty(filters.SchoolCapacityInUse)
-                                         ? new List<string>()
-                                         : new List<string> { filters.SchoolCapacityInUse },
-                                     IsSingleSelect = true
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Nursery provision", Name = "nurseryProvision",
-                                     Options = FilterOptions.NurseryProvision,
-                                     SelectedValues = string.IsNullOrEmpty(filters.NurseryProvision)
-                                         ? new List<string>()
-                                         : new List<string> { filters.NurseryProvision },
-                                     IsSingleSelect = true
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Sixth form", Name = "sixthForm",
-                                     Options = FilterOptions.SixthForm,
-                                     SelectedValues = string.IsNullOrEmpty(filters.SixthForm)
-                                         ? new List<string>()
-                                         : new List<string> { filters.SixthForm },
-                                     IsSingleSelect = true
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Admissions policy", Name = "selectedAdmissionsPolicy",
-                                     Options = FilterOptions.AdmissionsPolicies,
-                                     SelectedValues = filters.SelectedAdmissionsPolicy
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Governance structure", Name = "selectedGovernanceStructure",
-                                     Options = FilterOptions.GovernanceStructures,
-                                     SelectedValues = filters.SelectedGovernanceStructure
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Type of resourced provision", Name = "selectedResourcedProvisionType",
-                                     Options = FilterOptions.ResourcedProvisionTypes,
-                                     SelectedValues = filters.SelectedResourcedProvisionType
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Gender of entry", Name = "selectedGenderOfEntry",
-                                     Options = FilterOptions.GendersOfEntry,
-                                     SelectedValues = filters.SelectedGenderOfEntry
-                                 }' />
-                    </fieldset>
-
-                    @* ═══════════════════════════════ *@
-                    @* ATTENDANCE                       *@
-                    @* ═══════════════════════════════ *@
-                    <fieldset class="govuk-fieldset govuk-!-margin-top-4">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Attendance</legend>
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Overall absence rate", Name = "overallAbsenceRate",
-                                     Options = FilterOptions.AbsenceRates,
-                                     SelectedValues = string.IsNullOrEmpty(filters.OverallAbsenceRate)
-                                         ? new List<string>()
-                                         : new List<string> { filters.OverallAbsenceRate },
-                                     IsSingleSelect = true
-                                 }' />
-
-                        <partial name="SimilarSchoolsFilterSection"
-                                 model='new FilterCheckboxGroupModel {
-                                     Legend = "Persistent absence rate", Name = "persistentAbsenceRate",
-                                     Options = FilterOptions.AbsenceRates,
-                                     SelectedValues = string.IsNullOrEmpty(filters.PersistentAbsenceRate)
-                                         ? new List<string>()
-                                         : new List<string> { filters.PersistentAbsenceRate },
-                                     IsSingleSelect = true
-                                 }' />
+                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Filters</legend>
+                        @foreach (var filter in Model.FilterOptions)
+                        {
+                            <partial name="SimilarSchoolsFilterSection" model="filter" />
+                        }
                     </fieldset>
                 </div>
             </div>
@@ -203,23 +81,40 @@
 </div>
 
 @functions {
-    List<string> GetActiveFilterTags(SimilarSchoolsFilterViewModel f)
+    List<(string Label, string RemoveUrl)> GetFilterTagsWithRemoveUrls()
     {
-        var tags = new List<string>();
-        if (!string.IsNullOrEmpty(f.Distance)) tags.Add(f.Distance);
-        tags.AddRange(f.SelectedRegions);
-        tags.AddRange(f.SelectedUrbanOrRural);
-        tags.AddRange(f.SelectedPhaseOfEducation);
-        if (!string.IsNullOrEmpty(f.SchoolCapacityInUse)) tags.Add(f.SchoolCapacityInUse);
-        if (!string.IsNullOrEmpty(f.NurseryProvision)) tags.Add($"Nursery: {f.NurseryProvision}");
-        if (!string.IsNullOrEmpty(f.SixthForm)) tags.Add($"Sixth form: {f.SixthForm}");
-        tags.AddRange(f.SelectedAdmissionsPolicy);
-        tags.AddRange(f.SelectedGovernanceStructure);
-        tags.AddRange(f.SelectedResourcedProvisionType);
-        tags.AddRange(f.SelectedGenderOfEntry);
-        if (!string.IsNullOrEmpty(f.OverallAbsenceRate)) tags.Add($"Absence: {f.OverallAbsenceRate}");
-        if (!string.IsNullOrEmpty(f.PersistentAbsenceRate)) tags.Add($"Persistent absence: {f.PersistentAbsenceRate}");
+        var tags = new List<(string Label, string RemoveUrl)>();
+
+        foreach (var filter in Model.FilterOptions)
+        {
+            foreach (var option in filter.Options.Where(o => o.Selected))
+            {
+                var qs = BuildQueryStringWithout(filter.Key, option.Key);
+                var removeUrl = Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn }) + qs;
+                tags.Add((option.Name, removeUrl));
+            }
+        }
+
         return tags;
+    }
+
+    string BuildQueryStringWithout(string excludeParam, string excludeValue)
+    {
+        var parts = new List<string>();
+
+        if (!string.IsNullOrEmpty(Model.SortBy))
+            parts.Add($"sortBy={Uri.EscapeDataString(Model.SortBy)}");
+
+        foreach (var (key, values) in Model.CurrentFilters)
+        {
+            foreach (var v in values)
+            {
+                if (key == excludeParam && v == excludeValue) continue;
+                parts.Add($"{key}={Uri.EscapeDataString(v)}");
+            }
+        }
+
+        return parts.Count > 1 ? "?" + string.Join("&", parts) : "";
     }
 }
 

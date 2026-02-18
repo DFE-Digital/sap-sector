@@ -1,18 +1,20 @@
-﻿@using SAPSec.Web.ViewModels
-@model FilterCheckboxGroupModel
+﻿@using SAPSec.Core.Features.Filtering
+@using SAPSec.Core.Features.SimilarSchools.UseCases
+@model SimilarSchoolsAvailableFilter
 
 @{
-    var sectionId = $"filter-{Model.Name}";
-    var hasSelection = Model.SelectedValues?.Any() == true;
+    var sectionId = $"filter-{Model.Key}";
+    var hasSelection = Model.Options.Any(o => o.Selected);
     var isExpanded = hasSelection ? "true" : "false";
+    var isSingleSelect = Model.Type == FilterType.SingleValue;
 }
 
-<div class="app-filter-section" data-module="app-filter-section">
+<div class="app-filter-section app-filter-section--divider" data-module="app-filter-section">
     <button type="button"
             class="app-filter-section__toggle"
             aria-expanded="@isExpanded"
             aria-controls="@sectionId">
-        <span class="app-filter-section__title">@Model.Legend</span>
+        <span class="app-filter-section__title">@Model.Name</span>
         <span class="app-filter-section__indicator">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" clip-rule="evenodd"
@@ -23,23 +25,21 @@
     </button>
 
     <div class="app-filter-section__content" id="@sectionId" @(hasSelection ? "" : "hidden")>
-        @if (Model.IsSingleSelect)
+        @if (isSingleSelect)
         {
-            @* Radio buttons for single-select filters *@
             <div class="govuk-radios govuk-radios--small">
                 @foreach (var option in Model.Options)
                 {
-                    var isChecked = Model.SelectedValues?.Contains(option) == true;
-                    var inputId = $"{Model.Name}-{option.Replace(" ", "-").Replace("%", "pct").Replace("(", "").Replace(")", "").ToLower()}";
+                    var inputId = $"{Model.Key}-{option.Key.Replace(" ", "-").Replace("%", "pct").Replace("(", "").Replace(")", "").ToLower()}";
                     <div class="govuk-radios__item">
                         <input class="govuk-radios__input"
                                id="@inputId"
-                               name="@Model.Name"
+                               name="@Model.Key"
                                type="radio"
-                               value="@option"
-                               @(isChecked ? "checked" : "")>
+                               value="@option.Key"
+                               @(option.Selected ? "checked" : "")>
                         <label class="govuk-label govuk-radios__label" for="@inputId">
-                            @option
+                            @option.Name
                         </label>
                     </div>
                 }
@@ -47,21 +47,19 @@
         }
         else
         {
-            @* Checkboxes for multi-select filters *@
             <div class="govuk-checkboxes govuk-checkboxes--small">
                 @foreach (var option in Model.Options)
                 {
-                    var isChecked = Model.SelectedValues?.Contains(option) == true;
-                    var inputId = $"{Model.Name}-{option.Replace(" ", "-").Replace("(", "").Replace(")", "").ToLower()}";
+                    var inputId = $"{Model.Key}-{option.Key.Replace(" ", "-").Replace("(", "").Replace(")", "").ToLower()}";
                     <div class="govuk-checkboxes__item">
                         <input class="govuk-checkboxes__input"
                                id="@inputId"
-                               name="@Model.Name"
+                               name="@Model.Key"
                                type="checkbox"
-                               value="@option"
-                               @(isChecked ? "checked" : "")>
+                               value="@option.Key"
+                               @(option.Selected ? "checked" : "")>
                         <label class="govuk-label govuk-checkboxes__label" for="@inputId">
-                            @option
+                            @option.Name
                         </label>
                     </div>
                 }

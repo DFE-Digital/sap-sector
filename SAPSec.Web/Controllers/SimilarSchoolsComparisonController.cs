@@ -1,46 +1,42 @@
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Web.Constants;
+using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
-[Route("school/{urn}/view-similar-schools/{comparisonUrn}")]
+[Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
 public class SimilarSchoolsComparisonController : Controller
 {
-    private readonly ISchoolDetailsService _schoolDetailsService;
-    private readonly ILogger<SimilarSchoolsComparisonController> _logger;
+    private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
 
-    public SimilarSchoolsComparisonController(ISchoolDetailsService schoolDetailsService)
+    public SimilarSchoolsComparisonController(GetSimilarSchoolDetails getSimilarSchoolDetails)
     {
-        _schoolDetailsService = schoolDetailsService;
+        _getSimilarSchoolDetails = getSimilarSchoolDetails;
     }
     
     [HttpGet]
-    public IActionResult Index(string urn, string comparisonUrn)
+    public async Task<IActionResult> Index(string urn, string similarSchoolUrn)
     {
-        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
-        {
-            return BadRequest("Invalid URN.");
-        }
-
-        var mainSchool = GetMockSchool(mainUrn);
-        var comparedSchool = GetMockCompareSchool(compareUrn);
-
-        if (mainSchool is null || comparedSchool is null)
-        {
-            return NotFound();
-        }
-
-        comparedSchool.IsComparedSchool = true;
-
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        
+        var response = await _getSimilarSchoolDetails.Execute(new GetSimilarSchoolDetailsRequest(urn, similarSchoolUrn));
+        
         var model = new SimilarSchoolsComparisonViewModel
         {
-            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
-            {
-                mainSchool,
-                comparedSchool
-            }
+            Urn = urn,
+            SimilarSchoolUrn = similarSchoolUrn,
+            Name = response.SchoolName,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name.Display(),
+            CurrentSchoolLatitude = response.CurrentSchoolCoordinates.Latitude,
+            CurrentSchoolLongitude = response.CurrentSchoolCoordinates.Longitude,
+            SimilarSchoolLatitude = response.SimilarSchoolCoordinates.Latitude,
+            SimilarSchoolLongitude = response.SimilarSchoolCoordinates.Longitude,
+            Distance = response.DistanceMiles,
+            SimilarSchoolDetails = response.SimilarSchoolDetails
         };
 
         SetComparisonSchoolViewData(model);
@@ -52,30 +48,22 @@ public class SimilarSchoolsComparisonController : Controller
     
     [HttpGet]
     [Route("Ks4HeadlineMeasures")]
-    public IActionResult Ks4HeadlineMeasures(string urn, string comparisonUrn)
+    public async Task<IActionResult> Ks4HeadlineMeasures(string urn, string similarSchoolUrn)
     {
-        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
-        {
-            return BadRequest("Invalid URN.");
-        }
-
-        var mainSchool = GetMockSchool(mainUrn);
-        var comparedSchool = GetMockCompareSchool(compareUrn);
-
-        if (mainSchool is null || comparedSchool is null)
-        {
-            return NotFound();
-        }
-
-        comparedSchool.IsComparedSchool = true;
-
+        var response = await _getSimilarSchoolDetails.Execute(new GetSimilarSchoolDetailsRequest(urn, similarSchoolUrn));
+        
         var model = new SimilarSchoolsComparisonViewModel
         {
-            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
-            {
-                mainSchool,
-                comparedSchool
-            }
+            Urn = urn,
+            SimilarSchoolUrn = similarSchoolUrn,
+            Name = response.SchoolName,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name.Display(),
+            CurrentSchoolLatitude = response.CurrentSchoolCoordinates.Latitude,
+            CurrentSchoolLongitude = response.CurrentSchoolCoordinates.Longitude,
+            SimilarSchoolLatitude = response.SimilarSchoolCoordinates.Latitude,
+            SimilarSchoolLongitude = response.SimilarSchoolCoordinates.Longitude,
+            Distance = response.DistanceMiles,
+            SimilarSchoolDetails = response.SimilarSchoolDetails
         };
 
         SetComparisonSchoolViewData(model);
@@ -84,30 +72,22 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("Ks4CoreSubjects")]
-    public IActionResult Ks4CoreSubjects(string urn, string comparisonUrn)
+    public async Task<IActionResult> Ks4CoreSubjects(string urn, string similarSchoolUrn)
     {
-        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
-        {
-            return BadRequest("Invalid URN.");
-        }
-
-        var mainSchool = GetMockSchool(mainUrn);
-        var comparedSchool = GetMockCompareSchool(compareUrn);
-
-        if (mainSchool is null || comparedSchool is null)
-        {
-            return NotFound();
-        }
-
-        comparedSchool.IsComparedSchool = true;
-
+        var response = await _getSimilarSchoolDetails.Execute(new GetSimilarSchoolDetailsRequest(urn, similarSchoolUrn));
+        
         var model = new SimilarSchoolsComparisonViewModel
         {
-            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
-            {
-                mainSchool,
-                comparedSchool
-            }
+            Urn = urn,
+            SimilarSchoolUrn = similarSchoolUrn,
+            Name = response.SchoolName,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name.Display(),
+            CurrentSchoolLatitude = response.CurrentSchoolCoordinates.Latitude,
+            CurrentSchoolLongitude = response.CurrentSchoolCoordinates.Longitude,
+            SimilarSchoolLatitude = response.SimilarSchoolCoordinates.Latitude,
+            SimilarSchoolLongitude = response.SimilarSchoolCoordinates.Longitude,
+            Distance = response.DistanceMiles,
+            SimilarSchoolDetails = response.SimilarSchoolDetails
         };
 
         SetComparisonSchoolViewData(model);
@@ -116,31 +96,24 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("attendance")]
-    public IActionResult Attendance(string urn, string comparisonUrn)
+    public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
-        if (!int.TryParse(urn, out var mainUrn) || !int.TryParse(comparisonUrn, out var compareUrn))
-        {
-            return BadRequest("Invalid URN.");
-        }
-
-        var mainSchool = GetMockSchool(mainUrn);
-        var comparedSchool = GetMockCompareSchool(compareUrn);
-
-        if (mainSchool is null || comparedSchool is null)
-        {
-            return NotFound();
-        }
-
-        comparedSchool.IsComparedSchool = true;
-
+        var response = await _getSimilarSchoolDetails.Execute(new GetSimilarSchoolDetailsRequest(urn, similarSchoolUrn));
+        
         var model = new SimilarSchoolsComparisonViewModel
         {
-            SimilarSchoolViewModels = new List<SimilarSchoolViewModel>
-            {
-                mainSchool,
-                comparedSchool
-            }
+            Urn = urn,
+            SimilarSchoolUrn = similarSchoolUrn,
+            Name = response.SchoolName,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name.Display(),
+            CurrentSchoolLatitude = response.CurrentSchoolCoordinates.Latitude,
+            CurrentSchoolLongitude = response.CurrentSchoolCoordinates.Longitude,
+            SimilarSchoolLatitude = response.SimilarSchoolCoordinates.Latitude,
+            SimilarSchoolLongitude = response.SimilarSchoolCoordinates.Longitude,
+            Distance = response.DistanceMiles,
+            SimilarSchoolDetails = response.SimilarSchoolDetails
         };
+        
         SetComparisonSchoolViewData(model);
 
         return View(model);
@@ -148,87 +121,33 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("SchoolDetails")]
-    public async Task<IActionResult>SchoolDetails(string urn, string comparisonUrn)
+    public async Task<IActionResult> SchoolDetails(string urn, string similarSchoolUrn)
     {
-        if (!TryParseUrns(urn, comparisonUrn, out var mainUrn, out var compareUrn))
-            return BadRequest("Invalid URN.");
-
-        var mainSchool = GetMockSchool(mainUrn);
-        var comparedSchool = GetMockCompareSchool(compareUrn);
-
-        var comparedDetails =await  _schoolDetailsService.TryGetByUrnAsync(compareUrn.ToString());
-        if (comparedDetails is null)
-            return NotFound();
-
-        comparedSchool.IsComparedSchool = true;
+        var response = await _getSimilarSchoolDetails.Execute(new GetSimilarSchoolDetailsRequest(urn, similarSchoolUrn));
         
-        var distanceText = DistanceFormatter.DistanceMilesOrNoData(
-            mainSchool.Easting, mainSchool.Northing,
-            comparedSchool.Easting, comparedSchool.Northing
-        );
-
         var model = new SimilarSchoolsComparisonViewModel
         {
-            SimilarSchoolViewModels = new List<SimilarSchoolViewModel> { mainSchool, comparedSchool },
-            comparedSchoolDetails = comparedDetails,
-            DistanceBetweenSchools = distanceText
+            Urn = urn,
+            SimilarSchoolUrn = similarSchoolUrn,
+            Name = response.SchoolName,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name.Display(),
+            CurrentSchoolLatitude = response.CurrentSchoolCoordinates.Latitude,
+            CurrentSchoolLongitude = response.CurrentSchoolCoordinates.Longitude,
+            SimilarSchoolLatitude = response.SimilarSchoolCoordinates.Latitude,
+            SimilarSchoolLongitude = response.SimilarSchoolCoordinates.Longitude,
+            Distance = response.DistanceMiles,
+            SimilarSchoolDetails = response.SimilarSchoolDetails
         };
+        
         SetComparisonSchoolViewData(model);
 
         return View(model);
     }
 
-    private static bool TryParseUrns(string urn, string comparisonUrn, out int mainUrn, out int compareUrn)
-    {
-        compareUrn = 0;
-        return int.TryParse(urn, out mainUrn) && int.TryParse(comparisonUrn, out compareUrn);
-    }
-
-
+    
     private void SetComparisonSchoolViewData(SimilarSchoolsComparisonViewModel data)
     {
         ViewData["ComparisonSchool"] = data;
     }
     
-    private static SimilarSchoolViewModel GetMockSchool(int urn)
-    {
-        return new SimilarSchoolViewModel()
-        {
-            Urn = urn, NeighbourUrn = 100750, Dist = 0.3573, Rank = 1,
-            Ks2Rp = 107.67, Ks2Mp = 106.23, PpPerc = 23.29, PercentEal = 30.77,
-            Polar4QuintilePupils = 4, PStability = 90.21, IdaciPupils = 0.201,
-            PercentSchSupport = 14.73, NumberOfPupils = 958, PercentStatementOrEhp = 1.57,
-            Att8Scr = 60.7,
-            EstablishmentName = "Abbey Academy",
-            Street = "Abbey Way", Town = "Sheffield", County = "South Yorkshire", Postcode = "S17 5DE",
-            PhaseOfEducation = "Secondary", TypeOfEstablishment = "Academy",
-            Region = "Yorkshire and The Humber", UrbanOrRural = "Urban",
-            AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
-            HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-            SchoolCapacity = 1200, OverallAbsenceRate = 5.2, PersistentAbsenceRate = 12.1,
-            Latitude = "51.191000", Longitude = "0.273000",
-            Easting = 435000, Northing = 385000
-        };
-    }
-
-    private static SimilarSchoolViewModel GetMockCompareSchool(int urn)
-    {
-        return new SimilarSchoolViewModel()
-        {
-            Urn = urn, NeighbourUrn = 102153, Dist = 0.3646, Rank = 2,
-            Ks2Rp = 106.89, Ks2Mp = 105.41, PpPerc = 28.15, PercentEal = 25.60,
-            Polar4QuintilePupils = 4, PStability = 91.10, IdaciPupils = 0.195,
-            PercentSchSupport = 12.80, NumberOfPupils = 1120, PercentStatementOrEhp = 1.42,
-            Att8Scr = 53.2,
-            EstablishmentName = "Wentworth High School",
-            Street = "Sycamore Rise", Town = "Bakewell", County = "Derbyshire", Postcode = "DE45 1GH",
-            PhaseOfEducation = "Secondary", TypeOfEstablishment = "Foundation school",
-            Region = "East Midlands", UrbanOrRural = "Rural",
-            AdmissionsPolicy = "Comprehensive", Gender = "Mixed",
-            HasSixthForm = true, HasNurseryProvision = false, ResourcedProvisionType = "None",
-            SchoolCapacity = 800, OverallAbsenceRate = 4.8, PersistentAbsenceRate = 10.3,
-            Latitude = "54.968000", Longitude = "-2.104000",
-            Easting = 438500, Northing = 388200
-        };
-    }
 }

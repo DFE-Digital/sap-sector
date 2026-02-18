@@ -69,38 +69,13 @@
         if (!string.IsNullOrEmpty(Model.SortBy))
             qs.Add($"sortBy={Uri.EscapeDataString(Model.SortBy)}");
 
-        var f = Model.Filters;
-
-        if (!string.IsNullOrEmpty(f.Distance))
-            qs.Add($"distance={Uri.EscapeDataString(f.Distance)}");
-
-        foreach (var v in f.SelectedRegions)
-            qs.Add($"selectedRegions={Uri.EscapeDataString(v)}");
-        foreach (var v in f.SelectedUrbanOrRural)
-            qs.Add($"selectedUrbanOrRural={Uri.EscapeDataString(v)}");
-        foreach (var v in f.SelectedPhaseOfEducation)
-            qs.Add($"selectedPhaseOfEducation={Uri.EscapeDataString(v)}");
-
-        if (!string.IsNullOrEmpty(f.SchoolCapacityInUse))
-            qs.Add($"schoolCapacityInUse={Uri.EscapeDataString(f.SchoolCapacityInUse)}");
-        if (!string.IsNullOrEmpty(f.NurseryProvision))
-            qs.Add($"nurseryProvision={Uri.EscapeDataString(f.NurseryProvision)}");
-        if (!string.IsNullOrEmpty(f.SixthForm))
-            qs.Add($"sixthForm={Uri.EscapeDataString(f.SixthForm)}");
-
-        foreach (var v in f.SelectedAdmissionsPolicy)
-            qs.Add($"selectedAdmissionsPolicy={Uri.EscapeDataString(v)}");
-        foreach (var v in f.SelectedGovernanceStructure)
-            qs.Add($"selectedGovernanceStructure={Uri.EscapeDataString(v)}");
-        foreach (var v in f.SelectedResourcedProvisionType)
-            qs.Add($"selectedResourcedProvisionType={Uri.EscapeDataString(v)}");
-        foreach (var v in f.SelectedGenderOfEntry)
-            qs.Add($"selectedGenderOfEntry={Uri.EscapeDataString(v)}");
-
-        if (!string.IsNullOrEmpty(f.OverallAbsenceRate))
-            qs.Add($"overallAbsenceRate={Uri.EscapeDataString(f.OverallAbsenceRate)}");
-        if (!string.IsNullOrEmpty(f.PersistentAbsenceRate))
-            qs.Add($"persistentAbsenceRate={Uri.EscapeDataString(f.PersistentAbsenceRate)}");
+        foreach (var (key, values) in Model.CurrentFilters)
+        {
+            foreach (var v in values)
+            {
+                qs.Add($"{key}={Uri.EscapeDataString(v)}");
+            }
+        }
 
         return Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })
                + "?" + string.Join("&", qs);

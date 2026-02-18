@@ -2,10 +2,5 @@
 @{
     Layout = "_Layout";
     
-    var mainSchool = Model.SimilarSchoolViewModels.FirstOrDefault(s => !s.IsComparedSchool);
-    var comparedSchool = Model.SimilarSchoolViewModels.FirstOrDefault(s => s.IsComparedSchool);
-
-    ViewData["Title"] = mainSchool is not null && comparedSchool is not null
-        ? $"{mainSchool.Urn} Compare {comparedSchool.Urn}"
-        : "School comparison";
+   
 }
