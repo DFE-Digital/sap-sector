@@ -2,9 +2,8 @@ using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
-using SAPSec.Infrastructure.Repositories.Json;
 
-namespace SAPSec.Infrastructure.Repositories;
+namespace SAPSec.Infrastructure.Repositories.Json;
 
 public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
 {
@@ -80,6 +79,27 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             Coordinates = BNGCoordinates.TryParse(currentEstab.Easting, currentEstab.Northing, out var coords) ? coords : null,
             UrbanRuralId = currentEstab.UrbanRuralId,
             UrbanRuralName = currentEstab.UrbanRuralName,
+            RegionId = currentEstab.RegionId,
+            RegionName = currentEstab.RegionName,
+            AdmissionsPolicyId = currentEstab.AdmissionsPolicyId,
+            AdmissionsPolicyName = currentEstab.AdmissionsPolicyName,
+            PhaseOfEducationId = currentEstab.PhaseOfEducationId,
+            PhaseOfEducationName = currentEstab.PhaseOfEducationName,
+            GenderId = currentEstab.GenderId,
+            GenderName = currentEstab.GenderName,
+            TotalCapacity = currentEstab.TotalCapacity,
+            TotalPupils = currentEstab.TotalPupils,
+            TypeOfEstablishmentId = currentEstab.TypeOfEstablishmentId,
+            TypeOfEstablishmentName = currentEstab.TypeOfEstablishmentName,
+            EstablishmentTypeGroupId = currentEstab.EstablishmentTypeGroupId,
+            EstablishmentTypeGroupName = currentEstab.EstablishmentTypeGroupName,
+            TrustSchoolFlagId = currentEstab.TrustSchoolFlagId,
+            TrustSchoolFlagName = currentEstab.TrustSchoolFlagName,
+            OfficialSixthFormId = currentEstab.OfficialSixthFormId,
+            OfficialSixthFormName = currentEstab.OfficialSixthFormName,
+            NurseryProvisionName = currentEstab.NurseryProvisionName,
+            ResourcedProvisionId = currentEstab.ResourcedProvisionId,
+            ResourcedProvisionName = currentEstab.ResourcedProvisionName,
             Attainment8Score = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Attainment8_Tot_Est_Current_Num),
             BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Bio59_Sum_Est_Current_Num),
             ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Chem59_Sum_Est_Current_Num),

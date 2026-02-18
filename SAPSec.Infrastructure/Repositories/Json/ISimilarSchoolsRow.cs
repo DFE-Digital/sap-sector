@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Features.SimilarSchools
+﻿namespace SAPSec.Infrastructure.Repositories.Json
 {
     public interface ISimilarSchoolsRow
     {
