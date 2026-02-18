@@ -3,7 +3,6 @@ using CsvHelper.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SapSec.SimilarSchoolsJsonGenerator.Models;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using SAPSec.Infrastructure.Repositories;
 using SAPSec.Infrastructure.Repositories.Json;

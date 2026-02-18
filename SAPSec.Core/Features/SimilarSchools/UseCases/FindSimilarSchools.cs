@@ -62,7 +62,7 @@ public record SimilarSchoolsAvailableFilter(
     string Name,
     FilterType Type,
     IReadOnlyCollection<FilterOption> Options,
-    string? CurrentSchoolValue);
+    DataWithAvailability<string> CurrentSchoolValue);
 
 public record SimilarSchoolResult(
     SimilarSchool SimilarSchool,

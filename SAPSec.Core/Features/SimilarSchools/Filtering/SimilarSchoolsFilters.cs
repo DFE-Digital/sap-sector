@@ -1,5 +1,4 @@
-﻿using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
+﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -8,7 +7,18 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
     private Dictionary<string, ISimilarSchoolsFilter> _filters = new List<ISimilarSchoolsFilter>
     {
         new SimilarSchoolsDistanceFilter(currentSchool),
+        new SimilarSchoolsRegionFilter(currentSchool),
         new SimilarSchoolsUrbanRuralFilter(currentSchool),
+        new SimilarSchoolsPhaseOfEducationFilter(currentSchool),
+        new SimilarSchoolsSchoolCapacityInUseFilter(currentSchool),
+        new SimilarSchoolsNurseryProvisionFilter(currentSchool),
+        new SimilarSchoolsSixthFormFilter(currentSchool),
+        new SimilarSchoolsAdmissionsPolicyFilter(currentSchool),
+        // TODO: Governance structure
+        new SimilarSchoolsTypeOfSpecialistProvisionFilter(currentSchool),
+        new SimilarSchoolsGenderOfEntryFilter(currentSchool),
+        // TODO: Overall absence rate
+        // TODO: Persistent absence rate
     }.ToDictionary(f => f.Key, StringComparer.InvariantCultureIgnoreCase);
 
     public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)

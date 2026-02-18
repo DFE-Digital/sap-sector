@@ -51,7 +51,28 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Easting",
                 "Northing",
                 "UrbanRuralId",
-                "UrbanRuralName"
+                "UrbanRuralName",
+                "RegionId",
+                "RegionName",
+                "TotalCapacity",
+                "TotalPupils",
+                "PhaseOfEducationId",
+                "PhaseOfEducationName",
+                "NurseryProvisionName",
+                "OfficialSixthFormId",
+                "OfficialSixthFormName",
+                "AdmissionsPolicyId",
+                "AdmissionsPolicyName",
+                "GenderId",
+                "GenderName",
+                "ResourcedProvisionId",
+                "ResourcedProvisionName",
+                "TypeOfEstablishmentId",
+                "TypeOfEstablishmentName",
+                "EstablishmentTypeGroupId",
+                "EstablishmentTypeGroupName",
+                "TrustSchoolFlagId",
+                "TrustSchoolFlagName"
             FROM public.v_establishment 
             WHERE "URN" = @urn;
             
@@ -68,7 +89,28 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Easting",
                 "Northing",
                 "UrbanRuralId",
-                "UrbanRuralName"
+                "UrbanRuralName",
+                "RegionId",
+                "RegionName",
+                "TotalCapacity",
+                "TotalPupils",
+                "PhaseOfEducationId",
+                "PhaseOfEducationName",
+                "NurseryProvisionName",
+                "OfficialSixthFormId",
+                "OfficialSixthFormName",
+                "AdmissionsPolicyId",
+                "AdmissionsPolicyName",
+                "GenderId",
+                "GenderName",
+                "ResourcedProvisionId",
+                "ResourcedProvisionName",
+                "TypeOfEstablishmentId",
+                "TypeOfEstablishmentName",
+                "EstablishmentTypeGroupId",
+                "EstablishmentTypeGroupName",
+                "TrustSchoolFlagId",
+                "TrustSchoolFlagName"
             FROM public.v_establishment 
             WHERE "URN" IN (
                 SELECT "neighbour_urn" 
@@ -124,6 +166,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             return (BuildEmptySchool(urn, currentSchoolPerformance), []);
         }
 
+        var map = SqlMapper.GetTypeMap(typeof(SimilarSchoolDao));
         return (
             FromDao(currentSchoolDao, currentSchoolPerformance),
             similarSchoolDaos
@@ -148,6 +191,27 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         Coordinates = BNGCoordinates.TryParse(sch.Easting, sch.Northing, out var coords) ? coords : null,
         UrbanRuralId = sch.UrbanRuralId,
         UrbanRuralName = sch.UrbanRuralName,
+        RegionId = sch.RegionId,
+        RegionName = sch.RegionName,
+        AdmissionsPolicyId = sch.AdmissionsPolicyId,
+        AdmissionsPolicyName = sch.AdmissionsPolicyName,
+        PhaseOfEducationId = sch.PhaseOfEducationId,
+        PhaseOfEducationName = sch.PhaseOfEducationName,
+        GenderId = sch.GenderId,
+        GenderName = sch.GenderName,
+        TotalCapacity = sch.TotalCapacity,
+        TotalPupils = sch.TotalPupils,
+        TypeOfEstablishmentId = sch.TypeOfEstablishmentId,
+        TypeOfEstablishmentName = sch.TypeOfEstablishmentName,
+        EstablishmentTypeGroupId = sch.EstablishmentTypeGroupId,
+        EstablishmentTypeGroupName = sch.EstablishmentTypeGroupName,
+        TrustSchoolFlagId = sch.TrustSchoolFlagId,
+        TrustSchoolFlagName = sch.TrustSchoolFlagName,
+        OfficialSixthFormId = sch.OfficialSixthFormId,
+        OfficialSixthFormName = sch.OfficialSixthFormName,
+        NurseryProvisionName = sch.NurseryProvisionName,
+        ResourcedProvisionId = sch.ResourcedProvisionId,
+        ResourcedProvisionName = sch.ResourcedProvisionName,
         Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
         BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
         ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),
@@ -199,8 +263,29 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         public required string LAName { get; set; }
         public required string Easting { get; set; }
         public required string Northing { get; set; }
+        public required string RegionId { get; set; }
+        public required string RegionName { get; set; }
         public required string UrbanRuralId { get; set; }
         public required string UrbanRuralName { get; set; }
+        public required string TotalCapacity { get; set; }
+        public required string TotalPupils { get; set; }
+        public required string PhaseOfEducationId { get; set; }
+        public required string PhaseOfEducationName { get; set; }
+        public required string NurseryProvisionName { get; set; }
+        public required string OfficialSixthFormId { get; set; }
+        public required string OfficialSixthFormName { get; set; }
+        public required string AdmissionsPolicyId { get; set; }
+        public required string AdmissionsPolicyName { get; set; }
+        public required string GenderId { get; set; }
+        public required string GenderName { get; set; }
+        public required string ResourcedProvisionId { get; set; }
+        public required string ResourcedProvisionName { get; set; }
+        public required string TypeOfEstablishmentId { get; set; }
+        public required string TypeOfEstablishmentName { get; set; }
+        public required string EstablishmentTypeGroupId { get; set; }
+        public required string EstablishmentTypeGroupName { get; set; }
+        public required string TrustSchoolFlagId { get; set; }
+        public required string TrustSchoolFlagName { get; set; }
     }
 
     private class SimilarSchoolPerformanceDao

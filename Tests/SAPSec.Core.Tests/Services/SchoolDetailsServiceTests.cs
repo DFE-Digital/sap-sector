@@ -270,7 +270,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvision = "Has SEN unit";
+        establishment.ResourcedProvisionName = "Has SEN unit";
 
         _establishmentServiceMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -288,7 +288,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvision = "Has resourced provision";
+        establishment.ResourcedProvisionName = "Has resourced provision";
 
         _establishmentServiceMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -306,7 +306,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvision = "Has SEN unit and resourced provision";
+        establishment.ResourcedProvisionName = "Has SEN unit and resourced provision";
 
         _establishmentServiceMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -518,10 +518,10 @@ public class SchoolDetailsServiceTests
             Postcode = "S1 1AA",
             GenderName = "Mixed",
             ReligiousCharacterName = "None",
-            AdmissionPolicy = "Non-selective",
-            HeadteacherTitle = "Mr",
-            HeadteacherFirstName = "John",
-            HeadteacherLastName = "Smith",
+            AdmissionsPolicyName = "Non-selective",
+            HeadTitle = "Mr",
+            HeadFirstName = "John",
+            HeadLastName = "Smith",
             Website = "https://www.testacademy.org.uk",
             TelephoneNum = "0114 123 4567",
             AgeRangeLow = "11",

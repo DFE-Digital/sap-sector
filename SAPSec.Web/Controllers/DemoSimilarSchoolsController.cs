@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
@@ -42,9 +43,12 @@ public class DemoSimilarSchoolsController : Controller
             return RedirectToAction("Error");
         }
 
+        var path = Request.GetEncodedPathAndQuery();
+
         return View(new DemoSimilarSchoolsViewModel
         {
             Name = response.SchoolName,
+            CurrentUrl = path.Contains("?") ? path : path + "?",
             SortOptions = response.SortOptions,
             FilterOptions = response.FilterOptions,
             ResultsPage = response.ResultsPage.Map(r => new DemoSimilarSchoolResultViewModel
