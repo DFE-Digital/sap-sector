@@ -23,7 +23,7 @@ var schools = Model.MapSchools
             la = "",
             lat,
             lon,
-            url = Url.Action("Index", "School", new { urn = s.Urn })
+            url = Url.Action("Index", "SimilarSchoolsComparison", new { urn = @Model.Urn, similarSchoolUrn =s.Urn })
         };
     })
     .Where(x => x != null)
