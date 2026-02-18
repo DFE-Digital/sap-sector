@@ -27,9 +27,9 @@ public class SchoolController : Controller
     }
 
     [HttpGet]
-    public IActionResult Index(string urn)
+    public async Task<IActionResult> Index(string urn)
     {
-        var school = _schoolDetailsService.TryGetByUrn(urn);
+        var school = _schoolDetailsService.TryGetByUrnAsync(urn);
 
         if (school is null)
         {
@@ -44,9 +44,9 @@ public class SchoolController : Controller
 
     [HttpGet]
     [Route("school-details")]
-    public IActionResult SchoolDetails(string urn)
+    public async Task<IActionResult> SchoolDetails(string urn)
     {
-        var school = _schoolDetailsService.TryGetByUrn(urn);
+        var school = _schoolDetailsService.TryGetByUrnAsync(urn);
         if (school != null)
         {
             SetSchoolViewData(school);
@@ -62,9 +62,9 @@ public class SchoolController : Controller
 
     [HttpGet]
     [Route("what-is-a-similar-school")]
-    public IActionResult WhatIsASimilarSchool(string urn)
+    public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        var school = _schoolDetailsService.TryGetByUrn(urn);
+        var school = _schoolDetailsService.TryGetByUrnAsync(urn);
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
@@ -79,13 +79,13 @@ public class SchoolController : Controller
 
     [HttpGet]
     [Route("view-similar-schools")]
-    public IActionResult ViewSimilarSchools(
+    public async Task<IActionResult> ViewSimilarSchools(
         string urn,
         [FromQuery] SimilarSchoolsFilterViewModel filters,
         [FromQuery] string sortBy = "Attainment 8",
         [FromQuery] int page = 1)
     {
-        var school = _schoolDetailsService.TryGetByUrn(urn);
+        var school = _schoolDetailsService.TryGetByUrnAsync(urn);
         if (school is null)
         {
             _logger.LogInformation("{Urn} was not found on School Controller", urn);
@@ -134,7 +134,7 @@ public class SchoolController : Controller
 
     [HttpGet]
     [Route("attendance")]
-    public IActionResult Attendance(string urn)
+    public async Task<IActionResult> Attendance(string urn)
     {
         var school = _schoolDetailsService.TryGetByUrn(urn);
         if (school != null)
@@ -151,7 +151,7 @@ public class SchoolController : Controller
 
     [HttpGet]
     [Route("ks4-headline-measures")]
-    public IActionResult Ks4HeadlineMeasures(string urn)
+    public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
     {
         var school = _schoolDetailsService.TryGetByUrn(urn);
         if (school != null)
@@ -168,7 +168,7 @@ public class SchoolController : Controller
 
     [HttpGet]
     [Route("ks4-core-subjects")]
-    public IActionResult Ks4CoreSubjects(string urn)
+    public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
         var school = _schoolDetailsService.TryGetByUrn(urn);
         if (school != null)

@@ -227,9 +227,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788/school-details");
+        Page.Url.Should().Contain("school/136994/school-details");
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Alderbrook School");
     }
 
     [Fact]

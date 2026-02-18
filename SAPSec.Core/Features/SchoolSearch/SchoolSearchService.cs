@@ -1,4 +1,4 @@
-﻿using Lucene.Net.Search;
+﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using System.Globalization;
@@ -17,22 +17,32 @@ namespace SAPSec.Core.Features.SchoolSearch
 
             var results = new List<SchoolSearchResult>();
 
-            if (searchResults.Count == 0) return results;
-
-            foreach (var (urn, schoolName) in searchResults)
+            if (!searchResults.Any())
             {
-                var school = _establishmentService.GetEstablishment(urn.ToString());
+                return results;
+            }
 
-                if (double.TryParse(school.Easting, NumberStyles.Any, CultureInfo.InvariantCulture, out var easting) &&
-                    double.TryParse(school.Northing, NumberStyles.Any, CultureInfo.InvariantCulture, out var northing))
+            var schools = await _establishmentService.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
+
+            foreach (var r in searchResults.GroupJoin(schools,
+                r => r.urn.ToString(),
+                s => s.URN,
+                (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
+            {
+                if (r.School == null)
                 {
-                    var (lat, lon) = CoordinateConverter.EastingNorthingToLatLon(easting, northing);
-
-                    school.Latitude = lat.ToString(CultureInfo.InvariantCulture);
-                    school.Longitude = lon.ToString(CultureInfo.InvariantCulture);
+                    continue;
                 }
 
-                results.Add(SchoolSearchResult.FromNameAndEstablishment(schoolName, school));
+                if (BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords))
+                {
+                    var latLong = CoordinateConverter.Convert(coords);
+
+                    r.School.Latitude = latLong.Latitude.ToString(CultureInfo.InvariantCulture);
+                    r.School.Longitude = latLong.Longitude.ToString(CultureInfo.InvariantCulture);
+                }
+
+                results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School));
             }
 
             return results;
@@ -44,27 +54,38 @@ namespace SAPSec.Core.Features.SchoolSearch
 
             var results = new List<SchoolSearchResult>();
 
-            if (searchResults.Count == 0) return results;
-
-            foreach (var (urn, schoolName) in searchResults)
+            if (!searchResults.Any())
             {
-                var school = _establishmentService.GetEstablishment(urn.ToString());
+                return results;
+            }
 
-                results.Add(SchoolSearchResult.FromNameAndEstablishment(schoolName, school));
+            var schools = await _establishmentService.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
+
+            foreach (var r in searchResults.GroupJoin(schools,
+                r => r.urn.ToString(),
+                s => s.URN,
+                (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
+            {
+                if (r.School == null)
+                {
+                    continue;
+                }
+
+                results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School));
             }
 
             return results;
         }
 
-        public Establishment? SearchByNumber(string schoolNumber)
+        public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
         {
             var isNumber = Regex.IsMatch(schoolNumber, @"^\d+$");
             var isDfENumber = Regex.IsMatch(schoolNumber, @"^\d+\\|/\d+$");
 
             return isNumber
-                ? _establishmentService.GetEstablishmentByAnyNumber(schoolNumber)
+                ? (await _establishmentService.GetEstablishmentByAnyNumberAsync(schoolNumber))
                 : isDfENumber
-                    ? _establishmentService.GetEstablishmentByAnyNumber(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty))
+                    ? (await _establishmentService.GetEstablishmentByAnyNumberAsync(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty)))
                     : null;
         }
     }

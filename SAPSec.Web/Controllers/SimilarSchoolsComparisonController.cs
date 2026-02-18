@@ -148,7 +148,7 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("SchoolDetails")]
-    public IActionResult SchoolDetails(string urn, string comparisonUrn)
+    public async Task<IActionResult>SchoolDetails(string urn, string comparisonUrn)
     {
         if (!TryParseUrns(urn, comparisonUrn, out var mainUrn, out var compareUrn))
             return BadRequest("Invalid URN.");
@@ -156,7 +156,7 @@ public class SimilarSchoolsComparisonController : Controller
         var mainSchool = GetMockSchool(mainUrn);
         var comparedSchool = GetMockCompareSchool(compareUrn);
 
-        var comparedDetails = _schoolDetailsService.TryGetByUrn(compareUrn.ToString());
+        var comparedDetails =await  _schoolDetailsService.TryGetByUrnAsync(compareUrn.ToString());
         if (comparedDetails is null)
             return NotFound();
 
