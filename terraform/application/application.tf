@@ -68,6 +68,7 @@ module "application_configuration" {
   }
   secret_variables = {
     DATABASE_URL = module.postgres.url
+    ConnectionStrings__PostgresConnectionString = module.postgres.dotnet_connection_string
     DsiConfiguration__ClientId     = data.azurerm_key_vault_secret.dsi_client_id.value
     DsiConfiguration__ClientSecret = data.azurerm_key_vault_secret.dsi_client_secret.value
     DsiConfiguration__ApiSecret    = data.azurerm_key_vault_secret.dsi_api_secret.value

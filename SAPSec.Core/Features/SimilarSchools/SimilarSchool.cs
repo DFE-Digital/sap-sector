@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Geography;
+﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools;

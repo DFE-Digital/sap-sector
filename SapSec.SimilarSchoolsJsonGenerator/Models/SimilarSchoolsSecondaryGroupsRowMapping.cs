@@ -1,4 +1,4 @@
-using CsvHelper.Configuration;
+﻿using CsvHelper.Configuration;
 using SAPSec.Core.Features.SimilarSchools;
 
 namespace SapSec.SimilarSchoolsJsonGenerator.Models

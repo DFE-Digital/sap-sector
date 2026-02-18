@@ -7,9 +7,9 @@
     <div class="govuk-form-group govuk-!-margin-bottom-4">
         <label class="govuk-label govuk-!-display-inline govuk-!-font-weight-bold" for="sort-by">Sort by</label>
         <select class="govuk-select" id="sort-by" name="sortBy" form="similar-schools-filter-form">
-            @foreach (var option in FilterOptions.SortOptions)
+            @foreach (var option in Model.SortOptions)
             {
-                <option value="@option" selected="@(option == Model.SortBy ? "selected" : null)">@option</option>
+                <option value="@option.Key" selected="@(option.Selected ? "selected" : null)">@option.Name</option>
             }
         </select>
     </div>  

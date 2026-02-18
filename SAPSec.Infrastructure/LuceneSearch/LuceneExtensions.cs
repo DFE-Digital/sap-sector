@@ -6,7 +6,7 @@ namespace SAPSec.Infrastructure.LuceneSearch;
 [ExcludeFromCodeCoverage]
 public static class LuceneExtensions
 {
-    public static void AddLuceneDependencies(this IServiceCollection services)
+    public static void AddLuceneDependencies(this IServiceCollection services, bool enableStartupIndexBuilder = true)
     {
         services.AddSingleton<LuceneIndexContext>();
         services.AddSingleton<LuceneIndexWriter>();
@@ -14,6 +14,9 @@ public static class LuceneExtensions
         services.AddSingleton<LuceneHighlighter>();
         services.AddSingleton<LuceneSynonymMapBuilder>();
         services.AddSingleton<LuceneTokeniser>();
-        services.AddHostedService<StartupIndexBuilder>();
+        if (enableStartupIndexBuilder)
+        {
+            services.AddHostedService<StartupIndexBuilder>();
+        }
     }
 }

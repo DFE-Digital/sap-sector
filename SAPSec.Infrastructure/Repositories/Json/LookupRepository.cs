@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Model;
 using SAPSec.Core.Interfaces.Repositories;
 

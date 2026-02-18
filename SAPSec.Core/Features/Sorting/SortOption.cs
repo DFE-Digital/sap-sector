@@ -1,4 +1,4 @@
-namespace SAPSec.Core.Features.Sorting;
+﻿namespace SAPSec.Core.Features.Sorting;
 
 public record SortOption(
     string Key,

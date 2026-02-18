@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;

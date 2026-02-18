@@ -24,10 +24,4 @@
 	<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Remove="Interfaces\Repositories\KS4\Absence\IEstablishmentAbsenceRepository.cs" />
-    <Compile Remove="Interfaces\Repositories\KS4\SubjectEntries\IEstablishmentAbsenceRepository.cs" />
-    <Compile Remove="Interfaces\Services\KS4\Destinations\IEnglandDestinationsService.cs" />
-  </ItemGroup>
-
 </Project>
