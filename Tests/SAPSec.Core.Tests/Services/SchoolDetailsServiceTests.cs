@@ -1,10 +1,8 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Services;
-using Xunit;
 
 namespace SAPSec.Core.Tests.Services;
 
@@ -44,8 +42,8 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Urn.Value.Should().Be("123456");
-        result.Name.Value.Should().Be("Test Academy");
+        result.Urn.Should().Be("123456");
+        result.Name.Should().Be("Test Academy");
     }
 
     [Fact]
@@ -61,8 +59,8 @@ public class SchoolDetailsServiceTests
         var result = await _sut.GetByUrnAsync("123456");
 
         // Assert
-        result.Urn.Value.Should().Be("123456");
-        result.Ukprn.Value.Should().Be("10012345");
+        result.Urn.Should().Be("123456");
+        result.Ukprn.Should().Be("10012345");
     }
 
     [Fact]
@@ -338,7 +336,7 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Urn.Value.Should().Be("123456");
+        result!.Urn.Should().Be("123456");
     }
 
     [Fact]
@@ -396,7 +394,7 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Value.Should().Be("Test Academy");
+        result!.Name.Should().Be("Test Academy");
     }
 
     [Fact]

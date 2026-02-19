@@ -1,10 +1,8 @@
 ﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsTypeOfSpecialistProvisionFilter(SimilarSchool currentSchool) : SimilarSchoolsIdAndNameFieldFilter(
+public class SimilarSchoolsTypeOfSpecialistProvisionFilter(SimilarSchool currentSchool) : SimilarSchoolsReferenceDataFilter(
     currentSchool,
-    s => s.ResourcedProvisionId,
-    s => s.ResourcedProvisionName)
+    s => s.ResourcedProvision)
 {
-    public override string Key => "sp";
     public override string Name => "Type of specialist provision";
 }

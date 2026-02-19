@@ -3,9 +3,8 @@ using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
-using SAPSec.Infrastructure.Factories;
 
-namespace SAPSec.Infrastructure.Repositories.Postgres;
+namespace SAPSec.Infrastructure.Postgres;
 
 public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
 {
@@ -187,35 +186,25 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             Town = sch.Town,
             Postcode = sch.Postcode
         },
-        LocalAuthority = new Core.Features.SimilarSchools.LocalAuthority(sch.LAId, sch.LAName),
-        Coordinates = BNGCoordinates.TryParse(sch.Easting, sch.Northing, out var coords) ? coords : null,
-        UrbanRuralId = sch.UrbanRuralId,
-        UrbanRuralName = sch.UrbanRuralName,
-        RegionId = sch.RegionId,
-        RegionName = sch.RegionName,
-        AdmissionsPolicyId = sch.AdmissionsPolicyId,
-        AdmissionsPolicyName = sch.AdmissionsPolicyName,
-        PhaseOfEducationId = sch.PhaseOfEducationId,
-        PhaseOfEducationName = sch.PhaseOfEducationName,
-        GenderId = sch.GenderId,
-        GenderName = sch.GenderName,
         TotalCapacity = sch.TotalCapacity,
         TotalPupils = sch.TotalPupils,
-        TypeOfEstablishmentId = sch.TypeOfEstablishmentId,
-        TypeOfEstablishmentName = sch.TypeOfEstablishmentName,
-        EstablishmentTypeGroupId = sch.EstablishmentTypeGroupId,
-        EstablishmentTypeGroupName = sch.EstablishmentTypeGroupName,
-        TrustSchoolFlagId = sch.TrustSchoolFlagId,
-        TrustSchoolFlagName = sch.TrustSchoolFlagName,
-        OfficialSixthFormId = sch.OfficialSixthFormId,
-        OfficialSixthFormName = sch.OfficialSixthFormName,
         NurseryProvisionName = sch.NurseryProvisionName,
-        ResourcedProvisionId = sch.ResourcedProvisionId,
-        ResourcedProvisionName = sch.ResourcedProvisionName,
+        Coordinates = BNGCoordinates.TryParse(sch.Easting, sch.Northing, out var coords) ? coords : null,
+        LocalAuthority = new(sch.LAId, sch.LAName),
+        UrbanRural = new(sch.UrbanRuralId, sch.UrbanRuralName),
+        Region = new(sch.RegionId, sch.RegionName),
+        AdmissionsPolicy = new(sch.AdmissionsPolicyId, sch.AdmissionsPolicyName),
+        PhaseOfEducation = new(sch.PhaseOfEducationId, sch.PhaseOfEducationName),
+        Gender = new(sch.GenderId, sch.GenderName),
+        TypeOfEstablishment = new(sch.TypeOfEstablishmentId, sch.TypeOfEstablishmentName),
+        EstablishmentTypeGroup = new(sch.EstablishmentTypeGroupId, sch.EstablishmentTypeGroupName),
+        TrustSchoolFlag = new(sch.TrustSchoolFlagId, sch.TrustSchoolFlagName),
+        OfficialSixthForm = new(sch.OfficialSixthFormId, sch.OfficialSixthFormName),
+        ResourcedProvision = new(sch.ResourcedProvisionId, sch.ResourcedProvisionName),
         Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
         BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
         ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),
-        CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Num),
+        CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Num),
         EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Num),
         EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Num),
         EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Num),

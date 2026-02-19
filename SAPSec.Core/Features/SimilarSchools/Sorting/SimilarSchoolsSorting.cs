@@ -22,7 +22,7 @@ public class SimilarSchoolsSorting(string sortBy)
                 i => i.MathsGcseGrade5AndAbovePercentage),
 
             "CombSci" => Sort(items, "CombSci", "Combined science (double award) GCSE (Grade 5-5 and above)",
-                i => i.CombinedSciencGcseGrade55AndAbovePercentage),
+                i => i.CombinedScienceGcseGrade55AndAbovePercentage),
 
             "Bio" => Sort(items, "Bio", "Biology GCSE (Grade 5 and above)",
                 i => i.BiologyGcseGrade5AndAbovePercentage),

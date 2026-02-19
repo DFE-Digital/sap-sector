@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using SAPSec.Infrastructure.Repositories.Json;
+using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories
 {

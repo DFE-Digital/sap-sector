@@ -63,8 +63,8 @@ public class DemoSimilarSchoolsController : Controller
                 LAName = r.SimilarSchool.LocalAuthority.Name,
                 Latitude = r.Coordinates.Latitude.ToString(),
                 Longitude = r.Coordinates.Longitude.ToString(),
-                UrbanRuralId = r.SimilarSchool.UrbanRuralId,
-                UrbanRuralName = r.SimilarSchool.UrbanRuralName,
+                UrbanRuralId = r.SimilarSchool.UrbanRural.Id,
+                UrbanRuralName = r.SimilarSchool.UrbanRural.Name,
                 SortValue = $"{r.SortValue.Name}: {r.SortValue.Value.Display("0.00")}"
             }),
             AllResults = response.AllResults.Select(r => new DemoSimilarSchoolResultViewModel
@@ -79,8 +79,8 @@ public class DemoSimilarSchoolsController : Controller
                 LAName = r.SimilarSchool.LocalAuthority.Name,
                 Latitude = r.Coordinates.Latitude.ToString(),
                 Longitude = r.Coordinates.Longitude.ToString(),
-                UrbanRuralId = r.SimilarSchool.UrbanRuralId,
-                UrbanRuralName = r.SimilarSchool.UrbanRuralName,
+                UrbanRuralId = r.SimilarSchool.UrbanRural.Id,
+                UrbanRuralName = r.SimilarSchool.UrbanRural.Name,
                 SortValue = $"{r.SortValue.Name}: {r.SortValue.Value.Display("0.00")}"
             })
         });

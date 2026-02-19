@@ -6,7 +6,7 @@
     ViewData["Title"] = "What is a similar school?";
 }
 
-<span class="govuk-caption-xl">@Model.Name.Display()</span>
+<span class="govuk-caption-xl">@Model.Name</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
 <p class="govuk-body">
@@ -69,7 +69,7 @@
 </p>
 
 <p class="govuk-body">
-    You can <a href="/school/@Model.Urn.Display()/view-similar-schools" class="govuk-link">view all the schools most similar to this one</a> and select individual schools to see its similarity, performance and contact details.
+    You can <a href="/school/@Model.Urn/view-similar-schools" class="govuk-link">view all the schools most similar to this one</a> and select individual schools to see its similarity, performance and contact details.
 </p>
 
 <h2 class="govuk-heading-m govuk-!-padding-top-6">Annual updates to similar schools data</h2>

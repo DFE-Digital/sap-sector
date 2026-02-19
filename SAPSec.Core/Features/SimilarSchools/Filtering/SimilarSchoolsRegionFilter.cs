@@ -1,10 +1,8 @@
 ﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsRegionFilter(SimilarSchool currentSchool) : SimilarSchoolsIdAndNameFieldFilter(
+public class SimilarSchoolsRegionFilter(SimilarSchool currentSchool) : SimilarSchoolsReferenceDataFilter(
     currentSchool,
-    s => s.RegionId,
-    s => s.RegionName)
+    s => s.Region)
 {
-    public override string Key => "reg";
     public override string Name => "Region";
 }

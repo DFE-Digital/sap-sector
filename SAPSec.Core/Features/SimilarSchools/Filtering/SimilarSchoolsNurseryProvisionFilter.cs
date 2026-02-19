@@ -6,7 +6,6 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsNurseryProvisionFilter(SimilarSchool currentSchool) : ISimilarSchoolsMultiValueFilter
 {
-    public string Key => "np";
     public string Name => "Nursery provision";
     public FilterType Type => FilterType.MultipleValue;
 
@@ -20,8 +19,8 @@ public class SimilarSchoolsNurseryProvisionFilter(SimilarSchool currentSchool) :
         return items.Where(i => values.Contains(i.NurseryProvisionName));
     }
 
-    public SimilarSchoolsAvailableFilter AsAvailableFilter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
-        Key,
+    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
+        key,
         Name,
         Type,
         GetPossibleOptions(items, values).ToList().AsReadOnly(),

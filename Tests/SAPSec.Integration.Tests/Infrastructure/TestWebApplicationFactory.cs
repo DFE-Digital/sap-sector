@@ -9,7 +9,7 @@ using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Repositories.Json;
+using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.Repositories;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;

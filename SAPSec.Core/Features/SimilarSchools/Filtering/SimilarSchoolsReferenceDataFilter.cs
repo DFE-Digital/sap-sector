@@ -4,12 +4,10 @@ using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public abstract class SimilarSchoolsIdAndNameFieldFilter(
+public abstract class SimilarSchoolsReferenceDataFilter(
     SimilarSchool currentSchool,
-    Func<SimilarSchool, string> idField,
-    Func<SimilarSchool, string> nameField) : ISimilarSchoolsMultiValueFilter
+    Func<SimilarSchool, ReferenceData> field) : ISimilarSchoolsMultiValueFilter
 {
-    public abstract string Key { get; }
     public abstract string Name { get; }
     public FilterType Type => FilterType.MultipleValue;
 
@@ -20,18 +18,18 @@ public abstract class SimilarSchoolsIdAndNameFieldFilter(
             return items;
         }
 
-        return items.Where(i => values.Contains(idField(i)));
+        return items.Where(i => values.Contains(field(i).Id));
     }
 
-    public SimilarSchoolsAvailableFilter AsAvailableFilter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
-        Key,
+    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
+        key,
         Name,
         Type,
         GetPossibleOptions(items, values).ToList().AsReadOnly(),
-        DataWithAvailability.FromStringWithCodes(idField(currentSchool), nameField(currentSchool)));
+        DataWithAvailability.FromStringWithCodes(field(currentSchool).Id, field(currentSchool).Name));
 
     private IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
-        items.GroupBy(i => new { Id = idField(i), Name = nameField(i) })
+        items.GroupBy(field)
             .Select(g => new FilterOption(
                 g.Key.Id,
                 g.Key.Name,

@@ -19,9 +19,11 @@ public class GetSimilarSchoolDetails(
         return new(
             currentSchool.Name,
             // TODO: Validate coordinates exist
-            CoordinateConverter.Convert(currentSchool.Coordinates!),
-            CoordinateConverter.Convert(similarSchool.Coordinates!),
-            currentSchool.Coordinates!.DistanceMiles(similarSchool.Coordinates!),
+            currentSchool.Coordinates is null ? null : CoordinateConverter.Convert(currentSchool.Coordinates),
+            similarSchool.Coordinates is null ? null : CoordinateConverter.Convert(similarSchool.Coordinates),
+            currentSchool.Coordinates is null || similarSchool.Coordinates is null
+                ? null
+                : currentSchool.Coordinates.DistanceMiles(similarSchool.Coordinates),
             similarSchoolDetails
         );
     }
@@ -33,7 +35,7 @@ public record GetSimilarSchoolDetailsRequest(
 
 public record GetSimilarSchoolDetailsResponse(
     string SchoolName,
-    GeographicCoordinates CurrentSchoolCoordinates,
-    GeographicCoordinates SimilarSchoolCoordinates,
-    double DistanceMiles,
+    GeographicCoordinates? CurrentSchoolCoordinates,
+    GeographicCoordinates? SimilarSchoolCoordinates,
+    double? DistanceMiles,
     SchoolDetails SimilarSchoolDetails);

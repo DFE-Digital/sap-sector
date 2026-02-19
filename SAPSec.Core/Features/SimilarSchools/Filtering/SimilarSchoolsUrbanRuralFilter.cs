@@ -1,10 +1,8 @@
 ﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsUrbanRuralFilter(SimilarSchool currentSchool) : SimilarSchoolsIdAndNameFieldFilter(
+public class SimilarSchoolsUrbanRuralFilter(SimilarSchool currentSchool) : SimilarSchoolsReferenceDataFilter(
     currentSchool,
-    s => s.UrbanRuralId,
-    s => s.UrbanRuralName)
+    s => s.UrbanRural)
 {
-    public override string Key => "ur";
     public override string Name => "Urban or rural";
 }

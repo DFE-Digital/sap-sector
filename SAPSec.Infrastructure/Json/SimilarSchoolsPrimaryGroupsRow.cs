@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Infrastructure.Repositories.Json
+﻿namespace SAPSec.Infrastructure.Json
 {
     public class SimilarSchoolsPrimaryGroupsRow : ISimilarSchoolsGroupsRow
     {

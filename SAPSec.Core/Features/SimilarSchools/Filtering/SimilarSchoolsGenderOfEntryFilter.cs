@@ -1,10 +1,8 @@
 ﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsGenderOfEntryFilter(SimilarSchool currentSchool) : SimilarSchoolsIdAndNameFieldFilter(
+public class SimilarSchoolsGenderOfEntryFilter(SimilarSchool currentSchool) : SimilarSchoolsReferenceDataFilter(
     currentSchool,
-    s => s.GenderId,
-    s => s.GenderName)
+    s => s.Gender)
 {
-    public override string Key => "g";
     public override string Name => "Gender of entry";
 }

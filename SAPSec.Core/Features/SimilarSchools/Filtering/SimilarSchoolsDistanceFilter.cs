@@ -6,7 +6,6 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimilarSchoolsSingleValueFilter
 {
-    public string Key => "dist";
     public string Name => "Distance";
     public FilterType Type => FilterType.SingleValue;
 
@@ -34,8 +33,8 @@ public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimila
             });
     }
 
-    public SimilarSchoolsAvailableFilter AsAvailableFilter(IEnumerable<SimilarSchool> items, string? value) => new(
-        Key,
+    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, string? value) => new(
+        key,
         Name,
         Type,
         GetPossibleOptions(items, value).ToList().AsReadOnly(),
@@ -92,40 +91,4 @@ public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimila
             }
         }
     }
-}
-
-public class SimilarSchoolsSchoolCapacityInUseFilter(SimilarSchool currentSchool) : ISimilarSchoolsNumericRangeFilter
-{
-    public string Key => "sc";
-    public string Name => "School capacity in use";
-    public FilterType Type => FilterType.NumericRange;
-
-    public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, string? from, string? to)
-    {
-        var minValue = !string.IsNullOrWhiteSpace(from) && decimal.TryParse(from, out decimal f) ? f : decimal.MinValue;
-        var maxValue = !string.IsNullOrWhiteSpace(to) && decimal.TryParse(to, out decimal t) ? t : decimal.MaxValue;
-
-        return items
-            .Select(i => new
-            {
-                Item = i,
-                CapacityInUse = CalculateCapacityInUse(i) ?? 0.0M
-            })
-            .Where(i => minValue <= i.CapacityInUse && i.CapacityInUse <= maxValue)
-            .Select(i => i.Item);
-    }
-
-    public SimilarSchoolsAvailableFilter AsAvailableFilter(IEnumerable<SimilarSchool> items, string? from, string? to) => new(
-        Key,
-        Name,
-        Type,
-        [],
-        CalculateCapacityInUse(currentSchool) is decimal c
-            ? DataWithAvailability.Available($"{c}%")
-            : DataWithAvailability.NotAvailable<string>());
-
-    private decimal? CalculateCapacityInUse(SimilarSchool school) =>
-        decimal.TryParse(school.TotalPupils, out decimal totalPupils) && decimal.TryParse(school.TotalCapacity, out decimal totalCapacity)
-            ? (totalPupils / totalCapacity) * 100.0M
-            : null;
 }
