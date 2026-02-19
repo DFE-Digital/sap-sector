@@ -1,10 +1,8 @@
 ﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsSixthFormFilter(SimilarSchool currentSchool) : SimilarSchoolsIdAndNameFieldFilter(
+public class SimilarSchoolsSixthFormFilter(SimilarSchool currentSchool) : SimilarSchoolsReferenceDataFilter(
     currentSchool,
-    s => s.OfficialSixthFormId,
-    s => s.OfficialSixthFormName)
+    s => s.OfficialSixthForm)
 {
-    public override string Key => "sf";
     public override string Name => "Sixth form";
 }

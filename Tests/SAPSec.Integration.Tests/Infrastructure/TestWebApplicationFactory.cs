@@ -9,7 +9,7 @@ using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Repositories.Json;
+using SAPSec.Infrastructure.Json;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
 

@@ -1,10 +1,8 @@
 ﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsPhaseOfEducationFilter(SimilarSchool currentSchool) : SimilarSchoolsIdAndNameFieldFilter(
+public class SimilarSchoolsPhaseOfEducationFilter(SimilarSchool currentSchool) : SimilarSchoolsReferenceDataFilter(
     currentSchool,
-    s => s.PhaseOfEducationId,
-    s => s.PhaseOfEducationName)
+    s => s.PhaseOfEducation)
 {
-    public override string Key => "poe";
     public override string Name => "Phase of education";
 }

@@ -5,8 +5,8 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Services;
+using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
-using SAPSec.Infrastructure.Repositories.Json;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Web.Extensions

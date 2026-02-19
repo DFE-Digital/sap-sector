@@ -1,10 +1,8 @@
 ﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsAdmissionsPolicyFilter(SimilarSchool currentSchool) : SimilarSchoolsIdAndNameFieldFilter(
+public class SimilarSchoolsAdmissionsPolicyFilter(SimilarSchool currentSchool) : SimilarSchoolsReferenceDataFilter(
     currentSchool,
-    s => s.AdmissionsPolicyId,
-    s => s.AdmissionsPolicyName)
+    s => s.AdmissionsPolicy)
 {
-    public override string Key => "ap";
     public override string Name => "Admissions policy";
 }

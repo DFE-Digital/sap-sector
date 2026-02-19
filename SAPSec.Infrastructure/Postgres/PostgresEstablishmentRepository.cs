@@ -2,9 +2,8 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
-using SAPSec.Infrastructure.Factories;
 
-namespace SAPSec.Infrastructure.Repositories.Postgres;
+namespace SAPSec.Infrastructure.Postgres;
 
 public class PostgresEstablishmentRepository : IEstablishmentRepository
 {

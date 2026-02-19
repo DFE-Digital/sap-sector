@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Npgsql;
 
-namespace SAPSec.Infrastructure.Factories;
+namespace SAPSec.Infrastructure.Postgres;
 
 public sealed class NpgsqlDataSourceFactory
 {

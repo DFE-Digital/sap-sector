@@ -1,5 +1,5 @@
 ﻿using CsvHelper.Configuration;
-using SAPSec.Infrastructure.Repositories.Json;
+using SAPSec.Infrastructure.Json;
 
 namespace SapSec.SimilarSchoolsJsonGenerator.Models
 {

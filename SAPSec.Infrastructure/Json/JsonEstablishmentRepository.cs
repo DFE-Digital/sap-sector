@@ -2,7 +2,7 @@
 using SAPSec.Core.Model;
 using SAPSec.Core.Interfaces.Repositories;
 
-namespace SAPSec.Infrastructure.Repositories.Json
+namespace SAPSec.Infrastructure.Json
 {
     public class JsonEstablishmentRepository : IEstablishmentRepository
     {

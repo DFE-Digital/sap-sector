@@ -2,7 +2,7 @@
 using SAPSec.Core.Model;
 using SAPSec.Core.Interfaces.Repositories;
 
-namespace SAPSec.Infrastructure.Repositories.Json
+namespace SAPSec.Infrastructure.Json
 {
     public class LookupRepository : ILookupRepository
     {
@@ -20,7 +20,7 @@ namespace SAPSec.Infrastructure.Repositories.Json
 
         public async Task<IEnumerable<Lookup>> GetAllLookupsAsync()
         {
-            return (await _lookupMetadataRepository.ReadAllAsync()) ?? [];
+            return await _lookupMetadataRepository.ReadAllAsync() ?? [];
         }
 
 

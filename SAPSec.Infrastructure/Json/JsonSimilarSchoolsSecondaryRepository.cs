@@ -3,7 +3,7 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
 
-namespace SAPSec.Infrastructure.Repositories.Json;
+namespace SAPSec.Infrastructure.Json;
 
 public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
 {
@@ -75,35 +75,25 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
                 Town = currentEstab.Town,
                 Postcode = currentEstab.Postcode
             },
-            LocalAuthority = new Core.Features.SimilarSchools.LocalAuthority(currentEstab.LAId, currentEstab.LAName),
-            Coordinates = BNGCoordinates.TryParse(currentEstab.Easting, currentEstab.Northing, out var coords) ? coords : null,
-            UrbanRuralId = currentEstab.UrbanRuralId,
-            UrbanRuralName = currentEstab.UrbanRuralName,
-            RegionId = currentEstab.RegionId,
-            RegionName = currentEstab.RegionName,
-            AdmissionsPolicyId = currentEstab.AdmissionsPolicyId,
-            AdmissionsPolicyName = currentEstab.AdmissionsPolicyName,
-            PhaseOfEducationId = currentEstab.PhaseOfEducationId,
-            PhaseOfEducationName = currentEstab.PhaseOfEducationName,
-            GenderId = currentEstab.GenderId,
-            GenderName = currentEstab.GenderName,
             TotalCapacity = currentEstab.TotalCapacity,
             TotalPupils = currentEstab.TotalPupils,
-            TypeOfEstablishmentId = currentEstab.TypeOfEstablishmentId,
-            TypeOfEstablishmentName = currentEstab.TypeOfEstablishmentName,
-            EstablishmentTypeGroupId = currentEstab.EstablishmentTypeGroupId,
-            EstablishmentTypeGroupName = currentEstab.EstablishmentTypeGroupName,
-            TrustSchoolFlagId = currentEstab.TrustSchoolFlagId,
-            TrustSchoolFlagName = currentEstab.TrustSchoolFlagName,
-            OfficialSixthFormId = currentEstab.OfficialSixthFormId,
-            OfficialSixthFormName = currentEstab.OfficialSixthFormName,
             NurseryProvisionName = currentEstab.NurseryProvisionName,
-            ResourcedProvisionId = currentEstab.ResourcedProvisionId,
-            ResourcedProvisionName = currentEstab.ResourcedProvisionName,
+            Coordinates = BNGCoordinates.TryParse(currentEstab.Easting, currentEstab.Northing, out var coords) ? coords : null,
+            LocalAuthority = new(currentEstab.LAId, currentEstab.LAName),
+            UrbanRural = new(currentEstab.UrbanRuralId, currentEstab.UrbanRuralName),
+            Region = new(currentEstab.RegionId, currentEstab.RegionName),
+            AdmissionsPolicy = new(currentEstab.AdmissionsPolicyId, currentEstab.AdmissionsPolicyName),
+            PhaseOfEducation = new(currentEstab.PhaseOfEducationId, currentEstab.PhaseOfEducationName),
+            Gender = new(currentEstab.GenderId, currentEstab.GenderName),
+            TypeOfEstablishment = new(currentEstab.TypeOfEstablishmentId, currentEstab.TypeOfEstablishmentName),
+            EstablishmentTypeGroup = new(currentEstab.EstablishmentTypeGroupId, currentEstab.EstablishmentTypeGroupName),
+            TrustSchoolFlag = new(currentEstab.TrustSchoolFlagId, currentEstab.TrustSchoolFlagName),
+            OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
+            ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
             Attainment8Score = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Attainment8_Tot_Est_Current_Num),
             BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Bio59_Sum_Est_Current_Num),
             ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Chem59_Sum_Est_Current_Num),
-            CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.CombSci59_Sum_Est_Current_Num),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.CombSci59_Sum_Est_Current_Num),
             EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngLang59_Sum_Est_Current_Num),
             EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngLit59_Sum_Est_Current_Num),
             EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngMaths59_Tot_Est_Current_Num),

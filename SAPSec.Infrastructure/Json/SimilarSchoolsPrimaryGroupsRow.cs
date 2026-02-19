@@ -1,6 +1,6 @@
-﻿namespace SAPSec.Infrastructure.Repositories.Json
+﻿namespace SAPSec.Infrastructure.Json
 {
-    public class SimilarSchoolsSecondaryGroupsRow : ISimilarSchoolsGroupsRow
+    public class SimilarSchoolsPrimaryGroupsRow : ISimilarSchoolsGroupsRow
     {
         public required string URN { get; set; }
         public required string NeighbourURN { get; set; }

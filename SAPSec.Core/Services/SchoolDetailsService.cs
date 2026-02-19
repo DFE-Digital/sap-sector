@@ -67,8 +67,8 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
         return new SchoolDetails
         {
             // Identifiers
-            Name = DataMapper.MapRequiredString(establishment.EstablishmentName),
-            Urn = DataMapper.MapRequiredString(establishment.URN),
+            Urn = establishment.URN,
+            Name = establishment.EstablishmentName,
             DfENumber = DataMapper.MapDfENumber(establishment.DfENumber),
             Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
 
