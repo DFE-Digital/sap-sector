@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SchoolSearch;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 
@@ -10,7 +11,8 @@ namespace SAPSec.Web.Controllers;
 [Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
-    ISchoolSearchService _searchService) : Controller
+    ISchoolSearchService _searchService,
+    ISimilarSchoolsSecondaryRepository? _similarSchoolsSecondaryRepository = null) : Controller
 {
     private const int PageSize = 10;
     public const string Hint = "Search by name or school ID";
@@ -35,7 +37,9 @@ public class SchoolSearchController(
             {
                 return RedirectToAction("Search", new
                 {
-                    query = searchQueryViewModel.Query
+                    query = searchQueryViewModel.Query,
+                    secondaryOnly = searchQueryViewModel.SecondaryOnly,
+                    similarSchoolsOnly = searchQueryViewModel.SimilarSchoolsOnly
                 });
             }
 
@@ -58,9 +62,14 @@ public class SchoolSearchController(
     public async Task<IActionResult> Search(
         [FromQuery] string? query,
         [FromQuery] string[]? localAuthorities,
-        [FromQuery] int page = 1)
+        [FromQuery] int page = 1,
+        [FromQuery] bool? secondaryOnly = null,
+        [FromQuery] bool? similarSchoolsOnly = null)
     {
-        using (logger.BeginScope(new { query, page }))
+        var applySecondaryOnly = secondaryOnly ?? true;
+        var applySimilarSchoolsOnly = similarSchoolsOnly ?? true;
+
+        using (logger.BeginScope(new { query, secondaryOnly = applySecondaryOnly, similarSchoolsOnly = applySimilarSchoolsOnly, page }))
         {
             if (page < 1) page = 1;
 
@@ -80,6 +89,27 @@ public class SchoolSearchController(
                     .ToList();
             }
 
+            if (applySecondaryOnly)
+            {
+                results = results
+                    .Where(s => IsSecondaryPhase(s.PhaseOfEducationName))
+                    .ToList();
+            }
+
+            if (applySimilarSchoolsOnly)
+            {
+                var withSimilarSchools = await Task.WhenAll(results.Select(async s => new
+                {
+                    School = s,
+                    HasSimilarSchools = await HasSimilarSchoolsAsync(s.URN)
+                }));
+
+                results = withSimilarSchools
+                    .Where(x => x.HasSimilarSchools)
+                    .Select(x => x.School)
+                    .ToList();
+            }
+
             if (results.Count == 1 && (localAuthorities == null || localAuthorities.Length == 0))
             {
                 return RedirectToAction("Index", "School", new { results[0].URN });
@@ -95,7 +125,14 @@ public class SchoolSearchController(
             var totalPages = (int)Math.Ceiling((double)totalResults / PageSize);
             if (page > totalPages && totalPages > 0)
             {
-                return RedirectToAction("Search", new { query, localAuthorities, page = totalPages });
+                return RedirectToAction("Search", new
+                {
+                    query,
+                    localAuthorities,
+                    secondaryOnly = applySecondaryOnly,
+                    similarSchoolsOnly = applySimilarSchoolsOnly,
+                    page = totalPages
+                });
             }
 
             // Map all results for display
@@ -120,6 +157,8 @@ public class SchoolSearchController(
                 Query = query ?? string.Empty,
                 LocalAuthorities = allLocalAuthorities,
                 SelectedLocalAuthorities = localAuthorities ?? Array.Empty<string>(),
+                SecondaryOnly = applySecondaryOnly,
+                SimilarSchoolsOnly = applySimilarSchoolsOnly,
                 CurrentPage = page,
                 PageSize = PageSize,
                 TotalResults = totalResults,
@@ -154,6 +193,8 @@ public class SchoolSearchController(
                 return View(new SchoolSearchResultsViewModel
                 {
                     Query = searchQueryViewModel.Query,
+                    SecondaryOnly = searchQueryViewModel.SecondaryOnly,
+                    SimilarSchoolsOnly = searchQueryViewModel.SimilarSchoolsOnly
                 });
             }
 
@@ -186,4 +227,28 @@ public class SchoolSearchController(
             return Ok(suggestions);
         }
     }
+
+    private static bool IsSecondaryPhase(string? phaseOfEducationName) =>
+        !string.IsNullOrWhiteSpace(phaseOfEducationName) &&
+        phaseOfEducationName.Contains("secondary", StringComparison.InvariantCultureIgnoreCase);
+
+    private async Task<bool> HasSimilarSchoolsAsync(string urn)
+    {
+        if (_similarSchoolsSecondaryRepository is null)
+        {
+            return true;
+        }
+
+        try
+        {
+            var similarSchoolUrns = await _similarSchoolsSecondaryRepository.GetSimilarSchoolUrnsAsync(urn);
+            return similarSchoolUrns.Any();
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "Unable to fetch similar school URNs for search result URN {Urn}", urn);
+            return false;
+        }
+    }
 }
+

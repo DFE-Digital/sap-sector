@@ -17,6 +17,7 @@ namespace SAPSec.Core.Features.SchoolSearch
         string AddressTown,
         string AddressPostcode,
         string LANAme,
+        string PhaseOfEducationName,
         string? Latitude,
         string? Longitude
     )
@@ -31,6 +32,7 @@ namespace SAPSec.Core.Features.SchoolSearch
             establishment.Town,
             establishment.Postcode,
             establishment.LAName,
+            establishment.PhaseOfEducationName,
             establishment.Latitude,
             establishment.Longitude);
     }

@@ -11,4 +11,8 @@ public class SchoolSearchQueryViewModel
     public string? Urn { get; set; }
 
     public bool HasNoResults { get; set; }
+
+    public bool SecondaryOnly { get; set; } = true;
+
+    public bool SimilarSchoolsOnly { get; set; } = true;
 }

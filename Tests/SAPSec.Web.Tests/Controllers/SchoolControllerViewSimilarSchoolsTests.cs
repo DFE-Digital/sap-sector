@@ -14,19 +14,19 @@ using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
 
-public class SchoolControllerViewSimilarSchoolsTests
+public class SimilarSchoolsControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepoMock;
-    private readonly Mock<ILogger<SchoolController>> _loggerMock;
-    private readonly SchoolController _sut;
+    private readonly Mock<ILogger<SimilarSchoolsController>> _loggerMock;
+    private readonly SimilarSchoolsController _sut;
 
-    public SchoolControllerViewSimilarSchoolsTests()
+    public SimilarSchoolsControllerTests()
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
         _similarSchoolsRepoMock = new Mock<ISimilarSchoolsSecondaryRepository>();
-        _loggerMock = new Mock<ILogger<SchoolController>>();
-        _sut = new SchoolController(_schoolDetailsServiceMock.Object, new FindSimilarSchools(_similarSchoolsRepoMock.Object), _loggerMock.Object);
+        _loggerMock = new Mock<ILogger<SimilarSchoolsController>>();
+        _sut = new SimilarSchoolsController(_schoolDetailsServiceMock.Object, new FindSimilarSchools(_similarSchoolsRepoMock.Object), _loggerMock.Object);
         _sut.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()

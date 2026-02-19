@@ -1,5 +1,9 @@
-﻿@using SAPSec.Web.ViewModels
+@using SAPSec.Web.ViewModels
 @model SimilarSchoolsPageViewModel
+
+@{
+    var baseUrl = Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn });
+}
 
 @if (Model.TotalPages > 1)
 {
@@ -7,7 +11,7 @@
         @if (Model.HasPreviousPage)
         {
             <div class="govuk-pagination__prev">
-                <a class="govuk-link govuk-pagination__link" href="@BuildPageUrl(Model.CurrentPage - 1)" rel="prev">
+                <a class="govuk-link govuk-pagination__link" href="@(baseUrl + Model.BuildPaginationQueryString(Model.CurrentPage - 1))" rel="prev">
                     <svg class="govuk-pagination__icon govuk-pagination__icon--prev" xmlns="http://www.w3.org/2000/svg"
                          height="13" width="15" aria-hidden="true" focusable="false" viewBox="0 0 15 13">
                         <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
@@ -20,23 +24,23 @@
         }
 
         <ul class="govuk-pagination__list">
-            @foreach (var item in GetPageItems(Model.CurrentPage, Model.TotalPages))
+            @foreach (var item in Model.GetPaginationItems())
             {
-                if (item == -1)
+                if (item == SimilarSchoolsPageViewModel.PaginationEllipsis)
                 {
                     <li class="govuk-pagination__item govuk-pagination__item--ellipsis">&ctdot;</li>
                 }
                 else if (item == Model.CurrentPage)
                 {
                     <li class="govuk-pagination__item govuk-pagination__item--current">
-                        <a class="govuk-link govuk-pagination__link" href="@BuildPageUrl(item)"
+                        <a class="govuk-link govuk-pagination__link" href="@(baseUrl + Model.BuildPaginationQueryString(item))"
                            aria-label="Page @item" aria-current="page">@item</a>
                     </li>
                 }
                 else
                 {
                     <li class="govuk-pagination__item">
-                        <a class="govuk-link govuk-pagination__link" href="@BuildPageUrl(item)"
+                        <a class="govuk-link govuk-pagination__link" href="@(baseUrl + Model.BuildPaginationQueryString(item))"
                            aria-label="Page @item">@item</a>
                     </li>
                 }
@@ -46,7 +50,7 @@
         @if (Model.HasNextPage)
         {
             <div class="govuk-pagination__next">
-                <a class="govuk-link govuk-pagination__link" href="@BuildPageUrl(Model.CurrentPage + 1)" rel="next">
+                <a class="govuk-link govuk-pagination__link" href="@(baseUrl + Model.BuildPaginationQueryString(Model.CurrentPage + 1))" rel="next">
                     <span class="govuk-pagination__link-title">
                         Next<span class="govuk-visually-hidden"> page</span>
                     </span>
@@ -58,49 +62,4 @@
             </div>
         }
     </nav>
-}
-
-@functions {
-
-    string BuildPageUrl(int page)
-    {
-        var qs = new List<string> { $"page={page}" };
-
-        if (!string.IsNullOrEmpty(Model.SortBy))
-            qs.Add($"sortBy={Uri.EscapeDataString(Model.SortBy)}");
-
-        foreach (var (key, values) in Model.CurrentFilters)
-        {
-            foreach (var v in values)
-            {
-                qs.Add($"{key}={Uri.EscapeDataString(v)}");
-            }
-        }
-
-        return Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })
-               + "?" + string.Join("&", qs);
-    }
-
-    List<int> GetPageItems(int current, int total)
-    {
-        var items = new List<int>();
-
-        if (total <= 7)
-        {
-            for (int i = 1; i <= total; i++) items.Add(i);
-            return items;
-        }
-
-        items.Add(1);
-        if (current > 3) items.Add(-1);
-
-        int start = Math.Max(2, current - 1);
-        int end = Math.Min(total - 1, current + 1);
-        for (int i = start; i <= end; i++) items.Add(i);
-
-        if (current < total - 2) items.Add(-1);
-        items.Add(total);
-
-        return items;
-    }
 }
