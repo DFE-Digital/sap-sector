@@ -405,7 +405,8 @@ public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fi
     private async Task NavigateToHomePage()
     {
         await Page.GotoAsync(HomePath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+        await Page.WaitForSelectorAsync("main");
     }
 
     private async Task<AxeResult> AnalyzeAccessibility(params string[] wcagTags)

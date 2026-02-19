@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Infrastructure;
 using Deque.AxeCore.Playwright;
@@ -11,13 +11,19 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
 {
     private const string SchoolDetailsPath = "/school/147788/school-details";
 
+    private async Task NavigateToSchoolDetailsAsync()
+    {
+        await Page.GotoAsync(SchoolDetailsPath);
+        await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+        await Page.WaitForSelectorAsync("main");
+    }
+
     #region Axe Core Accessibility Tests
 
     [Fact]
     public async Task SchoolDetails_PassesAxeAccessibilityChecks()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var results = await Page.RunAxe();
 
@@ -35,8 +41,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_HasMainLandmark()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var main = Page.Locator("main");
         var count = await main.CountAsync();
@@ -47,8 +52,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_HasHeaderLandmark()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var header = Page.Locator("header");
         var count = await header.CountAsync();
@@ -59,8 +63,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_HasFooterLandmark()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var footer = Page.Locator("footer");
         var count = await footer.CountAsync();
@@ -71,8 +74,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_MainLandmark_HasId()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var main = Page.Locator("main#main-content");
         var count = await main.CountAsync();
@@ -87,8 +89,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_HasExactlyOneH1()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var h1Elements = Page.Locator("h1");
         var count = await h1Elements.CountAsync();
@@ -99,8 +100,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_H1_IsNotEmpty()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var h1 = Page.Locator("h1");
         var text = await h1.TextContentAsync();
@@ -111,8 +111,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_HeadingsAreInSequentialOrder()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         // Get all heading levels
         var headings = await Page.EvaluateAsync<int[]>(@"
@@ -134,8 +133,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SectionHeadings_AreH2()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var sectionHeadings = Page.Locator("h2.govuk-heading-m");
         var count = await sectionHeadings.CountAsync();
@@ -147,8 +145,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_AllHeadings_HaveTextContent()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var headings = Page.Locator("h1, h2, h3, h4, h5, h6");
         var count = await headings.CountAsync();
@@ -167,8 +164,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_HasSkipLink()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var skipLink = Page.Locator(".govuk-skip-link");
         var count = await skipLink.CountAsync();
@@ -179,8 +175,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SkipLink_TargetsMainContent()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var skipLink = Page.Locator(".govuk-skip-link");
         var href = await skipLink.GetAttributeAsync("href");
@@ -191,8 +186,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SkipLink_HasCorrectText()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var skipLink = Page.Locator(".govuk-skip-link");
         var text = await skipLink.TextContentAsync();
@@ -203,8 +197,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SkipLink_BecomesVisibleOnFocus()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var skipLink = Page.Locator(".govuk-skip-link");
 
@@ -217,8 +210,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SkipLink_WorksOnKeyboardNavigation()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         await Page.Keyboard.PressAsync("Tab");
 
@@ -235,8 +227,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_Links_HaveDistinguishableText()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var links = Page.Locator("main a");
         var count = await links.CountAsync();
@@ -263,8 +254,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SummaryLists_UseDefinitionListMarkup()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var summaryLists = Page.Locator(".govuk-summary-list");
         var count = await summaryLists.CountAsync();
@@ -279,8 +269,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SummaryListKeys_UseDtElement()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var keys = Page.Locator(".govuk-summary-list__key");
         var count = await keys.CountAsync();
@@ -295,8 +284,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_SummaryListValues_UseDdElement()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var values = Page.Locator(".govuk-summary-list__value");
         var count = await values.CountAsync();
@@ -315,8 +303,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_FocusOrder_IsLogical()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var focusableElements = await Page.EvaluateAsync<string[]>(@"
             () => {
@@ -335,8 +322,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_FocusIndicator_IsVisible()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var firstLink = Page.Locator("main a").First;
         await firstLink.FocusAsync();
@@ -361,8 +347,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_TextHasSufficientContrast()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var contrastRatio = await Page.EvaluateAsync<double>(@"
             () => {
@@ -407,8 +392,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_Links_HaveDistinguishableColor()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var linkColor = await Page.EvaluateAsync<string>(@"
             () => {
@@ -428,8 +412,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_PageHasLanguageAttribute()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var lang = await Page.EvaluateAsync<string>("() => document.documentElement.lang");
 
@@ -440,8 +423,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_Images_HaveAltText()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var images = Page.Locator("img:not([role='presentation'])");
         var count = await images.CountAsync();
@@ -456,8 +438,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_DecorativeImages_AreHiddenFromScreenReaders()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var decorativeImages = Page.Locator("img[role='presentation'], img[alt='']");
         var count = await decorativeImages.CountAsync();
@@ -475,8 +456,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_VisuallyHiddenText_IsProperlyHidden()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var visuallyHidden = Page.Locator(".govuk-visually-hidden");
         var count = await visuallyHidden.CountAsync();
@@ -500,8 +480,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_NavigationHasAriaLabel()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var navs = Page.Locator("nav");
         var count = await navs.CountAsync();
@@ -519,8 +498,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_ActiveNavItem_HasAriaCurrent()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var activeNavLink = Page.Locator(".govuk-service-navigation__item--active a");
         var count = await activeNavLink.CountAsync();
@@ -535,8 +513,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task SchoolDetails_NoInvalidAriaAttributes()
     {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var invalidAria = await Page.EvaluateAsync<string[]>(@"
             () => {
@@ -577,8 +554,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     public async Task SchoolDetails_TouchTargets_AreLargeEnough()
     {
         await Page.SetViewportSizeAsync(375, 667);
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var links = Page.Locator("main a");
         var count = await links.CountAsync();
@@ -599,8 +575,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     public async Task SchoolDetails_TextIsReadable_OnMobile()
     {
         await Page.SetViewportSizeAsync(375, 667);
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var fontSize = await Page.EvaluateAsync<double>(@"
             () => {
@@ -616,8 +591,7 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     public async Task SchoolDetails_NoHorizontalScroll_OnMobile()
     {
         await Page.SetViewportSizeAsync(375, 667);
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await NavigateToSchoolDetailsAsync();
 
         var hasHorizontalScroll = await Page.EvaluateAsync<bool>(@"
             () => document.documentElement.scrollWidth > document.documentElement.clientWidth
@@ -640,3 +614,4 @@ public class AxeViolation
     public string Description { get; set; } = string.Empty;
     public string Help { get; set; } = string.Empty;
 }
+

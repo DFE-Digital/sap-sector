@@ -22,6 +22,7 @@
                         lat,
                         lon,
                         url: s.url ?? "#",
+                        isComparedSchool: Boolean(s.isComparedSchool),
                     };
                 })
                 .filter(Boolean);
@@ -106,6 +107,8 @@
         }
 
         const fixedZoom = parseInt(host.dataset.fixedZoom || "14", 10);
+        const mode = (host.dataset.mapMode || "all").toLowerCase();
+        const useClusters = mode !== "compare";
 
         // Create map
         mapInstance = L.map(host, { scrollWheelZoom: true }).setView(
@@ -118,46 +121,83 @@
             attribution: "© OpenStreetMap contributors",
         }).addTo(mapInstance);
 
-        // Cluster group: blue circles with numbers
-        const clusters = L.markerClusterGroup({
-            showCoverageOnHover: false,
-            spiderfyOnMaxZoom: true,
+        let clusters = null;
 
-            iconCreateFunction: (cluster) => {
-                const count = cluster.getChildCount();
+        if (useClusters) {
+            // Cluster group: blue circles with numbers
+            clusters = L.markerClusterGroup({
+                showCoverageOnHover: false,
+                spiderfyOnMaxZoom: true,
+                iconCreateFunction: (cluster) => {
+                    const count = cluster.getChildCount();
 
-                let cls = "cluster-yellow";
-                if (count >= 10 && count <= 100) cls = "cluster-orange";
-                if (count > 100) cls = "cluster-red";
+                    let cls = "cluster-yellow";
+                    if (count >= 10 && count <= 100) cls = "cluster-orange";
+                    if (count > 100) cls = "cluster-red";
 
-                return L.divIcon({
-                    html: `<div><span>${count}</span></div>`,
-                    className: `marker-cluster ${cls}`,
-                    iconSize: L.point(40, 40),
-                });
-            },
-        });
+                    return L.divIcon({
+                        html: `<div><span>${count}</span></div>`,
+                        className: `marker-cluster ${cls}`,
+                        iconSize: L.point(40, 40),
+                    });
+                },
+            });
 
-        mapInstance.addLayer(clusters);
+            mapInstance.addLayer(clusters);
+        }
 
 
         // Blue SVG pin at correct size (your svg is 20x25)
-        const schoolIcon = L.icon({
+        // const schoolIcon = L.icon({
+        //     iconUrl: "/assets/images/marker-school.svg",
+        //     iconSize: [20, 25],
+        //     iconAnchor: [10, 24],
+        //     popupAnchor: [0, -22],
+        // });
+
+        const blueSchoolIcon = L.icon({
             iconUrl: "/assets/images/marker-school.svg",
             iconSize: [20, 25],
             iconAnchor: [10, 24],
             popupAnchor: [0, -22],
         });
 
-        // Add markers to clusters
+        const pinkSchoolIcon = L.icon({
+            iconUrl: "/assets/images/marker-school-pink.svg",
+            iconSize: [20, 25],
+            iconAnchor: [10, 24],
+            popupAnchor: [0, -22],
+        });
+
+
+        const markers = []; // collect markers for bounds when NOT clustering
+
         for (const s of schools) {
             const ll = L.latLng(s.lat, s.lon);
-            const m = L.marker(ll, { icon: schoolIcon }).bindPopup(popupHtml(s));
-            clusters.addLayer(m);
+            
+            // const m = L.marker(ll, { icon: schoolIcon }).bindPopup(popupHtml(s));
+
+            let iconToUse = blueSchoolIcon;
+
+            // If compare page (no clusters) and this is the main school → pink
+            if (!useClusters) {
+                iconToUse = s.isComparedSchool ? blueSchoolIcon : pinkSchoolIcon;
+            }
+
+            const m = L.marker(ll, { icon: iconToUse }).bindPopup(popupHtml(s));
+
+            if (useClusters) {
+                clusters.addLayer(m);
+            } else {
+                m.addTo(mapInstance);
+                markers.push(m);
+            }
         }
 
-        // Fit bounds to all markers (including clusters)
-        const bounds = clusters.getBounds();
+        const bounds = useClusters
+            ? clusters.getBounds()
+            : L.featureGroup(markers).getBounds();
+
         if (bounds.isValid()) {
             mapInstance.fitBounds(bounds.pad(0.1), {
                 padding: [40, 40],

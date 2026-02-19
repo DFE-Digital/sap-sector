@@ -1,2 +1,3 @@
 ---
 EXAMPLE_KEY: example value 1
+Lucene__EnableStartupIndexBuilder: "true"

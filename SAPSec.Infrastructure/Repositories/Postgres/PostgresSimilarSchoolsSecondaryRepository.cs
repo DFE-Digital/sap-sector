@@ -98,12 +98,31 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
         var results = await conn.QueryMultipleAsync(sql, new { urn });
 
-        var currentSchoolDao = await results.ReadSingleAsync<SimilarSchoolDao>();
+        var currentSchoolDao = await results.ReadSingleOrDefaultAsync<SimilarSchoolDao>();
         var similarSchoolDaos = await results.ReadAsync<SimilarSchoolDao>();
         var performanceDaos = await results.ReadAsync<SimilarSchoolPerformanceDao>();
 
-        var currentSchoolPerformance = performanceDaos.First(a => a.Id == urn);
-        var similarSchoolsPerformance = performanceDaos.Except([currentSchoolPerformance]);
+        var currentSchoolPerformance = performanceDaos.FirstOrDefault(a => a.Id == urn)
+            ?? new SimilarSchoolPerformanceDao
+            {
+                Id = urn,
+                Attainment8_Tot_Est_Current_Num = string.Empty,
+                Bio59_Sum_Est_Current_Num = string.Empty,
+                Chem59_Sum_Est_Current_Num = string.Empty,
+                CombSci59_Sum_Est_Current_Num = string.Empty,
+                EngLang59_Sum_Est_Current_Num = string.Empty,
+                EngLit59_Sum_Est_Current_Num = string.Empty,
+                EngMaths59_Tot_Est_Current_Num = string.Empty,
+                EngMaths59_Tot_Est_Current_Pct = string.Empty,
+                Maths59_Sum_Est_Current_Num = string.Empty,
+                Physics59_Sum_Est_Current_Num = string.Empty,
+            };
+        var similarSchoolsPerformance = performanceDaos.Where(a => a.Id != urn);
+
+        if (currentSchoolDao == null)
+        {
+            return (BuildEmptySchool(urn, currentSchoolPerformance), []);
+        }
 
         return (
             FromDao(currentSchoolDao, currentSchoolPerformance),
@@ -129,6 +148,33 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         Coordinates = BNGCoordinates.TryParse(sch.Easting, sch.Northing, out var coords) ? coords : null,
         UrbanRuralId = sch.UrbanRuralId,
         UrbanRuralName = sch.UrbanRuralName,
+        Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
+        BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
+        ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),
+        CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Num),
+        EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Num),
+        EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Num),
+        EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Num),
+        MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Num),
+        PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Num),
+    };
+
+    private static SimilarSchool BuildEmptySchool(string urn, SimilarSchoolPerformanceDao perf) => new SimilarSchool
+    {
+        URN = urn,
+        Name = string.Empty,
+        Address = new Address
+        {
+            Street = string.Empty,
+            Locality = string.Empty,
+            Address3 = string.Empty,
+            Town = string.Empty,
+            Postcode = string.Empty
+        },
+        LocalAuthority = new Core.Features.SimilarSchools.LocalAuthority(string.Empty, string.Empty),
+        Coordinates = null,
+        UrbanRuralId = string.Empty,
+        UrbanRuralName = string.Empty,
         Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
         BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
         ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),

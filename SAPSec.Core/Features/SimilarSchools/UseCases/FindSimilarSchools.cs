@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;

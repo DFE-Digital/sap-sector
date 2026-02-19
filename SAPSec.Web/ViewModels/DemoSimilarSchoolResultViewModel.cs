@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Web.ViewModels;
+namespace SAPSec.Web.ViewModels;
 
 public record DemoSimilarSchoolResultViewModel
 {

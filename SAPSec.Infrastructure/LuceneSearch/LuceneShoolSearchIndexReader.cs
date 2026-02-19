@@ -22,15 +22,27 @@ public class LuceneShoolSearchIndexReader(LuceneIndexContext context, LuceneToke
 
         try
         {
-            // Strict query for all but the LAST token
+            // Strict query for all but the LAST token (match on name, street, or postcode)
             var must = new BooleanQuery();
             foreach (var t in tokens.Take(tokens.Count - 1))
             {
-                must.Add(new TermQuery(new Term(FieldName.EstablishmentName, t)), Occur.MUST);
+                var tokenQuery = new BooleanQuery
+                {
+                    { new TermQuery(new Term(FieldName.EstablishmentName, t)), Occur.SHOULD },
+                    { new TermQuery(new Term(FieldName.Street, t)), Occur.SHOULD },
+                    { new TermQuery(new Term(FieldName.Postcode, t)), Occur.SHOULD }
+                };
+                must.Add(tokenQuery, Occur.MUST);
             }
 
-            // Add the LAST token as a PrefixQuery for partial matching
-            must.Add(new PrefixQuery(new Term(FieldName.EstablishmentName, tokens.Last())), Occur.MUST);
+            // Add the LAST token as a PrefixQuery for partial matching (name, street, or postcode)
+            var lastTokenQuery = new BooleanQuery
+            {
+                { new PrefixQuery(new Term(FieldName.EstablishmentName, tokens.Last())), Occur.SHOULD },
+                { new PrefixQuery(new Term(FieldName.Street, tokens.Last())), Occur.SHOULD },
+                { new PrefixQuery(new Term(FieldName.Postcode, tokens.Last())), Occur.SHOULD }
+            };
+            must.Add(lastTokenQuery, Occur.MUST);
 
             //Phrase boost – original order
             var phrase = new PhraseQuery { Slop = 2, Boost = 5f };

@@ -208,6 +208,11 @@
     margin-bottom: govuk-spacing(3);
 }
 
+.app-filter-section--divider {
+    padding-bottom: govuk-spacing(3);
+    border-bottom: 1px solid #B1B4B6;
+}
+
 .app-filter-section__toggle {
     display: flex;
     justify-content: space-between;
@@ -243,6 +248,7 @@
     display: flex;
     align-items: center;
     transition: transform 0.3s ease;
+    color: #0B0C0C;
 }
 
 .app-filter-section__toggle[aria-expanded="false"] .app-filter-section__indicator {
@@ -255,6 +261,11 @@
 
 .app-filter-section__content[hidden] {
     display: none;
+}
+.app-filter-header-divider {
+    border-bottom: 1px solid #DBDBDB;
+    padding-bottom: govuk-spacing(2);
+    margin-bottom: govuk-spacing(2);
 }
 .autocomplete__menu {
     border: none;
@@ -299,13 +310,18 @@
         display: block !important;
     }
 
-    .app-filter-panel {
-        display: none !important;
-    }
+.app-filter-panel {
+    display: none !important;
+}
 
-    .app-filter-panel--visible {
-        display: block !important;
-    }
+.app-filter-panel--visible {
+    display: block !important;
+}
+
+.app-filter-panel--similar {
+    width: 280px;
+    padding: 15px;
+}
 
     .moj-filter__options .govuk-button {
         width: auto !important;
