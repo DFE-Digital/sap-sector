@@ -60,7 +60,7 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.Urn.Should().Be("123456");
-        result.Ukprn.Should().Be("10012345");
+        result.Ukprn.Value.Should().Be("10012345");
     }
 
     [Fact]

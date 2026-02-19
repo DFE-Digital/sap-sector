@@ -12,7 +12,7 @@ public sealed class SenUnitRule : IBusinessRule<bool>
 {
     public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
-        var provision = establishment.ResourcedProvisionId;
+        var provision = establishment.ResourcedProvisionName;
 
         // Empty or explicitly no provision
         if (ResourcedProvisionValues.IsNoProvision(provision))
