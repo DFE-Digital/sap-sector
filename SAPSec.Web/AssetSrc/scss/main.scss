@@ -262,6 +262,12 @@
 .app-filter-section__content[hidden] {
     display: none;
 }
+
+.app-filter-inset-light-blue {
+    background-color: #e8f4fd;
+    border-left: 0;
+}
+
 .app-filter-header-divider {
     border-bottom: 1px solid #DBDBDB;
     padding-bottom: govuk-spacing(2);

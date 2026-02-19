@@ -5,6 +5,7 @@
     var hasActiveFilters = Model.FilterOptions.Any(f => f.Options.Any(o => o.Selected));
     var isExpanded = hasActiveFilters ? "true" : "false";
     var panelVisibleClass = hasActiveFilters ? "app-filter-panel--visible" : "";
+    var groupedFilters = GetGroupedFilters();
 }
 
 <div class="govuk-grid-column-one-third app-filter-column">
@@ -67,13 +68,20 @@
                         <span class="app-button-text">Apply filters</span>
                     </button>
 
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Filters</legend>
-                        @foreach (var filter in Model.FilterOptions)
-                        {
-                            <partial name="SimilarSchoolsFilterSection" model="filter" />
-                        }
-                    </fieldset>
+                    @foreach (var group in groupedFilters)
+                    {
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">@group.Heading</legend>
+                            @for (var i = 0; i < group.Filters.Count; i++)
+                            {
+                                var filter = group.Filters[i];
+                                var isLastInGroup = i == group.Filters.Count - 1;
+                                <partial name="SimilarSchoolsFilterSection"
+                                         model="filter"
+                                         view-data='new ViewDataDictionary(ViewData) { ["IsLastInGroup"] = isLastInGroup }' />
+                            }
+                        </fieldset>
+                    }
                 </div>
             </div>
         </div>
@@ -115,6 +123,41 @@
         }
 
         return parts.Count > 1 ? "?" + string.Join("&", parts) : "";
+    }
+
+    List<(string Heading, List<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> Filters)> GetGroupedFilters()
+    {
+        var categoryKeys = new List<(string Heading, List<string> Keys)>
+        {
+            ("Location", new List<string> { "dist", "ur" }),
+            ("School characteristics", new List<string> { "gender", "admissions", "phase", "type", "size", "sixthform", "nursery", "sen", "resourced" }),
+            ("Attendance", new List<string> { "overallabsence", "persistentabsence" })
+        };
+
+        var grouped = new List<(string Heading, List<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> Filters)>();
+
+        foreach (var (heading, keys) in categoryKeys)
+        {
+            var filters = keys
+                .Select(key => Model.FilterOptions.FirstOrDefault(f => f.Key.Equals(key, StringComparison.InvariantCultureIgnoreCase)))
+                .Where(f => f != null)
+                .Cast<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter>()
+                .ToList();
+
+            if (filters.Any())
+            {
+                grouped.Add((heading, filters));
+            }
+        }
+
+        var knownKeys = categoryKeys.SelectMany(kvp => kvp.Keys).ToHashSet(StringComparer.InvariantCultureIgnoreCase);
+        var remaining = Model.FilterOptions.Where(f => !knownKeys.Contains(f.Key)).ToList();
+        if (remaining.Any())
+        {
+            grouped.Add(("Other filters", remaining));
+        }
+
+        return grouped;
     }
 }
 
