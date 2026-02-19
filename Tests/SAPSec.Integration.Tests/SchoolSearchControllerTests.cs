@@ -2,7 +2,6 @@
 using System.Text.Json;
 using FluentAssertions;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Infrastructure.Entities;
 using SAPSec.Integration.Tests.Infrastructure;
 
 namespace SAPSec.Integration.Tests;

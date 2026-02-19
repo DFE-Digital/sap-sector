@@ -206,6 +206,39 @@ public static class DataWithAvailability
     }
 
     /// <summary>
+    /// Maps a string value to DataWithAvailability, handling GIAS special codes.
+    /// </summary>
+    public static DataWithAvailability<string> FromStringWithCodes(string? code, string? name)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return NotAvailable<string>();
+        }
+
+        if (EesDataCodes.IsRedacted(code))
+        {
+            return Redacted<string>();
+        }
+
+        if (EesDataCodes.IsNotApplicable(code))
+        {
+            return NotApplicable<string>();
+        }
+
+        if (EesDataCodes.IsNotAvailable(code))
+        {
+            return NotAvailable<string>();
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return NotAvailable<string>();
+        }
+
+        return Available(name);
+    }
+
+    /// <summary>
     /// Maps a string value that cannot have special codes.
     /// </summary>
     public static DataWithAvailability<string> FromStringWithoutCodes(string? value)

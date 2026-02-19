@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace SAPData;
 
@@ -294,62 +295,77 @@ public sealed class GenerateViews
         sb.AppendLine();
         sb.AppendLine("CREATE MATERIALIZED VIEW v_establishment AS");
         sb.AppendLine("SELECT");
-        sb.AppendLine("    t.\"urn\"                                 AS \"URN\",");
-        sb.AppendLine("    t.\"la__code_\"                           AS \"LAId\",");
-        sb.AppendLine("    t.\"la__name_\"                           AS \"LAName\",");
-        sb.AppendLine("    clean_int(t.\"gor__code_\")               AS \"RegionId\",");
-        sb.AppendLine("    t.\"gor__name_\"                          AS \"RegionName\",");
-        sb.AppendLine("    t.\"establishmentname\"                   AS \"EstablishmentName\",");
-        sb.AppendLine("    clean_int(t.\"establishmentnumber\")      AS \"EstablishmentNumber\",");
+        sb.AppendLine("    t.\"urn\"                                      AS \"URN\",");
+        sb.AppendLine("    t.\"la__code_\"                                AS \"LAId\",");
+        sb.AppendLine("    t.\"la__name_\"                                AS \"LAName\",");
+        sb.AppendLine("    t.\"gor__code_\"                               AS \"RegionId\",");
+        sb.AppendLine("    t.\"gor__name_\"                               AS \"RegionName\",");
+        sb.AppendLine("    t.\"establishmentname\"                        AS \"EstablishmentName\",");
+        sb.AppendLine("    clean_int(t.\"establishmentnumber\")           AS \"EstablishmentNumber\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"trusts__code_\")            AS \"TrustsId\",");
-        sb.AppendLine("    t.\"trusts__name_\"                       AS \"TrustName\",");
+        sb.AppendLine("    clean_int(t.\"trusts__code_\")                 AS \"TrustsId\",");
+        sb.AppendLine("    t.\"trusts__name_\"                            AS \"TrustName\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"admissionspolicy__code_\")  AS \"AdmissionsPolicyId\",");
-        sb.AppendLine("    t.\"admissionspolicy__name_\"             AS \"AdmissionPolicy\",");
+        sb.AppendLine("    clean_int(t.\"admissionspolicy__code_\")       AS \"AdmissionsPolicyId\",");
+        sb.AppendLine("    t.\"admissionspolicy__name_\"                  AS \"AdmissionsPolicyName\",");
         sb.AppendLine();
-        sb.AppendLine("    t.\"districtadministrative__code_\"       AS \"DistrictAdministrativeId\",");
-        sb.AppendLine("    t.\"districtadministrative__name_\"       AS \"DistrictAdministrativeName\",");
+        sb.AppendLine("    t.\"districtadministrative__code_\"            AS \"DistrictAdministrativeId\",");
+        sb.AppendLine("    t.\"districtadministrative__name_\"            AS \"DistrictAdministrativeName\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"phaseofeducation__code_\")  AS \"PhaseOfEducationId\",");
-        sb.AppendLine("    t.\"phaseofeducation__name_\"             AS \"PhaseOfEducationName\",");
+        sb.AppendLine("    clean_int(t.\"phaseofeducation__code_\")       AS \"PhaseOfEducationId\",");
+        sb.AppendLine("    t.\"phaseofeducation__name_\"                  AS \"PhaseOfEducationName\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"gender__code_\")            AS \"GenderId\",");
-        sb.AppendLine("    t.\"gender__name_\"                       AS \"GenderName\",");
+        sb.AppendLine("    clean_int(t.\"gender__code_\")                 AS \"GenderId\",");
+        sb.AppendLine("    t.\"gender__name_\"                            AS \"GenderName\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"officialsixthform__code_\") AS \"OfficialSixthFormId\",");
-        sb.AppendLine("    clean_int(t.\"religiouscharacter__code_\") AS \"ReligiousCharacterId\",");
-        sb.AppendLine("    t.\"religiouscharacter__name_\"           AS \"ReligiousCharacterName\",");
+        sb.AppendLine("    clean_int(t.\"religiouscharacter__code_\")     AS \"ReligiousCharacterId\",");
+        sb.AppendLine("    t.\"religiouscharacter__name_\"                AS \"ReligiousCharacterName\",");
         sb.AppendLine();
-        sb.AppendLine("    t.\"telephonenum\"                        AS \"TelephoneNum\",");
-        sb.AppendLine("    clean_int(t.\"numberofpupils\")           AS \"TotalPupils\",");
+        sb.AppendLine("    t.\"telephonenum\"                             AS \"TelephoneNum\",");
+        sb.AppendLine("    clean_int(t.\"schoolcapacity\")                AS \"TotalCapacity\",");
+        sb.AppendLine("    clean_int(t.\"numberofpupils\")                AS \"TotalPupils\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"typeofestablishment__code_\") AS \"TypeOfEstablishmentId\",");
-        sb.AppendLine("    t.\"typeofestablishment__name_\"          AS \"TypeOfEstablishmentName\",");
+        sb.AppendLine("    clean_int(t.\"typeofestablishment__code_\")    AS \"TypeOfEstablishmentId\",");
+        sb.AppendLine("    t.\"typeofestablishment__name_\"               AS \"TypeOfEstablishmentName\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"resourcedprovisiononroll\") AS \"ResourcedProvision\",");
-        sb.AppendLine("    t.\"typeofresourcedprovision__name_\"     AS \"ResourcedProvisionName\",");
+        sb.AppendLine("    clean_int(t.\"establishmenttypegroup__code_\") AS \"EstablishmentTypeGroupId\",");
+        sb.AppendLine("    t.\"establishmenttypegroup__name_\"            AS \"EstablishmentTypeGroupName\",");
         sb.AppendLine();
-        sb.AppendLine("    clean_int(t.\"ukprn\")                    AS \"UKPRN\",");
+        sb.AppendLine("    clean_int(t.\"resourcedprovisiononroll\")      AS \"ResourcedProvisionId\",");
+        sb.AppendLine("    t.\"typeofresourcedprovision__name_\"          AS \"ResourcedProvisionName\",");
         sb.AppendLine();
-        sb.AppendLine("    t.\"street\"                              AS \"Street\",");
-        sb.AppendLine("    t.\"locality\"                            AS \"Locality\",");
-        sb.AppendLine("    t.\"address3\"                            AS \"Address3\",");
-        sb.AppendLine("    t.\"town\"                                AS \"Town\",");
-        sb.AppendLine("    t.\"county__name_\"                       AS \"County\",");
-        sb.AppendLine("    t.\"postcode\"                            AS \"Postcode\",");
+        sb.AppendLine("    t.\"nurseryprovision__name_\"                  AS \"NurseryProvisionName\",");
         sb.AppendLine();
-        sb.AppendLine("    t.\"headtitle__name_\"                    AS \"HeadTitle\",");
-        sb.AppendLine("    t.\"headfirstname\"                       AS \"HeadFirstName\",");
-        sb.AppendLine("    t.\"headlastname\"                        AS \"HeadLastName\",");
-        sb.AppendLine("    t.\"headpreferredjobtitle\"               AS \"HeadPreferredJobTitle\",");
+        sb.AppendLine("    clean_int(t.\"officialsixthform__code_\")      AS \"OfficialSixthFormId\",");
+        sb.AppendLine("    t.\"officialsixthform__name_\"                 AS \"OfficialSixthFormName\",");
         sb.AppendLine();
-        sb.AppendLine("    t.\"urbanrural__code_\"                   AS \"UrbanRuralId\",");
-        sb.AppendLine("    t.\"urbanrural__name_\"                   AS \"UrbanRuralName\",");
+        sb.AppendLine("    clean_int(t.\"trustschoolflag__code_\")        AS \"TrustSchoolFlagId\",");
+        sb.AppendLine("    t.\"trustschoolflag__name_\"                   AS \"TrustSchoolFlagName\",");
         sb.AppendLine();
-        sb.AppendLine("    t.\"schoolwebsite\"                       AS \"Website\",");
-        sb.AppendLine("    clean_int(t.\"easting\")                  AS \"Easting\",");
-        sb.AppendLine("    clean_int(t.\"northing\")                 AS \"Northing\"");
+        sb.AppendLine("    clean_int(t.\"ukprn\")                         AS \"UKPRN\",");
+        sb.AppendLine();
+        sb.AppendLine("    t.\"street\"                                   AS \"Street\",");
+        sb.AppendLine("    t.\"locality\"                                 AS \"Locality\",");
+        sb.AppendLine("    t.\"address3\"                                 AS \"Address3\",");
+        sb.AppendLine("    t.\"town\"                                     AS \"Town\",");
+        sb.AppendLine("    t.\"county__name_\"                            AS \"County\",");
+        sb.AppendLine("    t.\"postcode\"                                 AS \"Postcode\",");
+        sb.AppendLine();
+        sb.AppendLine("    t.\"headtitle__name_\"                         AS \"HeadTitle\",");
+        sb.AppendLine("    t.\"headfirstname\"                            AS \"HeadFirstName\",");
+        sb.AppendLine("    t.\"headlastname\"                             AS \"HeadLastName\",");
+        sb.AppendLine("    t.\"headpreferredjobtitle\"                    AS \"HeadPreferredJobTitle\",");
+        sb.AppendLine();
+        sb.AppendLine("    t.\"urbanrural__code_\"                        AS \"UrbanRuralId\",");
+        sb.AppendLine("    t.\"urbanrural__name_\"                        AS \"UrbanRuralName\",");
+        sb.AppendLine();
+        sb.AppendLine("    t.\"schoolwebsite\"                            AS \"Website\",");
+        sb.AppendLine();
+        sb.AppendLine("    clean_int(t.\"easting\")                       AS \"Easting\",");
+        sb.AppendLine("    clean_int(t.\"northing\")                      AS \"Northing\",");
+        sb.AppendLine();
+        sb.AppendLine("    clean_int(t.\"statutorylowage\")               AS \"AgeRangeLow\",");
+        sb.AppendLine("    clean_int(t.\"statutoryhighage\")              AS \"AgeRangeHigh\"");
         sb.AppendLine($"FROM {rawTable} t;");
         sb.AppendLine();
         sb.AppendLine("CREATE UNIQUE INDEX idx_v_establishment_urn ON v_establishment (\"URN\");");
@@ -687,13 +703,23 @@ public sealed class GenerateViews
         var r = rows.First();
         var conditions = new List<string>();
         static string SqlLiteral(string? s) => (s ?? "").Replace("'", "''");
+        static string Condition(string filter, string filterValue) =>
+            "(" + string.Join(" OR ", filterValue.Split('+').Select(p => $"t.\"{DbCol(filter)}\" = '{SqlLiteral(p)}'")) + ")";
 
         if (!string.IsNullOrWhiteSpace(r.Filter))
-            conditions.Add($"t.\"{DbCol(r.Filter)}\" = '{SqlLiteral(r.FilterValue)}'");
+        {
+            conditions.Add(Condition(r.Filter, r.FilterValue));
+        }
+
         if (!string.IsNullOrWhiteSpace(r.Filter2))
-            conditions.Add($"t.\"{DbCol(r.Filter2)}\" = '{SqlLiteral(r.Filter2Value)}'");
+        {
+            conditions.Add(Condition(r.Filter2, r.Filter2Value));
+        }
+
         if (!string.IsNullOrWhiteSpace(r.Filter3))
-            conditions.Add($"t.\"{DbCol(r.Filter3)}\" = '{SqlLiteral(r.Filter3Value)}'");
+        {
+            conditions.Add(Condition(r.Filter3, r.Filter3Value));
+        }
 
         var whenClause = conditions.Count == 0 ? "TRUE" : string.Join(" AND ", conditions);
 

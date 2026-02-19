@@ -1,7 +1,6 @@
 ﻿using Lucene.Net.Index;
 using Lucene.Net.Search;
 using SAPSec.Core.Model;
-using SAPSec.Infrastructure.Entities;
 using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;

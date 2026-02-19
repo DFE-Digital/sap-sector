@@ -16,11 +16,11 @@
     {
         if (o.Selected)
         {
-            <li><strong>@o.Name @(o.Selected ? "(selected)" : "")</strong></li>
+            <li>@o.Key: <strong>@o.Name @(o.Selected ? "(selected)" : "")</strong></li>
         }
         else
         {
-            <li><a href="?sort=@o.Key">@o.Name</a></li>
+            <li>@o.Key: <a href="@(Model.CurrentUrl)&sort=@o.Key">@o.Name</a></li>
         }
     }
 </ul>
@@ -39,16 +39,16 @@
             {
                 if (o.Selected)
                 {
-                    <li><strong>@o.Name @(o.Selected ? "(selected)" : "")</strong></li>
+                    <li>@o.Key: <strong>@o.Name @(o.Selected ? "(selected)" : "")</strong></li>
                 }
                 else
                 {
-                    <li><a href="?@filter.Key=@o.Key">@o.Name</a></li>
+                    <li>@o.Key: <a href="@(Model.CurrentUrl)&@filter.Key=@o.Key">@o.Name</a></li>
                 }
             }
             </ul>
 
-            This school: @filter.CurrentSchoolValue
+            This school: @filter.CurrentSchoolValue.Display()
         </li>
     }
 </ul>

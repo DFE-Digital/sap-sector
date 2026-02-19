@@ -7,6 +7,7 @@ namespace SAPSec.Web.ViewModels;
 public record DemoSimilarSchoolsViewModel
 {
     public required string Name { get; set; }
+    public required string CurrentUrl { get; set; }
     public required IEnumerable<SortOption> SortOptions { get; set; }
     public required IEnumerable<SimilarSchoolsAvailableFilter> FilterOptions { get; set; }
     public required IPagedCollection<DemoSimilarSchoolResultViewModel> ResultsPage { get; set; }
