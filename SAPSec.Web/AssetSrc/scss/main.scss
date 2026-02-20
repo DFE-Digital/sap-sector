@@ -749,3 +749,13 @@
         margin-right: 15px;
     }
     }
+
+.compare-nav {
+  background-color: transparent !important;
+}
+
+.compare-nav .govuk-service-navigation__item--active
+.govuk-service-navigation__link {
+  font-weight: 700;
+  color: #0b0c0c;
+}

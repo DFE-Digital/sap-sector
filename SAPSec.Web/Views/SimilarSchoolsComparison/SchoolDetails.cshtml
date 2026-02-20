@@ -5,7 +5,6 @@
 @using SAPSec.Web.ViewModels
 @model SimilarSchoolsComparisonViewModel
 @{
-    
     Layout = "_Layout";
 
     var inv = CultureInfo.InvariantCulture;
@@ -14,13 +13,13 @@
     {
         new
         {
-            urn = "", 
+            urn = "",
             name = Model.Name,
-            address = "", 
+            address = "",
             la = "",
             lat = Model.CurrentSchoolLatitude,
             lon = Model.CurrentSchoolLongitude,
-            url = "#", 
+            url = (string?)null,
             isMain = true,
             isComparedSchool = false
         },
@@ -32,7 +31,7 @@
             la = "",
             lat = Model.SimilarSchoolLatitude,
             lon = Model.SimilarSchoolLongitude,
-            url = "#", 
+            url = (string?)null,
             isMain = false,
             isComparedSchool = true
         }
@@ -61,7 +60,7 @@
              aria-label="Map of schools">
             <div class="map-loading">Loading map…</div>
         </div>
-        
+
         <div class="govuk-!-margin-top-4">
             <span class="school-legend-item govuk-!-margin-right-8">
                 <img
@@ -106,30 +105,47 @@
                 <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.HeadteacherName.Display()</dd>
             </div>
 
+
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Website</dt>
-                <dd class="govuk-summary-list__value">
-                    <a class="govuk-link"
-                       href="@Model.SimilarSchoolDetails.Website.Value"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        @Model.SimilarSchoolDetails.Website.Value (opens in a new tab)
-                    </a>
-                </dd>
+                @if (Model.SimilarSchoolDetails.Website.IsAvailable)
+                {
+                    <dd class="govuk-summary-list__value">
+                        <a class="govuk-link"
+                           href="@Model.SimilarSchoolDetails.Website.Value"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            @Model.SimilarSchoolDetails.Website.Value (opens in a new tab)
+                        </a>
+                    </dd>
+                }
+                else
+                {
+                    <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Website.Display()</dd>
+                }
             </div>
+
 
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Telephone</dt>
                 <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Telephone.Display()</dd>
             </div>
 
+
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Email</dt>
-                <dd class="govuk-summary-list__value">
-                    <a class="govuk-link" href="mailto:@Model.SimilarSchoolDetails.Email.Display()">
-                        @Model.SimilarSchoolDetails.Email.Display()
-                    </a>
-                </dd>
+                @if (Model.SimilarSchoolDetails.Email.IsAvailable)
+                {
+                    <dd class="govuk-summary-list__value">
+                        <a class="govuk-link" href="mailto:@Model.SimilarSchoolDetails.Email.Display()">
+                            @Model.SimilarSchoolDetails.Email.Display()
+                        </a>
+                    </dd>
+                }
+                else
+                {
+                    <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Email.Display()</dd>
+                }
             </div>
 
         </dl>
@@ -266,35 +282,6 @@
     </div>
 </details>
 
-@* Contact Section *@
-<h2 class="govuk-heading-m">Contact details</h2>
-<dl class="govuk-summary-list govuk-!-margin-bottom-9">
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Headteacher / Principal</dt>
-        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.HeadteacherName.Display()</dd>
-    </div>
-    @if (Model.SimilarSchoolDetails.Website.IsAvailable)
-    {
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Website</dt>
-            <dd class="govuk-summary-list__value">
-                <a href="@Model.SimilarSchoolDetails.Website.Value" class="govuk-link" target="_blank"
-                   rel="noopener noreferrer">
-                    @Model.SimilarSchoolDetails.Website.Value (opens in a new tab)
-                </a>
-            </dd>
-        </div>
-    }
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Telephone</dt>
-        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Telephone.Display()</dd>
-    </div>
-    <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Email</dt>
-        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Email.Display()</dd>
-    </div>
-</dl>
-
 @* Further Information Section *@
 <h2 class="govuk-heading-m">Further information</h2>
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
@@ -312,11 +299,12 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Information from other services</dt>
             <dd class="govuk-summary-list__value">
-                <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.SimilarSchoolDetails.Urn.Value"
-                   class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    Financial benchmarking and insights tool (opens in a new tab)
-                </a>
-                <br/>
+                <div class="govuk-!-margin-bottom-2">
+                    <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.SimilarSchoolDetails.Urn.Value"
+                       class="govuk-link" target="_blank" rel="noopener noreferrer">
+                        Financial benchmarking and insights tool (opens in a new tab)
+                    </a>
+                </div>
                 <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/@Model.SimilarSchoolDetails.Urn.Value"
                    class="govuk-link" target="_blank" rel="noopener noreferrer">
                     Get information about schools (opens in a new tab)
@@ -350,7 +338,6 @@
 
 <script type="application/json" id="schools-data">
 @Html.Raw(json)
-
 
 </script>
 

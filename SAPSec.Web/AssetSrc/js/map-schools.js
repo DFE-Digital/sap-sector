@@ -21,7 +21,7 @@
                         la: s.la ?? "",
                         lat,
                         lon,
-                        url: s.url ?? "#",
+                        url: s.url ,
                         isComparedSchool: Boolean(s.isComparedSchool),
                     };
                 })
@@ -44,18 +44,26 @@
     function popupHtml(s) {
         const name = escapeHtml(s.name || "School");
         const address = escapeHtml(s.address || "");
-        const url = s.url || "#";
+
+        const hasUrl =
+            typeof s.url === "string" &&
+            s.url.trim().length > 0;
+
+        const nameHtml = hasUrl
+            ? `<a class="govuk-link govuk-link--no-visited-state popup-name" href="${s.url}">
+               <strong>${name}</strong>
+           </a>`
+            : `<strong class="popup-name">${name}</strong>`;
 
         return `
-    <div class="map-popup">
-      <a class="govuk-link govuk-link--no-visited-state popup-name" href="${url}">
-        <strong>${name}</strong>
-      </a>
-      <div class="popup-gap"></div>
-      <span class="popup-address">${address}</span>
-    </div>
-  `;
+        <div class="map-popup">
+            ${nameHtml}
+            <div class="popup-gap"></div>
+            <span class="popup-address">${address}</span>
+        </div>
+    `;
     }
+
 
 
     function renderSchoolList(schools) {
@@ -70,19 +78,24 @@
         listEl.innerHTML = `
       <ul class="govuk-list govuk-list--bullet">
         ${schools
-            .map(
-                (s) => `
-          <li>
-            <a class="govuk-link govuk-link--no-visited-state" href="${s.url}">
-              ${escapeHtml(s.name)}
-            </a><br/>
-            <span>${escapeHtml(s.address)}</span>
-          </li>`
-            )
+            .map((s) => {
+                const nameHtml = s.url
+                    ? `<a class="govuk-link govuk-link--no-visited-state" href="${s.url}">
+                         ${escapeHtml(s.name)}
+                       </a>`
+                    : `<span>${escapeHtml(s.name)}</span>`;
+
+                return `
+                  <li>
+                    ${nameHtml}<br/>
+                    <span>${escapeHtml(s.address)}</span>
+                  </li>`;
+            })
             .join("")}
       </ul>
     `;
     }
+
 
     function initMap() {
         const host = document.getElementById("map");
@@ -146,15 +159,7 @@
             mapInstance.addLayer(clusters);
         }
 
-
-        // Blue SVG pin at correct size (your svg is 20x25)
-        // const schoolIcon = L.icon({
-        //     iconUrl: "/assets/images/marker-school.svg",
-        //     iconSize: [20, 25],
-        //     iconAnchor: [10, 24],
-        //     popupAnchor: [0, -22],
-        // });
-
+        
         const blueSchoolIcon = L.icon({
             iconUrl: "/assets/images/marker-school.svg",
             iconSize: [20, 25],

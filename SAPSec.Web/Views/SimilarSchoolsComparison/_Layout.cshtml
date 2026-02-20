@@ -5,14 +5,17 @@
     Layout = "Views/Shared/_Layout";
 
     var comparisonModel = ViewData["ComparisonSchool"] as SimilarSchoolsComparisonViewModel;
-    
+
     var currentController = (string?)ViewContext.RouteData.Values["controller"];
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
 
     var routeValues = new Dictionary<string, object>();
-    
+
     routeValues["urn"] = comparisonModel.Urn;
     routeValues["similarSchoolUrn"] = comparisonModel.SimilarSchoolUrn;
+
+    string active(bool condition)
+        => condition ? "govuk-service-navigation__item--active" : "";
 }
 
 
@@ -41,17 +44,15 @@
         </a>
     </div>
 
-    @{
-        string selected(bool condition)
-            => condition ? "moj-sub-navigation__item--selected" : "";
-    }
+
     <div class="app-body-container-with-side-navigation">
 
         <span class="govuk-caption-l govuk-!-font-size-27">
             @comparisonModel.Name
         </span>
 
-        <span class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold">
+        <span
+            class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-padding-top-2 govuk-!-padding-bottom-2">
             Comparing to
         </span>
 
@@ -59,53 +60,62 @@
             @comparisonModel.SimilarSchoolName
         </h1>
 
-        <nav class="moj-sub-navigation moj-sub-navigation--inline"
-             aria-label="Compare sections">
-            <ul class="moj-sub-navigation__list">
+        <div class="govuk-service-navigation compare-nav">
 
-                <li class="moj-sub-navigation__item @selected(currentAction == "Index")">
-                    <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Index", "SimilarSchoolsComparison", routeValues)"
-                       aria-current="@(currentAction == "Index" ? "page" : null)">
-                        Similarity
-                    </a>
-                </li>
+            <div class="govuk-width-container">
+                <div class="govuk-service-navigation__container">
 
-                <li class="moj-sub-navigation__item @selected(currentAction == "Ks4HeadlineMeasures")">
-                    <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Ks4HeadlineMeasures", "SimilarSchoolsComparison", routeValues)"
-                       aria-current="@(currentAction == "Ks4HeadlineMeasures" ? "page" : null)">
-                        KS4 headline measures
-                    </a>
-                </li>
+                    <nav aria-label="Compare sections"
+                         class="govuk-service-navigation__wrapper">
 
-                <li class="moj-sub-navigation__item @selected(currentAction == "Ks4CoreSubjects")">
-                    <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Ks4CoreSubjects", "SimilarSchoolsComparison", routeValues)"
-                       aria-current="@(currentAction == "Ks4CoreSubjects" ? "page" : null)">
-                        KS4 core subjects
-                    </a>
-                </li>
+                        <ul class="govuk-service-navigation__list">
 
-                <li class="moj-sub-navigation__item @selected(currentAction == "Attendance")">
-                    <a class="moj-sub-navigation__link"
-                       href="@Url.Action("Attendance", "SimilarSchoolsComparison", routeValues)"
-                       aria-current="@(currentAction == "Attendance" ? "page" : null)">
-                        Attendance
-                    </a>
-                </li>
+                            <li class="govuk-service-navigation__item @active(currentAction == "Index")">
+                                <a class="govuk-service-navigation__link"
+                                   href="@Url.Action("Index", "SimilarSchoolsComparison", routeValues)"
+                                   aria-current="@(currentAction == "Index" ? "true" : null)">
+                                    Similarity
+                                </a>
+                            </li>
 
-                <li class="moj-sub-navigation__item @selected(currentAction == "SchoolDetails")">
-                    <a class="moj-sub-navigation__link"
-                       href="@Url.Action("SchoolDetails", "SimilarSchoolsComparison", routeValues)"
-                       aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
-                        School details
-                    </a>
-                </li>
+                            <li class="govuk-service-navigation__item @active(currentAction == "Ks4HeadlineMeasures")">
+                                <a class="govuk-service-navigation__link"
+                                   href="@Url.Action("Ks4HeadlineMeasures", "SimilarSchoolsComparison", routeValues)"
+                                   aria-current="@(currentAction == "Ks4HeadlineMeasures" ? "true" : null)">
+                                    KS4 headline measures
+                                </a>
+                            </li>
 
-            </ul>
-        </nav>
+                            <li class="govuk-service-navigation__item @active(currentAction == "Ks4CoreSubjects")">
+                                <a class="govuk-service-navigation__link"
+                                   href="@Url.Action("Ks4CoreSubjects", "SimilarSchoolsComparison", routeValues)"
+                                   aria-current="@(currentAction == "Ks4CoreSubjects" ? "true" : null)">
+                                    KS4 core subjects
+                                </a>
+                            </li>
 
+                            <li class="govuk-service-navigation__item @active(currentAction == "Attendance")">
+                                <a class="govuk-service-navigation__link"
+                                   href="@Url.Action("Attendance", "SimilarSchoolsComparison", routeValues)"
+                                   aria-current="@(currentAction == "Attendance" ? "true" : null)">
+                                    Attendance
+                                </a>
+                            </li>
+
+                            <li class="govuk-service-navigation__item @active(currentAction == "SchoolDetails")">
+                                <a class="govuk-service-navigation__link"
+                                   href="@Url.Action("SchoolDetails", "SimilarSchoolsComparison", routeValues)"
+                                   aria-current="@(currentAction == "SchoolDetails" ? "true" : null)">
+                                    School details
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </nav>
+                </div>
+            </div>
+        </div>
 
         <div class="govuk-!-margin-top-6">
             @RenderBody()
