@@ -297,13 +297,18 @@
 
 .app-similar-schools-sort__label {
     @include govuk-font($size: 16);
+    font-weight: 700;
     margin-bottom: 0;
 }
 
 .app-similar-schools-sort__select {
     width: 8px;
-    min-width: 320px;
+    min-width: 180px;
     max-width: 100%;
+}
+
+.app-similar-schools-filter-column {
+    margin-top: govuk-spacing(4);
 }
 .autocomplete__menu {
     border: none;
