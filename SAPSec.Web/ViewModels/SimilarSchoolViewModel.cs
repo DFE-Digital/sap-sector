@@ -48,6 +48,8 @@ public class SimilarSchoolViewModel
     
     public string? Latitude { get; set; }
     public string? Longitude { get; set; }
+    public string SortMetricName { get; set; } = "Attainment 8";
+    public string SortMetricDisplayValue { get; set; } = "N/A";
 
     public string FullAddress
     {

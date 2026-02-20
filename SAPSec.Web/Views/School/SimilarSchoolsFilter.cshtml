@@ -38,14 +38,6 @@
                             <div class="moj-filter__heading-title">
                                 <h2 class="govuk-heading-s">Selected filters</h2>
                             </div>
-                            <div class="moj-filter__heading-action">
-                                <p>
-                                    <a class="govuk-link govuk-link--no-visited-state"
-                                       href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })">
-                                        Clear filters
-                                    </a>
-                                </p>
-                            </div>
                         </div>
 
                         <ul class="moj-filter-tags">
@@ -58,6 +50,13 @@
                                 </li>
                             }
                         </ul>
+
+                        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+                            <a class="govuk-link govuk-link--no-visited-state"
+                               href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })">
+                                Clear filters
+                            </a>
+                        </p>
                     </div>
                 }
 

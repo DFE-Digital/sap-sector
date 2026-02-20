@@ -217,7 +217,11 @@ public class SimilarSchoolsController : Controller
             Latitude = result.Coordinates?.Latitude.ToString(),
             Longitude = result.Coordinates?.Longitude.ToString(),
             UrbanOrRural = school.UrbanRuralName,
-            Att8Scr = school.Attainment8Score.HasValue ? (double?)school.Attainment8Score.Value : null
+            Att8Scr = school.Attainment8Score.HasValue ? (double?)school.Attainment8Score.Value : null,
+            SortMetricName = result.SortValue.Name,
+            SortMetricDisplayValue = result.SortValue.Value.HasValue
+                ? result.SortValue.Value.Value.ToString("0.#")
+                : "N/A"
         };
     }
 }

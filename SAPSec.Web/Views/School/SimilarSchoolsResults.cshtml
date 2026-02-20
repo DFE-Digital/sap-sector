@@ -4,9 +4,9 @@
 @if (Model.Schools.Any())
 {
     @* Sort dropdown *@
-    <div class="govuk-form-group govuk-!-margin-bottom-4">
-        <label class="govuk-label govuk-!-display-inline govuk-!-font-weight-bold" for="sort-by">Sort by</label>
-        <select class="govuk-select" id="sort-by" name="sortBy" form="similar-schools-filter-form">
+    <div class="govuk-form-group app-similar-schools-sort">
+        <label class="govuk-label app-similar-schools-sort__label" for="sort-by">Sort by</label>
+        <select class="govuk-select app-similar-schools-sort__select" id="sort-by" name="sortBy" form="similar-schools-filter-form">
             @foreach (var option in Model.SortOptions)
             {
                 <option value="@option.Key" selected="@(option.Selected ? "selected" : null)">@option.Name</option>
@@ -37,7 +37,7 @@
                     @school.FullAddress
                 </p>
                 <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                    <strong>Attainment 8:</strong> @(school.Att8Scr.HasValue? school.Att8Scr.Value.ToString("F0") : "N/A")
+                    <strong>@school.SortMetricName:</strong> @school.SortMetricDisplayValue
                 </p>
             </li>
         }
