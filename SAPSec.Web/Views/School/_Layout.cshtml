@@ -43,25 +43,25 @@
                         : "";
                 }
                 <li class="app-side-navigation__item @selected("item", currentAction == "Index")">
-                    <a href=@Url.Action("Index", routeAttributes) 
+                    <a href=@Url.Action("Index", "School", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "Index")">
                         Overview
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "Ks4HeadlineMeasures")">
-                    <a href=@Url.Action("Ks4HeadlineMeasures", routeAttributes) 
+                    <a href=@Url.Action("Ks4HeadlineMeasures", "School", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "Ks4HeadlineMeasures")">
                         KS4 headline measures
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "Ks4CoreSubjects")">
-                    <a href=@Url.Action("Ks4CoreSubjects", routeAttributes) 
+                    <a href=@Url.Action("Ks4CoreSubjects", "School", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "Ks4CoreSubjects")">
                         KS4 core subjects
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "Attendance")">
-                    <a href=@Url.Action("Attendance", routeAttributes) 
+                    <a href=@Url.Action("Attendance", "School", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "Attendance")">
                         Attendance
                     </a>
@@ -79,13 +79,13 @@
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "SchoolDetails")">
-                    <a href=@Url.Action("SchoolDetails", routeAttributes) 
+                    <a href=@Url.Action("SchoolDetails", "School", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "SchoolDetails")">
                         School details
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "WhatIsASimilarSchool")">
-                    <a href=@Url.Action("WhatIsASimilarSchool", routeAttributes) 
+                    <a href=@Url.Action("WhatIsASimilarSchool", "School", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "WhatIsASimilarSchool")">
                         What is a similar school?
                     </a>
