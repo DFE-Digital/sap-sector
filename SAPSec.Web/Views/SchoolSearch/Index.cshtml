@@ -7,7 +7,9 @@
 
 @await Html.PartialAsync("_SchoolSearchQuery", new SchoolSearchQueryViewModel
 {
-    Query = Model.Query
+    Query = Model.Query,
+    SecondaryOnly = Model.SecondaryOnly,
+    SimilarSchoolsOnly = Model.SimilarSchoolsOnly
 })
 
 

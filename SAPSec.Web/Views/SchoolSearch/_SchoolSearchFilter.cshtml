@@ -13,6 +13,8 @@
 
     <form method="get" action="@Url.Action("Search", "SchoolSearch")" id="app-filter-panel" class="app-filter-panel @panelVisibleClass">
         <input type="hidden" name="query" value="@Model.Query" />
+        <input type="hidden" name="secondaryOnly" value="@Model.SecondaryOnly.ToString().ToLowerInvariant()" />
+        <input type="hidden" name="similarSchoolsOnly" value="@Model.SimilarSchoolsOnly.ToString().ToLowerInvariant()" />
 
         <div class="moj-filter">
             <div class="moj-filter__header">
@@ -32,7 +34,7 @@
                             <div class="moj-filter__heading-action">
                                 <p>
                                     <a class="govuk-link govuk-link--no-visited-state"
-                                       href="@Url.Action("Search", "SchoolSearch", new { query = Model.Query })">
+                                       href="@Url.Action("Search", "SchoolSearch", new { query = Model.Query, secondaryOnly = Model.SecondaryOnly, similarSchoolsOnly = Model.SimilarSchoolsOnly })">
                                         Clear filters
                                     </a>
                                 </p>
@@ -46,7 +48,9 @@
                                 var removeUrl = Url.Action("Search", "SchoolSearch", new
                                 {
                                     query = Model.Query,
-                                    localAuthorities = remainingFilters
+                                    localAuthorities = remainingFilters,
+                                    secondaryOnly = Model.SecondaryOnly,
+                                    similarSchoolsOnly = Model.SimilarSchoolsOnly
                                 });
                                 <li>
                                     <a class="moj-filter__tag" href="@removeUrl">

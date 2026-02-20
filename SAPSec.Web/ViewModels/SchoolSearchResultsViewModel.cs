@@ -23,6 +23,8 @@ public class SchoolSearchResultsViewModel : SchoolSearchQueryViewModel
         TotalResults = TotalResults,
         PageSize = PageSize,
         Query = Query,
-        LocalAuthorities = SelectedLocalAuthorities
+        LocalAuthorities = SelectedLocalAuthorities,
+        SecondaryOnly = SecondaryOnly,
+        SimilarSchoolsOnly = SimilarSchoolsOnly
     };
 }

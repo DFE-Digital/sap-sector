@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Services;
 using SAPSec.Web.Constants;
-using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
@@ -36,6 +34,7 @@ public class SchoolController : Controller
         }
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
         return View(school);
     }
 
@@ -47,13 +46,12 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
-            return RedirectToAction("Error");
-        }
+
+        _logger.LogInformation("{Urn} was not found on School Controller", urn);
+        return RedirectToAction("Error");
     }
 
     [HttpGet]
@@ -64,30 +62,12 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
-            return RedirectToAction("Error");
-        }
-    }
 
-    [HttpGet]
-    [Route("view-similar-schools")]
-    public async Task<IActionResult> ViewSimilarSchools(string urn)
-    {
-        var school = await _schoolDetailsService.TryGetByUrnAsync(urn);
-        if (school != null)
-        {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-            return View(school);
-        }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
-            return RedirectToAction("Error");
-        }
+        _logger.LogInformation("{Urn} was not found on School Controller", urn);
+        return RedirectToAction("Error");
     }
 
     [HttpGet]
@@ -98,13 +78,12 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
-            return RedirectToAction("Error");
-        }
+
+        _logger.LogInformation("{Urn} was not found on School Controller", urn);
+        return RedirectToAction("Error");
     }
 
     [HttpGet]
@@ -115,13 +94,12 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
-            return RedirectToAction("Error");
-        }
+
+        _logger.LogInformation("{Urn} was not found on School Controller", urn);
+        return RedirectToAction("Error");
     }
 
     [HttpGet]
@@ -132,13 +110,16 @@ public class SchoolController : Controller
         if (school != null)
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+            SetSchoolViewData(school);
             return View(school);
         }
-        else
-        {
-            _logger.LogInformation($"{urn} was not found on School Controller");
-            return RedirectToAction("Error");
-        }
+
+        _logger.LogInformation("{Urn} was not found on School Controller", urn);
+        return RedirectToAction("Error");
     }
 
+    private void SetSchoolViewData(Core.Model.SchoolDetails school)
+    {
+        ViewData["SchoolDetails"] = school;
+    }
 }

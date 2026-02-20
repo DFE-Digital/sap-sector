@@ -75,6 +75,9 @@
             queryParams.Add($"query={Uri.EscapeDataString(Model.Query)}");
         }
 
+        queryParams.Add($"secondaryOnly={Model.SecondaryOnly.ToString().ToLowerInvariant()}");
+        queryParams.Add($"similarSchoolsOnly={Model.SimilarSchoolsOnly.ToString().ToLowerInvariant()}");
+
         queryParams.Add($"page={page}");
 
         if (Model.LocalAuthorities != null)

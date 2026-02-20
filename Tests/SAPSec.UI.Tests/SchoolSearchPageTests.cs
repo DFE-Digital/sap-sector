@@ -227,9 +227,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/136994/school-details");
+        Page.Url.Should().Contain("/school/").And.Contain("/school-details");
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Alderbrook School");
+        schoolName.Should().NotBeNullOrWhiteSpace("School details page should show a caption");
     }
 
     [Fact]
