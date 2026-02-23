@@ -92,10 +92,12 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.WaitForURLAsync("**/find-a-school/search?query=Test%20School");
+        await Page.WaitForURLAsync("**/find-a-school/search**");
 
         Page.Url.Should().Contain("/find-a-school/search");
         Page.Url.Should().Contain("query=Test");
+        Page.Url.Should().Contain("secondaryOnly", "search now preserves hidden secondary-only filter");
+        Page.Url.Should().Contain("similarSchoolsOnly", "search now preserves hidden similar-schools-only filter");
     }
 
     [Fact]
