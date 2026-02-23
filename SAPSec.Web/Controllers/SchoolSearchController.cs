@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Web.Constants;
@@ -35,12 +36,11 @@ public class SchoolSearchController(
 
             if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
             {
-                return RedirectToAction("Search", new
-                {
-                    query = searchQueryViewModel.Query,
-                    secondaryOnly = searchQueryViewModel.SecondaryOnly,
-                    similarSchoolsOnly = searchQueryViewModel.SimilarSchoolsOnly
-                });
+                var routeValues = BuildSearchRouteValues(
+                    searchQueryViewModel.Query,
+                    searchQueryViewModel.SecondaryOnly,
+                    searchQueryViewModel.SimilarSchoolsOnly);
+                return RedirectToAction("Search", routeValues);
             }
 
             var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
@@ -125,14 +125,10 @@ public class SchoolSearchController(
             var totalPages = (int)Math.Ceiling((double)totalResults / PageSize);
             if (page > totalPages && totalPages > 0)
             {
-                return RedirectToAction("Search", new
-                {
-                    query,
-                    localAuthorities,
-                    secondaryOnly = applySecondaryOnly,
-                    similarSchoolsOnly = applySimilarSchoolsOnly,
-                    page = totalPages
-                });
+                var routeValues = BuildSearchRouteValues(query, applySecondaryOnly, applySimilarSchoolsOnly);
+                routeValues["localAuthorities"] = localAuthorities;
+                routeValues["page"] = totalPages;
+                return RedirectToAction("Search", routeValues);
             }
 
             // Map all results for display
@@ -200,7 +196,11 @@ public class SchoolSearchController(
 
             if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
             {
-                return RedirectToAction("Search", searchQueryViewModel);
+                var routeValues = BuildSearchRouteValues(
+                    searchQueryViewModel.Query,
+                    searchQueryViewModel.SecondaryOnly,
+                    searchQueryViewModel.SimilarSchoolsOnly);
+                return RedirectToAction("Search", routeValues);
             }
 
             var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
@@ -213,7 +213,11 @@ public class SchoolSearchController(
             }
 
             ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
-            return RedirectToAction("Search", searchQueryViewModel);
+            var fallbackRouteValues = BuildSearchRouteValues(
+                searchQueryViewModel.Query,
+                searchQueryViewModel.SecondaryOnly,
+                searchQueryViewModel.SimilarSchoolsOnly);
+            return RedirectToAction("Search", fallbackRouteValues);
         }
     }
 
@@ -231,6 +235,29 @@ public class SchoolSearchController(
     private static bool IsSecondaryPhase(string? phaseOfEducationName) =>
         !string.IsNullOrWhiteSpace(phaseOfEducationName) &&
         phaseOfEducationName.Contains("secondary", StringComparison.InvariantCultureIgnoreCase);
+
+    private static RouteValueDictionary BuildSearchRouteValues(
+        string? query,
+        bool secondaryOnly,
+        bool similarSchoolsOnly)
+    {
+        var routeValues = new RouteValueDictionary
+        {
+            ["query"] = query
+        };
+
+        if (secondaryOnly)
+        {
+            routeValues["secondaryOnly"] = true;
+        }
+
+        if (similarSchoolsOnly)
+        {
+            routeValues["similarSchoolsOnly"] = true;
+        }
+
+        return routeValues;
+    }
 
     private async Task<bool> HasSimilarSchoolsAsync(string urn)
     {

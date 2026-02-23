@@ -12,7 +12,7 @@ public class SchoolSearchQueryViewModel
 
     public bool HasNoResults { get; set; }
 
-    public bool SecondaryOnly { get; set; } = true;
+    public bool SecondaryOnly { get; set; }
 
-    public bool SimilarSchoolsOnly { get; set; } = true;
+    public bool SimilarSchoolsOnly { get; set; }
 }
