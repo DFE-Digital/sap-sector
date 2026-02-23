@@ -9,12 +9,8 @@ public static class FieldName
     public const string EstablishmentName = "EstablishmentName";
     public const string EstablishmentNameSort = "EstablishmentNameSort";
 
-    // public const string Street = "Street";
-    // public const string Locality = "Locality";
-    // public const string Address3 = "Address3";
-    // public const string Town = "Town";
-    // public const string County = "County (name)";
-    // public const string Postcode = "Postcode";
+    public const string Street = "Street";
+    public const string Postcode = "Postcode";
 
     // public const string EstablishmentNameSchoolId = "EstablishmentNameSchoolId";
     // public const string EstablishmentNameSchoolIdAddress = "EstablishmentNameSchoolIdAddress";

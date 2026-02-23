@@ -1,11 +1,14 @@
 ﻿@using SAPSec.Core.Model
 @using SAPSec.Web.Helpers
-@model SchoolDetails
+@{
+    var school = ViewData["SchoolDetails"] as SAPSec.Core.Model.SchoolDetails;
+}
 @{
     Layout = "Views/Shared/_Layout";
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var routeAttributes = new Dictionary<string, string> { { "urn", Model.Urn.Display() } };
+    var urnValue = school?.Urn.Display() ?? ViewContext.RouteData.Values["urn"]?.ToString() ?? string.Empty;
+    var routeAttributes = new Dictionary<string, string> { { "urn", urnValue } };
 }
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
@@ -95,6 +98,7 @@
         @RenderBody()
     </div>
 </div>
+@await RenderSectionAsync("Scripts", required: false)
 
 @section Scripts {
     <script add-nonce="true">

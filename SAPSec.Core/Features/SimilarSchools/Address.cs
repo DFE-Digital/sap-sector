@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Features.SimilarSchools;
+namespace SAPSec.Core.Features.SimilarSchools;
 
 public record Address
 {

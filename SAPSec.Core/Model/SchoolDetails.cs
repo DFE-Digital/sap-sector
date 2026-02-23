@@ -6,7 +6,7 @@ namespace SAPSec.Core.Model;
 /// School details with data availability information.
 /// Pure data container - all logic is in the service layer.
 /// </summary>
-public sealed class SchoolDetails
+public  class SchoolDetails
 {
     // Identifiers
     public required DataWithAvailability<string> Name { get; init; }

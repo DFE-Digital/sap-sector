@@ -1,0 +1,348 @@
+@using System.Globalization
+@using System.Text.Encodings.Web
+@using System.Text.Json
+@using SAPSec.Web.Helpers
+@using SAPSec.Web.ViewModels
+@model SimilarSchoolsComparisonViewModel
+@{
+    Layout = "_Layout";
+
+    var inv = CultureInfo.InvariantCulture;
+
+    var schools = new[]
+    {
+        new
+        {
+            urn = "",
+            name = Model.Name,
+            address = "",
+            la = "",
+            lat = Model.CurrentSchoolLatitude,
+            lon = Model.CurrentSchoolLongitude,
+            url = (string?)null,
+            isMain = true,
+            isComparedSchool = false
+        },
+        new
+        {
+            urn = "",
+            name = Model.SimilarSchoolName,
+            address = "",
+            la = "",
+            lat = Model.SimilarSchoolLatitude,
+            lon = Model.SimilarSchoolLongitude,
+            url = (string?)null,
+            isMain = false,
+            isComparedSchool = true
+        }
+    }.ToList();
+
+
+    var json = JsonSerializer.Serialize(schools, new JsonSerializerOptions
+    {
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    });
+}
+<link rel="stylesheet" href="~/css/leaflet.css"/>
+
+<h2>School Details</h2>
+
+<details class="govuk-details" data-module="govuk-details" id="comparison-map-details">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">View on a map</span>
+    </summary>
+
+    <div class="govuk-details__text govuk-!-padding-left-2 govuk-!-padding-right-0">
+        @* <div id="comparison-map" style="height:520px;"></div> *@
+        <div id="map" data-map-mode="compare"
+             data-fixed-zoom="14"
+             role="region"
+             aria-label="Map of schools">
+            <div class="map-loading">Loading map…</div>
+        </div>
+
+        <div class="govuk-!-margin-top-4">
+            <span class="school-legend-item govuk-!-margin-right-8">
+                <img
+                    src="/assets/images/marker-school.svg"
+                    alt=""
+                    class="school-marker-icon"
+                />
+                <span class="govuk-!-margin-left-2">
+                @Model.SimilarSchoolName
+                </span>
+            </span>
+
+            <span class="school-legend-item">
+                <img
+                    src="/assets/images/marker-school-pink.svg"
+                    alt=""
+                    class="school-marker-icon"
+                />
+                <span class="govuk-!-margin-left-2">
+                @Model.Name
+                </span>
+            </span>
+        </div>
+
+
+    </div>
+</details>
+
+
+<div class="govuk-!-margin-top-6 govuk-!-margin-bottom-9" style="border: 1px solid #b1b4b6;">
+
+    <div class="govuk-!-padding-top-4 govuk-!-padding-right-6 govuk-!-padding-bottom-4 govuk-!-padding-left-6"
+         style="background: #f3f2f1;">
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-0">Contact this school</h2>
+    </div>
+
+    <div class="govuk-!-padding-6">
+        <dl class="govuk-summary-list govuk-summary-list--bordered govuk-!-margin-bottom-0">
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Headteacher/Principal</dt>
+                <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.HeadteacherName.Display()</dd>
+            </div>
+
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Website</dt>
+                @if (Model.SimilarSchoolDetails.Website.IsAvailable)
+                {
+                    <dd class="govuk-summary-list__value">
+                        <a class="govuk-link"
+                           href="@Model.SimilarSchoolDetails.Website.Value"
+                           target="_blank"
+                           rel="noopener noreferrer">
+                            @Model.SimilarSchoolDetails.Website.Value (opens in a new tab)
+                        </a>
+                    </dd>
+                }
+                else
+                {
+                    <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Website.Display()</dd>
+                }
+            </div>
+
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Telephone</dt>
+                <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Telephone.Display()</dd>
+            </div>
+
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Email</dt>
+                @if (Model.SimilarSchoolDetails.Email.IsAvailable)
+                {
+                    <dd class="govuk-summary-list__value">
+                        <a class="govuk-link" href="mailto:@Model.SimilarSchoolDetails.Email.Display()">
+                            @Model.SimilarSchoolDetails.Email.Display()
+                        </a>
+                    </dd>
+                }
+                else
+                {
+                    <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Email.Display()</dd>
+                }
+            </div>
+
+        </dl>
+    </div>
+</div>
+
+
+@* Location Section *@
+<h2 class="govuk-heading-m">Location</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Distance between school</dt>
+        <dd class="govuk-summary-list__value">@Model.DistanceDisplay miles</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Address</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Address.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Local authority</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.LocalAuthorityName.DisplayWithCode(Model.SimilarSchoolDetails.LocalAuthorityCode)</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Region</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.Region.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Urban/rural description</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.UrbanRuralDescription.Display()</dd>
+    </div>
+</dl>
+
+@* School Details Section *@
+<h2 class="govuk-heading-m">School details</h2>
+<dl class="govuk-summary-list">
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">ID</dt>
+        <dd class="govuk-summary-list__value">URN: @Model.SimilarSchoolDetails.Urn.Display(), DfE
+            number:@Model.SimilarSchoolDetails.DfENumber.Display(),
+            UKPRN: @Model.SimilarSchoolDetails.Ukprn.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Age range</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.AgeRangeLow.DisplayAgeRange(Model.SimilarSchoolDetails.AgeRangeHigh)</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Gender of entry</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.GenderOfEntry.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Phase of education</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.PhaseOfEducation.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">School type</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.SchoolType.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Governance structure</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.GovernanceStructure.Display()</dd>
+    </div>
+
+    @if (Model.SimilarSchoolDetails.AcademyTrustName.IsAvailable)
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Academy trust</dt>
+            <dd class="govuk-summary-list__value">
+                <a href="https://get-information-schools.service.gov.uk/Groups/Group/Details/@Model.SimilarSchoolDetails.AcademyTrustId.Value"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    @Model.SimilarSchoolDetails.AcademyTrustName.Value (opens in a new tab)
+                </a>
+            </dd>
+        </div>
+    }
+
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Admissions policy</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.AdmissionsPolicy.Display()</dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Religious character</dt>
+        <dd class="govuk-summary-list__value">@Model.SimilarSchoolDetails.ReligiousCharacter.Display()</dd>
+    </div>
+
+    @* Provision fields - content editors can change the text here *@
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Nursery provision</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.SimilarSchoolDetails.HasNurseryProvision.DisplayAs("Has nursery classes", "Does not have nursery classes")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Sixth form</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.SimilarSchoolDetails.HasSixthForm.DisplayAs("Has a sixth form", "Does not have a sixth form")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">SEN unit</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.SimilarSchoolDetails.HasSenUnit.DisplayAs("Has a SEN unit", "Does not have a SEN unit")
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Resourced provision</dt>
+        <dd class="govuk-summary-list__value">
+            @Model.SimilarSchoolDetails.HasResourcedProvision.DisplayAs("Has a resourced provision", "Does not have a resourced provision")
+        </dd>
+    </div>
+</dl>
+
+@* SEN Unit explanation *@
+<details class="govuk-details govuk-!-margin-bottom-9">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">
+            What is a SEN unit or resourced provision?
+        </span>
+    </summary>
+    <div class="govuk-details__text">
+        <p class="govuk-body">
+            SEN (special educational needs) units and resourced provisions are specialist provisions in mainstream
+            schools formally recognised by the local authority.
+        </p>
+        <p class="govuk-body">
+            In SEN units pupils are taught within separate classes for at least half of their time.
+        </p>
+        <p class="govuk-body">
+            In resourced provisions pupils are taught within mainstream classes for at least half of their time, but
+            have access to a base and specialist facilities around the school.
+        </p>
+        <p class="govuk-body">
+            They are both for pupils with SEN, who typically have education, health, and care (EHC) plans.
+        </p>
+    </div>
+</details>
+
+@* Further Information Section *@
+<h2 class="govuk-heading-m">Further information</h2>
+<dl class="govuk-summary-list govuk-!-margin-bottom-9">
+    @if (Model.SimilarSchoolDetails.Urn.IsAvailable)
+    {
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Ofsted report</dt>
+            <dd class="govuk-summary-list__value">
+                <a href="https://reports.ofsted.gov.uk/provider/23/@Model.SimilarSchoolDetails.Urn.Value"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    View the latest Ofsted report (opens in a new tab)
+                </a>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Information from other services</dt>
+            <dd class="govuk-summary-list__value">
+                <div class="govuk-!-margin-bottom-2">
+                    <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.SimilarSchoolDetails.Urn.Value"
+                       class="govuk-link" target="_blank" rel="noopener noreferrer">
+                        Financial benchmarking and insights tool (opens in a new tab)
+                    </a>
+                </div>
+                <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/@Model.SimilarSchoolDetails.Urn.Value"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    Get information about schools (opens in a new tab)
+                </a>
+            </dd>
+        </div>
+    }
+</dl>
+
+@* Data sources *@
+<details class="govuk-details">
+    <summary class="govuk-details__summary">
+        <span class="govuk-details__summary-text">Data sources</span>
+    </summary>
+    <div class="govuk-details__text">
+        <p class="govuk-body">
+            The data shown is sourced from
+            <a href="https://get-information-schools.service.gov.uk/" class="govuk-link" target="_blank"
+               rel="noopener noreferrer">
+                Get Information about Schools (opens in a new tab)
+            </a>
+            and from
+            <a href="https://explore-education-statistics.service.gov.uk/" class="govuk-link" target="_blank"
+               rel="noopener noreferrer">
+                Explore education statistics (opens in a new tab)
+            </a>.
+        </p>
+    </div>
+</details>
+
+
+<script type="application/json" id="schools-data">
+@Html.Raw(json)
+
+</script>
+
+@section Scripts {
+
+    <script src="~/js/map-schools.js"></script>
+    <script src="~/js/leaflet.js"></script>
+}

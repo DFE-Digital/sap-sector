@@ -8,7 +8,7 @@ public class StartupIndexBuilder(ILogger<StartupIndexBuilder> logger, LuceneInde
 {
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        logger.LogInformation("reading Establishment Data From CSV at startup...");
+        logger.LogInformation("Reading establishment data from Postgres at startup...");
 
         var schools = await establishmentService.GetAllEstablishmentsAsync();
 
