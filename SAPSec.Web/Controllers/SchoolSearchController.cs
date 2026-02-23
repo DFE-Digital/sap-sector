@@ -75,6 +75,23 @@ public class SchoolSearchController(
 
             var results = await _searchService.SearchAsync(query ?? string.Empty);
 
+            // Preserve direct navigation when the query uniquely matches a school name,
+            // even if hidden filters would later reduce results to zero.
+            if (!string.IsNullOrWhiteSpace(query) && (localAuthorities == null || localAuthorities.Length == 0))
+            {
+                var exactMatches = results
+                    .Where(s => string.Equals(
+                        s.EstablishmentName?.Trim(),
+                        query.Trim(),
+                        StringComparison.InvariantCultureIgnoreCase))
+                    .ToList();
+
+                if (exactMatches.Count == 1 && !string.IsNullOrWhiteSpace(exactMatches[0].URN))
+                {
+                    return RedirectToAction("Index", "School", new { urn = exactMatches[0].URN });
+                }
+            }
+
             var allLocalAuthorities = results
                 .Select(s => s.LANAme)
                 .Where(la => !string.IsNullOrWhiteSpace(la))
