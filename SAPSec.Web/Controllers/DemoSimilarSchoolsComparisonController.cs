@@ -1,4 +1,4 @@
-﻿using Lucene.Net.Search;
+using Lucene.Net.Search;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SimilarSchools.UseCases;

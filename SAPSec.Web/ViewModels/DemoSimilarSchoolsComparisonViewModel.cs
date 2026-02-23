@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Web.ViewModels;
 
