@@ -275,6 +275,12 @@
     margin-top: 0;
 }
 
+.app-filter-selected-divider {
+    border-bottom: 1px solid #b1b4b6;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
 .app-filter-panel--similar .govuk-radios--small .govuk-radios__item {
     min-height: 34px;
 }
@@ -284,7 +290,13 @@
 }
 
 .app-similar-schools-content {
-    margin-top: govuk-spacing(5);
+    margin-top: 0;
+}
+
+@media (min-width: 40.0625em) {
+    .app-similar-schools-content {
+        margin-top: 55px;
+    }
 }
 
 .app-similar-schools-sort {
@@ -306,9 +318,6 @@
     max-width: 100%;
 }
 
-.app-similar-schools-filter-column {
-    margin-top: govuk-spacing(4);
-}
 .autocomplete__menu {
     border: none;
     border-top: none;
@@ -354,6 +363,8 @@
 
 .app-filter-panel {
     display: none !important;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .app-filter-panel--visible {
@@ -361,8 +372,10 @@
 }
 
 .app-filter-panel--similar {
-    width: 280px;
+    width: 100%;
+    max-width: 100%;
     padding: 15px;
+    box-sizing: border-box;
 }
 
     .moj-filter__options .govuk-button {
