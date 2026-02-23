@@ -158,7 +158,9 @@ public class SimilarSchoolsController : Controller
         string urn)
     {
         var tags = new List<SimilarSchoolsSelectedFilterTagViewModel>();
-        var baseUrl = Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn }) ?? $"/school/{urn}/view-similar-schools";
+        var baseUrl = Url is null
+            ? $"/school/{urn}/view-similar-schools"
+            : Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn }) ?? $"/school/{urn}/view-similar-schools";
 
         foreach (var filter in filterOptions)
         {
