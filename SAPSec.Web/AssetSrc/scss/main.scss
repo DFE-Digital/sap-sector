@@ -318,6 +318,25 @@
     max-width: 100%;
 }
 
+@media (max-width: 40.0625em) {
+    .app-similar-schools-sort {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: govuk-spacing(1);
+    }
+
+    .app-similar-schools-sort__label {
+        display: block;
+        width: 100%;
+    }
+
+    .app-similar-schools-sort__select {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+    }
+}
+
 .autocomplete__menu {
     border: none;
     border-top: none;
