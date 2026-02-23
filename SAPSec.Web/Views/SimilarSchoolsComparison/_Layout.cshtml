@@ -27,7 +27,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Url.Action("ViewSimilarSchools", "School", new { urn = @comparisonModel.Urn })">
+                   href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = @comparisonModel.Urn })">
                     View similar schools
                 </a>
             </li>
@@ -39,7 +39,7 @@
     @* LEFT: back link alone *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Url.Action("ViewSimilarSchools", "School", new { urn = @comparisonModel.Urn })">
+           href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = @comparisonModel.Urn })">
             Back
         </a>
     </div>

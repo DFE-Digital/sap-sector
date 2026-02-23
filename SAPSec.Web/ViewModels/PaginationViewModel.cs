@@ -9,6 +9,8 @@ public class PaginationViewModel
     public int PageSize { get; set; } = 10;
     public string? Query { get; set; }
     public string[]? LocalAuthorities { get; set; }
+    public bool SecondaryOnly { get; set; } = true;
+    public bool SimilarSchoolsOnly { get; set; } = true;
 
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;

@@ -23,7 +23,7 @@ var schools = Model.MapSchools
             la = "",
             lat,
             lon,
-            url = Url.Action("Index", "SimilarSchoolsComparison", new { urn = @Model.Urn, similarSchoolUrn =s.Urn })
+            url = Url.Action("Index", "School", new { urn = s.Urn })
         };
     })
     .Where(x => x != null)
@@ -46,7 +46,7 @@ var json = JsonSerializer.Serialize(schools, new JsonSerializerOptions
 
 <hr class="govuk-section-break govuk-section-break--visible">
 
-<div id="map" data-map-mode="all"
+<div id="map"
      data-fixed-zoom="14"
      role="region"
      aria-label="Map of schools">

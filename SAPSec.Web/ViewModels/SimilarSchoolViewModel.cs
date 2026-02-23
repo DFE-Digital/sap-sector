@@ -8,6 +8,8 @@
 /// </summary>
 public class SimilarSchoolViewModel
 {
+    public string UrnRaw { get; set; } = string.Empty;
+
     // From v_similar_schools_secondary_groups
     public int Urn { get; set; }
     public int NeighbourUrn { get; set; }
@@ -46,10 +48,10 @@ public class SimilarSchoolViewModel
     public double? OverallAbsenceRate { get; set; }
     public double? PersistentAbsenceRate { get; set; }
     
-    public int? Easting { get; set; }
-    public int? Northing { get; set; }
     public string? Latitude { get; set; }
     public string? Longitude { get; set; }
+    public string SortMetricName { get; set; } = "Attainment 8";
+    public string SortMetricDisplayValue { get; set; } = "N/A";
 
     public string FullAddress
     {
@@ -60,5 +62,4 @@ public class SimilarSchoolViewModel
             return string.Join(", ", parts);
         }
     }
-    public bool IsComparedSchool { get; set; } = false;
 }

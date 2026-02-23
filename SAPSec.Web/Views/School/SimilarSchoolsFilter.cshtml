@@ -2,12 +2,12 @@
 @model SimilarSchoolsPageViewModel
 
 @{
-    var hasActiveFilters = Model.FilterOptions.Any(f => f.Options.Any(o => o.Selected));
+    var hasActiveFilters = Model.HasActiveFilters;
     var isExpanded = hasActiveFilters ? "true" : "false";
     var panelVisibleClass = hasActiveFilters ? "app-filter-panel--visible" : "";
 }
 
-<div class="govuk-grid-column-one-third app-filter-column">
+<div class="govuk-grid-column-one-third app-filter-column app-similar-schools-filter-column">
     <button type="button" class="govuk-button govuk-button--secondary app-filter-toggle"
             data-module="app-filter-toggle"
             aria-expanded="@isExpanded"
@@ -17,7 +17,7 @@
     </button>
 
     <form method="get"
-          action="@Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })"
+          action="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })"
           id="similar-schools-filter-form"
           class="app-filter-panel app-filter-panel--similar @panelVisibleClass">
 
@@ -33,23 +33,15 @@
                 @* ── Selected filter tags + Clear filters ── *@
                 @if (hasActiveFilters)
                 {
-                    <div class="moj-filter__selected">
+                    <div class="moj-filter__selected app-filter-selected-divider">
                         <div class="moj-filter__selected-heading">
                             <div class="moj-filter__heading-title">
                                 <h2 class="govuk-heading-s">Selected filters</h2>
                             </div>
-                            <div class="moj-filter__heading-action">
-                                <p>
-                                    <a class="govuk-link govuk-link--no-visited-state"
-                                       href="@Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn })">
-                                        Clear filters
-                                    </a>
-                                </p>
-                            </div>
                         </div>
 
                         <ul class="moj-filter-tags">
-                            @foreach (var tag in GetFilterTagsWithRemoveUrls())
+                            @foreach (var tag in Model.SelectedFilterTags)
                             {
                                 <li>
                                     <a class="moj-filter__tag" href="@tag.RemoveUrl">
@@ -58,6 +50,13 @@
                                 </li>
                             }
                         </ul>
+
+                        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0 app-clear-filters-spacing">
+                            <a class="govuk-link govuk-link--no-visited-state"
+                               href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })">
+                                Clear filters
+                            </a>
+                        </p>
                     </div>
                 }
 
@@ -67,56 +66,25 @@
                         <span class="app-button-text">Apply filters</span>
                     </button>
 
-                    <fieldset class="govuk-fieldset">
-                        <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">Filters</legend>
-                        @foreach (var filter in Model.FilterOptions)
-                        {
-                            <partial name="SimilarSchoolsFilterSection" model="filter" />
-                        }
-                    </fieldset>
+                    @foreach (var group in Model.FilterGroups)
+                    {
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">@group.Heading</legend>
+                            @for (var i = 0; i < group.Filters.Count; i++)
+                            {
+                                var filter = group.Filters[i];
+                                var isLastInGroup = i == group.Filters.Count - 1;
+                                <partial name="~/Views/School/SimilarSchoolsFilterSection.cshtml"
+                                         model="filter"
+                                         view-data='new ViewDataDictionary(ViewData) { ["IsLastInGroup"] = isLastInGroup }' />
+                            }
+                        </fieldset>
+                    }
                 </div>
             </div>
         </div>
     </form>
 </div>
-
-@functions {
-    List<(string Label, string RemoveUrl)> GetFilterTagsWithRemoveUrls()
-    {
-        var tags = new List<(string Label, string RemoveUrl)>();
-
-        foreach (var filter in Model.FilterOptions)
-        {
-            foreach (var option in filter.Options.Where(o => o.Selected))
-            {
-                var qs = BuildQueryStringWithout(filter.Key, option.Key);
-                var removeUrl = Url.Action("ViewSimilarSchools", "School", new { urn = Model.Urn }) + qs;
-                tags.Add((option.Name, removeUrl));
-            }
-        }
-
-        return tags;
-    }
-
-    string BuildQueryStringWithout(string excludeParam, string excludeValue)
-    {
-        var parts = new List<string>();
-
-        if (!string.IsNullOrEmpty(Model.SortBy))
-            parts.Add($"sortBy={Uri.EscapeDataString(Model.SortBy)}");
-
-        foreach (var (key, values) in Model.CurrentFilters)
-        {
-            foreach (var v in values)
-            {
-                if (key == excludeParam && v == excludeValue) continue;
-                parts.Add($"{key}={Uri.EscapeDataString(v)}");
-            }
-        }
-
-        return parts.Count > 1 ? "?" + string.Join("&", parts) : "";
-    }
-}
 
 <script add-nonce="true">
     (function () {

@@ -50,7 +50,7 @@ public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimila
             yield return new FilterOption("25", "Up to 25 miles", count, value == "25");
             yield return new FilterOption("50", "Up to 50 miles", count, value == "50");
             yield return new FilterOption("100", "Up to 100 miles", count, value == "100");
-            yield return new FilterOption("Over100", "More than 100 miles", count, string.IsNullOrWhiteSpace(value) || value == "Over100");
+            yield return new FilterOption("Over100", "More than 100 miles", count, value == "Over100");
         }
         else
         {
@@ -87,7 +87,7 @@ public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimila
             count = items.Count(i => i.Coordinates == null || i.Coordinates.DistanceMiles(currentSchool.Coordinates) > 100);
             if (count > 0)
             {
-                yield return new FilterOption("Over100", "More than 100 miles", count, string.IsNullOrWhiteSpace(value) || value == "Over100");
+                yield return new FilterOption("Over100", "More than 100 miles", count, value == "Over100");
             }
         }
     }
