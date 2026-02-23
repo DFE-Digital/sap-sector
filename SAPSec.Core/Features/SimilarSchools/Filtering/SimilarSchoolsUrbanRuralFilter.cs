@@ -7,7 +7,7 @@ public class SimilarSchoolsUrbanRuralFilter(SimilarSchool currentSchool) : ISimi
 {
     public string Key => "ur";
     public string Name => "Urban or rural";
-    public FilterType Type => FilterType.SingleValue;
+    public FilterType Type => FilterType.MultipleValue;
 
     public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
     {
