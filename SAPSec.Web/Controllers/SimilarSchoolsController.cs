@@ -209,6 +209,7 @@ public class SimilarSchoolsController : Controller
 
         return new SimilarSchoolViewModel
         {
+            UrnRaw = school.URN,
             Urn = int.TryParse(school.URN, out var urn) ? urn : 0,
             EstablishmentName = school.Name,
             Street = address.Street,

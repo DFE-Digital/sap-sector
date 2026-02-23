@@ -66,8 +66,8 @@ public class SchoolSearchController(
         [FromQuery] bool? secondaryOnly = null,
         [FromQuery] bool? similarSchoolsOnly = null)
     {
-        var applySecondaryOnly = secondaryOnly ?? false;
-        var applySimilarSchoolsOnly = similarSchoolsOnly ?? false;
+        var applySecondaryOnly = secondaryOnly ?? true;
+        var applySimilarSchoolsOnly = similarSchoolsOnly ?? true;
 
         using (logger.BeginScope(new { query, secondaryOnly = applySecondaryOnly, similarSchoolsOnly = applySimilarSchoolsOnly, page }))
         {
@@ -246,15 +246,8 @@ public class SchoolSearchController(
             ["query"] = query
         };
 
-        if (secondaryOnly)
-        {
-            routeValues["secondaryOnly"] = true;
-        }
-
-        if (similarSchoolsOnly)
-        {
-            routeValues["similarSchoolsOnly"] = true;
-        }
+        routeValues["secondaryOnly"] = secondaryOnly;
+        routeValues["similarSchoolsOnly"] = similarSchoolsOnly;
 
         return routeValues;
     }

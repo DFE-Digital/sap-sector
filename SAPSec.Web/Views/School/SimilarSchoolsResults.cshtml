@@ -1,5 +1,9 @@
-﻿@using SAPSec.Web.ViewModels
+@using SAPSec.Web.ViewModels
 @model SimilarSchoolsPageViewModel
+
+@{
+    var currentSchoolUrn = ViewContext.RouteData.Values["urn"]?.ToString() ?? Model.Urn.ToString();
+}
 
 @if (Model.Schools.Any())
 {
@@ -30,7 +34,7 @@
         {
             <li class="app-school-result" id="similar-school-@school.Urn">
                 <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
-                   href="@Url.Action("Index", "School", new { urn = school.Urn })">
+                   href="@Url.Action("Index", "SimilarSchoolsComparison", new { urn = currentSchoolUrn, similarSchoolUrn = string.IsNullOrWhiteSpace(school.UrnRaw) ? school.Urn.ToString() : school.UrnRaw })">
                     @school.EstablishmentName
                 </a>
                 <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
@@ -48,3 +52,6 @@ else
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
     <p class="govuk-body">No similar schools found matching your filters. Try removing some filters to see more results.</p>
 }
+
+
+

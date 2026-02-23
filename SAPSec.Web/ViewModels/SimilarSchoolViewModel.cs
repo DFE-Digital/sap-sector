@@ -8,6 +8,8 @@
 /// </summary>
 public class SimilarSchoolViewModel
 {
+    public string UrnRaw { get; set; } = string.Empty;
+
     // From v_similar_schools_secondary_groups
     public int Urn { get; set; }
     public int NeighbourUrn { get; set; }

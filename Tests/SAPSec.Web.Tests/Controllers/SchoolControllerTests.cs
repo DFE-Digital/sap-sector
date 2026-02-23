@@ -2,28 +2,23 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
-using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
 
 public class SchoolControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepoMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
 
     public SchoolControllerTests()
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        _similarSchoolsRepoMock = new Mock<ISimilarSchoolsSecondaryRepository>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
-        _sut = new SchoolController(_schoolDetailsServiceMock.Object, new FindSimilarSchools(_similarSchoolsRepoMock.Object), _loggerMock.Object);
+        _sut = new SchoolController(_schoolDetailsServiceMock.Object, _loggerMock.Object);
     }
 
     #region Index Action Tests
