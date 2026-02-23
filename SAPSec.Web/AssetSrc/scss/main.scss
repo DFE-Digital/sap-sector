@@ -209,7 +209,6 @@
 }
 
 .app-filter-section--divider {
-    padding-bottom: govuk-spacing(3);
     border-bottom: 1px solid #B1B4B6;
 }
 
@@ -368,6 +367,10 @@
 
     .moj-filter__options .govuk-button {
         width: auto !important;
+    }
+
+    .app-filter-panel--similar #apply-filters-btn {
+        width: 100% !important;
     }
 
     .moj-filter {
