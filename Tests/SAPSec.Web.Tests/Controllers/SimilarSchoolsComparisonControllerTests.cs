@@ -9,9 +9,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
-using LocalAuthority = SAPSec.Core.Features.SimilarSchools.LocalAuthority;
 
 namespace SAPSec.Web.Tests.Controllers;
 
@@ -55,7 +53,7 @@ public class SimilarSchoolsComparisonControllerTests
         model.Urn.Should().Be(urn);
         model.SimilarSchoolUrn.Should().Be(similarUrn);
         model.Name.Should().Be(currentSchool.Name);
-        model.SimilarSchoolName.Should().Be(similarDetails.Name.Display());
+        model.SimilarSchoolName.Should().Be(similarDetails.Name);
 
         _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
         _sut.ViewData["ComparisonSchool"].Should().BeSameAs(model);
@@ -84,7 +82,7 @@ public class SimilarSchoolsComparisonControllerTests
 
         model.Distance.Should().BeGreaterThan(0);
         model.SimilarSchoolDetails.Should().NotBeNull();
-        model.SimilarSchoolDetails!.Urn.Value.Should().Be(similarUrn);
+        model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
     }
     private void SetupDependencies(
         string currentUrn,
@@ -121,18 +119,25 @@ public class SimilarSchoolsComparisonControllerTests
                 Locality = "",
                 Address3 = ""
             },
-
-            LocalAuthority = new LocalAuthority("373","Sheffield"),
-
             Coordinates = coordinates,
-
-            UrbanRuralId = "A1",
-            UrbanRuralName = "Urban",
-
+            TotalCapacity = string.Empty,
+            TotalPupils = string.Empty,
+            NurseryProvisionName = string.Empty,
+            LocalAuthority = new("373", "Sheffield"),
+            UrbanRural = new("A1", "Urban"),
+            Region = new(string.Empty, string.Empty),
+            AdmissionsPolicy = new(string.Empty, string.Empty),
+            PhaseOfEducation = new(string.Empty, string.Empty),
+            Gender = new(string.Empty, string.Empty),
+            TypeOfEstablishment = new(string.Empty, string.Empty),
+            EstablishmentTypeGroup = new(string.Empty, string.Empty),
+            TrustSchoolFlag = new(string.Empty, string.Empty),
+            OfficialSixthForm = new(string.Empty, string.Empty),
+            ResourcedProvision = new(string.Empty, string.Empty),
             Attainment8Score = DataWithAvailability.Available(50m),
             BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.Available(61m),
-            CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.Available(62m),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.Available(62m),
             EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.Available(63m),
             EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.Available(64m),
             EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(65m),
@@ -145,8 +150,8 @@ public class SimilarSchoolsComparisonControllerTests
     {
         return new SchoolDetails
         {
-            Urn = DataWithAvailability.Available(urn),
-            Name = DataWithAvailability.Available(name),
+            Urn = urn,
+            Name = name,
             DfENumber = DataWithAvailability.Available("373/1234"),
             Ukprn = DataWithAvailability.Available("10012345"),
 

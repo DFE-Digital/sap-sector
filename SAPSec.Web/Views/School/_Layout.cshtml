@@ -7,7 +7,7 @@
     Layout = "Views/Shared/_Layout";
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var urnValue = school?.Urn.Display() ?? ViewContext.RouteData.Values["urn"]?.ToString() ?? string.Empty;
+    var urnValue = school?.Urn ?? ViewContext.RouteData.Values["urn"]?.ToString() ?? string.Empty;
     var routeAttributes = new Dictionary<string, string> { { "urn", urnValue } };
 }
 @section Breadcrumbs {

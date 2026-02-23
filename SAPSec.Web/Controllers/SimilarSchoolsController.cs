@@ -61,7 +61,7 @@ public class SimilarSchoolsController : Controller
 
         var viewModel = new SimilarSchoolsPageViewModel
         {
-            EstablishmentName = school.Name.Display(),
+            EstablishmentName = school.Name,
             PhaseOfEducation = school.PhaseOfEducation.Display(),
             Urn = int.TryParse(urn, out var urnValue) ? urnValue : 0,
             Schools = schools,
@@ -219,7 +219,7 @@ public class SimilarSchoolsController : Controller
             Postcode = address.Postcode,
             Latitude = result.Coordinates?.Latitude.ToString(),
             Longitude = result.Coordinates?.Longitude.ToString(),
-            UrbanOrRural = school.UrbanRuralName,
+            UrbanOrRural = school.UrbanRural.Name,
             Att8Scr = school.Attainment8Score.HasValue ? (double?)school.Attainment8Score.Value : null,
             SortMetricName = result.SortValue.Name,
             SortMetricDisplayValue = result.SortValue.Value.HasValue

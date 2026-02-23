@@ -8,4 +8,6 @@ public static class FieldName
     public const string EstablishmentNumber = "EstablishmentNumber";
     public const string EstablishmentName = "EstablishmentName";
     public const string EstablishmentNameSort = "EstablishmentNameSort";
+    public const string Street = "Street";
+    public const string Postcode = "Postcode";
 }
