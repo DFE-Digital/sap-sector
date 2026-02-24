@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Helpers;
@@ -10,13 +11,16 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
+    private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
+        GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
         _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
+        _getKs4HeadlineMeasures = getKs4HeadlineMeasures ?? throw new ArgumentNullException(nameof(getKs4HeadlineMeasures));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
     
@@ -46,8 +50,18 @@ public class SimilarSchoolsComparisonController : Controller
         if (modelResult.Result != null)
             return modelResult.Result;
 
-        SetComparisonSchoolViewData(modelResult.Model!);
-        return View(modelResult.Model);
+        var thisSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
+        var selectedSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(similarSchoolUrn));
+
+        var model = modelResult.Model!;
+        model.ThisSchoolAttainment8ThreeYearAverage = thisSchoolKs4?.Attainment8ThreeYearAverage.SchoolValue;
+        model.SelectedSchoolAttainment8ThreeYearAverage = selectedSchoolKs4?.Attainment8ThreeYearAverage.SchoolValue;
+        model.EnglandAttainment8ThreeYearAverage =
+            thisSchoolKs4?.Attainment8ThreeYearAverage.EnglandValue
+            ?? selectedSchoolKs4?.Attainment8ThreeYearAverage.EnglandValue;
+
+        SetComparisonSchoolViewData(model);
+        return View(model);
     }
 
     [HttpGet]

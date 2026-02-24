@@ -1,14 +1,89 @@
-﻿@using SAPSec.Core.Model
 @using SAPSec.Web.Helpers
-@model SchoolDetails
+@model SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "KS4 headline measures";
+    ViewData["Title"] = "KS4 headline performance measures";
 }
 
-<span class="govuk-caption-xl">@Model.Name.Display()</span>
+<span class="govuk-caption-xl">@Model.SchoolDetails.Name.Display()</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
 <p class="govuk-body">
-    This page is under construction.
+    How @Model.SchoolDetails.Name.Display() compares with @Model.SchoolDetails.LocalAuthorityName.Display() and England based on KS4 headline performance measures.
 </p>
+
+<section class="govuk-!-margin-bottom-7">
+    <h2 class="govuk-heading-m">Progress 8</h2>
+    <p class="govuk-body">
+        There are no Progress 8 scores for the academic years 2024 and 2025 and no KS2 assessments for 2024, therefore no KS2 assessment data available to calculate a 2026 baseline, this is due to COVID-19 disruption.
+    </p>
+</section>
+
+<section>
+    <h2 class="govuk-heading-m">Attainment 8</h2>
+    <p class="govuk-body-s govuk-!-margin-bottom-2">
+        Information also from <a href="https://explore-education-statistics.service.gov.uk/" class="govuk-link" rel="noopener noreferrer" target="_blank">Explore education statistics</a>.
+    </p>
+
+    <ul class="app-ks4-view-switch govuk-!-margin-bottom-4">
+        <li class="app-ks4-view-switch__item">
+            <span class="app-ks4-view-switch__link">Year</span>
+        </li>
+        <li class="app-ks4-view-switch__item">
+            <span class="app-ks4-view-switch__link app-ks4-view-switch__link--active">3 year average</span>
+        </li>
+        <li class="app-ks4-view-switch__item">
+            <span class="app-ks4-view-switch__link">Table</span>
+        </li>
+    </ul>
+
+    <div class="app-ks4-bar-chart">
+        <div class="app-ks4-bar-row">
+            <div class="app-ks4-bar-label">@Model.SchoolLabel</div>
+            <div class="app-ks4-bar-track">
+                <div class="app-ks4-bar app-ks4-bar--school" style="width:@Model.SchoolWidthPercent.ToString("0.0")%;"></div>
+            </div>
+            <div class="app-ks4-bar-value">@Model.SchoolAttainment8Display</div>
+        </div>
+
+        <div class="app-ks4-bar-row">
+            <div class="app-ks4-bar-label">@Model.LocalAuthorityLabel</div>
+            <div class="app-ks4-bar-track">
+                <div class="app-ks4-bar app-ks4-bar--la" style="width:@Model.LocalAuthorityWidthPercent.ToString("0.0")%;"></div>
+            </div>
+            <div class="app-ks4-bar-value">@Model.LocalAuthorityAttainment8Display</div>
+        </div>
+
+        <div class="app-ks4-bar-row">
+            <div class="app-ks4-bar-label">@Model.EnglandLabel</div>
+            <div class="app-ks4-bar-track">
+                <div class="app-ks4-bar app-ks4-bar--england" style="width:@Model.EnglandWidthPercent.ToString("0.0")%;"></div>
+            </div>
+            <div class="app-ks4-bar-value">@Model.EnglandAttainment8Display</div>
+        </div>
+    </div>
+
+    <table class="govuk-table govuk-!-margin-top-6">
+        <caption class="govuk-visually-hidden">Attainment 8 three year averages</caption>
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Group</th>
+                <th scope="col" class="govuk-table__header">3 year average</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">@Model.SchoolLabel</th>
+                <td class="govuk-table__cell">@Model.SchoolAttainment8Display</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">@Model.LocalAuthorityLabel</th>
+                <td class="govuk-table__cell">@Model.LocalAuthorityAttainment8Display</td>
+            </tr>
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">@Model.EnglandLabel</th>
+                <td class="govuk-table__cell">@Model.EnglandAttainment8Display</td>
+            </tr>
+        </tbody>
+    </table>
+</section>

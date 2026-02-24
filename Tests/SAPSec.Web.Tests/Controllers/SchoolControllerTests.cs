@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
@@ -11,14 +13,21 @@ namespace SAPSec.Web.Tests.Controllers;
 public class SchoolControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
+    private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
 
     public SchoolControllerTests()
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
+        _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
-        _sut = new SchoolController(_schoolDetailsServiceMock.Object, _loggerMock.Object);
+
+        var getKs4HeadlineMeasures = new GetKs4HeadlineMeasures(
+            _ks4PerformanceRepositoryMock.Object,
+            _schoolDetailsServiceMock.Object);
+
+        _sut = new SchoolController(_schoolDetailsServiceMock.Object, getKs4HeadlineMeasures, _loggerMock.Object);
     }
 
     #region Index Action Tests
@@ -157,6 +166,51 @@ public class SchoolControllerTests
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().BeNull(); // Default view
+    }
+
+    #endregion
+
+    #region KS4 Headline Measures Action Tests
+
+    [Fact]
+    public async Task Ks4HeadlineMeasures_ValidUrn_ReturnsViewWithExpectedModel()
+    {
+        // Arrange
+        var urn = "123456";
+        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
+
+        _schoolDetailsServiceMock
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync(schoolDetails);
+
+        _ks4PerformanceRepositoryMock
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ReturnsAsync(new Ks4HeadlineMeasuresData(null, null, null));
+
+        // Act
+        var result = await _sut.Ks4HeadlineMeasures(urn);
+
+        // Assert
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel>();
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasures_SchoolNotFound_RedirectsToError()
+    {
+        // Arrange
+        var urn = "999999";
+
+        _schoolDetailsServiceMock
+            .Setup(x => x.TryGetByUrnAsync(urn))
+            .ReturnsAsync((SchoolDetails?)null);
+
+        // Act
+        var result = await _sut.Ks4HeadlineMeasures(urn);
+
+        // Assert
+        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirectResult.ActionName.Should().Be("Error");
     }
 
     #endregion
