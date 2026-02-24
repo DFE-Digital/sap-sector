@@ -2,7 +2,6 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace SAPData;
 
@@ -21,7 +20,10 @@ public sealed class GenerateViews
         Path.Combine(AppContext.BaseDirectory, "SAPData", "raw_sources.json")
     };
 
-    private sealed record ViewSpec(string ViewName, string Range, string Type);
+    private sealed record ViewSpec(
+        string ViewName,
+        string Range,
+        string Type);
 
     private sealed record RawSource(
         string Type,

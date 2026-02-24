@@ -28,6 +28,7 @@ public class SimilarSchoolsNurseryProvisionFilter(SimilarSchool currentSchool) :
 
     private IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
         items.GroupBy(i => new { i.NurseryProvisionName })
+            .Where(f => !string.IsNullOrWhiteSpace(f.Key.NurseryProvisionName))
             .Select(g => new FilterOption(
                 g.Key.NurseryProvisionName,
                 g.Key.NurseryProvisionName,

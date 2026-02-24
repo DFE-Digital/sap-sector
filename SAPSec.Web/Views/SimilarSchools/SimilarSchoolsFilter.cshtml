@@ -74,7 +74,7 @@
                             {
                                 var filter = group.Filters[i];
                                 var isLastInGroup = i == group.Filters.Count - 1;
-                                <partial name="~/Views/School/SimilarSchoolsFilterSection.cshtml"
+                                <partial name="SimilarSchoolsFilterSection.cshtml"
                                          model="filter"
                                          view-data='new ViewDataDictionary(ViewData) { ["IsLastInGroup"] = isLastInGroup }' />
                             }

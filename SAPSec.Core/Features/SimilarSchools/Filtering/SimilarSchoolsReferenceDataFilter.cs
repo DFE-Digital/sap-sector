@@ -30,6 +30,7 @@ public abstract class SimilarSchoolsReferenceDataFilter(
 
     private IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
         items.GroupBy(field)
+            .Where(f => !string.IsNullOrWhiteSpace(f.Key.Id) && f.Key.Id != "9")
             .Select(g => new FilterOption(
                 g.Key.Id,
                 g.Key.Name,
