@@ -29,7 +29,7 @@ public class SimilarSchoolsComparisonControllerTests
             _repoMock.Object,
             _schoolDetailsServiceMock.Object);
 
-        _sut = new SimilarSchoolsComparisonController(useCase, _loggerMock.Object, _repoMock.Object, _formatter);
+        _sut = new SimilarSchoolsComparisonController(useCase, ks4UseCase, _loggerMock.Object, _repoMock.Object, _formatter);
     }
 
     [Fact]
