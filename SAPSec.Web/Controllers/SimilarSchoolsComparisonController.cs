@@ -10,20 +10,23 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
+    private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
+        GetCharacteristicsComparison getCharacteristicsComparison,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
         _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
+        _getCharacteristicsComparison = getCharacteristicsComparison ?? throw new ArgumentNullException(nameof(getCharacteristicsComparison));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     [HttpGet]
     public Task<IActionResult> Index(string urn, string similarSchoolUrn) =>
         Similarity(urn, similarSchoolUrn);
-    
+
     [HttpGet]
     [Route("Similarity")]
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
@@ -33,6 +36,42 @@ public class SimilarSchoolsComparisonController : Controller
         var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
+
+        GetCharacteristicsComparisonResponse? response;
+        try
+        {
+            response = await _getCharacteristicsComparison.Execute(
+                new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Error calling GetCharacteristicsComparison for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                urn, similarSchoolUrn);
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        if (response is null || response.Rows is null || response.Rows.Count == 0)
+        {
+            _logger.LogWarning(
+                "GetCharacteristicsComparison returned no rows for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                urn, similarSchoolUrn);
+
+            return NotFound();
+        }
+
+        modelResult.Model!.CharacteristicsRows = response.Rows
+            .Select(r => new SimilarSchoolsComparisonViewModel.CharacteristicRow
+            {
+                Characteristic = r.Characteristic,
+                CurrentSchoolValue = r.CurrentSchoolValue,
+                SimilarSchoolValue = r.SimilarSchoolValue,
+                IsNumeric = r.IsNumeric
+            })
+            .ToList()
+            .AsReadOnly();
 
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);

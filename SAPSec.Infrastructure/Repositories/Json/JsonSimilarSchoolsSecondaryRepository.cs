@@ -1,3 +1,4 @@
+using System.Globalization;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
@@ -60,6 +61,66 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
                 .ToList()
                 .AsReadOnly());
     }
+
+    public async Task<IReadOnlyDictionary<string, SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+        IReadOnlyCollection<string> urns)
+    {
+        if (urns is null || urns.Count == 0)
+            return new Dictionary<string, SimilarSchoolsSecondaryValues>();
+
+        var wanted = new HashSet<string>(urns);
+        var rows = await _similarSchoolsValuesRepository.ReadAllAsync();
+
+        var dict = rows
+            .Where(r => wanted.Contains(r.URN))
+            .ToDictionary(
+                r => r.URN,
+                r => new SimilarSchoolsSecondaryValues
+                {
+                    Urn = r.URN,
+                    Ks2Rp = ParseDecimal(r.KS2RP),
+                    Ks2Mp = ParseDecimal(r.KS2MP),
+                    PpPerc = ParseDecimal(r.PPPerc),
+                    PercentEal = ParseDecimal(r.PercentEAL),
+                    Polar4QuintilePupils = ParseInt(r.Polar4QuintilePupils),
+                    PStability = ParseDecimal(r.PStability),
+                    IdaciPupils = ParseDecimal(r.IdaciPupils),
+                    PercentSchSupport = ParseDecimal(r.PercentSchSupport),
+                    NumberOfPupils = ParseInt(r.NumberOfPupils),
+                    PercentStatementOrEhp = ParseDecimal(r.PercentageStatementOrEHP),
+                });
+
+        // Ensure all requested URNs exist (avoids KeyNotFound in use case/tests)
+        foreach (var urn in urns)
+        {
+            if (!dict.ContainsKey(urn))
+            {
+                dict[urn] = new SimilarSchoolsSecondaryValues
+                {
+                    Urn = urn,
+                    Ks2Rp = 0,
+                    Ks2Mp = 0,
+                    PpPerc = 0,
+                    PercentEal = 0,
+                    Polar4QuintilePupils = 0,
+                    PStability = 0,
+                    IdaciPupils = 0,
+                    PercentSchSupport = 0,
+                    NumberOfPupils = 0,
+                    PercentStatementOrEhp = 0
+                };
+            }
+        }
+
+        return dict;
+    }
+
+    private static decimal ParseDecimal(string value) =>
+        decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0m;
+
+    private static int ParseInt(string value) =>
+        int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var i) ? i : 0;
+    
 
     private SimilarSchool FromJson(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)
     {

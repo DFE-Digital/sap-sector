@@ -38,6 +38,7 @@ namespace SAPSec.Web.Extensions
             // Use cases
             services.AddSingleton<FindSimilarSchools>();
             services.AddSingleton<GetSimilarSchoolDetails>();
+            services.AddSingleton<GetCharacteristicsComparison>();
         }
     }
 }

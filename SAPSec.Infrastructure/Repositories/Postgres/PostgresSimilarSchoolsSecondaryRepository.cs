@@ -131,6 +131,53 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 .ToList()
                 .AsReadOnly());
     }
+    
+    public async Task<IReadOnlyDictionary<string, SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+        IReadOnlyCollection<string> urns)
+    {
+        if (urns is null || urns.Count == 0)
+            return new Dictionary<string, SimilarSchoolsSecondaryValues>();
+
+        const string sql = """
+            SELECT
+                urn                      AS "Urn",
+                ks2_rp                   AS "Ks2Rp",
+                ks2_mp                   AS "Ks2Mp",
+                pp_perc                  AS "PpPerc",
+                percent_eal              AS "PercentEal",
+                polar4quintile_pupils    AS "Polar4QuintilePupils",
+                p_stability              AS "PStability",
+                idaci_pupils             AS "IdaciPupils",
+                percent_sch_support      AS "PercentSchSupport",
+                number_of_pupils         AS "NumberOfPupils",
+                percent_statement_or_ehp AS "PercentStatementOrEhp"
+            FROM public.v_similar_schools_secondary_values
+            WHERE urn = ANY(@Urns);
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        var daos = await conn.QueryAsync<SimilarSchoolsSecondaryValuesDao>(
+            new CommandDefinition(sql, new { Urns = urns.ToArray() }));
+
+        // Map DAO -> application model with null defaults (no missing-data states)
+        return daos
+            .Select(d => new SimilarSchoolsSecondaryValues
+            {
+                Urn = d.Urn,
+                Ks2Rp = d.Ks2Rp,
+                Ks2Mp = d.Ks2Mp,
+                PpPerc = d.PpPerc,
+                PercentEal = d.PercentEal,
+                Polar4QuintilePupils = d.Polar4QuintilePupils,
+                PStability = d.PStability,
+                IdaciPupils = d.IdaciPupils,
+                PercentSchSupport = d.PercentSchSupport,
+                NumberOfPupils = d.NumberOfPupils,
+                PercentStatementOrEhp = d.PercentStatementOrEhp
+            })
+            .ToDictionary(x => x.Urn, x => x);
+    }
 
     private SimilarSchool FromDao(SimilarSchoolDao sch, SimilarSchoolPerformanceDao perf) => new SimilarSchool
     {
@@ -216,5 +263,19 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         public required string EngMaths59_Tot_Est_Current_Pct { get; set; }
         public required string Maths59_Sum_Est_Current_Num { get; set; }
         public required string Physics59_Sum_Est_Current_Num { get; set; }
+    }
+    private class SimilarSchoolsSecondaryValuesDao
+    {
+        public string Urn { get; init; }
+        public required decimal Ks2Rp { get; init; }
+        public required decimal Ks2Mp { get; init; }
+        public required decimal PpPerc { get; init; }
+        public required decimal PercentEal { get; init; }
+        public required int Polar4QuintilePupils { get; init; }
+        public required decimal PStability { get; init; }
+        public required decimal IdaciPupils { get; init; }
+        public required decimal PercentSchSupport { get; init; }
+        public required int NumberOfPupils { get; init; }
+        public required decimal PercentStatementOrEhp { get; init; }
     }
 }
