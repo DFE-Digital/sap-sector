@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Web.Formatters;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
@@ -11,15 +12,18 @@ public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
+    private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetCharacteristicsComparison getCharacteristicsComparison,
+        ICharacteristicsComparisonFormatter characteristicsFormatter,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
         _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
         _getCharacteristicsComparison = getCharacteristicsComparison ?? throw new ArgumentNullException(nameof(getCharacteristicsComparison));
+        _characteristicsFormatter = characteristicsFormatter ?? throw new ArgumentNullException(nameof(characteristicsFormatter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -53,25 +57,18 @@ public class SimilarSchoolsComparisonController : Controller
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        if (response is null || response.Rows is null || response.Rows.Count == 0)
+        if (response is null)
         {
             _logger.LogWarning(
-                "GetCharacteristicsComparison returned no rows for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "GetCharacteristicsComparison returned no data for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return NotFound();
         }
 
-        modelResult.Model!.CharacteristicsRows = response.Rows
-            .Select(r => new SimilarSchoolsComparisonViewModel.CharacteristicRow
-            {
-                Characteristic = r.Characteristic,
-                CurrentSchoolValue = r.CurrentSchoolValue,
-                SimilarSchoolValue = r.SimilarSchoolValue,
-                IsNumeric = r.IsNumeric
-            })
-            .ToList()
-            .AsReadOnly();
+        modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
+            response.CurrentSchool,
+            response.SimilarSchool);
 
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
