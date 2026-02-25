@@ -26,19 +26,19 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     {
         var rows = new List<SimilarSchoolsSecondaryGroupsRow>
         {
-            new() { URN = "A", NeighbourURN = "B", Dist = "0.1", Rank = "1" },
-            new() { URN = "A", NeighbourURN = "C", Dist = "0.2", Rank = "2" },
-            new() { URN = "X", NeighbourURN = "Y", Dist = "0.3", Rank = "1" }
+            new() { URN = "123456", SimilarURN = "654321", Dist = "0.1", Rank = "1" },
+            new() { URN = "123456", SimilarURN = "654322", Dist = "0.2", Rank = "2" },
+            new() { URN = "111111", SimilarURN = "222222", Dist = "0.3", Rank = "1" }
         };
         _groupsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);
 
         var sut = CreateSut();
 
-        var result = await sut.GetSimilarSchoolUrnsAsync("A");
+        var result = await sut.GetSimilarSchoolUrnsAsync("123456");
 
         Assert.Equal(2, result.Count);
-        Assert.Contains("B", result);
-        Assert.Contains("C", result);
+        Assert.Contains("654321", result);
+        Assert.Contains("654322", result);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     {
         var current = new Establishment
         {
-            URN = "A",
+            URN = "123456",
             EstablishmentName = "Current School",
             LAId = "100",
             LAName = "LA",
@@ -60,7 +60,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         };
         var similar = new Establishment
         {
-            URN = "B",
+            URN = "654321",
             EstablishmentName = "Similar School",
             LAId = "100",
             LAName = "LA",
@@ -76,23 +76,23 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         _groupsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsSecondaryGroupsRow>
         {
-            new() { URN = "A", NeighbourURN = "B", Dist = "0.1", Rank = "1" }
+            new() { URN = "123456", SimilarURN = "654321", Dist = "0.1", Rank = "1" }
         });
 
         _performanceRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<EstablishmentPerformance>
         {
-            new() { Id = "A", Attainment8_Tot_Est_Current_Num = "50" },
-            new() { Id = "B", Attainment8_Tot_Est_Current_Num = "45" }
+            new() { Id = "123456", Attainment8_Tot_Est_Current_Num = "50" },
+            new() { Id = "654321", Attainment8_Tot_Est_Current_Num = "45" }
         });
 
         var sut = CreateSut();
 
-        var (currentSchool, similarSchools) = await sut.GetSimilarSchoolsGroupAsync("A");
+        var (currentSchool, similarSchools) = await sut.GetSimilarSchoolsGroupAsync("123456");
 
-        Assert.Equal("A", currentSchool.URN);
+        Assert.Equal("123456", currentSchool.URN);
         Assert.Equal("Current School", currentSchool.Name);
         Assert.Single(similarSchools);
-        Assert.Equal("B", similarSchools.First().URN);
+        Assert.Equal("654321", similarSchools.First().URN);
     }
 
     [Fact]
@@ -102,34 +102,36 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         {
             new()
             {
-                URN = "A",
-                KS2RP = "104.5",
-                KS2MP = "104.0",
-                PPPerc = "50.5",
-                PercentEAL = "10.1",
+                URN = "123456",
+                Ks2Rp = "104.5",
+                Ks2Mp = "104.0",
+                PpPerc = "50.5",
+                PercentEal = "10.1",
                 Polar4QuintilePupils = "3",
                 PStability = "90",
                 IdaciPupils = "0.316",
                 PercentSchSupport = "12.5",
                 NumberOfPupils = "500",
-                PercentageStatementOrEHP = "2.1",
+                PercentStatementOrEhp = "2.1",
                 Att8Scr = "42"
             }
         });
 
         var sut = CreateSut();
 
-        var result = await sut.GetSecondaryValuesByUrnsAsync(new[] { "A", "B" });
+        var result = await sut.GetSecondaryValuesByUrnsAsync(new[] { "123456", "654321" });
 
         Assert.Equal(2, result.Count);
-        Assert.True(result.ContainsKey("A"));
-        Assert.True(result.ContainsKey("B"));
+        Assert.Contains(result, v => v.Urn == "123456");
+        Assert.Contains(result, v => v.Urn == "654321");
 
-        Assert.Equal(104.5m, result["A"].Ks2Rp);
-        Assert.Equal(3, result["A"].Polar4QuintilePupils);
-        Assert.Equal(500, result["A"].NumberOfPupils);
+        var a = result.Single(v => v.Urn == "123456");
+        Assert.Equal(104.5m, a.Ks2ReadingScore);
+        Assert.Equal(3, a.Polar4Quintile);
+        Assert.Equal(500, a.PupilCount);
 
-        Assert.Equal(0m, result["B"].Ks2Rp);
-        Assert.Equal(0, result["B"].NumberOfPupils);
+        var b = result.Single(v => v.Urn == "654321");
+        Assert.Equal(0m, b.Ks2ReadingScore);
+        Assert.Equal(0, b.PupilCount);
     }
 }

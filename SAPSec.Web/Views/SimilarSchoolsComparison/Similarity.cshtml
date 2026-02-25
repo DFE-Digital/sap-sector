@@ -23,7 +23,6 @@
             <th scope="col" class="govuk-table__header govuk-!-width-one-half">Characteristic</th>
             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">@Model.Name</th>
             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">@Model.SimilarSchoolName</th>
-            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Similarity</th>
         </tr>
         </thead>
 
@@ -37,8 +36,6 @@
                 <td class="govuk-table__cell">@row.CurrentSchoolValue</td>
                 <td class="govuk-table__cell">@row.SimilarSchoolValue</td>
 
-                <!-- Placeholder column (keeps structure + alignment) -->
-                <td class="govuk-table__cell">&nbsp;</td>
             </tr>
         }
         </tbody>

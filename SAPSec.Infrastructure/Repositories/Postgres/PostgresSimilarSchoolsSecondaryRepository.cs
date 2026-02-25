@@ -23,7 +23,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT "neighbour_urn" 
+            SELECT "similar_urn" 
             FROM public.v_similar_schools_secondary_groups 
             WHERE "urn" = @urn;
         """;
@@ -71,7 +71,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "UrbanRuralName"
             FROM public.v_establishment 
             WHERE "URN" IN (
-                SELECT "neighbour_urn" 
+                SELECT "similar_urn" 
                 FROM public.v_similar_schools_secondary_groups 
                 WHERE "urn" = @urn
             );
@@ -90,7 +90,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Physics59_Sum_Est_Current_Num"
             FROM public.v_establishment_performance
             WHERE "Id" = @urn OR "Id" IN (
-                SELECT "neighbour_urn" 
+                SELECT "similar_urn" 
                 FROM public.v_similar_schools_secondary_groups 
                 WHERE "urn" = @urn
             );
@@ -132,11 +132,15 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 .AsReadOnly());
     }
     
-    public async Task<IReadOnlyDictionary<string, SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
-        IReadOnlyCollection<string> urns)
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+        IEnumerable<string> urns)
     {
-        if (urns is null || urns.Count == 0)
-            return new Dictionary<string, SimilarSchoolsSecondaryValues>();
+        if (urns is null)
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+
+        var urnList = urns as IList<string> ?? urns.ToList();
+        if (urnList.Count == 0)
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
 
         const string sql = """
             SELECT
@@ -158,25 +162,25 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         var daos = await conn.QueryAsync<SimilarSchoolsSecondaryValuesDao>(
-            new CommandDefinition(sql, new { Urns = urns.ToArray() }));
+            new CommandDefinition(sql, new { Urns = urnList.ToArray() }));
 
         // Map DAO -> application model with null defaults (no missing-data states)
         return daos
             .Select(d => new SimilarSchoolsSecondaryValues
             {
                 Urn = d.Urn,
-                Ks2Rp = d.Ks2Rp,
-                Ks2Mp = d.Ks2Mp,
-                PpPerc = d.PpPerc,
-                PercentEal = d.PercentEal,
-                Polar4QuintilePupils = d.Polar4QuintilePupils,
-                PStability = d.PStability,
-                IdaciPupils = d.IdaciPupils,
-                PercentSchSupport = d.PercentSchSupport,
-                NumberOfPupils = d.NumberOfPupils,
-                PercentStatementOrEhp = d.PercentStatementOrEhp
+                Ks2ReadingScore = d.Ks2Rp,
+                Ks2MathsScore = d.Ks2Mp,
+                PupilPremiumEligibilityPercentage = d.PpPerc,
+                PupilsWithEalPercentage = d.PercentEal,
+                Polar4Quintile = d.Polar4QuintilePupils,
+                PupilStabilityRate = d.PStability,
+                AverageIdaciScore = d.IdaciPupils,
+                PupilsWithSenSupportPercentage = d.PercentSchSupport,
+                PupilCount = d.NumberOfPupils,
+                PupilsWithEhcPlanPercentage = d.PercentStatementOrEhp
             })
-            .ToDictionary(x => x.Urn, x => x);
+            .ToList();
     }
 
     private SimilarSchool FromDao(SimilarSchoolDao sch, SimilarSchoolPerformanceDao perf) => new SimilarSchool

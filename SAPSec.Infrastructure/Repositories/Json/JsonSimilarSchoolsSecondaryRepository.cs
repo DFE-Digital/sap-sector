@@ -30,7 +30,7 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
     {
         var rows = await _similarSchoolsGroupsRepository.ReadAllAsync();
         var groupRows = rows.Where(r => r.URN == urn).ToList();
-        var neighbourUrns = groupRows.Select(r => r.NeighbourURN);
+        var neighbourUrns = groupRows.Select(r => r.SimilarURN);
 
         return neighbourUrns.ToList().AsReadOnly();
     }
@@ -42,7 +42,7 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
 
         var rows = await _similarSchoolsGroupsRepository.ReadAllAsync();
         var groupRows = rows.Where(r => r.URN == urn).ToList();
-        var neighbourUrns = groupRows.Select(r => r.NeighbourURN).ToList();
+        var neighbourUrns = groupRows.Select(r => r.SimilarURN).ToList();
 
         var similarSchoolsEstabs = allEstabs
             .Where(p => neighbourUrns.Contains(p.URN))
@@ -62,57 +62,60 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
                 .AsReadOnly());
     }
 
-    public async Task<IReadOnlyDictionary<string, SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
-        IReadOnlyCollection<string> urns)
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+        IEnumerable<string> urns)
     {
-        if (urns is null || urns.Count == 0)
-            return new Dictionary<string, SimilarSchoolsSecondaryValues>();
+        if (urns is null)
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
 
-        var wanted = new HashSet<string>(urns);
+        var urnList = urns as IList<string> ?? urns.ToList();
+        if (urnList.Count == 0)
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+
+        var wanted = new HashSet<string>(urnList);
         var rows = await _similarSchoolsValuesRepository.ReadAllAsync();
 
-        var dict = rows
+        var list = rows
             .Where(r => wanted.Contains(r.URN))
-            .ToDictionary(
-                r => r.URN,
-                r => new SimilarSchoolsSecondaryValues
-                {
-                    Urn = r.URN,
-                    Ks2Rp = ParseDecimal(r.KS2RP),
-                    Ks2Mp = ParseDecimal(r.KS2MP),
-                    PpPerc = ParseDecimal(r.PPPerc),
-                    PercentEal = ParseDecimal(r.PercentEAL),
-                    Polar4QuintilePupils = ParseInt(r.Polar4QuintilePupils),
-                    PStability = ParseDecimal(r.PStability),
-                    IdaciPupils = ParseDecimal(r.IdaciPupils),
-                    PercentSchSupport = ParseDecimal(r.PercentSchSupport),
-                    NumberOfPupils = ParseInt(r.NumberOfPupils),
-                    PercentStatementOrEhp = ParseDecimal(r.PercentageStatementOrEHP),
-                });
-
-        // Ensure all requested URNs exist (avoids KeyNotFound in use case/tests)
-        foreach (var urn in urns)
-        {
-            if (!dict.ContainsKey(urn))
+            .Select(r => new SimilarSchoolsSecondaryValues
             {
-                dict[urn] = new SimilarSchoolsSecondaryValues
+                Urn = r.URN,
+                Ks2ReadingScore = ParseDecimal(r.Ks2Rp),
+                Ks2MathsScore = ParseDecimal(r.Ks2Mp),
+                PupilPremiumEligibilityPercentage = ParseDecimal(r.PpPerc),
+                PupilsWithEalPercentage = ParseDecimal(r.PercentEal),
+                Polar4Quintile = ParseInt(r.Polar4QuintilePupils),
+                PupilStabilityRate = ParseDecimal(r.PStability),
+                AverageIdaciScore = ParseDecimal(r.IdaciPupils),
+                PupilsWithSenSupportPercentage = ParseDecimal(r.PercentSchSupport),
+                PupilCount = ParseInt(r.NumberOfPupils),
+                PupilsWithEhcPlanPercentage = ParseDecimal(r.PercentStatementOrEhp),
+            })
+            .ToList();
+
+        // Ensure all requested URNs exist (avoids missing-data issues in use cases/tests)
+        foreach (var urn in urnList)
+        {
+            if (list.All(v => v.Urn != urn))
+            {
+                list.Add(new SimilarSchoolsSecondaryValues
                 {
                     Urn = urn,
-                    Ks2Rp = 0,
-                    Ks2Mp = 0,
-                    PpPerc = 0,
-                    PercentEal = 0,
-                    Polar4QuintilePupils = 0,
-                    PStability = 0,
-                    IdaciPupils = 0,
-                    PercentSchSupport = 0,
-                    NumberOfPupils = 0,
-                    PercentStatementOrEhp = 0
-                };
+                    Ks2ReadingScore = 0,
+                    Ks2MathsScore = 0,
+                    PupilPremiumEligibilityPercentage = 0,
+                    PupilsWithEalPercentage = 0,
+                    Polar4Quintile = 0,
+                    PupilStabilityRate = 0,
+                    AverageIdaciScore = 0,
+                    PupilsWithSenSupportPercentage = 0,
+                    PupilCount = 0,
+                    PupilsWithEhcPlanPercentage = 0
+                });
             }
         }
 
-        return dict;
+        return list;
     }
 
     private static decimal ParseDecimal(string value) =>

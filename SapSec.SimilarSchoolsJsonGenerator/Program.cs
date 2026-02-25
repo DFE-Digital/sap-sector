@@ -105,20 +105,20 @@ public class Program
                 }
 
                 // If neighbour URN is not in our data set, map it to a URN that is in our dataset
-                if (!allUrns.Contains(row.NeighbourURN))
+                if (!allUrns.Contains(row.SimilarURN))
                 {
                     // If we've already mapped this URN, use that, otherwise pick the next unmapped one
                     // that isn't already in our neighbour set
-                    if (!urnLookup.ContainsKey(row.NeighbourURN))
+                    if (!urnLookup.ContainsKey(row.SimilarURN))
                     {
-                        urnLookup[row.NeighbourURN] = allUrns.Except([currentUrn, .. neighbours]).First();
+                        urnLookup[row.SimilarURN] = allUrns.Except([currentUrn, .. neighbours]).First();
                     }
 
-                    row.NeighbourURN = urnLookup[row.NeighbourURN];
+                    row.SimilarURN = urnLookup[row.SimilarURN];
                 }
 
                 // Update neighbours
-                neighbours.Add(row.NeighbourURN);
+                neighbours.Add(row.SimilarURN);
 
                 results.Add(row);
             }

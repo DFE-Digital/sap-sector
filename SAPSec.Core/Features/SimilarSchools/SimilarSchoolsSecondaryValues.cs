@@ -4,18 +4,20 @@ public class SimilarSchoolsSecondaryValues
 {
     public string Urn { get; init; } = default!;
 
-    public decimal Ks2Rp { get; init; }
-    public decimal Ks2Mp { get; init; }
+    public decimal Ks2ReadingScore { get; init; }
+    public decimal Ks2MathsScore { get; init; }
 
-    public decimal PpPerc { get; init; }
-    public decimal PercentEal { get; init; }
+    public decimal PupilPremiumEligibilityPercentage { get; init; }
+    public decimal PupilsWithEalPercentage { get; init; }
 
-    public int Polar4QuintilePupils { get; init; }
+    public int Polar4Quintile { get; init; }
 
-    public decimal PStability { get; init; }
-    public decimal IdaciPupils { get; init; }
-    public decimal PercentSchSupport { get; init; }
+    public decimal PupilStabilityRate { get; init; }
+    public decimal AverageIdaciScore { get; init; }
+    public decimal PupilsWithSenSupportPercentage { get; init; }
 
-    public int NumberOfPupils { get; init; }
-    public decimal PercentStatementOrEhp { get; init; }
+    public int PupilCount { get; init; }
+    public decimal PupilsWithEhcPlanPercentage { get; init; }
+
+    public decimal Ks2AverageScore => (Ks2ReadingScore + Ks2MathsScore) / 2m;
 }

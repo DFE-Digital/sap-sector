@@ -8,7 +8,7 @@ namespace SapSec.SimilarSchoolsJsonGenerator.Models
         public SimilarSchoolsSecondaryGroupsRowMapping()
         {
             Map(m => m.URN).Name("urn");
-            Map(m => m.NeighbourURN).Name("neighbour_urn");
+            Map(m => m.SimilarURN).Name("similar_urn");
             Map(m => m.Dist).Name("dist");
             Map(m => m.Rank).Name("rank");
         }

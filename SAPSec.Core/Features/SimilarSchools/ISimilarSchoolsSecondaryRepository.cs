@@ -4,7 +4,7 @@
     {
         Task<IReadOnlyCollection<string>> GetSimilarSchoolUrnsAsync(string urn);
         Task<(SimilarSchool, IReadOnlyCollection<SimilarSchool>)> GetSimilarSchoolsGroupAsync(string urn);
-        Task<IReadOnlyDictionary<string, SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
-            IReadOnlyCollection<string> urns);
+        Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+            IEnumerable<string> urns);
     }
 }

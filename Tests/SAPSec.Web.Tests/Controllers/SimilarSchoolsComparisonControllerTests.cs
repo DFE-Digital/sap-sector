@@ -158,42 +158,42 @@ public class SimilarSchoolsComparisonControllerTests
 
     private void SetupSecondaryValues(string currentUrn, string similarUrn)
     {
-        var dict = new Dictionary<string, SimilarSchoolsSecondaryValues>
+        var values = new List<SimilarSchoolsSecondaryValues>
         {
-            [currentUrn] = new SimilarSchoolsSecondaryValues
+            new SimilarSchoolsSecondaryValues
             {
                 Urn = currentUrn,
-                Ks2Rp = 104.5m,
-                Ks2Mp = 104.1m,
-                NumberOfPupils = 760,
-                PStability = 90m,
-                PpPerc = 52.0m,
-                IdaciPupils = 0.316508m,
-                Polar4QuintilePupils = 3,
-                PercentStatementOrEhp = 2.105263m,
-                PercentSchSupport = 16.315789m,
-                PercentEal = 39.525692m
+                Ks2ReadingScore = 104.5m,
+                Ks2MathsScore = 104.1m,
+                PupilCount = 760,
+                PupilStabilityRate = 90m,
+                PupilPremiumEligibilityPercentage = 52.0m,
+                AverageIdaciScore = 0.316508m,
+                Polar4Quintile = 3,
+                PupilsWithEhcPlanPercentage = 2.105263m,
+                PupilsWithSenSupportPercentage = 16.315789m,
+                PupilsWithEalPercentage = 39.525692m
             },
-            [similarUrn] = new SimilarSchoolsSecondaryValues
+            new SimilarSchoolsSecondaryValues
             {
                 Urn = similarUrn,
-                Ks2Rp = 103.7m,
-                Ks2Mp = 103.6m,
-                NumberOfPupils = 962,
-                PStability = 91.7m,
-                PpPerc = 41.2m,
-                IdaciPupils = 0.351137m,
-                Polar4QuintilePupils = 2,
-                PercentStatementOrEhp = 3.326403m,
-                PercentSchSupport = 8.939709m,
-                PercentEal = 61.954262m
+                Ks2ReadingScore = 103.7m,
+                Ks2MathsScore = 103.6m,
+                PupilCount = 962,
+                PupilStabilityRate = 91.7m,
+                PupilPremiumEligibilityPercentage = 41.2m,
+                AverageIdaciScore = 0.351137m,
+                Polar4Quintile = 2,
+                PupilsWithEhcPlanPercentage = 3.326403m,
+                PupilsWithSenSupportPercentage = 8.939709m,
+                PupilsWithEalPercentage = 61.954262m
             }
         };
 
         _repoMock
             .Setup(r => r.GetSecondaryValuesByUrnsAsync(
-                It.Is<IReadOnlyCollection<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
-            .ReturnsAsync(dict);
+                It.Is<IEnumerable<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
+            .ReturnsAsync(values);
     }
 
     // ============================

@@ -173,14 +173,14 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var headerCells = Page.Locator("table.govuk-table thead th");
-        (await headerCells.CountAsync()).Should().Be(4, "Similarity table should have 4 columns");
+        (await headerCells.CountAsync()).Should().Be(3, "Similarity table should have 3 columns");
         (await headerCells.Nth(0).TextContentAsync()).Should().Contain("Characteristic");
 
         var firstRow = Page.Locator("table.govuk-table tbody tr.govuk-table__row").First;
         (await firstRow.CountAsync()).Should().Be(1);
 
         var cells = firstRow.Locator("th, td");
-        (await cells.CountAsync()).Should().Be(4, "Row should have characteristic + 3 value cells");
+        (await cells.CountAsync()).Should().Be(3, "Row should have characteristic + 2 value cells");
 
         (await cells.Nth(0).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
         (await cells.Nth(1).TextContentAsync()).Should().NotBeNullOrWhiteSpace();

@@ -29,57 +29,57 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             new()
             {
                 Characteristic = "Total number of pupils",
-                CurrentSchoolValue = IntN0(current.NumberOfPupils),
-                SimilarSchoolValue = IntN0(similar.NumberOfPupils),
+                CurrentSchoolValue = IntN0(current.PupilCount),
+                SimilarSchoolValue = IntN0(similar.PupilCount),
                 IsNumeric = true
             },
             new()
             {
                 Characteristic = "Pupil stability rate",
-                CurrentSchoolValue = Percent1dp(current.PStability),
-                SimilarSchoolValue = Percent1dp(similar.PStability),
+                CurrentSchoolValue = Percent1dp(current.PupilStabilityRate),
+                SimilarSchoolValue = Percent1dp(similar.PupilStabilityRate),
                 IsNumeric = true
             },
             new()
             {
                 Characteristic = "Eligibility for pupil premium",
-                CurrentSchoolValue = Percent1dp(current.PpPerc),
-                SimilarSchoolValue = Percent1dp(similar.PpPerc),
+                CurrentSchoolValue = Percent1dp(current.PupilPremiumEligibilityPercentage),
+                SimilarSchoolValue = Percent1dp(similar.PupilPremiumEligibilityPercentage),
                 IsNumeric = true
             },
             new()
             {
                 Characteristic = "Average IDACI score",
-                CurrentSchoolValue = Dec3dp(current.IdaciPupils),
-                SimilarSchoolValue = Dec3dp(similar.IdaciPupils),
+                CurrentSchoolValue = Dec3dp(current.AverageIdaciScore),
+                SimilarSchoolValue = Dec3dp(similar.AverageIdaciScore),
                 IsNumeric = true
             },
             new()
             {
                 Characteristic = "Average POLAR4 quintile",
-                CurrentSchoolValue = PolarText(current.Polar4QuintilePupils),
-                SimilarSchoolValue = PolarText(similar.Polar4QuintilePupils),
+                CurrentSchoolValue = PolarText(current.Polar4Quintile),
+                SimilarSchoolValue = PolarText(similar.Polar4Quintile),
                 IsNumeric = false
             },
             new()
             {
                 Characteristic = "Percentage of pupils with an EHC plan",
-                CurrentSchoolValue = Percent1dp(current.PercentStatementOrEhp),
-                SimilarSchoolValue = Percent1dp(similar.PercentStatementOrEhp),
+                CurrentSchoolValue = Percent1dp(current.PupilsWithEhcPlanPercentage),
+                SimilarSchoolValue = Percent1dp(similar.PupilsWithEhcPlanPercentage),
                 IsNumeric = true
             },
             new()
             {
                 Characteristic = "Percentage of pupils with SEN support",
-                CurrentSchoolValue = Percent1dp(current.PercentSchSupport),
-                SimilarSchoolValue = Percent1dp(similar.PercentSchSupport),
+                CurrentSchoolValue = Percent1dp(current.PupilsWithSenSupportPercentage),
+                SimilarSchoolValue = Percent1dp(similar.PupilsWithSenSupportPercentage),
                 IsNumeric = true
             },
             new()
             {
                 Characteristic = "Percentage of pupils with EAL",
-                CurrentSchoolValue = Percent1dp(current.PercentEal),
-                SimilarSchoolValue = Percent1dp(similar.PercentEal),
+                CurrentSchoolValue = Percent1dp(current.PupilsWithEalPercentage),
+                SimilarSchoolValue = Percent1dp(similar.PupilsWithEalPercentage),
                 IsNumeric = true
             },
         }.AsReadOnly();
@@ -88,8 +88,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
     // Formatting rules
     private static string Ks2Int(SimilarSchoolsSecondaryValues s)
     {
-        var avg = (s.Ks2Rp + s.Ks2Mp) / 2m;
-        return Convert.ToInt32(Math.Round(avg, MidpointRounding.AwayFromZero))
+        return Convert.ToInt32(Math.Round(s.Ks2AverageScore, MidpointRounding.AwayFromZero))
             .ToString(CultureInfo.InvariantCulture);
     }
 

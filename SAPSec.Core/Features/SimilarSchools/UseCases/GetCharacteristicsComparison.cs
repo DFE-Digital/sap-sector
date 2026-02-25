@@ -11,11 +11,13 @@ public class GetCharacteristicsComparison(
 
         var values = await repository.GetSecondaryValuesByUrnsAsync(urns);
 
-        if (!values.TryGetValue(request.CurrentSchoolUrn, out var current))
-            throw new InvalidOperationException($"No characteristics found for URN {request.CurrentSchoolUrn}");
+        var current = values.FirstOrDefault(v => v.Urn == request.CurrentSchoolUrn);
+        if (current is null)
+            throw new NotFoundException($"No characteristics found for URN {request.CurrentSchoolUrn}");
 
-        if (!values.TryGetValue(request.SimilarSchoolUrn, out var similar))
-            throw new InvalidOperationException($"No characteristics found for URN {request.SimilarSchoolUrn}");
+        var similar = values.FirstOrDefault(v => v.Urn == request.SimilarSchoolUrn);
+        if (similar is null)
+            throw new NotFoundException($"No characteristics found for URN {request.SimilarSchoolUrn}");
 
         return new(current, similar);
     }

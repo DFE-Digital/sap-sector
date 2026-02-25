@@ -2,7 +2,7 @@
 
 /// <summary>
 /// Represents a similar school result, combining data from:
-/// - v_similar_schools_secondary_groups (urn, neighbour_urn, dist, rank)
+/// - v_similar_schools_secondary_groups (urn, similar_urn, dist, rank)
 /// - v_similar_schools_secondary_values (ks2_rp, ks2_mp, pp_perc, etc.)
 /// - v_establishment (establishment_name, street, town, county, postcode, etc.)
 /// </summary>
@@ -12,7 +12,7 @@ public class SimilarSchoolViewModel
 
     // From v_similar_schools_secondary_groups
     public int Urn { get; set; }
-    public int NeighbourUrn { get; set; }
+    public int SimilarUrn { get; set; }
     public double Dist { get; set; }
     public int Rank { get; set; }
 
