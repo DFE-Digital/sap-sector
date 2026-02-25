@@ -941,6 +941,88 @@
   right: 0;
 }
 
+.app-ks4-column-chart {
+  max-width: 760px;
+  border: 1px solid #b1b4b6;
+  padding: 16px 16px 10px;
+  background: #fff;
+}
+
+.app-ks4-column-chart__plot {
+  position: relative;
+  height: 280px;
+}
+
+.app-ks4-column-chart__grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid #d8d8d8;
+}
+
+.app-ks4-column-chart__grid--0 { bottom: 0; }
+.app-ks4-column-chart__grid--30 { bottom: 33.333%; }
+.app-ks4-column-chart__grid--60 { bottom: 66.666%; }
+.app-ks4-column-chart__grid--90 { bottom: 100%; }
+
+.app-ks4-column-chart__bars {
+  position: absolute;
+  left: 0;
+  right: 40px;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.app-ks4-column {
+  width: 120px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.app-ks4-column__bar {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.app-ks4-column__label {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.app-ks4-column-chart__axis {
+  margin-top: 8px;
+  margin-left: 0;
+  margin-right: 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  font-size: 12px;
+  color: #505a5f;
+}
+
+.app-ks4-column-chart__labels {
+  margin-top: 8px;
+  margin-right: 40px;
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.app-ks4-column-chart__labels .app-ks4-column__label {
+  width: 120px;
+}
+
 .app-ks4-bar {
   min-height: 24px;
   display: flex;
@@ -985,6 +1067,10 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .app-ks4-message-panel {

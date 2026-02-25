@@ -97,58 +97,46 @@
         </ul>
 
         <div class="govuk-tabs__panel" id="three-year-average">
-            <div class="app-ks4-scale" aria-hidden="true">
-                <div></div>
-                <div class="app-ks4-scale__ticks">
+            <div class="app-ks4-column-chart">
+                <div class="app-ks4-column-chart__plot">
+                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--0"></span>
+                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--30"></span>
+                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--60"></span>
+                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--90"></span>
+
+                    <div class="app-ks4-column-chart__bars">
+                        <div class="app-ks4-column">
+                            <div class="app-ks4-column__bar app-ks4-bar--selected-school"
+                                 style="height:@Model.SelectedSchoolWidthPercent.ToString("0.0")%;">
+                                <span class="app-ks4-bar-number">@Model.SelectedSchoolAttainment8Display</span>
+                            </div>
+                        </div>
+
+                        <div class="app-ks4-column">
+                            <div class="app-ks4-column__bar app-ks4-bar--this-school"
+                                 style="height:@Model.ThisSchoolWidthPercent.ToString("0.0")%;">
+                                <span class="app-ks4-bar-number">@Model.ThisSchoolAttainment8Display</span>
+                            </div>
+                        </div>
+
+                        <div class="app-ks4-column">
+                            <div class="app-ks4-column__bar app-ks4-bar--england-overall"
+                                 style="height:@Model.EnglandWidthPercent.ToString("0.0")%;">
+                                <span class="app-ks4-bar-number">@Model.EnglandAttainment8Display</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="app-ks4-column-chart__axis">
                     <span>0</span>
                     <span>30</span>
                     <span>60</span>
                     <span>90</span>
                 </div>
-                <div></div>
-            </div>
-
-            <div class="app-ks4-bar-chart">
-                <div class="app-ks4-bar-row">
-                    <div class="app-ks4-bar-label">@Model.SimilarSchoolName</div>
-                    <div class="app-ks4-bar-track">
-                        <span class="app-ks4-gridline app-ks4-gridline--0"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--30"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--60"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--90"></span>
-                        <div class="app-ks4-bar app-ks4-bar--selected-school"
-                             style="width:@Model.SelectedSchoolWidthPercent.ToString("0.0")%;">
-                            <span class="app-ks4-bar-number">@Model.SelectedSchoolAttainment8Display</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="app-ks4-bar-row">
-                    <div class="app-ks4-bar-label">@Model.Name</div>
-                    <div class="app-ks4-bar-track">
-                        <span class="app-ks4-gridline app-ks4-gridline--0"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--30"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--60"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--90"></span>
-                        <div class="app-ks4-bar app-ks4-bar--this-school"
-                             style="width:@Model.ThisSchoolWidthPercent.ToString("0.0")%;">
-                            <span class="app-ks4-bar-number">@Model.ThisSchoolAttainment8Display</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="app-ks4-bar-row">
-                    <div class="app-ks4-bar-label">England</div>
-                    <div class="app-ks4-bar-track">
-                        <span class="app-ks4-gridline app-ks4-gridline--0"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--30"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--60"></span>
-                        <span class="app-ks4-gridline app-ks4-gridline--90"></span>
-                        <div class="app-ks4-bar app-ks4-bar--england-overall"
-                             style="width:@Model.EnglandWidthPercent.ToString("0.0")%;">
-                            <span class="app-ks4-bar-number">@Model.EnglandAttainment8Display</span>
-                        </div>
-                    </div>
+                <div class="app-ks4-column-chart__labels">
+                    <div class="app-ks4-column__label">@Model.SimilarSchoolName</div>
+                    <div class="app-ks4-column__label">@Model.Name</div>
+                    <div class="app-ks4-column__label">Schools in England average</div>
                 </div>
             </div>
         </div>
