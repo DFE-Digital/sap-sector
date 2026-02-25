@@ -1,11 +1,11 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimilarSchoolsSingleValueFilter
 {
-    public string Key => "dist";
     public string Name => "Distance";
     public FilterType Type => FilterType.SingleValue;
 
@@ -33,12 +33,12 @@ public class SimilarSchoolsDistanceFilter(SimilarSchool currentSchool) : ISimila
             });
     }
 
-    public SimilarSchoolsAvailableFilter AsAvailableFilter(IEnumerable<SimilarSchool> items, string? value) => new(
-        Key,
+    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, string? value) => new(
+        key,
         Name,
         Type,
         GetPossibleOptions(items, value).ToList().AsReadOnly(),
-        null);
+        DataWithAvailability.NotApplicable<string>());
 
     private IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, string? value)
     {

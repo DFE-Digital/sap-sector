@@ -3,7 +3,7 @@
 @model SchoolDetails
 @{
     Layout = "_Layout";
-    ViewData["Title"] = Model.Name.Display();
+    ViewData["Title"] = Model.Name;
 }
 
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
@@ -21,7 +21,7 @@
     match every characteristic but they will be similar across a large number of them.
 </p>
 <p class="govuk-body">
-    Find out more about <a href="/school/@Model.Urn.Display()/what-is-a-similar-school" class="govuk-link">how the DfE defines what a similar school is</a>.
+    Find out more about <a href="/school/@Model.Urn/what-is-a-similar-school" class="govuk-link">how the DfE defines what a similar school is</a>.
 </p>
 
 <h2 class="govuk-heading-m govuk-!-padding-top-6">Compare school performance</h2>

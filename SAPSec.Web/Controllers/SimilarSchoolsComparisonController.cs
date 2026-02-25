@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
@@ -19,11 +18,11 @@ public class SimilarSchoolsComparisonController : Controller
         _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-    
+
     [HttpGet]
     public Task<IActionResult> Index(string urn, string similarSchoolUrn) =>
         Similarity(urn, similarSchoolUrn);
-    
+
     [HttpGet]
     [Route("Similarity")]
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
@@ -140,7 +139,7 @@ public class SimilarSchoolsComparisonController : Controller
         // Display() should handle "not available", but we still guard against null ref.
         var similarName = response.SimilarSchoolDetails.Name is null
             ? null
-            : response.SimilarSchoolDetails.Name.Display();
+            : response.SimilarSchoolDetails.Name;
 
         if (string.IsNullOrWhiteSpace(similarName))
         {

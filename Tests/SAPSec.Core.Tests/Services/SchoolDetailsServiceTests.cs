@@ -1,10 +1,8 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Services;
-using Xunit;
 
 namespace SAPSec.Core.Tests.Services;
 
@@ -44,8 +42,8 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result.Urn.Value.Should().Be("123456");
-        result.Name.Value.Should().Be("Test Academy");
+        result.Urn.Should().Be("123456");
+        result.Name.Should().Be("Test Academy");
     }
 
     [Fact]
@@ -61,7 +59,7 @@ public class SchoolDetailsServiceTests
         var result = await _sut.GetByUrnAsync("123456");
 
         // Assert
-        result.Urn.Value.Should().Be("123456");
+        result.Urn.Should().Be("123456");
         result.Ukprn.Value.Should().Be("10012345");
     }
 
@@ -270,7 +268,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvision = "Has SEN unit";
+        establishment.ResourcedProvisionName = "Has SEN unit";
 
         _establishmentServiceMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -288,7 +286,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvision = "Has resourced provision";
+        establishment.ResourcedProvisionName = "Has resourced provision";
 
         _establishmentServiceMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -306,7 +304,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvision = "Has SEN unit and resourced provision";
+        establishment.ResourcedProvisionName = "Has SEN unit and resourced provision";
 
         _establishmentServiceMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -338,7 +336,7 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Urn.Value.Should().Be("123456");
+        result!.Urn.Should().Be("123456");
     }
 
     [Fact]
@@ -396,7 +394,7 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.Should().NotBeNull();
-        result!.Name.Value.Should().Be("Test Academy");
+        result!.Name.Should().Be("Test Academy");
     }
 
     [Fact]
@@ -518,10 +516,10 @@ public class SchoolDetailsServiceTests
             Postcode = "S1 1AA",
             GenderName = "Mixed",
             ReligiousCharacterName = "None",
-            AdmissionPolicy = "Non-selective",
-            HeadteacherTitle = "Mr",
-            HeadteacherFirstName = "John",
-            HeadteacherLastName = "Smith",
+            AdmissionsPolicyName = "Non-selective",
+            HeadTitle = "Mr",
+            HeadFirstName = "John",
+            HeadLastName = "Smith",
             Website = "https://www.testacademy.org.uk",
             TelephoneNum = "0114 123 4567",
             AgeRangeLow = "11",

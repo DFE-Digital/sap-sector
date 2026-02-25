@@ -1,0 +1,85 @@
+@using SAPSec.Core.Features.Filtering
+@using SAPSec.Core.Features.SimilarSchools.UseCases
+@using SAPSec.Web.Helpers;
+
+@model SimilarSchoolsAvailableFilter
+
+@{
+    var sectionId = $"filter-{Model.Key}";
+    var hasSelection = Model.Options.Any(o => o.Selected);
+    var isExpanded = hasSelection ? "true" : "false";
+    var isSingleSelect = Model.Type == FilterType.SingleValue;
+    var isLastInGroup = ViewData["IsLastInGroup"] as bool? ?? false;
+    var sectionClasses = isLastInGroup ? "app-filter-section" : "app-filter-section app-filter-section--divider";
+}
+
+<div class="@sectionClasses" data-module="app-filter-section">
+    <button type="button"
+            class="app-filter-section__toggle"
+            aria-expanded="@isExpanded"
+            aria-controls="@sectionId">
+        <span class="app-filter-section__title">@Model.Name</span>
+        <span class="app-filter-section__indicator">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd"
+                      d="M11.9999 10.5177L17.7928 16.3105L19.207 14.8963L11.9999 7.68923L4.79282 14.8963L6.20703 16.3105L11.9999 10.5177Z"
+                      fill="currentColor"></path>
+            </svg>
+        </span>
+    </button>
+
+    <div class="app-filter-section__content" id="@sectionId" @(hasSelection ? "" : "hidden")>
+        @if (Model.Key.Equals("dist", StringComparison.InvariantCultureIgnoreCase))
+        {
+            <p class="govuk-hint">Miles from selected school</p>
+        }
+
+        @if (isSingleSelect)
+        {
+            <div class="govuk-radios govuk-radios--small">
+                @foreach (var option in Model.Options)
+                {
+                    var inputId = $"{Model.Key}-{option.Key.Replace(" ", "-").Replace("%", "pct").Replace("(", "").Replace(")", "").ToLower()}";
+                    <div class="govuk-radios__item">
+                        <input class="govuk-radios__input"
+                               id="@inputId"
+                               name="@Model.Key"
+                               type="radio"
+                               value="@option.Key"
+                               @(option.Selected ? "checked" : "")>
+                        <label class="govuk-label govuk-radios__label" for="@inputId">
+                            @option.Name
+                        </label>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="govuk-checkboxes govuk-checkboxes--small">
+                @foreach (var option in Model.Options)
+                {
+                    var inputId = $"{Model.Key}-{option.Key.Replace(" ", "-").Replace("(", "").Replace(")", "").ToLower()}";
+                    <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input"
+                               id="@inputId"
+                               name="@Model.Key"
+                               type="checkbox"
+                               value="@option.Key"
+                               @(option.Selected ? "checked" : "")>
+                        <label class="govuk-label govuk-checkboxes__label" for="@inputId">
+                            @option.Name
+                        </label>
+                    </div>
+                }
+            </div>
+        }
+
+        @if (Model.Key.Equals("ur", StringComparison.InvariantCultureIgnoreCase))
+        {
+            <div class="govuk-inset-text app-filter-inset-light-blue govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+                <strong>This School:</strong> @Model.CurrentSchoolValue.Display()
+            </div>
+        }
+    </div>
+</div>

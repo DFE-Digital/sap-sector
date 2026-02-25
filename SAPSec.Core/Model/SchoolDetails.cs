@@ -9,8 +9,8 @@ namespace SAPSec.Core.Model;
 public  class SchoolDetails
 {
     // Identifiers
-    public required DataWithAvailability<string> Name { get; init; }
-    public required DataWithAvailability<string> Urn { get; init; }
+    public required string Urn { get; init; }
+    public required string Name { get; init; }
     public required DataWithAvailability<string> DfENumber { get; init; }
     public required DataWithAvailability<string> Ukprn { get; init; }
 

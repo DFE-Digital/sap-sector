@@ -40,8 +40,8 @@ public class SchoolControllerTests
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         var model = viewResult.Model.Should().BeOfType<SchoolDetails>().Subject;
-        model.Urn.Value.Should().Be(urn);
-        model.Name.Value.Should().Be("Test Academy");
+        model.Urn.Should().Be(urn);
+        model.Name.Should().Be("Test Academy");
     }
 
     [Fact]
@@ -168,8 +168,8 @@ public class SchoolControllerTests
         return new SchoolDetails
         {
             // Identifiers - Using new DataAvailability factory
-            Name = DataWithAvailability.Available(name),
-            Urn = DataWithAvailability.Available(urn),
+            Name = name,
+            Urn = urn,
             DfENumber = DataWithAvailability.Available("373/1234"),
             Ukprn = DataWithAvailability.Available("10012345"),
 

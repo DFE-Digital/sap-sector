@@ -1,0 +1,158 @@
+@using SAPSec.Web.ViewModels
+@model SimilarSchoolsPageViewModel
+
+@{
+    var hasActiveFilters = Model.HasActiveFilters;
+    var isExpanded = hasActiveFilters ? "true" : "false";
+    var panelVisibleClass = hasActiveFilters ? "app-filter-panel--visible" : "";
+}
+
+<div class="govuk-grid-column-one-third app-filter-column app-similar-schools-filter-column">
+    <button type="button" class="govuk-button govuk-button--secondary app-filter-toggle"
+            data-module="app-filter-toggle"
+            aria-expanded="@isExpanded"
+            aria-controls="similar-schools-filter-form">
+        <span class="app-filter-toggle__show">Show filters</span>
+        <span class="app-filter-toggle__hide">Hide filters</span>
+    </button>
+
+    <form method="get"
+          action="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })"
+          id="similar-schools-filter-form"
+          class="app-filter-panel app-filter-panel--similar @panelVisibleClass">
+
+        <div class="moj-filter">
+            <div class="moj-filter__header app-filter-header-divider">
+                <div class="moj-filter__header-title">
+                    <h2 class="govuk-heading-m">Filters</h2>
+                </div>
+            </div>
+
+            <div class="moj-filter__content">
+
+                @* ── Selected filter tags + Clear filters ── *@
+                @if (hasActiveFilters)
+                {
+                    <div class="moj-filter__selected app-filter-selected-divider">
+                        <div class="moj-filter__selected-heading">
+                            <div class="moj-filter__heading-title">
+                                <h2 class="govuk-heading-s">Selected filters</h2>
+                            </div>
+                        </div>
+
+                        <ul class="moj-filter-tags">
+                            @foreach (var tag in Model.SelectedFilterTags)
+                            {
+                                <li>
+                                    <a class="moj-filter__tag" href="@tag.RemoveUrl">
+                                        <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+
+                        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0 app-clear-filters-spacing">
+                            <a class="govuk-link govuk-link--no-visited-state"
+                               href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })">
+                                Clear filters
+                            </a>
+                        </p>
+                    </div>
+                }
+
+                <div class="moj-filter__options">
+                    <button type="submit" class="govuk-button" data-module="govuk-button" id="apply-filters-btn">
+                        <span class="app-button-spinner" aria-hidden="true"></span>
+                        <span class="app-button-text">Apply filters</span>
+                    </button>
+
+                    @foreach (var group in Model.FilterGroups)
+                    {
+                        <fieldset class="govuk-fieldset">
+                            <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">@group.Heading</legend>
+                            @for (var i = 0; i < group.Filters.Count; i++)
+                            {
+                                var filter = group.Filters[i];
+                                var isLastInGroup = i == group.Filters.Count - 1;
+                                <partial name="SimilarSchoolsFilterSection.cshtml"
+                                         model="filter"
+                                         view-data='new ViewDataDictionary(ViewData) { ["IsLastInGroup"] = isLastInGroup }' />
+                            }
+                        </fieldset>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script add-nonce="true">
+    (function () {
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFilterProtection);
+        } else {
+            initFilterProtection();
+        }
+
+        function initFilterProtection() {
+            var filterForm = document.getElementById('similar-schools-filter-form');
+            if (!filterForm) return;
+
+            var applyButton = document.getElementById('apply-filters-btn');
+
+            filterForm.onsubmit = function (e) {
+                var activeElement = document.activeElement;
+                var isApplyButton = activeElement &&
+                    activeElement.type === 'submit' &&
+                    activeElement.textContent.indexOf('Apply') > -1;
+
+                if (!isApplyButton) {
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (applyButton) {
+                    applyButton.classList.add('govuk-button--loading');
+                    applyButton.disabled = true;
+                }
+            };
+
+            var checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(function (cb) {
+                var clone = cb.cloneNode(true);
+                cb.parentNode.replaceChild(clone, cb);
+            });
+        }
+    })();
+
+    (function () {
+        var sections = document.querySelectorAll('[data-module="app-filter-section"]');
+        sections.forEach(function (section) {
+            var toggle = section.querySelector('.app-filter-section__toggle');
+            var content = section.querySelector('.app-filter-section__content');
+            if (toggle && content) {
+                toggle.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    var expanded = toggle.getAttribute('aria-expanded') === 'true';
+                    toggle.setAttribute('aria-expanded', !expanded);
+                    expanded ? content.setAttribute('hidden', '') : content.removeAttribute('hidden');
+                });
+            }
+        });
+
+        var filterToggle = document.querySelector('[data-module="app-filter-toggle"]');
+        var filterPanel = document.getElementById('similar-schools-filter-form');
+        if (filterToggle && filterPanel) {
+            filterToggle.addEventListener('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var expanded = filterToggle.getAttribute('aria-expanded') === 'true';
+                filterToggle.setAttribute('aria-expanded', !expanded);
+                expanded
+                    ? filterPanel.classList.remove('app-filter-panel--visible')
+                    : filterPanel.classList.add('app-filter-panel--visible');
+            });
+        }
+    })();
+</script>

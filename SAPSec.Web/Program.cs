@@ -16,7 +16,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using GovUk.Frontend.AspNetCore;
 using Npgsql;
-using SAPSec.Infrastructure.Extensions;
+using SAPSec.Infrastructure.Postgres;
 
 namespace SAPSec.Web;
 
