@@ -30,7 +30,7 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
     {
         var rows = await _similarSchoolsGroupsRepository.ReadAllAsync();
         var groupRows = rows.Where(r => r.URN == urn).ToList();
-        var neighbourUrns = groupRows.Select(r => r.SimilarURN);
+        var neighbourUrns = groupRows.Select(r => r.NeighbourURN);
 
         return neighbourUrns.ToList().AsReadOnly();
     }
@@ -42,7 +42,7 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
 
         var rows = await _similarSchoolsGroupsRepository.ReadAllAsync();
         var groupRows = rows.Where(r => r.URN == urn).ToList();
-        var neighbourUrns = groupRows.Select(r => r.SimilarURN).ToList();
+        var neighbourUrns = groupRows.Select(r => r.NeighbourURN).ToList();
 
         var similarSchoolsEstabs = allEstabs
             .Where(p => neighbourUrns.Contains(p.URN))

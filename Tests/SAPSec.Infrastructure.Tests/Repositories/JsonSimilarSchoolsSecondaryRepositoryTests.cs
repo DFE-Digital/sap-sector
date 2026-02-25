@@ -22,13 +22,13 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
             _performanceRepo.Object);
 
     [Fact]
-    public async Task GetSimilarSchoolUrnsAsync_ReturnsSimilarUrns()
+    public async Task GetSimilarSchoolUrnsAsync_ReturnsNeighbourUrns()
     {
         var rows = new List<SimilarSchoolsSecondaryGroupsRow>
         {
-            new() { URN = "123456", SimilarURN = "654321", Dist = "0.1", Rank = "1" },
-            new() { URN = "123456", SimilarURN = "654322", Dist = "0.2", Rank = "2" },
-            new() { URN = "111111", SimilarURN = "222222", Dist = "0.3", Rank = "1" }
+            new() { URN = "123456", NeighbourURN = "654321", Dist = "0.1", Rank = "1" },
+            new() { URN = "123456", NeighbourURN = "654322", Dist = "0.2", Rank = "2" },
+            new() { URN = "111111", NeighbourURN = "222222", Dist = "0.3", Rank = "1" }
         };
         _groupsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);
 
@@ -76,7 +76,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         _groupsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsSecondaryGroupsRow>
         {
-            new() { URN = "123456", SimilarURN = "654321", Dist = "0.1", Rank = "1" }
+            new() { URN = "123456", NeighbourURN = "654321", Dist = "0.1", Rank = "1" }
         });
 
         _performanceRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<EstablishmentPerformance>

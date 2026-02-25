@@ -57,7 +57,7 @@ public class SimilarSchoolsComparisonController : Controller
         {
             _logger.LogError(
                 ex,
-                "Error calling GetCharacteristicsComparison for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "Error calling GetCharacteristicsComparison for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
 
             return StatusCode(StatusCodes.Status500InternalServerError);
@@ -122,7 +122,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
         {
             _logger.LogWarning(
-                "SimilarSchoolsComparison requested with invalid route params. urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "SimilarSchoolsComparison requested with invalid route params. urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, BadRequest());
@@ -138,7 +138,7 @@ public class SimilarSchoolsComparisonController : Controller
         {
             _logger.LogError(
                 ex,
-                "Error calling GetSimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "Error calling GetSimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, StatusCode(StatusCodes.Status500InternalServerError));
@@ -147,7 +147,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "GetSimilarSchoolDetails returned null for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
@@ -156,7 +156,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response.SimilarSchoolDetails is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null SimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "GetSimilarSchoolDetails returned null SimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
@@ -171,7 +171,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (string.IsNullOrWhiteSpace(similarName))
         {
             _logger.LogWarning(
-                "SimilarSchoolDetails.Name is missing for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "SimilarSchoolDetails.Name is missing for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
         }
 
@@ -208,7 +208,7 @@ public class SimilarSchoolsComparisonController : Controller
         {
             _logger.LogError(
                 ex,
-                "Error calling GetSimilarSchoolDetails (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "Error calling GetSimilarSchoolDetails (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, StatusCode(StatusCodes.Status500InternalServerError));
@@ -217,7 +217,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                "GetSimilarSchoolDetails returned null (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());

@@ -2,6 +2,6 @@
 {
     public interface ISimilarSchoolsGroupsRow : ISimilarSchoolsRow
     {
-        string SimilarURN { get; set; }
+        string NeighbourURN { get; set; }
     }
 }

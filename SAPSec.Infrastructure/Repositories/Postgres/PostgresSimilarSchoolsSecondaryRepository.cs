@@ -23,7 +23,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT "similar_urn" 
+            SELECT "neighbour_urn" 
             FROM public.v_similar_schools_secondary_groups 
             WHERE "urn" = @urn;
         """;
@@ -71,7 +71,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "UrbanRuralName"
             FROM public.v_establishment 
             WHERE "URN" IN (
-                SELECT "similar_urn" 
+                SELECT "neighbour_urn" 
                 FROM public.v_similar_schools_secondary_groups 
                 WHERE "urn" = @urn
             );
@@ -90,7 +90,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Physics59_Sum_Est_Current_Num"
             FROM public.v_establishment_performance
             WHERE "Id" = @urn OR "Id" IN (
-                SELECT "similar_urn" 
+                SELECT "neighbour_urn" 
                 FROM public.v_similar_schools_secondary_groups 
                 WHERE "urn" = @urn
             );
