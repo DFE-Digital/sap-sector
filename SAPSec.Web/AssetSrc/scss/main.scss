@@ -837,3 +837,11 @@
         margin-right: 15px;
     }
     }
+
+.js-only {
+  display: none;
+}
+
+.js-enabled .js-only {
+  display: block;
+}
