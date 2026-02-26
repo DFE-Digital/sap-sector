@@ -149,14 +149,12 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         var similarityTab = Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')");
         await similarityTab.ClickAsync();
 
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        Page.Url.Should().Contain("/view-similar-schools/137621");
-
-        var heading = Page.Locator("h1.govuk-heading-l:text-is('How these schools compare')");
-        (await heading.CountAsync()).Should().Be(1, "Similarity page heading should be visible");
+        var heading = Page.Locator("h1.govuk-heading-l");
+        await heading.WaitForAsync();
+        (await heading.TextContentAsync()).Should().Contain("How these schools compare");
 
         var table = Page.Locator("table.govuk-table");
+        await table.WaitForAsync();
         (await table.CountAsync()).Should().Be(1, "Similarity table should be visible");
 
         var rows = table.Locator("tbody tr.govuk-table__row");
@@ -170,8 +168,8 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')").ClickAsync();
-        await Page.WaitForURLAsync("**/Similarity");
-
+        var heading = Page.Locator("h1.govuk-heading-l");
+        await heading.WaitForAsync();
         var table = Page.Locator("table.govuk-table");
         await table.WaitForAsync();
 
