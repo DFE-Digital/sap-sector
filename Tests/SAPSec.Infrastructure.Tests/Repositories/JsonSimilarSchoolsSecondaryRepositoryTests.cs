@@ -96,7 +96,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     }
 
     [Fact]
-    public async Task GetSecondaryValuesByUrnsAsync_ReturnsParsedValues_AndFillsMissingUrns()
+    public async Task GetSecondaryValuesByUrnsAsync_ReturnsParsedValues()
     {
         _valuesRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsSecondaryValuesRow>
         {
@@ -121,17 +121,13 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         var result = await sut.GetSecondaryValuesByUrnsAsync(new[] { "123456", "654321" });
 
-        Assert.Equal(2, result.Count);
+        Assert.Single(result);
         Assert.Contains(result, v => v.Urn == "123456");
-        Assert.Contains(result, v => v.Urn == "654321");
 
         var a = result.Single(v => v.Urn == "123456");
         Assert.Equal(104.5m, a.Ks2ReadingScore);
         Assert.Equal(3, a.Polar4Quintile);
         Assert.Equal(500, a.PupilCount);
 
-        var b = result.Single(v => v.Urn == "654321");
-        Assert.Equal(0m, b.Ks2ReadingScore);
-        Assert.Equal(0, b.PupilCount);
     }
 }

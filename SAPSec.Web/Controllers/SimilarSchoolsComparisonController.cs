@@ -41,27 +41,15 @@ public class SimilarSchoolsComparisonController : Controller
         if (modelResult.Result != null)
             return modelResult.Result;
 
-        try
-        {
-            var response = await _getCharacteristicsComparison.Execute(
-                new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
+        var response = await _getCharacteristicsComparison.Execute(
+            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
 
-            modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
-                response.CurrentSchool,
-                response.SimilarSchool);
+        modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
+            response.CurrentSchool,
+            response.SimilarSchool);
 
-            SetComparisonSchoolViewData(modelResult.Model!);
-            return View("Similarity", modelResult.Model);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex,
-                "Error calling GetCharacteristicsComparison for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
-                urn, similarSchoolUrn);
-
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+        SetComparisonSchoolViewData(modelResult.Model!);
+        return View("Similarity", modelResult.Model);
     }
 
     [HttpGet]

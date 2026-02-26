@@ -93,28 +93,6 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             })
             .ToList();
 
-        // Ensure all requested URNs exist (avoids missing-data issues in use cases/tests)
-        foreach (var urn in urnList)
-        {
-            if (list.All(v => v.Urn != urn))
-            {
-                list.Add(new SimilarSchoolsSecondaryValues
-                {
-                    Urn = urn,
-                    Ks2ReadingScore = 0,
-                    Ks2MathsScore = 0,
-                    PupilPremiumEligibilityPercentage = 0,
-                    PupilsWithEalPercentage = 0,
-                    Polar4Quintile = 0,
-                    PupilStabilityRate = 0,
-                    AverageIdaciScore = 0,
-                    PupilsWithSenSupportPercentage = 0,
-                    PupilCount = 0,
-                    PupilsWithEhcPlanPercentage = 0
-                });
-            }
-        }
-
         return list;
     }
 
