@@ -170,13 +170,16 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')").ClickAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Page.WaitForURLAsync("**/Similarity");
 
-        var headerCells = Page.Locator("table.govuk-table thead th");
+        var table = Page.Locator("table.govuk-table");
+        await table.WaitForAsync();
+
+        var headerCells = table.Locator("thead th");
         (await headerCells.CountAsync()).Should().Be(3, "Similarity table should have 3 columns");
         (await headerCells.Nth(0).TextContentAsync()).Should().Contain("Characteristic");
 
-        var firstRow = Page.Locator("table.govuk-table tbody tr.govuk-table__row").First;
+        var firstRow = table.Locator("tbody tr.govuk-table__row").First;
         (await firstRow.CountAsync()).Should().Be(1);
 
         var cells = firstRow.Locator("th, td");
