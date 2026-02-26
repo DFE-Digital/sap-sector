@@ -1,3 +1,4 @@
+using System.Globalization;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
@@ -60,6 +61,47 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
                 .ToList()
                 .AsReadOnly());
     }
+
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+        IEnumerable<string> urns)
+    {
+        if (urns is null)
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+
+        var urnList = urns as IList<string> ?? urns.ToList();
+        if (urnList.Count == 0)
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+
+        var wanted = new HashSet<string>(urnList);
+        var rows = await _similarSchoolsValuesRepository.ReadAllAsync();
+
+        var list = rows
+            .Where(r => wanted.Contains(r.URN))
+            .Select(r => new SimilarSchoolsSecondaryValues
+            {
+                Urn = r.URN,
+                Ks2ReadingScore = ParseDecimal(r.Ks2Rp),
+                Ks2MathsScore = ParseDecimal(r.Ks2Mp),
+                PupilPremiumEligibilityPercentage = ParseDecimal(r.PpPerc),
+                PupilsWithEalPercentage = ParseDecimal(r.PercentEal),
+                Polar4Quintile = ParseInt(r.Polar4QuintilePupils),
+                PupilStabilityRate = ParseDecimal(r.PStability),
+                AverageIdaciScore = ParseDecimal(r.IdaciPupils),
+                PupilsWithSenSupportPercentage = ParseDecimal(r.PercentSchSupport),
+                PupilCount = ParseInt(r.NumberOfPupils),
+                PupilsWithEhcPlanPercentage = ParseDecimal(r.PercentStatementOrEhp),
+            })
+            .ToList();
+
+        return list;
+    }
+
+    private static decimal ParseDecimal(string value) =>
+        decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0m;
+
+    private static int ParseInt(string value) =>
+        int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var i) ? i : 0;
+    
 
     private SimilarSchool FromJson(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)
     {

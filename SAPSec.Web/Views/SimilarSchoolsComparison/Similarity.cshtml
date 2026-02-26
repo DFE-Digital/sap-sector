@@ -1,6 +1,43 @@
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
-    
-   
 }
+
+<h1 class="govuk-heading-l">How these schools compare</h1>
+
+<p class="govuk-body">
+    This school is part of a group of <strong>50</strong> schools that the DfE has identified as similar
+    based on 9 key characteristics.
+</p>
+
+<p class="govuk-body">
+    Learn <a href="@Url.Action("WhatIsASimilarSchool", "School", new { urn = Model.Urn })" class="govuk-link">
+        more about this data and how DfE identifies what a similar school is.
+    </a>
+</p>
+
+<div class="govuk-!-margin-top-8">
+    <table class="govuk-table govuk-table--responsive">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header govuk-!-width-one-half">Characteristic</th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">@Model.Name</th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">@Model.SimilarSchoolName</th>
+        </tr>
+        </thead>
+
+        <tbody class="govuk-table__body">
+        @foreach (var row in Model.CharacteristicsRows)
+        {
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">@row.Characteristic</th>
+
+                <!-- Left aligned like Figma (NO govuk-table__cell--numeric) -->
+                <td class="govuk-table__cell">@row.CurrentSchoolValue</td>
+                <td class="govuk-table__cell">@row.SimilarSchoolValue</td>
+
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
