@@ -8,6 +8,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Services;
+using SAPSec.Web.Formatters;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Repositories.Json;
 using System.Diagnostics.CodeAnalysis;
@@ -39,10 +40,13 @@ namespace SAPSec.Web.Extensions
             // Register SchoolDetailsService with explicit rule dependencies
             services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
+            services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
+
             // Use cases
             services.AddSingleton<GetKs4HeadlineMeasures>();
             services.AddSingleton<FindSimilarSchools>();
             services.AddSingleton<GetSimilarSchoolDetails>();
+            services.AddSingleton<GetCharacteristicsComparison>();
         }
     }
 }
