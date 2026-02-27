@@ -123,6 +123,16 @@ const copyStaticAssets = () =>
                 .src(["AssetSrc/js/*"], {encoding: false})
                 .pipe(gulp.dest("wwwroot/js/"))
         )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/chart.js/dist/chart.umd.js"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
         // --- Leaflet ---
         .on("end", () =>
             gulp

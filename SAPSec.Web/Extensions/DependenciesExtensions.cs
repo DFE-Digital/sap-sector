@@ -1,4 +1,6 @@
-﻿using SAPSec.Core.Features.SchoolSearch;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
@@ -23,6 +25,8 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
             services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
             services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
+            services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
+            services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
             services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
 
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
@@ -39,6 +43,7 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
 
             // Use cases
+            services.AddSingleton<GetKs4HeadlineMeasures>();
             services.AddSingleton<FindSimilarSchools>();
             services.AddSingleton<GetSimilarSchoolDetails>();
             services.AddSingleton<GetCharacteristicsComparison>();

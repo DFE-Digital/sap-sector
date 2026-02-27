@@ -1,5 +1,278 @@
+@using System.Text.Json
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
-   
 }
+
+<h1 class="govuk-heading-l">KS4 headline performance measures</h1>
+
+<p class="govuk-body">
+    How @Model.Name compares with @Model.SimilarSchoolName based on KS4 headline performance measures.
+</p>
+
+<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
+
+<section class="govuk-!-margin-bottom-7 app-ks4-progress" aria-labelledby="progress8-heading">
+    <h2 class="govuk-heading-m" id="progress8-heading">Progress 8</h2>
+    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about Progress 8</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                Progress 8 shows how much progress a pupil made compared to other pupils with similar prior attainment.
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                The score shows progress compared to the national average:
+            </p>
+            <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-bottom-3 app-ks4-copy-list">
+                <li>a score of 0 means pupils in this school made similar progress to others with similar starting points</li>
+                <li>a score of above 0 means pupils made more progress than average</li>
+                <li>a score of below 0 means pupils made less progress than average</li>
+            </ul>
+            <p class="govuk-body-s govuk-!-margin-bottom-0">
+                The confidence interval gives a range of scores the school could have achieved based on the cohort of pupils and natural variation in pupil performance across England.
+            </p>
+        </div>
+    </details>
+
+    <div class="app-ks4-message-panel">
+        <p class="govuk-body govuk-!-margin-bottom-0">
+            There are no Progress 8 scores for the academic years 2024 to 2025 and 2025 to 2026, as there is no KS2 assessment data available to calculate the baseline. This is due to COVID-19 disruption.
+        </p>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="~/js/chart-factory.js"></script>
+}
+
+<section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
+    <h2 class="govuk-heading-m" id="attainment8-heading">Attainment 8</h2>
+    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-4 app-ks4-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about Attainment 8</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                Attainment 8 is used to assess a pupil's achievement across their best performing 8 subjects.
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                The 8 subjects that are used in Attainment 8 are split into 3 groups:
+            </p>
+            <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-bottom-2 app-ks4-copy-list">
+                <li>
+                    EBacc qualifications, which are both double weighted:
+                    <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                        <li>English, if both language and literature are taken</li>
+                        <li>Maths</li>
+                    </ul>
+                </li>
+                <li>EBacc subjects, which include sciences, geography, history, and languages</li>
+                <li>Open group subjects, which can include GCSEs or vocational qualifications (including any other approved GCSEs or vocational qualifications)</li>
+            </ul>
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                Each GCSE grade is given a points score, for example grade 9 = 9 points, grade 8 = 8 points, and so on. The score from the best 8 subjects (with English and maths counting twice) are added together to give an Attainment 8 score.
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0">
+                If a student scores high grades across these subjects, their Attainment 8 score will be higher. The maximum score a pupil can have is 90.
+            </p>
+        </div>
+    </details>
+
+    <div class="govuk-form-group govuk-!-margin-bottom-2">
+        <label class="govuk-label govuk-!-font-weight-bold" for="pupilCharacteristic">Pupil characteristic</label>
+        <select class="govuk-select" id="pupilCharacteristic" name="pupilCharacteristic">
+            <option value="all-pupils" selected>All pupils</option>
+        </select>
+    </div>
+
+    <div class="govuk-tabs govuk-!-margin-bottom-6 app-ks4-tabs" data-module="govuk-tabs">
+        <h3 class="govuk-tabs__title">Attainment 8 views</h3>
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#three-year-average">3-year average</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#year-by-year">Year by year</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#table-view">Table</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="three-year-average">
+            @{
+                var chartData = new
+                {
+                    labels = new[]
+                    {
+                        Model.Name,
+                        Model.SimilarSchoolName,
+                        "Schools in England average"
+                    },
+                    data = new decimal?[]
+                    {
+                        Model.ThisSchoolAttainment8ThreeYearAverage,
+                        Model.SelectedSchoolAttainment8ThreeYearAverage,
+                        Model.EnglandAttainment8ThreeYearAverage
+                    }
+                };
+                var chartColors = new[] { "#d53880", "#003078", "#003078" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="ks4-attainment8-comparison-chart"
+                        class="js-chart"
+                        data-type="bar"
+                        data-axis-step="30"
+                        data-axis-max="90"
+                        data-axis-suffix=""
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
+            </div>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="year-by-year">
+            @{
+                var yearByYearData = new
+                {
+                    labels = new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" },
+                    datasets = new object[]
+                    {
+                        new
+                        {
+                            label = Model.Name,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal[]
+                            {
+                                Model.ThisSchoolAttainment8YearByYear?.Previous2 ?? 0m,
+                                Model.ThisSchoolAttainment8YearByYear?.Previous ?? 0m,
+                                Model.ThisSchoolAttainment8YearByYear?.Current ?? 0m
+                            }
+                        },
+                        new
+                        {
+                            label = Model.SimilarSchoolName,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal[]
+                            {
+                                Model.SelectedSchoolAttainment8YearByYear?.Previous2 ?? 0m,
+                                Model.SelectedSchoolAttainment8YearByYear?.Previous ?? 0m,
+                                Model.SelectedSchoolAttainment8YearByYear?.Current ?? 0m
+                            }
+                        },
+                        new
+                        {
+                            label = "Schools in England average",
+                            borderWidth = 2,
+                            borderColor = "#1d8f89",
+                            backgroundColor = "#1d8f89",
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal[]
+                            {
+                                Model.EnglandAttainment8YearByYear?.Previous2 ?? 0m,
+                                Model.EnglandAttainment8YearByYear?.Previous ?? 0m,
+                                Model.EnglandAttainment8YearByYear?.Current ?? 0m
+                            }
+                        }
+                    }
+                };
+                var yearByYearColors = new[] { "#d53880", "#003078", "#1d8f89" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="ks4-attainment8-comparison-yearbyyear-chart"
+                        class="js-chart"
+                        data-type="line"
+                        data-axis-step="30"
+                        data-axis-max="90"
+                        data-axis-suffix=""
+                        data-show-legend="true"
+                        data-show-datalabels="false"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                </canvas>
+            </div>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2025 to 2026</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.Name</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8YearByYear?.Previous2</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8YearByYear?.Previous</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8YearByYear?.Current</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8Display</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8YearByYear?.Previous2</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8YearByYear?.Previous</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8YearByYear?.Current</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8Display</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Schools in England average</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8YearByYear?.Previous2</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8YearByYear?.Previous</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8YearByYear?.Current</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8Display</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
+        </div>
+    </div>
+</section>

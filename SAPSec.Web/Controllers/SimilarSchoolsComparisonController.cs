@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Web.Formatters;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
@@ -11,26 +11,23 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
-    private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
-    private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
+    private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
-        GetCharacteristicsComparison getCharacteristicsComparison,
-        ICharacteristicsComparisonFormatter characteristicsFormatter,
+        GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
         _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
-        _getCharacteristicsComparison = getCharacteristicsComparison ?? throw new ArgumentNullException(nameof(getCharacteristicsComparison));
-        _characteristicsFormatter = characteristicsFormatter ?? throw new ArgumentNullException(nameof(characteristicsFormatter));
+        _getKs4HeadlineMeasures = getKs4HeadlineMeasures ?? throw new ArgumentNullException(nameof(getKs4HeadlineMeasures));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
-
+    
     [HttpGet]
     public Task<IActionResult> Index(string urn, string similarSchoolUrn) =>
         Similarity(urn, similarSchoolUrn);
-
+    
     [HttpGet]
     [Route("Similarity")]
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
@@ -40,13 +37,6 @@ public class SimilarSchoolsComparisonController : Controller
         var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
-
-        var response = await _getCharacteristicsComparison.Execute(
-            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
-
-        modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
-            response.CurrentSchool,
-            response.SimilarSchool);
 
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
@@ -60,8 +50,28 @@ public class SimilarSchoolsComparisonController : Controller
         if (modelResult.Result != null)
             return modelResult.Result;
 
-        SetComparisonSchoolViewData(modelResult.Model!);
-        return View(modelResult.Model);
+        var thisSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
+        var selectedSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(similarSchoolUrn));
+
+        var model = modelResult.Model!;
+        model.ThisSchoolAttainment8ThreeYearAverage = thisSchoolKs4?.Attainment8ThreeYearAverage.SchoolValue;
+        model.SelectedSchoolAttainment8ThreeYearAverage = selectedSchoolKs4?.Attainment8ThreeYearAverage.SchoolValue;
+        model.EnglandAttainment8ThreeYearAverage =
+            thisSchoolKs4?.Attainment8ThreeYearAverage.EnglandValue
+            ?? selectedSchoolKs4?.Attainment8ThreeYearAverage.EnglandValue;
+        model.ThisSchoolAttainment8YearByYear = thisSchoolKs4?.Attainment8YearByYear.School;
+        model.SelectedSchoolAttainment8YearByYear = selectedSchoolKs4?.Attainment8YearByYear.School;
+        model.EnglandAttainment8YearByYear =
+            thisSchoolKs4?.Attainment8YearByYear.England
+            ?? selectedSchoolKs4?.Attainment8YearByYear.England;
+        model.ThisSchoolTotalPupils = thisSchoolKs4?.SchoolTotalPupils;
+        model.SelectedSchoolTotalPupils = selectedSchoolKs4?.SchoolTotalPupils;
+        model.EnglandTotalPupils =
+            thisSchoolKs4?.EnglandTotalPupils
+            ?? selectedSchoolKs4?.EnglandTotalPupils;
+
+        SetComparisonSchoolViewData(model);
+        return View(model);
     }
 
     [HttpGet]
@@ -110,7 +120,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
         {
             _logger.LogWarning(
-                "SimilarSchoolsComparison requested with invalid route params. urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "SimilarSchoolsComparison requested with invalid route params. urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, BadRequest());
@@ -126,7 +136,7 @@ public class SimilarSchoolsComparisonController : Controller
         {
             _logger.LogError(
                 ex,
-                "Error calling GetSimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "Error calling GetSimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, StatusCode(StatusCodes.Status500InternalServerError));
@@ -135,7 +145,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "GetSimilarSchoolDetails returned null for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
@@ -144,7 +154,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response.SimilarSchoolDetails is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null SimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "GetSimilarSchoolDetails returned null SimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
@@ -159,7 +169,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (string.IsNullOrWhiteSpace(similarName))
         {
             _logger.LogWarning(
-                "SimilarSchoolDetails.Name is missing for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "SimilarSchoolDetails.Name is missing for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
         }
 
@@ -196,7 +206,7 @@ public class SimilarSchoolsComparisonController : Controller
         {
             _logger.LogError(
                 ex,
-                "Error calling GetSimilarSchoolDetails (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "Error calling GetSimilarSchoolDetails (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, StatusCode(StatusCodes.Status500InternalServerError));
@@ -205,7 +215,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "GetSimilarSchoolDetails returned null (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
