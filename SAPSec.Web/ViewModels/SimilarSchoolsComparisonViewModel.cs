@@ -22,10 +22,19 @@ public class SimilarSchoolsComparisonViewModel
     public decimal? ThisSchoolAttainment8ThreeYearAverage { get; set; }
     public decimal? SelectedSchoolAttainment8ThreeYearAverage { get; set; }
     public decimal? EnglandAttainment8ThreeYearAverage { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolAttainment8YearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolAttainment8YearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandAttainment8YearByYear { get; set; }
+    public int? ThisSchoolTotalPupils { get; set; }
+    public int? SelectedSchoolTotalPupils { get; set; }
+    public int? EnglandTotalPupils { get; set; }
 
     public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
     public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
     public string EnglandAttainment8Display => DisplayValue(EnglandAttainment8ThreeYearAverage);
+    public string ThisSchoolTotalPupilsDisplay => DisplayPupilCount(ThisSchoolTotalPupils);
+    public string SelectedSchoolTotalPupilsDisplay => DisplayPupilCount(SelectedSchoolTotalPupils);
+    public string EnglandTotalPupilsDisplay => DisplayPupilCount(EnglandTotalPupils);
 
     public decimal ThisSchoolWidthPercent => WidthPercent(ThisSchoolAttainment8ThreeYearAverage);
     public decimal SelectedSchoolWidthPercent => WidthPercent(SelectedSchoolAttainment8ThreeYearAverage);
@@ -48,4 +57,7 @@ public class SimilarSchoolsComparisonViewModel
 
     private static string DisplayValue(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) : "No available data";
+
+    private static string DisplayPupilCount(int? value) =>
+        value.HasValue ? value.Value.ToString("N0", CultureInfo.InvariantCulture) : "No available data";
 }

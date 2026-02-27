@@ -59,6 +59,16 @@ public class SimilarSchoolsComparisonController : Controller
         model.EnglandAttainment8ThreeYearAverage =
             thisSchoolKs4?.Attainment8ThreeYearAverage.EnglandValue
             ?? selectedSchoolKs4?.Attainment8ThreeYearAverage.EnglandValue;
+        model.ThisSchoolAttainment8YearByYear = thisSchoolKs4?.Attainment8YearByYear.School;
+        model.SelectedSchoolAttainment8YearByYear = selectedSchoolKs4?.Attainment8YearByYear.School;
+        model.EnglandAttainment8YearByYear =
+            thisSchoolKs4?.Attainment8YearByYear.England
+            ?? selectedSchoolKs4?.Attainment8YearByYear.England;
+        model.ThisSchoolTotalPupils = thisSchoolKs4?.SchoolTotalPupils;
+        model.SelectedSchoolTotalPupils = selectedSchoolKs4?.SchoolTotalPupils;
+        model.EnglandTotalPupils =
+            thisSchoolKs4?.EnglandTotalPupils
+            ?? selectedSchoolKs4?.EnglandTotalPupils;
 
         SetComparisonSchoolViewData(model);
         return View(model);

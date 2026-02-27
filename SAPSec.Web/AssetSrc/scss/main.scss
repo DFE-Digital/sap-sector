@@ -1080,6 +1080,50 @@
   margin-top: 4px;
 }
 
+.app-ks4-attainment {
+  background: #f4f8fb;
+  padding: 16px;
+}
+
+.app-ks4-progress {
+  background: #f4f8fb;
+  padding: 16px;
+}
+
+.app-ks4-details {
+  background: #f4f8fb;
+  padding: 12px 14px;
+}
+
+.app-ks4-details .govuk-details__summary {
+  background: #f4f8fb;
+}
+
+.app-ks4-details .govuk-details__summary-text {
+  text-decoration: none;
+}
+
+.app-ks4-details--white,
+.app-ks4-details--white .govuk-details__summary {
+  background: #ffffff;
+}
+
+.app-ks4-tabs .govuk-tabs__list {
+  background: #f4f8fb;
+  border-bottom: 1px solid #b1b4b6;
+}
+
+.app-ks4-tabs .govuk-tabs__panel {
+  background: #ffffff;
+  padding: 16px;
+  border: 1px solid #b1b4b6;
+}
+
+.app-ks4-chart-container {
+  height: 260px;
+  max-width: 760px;
+}
+
 .app-ks4-copy {
   max-width: 660px;
   line-height: 1.45;
@@ -1087,6 +1131,16 @@
 
 .app-ks4-copy-list li {
   margin-bottom: 4px;
+}
+
+.js-chart {
+  --gds-font-family: "GDS Transport", Arial, sans-serif;
+  --gds-font-size: 14;
+  --gds-text: #0b0c0c;
+  --gds-grey: #b1b4b6;
+  --gds-label-bg: #ffffff;
+  --gds-label-border: #b1b4b6;
+  --gds-label-padding: 4;
 }
 
 @media (max-width: 40.0625em) {

@@ -40,7 +40,6 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
             // Use cases
-            services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
             services.AddSingleton<GetKs4HeadlineMeasures>();
             services.AddSingleton<FindSimilarSchools>();
             services.AddSingleton<GetSimilarSchoolDetails>();

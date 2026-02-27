@@ -1,4 +1,5 @@
 @using SAPSec.Web.Helpers
+@using System.Text.Json
 @model SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel
 @{
     Layout = "_Layout";
@@ -37,53 +38,153 @@
         </li>
     </ul>
 
-    <div class="app-ks4-bar-chart">
-        <div class="app-ks4-bar-row">
-            <div class="app-ks4-bar-label">@Model.SchoolLabel</div>
-            <div class="app-ks4-bar-track">
-                <div class="app-ks4-bar app-ks4-bar--school" style="width:@Model.SchoolWidthPercent.ToString("0.0")%;"></div>
-            </div>
-            <div class="app-ks4-bar-value">@Model.SchoolAttainment8Display</div>
-        </div>
-
-        <div class="app-ks4-bar-row">
-            <div class="app-ks4-bar-label">@Model.LocalAuthorityLabel</div>
-            <div class="app-ks4-bar-track">
-                <div class="app-ks4-bar app-ks4-bar--la" style="width:@Model.LocalAuthorityWidthPercent.ToString("0.0")%;"></div>
-            </div>
-            <div class="app-ks4-bar-value">@Model.LocalAuthorityAttainment8Display</div>
-        </div>
-
-        <div class="app-ks4-bar-row">
-            <div class="app-ks4-bar-label">@Model.EnglandLabel</div>
-            <div class="app-ks4-bar-track">
-                <div class="app-ks4-bar app-ks4-bar--england" style="width:@Model.EnglandWidthPercent.ToString("0.0")%;"></div>
-            </div>
-            <div class="app-ks4-bar-value">@Model.EnglandAttainment8Display</div>
-        </div>
+    @{
+        var chartData = new
+        {
+            labels = new[]
+            {
+                Model.SchoolLabel,
+                Model.LocalAuthorityLabel,
+                Model.EnglandLabel
+            },
+            data = new decimal?[]
+            {
+                Model.SchoolAttainment8ThreeYearAverage,
+                Model.LocalAuthorityAttainment8ThreeYearAverage,
+                Model.EnglandAttainment8ThreeYearAverage
+            }
+        };
+        var chartColors = new[] { "#d53880", "#1d70b8", "#003078" };
+    }
+    <div class="app-ks4-chart-container">
+        <canvas id="ks4-attainment8-school-chart"
+                class="js-chart"
+                data-type="bar"
+                data-axis-step="30"
+                data-axis-max="90"
+                data-axis-suffix=""
+                data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+        </canvas>
     </div>
 
+    @{
+        var yearByYearData = new
+        {
+            labels = new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" },
+            datasets = new object[]
+            {
+                new
+                {
+                    label = Model.SchoolLabel,
+                    borderWidth = 2,
+                    pointRadius = 4,
+                    pointHoverRadius = 5,
+                    tension = 0,
+                    data = new decimal[]
+                    {
+                        Model.SchoolAttainment8YearByYear.Previous2 ?? 0m,
+                        Model.SchoolAttainment8YearByYear.Previous ?? 0m,
+                        Model.SchoolAttainment8YearByYear.Current ?? 0m
+                    }
+                },
+                new
+                {
+                    label = Model.LocalAuthorityLabel,
+                    borderWidth = 2,
+                    pointRadius = 4,
+                    pointHoverRadius = 5,
+                    tension = 0,
+                    data = new decimal[]
+                    {
+                        Model.LocalAuthorityAttainment8YearByYear.Previous2 ?? 0m,
+                        Model.LocalAuthorityAttainment8YearByYear.Previous ?? 0m,
+                        Model.LocalAuthorityAttainment8YearByYear.Current ?? 0m
+                    }
+                },
+                new
+                {
+                    label = Model.EnglandLabel,
+                    borderWidth = 2,
+                    borderColor = "#1d8f89",
+                    backgroundColor = "#1d8f89",
+                    pointRadius = 4,
+                    pointHoverRadius = 5,
+                    tension = 0,
+                    data = new decimal[]
+                    {
+                        Model.EnglandAttainment8YearByYear.Previous2 ?? 0m,
+                        Model.EnglandAttainment8YearByYear.Previous ?? 0m,
+                        Model.EnglandAttainment8YearByYear.Current ?? 0m
+                    }
+                }
+            }
+        };
+        var yearByYearColors = new[] { "#d53880", "#1d70b8", "#1d8f89" };
+    }
+    <div class="app-ks4-chart-container govuk-!-margin-top-4">
+        <canvas id="ks4-attainment8-school-yearbyyear-chart"
+                class="js-chart"
+                data-type="line"
+                data-axis-step="30"
+                data-axis-max="90"
+                data-axis-suffix=""
+                data-show-legend="true"
+                data-show-datalabels="false"
+                data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
+                data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+        </canvas>
+    </div>
+
+    <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Number of pupils entered</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SchoolLabel:</strong> @Model.SchoolTotalPupilsDisplay</p>
+            <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>@Model.EnglandLabel:</strong> @Model.EnglandTotalPupilsDisplay</p>
+        </div>
+    </details>
+
     <table class="govuk-table govuk-!-margin-top-6">
-        <caption class="govuk-visually-hidden">Attainment 8 three year averages</caption>
+        <caption class="govuk-visually-hidden">Attainment 8 results</caption>
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">Group</th>
+                <th scope="col" class="govuk-table__header">2023 to 2024</th>
+                <th scope="col" class="govuk-table__header">2024 to 2025</th>
+                <th scope="col" class="govuk-table__header">2025 to 2026</th>
                 <th scope="col" class="govuk-table__header">3 year average</th>
             </tr>
         </thead>
         <tbody class="govuk-table__body">
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">@Model.SchoolLabel</th>
+                <td class="govuk-table__cell">@Model.SchoolAttainment8YearByYear.Previous2</td>
+                <td class="govuk-table__cell">@Model.SchoolAttainment8YearByYear.Previous</td>
+                <td class="govuk-table__cell">@Model.SchoolAttainment8YearByYear.Current</td>
                 <td class="govuk-table__cell">@Model.SchoolAttainment8Display</td>
             </tr>
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">@Model.LocalAuthorityLabel</th>
+                <td class="govuk-table__cell">@Model.LocalAuthorityAttainment8YearByYear.Previous2</td>
+                <td class="govuk-table__cell">@Model.LocalAuthorityAttainment8YearByYear.Previous</td>
+                <td class="govuk-table__cell">@Model.LocalAuthorityAttainment8YearByYear.Current</td>
                 <td class="govuk-table__cell">@Model.LocalAuthorityAttainment8Display</td>
             </tr>
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">@Model.EnglandLabel</th>
+                <td class="govuk-table__cell">@Model.EnglandAttainment8YearByYear.Previous2</td>
+                <td class="govuk-table__cell">@Model.EnglandAttainment8YearByYear.Previous</td>
+                <td class="govuk-table__cell">@Model.EnglandAttainment8YearByYear.Current</td>
                 <td class="govuk-table__cell">@Model.EnglandAttainment8Display</td>
             </tr>
         </tbody>
     </table>
 </section>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="~/js/chart-factory.js"></script>
+}

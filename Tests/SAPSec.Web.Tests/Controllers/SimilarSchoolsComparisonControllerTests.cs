@@ -127,7 +127,9 @@ public class SimilarSchoolsComparisonControllerTests
                 Attainment8_Tot_Eng_Current_Num = 45.9,
                 Attainment8_Tot_Eng_Previous_Num = 46.1,
                 Attainment8_Tot_Eng_Previous2_Num = 46.3
-            }));
+            },
+            1200,
+            10844860));
 
         _ks4PerformanceRepositoryMock.Setup(r => r.GetByUrnAsync(similarUrn)).ReturnsAsync(new Ks4HeadlineMeasuresData(
             new EstablishmentPerformance
@@ -142,7 +144,9 @@ public class SimilarSchoolsComparisonControllerTests
                 Attainment8_Tot_Eng_Current_Num = 45.9,
                 Attainment8_Tot_Eng_Previous_Num = 46.1,
                 Attainment8_Tot_Eng_Previous2_Num = 46.3
-            }));
+            },
+            1100,
+            10844860));
 
         var result = await _sut.Ks4HeadlineMeasures(urn, similarUrn);
 

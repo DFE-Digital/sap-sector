@@ -39,7 +39,9 @@ public class GetKs4HeadlineMeasuresTests
                     Attainment8_Tot_Eng_Current_Num = 45.9,
                     Attainment8_Tot_Eng_Previous_Num = 46.1,
                     Attainment8_Tot_Eng_Previous2_Num = 46.4
-                }));
+                },
+                1200,
+                10844860));
 
         var sut = new GetKs4HeadlineMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);
 

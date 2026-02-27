@@ -1,20 +1,20 @@
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
 
 namespace SAPSec.Infrastructure.Repositories.Json;
 
 public class JsonKs4PerformanceRepository(
-    IJsonFile<Establishment> establishmentRepository,
+    IEstablishmentRepository establishmentRepository,
     IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
     IJsonFile<LAPerformance> localAuthorityPerformanceRepository,
     IJsonFile<EnglandPerformance> englandPerformanceRepository) : IKs4PerformanceRepository
 {
     public async Task<Ks4HeadlineMeasuresData?> GetByUrnAsync(string urn)
     {
-        var establishments = await establishmentRepository.ReadAllAsync();
-        var establishment = establishments.FirstOrDefault(e => e.URN == urn);
-        if (establishment is null)
+        var establishment = await establishmentRepository.GetEstablishmentAsync(urn);
+        if (string.IsNullOrWhiteSpace(establishment?.URN))
         {
             return null;
         }
@@ -31,6 +31,18 @@ public class JsonKs4PerformanceRepository(
         return new(
             establishmentPerformance,
             localAuthorityPerformance,
-            englandPerformance);
+            englandPerformance,
+            ParseNullableInt(establishment.TotalPupils),
+            null);
+    }
+
+    private static int? ParseNullableInt(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return int.TryParse(value, out var parsed) ? parsed : null;
     }
 }

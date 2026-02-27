@@ -185,7 +185,7 @@ public class SchoolControllerTests
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(null, null, null));
+            .ReturnsAsync(new Ks4HeadlineMeasuresData(null, null, null, null, null));
 
         // Act
         var result = await _sut.Ks4HeadlineMeasures(urn);

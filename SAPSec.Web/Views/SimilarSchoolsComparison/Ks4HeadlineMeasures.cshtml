@@ -1,9 +1,10 @@
+@using System.Text.Json
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
 }
 
-<h1 class="govuk-heading-xl">KS4 headline performance measures</h1>
+<h1 class="govuk-heading-l">KS4 headline performance measures</h1>
 
 <p class="govuk-body">
     How @Model.Name compares with @Model.SimilarSchoolName based on KS4 headline performance measures.
@@ -11,9 +12,9 @@
 
 <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
 
-<section class="govuk-!-margin-bottom-7" aria-labelledby="progress8-heading">
+<section class="govuk-!-margin-bottom-7 app-ks4-progress" aria-labelledby="progress8-heading">
     <h2 class="govuk-heading-m" id="progress8-heading">Progress 8</h2>
-    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3" data-module="govuk-details">
+    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
         <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text">Information about Progress 8</span>
         </summary>
@@ -42,9 +43,15 @@
     </div>
 </section>
 
-<section aria-labelledby="attainment8-heading">
+@section Scripts {
+    <script src="~/js/chart.umd.js"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js"></script>
+    <script src="~/js/chart-factory.js"></script>
+}
+
+<section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
     <h2 class="govuk-heading-m" id="attainment8-heading">Attainment 8</h2>
-    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-4" data-module="govuk-details">
+    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-4 app-ks4-details" data-module="govuk-details">
         <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text">Information about Attainment 8</span>
         </summary>
@@ -82,7 +89,7 @@
         </select>
     </div>
 
-    <div class="govuk-tabs govuk-!-margin-bottom-6" data-module="govuk-tabs">
+    <div class="govuk-tabs govuk-!-margin-bottom-6 app-ks4-tabs" data-module="govuk-tabs">
         <h3 class="govuk-tabs__title">Attainment 8 views</h3>
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
@@ -97,52 +104,127 @@
         </ul>
 
         <div class="govuk-tabs__panel" id="three-year-average">
-            <div class="app-ks4-column-chart">
-                <div class="app-ks4-column-chart__plot">
-                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--0"></span>
-                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--30"></span>
-                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--60"></span>
-                    <span class="app-ks4-column-chart__grid app-ks4-column-chart__grid--90"></span>
-
-                    <div class="app-ks4-column-chart__bars">
-                        <div class="app-ks4-column">
-                            <div class="app-ks4-column__bar app-ks4-bar--selected-school"
-                                 style="height:@Model.SelectedSchoolWidthPercent.ToString("0.0")%;">
-                                <span class="app-ks4-bar-number">@Model.SelectedSchoolAttainment8Display</span>
-                            </div>
-                        </div>
-
-                        <div class="app-ks4-column">
-                            <div class="app-ks4-column__bar app-ks4-bar--this-school"
-                                 style="height:@Model.ThisSchoolWidthPercent.ToString("0.0")%;">
-                                <span class="app-ks4-bar-number">@Model.ThisSchoolAttainment8Display</span>
-                            </div>
-                        </div>
-
-                        <div class="app-ks4-column">
-                            <div class="app-ks4-column__bar app-ks4-bar--england-overall"
-                                 style="height:@Model.EnglandWidthPercent.ToString("0.0")%;">
-                                <span class="app-ks4-bar-number">@Model.EnglandAttainment8Display</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="app-ks4-column-chart__axis">
-                    <span>0</span>
-                    <span>30</span>
-                    <span>60</span>
-                    <span>90</span>
-                </div>
-                <div class="app-ks4-column-chart__labels">
-                    <div class="app-ks4-column__label">@Model.SimilarSchoolName</div>
-                    <div class="app-ks4-column__label">@Model.Name</div>
-                    <div class="app-ks4-column__label">Schools in England average</div>
-                </div>
+            @{
+                var chartData = new
+                {
+                    labels = new[]
+                    {
+                        Model.Name,
+                        Model.SimilarSchoolName,
+                        "Schools in England average"
+                    },
+                    data = new decimal?[]
+                    {
+                        Model.ThisSchoolAttainment8ThreeYearAverage,
+                        Model.SelectedSchoolAttainment8ThreeYearAverage,
+                        Model.EnglandAttainment8ThreeYearAverage
+                    }
+                };
+                var chartColors = new[] { "#d53880", "#003078", "#003078" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="ks4-attainment8-comparison-chart"
+                        class="js-chart"
+                        data-type="bar"
+                        data-axis-step="30"
+                        data-axis-max="90"
+                        data-axis-suffix=""
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
             </div>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="year-by-year">
-            <p class="govuk-body">Year by year view will be shown here.</p>
+            @{
+                var yearByYearData = new
+                {
+                    labels = new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" },
+                    datasets = new object[]
+                    {
+                        new
+                        {
+                            label = Model.Name,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal[]
+                            {
+                                Model.ThisSchoolAttainment8YearByYear?.Previous2 ?? 0m,
+                                Model.ThisSchoolAttainment8YearByYear?.Previous ?? 0m,
+                                Model.ThisSchoolAttainment8YearByYear?.Current ?? 0m
+                            }
+                        },
+                        new
+                        {
+                            label = Model.SimilarSchoolName,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal[]
+                            {
+                                Model.SelectedSchoolAttainment8YearByYear?.Previous2 ?? 0m,
+                                Model.SelectedSchoolAttainment8YearByYear?.Previous ?? 0m,
+                                Model.SelectedSchoolAttainment8YearByYear?.Current ?? 0m
+                            }
+                        },
+                        new
+                        {
+                            label = "Schools in England average",
+                            borderWidth = 2,
+                            borderColor = "#1d8f89",
+                            backgroundColor = "#1d8f89",
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal[]
+                            {
+                                Model.EnglandAttainment8YearByYear?.Previous2 ?? 0m,
+                                Model.EnglandAttainment8YearByYear?.Previous ?? 0m,
+                                Model.EnglandAttainment8YearByYear?.Current ?? 0m
+                            }
+                        }
+                    }
+                };
+                var yearByYearColors = new[] { "#d53880", "#003078", "#1d8f89" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="ks4-attainment8-comparison-yearbyyear-chart"
+                        class="js-chart"
+                        data-type="line"
+                        data-axis-step="30"
+                        data-axis-max="90"
+                        data-axis-suffix=""
+                        data-show-legend="true"
+                        data-show-datalabels="false"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                </canvas>
+            </div>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="table-view">
@@ -150,24 +232,47 @@
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2025 to 2026</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8Display</td>
-                    </tr>
-                    <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.Name</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8YearByYear?.Previous2</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8YearByYear?.Previous</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8YearByYear?.Current</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8Display</td>
                     </tr>
                     <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8YearByYear?.Previous2</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8YearByYear?.Previous</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8YearByYear?.Current</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8Display</td>
+                    </tr>
+                    <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Schools in England average</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8YearByYear?.Previous2</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8YearByYear?.Previous</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8YearByYear?.Current</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8Display</td>
                     </tr>
                 </tbody>
             </table>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
         </div>
     </div>
 </section>
