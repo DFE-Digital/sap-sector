@@ -54,13 +54,20 @@ public class SchoolHomeController(
 
     private void SetViewBagProperties(User user, Organisation currentOrg)
     {
-        ViewBag.SchoolName = GetSchoolName(user, currentOrg);
+        var (schoolName, schoolUrn) = GetSchoolInfo(user, currentOrg);
+        ViewBag.SchoolName = schoolName;
+        ViewBag.Urn = schoolUrn;
         ViewBag.UserName = user.Name;
     }
 
-    private static string GetSchoolName(User user, Organisation currentOrg)
+    private static (string SchoolName, string SchoolUrn) GetSchoolInfo(User user, Organisation currentOrg)
     {
-        return user.Organisations.FirstOrDefault(o => o.Id == currentOrg.Id)?.Name ?? "School";
+        var org = user.Organisations.FirstOrDefault(o => o.Id == currentOrg.Id);
+
+        return (
+            org?.Name ?? "School",
+            org?.Urn ?? "138337"
+        );
     }
 
     private static class Routes
