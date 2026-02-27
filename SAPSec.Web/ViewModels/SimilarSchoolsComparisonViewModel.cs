@@ -18,6 +18,21 @@ public class SimilarSchoolsComparisonViewModel
         Distance is double d
             ? d.ToString("0.00", CultureInfo.InvariantCulture)
             : string.Empty;
+    public SchoolDetails? SimilarSchoolDetails { get; set; }
+
+    // ----------------------------
+    // Similarity (9 characteristics table)
+    // ----------------------------
+    public IReadOnlyList<CharacteristicRow> CharacteristicsRows { get; set; }
+        = Array.Empty<CharacteristicRow>();
+
+    public sealed class CharacteristicRow
+    {
+        public required string Characteristic { get; init; }
+        public required string CurrentSchoolValue { get; init; }
+        public required string SimilarSchoolValue { get; init; }
+        public bool IsNumeric { get; init; }
+    }
 
     public decimal? ThisSchoolAttainment8ThreeYearAverage { get; set; }
     public decimal? SelectedSchoolAttainment8ThreeYearAverage { get; set; }
@@ -39,8 +54,6 @@ public class SimilarSchoolsComparisonViewModel
     public decimal ThisSchoolWidthPercent => WidthPercent(ThisSchoolAttainment8ThreeYearAverage);
     public decimal SelectedSchoolWidthPercent => WidthPercent(SelectedSchoolAttainment8ThreeYearAverage);
     public decimal EnglandWidthPercent => WidthPercent(EnglandAttainment8ThreeYearAverage);
-
-    public SchoolDetails? SimilarSchoolDetails { get; set; }
 
     private const decimal Attainment8MaxScore = 90m;
 
