@@ -106,7 +106,12 @@ public class SchoolController : Controller
                 SchoolDetails = response.SchoolDetails,
                 SchoolAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SchoolValue,
                 LocalAuthorityAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.LocalAuthorityValue,
-                EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue
+                EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue,
+                SchoolAttainment8YearByYear = response.Attainment8YearByYear.School,
+                LocalAuthorityAttainment8YearByYear = response.Attainment8YearByYear.LocalAuthority,
+                EnglandAttainment8YearByYear = response.Attainment8YearByYear.England,
+                SchoolTotalPupils = response.SchoolTotalPupils,
+                EnglandTotalPupils = response.EnglandTotalPupils
             };
 
             return View(model);

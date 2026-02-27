@@ -84,7 +84,75 @@ public class SimilarSchoolsComparisonControllerTests
 
         model.Distance.Should().BeGreaterThan(0);
         model.SimilarSchoolDetails.Should().NotBeNull();
+<<<<<<< HEAD
         model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
+=======
+        model.SimilarSchoolDetails!.Urn.Value.Should().Be(similarUrn);
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasures_ReturnsComparisonValues_ForBothSchools_AndEngland()
+    {
+        var urn = "145327";
+        var similarUrn = "142075";
+
+        var currentSchool = CreateSimilarSchool(urn, "Main School",
+            new BNGCoordinates(Easting: 430000, Northing: 380000));
+
+        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School Group",
+            new BNGCoordinates(Easting: 431000, Northing: 381000));
+
+        var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
+        var currentDetails = CreateSchoolDetails(urn, "Main School");
+
+        SetupDependencies(urn, similarUrn, currentSchool, new[] { similarSchool }, similarDetails);
+
+        _schoolDetailsServiceMock.Setup(s => s.TryGetByUrnAsync(urn)).ReturnsAsync(currentDetails);
+        _schoolDetailsServiceMock.Setup(s => s.TryGetByUrnAsync(similarUrn)).ReturnsAsync(similarDetails);
+
+        _ks4PerformanceRepositoryMock.Setup(r => r.GetByUrnAsync(urn)).ReturnsAsync(new Ks4HeadlineMeasuresData(
+            new EstablishmentPerformance
+            {
+                Attainment8_Tot_Est_Current_Num = "45.0",
+                Attainment8_Tot_Est_Previous_Num = "46.0",
+                Attainment8_Tot_Est_Previous2_Num = "47.0"
+            },
+            new LAPerformance(),
+            new EnglandPerformance
+            {
+                Attainment8_Tot_Eng_Current_Num = 45.9,
+                Attainment8_Tot_Eng_Previous_Num = 46.1,
+                Attainment8_Tot_Eng_Previous2_Num = 46.3
+            },
+            1200,
+            10844860));
+
+        _ks4PerformanceRepositoryMock.Setup(r => r.GetByUrnAsync(similarUrn)).ReturnsAsync(new Ks4HeadlineMeasuresData(
+            new EstablishmentPerformance
+            {
+                Attainment8_Tot_Est_Current_Num = "48.0",
+                Attainment8_Tot_Est_Previous_Num = "47.0",
+                Attainment8_Tot_Est_Previous2_Num = "46.0"
+            },
+            new LAPerformance(),
+            new EnglandPerformance
+            {
+                Attainment8_Tot_Eng_Current_Num = 45.9,
+                Attainment8_Tot_Eng_Previous_Num = 46.1,
+                Attainment8_Tot_Eng_Previous2_Num = 46.3
+            },
+            1100,
+            10844860));
+
+        var result = await _sut.Ks4HeadlineMeasures(urn, similarUrn);
+
+        var view = result.Should().BeOfType<ViewResult>().Subject;
+        var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
+
+        model.ThisSchoolAttainment8ThreeYearAverage.Should().Be(46.0m);
+        model.SelectedSchoolAttainment8ThreeYearAverage.Should().Be(47.0m);
+        model.EnglandAttainment8ThreeYearAverage.Should().Be(46.1m);
+>>>>>>> 8ccb9fc (add bar and charts)
     }
     private void SetupDependencies(
         string currentUrn,

@@ -33,12 +33,33 @@ public class GetKs4HeadlineMeasures(
             ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
             ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
 
+        var schoolYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num));
+
+        var localAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num));
+
+        var englandYearByYear = new Ks4HeadlineMeasureSeries(
+            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num),
+            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
+            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
+
         return new(
             schoolDetails,
             new Ks4HeadlineMeasureAverage(
                 schoolAverage,
                 localAuthorityAverage,
-                englandAverage));
+                englandAverage),
+            new Ks4HeadlineMeasureYearByYear(
+                schoolYearByYear,
+                localAuthorityYearByYear,
+                englandYearByYear),
+            data?.EstablishmentTotalPupils,
+            data?.EnglandTotalPupils);
     }
 
     private static decimal? ParseNullableDecimal(string? value)
@@ -76,6 +97,19 @@ public record Ks4HeadlineMeasureAverage(
     decimal? LocalAuthorityValue,
     decimal? EnglandValue);
 
+public record Ks4HeadlineMeasureSeries(
+    decimal? Current,
+    decimal? Previous,
+    decimal? Previous2);
+
+public record Ks4HeadlineMeasureYearByYear(
+    Ks4HeadlineMeasureSeries School,
+    Ks4HeadlineMeasureSeries LocalAuthority,
+    Ks4HeadlineMeasureSeries England);
+
 public record GetKs4HeadlineMeasuresResponse(
     SchoolDetails SchoolDetails,
-    Ks4HeadlineMeasureAverage Attainment8ThreeYearAverage);
+    Ks4HeadlineMeasureAverage Attainment8ThreeYearAverage,
+    Ks4HeadlineMeasureYearByYear Attainment8YearByYear,
+    int? SchoolTotalPupils,
+    int? EnglandTotalPupils);

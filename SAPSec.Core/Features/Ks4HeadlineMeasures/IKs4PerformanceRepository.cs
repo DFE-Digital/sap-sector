@@ -10,4 +10,6 @@ public interface IKs4PerformanceRepository
 public record Ks4HeadlineMeasuresData(
     EstablishmentPerformance? EstablishmentPerformance,
     LAPerformance? LocalAuthorityPerformance,
-    EnglandPerformance? EnglandPerformance);
+    EnglandPerformance? EnglandPerformance,
+    int? EstablishmentTotalPupils,
+    int? EnglandTotalPupils);
