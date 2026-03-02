@@ -279,3 +279,213 @@
         </div>
     </div>
 </section>
+
+<section aria-labelledby="eng-maths-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+    <h2 class="govuk-heading-m" id="eng-maths-heading">Grade achieved in English and maths GCSEs</h2>
+
+    <div class="app-ks4-filter-row govuk-!-margin-bottom-4">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="engMathsGrade">Grade</label>
+            <select class="govuk-select" id="engMathsGrade" name="engMathsGrade">
+                <option value="4" selected>Grade 4 and above</option>
+                <option value="5">Grade 5 and above</option>
+                <option value="7">Grade 7 and above</option>
+            </select>
+        </div>
+
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="engMathsPupilCharacteristic">Pupil characteristic</label>
+            <select class="govuk-select" id="engMathsPupilCharacteristic" name="engMathsPupilCharacteristic">
+                <option value="all-pupils" selected>All pupils</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="app-ks4-tabs govuk-tabs" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#eng-maths-three-year-average">3-year average</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#eng-maths-year-by-year">Year by year</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#eng-maths-table-view">Table</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="eng-maths-three-year-average">
+            @{
+                var engMathsChartData = new
+                {
+                    labels = new[]
+                    {
+                        Model.Name,
+                        Model.SimilarSchoolName,
+                        "Schools in England average"
+                    },
+                    data = new decimal?[]
+                    {
+                        Model.ThisSchoolEngMaths49ThreeYearAverage,
+                        Model.SelectedSchoolEngMaths49ThreeYearAverage,
+                        Model.EnglandEngMaths49ThreeYearAverage
+                    }
+                };
+                var engMathsChartColors = new[] { "#d53780", "#003078", "#003078" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="eng-maths-comparison-chart"
+                        class="js-chart"
+                        data-type="bar"
+                        data-axis-step="25"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(engMathsChartColors))'>
+                </canvas>
+            </div>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-year-by-year">
+            @{
+                var engMathsYearByYearData = new
+                {
+                    labels = new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" },
+                    datasets = new object[]
+                    {
+                        new
+                        {
+                            label = Model.Name,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal?[]
+                            {
+                                Model.ThisSchoolEngMaths49YearByYear?.Previous2,
+                                Model.ThisSchoolEngMaths49YearByYear?.Previous,
+                                Model.ThisSchoolEngMaths49YearByYear?.Current
+                            }
+                        },
+                        new
+                        {
+                            label = Model.SimilarSchoolName,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal?[]
+                            {
+                                Model.SelectedSchoolEngMaths49YearByYear?.Previous2,
+                                Model.SelectedSchoolEngMaths49YearByYear?.Previous,
+                                Model.SelectedSchoolEngMaths49YearByYear?.Current
+                            }
+                        },
+                        new
+                        {
+                            label = "Schools in England average",
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal?[]
+                            {
+                                Model.EnglandEngMaths49YearByYear?.Previous2,
+                                Model.EnglandEngMaths49YearByYear?.Previous,
+                                Model.EnglandEngMaths49YearByYear?.Current
+                            }
+                        }
+                    }
+                };
+                var engMathsYearByYearColors = new[] { "#d53780", "#003078", "#1d8f89" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="eng-maths-comparison-yearbyyear-chart"
+                        class="js-chart"
+                        data-type="line"
+                        data-axis-step="25"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-show-legend="true"
+                        data-show-datalabels="false"
+                        data-show-x-grid="true"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearColors))'>
+                </canvas>
+            </div>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2025 to 2026</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.Name</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolEngMaths49Display</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolEngMaths49Display</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Schools in England average</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandEngMaths49Display</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils entered</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
+                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
+                </div>
+            </details>
+        </div>
+    </div>
+</section>

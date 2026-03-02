@@ -1157,6 +1157,21 @@
   margin-bottom: 4px;
 }
 
+.app-ks4-filter-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.app-ks4-filter-row .govuk-form-group {
+  margin-bottom: 0;
+}
+
+.app-ks4-filter-row .govuk-select {
+  min-width: 260px;
+}
+
 .js-chart {
   --gds-font-family: "GDS Transport", Arial, sans-serif;
   --gds-font-size: 14;
