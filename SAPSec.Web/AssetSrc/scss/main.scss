@@ -590,6 +590,12 @@
   width: 100%;
   padding: 0 15px;
 }
+@media (max-width: 40.0625em) {
+  .app-side-navigation-container {
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
 @media (min-width: 40.0625em) {
   .app-side-navigation-container {
     width: 20%;
