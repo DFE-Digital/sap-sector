@@ -10,8 +10,6 @@
     How @Model.Name compares with @Model.SimilarSchoolName based on KS4 headline performance measures.
 </p>
 
-<hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible" />
-
 <section class="govuk-!-margin-bottom-7 app-ks4-progress" aria-labelledby="progress8-heading">
     <h2 class="govuk-heading-m" id="progress8-heading">Progress 8</h2>
     <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
@@ -42,6 +40,7 @@
         </p>
     </div>
 </section>
+
 
 @section Scripts {
     <script src="~/js/chart.umd.js"></script>
@@ -120,7 +119,7 @@
                         Model.EnglandAttainment8ThreeYearAverage
                     }
                 };
-                var chartColors = new[] { "#d53880", "#003078", "#003078" };
+                var chartColors = new[] { "#d53780", "#003078", "#1d70b8" };
             }
             <div class="app-ks4-chart-container">
                 <canvas id="ks4-attainment8-comparison-chart"
@@ -128,6 +127,9 @@
                         data-type="bar"
                         data-axis-step="30"
                         data-axis-max="90"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
                         data-axis-suffix=""
                         data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
                         data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
@@ -208,6 +210,7 @@
                         data-axis-step="30"
                         data-axis-max="90"
                         data-axis-suffix=""
+                        data-show-x-grid="true"
                         data-show-legend="true"
                         data-show-datalabels="false"
                         data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'

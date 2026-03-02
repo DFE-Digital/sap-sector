@@ -1086,7 +1086,6 @@
 
 .app-ks4-details {
   background: #f4f8fb;
-  padding: 12px 14px;
 }
 
 .app-ks4-details .govuk-details__summary {
@@ -1102,14 +1101,33 @@
   background: #ffffff;
 }
 
+@supports not (-ms-ime-align: auto) {
+  .govuk-details__summary:focus {
+    outline: 3px solid transparent;
+    color: #0b0c0c;
+    background-color: #fd0 !important;
+  }
+}
+
 .app-ks4-tabs .govuk-tabs__list {
   background: #f4f8fb;
-  border-bottom: 1px solid #b1b4b6;
+  border-bottom: none;
+}
+
+.app-ks4-tabs .govuk-tabs__list-item {
+  background: #e7ecf0;
+}
+
+.app-ks4-tabs .govuk-tabs__list-item--selected {
+  background: #ffffff;
+  border: 1px solid #b1b4b6;
+  border-bottom: none;
 }
 
 .app-ks4-tabs .govuk-tabs__panel {
   background: #ffffff;
   padding: 16px;
+  padding-top: 20px;
   border: 1px solid #b1b4b6;
 }
 

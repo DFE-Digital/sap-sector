@@ -21,7 +21,7 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels) {
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -81,7 +81,11 @@
                             font: fonts,
                             display: true
                         },
-                        grid: { display: false }
+                        grid: {
+                            display: showXGrid,
+                            drawBorder: false,
+                            color: '#d8d8d8'
+                        }
                     }
                 },
                 plugins: {
@@ -172,7 +176,10 @@
                         },
                         display: showDataLabels,
                         formatter: function (value) {
-                            return showDataLabels ? `${value}${axisSuffix}` : null;
+                            if (!showDataLabels || value === null || value === undefined || Number.isNaN(value)) {
+                                return null;
+                            }
+                            return `${value}${axisSuffix}`;
                         },
                         clamp: true,
                         clip: false
@@ -184,7 +191,7 @@
         return common;
     }
 
-    function buildDatasets(type, chartData, colors) {
+    function buildDatasets(type, chartData, colors, barOptions) {
         if (type === 'line') {
             return chartData.datasets.map((ds, i) => {
                 const color = ds.borderColor || colors[i] || '#999';
@@ -208,8 +215,22 @@
                 borderWidth: 1,
                 barThickness: 'flex',
                 maxBarThickness: 70,
-                minBarLength: 3
+                minBarLength: 3,
+                categoryPercentage: 0.8,
+                barPercentage: 0.9
             };
+            if (barOptions) {
+                if (barOptions.barThickness !== null) {
+                    dataOptions.barThickness = barOptions.barThickness;
+                    dataOptions.maxBarThickness = barOptions.barThickness;
+                }
+                if (barOptions.categoryPercentage !== null) {
+                    dataOptions.categoryPercentage = barOptions.categoryPercentage;
+                }
+                if (barOptions.barPercentage !== null) {
+                    dataOptions.barPercentage = barOptions.barPercentage;
+                }
+            }
             if (Array.isArray(chartData.datasets)) {
                 return chartData.datasets.map((ds, i) => ({
                     label: ds.label,
@@ -244,6 +265,7 @@
             const type = canvas.dataset.type;
             const showLegend = canvas.dataset.showLegend === "true";
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
+            const showXGrid = canvas.dataset.showXGrid === "true";
             const axisStep = canvas.dataset.axisStep
                 ? parseInt(canvas.dataset.axisStep, 10)
                 : 20;
@@ -258,13 +280,27 @@
                 ? JSON.parse(canvas.dataset.colors)
                 : [];
 
+            const barThickness = canvas.dataset.barThickness
+                ? parseInt(canvas.dataset.barThickness, 10)
+                : null;
+            const categoryPercentage = canvas.dataset.categoryPercentage
+                ? parseFloat(canvas.dataset.categoryPercentage)
+                : null;
+            const barPercentage = canvas.dataset.barPercentage
+                ? parseFloat(canvas.dataset.barPercentage)
+                : null;
+
             const config = {
                 type,
                 data: {
                     labels: chartData.labels,
-                    datasets: buildDatasets(type, chartData, colors)
+                    datasets: buildDatasets(type, chartData, colors, {
+                        barThickness,
+                        categoryPercentage,
+                        barPercentage
+                    })
                 },
-                options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels),
+                options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid),
                 plugins: showDataLabels ? [ChartDataLabels] : []
             };
 

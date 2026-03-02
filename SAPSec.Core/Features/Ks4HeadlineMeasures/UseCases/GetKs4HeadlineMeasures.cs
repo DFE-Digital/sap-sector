@@ -48,6 +48,66 @@ public class GetKs4HeadlineMeasures(
             ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
             ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
 
+        var engMaths49SchoolAverage = Average(
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct));
+
+        var engMaths49LocalAuthorityAverage = Average(
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct));
+
+        var engMaths49EnglandAverage = Average(
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct));
+
+        var engMaths49SchoolYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct));
+
+        var engMaths49LocalAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct));
+
+        var engMaths49EnglandYearByYear = new Ks4HeadlineMeasureSeries(
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct));
+
+        var engMaths59SchoolAverage = Average(
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct));
+
+        var engMaths59LocalAuthorityAverage = Average(
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct));
+
+        var engMaths59EnglandAverage = Average(
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct));
+
+        var engMaths59SchoolYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct));
+
+        var engMaths59LocalAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
+            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct));
+
+        var engMaths59EnglandYearByYear = new Ks4HeadlineMeasureSeries(
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
+            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct));
+
         return new(
             schoolDetails,
             new Ks4HeadlineMeasureAverage(
@@ -58,6 +118,22 @@ public class GetKs4HeadlineMeasures(
                 schoolYearByYear,
                 localAuthorityYearByYear,
                 englandYearByYear),
+            new Ks4HeadlineMeasureAverage(
+                engMaths49SchoolAverage,
+                engMaths49LocalAuthorityAverage,
+                engMaths49EnglandAverage),
+            new Ks4HeadlineMeasureYearByYear(
+                engMaths49SchoolYearByYear,
+                engMaths49LocalAuthorityYearByYear,
+                engMaths49EnglandYearByYear),
+            new Ks4HeadlineMeasureAverage(
+                engMaths59SchoolAverage,
+                engMaths59LocalAuthorityAverage,
+                engMaths59EnglandAverage),
+            new Ks4HeadlineMeasureYearByYear(
+                engMaths59SchoolYearByYear,
+                engMaths59LocalAuthorityYearByYear,
+                engMaths59EnglandYearByYear),
             data?.EstablishmentTotalPupils,
             data?.EnglandTotalPupils);
     }
@@ -111,5 +187,9 @@ public record GetKs4HeadlineMeasuresResponse(
     SchoolDetails SchoolDetails,
     Ks4HeadlineMeasureAverage Attainment8ThreeYearAverage,
     Ks4HeadlineMeasureYearByYear Attainment8YearByYear,
+    Ks4HeadlineMeasureAverage EngMaths49ThreeYearAverage,
+    Ks4HeadlineMeasureYearByYear EngMaths49YearByYear,
+    Ks4HeadlineMeasureAverage EngMaths59ThreeYearAverage,
+    Ks4HeadlineMeasureYearByYear EngMaths59YearByYear,
     int? SchoolTotalPupils,
     int? EnglandTotalPupils);

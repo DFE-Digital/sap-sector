@@ -44,6 +44,18 @@ public class SimilarSchoolsComparisonViewModel
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolAttainment8YearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolAttainment8YearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandAttainment8YearByYear { get; set; }
+    public decimal? ThisSchoolEngMaths49ThreeYearAverage { get; set; }
+    public decimal? SelectedSchoolEngMaths49ThreeYearAverage { get; set; }
+    public decimal? EnglandEngMaths49ThreeYearAverage { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolEngMaths49YearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths49YearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandEngMaths49YearByYear { get; set; }
+    public decimal? ThisSchoolEngMaths59ThreeYearAverage { get; set; }
+    public decimal? SelectedSchoolEngMaths59ThreeYearAverage { get; set; }
+    public decimal? EnglandEngMaths59ThreeYearAverage { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolEngMaths59YearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths59YearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandEngMaths59YearByYear { get; set; }
     public int? ThisSchoolTotalPupils { get; set; }
     public int? SelectedSchoolTotalPupils { get; set; }
     public int? EnglandTotalPupils { get; set; }
@@ -51,6 +63,12 @@ public class SimilarSchoolsComparisonViewModel
     public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
     public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
     public string EnglandAttainment8Display => DisplayValue(EnglandAttainment8ThreeYearAverage);
+    public string ThisSchoolEngMaths49Display => DisplayPercent(ThisSchoolEngMaths49ThreeYearAverage);
+    public string SelectedSchoolEngMaths49Display => DisplayPercent(SelectedSchoolEngMaths49ThreeYearAverage);
+    public string EnglandEngMaths49Display => DisplayPercent(EnglandEngMaths49ThreeYearAverage);
+    public string ThisSchoolEngMaths59Display => DisplayPercent(ThisSchoolEngMaths59ThreeYearAverage);
+    public string SelectedSchoolEngMaths59Display => DisplayPercent(SelectedSchoolEngMaths59ThreeYearAverage);
+    public string EnglandEngMaths59Display => DisplayPercent(EnglandEngMaths59ThreeYearAverage);
     public string ThisSchoolTotalPupilsDisplay => DisplayPupilCount(ThisSchoolTotalPupils);
     public string SelectedSchoolTotalPupilsDisplay => DisplayPupilCount(SelectedSchoolTotalPupils);
     public string EnglandTotalPupilsDisplay => DisplayPupilCount(EnglandTotalPupils);
@@ -91,4 +109,7 @@ public class SimilarSchoolsComparisonViewModel
 
     private static string DisplayPupilCount(int? value) =>
         value.HasValue ? value.Value.ToString("N0", CultureInfo.InvariantCulture) : "No available data";
+
+    public static string DisplayPercent(decimal? value) =>
+        value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) + "%" : "No available data";
 }

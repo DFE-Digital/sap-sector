@@ -73,6 +73,26 @@ public class SimilarSchoolsComparisonController : Controller
         model.EnglandAttainment8YearByYear =
             thisSchoolKs4?.Attainment8YearByYear.England
             ?? selectedSchoolKs4?.Attainment8YearByYear.England;
+        model.ThisSchoolEngMaths49ThreeYearAverage = thisSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
+        model.SelectedSchoolEngMaths49ThreeYearAverage = selectedSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
+        model.EnglandEngMaths49ThreeYearAverage =
+            thisSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue
+            ?? selectedSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue;
+        model.ThisSchoolEngMaths49YearByYear = thisSchoolKs4?.EngMaths49YearByYear.School;
+        model.SelectedSchoolEngMaths49YearByYear = selectedSchoolKs4?.EngMaths49YearByYear.School;
+        model.EnglandEngMaths49YearByYear =
+            thisSchoolKs4?.EngMaths49YearByYear.England
+            ?? selectedSchoolKs4?.EngMaths49YearByYear.England;
+        model.ThisSchoolEngMaths59ThreeYearAverage = thisSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue;
+        model.SelectedSchoolEngMaths59ThreeYearAverage = selectedSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue;
+        model.EnglandEngMaths59ThreeYearAverage =
+            thisSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue
+            ?? selectedSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue;
+        model.ThisSchoolEngMaths59YearByYear = thisSchoolKs4?.EngMaths59YearByYear.School;
+        model.SelectedSchoolEngMaths59YearByYear = selectedSchoolKs4?.EngMaths59YearByYear.School;
+        model.EnglandEngMaths59YearByYear =
+            thisSchoolKs4?.EngMaths59YearByYear.England
+            ?? selectedSchoolKs4?.EngMaths59YearByYear.England;
         model.ThisSchoolTotalPupils = thisSchoolKs4?.SchoolTotalPupils;
         model.SelectedSchoolTotalPupils = selectedSchoolKs4?.SchoolTotalPupils;
         model.EnglandTotalPupils =
