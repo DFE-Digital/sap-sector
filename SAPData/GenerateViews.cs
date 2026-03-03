@@ -1,5 +1,6 @@
 ﻿using SAPData.Models;
 using System.Text;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
@@ -697,7 +698,45 @@ public sealed class GenerateViews
         if (best != null && tableMap.TryGetValue(best.Key, out rawTable))
             return true;
 
-        return false;
+        // Fallback: generate deterministic table name from dataset key.
+        // This matches GenerateRawTables.GenerateShortTableName and allows
+        // view generation when raw CSVs (and thus tablemapping.csv) are missing.
+        rawTable = GenerateShortTableName(key);
+        return true;
+    }
+
+    private static string GenerateShortTableName(string logicalKey)
+    {
+        using var sha1 = SHA1.Create();
+
+        var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(logicalKey));
+        string shortHash = BitConverter
+            .ToString(hash)
+            .Replace("-", "")
+            .Substring(0, 10)
+            .ToLowerInvariant();
+
+        string baseName = Sanitise(logicalKey);
+
+        if (baseName.Length > 20)
+            baseName = baseName.Substring(0, 20);
+
+        return $"t_{baseName}_{shortHash}";
+    }
+
+    private static string Sanitise(string input)
+    {
+        var sb = new StringBuilder();
+
+        foreach (var c in input.Trim())
+        {
+            if (char.IsLetterOrDigit(c) || c == '_')
+                sb.Append(c);
+            else
+                sb.Append('_');
+        }
+
+        return sb.ToString();
     }
 
     private static string BuildAggregatedExpression(IEnumerable<DataMapRow> rows)
