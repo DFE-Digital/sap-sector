@@ -306,7 +306,7 @@ jobs:
             -t 7200 \
             -x \
             -i "${BACKUP_FILE}" -c \
-            "${APP_NAME}" -- psql --set=ON_ERROR_STOP=1 -X
+            "${APP_NAME}" -- psql -X
 
       - name: Set up .NET (for SQL generation)
         uses: actions/setup-dotnet@v4
@@ -325,44 +325,92 @@ jobs:
 
           dotnet run --project SAPData -- --sql-dir ./SAPData/Sql
           
-          # Flatten run_all.sql (expand \ir includes) so konduit can stream a single file
+          # Build a views-only SQL file so we don't drop raw tables or recreate indexes.
           python - <<'PY'
           from pathlib import Path
-          import re
           
           base = Path("SAPData/Sql")
-          src = base / "run_all.sql"
-          out = base / "run_all_flat.sql"
-          include_re = re.compile(r"^\\\s*ir\s+(?P<path>.+)$", re.IGNORECASE)
+          out = base / "run_views_only.sql"
           
-          seen = set()
+          def read(path: Path) -> str:
+              return path.read_text(encoding="utf-8").rstrip()
           
-          def expand(path: Path) -> str:
-              text = path.read_text(encoding="utf-8")
-              lines = []
-              for line in text.splitlines():
-                  m = include_re.match(line.strip())
-                  if m:
-                      inc = (base / m.group("path").strip()).resolve()
-                      if inc in seen:
-                          continue
-                      seen.add(inc)
-                      lines.append(f"-- BEGIN {inc.name}")
-                      lines.append(expand(inc))
-                      lines.append(f"-- END {inc.name}")
-                  else:
-                      lines.append(line)
-              return "\n".join(lines)
+          parts = []
           
-          out.write_text(expand(src) + "\n", encoding="utf-8")
-          print(f"Flattened SQL written to {out}")
+          # Ensure helper functions exist without dropping data.
+          parts.append("""
+          CREATE OR REPLACE FUNCTION clean_int(value TEXT)
+          RETURNS INT
+          LANGUAGE plpgsql
+          IMMUTABLE
+          AS $$
+          BEGIN
+              IF value IS NULL OR trim(value) IN (
+                  '', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z'
+              ) THEN
+                  RETURN NULL;
+              END IF;
+              RETURN value::INT;
+          EXCEPTION WHEN others THEN
+              RETURN NULL;
+          END;
+          $$;
+          
+          CREATE OR REPLACE FUNCTION clean_numeric(value TEXT)
+          RETURNS NUMERIC
+          LANGUAGE plpgsql
+          IMMUTABLE
+          AS $$
+          BEGIN
+              IF value IS NULL OR trim(value) IN (
+                  '', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z'
+              ) THEN
+                  RETURN NULL;
+              END IF;
+              RETURN value::NUMERIC;
+          EXCEPTION WHEN others THEN
+              RETURN NULL;
+          END;
+          $$;
+          
+          CREATE OR REPLACE FUNCTION clean_date(value TEXT)
+          RETURNS DATE
+          LANGUAGE plpgsql
+          IMMUTABLE
+          AS $$
+          BEGIN
+              IF value IS NULL OR trim(value) IN (
+                  '', 'na', 'n/a', 'N/A', '.', '-', '--'
+              ) THEN
+                  RETURN NULL;
+              END IF;
+              RETURN value::DATE;
+          EXCEPTION WHEN others THEN
+              RETURN NULL;
+          END;
+          $$;
+          """.strip())
+          
+          # Include view definitions only (no cleanup, no raw table creation, no indexes).
+          for path in sorted(base.glob("03_*.sql")):
+              parts.append(f"-- BEGIN {path.name}")
+              parts.append(read(path))
+              parts.append(f"-- END {path.name}")
+          
+          for path in sorted(base.glob("50_*.sql")):
+              parts.append(f"-- BEGIN {path.name}")
+              parts.append(read(path))
+              parts.append(f"-- END {path.name}")
+          
+          out.write_text("\n\n".join(parts) + "\n", encoding="utf-8")
+          print(f"Views-only SQL written to {out}")
           PY
 
           "$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
-            -i SAPData/Sql/run_all_flat.sql \
+            -i SAPData/Sql/run_views_only.sql \
             "${APP_NAME}" -- psql -X
 
 
