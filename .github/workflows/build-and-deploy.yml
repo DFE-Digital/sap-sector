@@ -329,7 +329,7 @@ jobs:
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
-            "${APP_NAME}" -- bash -lc "psql -v ON_ERROR_STOP=1 -X -f SAPData/Sql/run_all.sql"
+            "${APP_NAME}" -- psql -vON_ERROR_STOP=1 -X -f SAPData/Sql/run_all.sql
 
 
   deploy:
