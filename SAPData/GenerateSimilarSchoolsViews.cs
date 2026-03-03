@@ -1,7 +1,5 @@
 using SAPData.Models;
-using System.Security.Cryptography;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace SAPData;
 
@@ -96,7 +94,7 @@ public sealed class GenerateSimilarSchoolsViews
         for (int i = 0; i < groups.Count; i++)
         {
             var g = groups[i];
-            if (!TryResolveRawTable(tableMap, g.Key, out var rawTable))
+            if (!tableMap.TryGetValue(g.Key, out var rawTable))
                 throw new InvalidOperationException($"Missing table mapping for {g.Key}");
 
             if (i == 0)
@@ -125,85 +123,4 @@ public sealed class GenerateSimilarSchoolsViews
             .Select(l => l.Split(','))
             .Where(p => p.Length == 2)
             .ToDictionary(p => p[0], p => p[1]);
-
-    private static bool TryResolveRawTable(
-        Dictionary<string, string> tableMap,
-        string? datasetKey,
-        out string? rawTable)
-    {
-        rawTable = "";
-
-        if (string.IsNullOrWhiteSpace(datasetKey))
-            return false;
-
-        var key = datasetKey.Trim().TrimStart('\uFEFF');
-
-        if (tableMap.TryGetValue(key, out rawTable))
-            return true;
-
-        var manualShortKey = "m_" + key;
-        if (tableMap.TryGetValue(manualShortKey, out rawTable))
-            return true;
-
-        var manualLongKey = "manual_" + key;
-        if (tableMap.TryGetValue(manualLongKey, out rawTable))
-            return true;
-
-        var versionRegex = new Regex(
-            "^" + Regex.Escape(key) + "_v(?<ver>[0-9]+\\.[0-9]+(\\.[0-9]+)?)$",
-            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
-
-        var best = tableMap.Keys
-            .Select(k => k.Trim().TrimStart('\uFEFF'))
-            .Select(k => new { Key = k, Match = versionRegex.Match(k) })
-            .Where(x => x.Match.Success)
-            .Select(x =>
-            {
-                var verText = x.Match.Groups["ver"].Value;
-                Version.TryParse(verText, out var ver);
-                return new { x.Key, Version = ver ?? new Version(0, 0) };
-            })
-            .OrderByDescending(x => x.Version)
-            .FirstOrDefault();
-
-        if (best != null && tableMap.TryGetValue(best.Key, out rawTable))
-            return true;
-
-        rawTable = GenerateShortTableName(key);
-        return true;
-    }
-
-    private static string GenerateShortTableName(string logicalKey)
-    {
-        using var sha1 = SHA1.Create();
-
-        var hash = sha1.ComputeHash(Encoding.UTF8.GetBytes(logicalKey));
-        string shortHash = BitConverter
-            .ToString(hash)
-            .Replace("-", "")
-            .Substring(0, 10)
-            .ToLowerInvariant();
-
-        string baseName = Sanitise(logicalKey);
-
-        if (baseName.Length > 20)
-            baseName = baseName.Substring(0, 20);
-
-        return $"t_{baseName}_{shortHash}";
-    }
-
-    private static string Sanitise(string input)
-    {
-        var sb = new StringBuilder();
-
-        foreach (var c in input.Trim())
-        {
-            if (char.IsLetterOrDigit(c) || c == '_')
-                sb.Append(c);
-            else
-                sb.Append('_');
-        }
-
-        return sb.ToString();
-    }
 }
