@@ -286,6 +286,7 @@ jobs:
           ls -lh "${BACKUP_FILE}"
 
       - name: Restore backup into PR review DB
+        id: restore_backup
         continue-on-error: true
         shell: bash
         env:
@@ -306,6 +307,29 @@ jobs:
             -x \
             -i "${BACKUP_FILE}" -c \
             "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X
+
+      - name: Set up .NET (for SQL generation)
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Regenerate and apply DB views
+        shell: bash
+        env:
+          AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
+
+          dotnet run --project SAPData -- --sql-dir ./SAPData/Sql
+
+          "$GITHUB_WORKSPACE/konduit.sh" \
+            -n "${AKS_NAMESPACE}" \
+            -t 7200 \
+            -x \
+            "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X -f SAPData/Sql/run_all.sql
 
 
   deploy:
