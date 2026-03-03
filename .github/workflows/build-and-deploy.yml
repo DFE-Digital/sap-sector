@@ -306,7 +306,7 @@ jobs:
             -t 7200 \
             -x \
             -i "${BACKUP_FILE}" -c \
-            "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X
+            "${APP_NAME}" -- psql --set=ON_ERROR_STOP=1 -X
 
       - name: Set up .NET (for SQL generation)
         uses: actions/setup-dotnet@v4
@@ -329,7 +329,7 @@ jobs:
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
-            "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X -f SAPData/Sql/run_all.sql
+            "${APP_NAME}" -- psql --set=ON_ERROR_STOP=1 -X -f SAPData/Sql/run_all.sql
 
 
   deploy:
