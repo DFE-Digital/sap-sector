@@ -7,27 +7,27 @@ using Xunit;
 namespace SAPSec.UI.Tests;
 
 [Collection("UITestsCollection")]
-public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
+public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SimilarSchoolDetailsPath = "/school/108088/view-similar-schools/137621/SchoolDetails";
+    private const string SimilarSchoolComparisonPath = "/school/108088/view-similar-schools/137621/SchoolDetails";
 
     #region Page Load Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_LoadsSuccessfully()
+    public async Task SimilarSchoolComparison_LoadsSuccessfully()
     {
-        var response = await Page.GotoAsync(SimilarSchoolDetailsPath);
+        var response = await Page.GotoAsync(SimilarSchoolComparisonPath);
 
         response.Should().NotBeNull();
         response.Status.Should().Be(200);
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_DisplaysComparingHeaderBlock()
+    public async Task SimilarSchoolComparison_DisplaysComparingHeaderBlock()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mainSchoolName = Page.Locator("span.govuk-caption-l");
@@ -53,9 +53,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Back Link Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_HasBackLink()
+    public async Task SimilarSchoolComparison_HasBackLink()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var backLink = Page.Locator("a.govuk-back-link");
@@ -65,9 +65,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_BackLink_HasCorrectText()
+    public async Task SimilarSchoolComparison_BackLink_HasCorrectText()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var backLink = Page.Locator("a.govuk-back-link");
@@ -77,9 +77,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_BackLink_HasExpectedHref()
+    public async Task SimilarSchoolComparison_BackLink_HasExpectedHref()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var backLink = Page.Locator("a.govuk-back-link");
@@ -94,9 +94,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Compare Navigation Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_ShowsCompareServiceNavigation()
+    public async Task SimilarSchoolComparison_ShowsCompareServiceNavigation()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var nav = Page.Locator("div.govuk-service-navigation.compare-nav nav[aria-label='Compare sections']");
@@ -106,9 +106,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_CompareServiceNavigation_HasAllTabs()
+    public async Task SimilarSchoolComparison_CompareServiceNavigation_HasAllTabs()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var links = Page.Locator("div.govuk-service-navigation.compare-nav a.govuk-service-navigation__link");
@@ -124,9 +124,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_SchoolDetailsTab_IsActive()
+    public async Task SimilarSchoolComparison_SchoolDetailsTab_IsActive()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var activeTab = Page.Locator("li.govuk-service-navigation__item--active a.govuk-service-navigation__link");
@@ -140,14 +140,62 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
         ariaCurrent.Should().Be("true", "Active tab should have aria-current='true'");
     }
 
+    [Fact]
+    public async Task SimilarSchoolComparison_CanNavigateToSimilarity_AndSeeCharacteristicsTable()
+    {
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var similarityTab = Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')");
+        await similarityTab.ClickAsync();
+
+        var heading = Page.Locator("h1.govuk-heading-l");
+        await heading.WaitForAsync();
+        (await heading.TextContentAsync()).Should().Contain("How these schools compare");
+
+        var table = Page.Locator("table.govuk-table");
+        await table.WaitForAsync();
+        (await table.CountAsync()).Should().Be(1, "Similarity table should be visible");
+
+        var rows = table.Locator("tbody tr.govuk-table__row");
+        (await rows.CountAsync()).Should().Be(9, "Similarity table should list 9 characteristics");
+    }
+
+    [Fact]
+    public async Task SimilarSchoolComparison_SimilarityTable_HasExpectedHeaderAndNonEmptyValues()
+    {
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')").ClickAsync();
+        var heading = Page.Locator("h1.govuk-heading-l");
+        await heading.WaitForAsync();
+        var table = Page.Locator("table.govuk-table");
+        await table.WaitForAsync();
+
+        var headerCells = table.Locator("thead th");
+        (await headerCells.CountAsync()).Should().Be(3, "Similarity table should have 3 columns");
+        (await headerCells.Nth(0).TextContentAsync()).Should().Contain("Characteristic");
+
+        var firstRow = table.Locator("tbody tr.govuk-table__row").First;
+        (await firstRow.CountAsync()).Should().Be(1);
+
+        var cells = firstRow.Locator("th, td");
+        (await cells.CountAsync()).Should().Be(3, "Row should have characteristic + 2 value cells");
+
+        (await cells.Nth(0).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
+        (await cells.Nth(1).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
+        (await cells.Nth(2).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
+    }
+
     #endregion
 
     #region Page Body Heading Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_Body_DisplaysSchoolDetailsHeading()
+    public async Task SimilarSchoolComparison_Body_DisplaysSchoolDetailsHeading()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var h2 = Page.Locator("h2:text-is('School Details')");
@@ -161,9 +209,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Map Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_DisplaysMapDetails_Component()
+    public async Task SimilarSchoolComparison_DisplaysMapDetails_Component()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var details = Page.Locator("details#comparison-map-details.govuk-details");
@@ -176,9 +224,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_MapContainer_HasExpectedAttributes()
+    public async Task SimilarSchoolComparison_MapContainer_HasExpectedAttributes()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
+        await Page.GotoAsync(SimilarSchoolComparisonPath, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
 
     
         await Page.WaitForSelectorAsync("#map", new() { State = WaitForSelectorState.Attached, Timeout = 15000 });
@@ -209,9 +257,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_MapLegend_HasBothMarkerIcons()
+    public async Task SimilarSchoolComparison_MapLegend_HasBothMarkerIcons()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mainMarker = Page.Locator("img.school-marker-icon[src='/assets/images/marker-school-pink.svg']");
@@ -222,9 +270,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_HasSchoolsDataJsonScript()
+    public async Task SimilarSchoolComparison_HasSchoolsDataJsonScript()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var script = Page.Locator("script#schools-data[type='application/json']");
@@ -245,9 +293,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Contact This School Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_DisplaysContactThisSchoolSection()
+    public async Task SimilarSchoolComparison_DisplaysContactThisSchoolSection()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var heading = Page.Locator("h2.govuk-heading-m:text-is('Contact this school')");
@@ -257,9 +305,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_ContactSection_DisplaysExpectedFields()
+    public async Task SimilarSchoolComparison_ContactSection_DisplaysExpectedFields()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         (await Page.Locator(".govuk-summary-list__key:text-is('Headteacher/Principal')").IsVisibleAsync())
@@ -276,9 +324,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_ExternalLinks_OpenInNewTab_WhenPresent()
+    public async Task SimilarSchoolComparison_ExternalLinks_OpenInNewTab_WhenPresent()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var externalLinks = Page.Locator("a[target='_blank']");
@@ -288,9 +336,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_ExternalLinks_HaveNoopenerNoreferrer_WhenPresent()
+    public async Task SimilarSchoolComparison_ExternalLinks_HaveNoopenerNoreferrer_WhenPresent()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var externalLinks = Page.Locator("a[target='_blank']");
@@ -310,9 +358,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Location Section Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_DisplaysLocationSection()
+    public async Task SimilarSchoolComparison_DisplaysLocationSection()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var locationHeading = Page.Locator("h2.govuk-heading-m:text-is('Location')");
@@ -322,9 +370,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_LocationSection_DisplaysExpectedFields()
+    public async Task SimilarSchoolComparison_LocationSection_DisplaysExpectedFields()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         (await Page.Locator(".govuk-summary-list__key:text-is('Distance between school')").IsVisibleAsync())
@@ -348,9 +396,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region School Details Section Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_DisplaysSchoolDetailsSection()
+    public async Task SimilarSchoolComparison_DisplaysSchoolDetailsSection()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var heading = Page.Locator("h2.govuk-heading-m:text-is('School details')");
@@ -360,9 +408,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_SchoolDetailsSection_DisplaysExpectedFields()
+    public async Task SimilarSchoolComparison_SchoolDetailsSection_DisplaysExpectedFields()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         (await Page.Locator(".govuk-summary-list__key:text-is('ID')").IsVisibleAsync())
@@ -403,9 +451,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_SENExplanationDetails_Exists()
+    public async Task SimilarSchoolComparison_SENExplanationDetails_Exists()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var senDetails = Page.Locator("details.govuk-details:has(summary .govuk-details__summary-text:has-text('What is a SEN unit or resourced provision?'))");
@@ -419,9 +467,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Further Information + Data Sources Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_DisplaysFurtherInformationSection()
+    public async Task SimilarSchoolComparison_DisplaysFurtherInformationSection()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var furtherInfoHeading = Page.Locator("h2.govuk-heading-m:text-is('Further information')");
@@ -431,9 +479,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_DisplaysDataSourcesDetails_WithExpectedLinks()
+    public async Task SimilarSchoolComparison_DisplaysDataSourcesDetails_WithExpectedLinks()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var dataSources = Page.Locator("details.govuk-details:has(summary .govuk-details__summary-text:text-is('Data sources'))");
@@ -453,9 +501,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Summary List Structure Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_SummaryListRows_HaveKeyAndValue()
+    public async Task SimilarSchoolComparison_SummaryListRows_HaveKeyAndValue()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var rows = Page.Locator(".govuk-summary-list__row");
@@ -477,9 +525,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     #region Accessibility Tests
 
     [Fact]
-    public async Task SimilarSchoolDetails_HeadingsAreInCorrectOrder()
+    public async Task SimilarSchoolComparison_HeadingsAreInCorrectOrder()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var h1 = Page.Locator("h1");
@@ -490,9 +538,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_HasMainContentLandmark()
+    public async Task SimilarSchoolComparison_HasMainContentLandmark()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var main = Page.Locator("main#main-content");
@@ -502,9 +550,9 @@ public class SimilarSchoolDetailsPageTests(WebApplicationSetupFixture fixture) :
     }
 
     [Fact]
-    public async Task SimilarSchoolDetails_SkipLinkTargetsMainContent()
+    public async Task SimilarSchoolComparison_SkipLinkTargetsMainContent()
     {
-        await Page.GotoAsync(SimilarSchoolDetailsPath);
+        await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var skipLink = Page.Locator(".govuk-skip-link");

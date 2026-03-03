@@ -6,18 +6,16 @@
 
     var comparisonModel = ViewData["ComparisonSchool"] as SimilarSchoolsComparisonViewModel;
 
-    var currentController = (string?)ViewContext.RouteData.Values["controller"];
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
 
-    var routeValues = new Dictionary<string, object>();
+    var routeValues = new Dictionary<string, object>
+    {
+        ["urn"] = comparisonModel!.Urn,
+        ["similarSchoolUrn"] = comparisonModel.SimilarSchoolUrn
+    };
 
-    routeValues["urn"] = comparisonModel.Urn;
-    routeValues["similarSchoolUrn"] = comparisonModel.SimilarSchoolUrn;
-
-    string active(bool condition)
-        => condition ? "govuk-service-navigation__item--active" : "";
+    string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
 }
-
 
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
@@ -27,7 +25,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = @comparisonModel.Urn })">
+                   href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = comparisonModel!.Urn })">
                     View similar schools
                 </a>
             </li>
@@ -35,39 +33,36 @@
     </nav>
 }
 
-<div class="govuk-grid-row govuk-!-margin-top-1">
-    @* LEFT: back link alone *@
-    <div class="app-side-navigation-container">
-        <a class="govuk-back-link"
-           href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = @comparisonModel.Urn })">
-            Back
-        </a>
-    </div>
+<div class="govuk-width-container">
 
+    <div class="govuk-grid-row govuk-!-margin-top-1">
 
-    <div class="app-body-container-with-side-navigation">
+        @* LEFT: back link *@
+        <div class="app-side-navigation-container">
+            <a class="govuk-back-link"
+               href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = comparisonModel!.Urn })">
+                Back
+            </a>
+        </div>
 
-        <span class="govuk-caption-l govuk-!-font-size-27">
-            @comparisonModel.Name
-        </span>
+        @* MAIN CONTENT *@
+        <div class="app-body-container-with-side-navigation">
 
-        <span
-            class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-padding-top-2 govuk-!-padding-bottom-2">
-            Comparing to
-        </span>
+            <span class="govuk-caption-l govuk-!-font-size-27">
+                @comparisonModel!.Name
+            </span>
 
-        <h1 class="govuk-heading-xl govuk-!-font-size-50 govuk-!-font-weight-bold">
-            @comparisonModel.SimilarSchoolName
-        </h1>
+            <span class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-padding-top-2 govuk-!-padding-bottom-2">
+                Comparing to
+            </span>
 
-        <div class="govuk-service-navigation compare-nav">
+            <h1 class="govuk-heading-xl govuk-!-font-size-50 govuk-!-font-weight-bold">
+                @comparisonModel.SimilarSchoolName
+            </h1>
 
-            <div class="govuk-width-container">
+            <div class="govuk-service-navigation compare-nav">
                 <div class="govuk-service-navigation__container">
-
-                    <nav aria-label="Compare sections"
-                         class="govuk-service-navigation__wrapper">
-
+                    <nav aria-label="Compare sections" class="govuk-service-navigation__wrapper">
                         <ul class="govuk-service-navigation__list">
 
                             <li class="govuk-service-navigation__item @active(currentAction == "Index")">
@@ -111,16 +106,15 @@
                             </li>
 
                         </ul>
-
                     </nav>
                 </div>
             </div>
-        </div>
 
-        <div class="govuk-!-margin-top-6">
-            @RenderBody()
-        </div>
+            <div class="govuk-!-margin-top-6">
+                @RenderBody()
+            </div>
 
+        </div>
     </div>
 </div>
 
