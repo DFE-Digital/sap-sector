@@ -329,7 +329,8 @@ jobs:
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
-            "${APP_NAME}" -- psql -X -f SAPData/Sql/run_all.sql
+            -i SAPData/Sql/run_all.sql \
+            "${APP_NAME}" -- psql -X
 
 
   deploy:
