@@ -1,5 +1,5 @@
 module "storage" {
-  source = "git::https://github.com/DFE-Digital/terraform-modules.git//aks/storage_account?ref=stable"
+  source = "./vendor/modules/aks//aks/storage_account"
 
   name = "dp"
 
