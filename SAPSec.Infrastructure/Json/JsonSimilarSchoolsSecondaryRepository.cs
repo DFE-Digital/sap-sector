@@ -55,9 +55,45 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
         return (
             FromJson(currentEstab, [currentSchoolPerformance]),
             similarSchoolsEstabs
-                .GroupJoin(similarSchoolsPerformance, d => d.URN, a => a.Id, FromJson)
-                .ToList()
-                .AsReadOnly());
+            .GroupJoin(similarSchoolsPerformance, d => d.URN, a => a.Id, FromJson)
+            .ToList()
+            .AsReadOnly());
+    }
+
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+        IEnumerable<string> urns)
+    {
+        if (urns is null)
+        {
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+        }
+
+        var urnList = urns as IList<string> ?? urns.ToList();
+        if (urnList.Count == 0)
+        {
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+        }
+
+        var rows = await _similarSchoolsValuesRepository.ReadAllAsync();
+        var matched = rows.Where(r => urnList.Contains(r.URN)).ToList();
+
+        return matched
+            .Select(r => new SimilarSchoolsSecondaryValues
+            {
+                Urn = r.URN,
+                Ks2ReadingScore = ParseDecimal(r.KS2RP),
+                Ks2MathsScore = ParseDecimal(r.KS2MP),
+                PupilPremiumEligibilityPercentage = ParseDecimal(r.PPPerc),
+                PupilsWithEalPercentage = ParseDecimal(r.PercentEAL),
+                Polar4Quintile = ParseInt(r.Polar4QuintilePupils),
+                PupilStabilityRate = ParseDecimal(r.PStability),
+                AverageIdaciScore = ParseDecimal(r.IdaciPupils),
+                PupilsWithSenSupportPercentage = ParseDecimal(r.PercentSchSupport),
+                PupilCount = ParseInt(r.NumberOfPupils),
+                PupilsWithEhcPlanPercentage = ParseDecimal(r.PercentageStatementOrEHP)
+            })
+            .ToList()
+            .AsReadOnly();
     }
 
     private SimilarSchool FromJson(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)
@@ -100,5 +136,37 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Maths59_Sum_Est_Current_Num),
             PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Physics59_Sum_Est_Current_Num),
         };
+    }
+
+    private static decimal ParseDecimal(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0m;
+        }
+
+        return decimal.TryParse(
+            value,
+            System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var parsed)
+            ? parsed
+            : 0m;
+    }
+
+    private static int ParseInt(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0;
+        }
+
+        return int.TryParse(
+            value,
+            System.Globalization.NumberStyles.Integer,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var parsed)
+            ? parsed
+            : 0;
     }
 }
