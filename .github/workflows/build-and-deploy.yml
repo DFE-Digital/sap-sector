@@ -324,12 +324,45 @@ jobs:
           : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
 
           dotnet run --project SAPData -- --sql-dir ./SAPData/Sql
+          
+          # Flatten run_all.sql (expand \ir includes) so konduit can stream a single file
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          
+          base = Path("SAPData/Sql")
+          src = base / "run_all.sql"
+          out = base / "run_all_flat.sql"
+          include_re = re.compile(r"^\\\s*ir\s+(?P<path>.+)$", re.IGNORECASE)
+          
+          seen = set()
+          
+          def expand(path: Path) -> str:
+              text = path.read_text(encoding="utf-8")
+              lines = []
+              for line in text.splitlines():
+                  m = include_re.match(line.strip())
+                  if m:
+                      inc = (base / m.group("path").strip()).resolve()
+                      if inc in seen:
+                          continue
+                      seen.add(inc)
+                      lines.append(f"-- BEGIN {inc.name}")
+                      lines.append(expand(inc))
+                      lines.append(f"-- END {inc.name}")
+                  else:
+                      lines.append(line)
+              return "\n".join(lines)
+          
+          out.write_text(expand(src) + "\n", encoding="utf-8")
+          print(f"Flattened SQL written to {out}")
+          PY
 
           "$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
-            -i SAPData/Sql/run_all.sql \
+            -i SAPData/Sql/run_all_flat.sql \
             "${APP_NAME}" -- psql -X
 
 
