@@ -12,18 +12,24 @@ public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
+    private readonly GetSimilarSchoolsSecondaryNationalStandardDeviations _getNationalStandardDeviations;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetCharacteristicsComparison getCharacteristicsComparison,
+        GetSimilarSchoolsSecondaryNationalStandardDeviations getNationalStandardDeviations,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
-        _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
-        _getCharacteristicsComparison = getCharacteristicsComparison ?? throw new ArgumentNullException(nameof(getCharacteristicsComparison));
-        _characteristicsFormatter = characteristicsFormatter ?? throw new ArgumentNullException(nameof(characteristicsFormatter));
+        _getSimilarSchoolDetails =
+            getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
+        _getCharacteristicsComparison = getCharacteristicsComparison ??
+                                        throw new ArgumentNullException(nameof(getCharacteristicsComparison));
+        _getNationalStandardDeviations = getNationalStandardDeviations ?? throw new ArgumentNullException(nameof(getNationalStandardDeviations));
+        _characteristicsFormatter = characteristicsFormatter ??
+                                    throw new ArgumentNullException(nameof(characteristicsFormatter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -44,10 +50,13 @@ public class SimilarSchoolsComparisonController : Controller
         var response = await _getCharacteristicsComparison.Execute(
             new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
 
+        var nationalSds = (await _getNationalStandardDeviations.Execute(new GetSimilarSchoolsSecondaryNationalStandardDeviationsRequest())).SimilarSchoolsSecondaryNationalSD;
+
         modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
             response.CurrentSchool,
-            response.SimilarSchool);
-
+            response.SimilarSchool,
+            nationalSds);
+        
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
     }

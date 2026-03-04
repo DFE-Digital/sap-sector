@@ -6,5 +6,6 @@
         Task<(SimilarSchool, IReadOnlyCollection<SimilarSchool>)> GetSimilarSchoolsGroupAsync(string urn);
         Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
             IEnumerable<string> urns);
+        Task<SimilarSchoolsSecondaryNationalSD> GetSimilarSchoolsSecondaryNationalSdAsync();
     }
 }

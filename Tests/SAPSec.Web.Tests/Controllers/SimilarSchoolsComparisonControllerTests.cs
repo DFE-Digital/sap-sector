@@ -21,6 +21,7 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
+    private readonly Mock<GetSimilarSchoolsSecondaryNationalStandardDeviations> _getNationalStandardDeviationsMock;
 
     private readonly SimilarSchoolsComparisonController _sut;
 
@@ -35,9 +36,26 @@ public class SimilarSchoolsComparisonControllerTests
 
         var characteristicsFormatter = new CharacteristicsComparisonFormatter();
 
+        _getNationalStandardDeviationsMock = new Mock<GetSimilarSchoolsSecondaryNationalStandardDeviations>(_repoMock.Object);
+        _getNationalStandardDeviationsMock
+            .Setup(r => r.Execute(It.IsAny<GetSimilarSchoolsSecondaryNationalStandardDeviationsRequest>()))
+            .ReturnsAsync(new GetSimilarSchoolsSecondaryNationalStandardDeviationsResponse(new SimilarSchoolsSecondaryNationalSD
+            {
+                PupilPremiumEligibilityPercentage = 13.983589m,
+                PupilsWithEalPercentage = 18.755181m,
+                Polar4Quintile = 1.022255m,
+                PupilStabilityRate = 6.442814m,
+                AverageIdaciScore = 0.078069m,
+                PupilsWithSenSupportPercentage = 5.530940m,
+                PupilCount = 388.664809m,
+                PupilsWithEhcPlanPercentage = 1.678816m,
+                Ks2AverageScore = 2.527329m
+            }));
+
         _sut = new SimilarSchoolsComparisonController(
             getSimilarSchoolDetails,
             getCharacteristicsComparison,
+            _getNationalStandardDeviationsMock.Object,
             characteristicsFormatter,
             _loggerMock.Object);
     }
@@ -100,7 +118,7 @@ public class SimilarSchoolsComparisonControllerTests
     }
 
     [Fact]
-    public async Task Similarity_ReturnsView_WithCharacteristicsRows()
+    public async Task Similarity_ReturnsView_WithCharacteristicsRows_AndSimilarityLabels()
     {
         var urn = "145327";
         var similarUrn = "142075";
@@ -114,8 +132,6 @@ public class SimilarSchoolsComparisonControllerTests
         var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
 
         SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool, similarDetails);
-
-        // NEW: setup secondary values for the use case
         SetupSecondaryValues(urn, similarUrn);
 
         var result = await _sut.Similarity(urn, similarUrn);
@@ -125,10 +141,16 @@ public class SimilarSchoolsComparisonControllerTests
 
         model.CharacteristicsRows.Should().NotBeNull();
         model.CharacteristicsRows.Should().HaveCount(9);
-
+        
         model.CharacteristicsRows[0].Characteristic.Should().Be("Average KS2 reading and maths score");
         model.CharacteristicsRows[0].CurrentSchoolValue.Should().NotBeNullOrWhiteSpace();
         model.CharacteristicsRows[0].SimilarSchoolValue.Should().NotBeNullOrWhiteSpace();
+        
+        model.CharacteristicsRows[4].Characteristic.Should().Be("Average IDACI score");
+        model.CharacteristicsRows[4].Similarity.Should().Be(SimilarSchoolsComparisonViewModel.SimilarityLabel.LessSimilar);
+
+        model.CharacteristicsRows[5].Characteristic.Should().Be("Average POLAR4 quintile");
+        model.CharacteristicsRows[5].Similarity.Should().Be(SimilarSchoolsComparisonViewModel.SimilarityLabel.NotSimilar);
     }
 
     private void SetupBaseDependencies(
@@ -138,14 +160,10 @@ public class SimilarSchoolsComparisonControllerTests
         SimilarSchool similarSchool,
         SchoolDetails similarDetails)
     {
-        // Ensure URNs match EXACTLY
         similarSchool.URN = similarUrn;
         currentSchool.URN = currentUrn;
 
-        var group = new List<SimilarSchool>
-        {
-            similarSchool
-        }.AsReadOnly();
+        var group = new List<SimilarSchool> { similarSchool }.AsReadOnly();
 
         _repoMock
             .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
@@ -195,10 +213,6 @@ public class SimilarSchoolsComparisonControllerTests
                 It.Is<IEnumerable<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
             .ReturnsAsync(values);
     }
-
-    // ============================
-    // FULLY POPULATED TEST DATA
-    // ============================
 
     private static SimilarSchool CreateSimilarSchool(string urn, string name, BNGCoordinates coordinates)
     {

@@ -183,6 +183,38 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             .ToList();
     }
 
+    public async Task<SimilarSchoolsSecondaryNationalSD> GetSimilarSchoolsSecondaryNationalSdAsync()
+    {
+        const string sql = """
+            SELECT
+                ks2_avg::numeric(18,6)                  AS "Ks2AverageScore",
+                pp_perc::numeric(18,6)                  AS "PpPerc",
+                percent_eal::numeric(18,6)              AS "PercentEal",
+                polar4quintile_pupils::numeric(18,6)    AS "Polar4QuintilePupils",
+                p_stability::numeric(18,6)              AS "PStability",
+                idaci_pupils::numeric(18,6)             AS "IdaciPupils",
+                percent_sch_support::numeric(18,6)      AS "PercentSchSupport",
+                number_of_pupils::numeric(18,6)         AS "NumberOfPupils",
+                percent_statement_or_ehp::numeric(18,6) AS "PercentStatementOrEhp"
+            FROM public.v_similar_schools_secondary_values_national_sd;
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+        var dao = await conn.QuerySingleAsync<SimilarSchoolsSecondaryNationalSdDao>(sql);
+        return new SimilarSchoolsSecondaryNationalSD
+        {
+            Ks2AverageScore = dao.Ks2AverageScore,
+            PupilPremiumEligibilityPercentage = dao.PpPerc,
+            PupilsWithEalPercentage = dao.PercentEal,
+            Polar4Quintile = dao.Polar4QuintilePupils,
+            PupilStabilityRate = dao.PStability,
+            AverageIdaciScore = dao.IdaciPupils,
+            PupilsWithSenSupportPercentage = dao.PercentSchSupport,
+            PupilCount = dao.NumberOfPupils,
+            PupilsWithEhcPlanPercentage = dao.PercentStatementOrEhp
+        };
+    }
+
     private SimilarSchool FromDao(SimilarSchoolDao sch, SimilarSchoolPerformanceDao perf) => new SimilarSchool
     {
         URN = sch.URN,
@@ -280,6 +312,19 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         public required decimal IdaciPupils { get; init; }
         public required decimal PercentSchSupport { get; init; }
         public required int NumberOfPupils { get; init; }
+        public required decimal PercentStatementOrEhp { get; init; }
+    }
+
+    private class SimilarSchoolsSecondaryNationalSdDao
+    {
+        public required decimal Ks2AverageScore { get; init; }
+        public required decimal PpPerc { get; init; }
+        public required decimal PercentEal { get; init; }
+        public required decimal Polar4QuintilePupils { get; init; }
+        public required decimal PStability { get; init; }
+        public required decimal IdaciPupils { get; init; }
+        public required decimal PercentSchSupport { get; init; }
+        public required decimal NumberOfPupils { get; init; }
         public required decimal PercentStatementOrEhp { get; init; }
     }
 }

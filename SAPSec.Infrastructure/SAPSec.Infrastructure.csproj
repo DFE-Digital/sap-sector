@@ -96,6 +96,9 @@
     <None Update="Data\Files\SimilarSchoolsSecondaryValuesRow.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Data\Files\SimilarSchoolsSecondaryNationalSD.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

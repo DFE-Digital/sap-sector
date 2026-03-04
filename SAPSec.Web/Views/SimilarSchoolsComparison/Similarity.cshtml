@@ -1,3 +1,4 @@
+@using SAPSec.Web.ViewModels
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
@@ -23,6 +24,7 @@
             <th scope="col" class="govuk-table__header govuk-!-width-one-half">Characteristic</th>
             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">@Model.Name</th>
             <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">@Model.SimilarSchoolName</th>
+            <th scope="col" class="govuk-table__header govuk-!-width-one-quarter">Similarity</th>
         </tr>
         </thead>
 
@@ -31,11 +33,24 @@
         {
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">@row.Characteristic</th>
-
-                <!-- Left aligned like Figma (NO govuk-table__cell--numeric) -->
+                
                 <td class="govuk-table__cell">@row.CurrentSchoolValue</td>
                 <td class="govuk-table__cell">@row.SimilarSchoolValue</td>
 
+                <td class="govuk-table__cell">
+                    @switch (row.Similarity)
+                    {
+                        case SimilarSchoolsComparisonViewModel.SimilarityLabel.Similar:
+                            <strong class="govuk-tag govuk-tag--green" style="white-space: nowrap;">Similar</strong>
+                            break;
+                        case SimilarSchoolsComparisonViewModel.SimilarityLabel.LessSimilar:
+                            <strong class="govuk-tag govuk-tag--yellow" style="white-space: nowrap;">Less similar</strong>
+                            break;
+                        default:
+                            <strong class="govuk-tag govuk-tag--red" style="white-space: nowrap;">Not similar</strong>
+                            break;
+                    }
+                </td>
             </tr>
         }
         </tbody>

@@ -13,13 +13,15 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesRow>> _valuesRepo = new();
     private readonly Mock<IJsonFile<Establishment>> _establishmentRepo = new();
     private readonly Mock<IJsonFile<EstablishmentPerformance>> _performanceRepo = new();
+    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryNationalSD>> _nationalSdRepo = new();
 
     private JsonSimilarSchoolsSecondaryRepository CreateSut() =>
         new(
             _groupsRepo.Object,
             _valuesRepo.Object,
             _establishmentRepo.Object,
-            _performanceRepo.Object);
+            _performanceRepo.Object,
+            _nationalSdRepo.Object);
 
     [Fact]
     public async Task GetSimilarSchoolUrnsAsync_ReturnsNeighbourUrns()
@@ -126,8 +128,45 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         var a = result.Single(v => v.Urn == "123456");
         Assert.Equal(104.5m, a.Ks2ReadingScore);
-        Assert.Equal(3, a.Polar4Quintile);
-        Assert.Equal(500, a.PupilCount);
+        Assert.Equal(3m, a.Polar4Quintile);
+        Assert.Equal(500m, a.PupilCount);
 
+    }
+
+    [Fact]
+    public async Task GetSimilarSchoolsSecondaryNationalSdAsync_ReturnsFirstRow()
+    {
+        var rows = new List<SimilarSchoolsSecondaryNationalSD>
+        {
+            new()
+            {
+                Ks2AverageScore = 2.45m,
+                PupilPremiumEligibilityPercentage = 10m,
+                PupilsWithEalPercentage = 5m,
+                Polar4Quintile = 1.1m,
+                PupilStabilityRate = 6m,
+                AverageIdaciScore = 0.08m,
+                PupilsWithSenSupportPercentage = 3m,
+                PupilCount = 400m,
+                PupilsWithEhcPlanPercentage = 1.5m
+            }
+        };
+        _nationalSdRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);
+
+        var sut = CreateSut();
+
+        var result = await sut.GetSimilarSchoolsSecondaryNationalSdAsync();
+
+        Assert.Equal(2.45m, result.Ks2AverageScore);
+    }
+
+    [Fact]
+    public async Task GetSimilarSchoolsSecondaryNationalSdAsync_Throws_WhenEmpty()
+    {
+        _nationalSdRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryNationalSD>());
+
+        var sut = CreateSut();
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSimilarSchoolsSecondaryNationalSdAsync());
     }
 }

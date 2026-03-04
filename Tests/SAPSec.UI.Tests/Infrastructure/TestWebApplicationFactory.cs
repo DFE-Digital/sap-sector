@@ -59,6 +59,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
                 services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
                 services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryNationalSD>, JsonFile<SimilarSchoolsSecondaryNationalSD>>();
 
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
                 services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();

@@ -13,17 +13,20 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
     private readonly IJsonFile<SimilarSchoolsSecondaryValuesRow> _similarSchoolsValuesRepository;
     private readonly IJsonFile<Establishment> _establishmentRepository;
     private readonly IJsonFile<EstablishmentPerformance> _establishmentPerformanceRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryNationalSD> _nationalSdRepository;
 
     public JsonSimilarSchoolsSecondaryRepository(
         IJsonFile<SimilarSchoolsSecondaryGroupsRow> similarSchoolsGroupsRepository,
         IJsonFile<SimilarSchoolsSecondaryValuesRow> similarSchoolsValuesRepository,
         IJsonFile<Establishment> establishmentRepository,
-        IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository)
+        IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
+        IJsonFile<SimilarSchoolsSecondaryNationalSD> nationalSdRepository)
     {
         _similarSchoolsGroupsRepository = similarSchoolsGroupsRepository;
         _similarSchoolsValuesRepository = similarSchoolsValuesRepository;
         _establishmentRepository = establishmentRepository;
         _establishmentPerformanceRepository = establishmentPerformanceRepository;
+        _nationalSdRepository = nationalSdRepository;
     }
 
     public async Task<IReadOnlyCollection<string>> GetSimilarSchoolUrnsAsync(string urn)
@@ -94,6 +97,12 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             .ToList();
 
         return list;
+    }
+
+    public async Task<SimilarSchoolsSecondaryNationalSD> GetSimilarSchoolsSecondaryNationalSdAsync()
+    {
+        var list = await _nationalSdRepository.ReadAllAsync();
+        return list.First();
     }
 
     private static decimal ParseDecimal(string value) =>
