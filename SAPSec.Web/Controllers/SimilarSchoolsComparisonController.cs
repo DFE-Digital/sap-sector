@@ -12,14 +12,14 @@ public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
-    private readonly GetSimilarSchoolsSecondaryNationalStandardDeviations _getNationalStandardDeviations;
+    private readonly GetSimilarSchoolsSecondaryNationalSD _getNationalStandardDeviations;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetCharacteristicsComparison getCharacteristicsComparison,
-        GetSimilarSchoolsSecondaryNationalStandardDeviations getNationalStandardDeviations,
+        GetSimilarSchoolsSecondaryNationalSD getNationalStandardDeviations,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
@@ -50,7 +50,7 @@ public class SimilarSchoolsComparisonController : Controller
         var response = await _getCharacteristicsComparison.Execute(
             new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
 
-        var nationalSds = (await _getNationalStandardDeviations.Execute(new GetSimilarSchoolsSecondaryNationalStandardDeviationsRequest())).SimilarSchoolsSecondaryNationalSD;
+        var nationalSds = (await _getNationalStandardDeviations.Execute(new GetSimilarSchoolsSecondaryNationalSDRequest())).SimilarSchoolsSecondaryNationalSD;
 
         modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
             response.CurrentSchool,

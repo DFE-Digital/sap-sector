@@ -21,8 +21,6 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
-    private readonly Mock<GetSimilarSchoolsSecondaryNationalStandardDeviations> _getNationalStandardDeviationsMock;
-
     private readonly SimilarSchoolsComparisonController _sut;
 
     public SimilarSchoolsComparisonControllerTests()
@@ -34,12 +32,9 @@ public class SimilarSchoolsComparisonControllerTests
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
             _repoMock.Object);
 
-        var characteristicsFormatter = new CharacteristicsComparisonFormatter();
-
-        _getNationalStandardDeviationsMock = new Mock<GetSimilarSchoolsSecondaryNationalStandardDeviations>(_repoMock.Object);
-        _getNationalStandardDeviationsMock
-            .Setup(r => r.Execute(It.IsAny<GetSimilarSchoolsSecondaryNationalStandardDeviationsRequest>()))
-            .ReturnsAsync(new GetSimilarSchoolsSecondaryNationalStandardDeviationsResponse(new SimilarSchoolsSecondaryNationalSD
+        _repoMock
+            .Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
+            .ReturnsAsync(new SimilarSchoolsSecondaryNationalSD
             {
                 PupilPremiumEligibilityPercentage = 13.983589m,
                 PupilsWithEalPercentage = 18.755181m,
@@ -50,12 +45,16 @@ public class SimilarSchoolsComparisonControllerTests
                 PupilCount = 388.664809m,
                 PupilsWithEhcPlanPercentage = 1.678816m,
                 Ks2AverageScore = 2.527329m
-            }));
+            });
+
+        var getNationalStandardDeviations = new GetSimilarSchoolsSecondaryNationalSD(_repoMock.Object);
+
+        var characteristicsFormatter = new CharacteristicsComparisonFormatter();
 
         _sut = new SimilarSchoolsComparisonController(
             getSimilarSchoolDetails,
             getCharacteristicsComparison,
-            _getNationalStandardDeviationsMock.Object,
+            getNationalStandardDeviations,
             characteristicsFormatter,
             _loggerMock.Object);
     }

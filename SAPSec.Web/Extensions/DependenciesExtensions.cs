@@ -41,7 +41,7 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<FindSimilarSchools>();
             services.AddSingleton<GetSimilarSchoolDetails>();
             services.AddSingleton<GetCharacteristicsComparison>();
-            services.AddSingleton<GetSimilarSchoolsSecondaryNationalStandardDeviations>();
+            services.AddSingleton<GetSimilarSchoolsSecondaryNationalSD>();
         }
     }
 }
