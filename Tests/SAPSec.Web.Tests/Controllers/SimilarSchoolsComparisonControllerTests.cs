@@ -9,6 +9,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -18,6 +19,7 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
+    private readonly ICharacteristicsComparisonFormatter _formatter = new CharacteristicsComparisonFormatter();
 
     private readonly SimilarSchoolsComparisonController _sut;
 
@@ -27,7 +29,7 @@ public class SimilarSchoolsComparisonControllerTests
             _repoMock.Object,
             _schoolDetailsServiceMock.Object);
 
-        _sut = new SimilarSchoolsComparisonController(useCase, _loggerMock.Object);
+        _sut = new SimilarSchoolsComparisonController(useCase, _loggerMock.Object, _repoMock.Object, _formatter);
     }
 
     [Fact]

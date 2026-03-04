@@ -5,6 +5,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Services;
+using SAPSec.Web.Formatters;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using System.Diagnostics.CodeAnalysis;
@@ -37,6 +38,9 @@ namespace SAPSec.Web.Extensions
             // Use cases
             services.AddSingleton<FindSimilarSchools>();
             services.AddSingleton<GetSimilarSchoolDetails>();
+
+            // Formatters
+            services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
         }
     }
 }
