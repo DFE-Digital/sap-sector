@@ -97,6 +97,40 @@ public class SimilarSchoolsComparisonControllerTests
             .Setup(r => r.GetSimilarSchoolsGroupAsync(currentUrn))
             .ReturnsAsync((currentSchool, group));
 
+        _repoMock
+            .Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new List<SimilarSchoolsSecondaryValues>
+            {
+                new()
+                {
+                    Urn = currentUrn,
+                    Ks2ReadingScore = 105.1m,
+                    Ks2MathsScore = 104.9m,
+                    PupilPremiumEligibilityPercentage = 28.4m,
+                    PupilsWithEalPercentage = 12.3m,
+                    Polar4Quintile = 3,
+                    PupilStabilityRate = 91m,
+                    AverageIdaciScore = 0.215m,
+                    PupilsWithSenSupportPercentage = 13.2m,
+                    PupilCount = 920,
+                    PupilsWithEhcPlanPercentage = 1.8m
+                },
+                new()
+                {
+                    Urn = similarUrn,
+                    Ks2ReadingScore = 104.6m,
+                    Ks2MathsScore = 104.1m,
+                    PupilPremiumEligibilityPercentage = 31.7m,
+                    PupilsWithEalPercentage = 9.8m,
+                    Polar4Quintile = 3,
+                    PupilStabilityRate = 89m,
+                    AverageIdaciScore = 0.232m,
+                    PupilsWithSenSupportPercentage = 14.9m,
+                    PupilCount = 870,
+                    PupilsWithEhcPlanPercentage = 2.1m
+                }
+            }.AsReadOnly());
+
         _schoolDetailsServiceMock
             .Setup(s => s.GetByUrnAsync(similarUrn))
             .ReturnsAsync(similarDetails);
