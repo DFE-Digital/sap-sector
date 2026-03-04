@@ -187,9 +187,6 @@ public sealed class GenerateSimilarSchoolsViews
         sb.AppendLine("    stddev_pop(NULLIF(NULLIF(att8scr, 'NA'), '')::numeric)                  AS att8scr");
         sb.AppendLine($"FROM public.{rawTable}");
         sb.AppendLine("WITH DATA;");
-        sb.AppendLine();
-        sb.AppendLine($"ALTER TABLE {viewName}");
-        sb.AppendLine("    OWNER TO postgres;");
 
         File.WriteAllText(
             Path.Combine(_sqlDir, $"50_{viewName}.sql"),
