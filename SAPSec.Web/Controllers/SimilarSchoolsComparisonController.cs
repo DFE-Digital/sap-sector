@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
@@ -11,20 +11,22 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
-    private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
-    private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
+    private readonly ISimilarSchoolsSecondaryRepository _similarSchoolsSecondaryRepository;
+    private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
-        GetCharacteristicsComparison getCharacteristicsComparison,
-        ICharacteristicsComparisonFormatter characteristicsFormatter,
-        ILogger<SimilarSchoolsComparisonController> logger)
+        ILogger<SimilarSchoolsComparisonController> logger,
+        ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
+        ICharacteristicsComparisonFormatter characteristicsFormatter)
     {
         _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
-        _getCharacteristicsComparison = getCharacteristicsComparison ?? throw new ArgumentNullException(nameof(getCharacteristicsComparison));
-        _characteristicsFormatter = characteristicsFormatter ?? throw new ArgumentNullException(nameof(characteristicsFormatter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _similarSchoolsSecondaryRepository = similarSchoolsSecondaryRepository
+            ?? throw new ArgumentNullException(nameof(similarSchoolsSecondaryRepository));
+        _characteristicsFormatter = characteristicsFormatter
+            ?? throw new ArgumentNullException(nameof(characteristicsFormatter));
     }
 
     [HttpGet]
@@ -40,13 +42,6 @@ public class SimilarSchoolsComparisonController : Controller
         var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
-
-        var response = await _getCharacteristicsComparison.Execute(
-            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
-
-        modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
-            response.CurrentSchool,
-            response.SimilarSchool);
 
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
@@ -110,7 +105,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
         {
             _logger.LogWarning(
-                "SimilarSchoolsComparison requested with invalid route params. urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "SimilarSchoolsComparison requested with invalid route params. urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, BadRequest());
@@ -126,7 +121,7 @@ public class SimilarSchoolsComparisonController : Controller
         {
             _logger.LogError(
                 ex,
-                "Error calling GetSimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "Error calling GetSimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, StatusCode(StatusCodes.Status500InternalServerError));
@@ -135,7 +130,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "GetSimilarSchoolDetails returned null for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
@@ -144,7 +139,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response.SimilarSchoolDetails is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null SimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "GetSimilarSchoolDetails returned null SimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
@@ -154,12 +149,12 @@ public class SimilarSchoolsComparisonController : Controller
         // Display() should handle "not available", but we still guard against null ref.
         var similarName = response.SimilarSchoolDetails.Name is null
             ? null
-            : response.SimilarSchoolDetails.Name.Display();
+            : response.SimilarSchoolDetails.Name;
 
         if (string.IsNullOrWhiteSpace(similarName))
         {
             _logger.LogWarning(
-                "SimilarSchoolDetails.Name is missing for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "SimilarSchoolDetails.Name is missing for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
         }
 
@@ -171,6 +166,7 @@ public class SimilarSchoolsComparisonController : Controller
             SimilarSchoolName = similarName ?? string.Empty
         };
 
+        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn);
         return (model, null);
     }
 
@@ -196,7 +192,7 @@ public class SimilarSchoolsComparisonController : Controller
         {
             _logger.LogError(
                 ex,
-                "Error calling GetSimilarSchoolDetails (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "Error calling GetSimilarSchoolDetails (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, StatusCode(StatusCodes.Status500InternalServerError));
@@ -205,7 +201,7 @@ public class SimilarSchoolsComparisonController : Controller
         if (response is null)
         {
             _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{NeighbourUrn}'",
+                "GetSimilarSchoolDetails returned null (SchoolDetails) for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
                 urn, similarSchoolUrn);
 
             return (null, NotFound());
@@ -226,5 +222,23 @@ public class SimilarSchoolsComparisonController : Controller
     private void SetComparisonSchoolViewData(SimilarSchoolsComparisonViewModel data)
     {
         ViewData["ComparisonSchool"] = data;
+    }
+
+    private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>
+        BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn)
+    {
+        var values = await _similarSchoolsSecondaryRepository.GetSecondaryValuesByUrnsAsync(new[] { urn, similarSchoolUrn });
+        var current = values.FirstOrDefault(v => v.Urn == urn);
+        var similar = values.FirstOrDefault(v => v.Urn == similarSchoolUrn);
+
+        if (current is null || similar is null)
+        {
+            _logger.LogWarning(
+                "Similarity characteristics missing for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
+                urn, similarSchoolUrn);
+            return Array.Empty<SimilarSchoolsComparisonViewModel.CharacteristicRow>();
+        }
+
+        return _characteristicsFormatter.BuildRows(current, similar);
     }
 }

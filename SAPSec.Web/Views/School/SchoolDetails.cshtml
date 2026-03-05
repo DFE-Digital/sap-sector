@@ -5,7 +5,7 @@
     ViewData["Title"] = $"School details";
 }
 
-<span class="govuk-caption-xl">@Model.Name.Display()</span>
+<span class="govuk-caption-xl">@Model.Name</span>
 <h1 class="govuk-heading-xl">School details</h1>
 
 @* Location Section *@
@@ -34,7 +34,7 @@
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">ID</dt>
-        <dd class="govuk-summary-list__value">URN: @Model.Urn.Display(), DfE number:@Model.DfENumber.Display(), UKPRN: @Model.Ukprn.Display()</dd>
+        <dd class="govuk-summary-list__value">URN: @Model.Urn, DfE number:@Model.DfENumber.Display(), UKPRN: @Model.Ukprn.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Age range</dt>
@@ -160,32 +160,29 @@
 @* Further Information Section *@
 <h2 class="govuk-heading-m">Further information</h2>
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
-    @if (Model.Urn.IsAvailable)
-    {
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Ofsted report</dt>
-            <dd class="govuk-summary-list__value">
-                <a href="https://reports.ofsted.gov.uk/provider/23/@Model.Urn.Value"
-                   class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    View the latest Ofsted report (opens in a new tab)
-                </a>
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Information from other services</dt>
-            <dd class="govuk-summary-list__value">
-                <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.Urn.Value"
-                   class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    Financial benchmarking and insights tool (opens in a new tab)
-                </a>
-                <br />
-                <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/@Model.Urn.Value"
-                   class="govuk-link" target="_blank" rel="noopener noreferrer">
-                    Get information about schools (opens in a new tab)
-                </a>
-            </dd>
-        </div>
-    }
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Ofsted report</dt>
+        <dd class="govuk-summary-list__value">
+            <a href="https://reports.ofsted.gov.uk/provider/23/@Model.Urn"
+                class="govuk-link" target="_blank" rel="noopener noreferrer">
+                View the latest Ofsted report (opens in a new tab)
+            </a>
+        </dd>
+    </div>
+    <div class="govuk-summary-list__row">
+        <dt class="govuk-summary-list__key">Information from other services</dt>
+        <dd class="govuk-summary-list__value">
+            <a href="https://financial-benchmarking-and-insights-tool.education.gov.uk/school/@Model.Urn"
+                class="govuk-link" target="_blank" rel="noopener noreferrer">
+                Financial benchmarking and insights tool (opens in a new tab)
+            </a>
+            <br />
+            <a href="https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/@Model.Urn"
+                class="govuk-link" target="_blank" rel="noopener noreferrer">
+                Get information about schools (opens in a new tab)
+            </a>
+        </dd>
+    </div>
 </dl>
 
 @* Data sources *@

@@ -67,8 +67,8 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
         return new SchoolDetails
         {
             // Identifiers
-            Name = DataMapper.MapRequiredString(establishment.EstablishmentName),
-            Urn = DataMapper.MapRequiredString(establishment.URN),
+            Urn = establishment.URN,
+            Name = establishment.EstablishmentName,
             DfENumber = DataMapper.MapDfENumber(establishment.DfENumber),
             Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
 
@@ -85,7 +85,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             GenderOfEntry = DataMapper.MapString(establishment.GenderName),
             PhaseOfEducation = DataMapper.MapString(establishment.PhaseOfEducationName),
             SchoolType = DataMapper.MapString(establishment.TypeOfEstablishmentName),
-            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionPolicy),
+            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionsPolicyId),
             ReligiousCharacter = DataMapper.MapString(establishment.ReligiousCharacterName),
 
             // Governance - business rule

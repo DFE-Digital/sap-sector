@@ -15,21 +15,28 @@ namespace SAPSec.Core.Model
         public string TrustsId { get; set; } = string.Empty;
         public string TrustName { get; set; } = string.Empty;
         public string AdmissionsPolicyId { get; set; } = string.Empty;
-        public string AdmissionPolicy { get; set; } = string.Empty;
+        public string AdmissionsPolicyName { get; set; } = string.Empty;
         public string DistrictAdministrativeId { get; set; } = string.Empty;
         public string DistrictAdministrativeName { get; set; } = string.Empty;
         public string PhaseOfEducationId { get; set; } = string.Empty;
         public string PhaseOfEducationName { get; set; } = string.Empty;
         public string GenderId { get; set; } = string.Empty;
         public string GenderName { get; set; } = string.Empty;
-        public string OfficialSixthFormId { get; set; } = string.Empty;
         public string ReligiousCharacterId { get; set; } = string.Empty;
         public string ReligiousCharacterName { get; set; } = string.Empty;
         public string TelephoneNum { get; set; } = string.Empty;
+        public string TotalCapacity { get; set; } = string.Empty;
         public string TotalPupils { get; set; } = string.Empty;
         public string TypeOfEstablishmentId { get; set; } = string.Empty;
         public string TypeOfEstablishmentName { get; set; } = string.Empty;
-        public string ResourcedProvision { get; set; } = string.Empty;
+        public string EstablishmentTypeGroupId { get; set; } = string.Empty;
+        public string EstablishmentTypeGroupName { get; set; } = string.Empty;
+        public string TrustSchoolFlagId { get; set; } = string.Empty;
+        public string TrustSchoolFlagName { get; set; } = string.Empty;
+        public string OfficialSixthFormId { get; set; } = string.Empty;
+        public string OfficialSixthFormName { get; set; } = string.Empty;
+        public string NurseryProvisionName { get; set; } = string.Empty;
+        public string ResourcedProvisionId { get; set; } = string.Empty;
         public string ResourcedProvisionName { get; set; } = string.Empty;
         public string UKPRN { get; set; } = string.Empty;
         public string Street { get; set; } = string.Empty;
@@ -47,18 +54,15 @@ namespace SAPSec.Core.Model
         public string Website { get; set; } = string.Empty;
         public string Easting { get; set; } = string.Empty;
         public string Northing { get; set; } = string.Empty;
+        public string AgeRangeLow { get; set; } = string.Empty;
+        public string AgeRangeRange { get; set; } = string.Empty;
+
+
         public string? Latitude { get; set; }
         public string? Longitude { get; set; }
 
         // Also known as LA/Estab, for obvious reasons
         public string DfENumber => $"{LAId}/{EstablishmentNumber}";
         public string DfENumberSearchable => $"{LAId}{EstablishmentNumber}";
-
-        //TODO: missing from DB
-        public string HeadteacherTitle { get; set; } = string.Empty;
-        public string HeadteacherFirstName { get; set; } = string.Empty;
-        public string HeadteacherLastName { get; set; } = string.Empty;
-        public string AgeRangeLow { get; set; } = string.Empty;
-        public string AgeRangeRange { get; set; } = string.Empty;
     }
 }

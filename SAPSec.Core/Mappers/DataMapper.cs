@@ -57,9 +57,9 @@ public static class DataMapper
     {
         var parts = new List<string>();
 
-        AddIfNotEmpty(parts, establishment.HeadteacherTitle);
-        AddIfNotEmpty(parts, establishment.HeadteacherFirstName);
-        AddIfNotEmpty(parts, establishment.HeadteacherLastName);
+        AddIfNotEmpty(parts, establishment.HeadTitle);
+        AddIfNotEmpty(parts, establishment.HeadFirstName);
+        AddIfNotEmpty(parts, establishment.HeadLastName);
 
         return DataWithAvailability.FromStringWithoutCodes(string.Join(" ", parts));
     }

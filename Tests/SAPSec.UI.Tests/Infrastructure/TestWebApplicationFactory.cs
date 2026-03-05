@@ -7,12 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model;
-using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Repositories.Json;
-using SAPSec.Infrastructure.Repositories;
+using SAPSec.Core.Model;
+using SAPSec.Core.Model.KS4.Performance;
+using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.Mocks;
 using SAPSec.Web;
 
@@ -62,7 +61,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
                 services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-                
+
             });
     }
 

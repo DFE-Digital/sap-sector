@@ -1,4 +1,4 @@
-﻿using SAPData.Models;
+using SAPData.Models;
 using System.Text;
 
 namespace SAPData;
