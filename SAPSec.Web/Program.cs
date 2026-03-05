@@ -134,7 +134,8 @@ public class Program
 
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
+        app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
+        /*if (app.Environment.IsDevelopment())
         {
             app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
         }
@@ -143,7 +144,7 @@ public class Program
             app.UseMiddleware<NotFoundExceptionMiddleware>();
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
-        }
+        }*/
         app.UseForwardedHeaders();
 
         app.UseStatusCodePagesWithReExecute("/error/{0}");
