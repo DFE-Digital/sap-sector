@@ -141,7 +141,7 @@ public class Program
         else
         {
             app.UseMiddleware<NotFoundExceptionMiddleware>();
-            app.UseExceptionHandler("/Home/Error");
+            app.UseExceptionHandler("/error");
             app.UseHsts();
         }
         app.UseForwardedHeaders();

@@ -6,7 +6,7 @@ namespace SAPSec.Web.Controllers;
 
 [Controller]
 [Route("error")]
-public class ErrorController(IWebHostEnvironment environment) : Controller
+public class ErrorController : Controller
 {
     [HttpGet]
     [HttpPost]
