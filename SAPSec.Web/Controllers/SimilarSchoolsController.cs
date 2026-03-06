@@ -61,7 +61,7 @@ public class SimilarSchoolsController : Controller
 
         var viewModel = new SimilarSchoolsPageViewModel
         {
-            EstablishmentName = school.Name.Display(),
+            EstablishmentName = school.Name,
             PhaseOfEducation = school.PhaseOfEducation.Display(),
             Urn = int.TryParse(urn, out var urnValue) ? urnValue : 0,
             Schools = schools,
@@ -77,7 +77,7 @@ public class SimilarSchoolsController : Controller
             TotalResults = response.AllResults.Count
         };
 
-        return View("~/Views/School/ViewSimilarSchools.cshtml", viewModel);
+        return View(viewModel);
     }
 
     [HttpGet]
@@ -120,9 +120,9 @@ public class SimilarSchoolsController : Controller
     {
         var categoryKeys = new List<(string Heading, List<string> Keys)>
         {
-            ("Location", new List<string> { "dist", "ur" }),
-            ("School characteristics", new List<string> { "gender", "admissions", "phase", "type", "size", "sixthform", "nursery", "sen", "resourced" }),
-            ("Attendance", new List<string> { "overallabsence", "persistentabsence" })
+            ("Location", new List<string> { "dist", "reg", "ur" }),
+            ("School characteristics", new List<string> { "poe", "sc", "np", "sf", "ap", "sp", "goe" }),
+            ("Attendance", new List<string> { "oa", "pa" })
         };
 
         var grouped = new List<SimilarSchoolsFilterGroupViewModel>();
@@ -219,12 +219,10 @@ public class SimilarSchoolsController : Controller
             Postcode = address.Postcode,
             Latitude = result.Coordinates?.Latitude.ToString(),
             Longitude = result.Coordinates?.Longitude.ToString(),
-            UrbanOrRural = school.UrbanRuralName,
+            UrbanOrRural = school.UrbanRural.Name,
             Att8Scr = school.Attainment8Score.HasValue ? (double?)school.Attainment8Score.Value : null,
             SortMetricName = result.SortValue.Name,
-            SortMetricDisplayValue = result.SortValue.Value.HasValue
-                ? result.SortValue.Value.Value.ToString("0.#")
-                : "N/A"
+            SortMetricDisplayValue = result.SortValue.Value.Display(v => v.ToString("0.#"))
         };
     }
 }

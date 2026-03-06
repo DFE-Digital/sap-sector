@@ -2,8 +2,7 @@ using Moq;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
-using SAPSec.Infrastructure.Repositories;
-using SAPSec.Infrastructure.Repositories.Json;
+using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
 
@@ -105,16 +104,16 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
             new()
             {
                 URN = "123456",
-                Ks2Rp = "104.5",
-                Ks2Mp = "104.0",
-                PpPerc = "50.5",
-                PercentEal = "10.1",
+                KS2RP = "104.5",
+                KS2MP = "104.0",
+                PPPerc = "50.5",
+                PercentEAL = "10.1",
                 Polar4QuintilePupils = "3",
                 PStability = "90",
                 IdaciPupils = "0.316",
                 PercentSchSupport = "12.5",
                 NumberOfPupils = "500",
-                PercentStatementOrEhp = "2.1",
+                PercentageStatementOrEHP = "2.1",
                 Att8Scr = "42"
             }
         });

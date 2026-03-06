@@ -1,4 +1,4 @@
-﻿﻿using SAPSec.Core.Features.SchoolSearch;
+﻿using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Repositories;

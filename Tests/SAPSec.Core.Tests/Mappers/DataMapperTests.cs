@@ -302,9 +302,9 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            HeadteacherTitle = "Mrs",
-            HeadteacherFirstName = "Jane",
-            HeadteacherLastName = "Smith"
+            HeadTitle = "Mrs",
+            HeadFirstName = "Jane",
+            HeadLastName = "Smith"
         };
 
         // Act
@@ -321,8 +321,8 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            HeadteacherFirstName = "Jane",
-            HeadteacherLastName = "Smith"
+            HeadFirstName = "Jane",
+            HeadLastName = "Smith"
         };
 
         // Act
@@ -339,7 +339,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            HeadteacherLastName = "Smith"
+            HeadLastName = "Smith"
         };
 
         // Act
