@@ -35,7 +35,8 @@ public class SimilarSchoolsController : Controller
         if (school is null)
         {
             _logger.LogInformation("{Urn} was not found on SimilarSchools Controller", urn);
-            return RedirectToAction("Error", "School");
+            HttpContext.Items["ErrorDetail"] = $"School details not found for URN {urn}.";
+            return RedirectToAction("StatusCodeError", "Error", new { statusCode = 404 });
         }
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
@@ -45,11 +46,21 @@ public class SimilarSchoolsController : Controller
         var filterBy = BuildCoreFilters(Request.Query);
         var currentFilters = ExtractCurrentFilters(Request.Query);
 
-        var response = await _findSimilarSchools.Execute(new FindSimilarSchoolsRequest(
-            urn,
-            filterBy,
-            coreSortBy,
-            page));
+        FindSimilarSchoolsResponse response;
+        try
+        {
+            response = await _findSimilarSchools.Execute(new FindSimilarSchoolsRequest(
+                urn,
+                filterBy,
+                coreSortBy,
+                page));
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed loading similar schools for URN {Urn}", urn);
+            HttpContext.Items["ErrorDetail"] = $"{ex.GetType().Name}: {ex.Message}";
+            return RedirectToAction("StatusCodeError", "Error", new { statusCode = 500 });
+        }
 
         var schools = response.ResultsPage
             .Select(MapToViewModel)
