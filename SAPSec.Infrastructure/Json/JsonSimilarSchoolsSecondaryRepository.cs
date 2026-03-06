@@ -1,0 +1,172 @@
+using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Model;
+using SAPSec.Core.Model.KS4.Performance;
+
+namespace SAPSec.Infrastructure.Json;
+
+public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
+{
+    private readonly IJsonFile<SimilarSchoolsSecondaryGroupsRow> _similarSchoolsGroupsRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryValuesRow> _similarSchoolsValuesRepository;
+    private readonly IJsonFile<Establishment> _establishmentRepository;
+    private readonly IJsonFile<EstablishmentPerformance> _establishmentPerformanceRepository;
+
+    public JsonSimilarSchoolsSecondaryRepository(
+        IJsonFile<SimilarSchoolsSecondaryGroupsRow> similarSchoolsGroupsRepository,
+        IJsonFile<SimilarSchoolsSecondaryValuesRow> similarSchoolsValuesRepository,
+        IJsonFile<Establishment> establishmentRepository,
+        IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository)
+    {
+        _similarSchoolsGroupsRepository = similarSchoolsGroupsRepository;
+        _similarSchoolsValuesRepository = similarSchoolsValuesRepository;
+        _establishmentRepository = establishmentRepository;
+        _establishmentPerformanceRepository = establishmentPerformanceRepository;
+    }
+
+    public async Task<IReadOnlyCollection<string>> GetSimilarSchoolUrnsAsync(string urn)
+    {
+        var rows = await _similarSchoolsGroupsRepository.ReadAllAsync();
+        var groupRows = rows.Where(r => r.URN == urn).ToList();
+        var neighbourUrns = groupRows.Select(r => r.NeighbourURN);
+
+        return neighbourUrns.ToList().AsReadOnly();
+    }
+
+    public async Task<(SimilarSchool, IReadOnlyCollection<SimilarSchool>)> GetSimilarSchoolsGroupAsync(string urn)
+    {
+        var allEstabs = await _establishmentRepository.ReadAllAsync();
+        var currentEstab = allEstabs.Single(e => e.URN == urn);
+
+        var rows = await _similarSchoolsGroupsRepository.ReadAllAsync();
+        var groupRows = rows.Where(r => r.URN == urn).ToList();
+        var neighbourUrns = groupRows.Select(r => r.NeighbourURN).ToList();
+
+        var similarSchoolsEstabs = allEstabs
+            .Where(p => neighbourUrns.Contains(p.URN))
+            .ToList();
+
+        var allPerformance = await _establishmentPerformanceRepository.ReadAllAsync();
+        var currentSchoolPerformance = allPerformance.Single(p => p.Id == urn);
+        var similarSchoolsPerformance = allPerformance
+            .Where(p => neighbourUrns.Contains(p.Id))
+            .ToList();
+
+        return (
+            FromJson(currentEstab, [currentSchoolPerformance]),
+            similarSchoolsEstabs
+            .GroupJoin(similarSchoolsPerformance, d => d.URN, a => a.Id, FromJson)
+            .ToList()
+            .AsReadOnly());
+    }
+
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
+        IEnumerable<string> urns)
+    {
+        if (urns is null)
+        {
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+        }
+
+        var urnList = urns as IList<string> ?? urns.ToList();
+        if (urnList.Count == 0)
+        {
+            return Array.Empty<SimilarSchoolsSecondaryValues>();
+        }
+
+        var rows = await _similarSchoolsValuesRepository.ReadAllAsync();
+        var matched = rows.Where(r => urnList.Contains(r.URN)).ToList();
+
+        return matched
+            .Select(r => new SimilarSchoolsSecondaryValues
+            {
+                Urn = r.URN,
+                Ks2ReadingScore = ParseDecimal(r.KS2RP),
+                Ks2MathsScore = ParseDecimal(r.KS2MP),
+                PupilPremiumEligibilityPercentage = ParseDecimal(r.PPPerc),
+                PupilsWithEalPercentage = ParseDecimal(r.PercentEAL),
+                Polar4Quintile = ParseInt(r.Polar4QuintilePupils),
+                PupilStabilityRate = ParseDecimal(r.PStability),
+                AverageIdaciScore = ParseDecimal(r.IdaciPupils),
+                PupilsWithSenSupportPercentage = ParseDecimal(r.PercentSchSupport),
+                PupilCount = ParseInt(r.NumberOfPupils),
+                PupilsWithEhcPlanPercentage = ParseDecimal(r.PercentageStatementOrEHP)
+            })
+            .ToList()
+            .AsReadOnly();
+    }
+
+    private SimilarSchool FromJson(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)
+    {
+        var currentSchoolPerformance = currentSchoolPerformances.FirstOrDefault();
+        return new SimilarSchool
+        {
+            URN = currentEstab.URN,
+            Name = currentEstab.EstablishmentName,
+            Address = new Address
+            {
+                Street = currentEstab.Street,
+                Locality = currentEstab.Locality,
+                Address3 = currentEstab.Address3,
+                Town = currentEstab.Town,
+                Postcode = currentEstab.Postcode
+            },
+            TotalCapacity = currentEstab.TotalCapacity,
+            TotalPupils = currentEstab.TotalPupils,
+            NurseryProvisionName = currentEstab.NurseryProvisionName,
+            Coordinates = BNGCoordinates.TryParse(currentEstab.Easting, currentEstab.Northing, out var coords) ? coords : null,
+            LocalAuthority = new(currentEstab.LAId, currentEstab.LAName),
+            UrbanRural = new(currentEstab.UrbanRuralId, currentEstab.UrbanRuralName),
+            Region = new(currentEstab.RegionId, currentEstab.RegionName),
+            AdmissionsPolicy = new(currentEstab.AdmissionsPolicyId, currentEstab.AdmissionsPolicyName),
+            PhaseOfEducation = new(currentEstab.PhaseOfEducationId, currentEstab.PhaseOfEducationName),
+            Gender = new(currentEstab.GenderId, currentEstab.GenderName),
+            TypeOfEstablishment = new(currentEstab.TypeOfEstablishmentId, currentEstab.TypeOfEstablishmentName),
+            EstablishmentTypeGroup = new(currentEstab.EstablishmentTypeGroupId, currentEstab.EstablishmentTypeGroupName),
+            TrustSchoolFlag = new(currentEstab.TrustSchoolFlagId, currentEstab.TrustSchoolFlagName),
+            OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
+            ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
+            Attainment8Score = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Attainment8_Tot_Est_Current_Num),
+            BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Bio59_Sum_Est_Current_Num),
+            ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Chem59_Sum_Est_Current_Num),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.CombSci59_Sum_Est_Current_Num),
+            EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngLang59_Sum_Est_Current_Num),
+            EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngLit59_Sum_Est_Current_Num),
+            EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngMaths59_Tot_Est_Current_Num),
+            MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Maths59_Sum_Est_Current_Num),
+            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Physics59_Sum_Est_Current_Num),
+        };
+    }
+
+    private static decimal ParseDecimal(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0m;
+        }
+
+        return decimal.TryParse(
+            value,
+            System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var parsed)
+            ? parsed
+            : 0m;
+    }
+
+    private static int ParseInt(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0;
+        }
+
+        return int.TryParse(
+            value,
+            System.Globalization.NumberStyles.Integer,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var parsed)
+            ? parsed
+            : 0;
+    }
+}

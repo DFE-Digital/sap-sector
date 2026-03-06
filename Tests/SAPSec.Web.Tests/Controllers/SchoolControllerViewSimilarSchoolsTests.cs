@@ -6,7 +6,6 @@ using Moq;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
@@ -173,8 +172,8 @@ public class SimilarSchoolsControllerTests
     {
         return new SchoolDetails
         {
-            Name = DataWithAvailability.Available(name),
-            Urn = DataWithAvailability.Available(urn),
+            Name = name,
+            Urn = urn,
             DfENumber = DataWithAvailability.Available("373/1234"),
             Ukprn = DataWithAvailability.Available("10012345"),
             Address = DataWithAvailability.Available("123 Test Street, Sheffield, S1 1AA"),
@@ -234,14 +233,25 @@ public class SimilarSchoolsControllerTests
                 Town = "Town",
                 Postcode = "ZZ1 1ZZ"
             },
-            LocalAuthority = new SAPSec.Core.Features.SimilarSchools.LocalAuthority("001", "Authority"),
             Coordinates = new BNGCoordinates(100, 100),
-            UrbanRuralId = urbanId,
-            UrbanRuralName = urbanName,
+            TotalCapacity = string.Empty,
+            TotalPupils = string.Empty,
+            NurseryProvisionName = string.Empty,
+            LocalAuthority = new("001", "Authority"),
+            UrbanRural = new(urbanId, urbanName),
+            Region = new(string.Empty, string.Empty),
+            AdmissionsPolicy = new(string.Empty, string.Empty),
+            PhaseOfEducation = new(string.Empty, string.Empty),
+            Gender = new(string.Empty, string.Empty),
+            TypeOfEstablishment = new(string.Empty, string.Empty),
+            EstablishmentTypeGroup = new(string.Empty, string.Empty),
+            TrustSchoolFlag = new(string.Empty, string.Empty),
+            OfficialSixthForm = new(string.Empty, string.Empty),
+            ResourcedProvision = new(string.Empty, string.Empty),
             Attainment8Score = DataWithAvailability.Available(50m),
             BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
-            CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.Available(60m),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.Available(60m),
             EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),

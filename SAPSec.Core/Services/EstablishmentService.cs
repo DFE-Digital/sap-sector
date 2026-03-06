@@ -60,7 +60,7 @@ public class EstablishmentService : IEstablishmentService
             LookupTypes.TypeOfEstablishment,
             establishment.TypeOfEstablishmentId);
 
-        establishment.AdmissionPolicy = await _lookupService.GetLookupValueAsync(
+        establishment.AdmissionsPolicyId = await _lookupService.GetLookupValueAsync(
             LookupTypes.AdmissionsPolicy,
             establishment.AdmissionsPolicyId);
 

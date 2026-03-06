@@ -1,11 +1,6 @@
 ﻿using FluentAssertions;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Playwright;
-using SAPSec.Infrastructure.Entities;
 using SAPSec.UI.Tests.Infrastructure;
-using SAPSec.Web.ViewModels;
-using System.Security.Policy;
 using Xunit;
 
 namespace SAPSec.UI.Tests;

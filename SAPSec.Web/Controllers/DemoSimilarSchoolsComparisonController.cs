@@ -31,11 +31,11 @@ public class DemoSimilarSchoolsComparisonController : Controller
         return View(new DemoSimilarSchoolsComparisonViewModel
         {
             Name = response.SchoolName,
-            SimilarSchoolName = response.SimilarSchoolDetails.Name.Display(),
-            CurrentSchoolLatitude = response.CurrentSchoolCoordinates.Latitude,
-            CurrentSchoolLongitude = response.CurrentSchoolCoordinates.Longitude,
-            SimilarSchoolLatitude = response.SimilarSchoolCoordinates.Latitude,
-            SimilarSchoolLongitude = response.SimilarSchoolCoordinates.Longitude,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name,
+            CurrentSchoolLatitude = response.CurrentSchoolCoordinates?.Latitude,
+            CurrentSchoolLongitude = response.CurrentSchoolCoordinates?.Longitude,
+            SimilarSchoolLatitude = response.SimilarSchoolCoordinates?.Latitude,
+            SimilarSchoolLongitude = response.SimilarSchoolCoordinates?.Longitude,
             Distance = response.DistanceMiles,
             SimilarSchoolDetails = response.SimilarSchoolDetails
         });
