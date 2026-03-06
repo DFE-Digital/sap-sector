@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -150,6 +151,39 @@ public class SimilarSchoolsComparisonControllerTests
         model.CharacteristicsRows[5].Similarity.Should().Be(SchoolSimilarity.NotSimilar);
     }
 
+    [Fact]
+    public async Task Similarity_WithGroupCalculationQuery_UsesGroupStandardDeviation()
+    {
+        var urn = "145327";
+        var similarUrn = "142075";
+
+        var currentSchool = CreateSimilarSchool(urn, "Main School",
+            new BNGCoordinates(Easting: 430000, Northing: 380000));
+
+        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School Group",
+            new BNGCoordinates(Easting: 431000, Northing: 381000));
+
+        var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
+
+        SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool, similarDetails);
+        SetupSecondaryValues(urn, similarUrn);
+        SetupGroupSecondaryValues(urn, new[] { similarUrn, "300001", "300002", "300003", "300004" });
+
+        _sut.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+        _sut.HttpContext.Request.QueryString = new QueryString("?similarityCalculation=group");
+
+        var result = await _sut.Similarity(urn, similarUrn);
+
+        var view = result.Should().BeOfType<ViewResult>().Subject;
+        var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
+
+        model.CharacteristicsRows.Should().NotBeNull();
+        model.CharacteristicsRows[0].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
+    }
+
     private void SetupBaseDependencies(
         string currentUrn,
         string similarUrn,
@@ -209,6 +243,51 @@ public class SimilarSchoolsComparisonControllerTests
             .Setup(r => r.GetSecondaryValuesByUrnsAsync(
                 It.Is<IEnumerable<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
             .ReturnsAsync(values);
+    }
+
+    private void SetupGroupSecondaryValues(string currentUrn, IReadOnlyCollection<string> groupUrns)
+    {
+        _repoMock
+            .Setup(r => r.GetSimilarSchoolUrnsAsync(currentUrn))
+            .ReturnsAsync(groupUrns);
+
+        var groupValues = new List<SimilarSchoolsSecondaryValues>
+        {
+            new()
+            {
+                Urn = groupUrns.ElementAt(0),
+                Ks2ReadingScore = 101m,
+                Ks2MathsScore = 101m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(1),
+                Ks2ReadingScore = 102m,
+                Ks2MathsScore = 102m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(2),
+                Ks2ReadingScore = 103m,
+                Ks2MathsScore = 103m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(3),
+                Ks2ReadingScore = 104m,
+                Ks2MathsScore = 104m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(4),
+                Ks2ReadingScore = 105m,
+                Ks2MathsScore = 105m
+            }
+        };
+
+        _repoMock
+            .Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u => u.SequenceEqual(groupUrns))))
+            .ReturnsAsync(groupValues);
     }
 
     private static SimilarSchool CreateSimilarSchool(string urn, string name, BNGCoordinates coordinates)

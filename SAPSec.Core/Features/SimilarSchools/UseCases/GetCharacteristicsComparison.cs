@@ -10,7 +10,9 @@ public class GetCharacteristicsComparison(
         var urns = new[] { request.CurrentSchoolUrn, request.SimilarSchoolUrn };
 
         var values = await repository.GetSecondaryValuesByUrnsAsync(urns);
-        var national = await repository.GetSimilarSchoolsSecondaryNationalSdAsync();
+        var standardDeviations = request.SimilarityCalculationMethod == SimilarityCalculationMethod.Group
+            ? await BuildGroupStandardDeviationsAsync(request.CurrentSchoolUrn)
+            : await repository.GetSimilarSchoolsSecondaryNationalSdAsync();
 
         var current = values.FirstOrDefault(v => v.Urn == request.CurrentSchoolUrn);
         if (current is null)
@@ -27,39 +29,58 @@ public class GetCharacteristicsComparison(
             Ks2AverageScore = Build(
                 current.Ks2AverageScore,
                 similar.Ks2AverageScore,
-                national.Ks2AverageScore),
+                standardDeviations.Ks2AverageScore),
             PupilPremiumEligibilityPercentage = Build(
                 current.PupilPremiumEligibilityPercentage,
                 similar.PupilPremiumEligibilityPercentage,
-                national.PupilPremiumEligibilityPercentage),
+                standardDeviations.PupilPremiumEligibilityPercentage),
             PupilsWithEalPercentage = Build(
                 current.PupilsWithEalPercentage,
                 similar.PupilsWithEalPercentage,
-                national.PupilsWithEalPercentage),
+                standardDeviations.PupilsWithEalPercentage),
             Polar4Quintile = Build(
                 RoundInt(current.Polar4Quintile),
                 RoundInt(similar.Polar4Quintile),
-                RoundInt(national.Polar4Quintile)),
+                RoundInt(standardDeviations.Polar4Quintile)),
             PupilCount = Build(
                 RoundInt(current.PupilCount),
                 RoundInt(similar.PupilCount),
-                RoundInt(national.PupilCount)),
+                RoundInt(standardDeviations.PupilCount)),
             PupilStabilityRate = Build(
                 current.PupilStabilityRate,
                 similar.PupilStabilityRate,
-                national.PupilStabilityRate),
+                standardDeviations.PupilStabilityRate),
             AverageIdaciScore = Build(
                 current.AverageIdaciScore,
                 similar.AverageIdaciScore,
-                national.AverageIdaciScore),
+                standardDeviations.AverageIdaciScore),
             PupilsWithSenSupportPercentage = Build(
                 current.PupilsWithSenSupportPercentage,
                 similar.PupilsWithSenSupportPercentage,
-                national.PupilsWithSenSupportPercentage),
+                standardDeviations.PupilsWithSenSupportPercentage),
             PupilsWithEhcPlanPercentage = Build(
                 current.PupilsWithEhcPlanPercentage,
                 similar.PupilsWithEhcPlanPercentage,
-                national.PupilsWithEhcPlanPercentage)
+                standardDeviations.PupilsWithEhcPlanPercentage)
+        };
+    }
+
+    private async Task<SimilarSchoolsSecondaryNationalSD> BuildGroupStandardDeviationsAsync(string currentSchoolUrn)
+    {
+        var groupUrns = await repository.GetSimilarSchoolUrnsAsync(currentSchoolUrn);
+        var groupValues = await repository.GetSecondaryValuesByUrnsAsync(groupUrns);
+
+        return new SimilarSchoolsSecondaryNationalSD
+        {
+            Ks2AverageScore = PopulationStandardDeviation(groupValues.Select(v => v.Ks2AverageScore)),
+            PupilPremiumEligibilityPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilPremiumEligibilityPercentage)),
+            PupilsWithEalPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilsWithEalPercentage)),
+            Polar4Quintile = PopulationStandardDeviation(groupValues.Select(v => v.Polar4Quintile)),
+            PupilStabilityRate = PopulationStandardDeviation(groupValues.Select(v => v.PupilStabilityRate)),
+            AverageIdaciScore = PopulationStandardDeviation(groupValues.Select(v => v.AverageIdaciScore)),
+            PupilsWithSenSupportPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilsWithSenSupportPercentage)),
+            PupilCount = PopulationStandardDeviation(groupValues.Select(v => v.PupilCount)),
+            PupilsWithEhcPlanPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilsWithEhcPlanPercentage))
         };
     }
 
@@ -94,11 +115,34 @@ public class GetCharacteristicsComparison(
 
     private static int RoundInt(decimal value) =>
         Convert.ToInt32(Math.Round(value, MidpointRounding.AwayFromZero));
+
+    private static decimal PopulationStandardDeviation(IEnumerable<decimal> values)
+    {
+        var samples = values.ToArray();
+        if (samples.Length == 0)
+        {
+            return 0m;
+        }
+
+        var mean = samples.Average();
+        var variance = samples
+            .Select(v => (v - mean) * (v - mean))
+            .Average();
+
+        return (decimal)Math.Sqrt((double)variance);
+    }
 }
 
 public record GetCharacteristicsComparisonRequest(
     string CurrentSchoolUrn,
-    string SimilarSchoolUrn);
+    string SimilarSchoolUrn,
+    SimilarityCalculationMethod SimilarityCalculationMethod = SimilarityCalculationMethod.National);
+
+public enum SimilarityCalculationMethod
+{
+    National,
+    Group
+}
 
 public record GetCharacteristicsComparisonResponse
 {

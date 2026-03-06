@@ -222,6 +222,131 @@ public class GetCharacteristicsComparisonTests
         Assert.Equal(SchoolSimilarity.LessSimilar, result.PupilsWithEhcPlanPercentage.Similarity);
     }
 
+    [Fact]
+    public async Task Execute_UsesNationalSd_ByDefault()
+    {
+        var currentUrn = "100";
+        var similarUrn = "200";
+
+        var current = BuildValues(currentUrn, ks2Avg: 100m);
+        var similar = BuildValues(similarUrn, ks2Avg: 106m);
+
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[] { current, similar });
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
+            .ReturnsAsync(BuildNationalSd(ks2AvgSd: 20m));
+
+        var sut = CreateSut();
+
+        var result = await sut.Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn));
+
+        Assert.Equal(SchoolSimilarity.Similar, result.Ks2AverageScore.Similarity);
+        _repo.Verify(r => r.GetSimilarSchoolsSecondaryNationalSdAsync(), Times.Once);
+        _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Execute_UsesNationalSd_WhenExplicitlyRequested()
+    {
+        var currentUrn = "100";
+        var similarUrn = "200";
+
+        var current = BuildValues(currentUrn, ks2Avg: 100m);
+        var similar = BuildValues(similarUrn, ks2Avg: 106m);
+
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[] { current, similar });
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
+            .ReturnsAsync(BuildNationalSd(ks2AvgSd: 20m));
+
+        var sut = CreateSut();
+
+        var result = await sut.Execute(new GetCharacteristicsComparisonRequest(
+            currentUrn,
+            similarUrn,
+            SimilarityCalculationMethod.National));
+
+        Assert.Equal(SchoolSimilarity.Similar, result.Ks2AverageScore.Similarity);
+        _repo.Verify(r => r.GetSimilarSchoolsSecondaryNationalSdAsync(), Times.Once);
+        _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task Execute_UsesGroupSd_WhenRequested()
+    {
+        var currentUrn = "100";
+        var similarUrn = "200";
+
+        var current = BuildValues(currentUrn, ks2Avg: 100m);
+        var similar = BuildValues(similarUrn, ks2Avg: 106m);
+
+        var groupUrns = new[] { "200", "300", "400", "500", "600" };
+        var groupValues = new[]
+        {
+            BuildValues("200", ks2Avg: 100m),
+            BuildValues("300", ks2Avg: 102m),
+            BuildValues("400", ks2Avg: 104m),
+            BuildValues("500", ks2Avg: 106m),
+            BuildValues("600", ks2Avg: 108m)
+        };
+
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
+                u.Contains(currentUrn) && u.Contains(similarUrn) && u.Count() == 2)))
+            .ReturnsAsync(new[] { current, similar });
+        _repo.Setup(r => r.GetSimilarSchoolUrnsAsync(currentUrn))
+            .ReturnsAsync(groupUrns);
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
+                u.SequenceEqual(groupUrns))))
+            .ReturnsAsync(groupValues);
+
+        var sut = CreateSut();
+
+        var result = await sut.Execute(new GetCharacteristicsComparisonRequest(
+            currentUrn,
+            similarUrn,
+            SimilarityCalculationMethod.Group));
+
+        Assert.Equal(SchoolSimilarity.NotSimilar, result.Ks2AverageScore.Similarity);
+        _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(currentUrn), Times.Once);
+        _repo.Verify(r => r.GetSimilarSchoolsSecondaryNationalSdAsync(), Times.Never);
+    }
+
+    [Fact]
+    public async Task Execute_ReturnsNotSimilar_WhenGroupSdIsZero()
+    {
+        var currentUrn = "100";
+        var similarUrn = "200";
+
+        var current = BuildValues(currentUrn, ks2Avg: 100m);
+        var similar = BuildValues(similarUrn, ks2Avg: 120m);
+
+        var groupUrns = new[] { "300", "400", "500" };
+        var groupValues = new[]
+        {
+            BuildValues("300", ks2Avg: 110m),
+            BuildValues("400", ks2Avg: 110m),
+            BuildValues("500", ks2Avg: 110m)
+        };
+
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
+                u.Contains(currentUrn) && u.Contains(similarUrn) && u.Count() == 2)))
+            .ReturnsAsync(new[] { current, similar });
+        _repo.Setup(r => r.GetSimilarSchoolUrnsAsync(currentUrn))
+            .ReturnsAsync(groupUrns);
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
+                u.SequenceEqual(groupUrns))))
+            .ReturnsAsync(groupValues);
+
+        var sut = CreateSut();
+
+        var result = await sut.Execute(new GetCharacteristicsComparisonRequest(
+            currentUrn,
+            similarUrn,
+            SimilarityCalculationMethod.Group));
+
+        Assert.Equal(SchoolSimilarity.NotSimilar, result.Ks2AverageScore.Similarity);
+    }
+
     private static SimilarSchoolsSecondaryValues BuildValues(
         string urn,
         decimal ks2Avg,

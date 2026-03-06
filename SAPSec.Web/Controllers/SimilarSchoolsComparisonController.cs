@@ -47,11 +47,6 @@ public class SimilarSchoolsComparisonController : Controller
         var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
-
-        var response = await _getCharacteristicsComparison.Execute(
-            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
-
-        modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(response);
         
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
@@ -237,9 +232,21 @@ public class SimilarSchoolsComparisonController : Controller
     private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>
         BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn)
     {
+        var similarityCalculation =
+            HttpContext?.Request?.Query.TryGetValue("similarityCalculation", out var rawValue) == true
+                ? rawValue.ToString()
+                : null;
+        var calculationMethod = ParseSimilarityCalculation(similarityCalculation);
         var response = await _getCharacteristicsComparison.Execute(
-            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
+            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn, calculationMethod));
 
         return _characteristicsFormatter.BuildRows(response);
+    }
+
+    private static SimilarityCalculationMethod ParseSimilarityCalculation(string? value)
+    {
+        return string.Equals(value, "group", StringComparison.OrdinalIgnoreCase)
+            ? SimilarityCalculationMethod.Group
+            : SimilarityCalculationMethod.National;
     }
 }
