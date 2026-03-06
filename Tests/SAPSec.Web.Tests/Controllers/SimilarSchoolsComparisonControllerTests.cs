@@ -12,7 +12,6 @@ using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
-using LocalAuthority = SAPSec.Core.Features.SimilarSchools.LocalAuthority;
 
 namespace SAPSec.Web.Tests.Controllers;
 
@@ -53,7 +52,8 @@ public class SimilarSchoolsComparisonControllerTests
             getSimilarSchoolDetails,
             getCharacteristicsComparison,
             characteristicsFormatter,
-            _loggerMock.Object);
+            _loggerMock.Object,
+            _repoMock.Object);
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class SimilarSchoolsComparisonControllerTests
         model.Urn.Should().Be(urn);
         model.SimilarSchoolUrn.Should().Be(similarUrn);
         model.Name.Should().Be(currentSchool.Name);
-        model.SimilarSchoolName.Should().Be(similarDetails.Name.Display());
+        model.SimilarSchoolName.Should().Be(similarDetails.Name);
 
         _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
         _sut.ViewData["ComparisonSchool"].Should().BeSameAs(model);
@@ -102,6 +102,7 @@ public class SimilarSchoolsComparisonControllerTests
         var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
 
         SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool, similarDetails);
+        SetupSecondaryValues(urn, similarUrn);
 
         var result = await _sut.SchoolDetails(urn, similarUrn);
 
@@ -110,7 +111,7 @@ public class SimilarSchoolsComparisonControllerTests
 
         model.Distance.Should().BeGreaterThan(0);
         model.SimilarSchoolDetails.Should().NotBeNull();
-        model.SimilarSchoolDetails!.Urn.Value.Should().Be(similarUrn);
+        model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
     }
 
     [Fact]
@@ -224,14 +225,25 @@ public class SimilarSchoolsComparisonControllerTests
                 Locality = "",
                 Address3 = ""
             },
-            LocalAuthority = new LocalAuthority("373", "Sheffield"),
+            TotalCapacity = "1200",
+            TotalPupils = "1000",
+            NurseryProvisionName = "No",
+            LocalAuthority = new ReferenceData("373", "Sheffield"),
+            Region = new ReferenceData("R", "Yorkshire and the Humber"),
+            UrbanRural = new ReferenceData("A1", "Urban"),
+            PhaseOfEducation = new ReferenceData("P", "Secondary"),
+            OfficialSixthForm = new ReferenceData("1", "Has sixth form"),
+            AdmissionsPolicy = new ReferenceData("1", "Comprehensive"),
+            Gender = new ReferenceData("M", "Mixed"),
+            ResourcedProvision = new ReferenceData("0", "No"),
+            TypeOfEstablishment = new ReferenceData("27", "Academy"),
+            EstablishmentTypeGroup = new ReferenceData("10", "Academies"),
+            TrustSchoolFlag = new ReferenceData("0", "No"),
             Coordinates = coordinates,
-            UrbanRuralId = "A1",
-            UrbanRuralName = "Urban",
             Attainment8Score = DataWithAvailability.Available(50m),
             BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.Available(61m),
-            CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.Available(62m),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.Available(62m),
             EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.Available(63m),
             EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.Available(64m),
             EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(65m),
@@ -244,8 +256,8 @@ public class SimilarSchoolsComparisonControllerTests
     {
         return new SchoolDetails
         {
-            Urn = DataWithAvailability.Available(urn),
-            Name = DataWithAvailability.Available(name),
+            Urn = urn,
+            Name = name,
             DfENumber = DataWithAvailability.Available("373/1234"),
             Ukprn = DataWithAvailability.Available("10012345"),
             Address = DataWithAvailability.Available("123 Test Street, Sheffield, S1 1AA"),

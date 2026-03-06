@@ -8,8 +8,8 @@ using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Services;
 using SAPSec.Web.Formatters;
 using SAPSec.Infrastructure.LuceneSearch;
-using SAPSec.Infrastructure.Repositories.Json;
 using System.Diagnostics.CodeAnalysis;
+using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Web.Extensions
 {

@@ -105,13 +105,6 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
         return list.First();
     }
 
-    private static decimal ParseDecimal(string value) =>
-        decimal.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0m;
-
-    private static int ParseInt(string value) =>
-        int.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out var i) ? i : 0;
-    
-
     private SimilarSchool FromJson(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)
     {
         var currentSchoolPerformance = currentSchoolPerformances.FirstOrDefault();

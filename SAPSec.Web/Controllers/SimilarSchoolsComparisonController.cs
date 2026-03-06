@@ -11,6 +11,7 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
+    private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
     private readonly ISimilarSchoolsSecondaryRepository _similarSchoolsSecondaryRepository;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
@@ -28,12 +29,9 @@ public class SimilarSchoolsComparisonController : Controller
                                         throw new ArgumentNullException(nameof(getCharacteristicsComparison));
         _characteristicsFormatter = characteristicsFormatter ??
                                     throw new ArgumentNullException(nameof(characteristicsFormatter));
-        _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _similarSchoolsSecondaryRepository = similarSchoolsSecondaryRepository
             ?? throw new ArgumentNullException(nameof(similarSchoolsSecondaryRepository));
-        _characteristicsFormatter = characteristicsFormatter
-            ?? throw new ArgumentNullException(nameof(characteristicsFormatter));
     }
 
     [HttpGet]
@@ -239,18 +237,9 @@ public class SimilarSchoolsComparisonController : Controller
     private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>
         BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn)
     {
-        var values = await _similarSchoolsSecondaryRepository.GetSecondaryValuesByUrnsAsync(new[] { urn, similarSchoolUrn });
-        var current = values.FirstOrDefault(v => v.Urn == urn);
-        var similar = values.FirstOrDefault(v => v.Urn == similarSchoolUrn);
+        var response = await _getCharacteristicsComparison.Execute(
+            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
 
-        if (current is null || similar is null)
-        {
-            _logger.LogWarning(
-                "Similarity characteristics missing for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
-                urn, similarSchoolUrn);
-            return Array.Empty<SimilarSchoolsComparisonViewModel.CharacteristicRow>();
-        }
-
-        return _characteristicsFormatter.BuildRows(current, similar);
+        return _characteristicsFormatter.BuildRows(response);
     }
 }
