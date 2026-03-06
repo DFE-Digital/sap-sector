@@ -180,11 +180,7 @@ public class SimilarSchoolsComparisonController : Controller
             return (null, NotFound());
         }
 
-        // Name is a "DataWithAvailability", can be null or not available depending on your model.
-        // Display() should handle "not available", but we still guard against null ref.
-        var similarName = response.SimilarSchoolDetails.Name is null
-            ? null
-            : response.SimilarSchoolDetails.Name.Display();
+        var similarName = response.SimilarSchoolDetails.Name;
 
         if (string.IsNullOrWhiteSpace(similarName))
         {
