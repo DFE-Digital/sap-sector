@@ -1,6 +1,6 @@
 using System.Globalization;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Web.Helpers;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Formatters;
@@ -8,101 +8,95 @@ namespace SAPSec.Web.Formatters;
 public interface ICharacteristicsComparisonFormatter
 {
     IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow> BuildRows(
-        SimilarSchoolsSecondaryValues current,
-        SimilarSchoolsSecondaryValues similar,
-        SimilarSchoolsSecondaryNationalSD nationalSds);
+        GetCharacteristicsComparisonResponse response);
 }
 
 public sealed class CharacteristicsComparisonFormatter : ICharacteristicsComparisonFormatter
 {
  public IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow> BuildRows(
-    SimilarSchoolsSecondaryValues current,
-    SimilarSchoolsSecondaryValues similar,
-    SimilarSchoolsSecondaryNationalSD national)
+    GetCharacteristicsComparisonResponse response)
 {
     return new List<SimilarSchoolsComparisonViewModel.CharacteristicRow>(9)
     {
         new()
         {
             Characteristic = "Average KS2 reading and maths score",
-            CurrentSchoolValue = Ks2Int(current),
-            SimilarSchoolValue = Ks2Int(similar),
+            CurrentSchoolValue = Ks2Int(response.Ks2AverageScore.CurrentSchoolValue),
+            SimilarSchoolValue = Ks2Int(response.Ks2AverageScore.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.Ks2AverageScore, similar.Ks2AverageScore, national.Ks2AverageScore)
+            Similarity = response.Ks2AverageScore.Similarity
         },
         new()
         {
             Characteristic = "Total number of pupils",
-            CurrentSchoolValue = IntN0(current.PupilCount),
-            SimilarSchoolValue = IntN0(similar.PupilCount),
+            CurrentSchoolValue = IntN0(response.PupilCount.CurrentSchoolValue),
+            SimilarSchoolValue = IntN0(response.PupilCount.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.PupilCount, similar.PupilCount, national.PupilCount)
+            Similarity = response.PupilCount.Similarity
         },
         new()
         {
             Characteristic = "Pupil stability rate",
-            CurrentSchoolValue = Percent1dp(current.PupilStabilityRate),
-            SimilarSchoolValue = Percent1dp(similar.PupilStabilityRate),
+            CurrentSchoolValue = Percent1dp(response.PupilStabilityRate.CurrentSchoolValue),
+            SimilarSchoolValue = Percent1dp(response.PupilStabilityRate.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.PupilStabilityRate, similar.PupilStabilityRate, national.PupilStabilityRate)
+            Similarity = response.PupilStabilityRate.Similarity
         },
         new()
         {
             Characteristic = "Eligibility for pupil premium",
-            CurrentSchoolValue = Percent1dp(current.PupilPremiumEligibilityPercentage),
-            SimilarSchoolValue = Percent1dp(similar.PupilPremiumEligibilityPercentage),
+            CurrentSchoolValue = Percent1dp(response.PupilPremiumEligibilityPercentage.CurrentSchoolValue),
+            SimilarSchoolValue = Percent1dp(response.PupilPremiumEligibilityPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.PupilPremiumEligibilityPercentage, similar.PupilPremiumEligibilityPercentage, national.PupilPremiumEligibilityPercentage)
+            Similarity = response.PupilPremiumEligibilityPercentage.Similarity
         },
         new()
         {
             Characteristic = "Average IDACI score",
-            CurrentSchoolValue = Dec3dp(current.AverageIdaciScore),
-            SimilarSchoolValue = Dec3dp(similar.AverageIdaciScore),
+            CurrentSchoolValue = Dec3dp(response.AverageIdaciScore.CurrentSchoolValue),
+            SimilarSchoolValue = Dec3dp(response.AverageIdaciScore.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.AverageIdaciScore, similar.AverageIdaciScore, national.AverageIdaciScore)
+            Similarity = response.AverageIdaciScore.Similarity
         },
         new()
         {
             Characteristic = "Average POLAR4 quintile",
-            CurrentSchoolValue = PolarText(current.Polar4Quintile),
-            SimilarSchoolValue = PolarText(similar.Polar4Quintile),
+            CurrentSchoolValue = PolarText(response.Polar4Quintile.CurrentSchoolValue),
+            SimilarSchoolValue = PolarText(response.Polar4Quintile.SimilarSchoolValue),
             IsNumeric = false,
-            Similarity = SimilarityCalculator.Calculate(current.Polar4Quintile, similar.Polar4Quintile, national.Polar4Quintile)
+            Similarity = response.Polar4Quintile.Similarity
         },
         new()
         {
             Characteristic = "Percentage of pupils with an EHC plan",
-            CurrentSchoolValue = Percent1dp(current.PupilsWithEhcPlanPercentage),
-            SimilarSchoolValue = Percent1dp(similar.PupilsWithEhcPlanPercentage),
+            CurrentSchoolValue = Percent1dp(response.PupilsWithEhcPlanPercentage.CurrentSchoolValue),
+            SimilarSchoolValue = Percent1dp(response.PupilsWithEhcPlanPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.PupilsWithEhcPlanPercentage, similar.PupilsWithEhcPlanPercentage, national.PupilsWithEhcPlanPercentage)
+            Similarity = response.PupilsWithEhcPlanPercentage.Similarity
         },
         new()
         {
             Characteristic = "Percentage of pupils with SEN support",
-            CurrentSchoolValue = Percent1dp(current.PupilsWithSenSupportPercentage),
-            SimilarSchoolValue = Percent1dp(similar.PupilsWithSenSupportPercentage),
+            CurrentSchoolValue = Percent1dp(response.PupilsWithSenSupportPercentage.CurrentSchoolValue),
+            SimilarSchoolValue = Percent1dp(response.PupilsWithSenSupportPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.PupilsWithSenSupportPercentage, similar.PupilsWithSenSupportPercentage, national.PupilsWithSenSupportPercentage)
+            Similarity = response.PupilsWithSenSupportPercentage.Similarity
         },
         new()
         {
             Characteristic = "Percentage of pupils with EAL",
-            CurrentSchoolValue = Percent1dp(current.PupilsWithEalPercentage),
-            SimilarSchoolValue = Percent1dp(similar.PupilsWithEalPercentage),
+            CurrentSchoolValue = Percent1dp(response.PupilsWithEalPercentage.CurrentSchoolValue),
+            SimilarSchoolValue = Percent1dp(response.PupilsWithEalPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = SimilarityCalculator.Calculate(current.PupilsWithEalPercentage, similar.PupilsWithEalPercentage, national.PupilsWithEalPercentage)
+            Similarity = response.PupilsWithEalPercentage.Similarity
         }
     }.AsReadOnly();
 }
 
     // Formatting rules
-    private static string Ks2Int(SimilarSchoolsSecondaryValues s)
-    {
-        return Convert.ToInt32(Math.Round(s.Ks2AverageScore, MidpointRounding.AwayFromZero))
+    private static string Ks2Int(decimal v) =>
+        Convert.ToInt32(Math.Round(v, MidpointRounding.AwayFromZero))
             .ToString(CultureInfo.InvariantCulture);
-    }
 
     private static string IntN0(decimal v) =>
         Convert.ToInt32(Math.Round(v, MidpointRounding.AwayFromZero))
@@ -114,7 +108,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
     private static string Dec3dp(decimal v) =>
         v.ToString("0.000", CultureInfo.InvariantCulture);
 
-    private static string PolarText(decimal q) =>
-        $"Quintile {Convert.ToInt32(Math.Round(q, MidpointRounding.AwayFromZero))}";
+    private static string PolarText(int q) =>
+        $"Quintile {q}";
     
 }

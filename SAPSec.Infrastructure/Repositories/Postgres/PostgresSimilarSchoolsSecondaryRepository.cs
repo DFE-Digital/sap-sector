@@ -302,7 +302,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     }
     private class SimilarSchoolsSecondaryValuesDao
     {
-        public string Urn { get; init; }
+        public required string Urn { get; init; }
         public required decimal Ks2Rp { get; init; }
         public required decimal Ks2Mp { get; init; }
         public required decimal PpPerc { get; init; }

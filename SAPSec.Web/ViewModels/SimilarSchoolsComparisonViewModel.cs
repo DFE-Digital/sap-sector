@@ -1,5 +1,6 @@
 using System.Globalization;
 using SAPSec.Core.Model;
+using SAPSec.Core.Features.SimilarSchools;
 
 namespace SAPSec.Web.ViewModels;
 
@@ -39,13 +40,6 @@ public class SimilarSchoolsComparisonViewModel
         public required string SimilarSchoolValue { get; init; }
         public bool IsNumeric { get; init; }
 
-        public SimilarityLabel Similarity { get; init; }
-    }
-
-    public enum SimilarityLabel
-    {
-        Similar,
-        LessSimilar,
-        NotSimilar
+        public SchoolSimilarity Similarity { get; init; }
     }
 }

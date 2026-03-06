@@ -47,14 +47,11 @@ public class SimilarSchoolsComparisonControllerTests
                 Ks2AverageScore = 2.527329m
             });
 
-        var getNationalStandardDeviations = new GetSimilarSchoolsSecondaryNationalSD(_repoMock.Object);
-
         var characteristicsFormatter = new CharacteristicsComparisonFormatter();
 
         _sut = new SimilarSchoolsComparisonController(
             getSimilarSchoolDetails,
             getCharacteristicsComparison,
-            getNationalStandardDeviations,
             characteristicsFormatter,
             _loggerMock.Object);
     }
@@ -146,10 +143,10 @@ public class SimilarSchoolsComparisonControllerTests
         model.CharacteristicsRows[0].SimilarSchoolValue.Should().NotBeNullOrWhiteSpace();
         
         model.CharacteristicsRows[4].Characteristic.Should().Be("Average IDACI score");
-        model.CharacteristicsRows[4].Similarity.Should().Be(SimilarSchoolsComparisonViewModel.SimilarityLabel.LessSimilar);
+        model.CharacteristicsRows[4].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
 
         model.CharacteristicsRows[5].Characteristic.Should().Be("Average POLAR4 quintile");
-        model.CharacteristicsRows[5].Similarity.Should().Be(SimilarSchoolsComparisonViewModel.SimilarityLabel.NotSimilar);
+        model.CharacteristicsRows[5].Similarity.Should().Be(SchoolSimilarity.NotSimilar);
     }
 
     private void SetupBaseDependencies(

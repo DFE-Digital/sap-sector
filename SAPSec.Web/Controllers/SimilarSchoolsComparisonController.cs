@@ -12,14 +12,12 @@ public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
-    private readonly GetSimilarSchoolsSecondaryNationalSD _getNationalStandardDeviations;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetCharacteristicsComparison getCharacteristicsComparison,
-        GetSimilarSchoolsSecondaryNationalSD getNationalStandardDeviations,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
@@ -27,7 +25,6 @@ public class SimilarSchoolsComparisonController : Controller
             getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
         _getCharacteristicsComparison = getCharacteristicsComparison ??
                                         throw new ArgumentNullException(nameof(getCharacteristicsComparison));
-        _getNationalStandardDeviations = getNationalStandardDeviations ?? throw new ArgumentNullException(nameof(getNationalStandardDeviations));
         _characteristicsFormatter = characteristicsFormatter ??
                                     throw new ArgumentNullException(nameof(characteristicsFormatter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -50,12 +47,7 @@ public class SimilarSchoolsComparisonController : Controller
         var response = await _getCharacteristicsComparison.Execute(
             new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
 
-        var nationalSds = (await _getNationalStandardDeviations.Execute(new GetSimilarSchoolsSecondaryNationalSDRequest())).SimilarSchoolsSecondaryNationalSD;
-
-        modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(
-            response.CurrentSchool,
-            response.SimilarSchool,
-            nationalSds);
+        modelResult.Model!.CharacteristicsRows = _characteristicsFormatter.BuildRows(response);
         
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);

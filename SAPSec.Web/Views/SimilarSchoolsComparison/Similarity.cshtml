@@ -1,3 +1,4 @@
+@using SAPSec.Core.Features.SimilarSchools
 @using SAPSec.Web.ViewModels
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
@@ -40,10 +41,10 @@
                 <td class="govuk-table__cell">
                     @switch (row.Similarity)
                     {
-                        case SimilarSchoolsComparisonViewModel.SimilarityLabel.Similar:
+                        case SchoolSimilarity.Similar:
                             <strong class="govuk-tag govuk-tag--green" style="white-space: nowrap;">Similar</strong>
                             break;
-                        case SimilarSchoolsComparisonViewModel.SimilarityLabel.LessSimilar:
+                        case SchoolSimilarity.LessSimilar:
                             <strong class="govuk-tag govuk-tag--yellow" style="white-space: nowrap;">Less similar</strong>
                             break;
                         default:
