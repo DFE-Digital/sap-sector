@@ -12,5 +12,10 @@
         <p class="govuk-body">
             If you pasted the web address, check you copied the entire address.
         </p>
+        @if (ViewData["ErrorDetail"] is string detail && !string.IsNullOrWhiteSpace(detail))
+        {
+            <h2 class="govuk-heading-m">Error details</h2>
+            <pre class="govuk-body">@detail</pre>
+        }
     </div>
 </div>

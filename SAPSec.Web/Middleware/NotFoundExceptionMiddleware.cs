@@ -10,13 +10,14 @@ public sealed class NotFoundExceptionMiddleware(RequestDelegate next)
         {
             await next(context);
         }
-        catch (NotFoundException)
+        catch (NotFoundException ex)
         {
             if (context.Response.HasStarted)
             {
                 throw;
             }
 
+            context.Items["ErrorDetail"] = $"{ex.GetType().Name}: {ex.Message}";
             var originalPath = context.Request.Path;
             context.Response.Clear();
             context.Response.StatusCode = StatusCodes.Status404NotFound;

@@ -7,5 +7,10 @@
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewData[ViewDataKeys.Title]</h1>
         <p class="govuk-body">Try again later.</p>
+        @if (ViewData["ErrorDetail"] is string detail && !string.IsNullOrWhiteSpace(detail))
+        {
+            <h2 class="govuk-heading-m">Error details</h2>
+            <pre class="govuk-body">@detail</pre>
+        }
     </div>
 </div>
