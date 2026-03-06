@@ -88,7 +88,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Easting",
                 "Northing",
                 "UrbanRuralId",
-<<<<<<< HEAD:SAPSec.Infrastructure/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
                 "UrbanRuralName",
                 "RegionId",
                 "RegionName",
@@ -118,16 +117,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 WHERE "urn" = @urn
             );
 
-=======
-                "UrbanRuralName"
-            FROM public.v_establishment 
-            WHERE "URN" IN (
-                SELECT "neighbour_urn" 
-                FROM public.v_similar_schools_secondary_groups 
-                WHERE "urn" = @urn
-            );
-
->>>>>>> 8ccb9fc (add bar and charts):SAPSec.Infrastructure/Repositories/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
             SELECT
                 "Id",
                 "Attainment8_Tot_Est_Current_Num",
@@ -135,7 +124,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Chem59_Sum_Est_Current_Num",
                 "CombSci59_Sum_Est_Current_Num",
                 "EngLang59_Sum_Est_Current_Num",
-<<<<<<< HEAD:SAPSec.Infrastructure/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
                 "EngLit59_Sum_Est_Current_Num",
                 "EngMaths59_Tot_Est_Current_Num",
                 "EngMaths59_Tot_Est_Current_Pct",
@@ -147,19 +135,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 FROM public.v_similar_schools_secondary_groups 
                 WHERE "urn" = @urn
             );
-=======
-                "EngLit59_Sum_Est_Current_Num",
-                "EngMaths59_Tot_Est_Current_Num",
-                "EngMaths59_Tot_Est_Current_Pct",
-                "Maths59_Sum_Est_Current_Num",
-                "Physics59_Sum_Est_Current_Num"
-            FROM public.v_establishment_performance
-            WHERE "Id" = @urn OR "Id" IN (
-                SELECT "neighbour_urn" 
-                FROM public.v_similar_schools_secondary_groups 
-                WHERE "urn" = @urn
-            );
->>>>>>> 8ccb9fc (add bar and charts):SAPSec.Infrastructure/Repositories/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
         """;
 
         var results = await conn.QueryMultipleAsync(sql, new { urn });
@@ -270,7 +245,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         TotalPupils = sch.TotalPupils,
         NurseryProvisionName = sch.NurseryProvisionName,
         Coordinates = BNGCoordinates.TryParse(sch.Easting, sch.Northing, out var coords) ? coords : null,
-<<<<<<< HEAD:SAPSec.Infrastructure/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
         LocalAuthority = new(sch.LAId, sch.LAName),
         UrbanRural = new(sch.UrbanRuralId, sch.UrbanRuralName),
         Region = new(sch.RegionId, sch.RegionName),
@@ -290,18 +264,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Num),
         EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Num),
         MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Num),
-=======
-        UrbanRuralId = sch.UrbanRuralId,
-        UrbanRuralName = sch.UrbanRuralName,
-        Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
-        BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
-        ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),
-        CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Num),
-        EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Num),
-        EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Num),
-        EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Num),
-        MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Num),
->>>>>>> 8ccb9fc (add bar and charts):SAPSec.Infrastructure/Repositories/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
         PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Num),
     };
 
@@ -386,7 +348,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         public required string Id { get; set; }
         public required string Attainment8_Tot_Est_Current_Num { get; set; }
         public required string Bio59_Sum_Est_Current_Num { get; set; }
-<<<<<<< HEAD:SAPSec.Infrastructure/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
         public required string Chem59_Sum_Est_Current_Num { get; set; }
         public required string CombSci59_Sum_Est_Current_Num { get; set; }
         public required string EngLang59_Sum_Est_Current_Num { get; set; }
@@ -410,15 +371,5 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         public decimal PercentSchSupport { get; init; }
         public int NumberOfPupils { get; init; }
         public decimal PercentStatementOrEhp { get; init; }
-=======
-        public required string Chem59_Sum_Est_Current_Num { get; set; }
-        public required string CombSci59_Sum_Est_Current_Num { get; set; }
-        public required string EngLang59_Sum_Est_Current_Num { get; set; }
-        public required string EngLit59_Sum_Est_Current_Num { get; set; }
-        public required string EngMaths59_Tot_Est_Current_Num { get; set; }
-        public required string EngMaths59_Tot_Est_Current_Pct { get; set; }
-        public required string Maths59_Sum_Est_Current_Num { get; set; }
-        public required string Physics59_Sum_Est_Current_Num { get; set; }
->>>>>>> 8ccb9fc (add bar and charts):SAPSec.Infrastructure/Repositories/Postgres/PostgresSimilarSchoolsSecondaryRepository.cs
     }
 }

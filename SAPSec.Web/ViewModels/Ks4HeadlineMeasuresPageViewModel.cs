@@ -19,7 +19,7 @@ public class Ks4HeadlineMeasuresPageViewModel
     public string LocalAuthorityAttainment8Display => DisplayValue(LocalAuthorityAttainment8ThreeYearAverage);
     public string EnglandAttainment8Display => DisplayValue(EnglandAttainment8ThreeYearAverage);
 
-    public string SchoolLabel => SchoolDetails.Name.Display();
+    public string SchoolLabel => SchoolDetails.Name;
     public string LocalAuthorityLabel => $"{SchoolDetails.LocalAuthorityName.Display()} local authority";
     public string EnglandLabel => "England";
 

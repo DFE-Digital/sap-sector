@@ -2,9 +2,8 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Model.KS4.Performance;
-using SAPSec.Infrastructure.Factories;
 
-namespace SAPSec.Infrastructure.Repositories.Postgres;
+namespace SAPSec.Infrastructure.Postgres;
 
 public class PostgresKs4PerformanceRepository(
     ILogger<PostgresKs4PerformanceRepository> logger,

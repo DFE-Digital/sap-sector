@@ -79,20 +79,6 @@ public class SimilarSchoolsComparisonViewModel
 
     private const decimal Attainment8MaxScore = 90m;
 
-    // ----------------------------
-    // Similarity (9 characteristics table)
-    // ----------------------------
-    public IReadOnlyList<CharacteristicRow> CharacteristicsRows { get; set; }
-        = Array.Empty<CharacteristicRow>();
-
-    public sealed class CharacteristicRow
-    {
-        public required string Characteristic { get; init; }
-        public required string CurrentSchoolValue { get; init; }
-        public required string SimilarSchoolValue { get; init; }
-        public bool IsNumeric { get; init; }
-    }
-
     private decimal WidthPercent(decimal? value)
     {
         if (!value.HasValue)
