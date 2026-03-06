@@ -13,13 +13,10 @@ public class ErrorController(IWebHostEnvironment environment) : Controller
     public IActionResult Problem()
     {
         ViewData[ViewDataKeys.UseJsBackLink] = true;
-        if (!environment.IsProduction())
+        var exceptionFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+        if (exceptionFeature?.Error is Exception ex)
         {
-            var exceptionFeature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
-            if (exceptionFeature?.Error is Exception ex)
-            {
-                ViewData["ErrorDetail"] = $"{ex.GetType().Name}: {ex.Message}";
-            }
+            ViewData["ErrorDetail"] = $"{ex.GetType().Name}: {ex.Message}";
         }
 
         return View();
@@ -31,7 +28,7 @@ public class ErrorController(IWebHostEnvironment environment) : Controller
     public IActionResult StatusCodeError(int statusCode)
     {
         ViewData[ViewDataKeys.UseJsBackLink] = true;
-        if (!environment.IsProduction() && HttpContext.Items.TryGetValue("ErrorDetail", out var detail))
+        if (HttpContext.Items.TryGetValue("ErrorDetail", out var detail))
         {
             ViewData["ErrorDetail"] = detail?.ToString();
         }
