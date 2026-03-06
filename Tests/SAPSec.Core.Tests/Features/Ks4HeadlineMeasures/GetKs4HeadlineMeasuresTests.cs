@@ -74,8 +74,8 @@ public class GetKs4HeadlineMeasuresTests
     {
         return new SchoolDetails
         {
-            Name = DataWithAvailability.Available("Test School"),
-            Urn = DataWithAvailability.Available(urn),
+            Name = "Test School",
+            Urn = urn,
             DfENumber = DataWithAvailability.Available("001/1234"),
             Ukprn = DataWithAvailability.Available("10000000"),
             Address = DataWithAvailability.Available("Test Address"),
