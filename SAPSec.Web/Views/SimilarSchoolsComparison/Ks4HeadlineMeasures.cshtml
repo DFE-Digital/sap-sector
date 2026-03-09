@@ -46,92 +46,7 @@
     <script src="~/js/chart.umd.js"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js"></script>
     <script src="~/js/chart-factory.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const gradeSelect = document.getElementById("engMathsGrade");
-            if (!gradeSelect) {
-                return;
-            }
-            const dataEndpoint = "@Url.Action("Ks4HeadlineMeasuresData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })";
-
-            const barChartCanvas = document.getElementById("eng-maths-comparison-chart");
-            const lineChartCanvas = document.getElementById("eng-maths-comparison-yearbyyear-chart");
-
-            const tableCellMap = {
-                thisSchool: [
-                    document.querySelector("[data-eng-maths-cell='this-prev2']"),
-                    document.querySelector("[data-eng-maths-cell='this-prev']"),
-                    document.querySelector("[data-eng-maths-cell='this-current']"),
-                    document.querySelector("[data-eng-maths-cell='this-avg']")
-                ],
-                similarSchool: [
-                    document.querySelector("[data-eng-maths-cell='similar-prev2']"),
-                    document.querySelector("[data-eng-maths-cell='similar-prev']"),
-                    document.querySelector("[data-eng-maths-cell='similar-current']"),
-                    document.querySelector("[data-eng-maths-cell='similar-avg']")
-                ],
-                england: [
-                    document.querySelector("[data-eng-maths-cell='england-prev2']"),
-                    document.querySelector("[data-eng-maths-cell='england-prev']"),
-                    document.querySelector("[data-eng-maths-cell='england-current']"),
-                    document.querySelector("[data-eng-maths-cell='england-avg']")
-                ]
-            };
-
-            function updateTableRow(cells, values) {
-                cells.forEach(function (cell, index) {
-                    if (cell) {
-                        cell.textContent = values?.[index] ?? "No available data";
-                    }
-                });
-            }
-
-            function applyEngMathsViews(gradeData) {
-                if (!gradeData) {
-                    return;
-                }
-
-                const barChart = window.Chart && barChartCanvas ? window.Chart.getChart(barChartCanvas) : null;
-                if (barChart && barChart.data?.datasets?.[0]) {
-                    barChart.data.datasets[0].data = gradeData.bar;
-                    barChart.update();
-                }
-
-                const lineChart = window.Chart && lineChartCanvas ? window.Chart.getChart(lineChartCanvas) : null;
-                if (lineChart && lineChart.data?.datasets?.length >= 3) {
-                    lineChart.data.datasets[0].data = gradeData.line.thisSchool;
-                    lineChart.data.datasets[1].data = gradeData.line.similarSchool;
-                    lineChart.data.datasets[2].data = gradeData.line.england;
-                    lineChart.update();
-                }
-
-                updateTableRow(tableCellMap.thisSchool, gradeData.table.thisSchool);
-                updateTableRow(tableCellMap.similarSchool, gradeData.table.similarSchool);
-                updateTableRow(tableCellMap.england, gradeData.table.england);
-            }
-
-            async function loadEngMathsViews(grade) {
-                const response = await fetch(dataEndpoint + "?grade=" + encodeURIComponent(grade), {
-                    headers: {
-                        "Accept": "application/json"
-                    }
-                });
-
-                if (!response.ok) {
-                    return;
-                }
-
-                const gradeData = await response.json();
-                applyEngMathsViews(gradeData);
-            }
-
-            gradeSelect.addEventListener("change", function () {
-                loadEngMathsViews(gradeSelect.value);
-            });
-
-            loadEngMathsViews(gradeSelect.value);
-        });
-    </script>
+    <script src="~/js/similar-schools-ks4-grade-switcher.js"></script>
 }
 
 <section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
@@ -332,7 +247,10 @@
     <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="engMathsGrade">Grade</label>
-            <select class="govuk-select" id="engMathsGrade" name="engMathsGrade">
+            <select class="govuk-select"
+                    id="engMathsGrade"
+                    name="engMathsGrade"
+                    data-endpoint="@Url.Action("Ks4HeadlineMeasuresData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
             </select>
