@@ -1209,9 +1209,7 @@
 }
 
 .govuk-frontend-supported {
-  @include govuk-media-query($from: tablet) {
-    .govuk-tabs__panel--hidden {
-      display: none;
-    }
+  .govuk-tabs__panel--hidden {
+    display: none;
   }
 }
