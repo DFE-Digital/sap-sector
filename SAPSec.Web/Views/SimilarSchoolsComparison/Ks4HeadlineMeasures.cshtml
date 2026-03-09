@@ -52,118 +52,7 @@
             if (!gradeSelect) {
                 return;
             }
-
-            const engMathsDataByGrade = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, object>
-            {
-                ["4"] = new
-                {
-                    bar = new decimal?[]
-                    {
-                        Model.ThisSchoolEngMaths49ThreeYearAverage,
-                        Model.SelectedSchoolEngMaths49ThreeYearAverage,
-                        Model.EnglandEngMaths49ThreeYearAverage
-                    },
-                    line = new
-                    {
-                        thisSchool = new decimal?[]
-                        {
-                            Model.ThisSchoolEngMaths49YearByYear?.Previous2,
-                            Model.ThisSchoolEngMaths49YearByYear?.Previous,
-                            Model.ThisSchoolEngMaths49YearByYear?.Current
-                        },
-                        similarSchool = new decimal?[]
-                        {
-                            Model.SelectedSchoolEngMaths49YearByYear?.Previous2,
-                            Model.SelectedSchoolEngMaths49YearByYear?.Previous,
-                            Model.SelectedSchoolEngMaths49YearByYear?.Current
-                        },
-                        england = new decimal?[]
-                        {
-                            Model.EnglandEngMaths49YearByYear?.Previous2,
-                            Model.EnglandEngMaths49YearByYear?.Previous,
-                            Model.EnglandEngMaths49YearByYear?.Current
-                        }
-                    },
-                    table = new
-                    {
-                        thisSchool = new[]
-                        {
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous2),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Current),
-                            Model.ThisSchoolEngMaths49Display
-                        },
-                        similarSchool = new[]
-                        {
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous2),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Current),
-                            Model.SelectedSchoolEngMaths49Display
-                        },
-                        england = new[]
-                        {
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous2),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Current),
-                            Model.EnglandEngMaths49Display
-                        }
-                    }
-                },
-                ["5"] = new
-                {
-                    bar = new decimal?[]
-                    {
-                        Model.ThisSchoolEngMaths59ThreeYearAverage,
-                        Model.SelectedSchoolEngMaths59ThreeYearAverage,
-                        Model.EnglandEngMaths59ThreeYearAverage
-                    },
-                    line = new
-                    {
-                        thisSchool = new decimal?[]
-                        {
-                            Model.ThisSchoolEngMaths59YearByYear?.Previous2,
-                            Model.ThisSchoolEngMaths59YearByYear?.Previous,
-                            Model.ThisSchoolEngMaths59YearByYear?.Current
-                        },
-                        similarSchool = new decimal?[]
-                        {
-                            Model.SelectedSchoolEngMaths59YearByYear?.Previous2,
-                            Model.SelectedSchoolEngMaths59YearByYear?.Previous,
-                            Model.SelectedSchoolEngMaths59YearByYear?.Current
-                        },
-                        england = new decimal?[]
-                        {
-                            Model.EnglandEngMaths59YearByYear?.Previous2,
-                            Model.EnglandEngMaths59YearByYear?.Previous,
-                            Model.EnglandEngMaths59YearByYear?.Current
-                        }
-                    },
-                    table = new
-                    {
-                        thisSchool = new[]
-                        {
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths59YearByYear?.Previous2),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths59YearByYear?.Previous),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths59YearByYear?.Current),
-                            Model.ThisSchoolEngMaths59Display
-                        },
-                        similarSchool = new[]
-                        {
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths59YearByYear?.Previous2),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths59YearByYear?.Previous),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths59YearByYear?.Current),
-                            Model.SelectedSchoolEngMaths59Display
-                        },
-                        england = new[]
-                        {
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths59YearByYear?.Previous2),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths59YearByYear?.Previous),
-                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths59YearByYear?.Current),
-                            Model.EnglandEngMaths59Display
-                        }
-                    }
-                }
-            }));
+            const dataEndpoint = "@Url.Action("Ks4HeadlineMeasuresData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })";
 
             const barChartCanvas = document.getElementById("eng-maths-comparison-chart");
             const lineChartCanvas = document.getElementById("eng-maths-comparison-yearbyyear-chart");
@@ -192,13 +81,12 @@
             function updateTableRow(cells, values) {
                 cells.forEach(function (cell, index) {
                     if (cell) {
-                        cell.textContent = values[index];
+                        cell.textContent = values?.[index] ?? "No available data";
                     }
                 });
             }
 
-            function updateEngMathsViews(grade) {
-                const gradeData = engMathsDataByGrade[grade] || engMathsDataByGrade["4"];
+            function applyEngMathsViews(gradeData) {
                 if (!gradeData) {
                     return;
                 }
@@ -222,11 +110,26 @@
                 updateTableRow(tableCellMap.england, gradeData.table.england);
             }
 
+            async function loadEngMathsViews(grade) {
+                const response = await fetch(dataEndpoint + "?grade=" + encodeURIComponent(grade), {
+                    headers: {
+                        "Accept": "application/json"
+                    }
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const gradeData = await response.json();
+                applyEngMathsViews(gradeData);
+            }
+
             gradeSelect.addEventListener("change", function () {
-                updateEngMathsViews(gradeSelect.value);
+                loadEngMathsViews(gradeSelect.value);
             });
 
-            updateEngMathsViews(gradeSelect.value);
+            loadEngMathsViews(gradeSelect.value);
         });
     </script>
 }
