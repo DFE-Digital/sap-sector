@@ -1,50 +1,48 @@
 ﻿using Microsoft.Extensions.Logging;
-using SAPSec.Core.Model;
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Model;
 
-namespace SAPSec.Infrastructure.Json
+namespace SAPSec.Infrastructure.Json;
+
+public class JsonEstablishmentRepository : IEstablishmentRepository
 {
-    public class JsonEstablishmentRepository : IEstablishmentRepository
+    private readonly IJsonFile<Establishment> _establishmentMetadataRepository;
+    private ILogger<Establishment> _logger;
+
+    public JsonEstablishmentRepository(
+        IJsonFile<Establishment> establishmentMetadataRepository,
+        ILogger<Establishment> logger)
     {
-        private readonly IJsonFile<Establishment> _establishmentMetadataRepository;
-        private ILogger<Establishment> _logger;
+        _establishmentMetadataRepository = establishmentMetadataRepository;
+        _logger = logger;
+    }
 
-        public JsonEstablishmentRepository(
-            IJsonFile<Establishment> establishmentMetadataRepository,
-            ILogger<Establishment> logger)
-        {
-            _establishmentMetadataRepository = establishmentMetadataRepository;
-            _logger = logger;
-        }
+    public async Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
+    {
+        var establishments = await _establishmentMetadataRepository.ReadAllAsync();
 
-        public async Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
-        {
-            var establishments = await _establishmentMetadataRepository.ReadAllAsync();
+        return establishments.ToList().AsReadOnly();
+    }
 
-            return establishments.ToList().AsReadOnly();
-        }
+    public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns)
+    {
+        var establishments = await _establishmentMetadataRepository.ReadAllAsync();
 
-        public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns)
-        {
-            var establishments = await _establishmentMetadataRepository.ReadAllAsync();
+        return establishments.Where(e => urns.Contains(e.URN)).ToList().AsReadOnly();
+    }
 
-            return establishments.Where(e => urns.Contains(e.URN)).ToList().AsReadOnly();
-        }
+    public async Task<Establishment?> GetEstablishmentAsync(string urn)
+    {
+        var allEstablishments = await GetEstablishmentsAsync([urn]);
+        var establishment = allEstablishments.FirstOrDefault();
 
+        return establishment;
+    }
 
-        public async Task<Establishment> GetEstablishmentAsync(string urn)
-        {
-            var allEstablishments = await GetEstablishmentsAsync([urn]);
-            var establishment = allEstablishments.FirstOrDefault();
+    public async Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
+    {
+        var allEstablishments = await _establishmentMetadataRepository.ReadAllAsync();
 
-            return establishment ?? new Establishment();
-        }
-
-        public async Task<Establishment> GetEstablishmentByAnyNumberAsync(string number)
-        {
-            var allEstablishments = await _establishmentMetadataRepository.ReadAllAsync();
-
-            return allEstablishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.DfENumberSearchable == number) ?? new Establishment();
-        }
+        return allEstablishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.DfENumberSearchable == number);
     }
 }

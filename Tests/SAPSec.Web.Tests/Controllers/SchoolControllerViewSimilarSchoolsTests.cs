@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -38,7 +39,7 @@ public class SimilarSchoolsControllerTests
         var urn = "147788";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -57,7 +58,7 @@ public class SimilarSchoolsControllerTests
         var urn = "147788";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -68,17 +69,17 @@ public class SimilarSchoolsControllerTests
     }
 
     [Fact]
-    public async Task ViewSimilarSchools_SchoolNotFound_RedirectsToError()
+    public async Task ViewSimilarSchools_SchoolNotFound_RedirectsToNotFound()
     {
         var urn = "999999";
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
-            .ReturnsAsync((SchoolDetails?)null);
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ThrowsAsync(new NotFoundException("School not found"));
 
         var result = await _sut.ViewSimilarSchools(urn, "Att8", 1);
 
         var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectResult.ActionName.Should().Be("Error");
+        redirectResult.ActionName.Should().Be("NotFound");
     }
 
     [Fact]
@@ -87,7 +88,7 @@ public class SimilarSchoolsControllerTests
         var urn = "not-a-number";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -102,7 +103,7 @@ public class SimilarSchoolsControllerTests
         var urn = "147788";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -120,7 +121,7 @@ public class SimilarSchoolsControllerTests
         var urn = "147788";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
         _sut.ControllerContext.HttpContext!.Request.QueryString = new QueryString("?ur=UR1&sortBy=Att8");
@@ -138,7 +139,7 @@ public class SimilarSchoolsControllerTests
         var urn = "147788";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -155,7 +156,7 @@ public class SimilarSchoolsControllerTests
         var urn = "147788";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 

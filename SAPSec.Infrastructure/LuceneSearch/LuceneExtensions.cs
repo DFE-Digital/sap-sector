@@ -1,12 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 
 [ExcludeFromCodeCoverage]
 public static class LuceneExtensions
 {
-    public static void AddLuceneDependencies(this IServiceCollection services, bool enableStartupIndexBuilder = true)
+    public static void AddLuceneDependencies(this IServiceCollection services)
     {
         services.AddSingleton<LuceneIndexContext>();
         services.AddSingleton<LuceneIndexWriter>();
@@ -14,9 +14,6 @@ public static class LuceneExtensions
         services.AddSingleton<LuceneHighlighter>();
         services.AddSingleton<LuceneSynonymMapBuilder>();
         services.AddSingleton<LuceneTokeniser>();
-        if (enableStartupIndexBuilder)
-        {
-            services.AddHostedService<StartupIndexBuilder>();
-        }
+        services.AddHostedService<StartupIndexBuilder>();
     }
 }

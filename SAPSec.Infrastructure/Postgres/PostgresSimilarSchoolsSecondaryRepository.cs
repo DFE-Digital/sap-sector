@@ -32,7 +32,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         return urns.ToList().AsReadOnly();
     }
 
-    public async Task<(SimilarSchool, IReadOnlyCollection<SimilarSchool>)> GetSimilarSchoolsGroupAsync(string urn)
+    public async Task<(SimilarSchool?, IReadOnlyCollection<SimilarSchool>)> GetSimilarSchoolsGroupAsync(string urn)
     {
         using var conn = await _factory.Create().OpenConnectionAsync();
 
@@ -74,6 +74,11 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         var results = await conn.QueryMultipleAsync(sql, new { urn });
 
         var currentSchool = await results.ReadSingleOrDefaultAsync<Establishment>();
+        if (currentSchoolDao == null)
+        {
+            return (null, []);
+        }
+
         var similarSchools = await results.ReadAsync<Establishment>();
         var performanceDaos = await results.ReadAsync<SimilarSchoolPerformanceDao>();
 
@@ -94,11 +99,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             };
         var similarSchoolsPerformance = performanceDaos.Where(a => a.Id != urn);
 
-        if (currentSchool == null)
-        {
-            return (BuildEmptySchool(urn, currentSchoolPerformance), []);
-        }
-
         return (
             FromDao(currentSchool, currentSchoolPerformance),
             similarSchools
@@ -112,13 +112,13 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     {
         if (urns is null)
         {
-            return Array.Empty<SimilarSchoolsSecondaryValues>();
+            return [];
         }
 
         var urnList = urns as IList<string> ?? urns.ToList();
         if (urnList.Count == 0)
         {
-            return Array.Empty<SimilarSchoolsSecondaryValues>();
+            return [];
         }
 
         const string sql = """
@@ -221,44 +221,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         TrustSchoolFlag = new(sch.TrustSchoolFlagId, sch.TrustSchoolFlagName),
         OfficialSixthForm = new(sch.OfficialSixthFormId, sch.OfficialSixthFormName),
         ResourcedProvision = new(sch.ResourcedProvisionId, sch.ResourcedProvisionName),
-        Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
-        BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
-        ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),
-        CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Num),
-        EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Num),
-        EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Num),
-        EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Num),
-        MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Num),
-        PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Num),
-    };
-
-    private static SimilarSchool BuildEmptySchool(string urn, SimilarSchoolPerformanceDao perf) => new SimilarSchool
-    {
-        URN = urn,
-        Name = string.Empty,
-        Address = new Address
-        {
-            Street = string.Empty,
-            Locality = string.Empty,
-            Address3 = string.Empty,
-            Town = string.Empty,
-            Postcode = string.Empty
-        },
-        TotalCapacity = string.Empty,
-        TotalPupils = string.Empty,
-        NurseryProvisionName = string.Empty,
-        LocalAuthority = new(string.Empty, string.Empty),
-        Coordinates = null,
-        UrbanRural = new(string.Empty, string.Empty),
-        Region = new(string.Empty, string.Empty),
-        AdmissionsPolicy = new(string.Empty, string.Empty),
-        PhaseOfEducation = new(string.Empty, string.Empty),
-        Gender = new(string.Empty, string.Empty),
-        TypeOfEstablishment = new(string.Empty, string.Empty),
-        EstablishmentTypeGroup = new(string.Empty, string.Empty),
-        TrustSchoolFlag = new(string.Empty, string.Empty),
-        OfficialSixthForm = new(string.Empty, string.Empty),
-        ResourcedProvision = new(string.Empty, string.Empty),
         Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
         BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
         ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),

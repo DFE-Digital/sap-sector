@@ -46,10 +46,10 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         return result.ToList();
     }
 
-    public async Task<Establishment> GetEstablishmentAsync(string urn)
+    public async Task<Establishment?> GetEstablishmentAsync(string urn)
     {
         if (string.IsNullOrWhiteSpace(urn))
-            return new Establishment();
+            return null;
 
         using var conn = await _factory.Create().OpenConnectionAsync();
 
@@ -66,13 +66,14 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         """;
 
         var result = await conn.QuerySingleOrDefaultAsync<Establishment>(sql, new { urn });
-        return result ?? new Establishment();
+
+        return result;
     }
 
-    public async Task<Establishment> GetEstablishmentByAnyNumberAsync(string number)
+    public async Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
     {
         if (string.IsNullOrWhiteSpace(number))
-            return new Establishment();
+            return null;
 
         using var conn = await _factory.Create().OpenConnectionAsync();
 
@@ -93,6 +94,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         """;
 
         var result = await conn.QuerySingleOrDefaultAsync<Establishment>(sql, new { number, ukprn });
-        return result ?? new Establishment();
+
+        return result;
     }
 }

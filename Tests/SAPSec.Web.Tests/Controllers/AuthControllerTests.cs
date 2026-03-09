@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
@@ -201,7 +202,7 @@ public class AuthControllerTests
     public async Task SelectOrganisation_Get_WithNullUser_RedirectsToProblem()
     {
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((User?)null);
+            .ThrowsAsync(new NotFoundException("User not found"));
 
         var result = await _controller.SelectOrganisation(null);
 
@@ -237,7 +238,7 @@ public class AuthControllerTests
     public async Task SelectOrganisation_Get_WithNullUser_LogsWarning()
     {
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((User?)null);
+            .ThrowsAsync(new NotFoundException("User not found"));
 
         await _controller.SelectOrganisation(null);
 

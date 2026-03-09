@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using GovUk.Frontend.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using SAPSec.Infrastructure.LuceneSearch;
+using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -14,9 +16,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using GovUk.Frontend.AspNetCore;
-using Npgsql;
-using SAPSec.Infrastructure.Postgres;
 
 namespace SAPSec.Web;
 
@@ -26,7 +25,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+
         builder.Services.AddGovUkFrontend(options =>
         {
             options.Rebrand = true;
@@ -118,19 +117,12 @@ public class Program
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
-
-
-
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
-        var enableLuceneStartupIndexBuilder =
-            builder.Configuration.GetValue("Lucene:EnableStartupIndexBuilder", true);
-        builder.Services.AddLuceneDependencies(enableLuceneStartupIndexBuilder);
+        builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
         builder.Services.AddDependencies();
-
-        //builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
 
         var app = builder.Build();
 
@@ -186,7 +178,7 @@ public class Program
         app.UseRouting();
 
         app.UseSession();
-        
+
         app.UseGovUkFrontend();
 
         app.UseAuthentication();

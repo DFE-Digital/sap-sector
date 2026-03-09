@@ -12,9 +12,18 @@ public class GetSimilarSchoolDetails(
     {
         // TODO: Validate SimilarSchoolUrn actually belongs in similar schools group for current school
         var (currentSchool, similarSchools) = await repository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
-        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
+        if (currentSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
+        }
 
-        var similarSchool = similarSchools.Single(s => s.URN == request.SimilarSchoolUrn);
+        var similarSchool = similarSchools.SingleOrDefault(s => s.URN == request.SimilarSchoolUrn);
+        if (similarSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
+        }
+
+        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
 
         return new(
             currentSchool.Name,

@@ -26,7 +26,7 @@ public class LuceneSynonymMapTests
             new Establishment(){URN = "1",UKPRN = "10",LAId = "100",EstablishmentNumber = "1000",EstablishmentName = "Saint Peter School"},
             new Establishment(){URN = "2",UKPRN = "20",LAId = "200",EstablishmentNumber = "2000",EstablishmentName = "ss helan Primary"},
             new Establishment(){URN = "3",UKPRN = "30",LAId = "300",EstablishmentNumber = "3000",EstablishmentName = "st park High"}
-        ]);
+        ], CancellationToken.None);
 
         var results = await _sut.SearchAsync(input);
 
@@ -41,7 +41,7 @@ public class LuceneSynonymMapTests
             new Establishment(){URN = "1",UKPRN = "10",LAId = "100",EstablishmentNumber = "1000",EstablishmentName = "Saint Peter School"},
             new Establishment(){URN = "2",UKPRN = "20",LAId = "200",EstablishmentNumber = "2000",EstablishmentName = "ss helan Primary"},
             new Establishment(){URN = "3",UKPRN = "20",LAId = "200",EstablishmentNumber = "2000",EstablishmentName = "st park High"}
-        ]);
+        ], CancellationToken.None);
 
         var results = await _sut.SearchAsync(input);
 
@@ -56,7 +56,7 @@ public class LuceneSynonymMapTests
         _writer.BuildIndex([
            new Establishment(){URN = "1",UKPRN = "10",LAId = "100",EstablishmentNumber = "1000",EstablishmentName = "Saint Peter Cofe School"},
             new Establishment(){URN = "2",UKPRN = "20",LAId = "200",EstablishmentNumber = "2000",EstablishmentName = "ss helan Primary Church of England"}
-       ]);
+       ], CancellationToken.None);
 
         var results = await _sut.SearchAsync(input);
 
@@ -71,7 +71,7 @@ public class LuceneSynonymMapTests
         _writer.BuildIndex([
            new Establishment(){URN = "1",UKPRN = "10",LAId = "100",EstablishmentNumber = "1000",EstablishmentName = "Saint Peter RM School"},
             new Establishment(){URN = "2",UKPRN = "20",LAId = "200",EstablishmentNumber = "2000",EstablishmentName = "ss helan Primary roman Catholic"}
-           ]);
+        ], CancellationToken.None);
 
         var results = await _sut.SearchAsync(input);
 
@@ -91,7 +91,7 @@ public class LuceneSynonymMapTests
             new Establishment(){URN = "2",UKPRN = "20",LAId = "200",EstablishmentNumber = "2000",EstablishmentName = "Primary Ave. School"},
             new Establishment(){URN = "3",UKPRN = "30",LAId = "300",EstablishmentNumber = "3000",EstablishmentName = "Primary Aven School"},
             new Establishment(){URN = "4",UKPRN = "40",LAId = "400",EstablishmentNumber = "4000",EstablishmentName = "Primary avenue School"}
-        ]);
+        ], CancellationToken.None);
 
         var results = await _sut.SearchAsync(input);
 
@@ -119,7 +119,7 @@ public class LuceneSynonymMapTests
     {
         _writer.BuildIndex([
             new Establishment(){URN = "1",UKPRN = "10",LAId = "100",EstablishmentNumber = "1000",EstablishmentName = $"Saint Peter {synonym} School"},
-        ]);
+        ], CancellationToken.None);
 
         var results = await _sut.SearchAsync(input);
 
@@ -134,7 +134,7 @@ public class LuceneSynonymMapTests
         _writer.BuildIndex([
             new Establishment(){URN = "1",UKPRN = "10",LAId = "100",EstablishmentNumber = "1000",EstablishmentName = "Saint Peter st ave School"},
             new Establishment(){URN = "2",UKPRN = "20",LAId = "200",EstablishmentNumber = "2000",EstablishmentName = "Primary st Avenue School"},
-        ]);
+        ], CancellationToken.None);
 
         var result = await _sut.SearchAsync(Input);
 

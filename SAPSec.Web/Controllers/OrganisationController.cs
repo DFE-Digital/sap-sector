@@ -33,10 +33,6 @@ public class OrganisationController(
     public async Task<IActionResult> Switch()
     {
         var user = await _userService.GetUserFromClaimsAsync(User);
-        if (user == null || !user.Organisations.Any())
-        {
-            return RedirectToAction("Error", "Home");
-        }
 
         return View(user);
     }
@@ -51,10 +47,6 @@ public class OrganisationController(
         }
 
         var user = await _userService.GetUserFromClaimsAsync(User);
-        if (user == null)
-        {
-            return RedirectToAction("Error", "Home");
-        }
 
         var organisation = user.Organisations.FirstOrDefault(o => o.Id == organisationId);
         if (organisation == null)
@@ -85,10 +77,6 @@ public class OrganisationController(
     public async Task<IActionResult> GetCurrent()
     {
         var organisation = await _userService.GetCurrentOrganisationAsync(User);
-        if (organisation == null)
-        {
-            return NotFound();
-        }
 
         return Json(organisation);
     }
@@ -102,10 +90,6 @@ public class OrganisationController(
         }
 
         var organisation = await _apiService.GetOrganisationAsync(organisationId);
-        if (organisation == null)
-        {
-            return NotFound();
-        }
 
         return Json(organisation);
     }

@@ -2,7 +2,7 @@ using SAPSec.Core;
 
 namespace SAPSec.Web.Middleware;
 
-public sealed class NotFoundExceptionMiddleware(RequestDelegate next)
+public sealed class NotFoundExceptionMiddleware(RequestDelegate next, ILogger<NotFoundExceptionMiddleware> logger)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -10,8 +10,10 @@ public sealed class NotFoundExceptionMiddleware(RequestDelegate next)
         {
             await next(context);
         }
-        catch (NotFoundException)
+        catch (NotFoundException ex)
         {
+            logger.LogError(ex, ex.Message);
+
             if (context.Response.HasStarted)
             {
                 throw;

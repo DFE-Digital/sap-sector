@@ -41,7 +41,7 @@ public class SchoolControllerTests
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
 
         // Act
@@ -62,7 +62,7 @@ public class SchoolControllerTests
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
 
         // Act
@@ -80,8 +80,8 @@ public class SchoolControllerTests
         var urn = "999999";
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
-            .ReturnsAsync((SchoolDetails?)null);
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ThrowsAsync(new NotFoundException("School not found"));
 
         // Act
         var result = await _sut.Index(urn);
@@ -91,17 +91,17 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public void Index_SchoolNotFound_LogsInformation()
+    public async Task Index_SchoolNotFound_LogsInformation()
     {
         // Arrange
         var urn = "999999";
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
-            .ReturnsAsync((SchoolDetails?)null);
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ThrowsAsync(new NotFoundException("School not found"));
 
         // Act
-        _sut.Index(urn);
+        await _sut.Index(urn);
 
         // Assert
         _loggerMock.Verify(
@@ -122,8 +122,8 @@ public class SchoolControllerTests
     {
         // Arrange
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(It.IsAny<string>()))
-            .ReturnsAsync((SchoolDetails?)null);
+            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
+            .ThrowsAsync(new NotFoundException("School not found"));
 
         // Act
         var result = await _sut.Index(urn!);
@@ -133,21 +133,21 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public void Index_ServiceCalled_WithCorrectUrn()
+    public async Task Index_ServiceCalled_WithCorrectUrn()
     {
         // Arrange
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
 
         // Act
-        _sut.Index(urn);
+        await _sut.Index(urn);
 
         // Assert
-        _schoolDetailsServiceMock.Verify(x => x.TryGetByUrnAsync(urn), Times.Once);
+        _schoolDetailsServiceMock.Verify(x => x.GetByUrnAsync(urn), Times.Once);
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public class SchoolControllerTests
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
 
         // Act
