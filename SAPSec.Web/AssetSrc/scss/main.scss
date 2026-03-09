@@ -604,9 +604,12 @@
   .app-body-container-with-side-navigation {
     width: 80%;
   }
+}
 
-  .app-similar-schools-comparison-layout .app-body-container-with-side-navigation {
-    width: 100%;
+@media (max-width: 40.0625em) {
+  .app-similar-schools-comparison-layout .app-side-navigation-container {
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
 
