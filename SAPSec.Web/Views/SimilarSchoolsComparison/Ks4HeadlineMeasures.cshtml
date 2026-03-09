@@ -46,6 +46,189 @@
     <script src="~/js/chart.umd.js"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js"></script>
     <script src="~/js/chart-factory.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const gradeSelect = document.getElementById("engMathsGrade");
+            if (!gradeSelect) {
+                return;
+            }
+
+            const engMathsDataByGrade = @Html.Raw(JsonSerializer.Serialize(new Dictionary<string, object>
+            {
+                ["4"] = new
+                {
+                    bar = new decimal?[]
+                    {
+                        Model.ThisSchoolEngMaths49ThreeYearAverage,
+                        Model.SelectedSchoolEngMaths49ThreeYearAverage,
+                        Model.EnglandEngMaths49ThreeYearAverage
+                    },
+                    line = new
+                    {
+                        thisSchool = new decimal?[]
+                        {
+                            Model.ThisSchoolEngMaths49YearByYear?.Previous2,
+                            Model.ThisSchoolEngMaths49YearByYear?.Previous,
+                            Model.ThisSchoolEngMaths49YearByYear?.Current
+                        },
+                        similarSchool = new decimal?[]
+                        {
+                            Model.SelectedSchoolEngMaths49YearByYear?.Previous2,
+                            Model.SelectedSchoolEngMaths49YearByYear?.Previous,
+                            Model.SelectedSchoolEngMaths49YearByYear?.Current
+                        },
+                        england = new decimal?[]
+                        {
+                            Model.EnglandEngMaths49YearByYear?.Previous2,
+                            Model.EnglandEngMaths49YearByYear?.Previous,
+                            Model.EnglandEngMaths49YearByYear?.Current
+                        }
+                    },
+                    table = new
+                    {
+                        thisSchool = new[]
+                        {
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous2),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Current),
+                            Model.ThisSchoolEngMaths49Display
+                        },
+                        similarSchool = new[]
+                        {
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous2),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Current),
+                            Model.SelectedSchoolEngMaths49Display
+                        },
+                        england = new[]
+                        {
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous2),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Current),
+                            Model.EnglandEngMaths49Display
+                        }
+                    }
+                },
+                ["5"] = new
+                {
+                    bar = new decimal?[]
+                    {
+                        Model.ThisSchoolEngMaths59ThreeYearAverage,
+                        Model.SelectedSchoolEngMaths59ThreeYearAverage,
+                        Model.EnglandEngMaths59ThreeYearAverage
+                    },
+                    line = new
+                    {
+                        thisSchool = new decimal?[]
+                        {
+                            Model.ThisSchoolEngMaths59YearByYear?.Previous2,
+                            Model.ThisSchoolEngMaths59YearByYear?.Previous,
+                            Model.ThisSchoolEngMaths59YearByYear?.Current
+                        },
+                        similarSchool = new decimal?[]
+                        {
+                            Model.SelectedSchoolEngMaths59YearByYear?.Previous2,
+                            Model.SelectedSchoolEngMaths59YearByYear?.Previous,
+                            Model.SelectedSchoolEngMaths59YearByYear?.Current
+                        },
+                        england = new decimal?[]
+                        {
+                            Model.EnglandEngMaths59YearByYear?.Previous2,
+                            Model.EnglandEngMaths59YearByYear?.Previous,
+                            Model.EnglandEngMaths59YearByYear?.Current
+                        }
+                    },
+                    table = new
+                    {
+                        thisSchool = new[]
+                        {
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths59YearByYear?.Previous2),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths59YearByYear?.Previous),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths59YearByYear?.Current),
+                            Model.ThisSchoolEngMaths59Display
+                        },
+                        similarSchool = new[]
+                        {
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths59YearByYear?.Previous2),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths59YearByYear?.Previous),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths59YearByYear?.Current),
+                            Model.SelectedSchoolEngMaths59Display
+                        },
+                        england = new[]
+                        {
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths59YearByYear?.Previous2),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths59YearByYear?.Previous),
+                            SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths59YearByYear?.Current),
+                            Model.EnglandEngMaths59Display
+                        }
+                    }
+                }
+            }));
+
+            const barChartCanvas = document.getElementById("eng-maths-comparison-chart");
+            const lineChartCanvas = document.getElementById("eng-maths-comparison-yearbyyear-chart");
+
+            const tableCellMap = {
+                thisSchool: [
+                    document.querySelector("[data-eng-maths-cell='this-prev2']"),
+                    document.querySelector("[data-eng-maths-cell='this-prev']"),
+                    document.querySelector("[data-eng-maths-cell='this-current']"),
+                    document.querySelector("[data-eng-maths-cell='this-avg']")
+                ],
+                similarSchool: [
+                    document.querySelector("[data-eng-maths-cell='similar-prev2']"),
+                    document.querySelector("[data-eng-maths-cell='similar-prev']"),
+                    document.querySelector("[data-eng-maths-cell='similar-current']"),
+                    document.querySelector("[data-eng-maths-cell='similar-avg']")
+                ],
+                england: [
+                    document.querySelector("[data-eng-maths-cell='england-prev2']"),
+                    document.querySelector("[data-eng-maths-cell='england-prev']"),
+                    document.querySelector("[data-eng-maths-cell='england-current']"),
+                    document.querySelector("[data-eng-maths-cell='england-avg']")
+                ]
+            };
+
+            function updateTableRow(cells, values) {
+                cells.forEach(function (cell, index) {
+                    if (cell) {
+                        cell.textContent = values[index];
+                    }
+                });
+            }
+
+            function updateEngMathsViews(grade) {
+                const gradeData = engMathsDataByGrade[grade] || engMathsDataByGrade["4"];
+                if (!gradeData) {
+                    return;
+                }
+
+                const barChart = window.Chart && barChartCanvas ? window.Chart.getChart(barChartCanvas) : null;
+                if (barChart && barChart.data?.datasets?.[0]) {
+                    barChart.data.datasets[0].data = gradeData.bar;
+                    barChart.update();
+                }
+
+                const lineChart = window.Chart && lineChartCanvas ? window.Chart.getChart(lineChartCanvas) : null;
+                if (lineChart && lineChart.data?.datasets?.length >= 3) {
+                    lineChart.data.datasets[0].data = gradeData.line.thisSchool;
+                    lineChart.data.datasets[1].data = gradeData.line.similarSchool;
+                    lineChart.data.datasets[2].data = gradeData.line.england;
+                    lineChart.update();
+                }
+
+                updateTableRow(tableCellMap.thisSchool, gradeData.table.thisSchool);
+                updateTableRow(tableCellMap.similarSchool, gradeData.table.similarSchool);
+                updateTableRow(tableCellMap.england, gradeData.table.england);
+            }
+
+            gradeSelect.addEventListener("change", function () {
+                updateEngMathsViews(gradeSelect.value);
+            });
+
+            updateEngMathsViews(gradeSelect.value);
+        });
+    </script>
 }
 
 <section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
@@ -80,13 +263,6 @@
             </p>
         </div>
     </details>
-
-    <div class="govuk-form-group govuk-!-margin-bottom-6">
-        <label class="govuk-label govuk-!-font-weight-bold" for="pupilCharacteristic">Pupil characteristic</label>
-        <select class="govuk-select" id="pupilCharacteristic" name="pupilCharacteristic">
-            <option value="all-pupils" selected>All pupils</option>
-        </select>
-    </div>
 
     <div class="govuk-tabs govuk-!-margin-bottom-6 app-ks4-tabs" data-module="govuk-tabs">
         <h3 class="govuk-tabs__title">Attainment 8 views</h3>
@@ -217,17 +393,6 @@
                         data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
                 </canvas>
             </div>
-
-            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">Number of pupils entered</span>
-                </summary>
-                <div class="govuk-details__text">
-                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
-                </div>
-            </details>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="table-view">
@@ -289,16 +454,9 @@
             <select class="govuk-select" id="engMathsGrade" name="engMathsGrade">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
-                <option value="7">Grade 7 and above</option>
             </select>
         </div>
-
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="engMathsPupilCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="engMathsPupilCharacteristic" name="engMathsPupilCharacteristic">
-                <option value="all-pupils" selected>All pupils</option>
-            </select>
-        </div>
+    
     </div>
 
     <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6" data-module="govuk-tabs">
@@ -348,16 +506,6 @@
                 </canvas>
             </div>
 
-            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">Number of pupils entered</span>
-                </summary>
-                <div class="govuk-details__text">
-                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
-                </div>
-            </details>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-year-by-year">
@@ -454,38 +602,28 @@
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.Name</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolEngMaths49Display</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolEngMaths49YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-avg">@Model.ThisSchoolEngMaths49Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolEngMaths49Display</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolEngMaths49YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-avg">@Model.SelectedSchoolEngMaths49Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Schools in England average</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandEngMaths49Display</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandEngMaths49YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-avg">@Model.EnglandEngMaths49Display</td>
                     </tr>
                 </tbody>
             </table>
 
-            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 app-ks4-details app-ks4-details--white" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">Number of pupils entered</span>
-                </summary>
-                <div class="govuk-details__text">
-                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.SimilarSchoolName:</strong> @Model.SelectedSchoolTotalPupilsDisplay</p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-1"><strong>@Model.Name:</strong> @Model.ThisSchoolTotalPupilsDisplay</p>
-                    <p class="govuk-body-s govuk-!-margin-bottom-0"><strong>England:</strong> @Model.EnglandTotalPupilsDisplay</p>
-                </div>
-            </details>
         </div>
     </div>
 </section>
