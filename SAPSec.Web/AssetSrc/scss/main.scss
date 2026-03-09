@@ -1197,4 +1197,21 @@
   .app-ks4-bar-value {
     font-size: 14px;
   }
+
+  .app-ks4-tabs .govuk-tabs__panel {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .app-ks4-tabs .govuk-table {
+    min-width: 40rem;
+  }
+}
+
+.govuk-frontend-supported {
+  @include govuk-media-query($from: tablet) {
+    .govuk-tabs__panel--hidden {
+      display: none;
+    }
+  }
 }
