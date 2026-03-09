@@ -1209,7 +1209,7 @@
 }
 
 .govuk-frontend-supported {
-  .govuk-tabs__panel--hidden {
-    display: none;
+  .app-ks4-tabs .govuk-tabs__panel--hidden {
+    display: none !important;
   }
 }
