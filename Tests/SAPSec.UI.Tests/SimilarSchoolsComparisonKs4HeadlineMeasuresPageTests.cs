@@ -26,11 +26,18 @@ public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplication
         await Page.GotoAsync(Path);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var chartRows = Page.Locator(".app-ks4-bar-chart .app-ks4-bar-row");
-        (await chartRows.CountAsync()).Should().Be(3);
+        var barChart = Page.Locator("#ks4-attainment8-comparison-chart");
+        var lineChart = Page.Locator("#ks4-attainment8-comparison-yearbyyear-chart");
+        (await barChart.CountAsync()).Should().Be(1);
+        (await lineChart.CountAsync()).Should().Be(1);
 
-        (await Page.Locator(".app-ks4-bar--selected-school").CountAsync()).Should().Be(1);
-        (await Page.Locator(".app-ks4-bar--this-school").CountAsync()).Should().Be(1);
-        (await Page.Locator(".app-ks4-bar--england-overall").CountAsync()).Should().Be(1);
+        var barChartData = await barChart.GetAttributeAsync("data-chart");
+        barChartData.Should().NotBeNullOrWhiteSpace();
+        barChartData.Should().Contain("Schools in England average");
+
+        var barChartColours = await barChart.GetAttributeAsync("data-colors");
+        barChartColours.Should().NotBeNullOrWhiteSpace();
+        barChartColours.Should().Contain("#d53780");
+        barChartColours.Should().Contain("#003078");
     }
 }

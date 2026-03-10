@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
@@ -53,14 +54,18 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
 
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
+                services.RemoveAll<IKs4PerformanceRepository>();
 
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsRow>, JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
                 services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
                 services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
+                services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
+                services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
 
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
                 services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
+                services.AddScoped<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
 
             });
     }
