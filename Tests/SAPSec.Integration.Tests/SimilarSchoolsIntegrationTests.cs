@@ -63,8 +63,8 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("selected school");
-        content.Should().Contain("this school");
-        content.Should().Contain("England");
+        content.Should().Contain("KS4 headline performance measures");
+        content.Should().Contain("Progress 8");
+        content.Should().Contain("Attainment 8");
     }
 }
