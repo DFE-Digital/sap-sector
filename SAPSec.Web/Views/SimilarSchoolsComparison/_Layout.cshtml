@@ -14,6 +14,7 @@
         ["similarSchoolUrn"] = comparisonModel.SimilarSchoolUrn
     };
 
+    var isKs4HeadlineMeasures = string.Equals(currentAction, "Ks4HeadlineMeasures", StringComparison.OrdinalIgnoreCase);
     string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
 }
 
@@ -33,9 +34,9 @@
     </nav>
 }
 
-<div class="govuk-width-container app-similar-schools-comparison-layout">
+<div>
 
-    <div class="govuk-grid-row govuk-!-margin-top-1">
+    <div class="govuk-grid-row govuk-!-margin-top-1 @(isKs4HeadlineMeasures ? "app-ks4-headline-mobile-layout" : "")">
 
         @* LEFT: back link *@
         <div class="app-side-navigation-container">
