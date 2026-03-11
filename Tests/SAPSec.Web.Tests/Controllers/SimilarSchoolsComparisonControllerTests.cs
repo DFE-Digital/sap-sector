@@ -169,13 +169,7 @@ public class SimilarSchoolsComparisonControllerTests
         SetupSecondaryValues(urn, similarUrn);
         SetupGroupSecondaryValues(urn, new[] { similarUrn, "300001", "300002", "300003", "300004" });
 
-        _sut.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext()
-        };
-        _sut.HttpContext.Request.QueryString = new QueryString("?similarityCalculation=group");
-
-        var result = await _sut.Similarity(urn, similarUrn);
+        var result = await _sut.Similarity(urn, similarUrn, "group");
 
         var view = result.Should().BeOfType<ViewResult>().Subject;
         var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
