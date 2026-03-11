@@ -594,12 +594,15 @@
 .app-body-container-with-side-navigation {
   margin-top: 15px !important;
 }
+
 @media (max-width: 40.0625em) {
-  .app-side-navigation-container {
+  .app-side-navigation-container,
+  .app-body-container-with-side-navigation {
     padding-left: 0;
     padding-right: 0;
   }
 }
+
 @media (min-width: 40.0625em) {
   .app-side-navigation-container {
     width: 20%;
@@ -607,19 +610,6 @@
 
   .app-body-container-with-side-navigation {
     width: 80%;
-  }
-}
-
-@media (max-width: 40.0625em) {
-  .app-similar-schools-comparison-layout .govuk-grid-row {
-    margin-left: 0;
-    margin-right: 0;
-  }
-
-  .app-similar-schools-comparison-layout .app-side-navigation-container,
-  .app-similar-schools-comparison-layout .app-body-container-with-side-navigation {
-    padding-left: 0;
-    padding-right: 0;
   }
 }
 
