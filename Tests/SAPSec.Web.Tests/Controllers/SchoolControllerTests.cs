@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
@@ -185,7 +186,7 @@ public class SchoolControllerTests
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(null, null, null, null, null));
+            .ReturnsAsync(new Ks4HeadlineMeasuresData(null, null, null));
 
         // Act
         var result = await _sut.Ks4HeadlineMeasures(urn);
@@ -196,7 +197,7 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public async Task Ks4HeadlineMeasures_SchoolNotFound_RedirectsToError()
+    public async Task Ks4HeadlineMeasures_SchoolNotFound_ThrowsNotFoundException()
     {
         // Arrange
         var urn = "999999";
@@ -206,11 +207,11 @@ public class SchoolControllerTests
             .ReturnsAsync((SchoolDetails?)null);
 
         // Act
-        var result = await _sut.Ks4HeadlineMeasures(urn);
+        var act = async () => await _sut.Ks4HeadlineMeasures(urn);
 
         // Assert
-        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectResult.ActionName.Should().Be("Error");
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("*999999*");
     }
 
     #endregion

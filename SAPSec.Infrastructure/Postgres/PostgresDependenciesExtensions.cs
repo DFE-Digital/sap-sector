@@ -2,7 +2,6 @@ using Microsoft.Extensions.DependencyInjection;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Infrastructure.TypeHandlers;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -10,7 +9,6 @@ public static class PostgresDependenciesExtensions
 {
     public static IServiceCollection AddPostgresqlDependencies(this IServiceCollection services)
     {
-        Dapper.SqlMapper.AddTypeHandler(typeof(double?), new NullableDoubleHandler());
 
         services.AddSingleton<NpgsqlDataSourceFactory>();
 
@@ -22,3 +20,4 @@ public static class PostgresDependenciesExtensions
         return services;
     }
 }
+

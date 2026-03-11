@@ -93,11 +93,6 @@ public class SimilarSchoolsComparisonController : Controller
         model.EnglandEngMaths59YearByYear =
             thisSchoolKs4?.EngMaths59YearByYear.England
             ?? selectedSchoolKs4?.EngMaths59YearByYear.England;
-        model.ThisSchoolTotalPupils = thisSchoolKs4?.SchoolTotalPupils;
-        model.SelectedSchoolTotalPupils = selectedSchoolKs4?.SchoolTotalPupils;
-        model.EnglandTotalPupils =
-            thisSchoolKs4?.EnglandTotalPupils
-            ?? selectedSchoolKs4?.EnglandTotalPupils;
 
         SetComparisonSchoolViewData(model);
         return View(model);
@@ -113,97 +108,86 @@ public class SimilarSchoolsComparisonController : Controller
         }
 
         var normalizedGrade = grade == "5" ? "5" : "4";
+        var thisSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
+        var selectedSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(similarSchoolUrn));
 
-        try
+        var isGrade5 = normalizedGrade == "5";
+
+        var thisSchoolThreeYear = isGrade5
+            ? thisSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue
+            : thisSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
+        var selectedSchoolThreeYear = isGrade5
+            ? selectedSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue
+            : selectedSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
+        var englandThreeYear = isGrade5
+            ? (thisSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue ?? selectedSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue)
+            : (thisSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue ?? selectedSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue);
+
+        var thisSchoolSeries = isGrade5
+            ? thisSchoolKs4?.EngMaths59YearByYear.School
+            : thisSchoolKs4?.EngMaths49YearByYear.School;
+        var selectedSchoolSeries = isGrade5
+            ? selectedSchoolKs4?.EngMaths59YearByYear.School
+            : selectedSchoolKs4?.EngMaths49YearByYear.School;
+        var englandSeries = isGrade5
+            ? (thisSchoolKs4?.EngMaths59YearByYear.England ?? selectedSchoolKs4?.EngMaths59YearByYear.England)
+            : (thisSchoolKs4?.EngMaths49YearByYear.England ?? selectedSchoolKs4?.EngMaths49YearByYear.England);
+
+        return Json(new
         {
-            var thisSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
-            var selectedSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(similarSchoolUrn));
-
-            var isGrade5 = normalizedGrade == "5";
-
-            var thisSchoolThreeYear = isGrade5
-                ? thisSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue
-                : thisSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
-            var selectedSchoolThreeYear = isGrade5
-                ? selectedSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue
-                : selectedSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
-            var englandThreeYear = isGrade5
-                ? (thisSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue ?? selectedSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue)
-                : (thisSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue ?? selectedSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue);
-
-            var thisSchoolSeries = isGrade5
-                ? thisSchoolKs4?.EngMaths59YearByYear.School
-                : thisSchoolKs4?.EngMaths49YearByYear.School;
-            var selectedSchoolSeries = isGrade5
-                ? selectedSchoolKs4?.EngMaths59YearByYear.School
-                : selectedSchoolKs4?.EngMaths49YearByYear.School;
-            var englandSeries = isGrade5
-                ? (thisSchoolKs4?.EngMaths59YearByYear.England ?? selectedSchoolKs4?.EngMaths59YearByYear.England)
-                : (thisSchoolKs4?.EngMaths49YearByYear.England ?? selectedSchoolKs4?.EngMaths49YearByYear.England);
-
-            return Json(new
+            grade = normalizedGrade,
+            bar = new decimal?[]
             {
-                grade = normalizedGrade,
-                bar = new decimal?[]
+                thisSchoolThreeYear,
+                selectedSchoolThreeYear,
+                englandThreeYear
+            },
+            line = new
+            {
+                thisSchool = new decimal?[]
                 {
-                    thisSchoolThreeYear,
-                    selectedSchoolThreeYear,
-                    englandThreeYear
+                    thisSchoolSeries?.Previous2,
+                    thisSchoolSeries?.Previous,
+                    thisSchoolSeries?.Current
                 },
-                line = new
+                similarSchool = new decimal?[]
                 {
-                    thisSchool = new decimal?[]
-                    {
-                        thisSchoolSeries?.Previous2,
-                        thisSchoolSeries?.Previous,
-                        thisSchoolSeries?.Current
-                    },
-                    similarSchool = new decimal?[]
-                    {
-                        selectedSchoolSeries?.Previous2,
-                        selectedSchoolSeries?.Previous,
-                        selectedSchoolSeries?.Current
-                    },
-                    england = new decimal?[]
-                    {
-                        englandSeries?.Previous2,
-                        englandSeries?.Previous,
-                        englandSeries?.Current
-                    }
+                    selectedSchoolSeries?.Previous2,
+                    selectedSchoolSeries?.Previous,
+                    selectedSchoolSeries?.Current
                 },
-                table = new
+                england = new decimal?[]
                 {
-                    thisSchool = new[]
-                    {
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Previous2),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Previous),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Current),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolThreeYear)
-                    },
-                    similarSchool = new[]
-                    {
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Previous2),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Previous),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Current),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolThreeYear)
-                    },
-                    england = new[]
-                    {
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Previous2),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Previous),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Current),
-                        SimilarSchoolsComparisonViewModel.DisplayPercent(englandThreeYear)
-                    }
+                    englandSeries?.Previous2,
+                    englandSeries?.Previous,
+                    englandSeries?.Current
                 }
-            });
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex,
-                "Error loading KS4 headline measures data for urn='{Urn}', similarSchoolUrn='{SimilarUrn}', grade='{Grade}'",
-                urn, similarSchoolUrn, normalizedGrade);
-            return StatusCode(StatusCodes.Status500InternalServerError);
-        }
+            },
+            table = new
+            {
+                thisSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolThreeYear)
+                },
+                similarSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolThreeYear)
+                },
+                england = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandThreeYear)
+                }
+            }
+        });
     }
 
     [HttpGet]

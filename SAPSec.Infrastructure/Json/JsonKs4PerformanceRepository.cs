@@ -1,6 +1,5 @@
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model;
 using SAPSec.Core.Model.KS4.Performance;
 
 namespace SAPSec.Infrastructure.Json;
@@ -31,18 +30,6 @@ public class JsonKs4PerformanceRepository(
         return new(
             establishmentPerformance,
             localAuthorityPerformance,
-            englandPerformance,
-            ParseNullableInt(establishment.TotalPupils),
-            null);
-    }
-
-    private static int? ParseNullableInt(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return null;
-        }
-
-        return int.TryParse(value, out var parsed) ? parsed : null;
+            englandPerformance);
     }
 }

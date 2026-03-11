@@ -1,23 +1,141 @@
 (function () {
-    const defaultColors = [
-        '#DE6B24',
-        '#27A0CC',
-        '#003C56'
-    ];
+    const datasetColorKeys = ['school', 'comparator', 'england'];
+    const CHART_CONFIG = {
+        defaults: {
+            axisStep: 20,
+            axisSuffix: '%',
+            maxDevicePixelRatio: 2,
+            resizeDebounceMs: 100,
+            labelWrapChars: 15
+        },
+        legend: {
+            position: 'bottom',
+            pointStyle: 'circle',
+            box: {
+                width: 10,
+                height: 10
+            },
+            padding: 16
+        },
+        line: {
+            width: {
+                major: 2,
+                minor: 1
+            },
+            series: {
+                tension: 0.2,
+                pointRadius: 4,
+                pointHoverRadius: 5
+            },
+            datalabels: {
+                anchor: 'end',
+                align: 'right',
+                offset: 10,
+                endOnly: true
+            },
+            layout: {
+                rightPaddingWithDatalabels: 100
+            }
+        },
+        bar: {
+            width: {
+                major: 2,
+                minor: 1
+            },
+            labels: {
+                yTickPadding: 10
+            },
+            dataset: {
+                borderWidth: 1,
+                barThickness: 'flex',
+                maxBarThickness: 70,
+                minBarLength: 3,
+                categoryPercentage: 0.8,
+                barPercentage: 0.9
+            },
+            datalabels: {
+                anchor: 'end',
+                alignThreshold: 10,
+                smallValueAlign: 'end',
+                defaultAlign: 'start',
+                offset: 10,
+                fontWeight: 'bold'
+            }
+        },
+        fallbacks: {
+            legendBoxColor: '#6f777b'
+        }
+    };
 
     const charts = {};
 
     function gdsVars(canvas) {
         const s = getComputedStyle(canvas);
 
+        const colorDefaults = {
+            school: s.getPropertyValue('--chart-color-school').trim(),
+            comparator: s.getPropertyValue('--chart-color-comparator').trim(),
+            england: s.getPropertyValue('--chart-color-england').trim(),
+            fallback: s.getPropertyValue('--chart-color-fallback').trim()
+        };
+
         return {
             fontFamily: s.getPropertyValue('--gds-font-family').trim(),
             fontSize: parseInt(s.getPropertyValue('--gds-font-size')),
             text: s.getPropertyValue('--gds-text'),
             grey: s.getPropertyValue('--gds-grey'),
+            gridMinor: s.getPropertyValue('--gds-grid-minor').trim(),
+            gridMajor: s.getPropertyValue('--gds-grid-major').trim(),
+            gridX: s.getPropertyValue('--gds-grid-x').trim(),
+            onBarLabel: s.getPropertyValue('--gds-on-bar-label').trim(),
             labelBg: s.getPropertyValue('--gds-label-bg'),
             labelBorder: s.getPropertyValue('--gds-label-border'),
-            labelPadding: parseInt(s.getPropertyValue('--gds-label-padding'))
+            labelPadding: parseInt(s.getPropertyValue('--gds-label-padding')),
+            colorDefaults
+        };
+    }
+
+    function resolveColorConfig(rawColors, gdsStyles) {
+        const defaults = gdsStyles.colorDefaults;
+
+        if (Array.isArray(rawColors)) {
+            const byKey = {
+                school: rawColors[0] || defaults.school,
+                comparator: rawColors[1] || defaults.comparator,
+                england: rawColors[2] || defaults.england,
+                fallback: defaults.fallback
+            };
+
+            return {
+                byKey,
+                palette: rawColors.length ? rawColors : [byKey.school, byKey.comparator, byKey.england]
+            };
+        }
+
+        if (rawColors && typeof rawColors === 'object') {
+            const byKey = {
+                school: rawColors.school || defaults.school,
+                comparator: rawColors.comparator || defaults.comparator,
+                england: rawColors.england || defaults.england,
+                fallback: defaults.fallback
+            };
+
+            return {
+                byKey,
+                palette: Object.values(byKey).filter((_, i) => i < 3)
+            };
+        }
+
+        const byKey = {
+            school: defaults.school,
+            comparator: defaults.comparator,
+            england: defaults.england,
+            fallback: defaults.fallback
+        };
+
+        return {
+            byKey,
+            palette: [byKey.school, byKey.comparator, byKey.england]
         };
     }
 
@@ -25,7 +143,7 @@
         const common = {
             responsive: true,
             maintainAspectRatio: false,
-            devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2)
+            devicePixelRatio: Math.min(window.devicePixelRatio || 1, CHART_CONFIG.defaults.maxDevicePixelRatio)
         };
 
         const fonts = {
@@ -36,13 +154,13 @@
         const stepSize = axisStep;
         const legendOptions = {
             display: showLegend,
-            position: 'bottom',
+            position: CHART_CONFIG.legend.position,
             labels: {
                 usePointStyle: true,
-                pointStyle: 'circle',
-                boxWidth: 10,
-                boxHeight: 10,
-                padding: 16
+                pointStyle: CHART_CONFIG.legend.pointStyle,
+                boxWidth: CHART_CONFIG.legend.box.width,
+                boxHeight: CHART_CONFIG.legend.box.height,
+                padding: CHART_CONFIG.legend.padding
             }
         };
 
@@ -50,7 +168,7 @@
             return {
                 ...common,
                 layout: {
-                    padding: { right: showDataLabels ? 100 : 0 }
+                    padding: { right: showDataLabels ? CHART_CONFIG.line.layout.rightPaddingWithDatalabels : 0 }
                 },
                 scales: {
                     y: {
@@ -60,10 +178,10 @@
                             display: true,
                             drawBorder: false,
                             color: (context) => {
-                                return context.tick.value === 0 ? '#000' : '#ccc';
+                                return context.tick.value === 0 ? gdsStyles.gridMajor : gdsStyles.gridMinor;
                             },
                             lineWidth: (context) => {
-                                return context.tick.value === 0 ? 2 : 1;
+                                return context.tick.value === 0 ? CHART_CONFIG.line.width.major : CHART_CONFIG.line.width.minor;
                             }
                         },
                         border: { display: false },
@@ -84,7 +202,7 @@
                         grid: {
                             display: showXGrid,
                             drawBorder: false,
-                            color: '#d8d8d8'
+                            color: gdsStyles.gridX
                         }
                     }
                 },
@@ -97,13 +215,15 @@
                     },
                     datalabels: {
                         anchor: 'end',
-                        align: 'right',
-                        offset: 10,
+                        align: CHART_CONFIG.line.datalabels.align,
+                        offset: CHART_CONFIG.line.datalabels.offset,
                         color: gdsStyles.text,
                         font: fonts,
                         display: showDataLabels
                             ? function (ctx) {
-                                return ctx.dataIndex === ctx.dataset.data.length - 1;
+                                return CHART_CONFIG.line.datalabels.endOnly
+                                    ? ctx.dataIndex === ctx.dataset.data.length - 1
+                                    : true;
                             }
                             : false,
                         formatter: function (value, context) {
@@ -128,10 +248,10 @@
                             display: true,
                             drawBorder: false,
                             color: (context) => {
-                                return context.tick.value === 0 ? '#000' : '#ccc';
+                                return context.tick.value === 0 ? gdsStyles.gridMajor : gdsStyles.gridMinor;
                             },
                             lineWidth: (context) => {
-                                return context.tick.value === 0 ? 2 : 1;
+                                return context.tick.value === 0 ? CHART_CONFIG.bar.width.major : CHART_CONFIG.bar.width.minor;
                             }
                         },
                         border: { display: false },
@@ -152,9 +272,9 @@
                             font: fonts,
                             callback: function (value) {
                                 const label = this.getLabelForValue(value);
-                                return wrapLabel(label.toString(), 15);
+                                return wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars);
                             },
-                            padding: 10
+                            padding: CHART_CONFIG.bar.labels.yTickPadding
                         }
                     }
                 },
@@ -166,13 +286,15 @@
                         font: fonts
                     },
                     datalabels: {
-                        anchor: 'end',
-                        align: ctx => ctx.dataset.data[ctx.dataIndex] < 10 ? 'end' : 'start',
-                        offset: 10,
-                        color: () => '#ffffff',
+                        anchor: CHART_CONFIG.bar.datalabels.anchor,
+                        align: ctx => ctx.dataset.data[ctx.dataIndex] < CHART_CONFIG.bar.datalabels.alignThreshold
+                            ? CHART_CONFIG.bar.datalabels.smallValueAlign
+                            : CHART_CONFIG.bar.datalabels.defaultAlign,
+                        offset: CHART_CONFIG.bar.datalabels.offset,
+                        color: () => gdsStyles.onBarLabel,
                         font: {
                             ...fonts,
-                            weight: 'bold'
+                            weight: CHART_CONFIG.bar.datalabels.fontWeight
                         },
                         display: showDataLabels,
                         formatter: function (value) {
@@ -191,19 +313,20 @@
         return common;
     }
 
-    function buildDatasets(type, chartData, colors, barOptions) {
+    function buildDatasets(type, chartData, colorConfig, barOptions) {
         if (type === 'line') {
             return chartData.datasets.map((ds, i) => {
-                const color = ds.borderColor || colors[i] || '#999';
+                const keyedColor = colorConfig.byKey[datasetColorKeys[i]];
+                const color = ds.borderColor || keyedColor || colorConfig.palette[i] || colorConfig.byKey.fallback;
                 return {
                     label: ds.label,
                     data: ds.data,
                     borderColor: color,
                     backgroundColor: ds.backgroundColor || color,
                     fill: ds.fill ?? false,
-                    tension: ds.tension ?? 0.2,
-                    pointRadius: ds.pointRadius ?? 4,
-                    pointHoverRadius: ds.pointHoverRadius ?? 5,
+                    tension: ds.tension ?? CHART_CONFIG.line.series.tension,
+                    pointRadius: ds.pointRadius ?? CHART_CONFIG.line.series.pointRadius,
+                    pointHoverRadius: ds.pointHoverRadius ?? CHART_CONFIG.line.series.pointHoverRadius,
                     pointBackgroundColor: ds.pointBackgroundColor || color,
                     ...ds
                 };
@@ -212,12 +335,7 @@
 
         if (type === 'bar') {
             const dataOptions = {
-                borderWidth: 1,
-                barThickness: 'flex',
-                maxBarThickness: 70,
-                minBarLength: 3,
-                categoryPercentage: 0.8,
-                barPercentage: 0.9
+                ...CHART_CONFIG.bar.dataset
             };
             if (barOptions) {
                 if (barOptions.barThickness !== null) {
@@ -235,7 +353,7 @@
                 return chartData.datasets.map((ds, i) => ({
                     label: ds.label,
                     data: ds.data,
-                    backgroundColor: ds.backgroundColor || colors[i] || defaultColors[i],
+                    backgroundColor: ds.backgroundColor || colorConfig.byKey[datasetColorKeys[i]] || colorConfig.palette[i] || colorConfig.byKey.fallback,
                     ...dataOptions,
                     ...ds
                 }));
@@ -243,7 +361,7 @@
 
             return [{
                 data: chartData.data,
-                backgroundColor: colors.length ? colors : defaultColors,
+                backgroundColor: colorConfig.palette,
                 ...dataOptions
             }];
         }
@@ -268,17 +386,18 @@
             const showXGrid = canvas.dataset.showXGrid === "true";
             const axisStep = canvas.dataset.axisStep
                 ? parseInt(canvas.dataset.axisStep, 10)
-                : 20;
+                : CHART_CONFIG.defaults.axisStep;
             const axisMax = canvas.dataset.axisMax
                 ? parseFloat(canvas.dataset.axisMax)
                 : null;
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
-                : '%';
+                : CHART_CONFIG.defaults.axisSuffix;
 
-            const colors = canvas.dataset.colors
+            const rawColors = canvas.dataset.colors
                 ? JSON.parse(canvas.dataset.colors)
-                : [];
+                : null;
+            const colorConfig = resolveColorConfig(rawColors, gdsStyles);
 
             const barThickness = canvas.dataset.barThickness
                 ? parseInt(canvas.dataset.barThickness, 10)
@@ -294,7 +413,7 @@
                 type,
                 data: {
                     labels: chartData.labels,
-                    datasets: buildDatasets(type, chartData, colors, {
+                    datasets: buildDatasets(type, chartData, colorConfig, {
                         barThickness,
                         categoryPercentage,
                         barPercentage
@@ -347,7 +466,7 @@
             const li = document.createElement('li');
             const box = document.createElement('span');
             box.classList.add('legend-box');
-            box.style.backgroundColor = ds.backgroundColor || ds.borderColor || '#000';
+            box.style.backgroundColor = ds.backgroundColor || ds.borderColor || CHART_CONFIG.fallbacks.legendBoxColor;
 
             const label = document.createElement('span');
             label.textContent = ds.label;
@@ -386,7 +505,7 @@
 
                     chart.update();
                 });
-            }, 100);
+            }, CHART_CONFIG.defaults.resizeDebounceMs);
         });
     }
 

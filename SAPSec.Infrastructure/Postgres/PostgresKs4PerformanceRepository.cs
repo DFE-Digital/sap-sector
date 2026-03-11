@@ -17,13 +17,10 @@ public class PostgresKs4PerformanceRepository(
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT "LAId", "TotalPupils"
+            SELECT "LAId"
             FROM public.v_establishment
             WHERE "URN" = @urn
             LIMIT 1;
-
-            SELECT SUM("TotalPupils")::int AS "EnglandTotalPupils"
-            FROM public.v_establishment;
 
             SELECT *
             FROM public.v_establishment_performance
@@ -38,7 +35,6 @@ public class PostgresKs4PerformanceRepository(
         using var results = await conn.QueryMultipleAsync(sql, new { urn });
 
         var establishmentInfo = await results.ReadSingleOrDefaultAsync<EstablishmentInfo>();
-        var englandTotalPupils = await results.ReadSingleOrDefaultAsync<int?>();
         var establishmentPerformance = await results.ReadSingleOrDefaultAsync<EstablishmentPerformance>();
         var englandPerformance = await results.ReadSingleOrDefaultAsync<EnglandPerformance>();
 
@@ -67,14 +63,11 @@ public class PostgresKs4PerformanceRepository(
         return new(
             establishmentPerformance,
             localAuthorityPerformance,
-            englandPerformance,
-            establishmentInfo?.TotalPupils,
-            englandTotalPupils);
+            englandPerformance);
     }
 
     private sealed class EstablishmentInfo
     {
         public string? LAId { get; set; }
-        public int? TotalPupils { get; set; }
     }
 }

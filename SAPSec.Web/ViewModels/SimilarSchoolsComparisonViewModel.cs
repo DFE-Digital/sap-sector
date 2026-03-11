@@ -56,9 +56,6 @@ public class SimilarSchoolsComparisonViewModel
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolEngMaths59YearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths59YearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandEngMaths59YearByYear { get; set; }
-    public int? ThisSchoolTotalPupils { get; set; }
-    public int? SelectedSchoolTotalPupils { get; set; }
-    public int? EnglandTotalPupils { get; set; }
 
     public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
     public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
@@ -69,9 +66,6 @@ public class SimilarSchoolsComparisonViewModel
     public string ThisSchoolEngMaths59Display => DisplayPercent(ThisSchoolEngMaths59ThreeYearAverage);
     public string SelectedSchoolEngMaths59Display => DisplayPercent(SelectedSchoolEngMaths59ThreeYearAverage);
     public string EnglandEngMaths59Display => DisplayPercent(EnglandEngMaths59ThreeYearAverage);
-    public string ThisSchoolTotalPupilsDisplay => DisplayPupilCount(ThisSchoolTotalPupils);
-    public string SelectedSchoolTotalPupilsDisplay => DisplayPupilCount(SelectedSchoolTotalPupils);
-    public string EnglandTotalPupilsDisplay => DisplayPupilCount(EnglandTotalPupils);
 
     public decimal ThisSchoolWidthPercent => WidthPercent(ThisSchoolAttainment8ThreeYearAverage);
     public decimal SelectedSchoolWidthPercent => WidthPercent(SelectedSchoolAttainment8ThreeYearAverage);
@@ -92,9 +86,6 @@ public class SimilarSchoolsComparisonViewModel
 
     private static string DisplayValue(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) : "No available data";
-
-    private static string DisplayPupilCount(int? value) =>
-        value.HasValue ? value.Value.ToString("N0", CultureInfo.InvariantCulture) : "No available data";
 
     public static string DisplayPercent(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) + "%" : "No available data";

@@ -1,4 +1,5 @@
 using System.Globalization;
+using SAPSec.Core;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 
@@ -8,12 +9,12 @@ public class GetKs4HeadlineMeasures(
     IKs4PerformanceRepository repository,
     ISchoolDetailsService schoolDetailsService)
 {
-    public async Task<GetKs4HeadlineMeasuresResponse?> Execute(GetKs4HeadlineMeasuresRequest request)
+    public async Task<GetKs4HeadlineMeasuresResponse> Execute(GetKs4HeadlineMeasuresRequest request)
     {
         var schoolDetails = await schoolDetailsService.TryGetByUrnAsync(request.Urn);
         if (schoolDetails is null)
         {
-            return null;
+            throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
 
         var data = await repository.GetByUrnAsync(request.Urn);
@@ -24,14 +25,14 @@ public class GetKs4HeadlineMeasures(
             ParseNullableDecimal(data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num));
 
         var localAuthorityAverage = Average(
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num));
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num));
 
         var englandAverage = Average(
-            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num),
-            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
-            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
+            ParseNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num),
+            ParseNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
+            ParseNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
 
         var schoolYearByYear = new Ks4HeadlineMeasureSeries(
             ParseNullableDecimal(data?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num),
@@ -39,14 +40,14 @@ public class GetKs4HeadlineMeasures(
             ParseNullableDecimal(data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num));
 
         var localAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num));
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num));
 
         var englandYearByYear = new Ks4HeadlineMeasureSeries(
-            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num),
-            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
-            ConvertNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
+            ParseNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num),
+            ParseNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
+            ParseNullableDecimal(data?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
 
         var engMaths49SchoolAverage = Average(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct),
@@ -54,14 +55,14 @@ public class GetKs4HeadlineMeasures(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct));
 
         var engMaths49LocalAuthorityAverage = Average(
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct));
 
         var engMaths49EnglandAverage = Average(
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct));
 
         var engMaths49SchoolYearByYear = new Ks4HeadlineMeasureSeries(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct),
@@ -69,14 +70,14 @@ public class GetKs4HeadlineMeasures(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct));
 
         var engMaths49LocalAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct));
 
         var engMaths49EnglandYearByYear = new Ks4HeadlineMeasureSeries(
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct));
 
         var engMaths59SchoolAverage = Average(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct),
@@ -84,14 +85,14 @@ public class GetKs4HeadlineMeasures(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct));
 
         var engMaths59LocalAuthorityAverage = Average(
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct));
 
         var engMaths59EnglandAverage = Average(
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct));
 
         var engMaths59SchoolYearByYear = new Ks4HeadlineMeasureSeries(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct),
@@ -99,14 +100,14 @@ public class GetKs4HeadlineMeasures(
             ParseNullableDecimal(data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct));
 
         var engMaths59LocalAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
-            ConvertNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct));
 
         var engMaths59EnglandYearByYear = new Ks4HeadlineMeasureSeries(
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
-            ConvertNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct));
 
         return new(
             schoolDetails,
@@ -133,9 +134,7 @@ public class GetKs4HeadlineMeasures(
             new Ks4HeadlineMeasureYearByYear(
                 engMaths59SchoolYearByYear,
                 engMaths59LocalAuthorityYearByYear,
-                engMaths59EnglandYearByYear),
-            data?.EstablishmentTotalPupils,
-            data?.EnglandTotalPupils);
+                engMaths59EnglandYearByYear));
     }
 
     private static decimal? ParseNullableDecimal(string? value)
@@ -149,9 +148,6 @@ public class GetKs4HeadlineMeasures(
             ? parsed
             : null;
     }
-
-    private static decimal? ConvertNullableDecimal(double? value) =>
-        value is null ? null : Convert.ToDecimal(value.Value);
 
     private static decimal? Average(params decimal?[] values)
     {
@@ -190,6 +186,6 @@ public record GetKs4HeadlineMeasuresResponse(
     Ks4HeadlineMeasureAverage EngMaths49ThreeYearAverage,
     Ks4HeadlineMeasureYearByYear EngMaths49YearByYear,
     Ks4HeadlineMeasureAverage EngMaths59ThreeYearAverage,
-    Ks4HeadlineMeasureYearByYear EngMaths59YearByYear,
-    int? SchoolTotalPupils,
-    int? EnglandTotalPupils);
+    Ks4HeadlineMeasureYearByYear EngMaths59YearByYear);
+
+

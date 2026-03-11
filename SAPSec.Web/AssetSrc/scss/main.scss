@@ -611,9 +611,15 @@
 }
 
 @media (max-width: 40.0625em) {
-  .app-similar-schools-comparison-layout .app-side-navigation-container {
-    padding-left: 15px;
-    padding-right: 15px;
+  .app-similar-schools-comparison-layout .govuk-grid-row {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .app-similar-schools-comparison-layout .app-side-navigation-container,
+  .app-similar-schools-comparison-layout .app-body-container-with-side-navigation {
+    padding-left: 0;
+    padding-right: 0;
   }
 }
 
@@ -873,6 +879,17 @@
   text-decoration: none;
 }
 
+$app-ks4-color-school: #d53880;
+$app-ks4-color-authority: #1d70b8;
+$app-ks4-color-england: #003078;
+$app-ks4-color-panel-bg: #f4f8fb;
+$app-ks4-color-panel-tab: #e7ecf0;
+$app-ks4-color-border: #b1b4b6;
+$app-ks4-color-white: #ffffff;
+$app-ks4-color-axis: #505a5f;
+$app-ks4-color-grid: #d8d8d8;
+$app-ks4-color-track: #f3f2f1;
+
 .app-ks4-bar-chart {
   display: flex;
   flex-direction: column;
@@ -892,7 +909,7 @@
 .app-ks4-scale__ticks {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  color: #505a5f;
+  color: $app-ks4-color-axis;
   font-size: 12px;
 }
 
@@ -921,7 +938,7 @@
 }
 
 .app-ks4-bar-track {
-  background: #f3f2f1;
+  background: $app-ks4-color-track;
   min-height: 24px;
   position: relative;
   overflow: visible;
@@ -932,7 +949,7 @@
   top: 0;
   bottom: 0;
   width: 1px;
-  background: #b1b4b6;
+  background: $app-ks4-color-border;
   z-index: 1;
 }
 
@@ -954,9 +971,9 @@
 
 .app-ks4-column-chart {
   max-width: 760px;
-  border: 1px solid #b1b4b6;
+  border: 1px solid $app-ks4-color-border;
   padding: 16px 16px 10px;
-  background: #fff;
+  background: $app-ks4-color-white;
 }
 
 .app-ks4-column-chart__plot {
@@ -968,7 +985,7 @@
   position: absolute;
   left: 0;
   right: 0;
-  border-top: 1px solid #d8d8d8;
+  border-top: 1px solid $app-ks4-color-grid;
 }
 
 .app-ks4-column-chart__grid--0 { bottom: 0; }
@@ -1019,7 +1036,7 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   font-size: 12px;
-  color: #505a5f;
+  color: $app-ks4-color-axis;
 }
 
 .app-ks4-column-chart__labels {
@@ -1045,27 +1062,27 @@
 }
 
 .app-ks4-bar--school {
-  background: #d53880;
+  background: $app-ks4-color-school;
 }
 
 .app-ks4-bar--la {
-  background: #1d70b8;
+  background: $app-ks4-color-authority;
 }
 
 .app-ks4-bar--england {
-  background: #003078;
+  background: $app-ks4-color-england;
 }
 
 .app-ks4-bar--selected-school {
-  background: #d53880;
+  background: $app-ks4-color-school;
 }
 
 .app-ks4-bar--this-school {
-  background: #1d70b8;
+  background: $app-ks4-color-authority;
 }
 
 .app-ks4-bar--england-overall {
-  background: #003078;
+  background: $app-ks4-color-england;
 }
 
 .app-ks4-bar-value {
@@ -1074,7 +1091,7 @@
 }
 
 .app-ks4-bar-number {
-  color: #ffffff;
+  color: $app-ks4-color-white;
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
@@ -1085,29 +1102,29 @@
 }
 
 .app-ks4-message-panel {
-  border-left: 5px solid #b1b4b6;
+  border-left: 5px solid $app-ks4-color-border;
   padding-left: 14px;
   max-width: 660px;
   margin-top: 4px;
 }
 
 .app-ks4-attainment {
-  background: #f4f8fb;
+  background: $app-ks4-color-panel-bg;
   padding: 16px;
   padding-bottom: 0.1rem;
 }
 
 .app-ks4-progress {
-  background: #f4f8fb;
+  background: $app-ks4-color-panel-bg;
   padding: 16px;
 }
 
 .app-ks4-details {
-  background: #f4f8fb;
+  background: $app-ks4-color-panel-bg;
 }
 
 .app-ks4-details .govuk-details__summary {
-  background: #f4f8fb;
+  background: $app-ks4-color-panel-bg;
 }
 
 .app-ks4-details .govuk-details__summary-text {
@@ -1116,7 +1133,7 @@
 
 .app-ks4-details--white,
 .app-ks4-details--white .govuk-details__summary {
-  background: #ffffff;
+  background: $app-ks4-color-white;
 }
 
 @supports not (-ms-ime-align: auto) {
@@ -1128,25 +1145,25 @@
 }
 
 .app-ks4-tabs .govuk-tabs__list {
-  background: #f4f8fb;
+  background: $app-ks4-color-panel-bg;
   border-bottom: none;
 }
 
 .app-ks4-tabs .govuk-tabs__list-item {
-  background: #e7ecf0;
+  background: $app-ks4-color-panel-tab;
 }
 
 .app-ks4-tabs .govuk-tabs__list-item--selected {
-  background: #ffffff;
-  border: 1px solid #b1b4b6;
+  background: $app-ks4-color-white;
+  border: 1px solid $app-ks4-color-border;
   border-bottom: none;
 }
 
 .app-ks4-tabs .govuk-tabs__panel {
-  background: #ffffff;
+  background: $app-ks4-color-white;
   padding: 16px;
   padding-top: 20px;
-  border: 1px solid #b1b4b6;
+  border: 1px solid $app-ks4-color-border;
 }
 
 .app-ks4-chart-container {
@@ -1183,9 +1200,17 @@
   --gds-font-size: 14;
   --gds-text: #0b0c0c;
   --gds-grey: #b1b4b6;
+  --gds-grid-major: #0b0c0c;
+  --gds-grid-minor: #b1b4b6;
+  --gds-grid-x: #d8d8d8;
+  --gds-on-bar-label: #ffffff;
   --gds-label-bg: #ffffff;
   --gds-label-border: #b1b4b6;
   --gds-label-padding: 4;
+  --chart-color-school: #de6b24;
+  --chart-color-comparator: #27a0cc;
+  --chart-color-england: #003c56;
+  --chart-color-fallback: #6f777b;
 }
 
 @media (max-width: 40.0625em) {

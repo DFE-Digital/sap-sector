@@ -12,8 +12,6 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolAttainment8YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityAttainment8YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries EnglandAttainment8YearByYear { get; set; }
-    public int? SchoolTotalPupils { get; set; }
-    public int? EnglandTotalPupils { get; set; }
 
     public string SchoolAttainment8Display => DisplayValue(SchoolAttainment8ThreeYearAverage);
     public string LocalAuthorityAttainment8Display => DisplayValue(LocalAuthorityAttainment8ThreeYearAverage);
@@ -22,9 +20,6 @@ public class Ks4HeadlineMeasuresPageViewModel
     public string SchoolLabel => SchoolDetails.Name;
     public string LocalAuthorityLabel => $"{SchoolDetails.LocalAuthorityName.Display()} local authority";
     public string EnglandLabel => "England";
-
-    public string SchoolTotalPupilsDisplay => DisplayPupilCount(SchoolTotalPupils);
-    public string EnglandTotalPupilsDisplay => DisplayPupilCount(EnglandTotalPupils);
 
     public decimal SchoolWidthPercent => WidthPercent(SchoolAttainment8ThreeYearAverage);
     public decimal LocalAuthorityWidthPercent => WidthPercent(LocalAuthorityAttainment8ThreeYearAverage);
@@ -50,7 +45,4 @@ public class Ks4HeadlineMeasuresPageViewModel
 
     private static string DisplayValue(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0") : "No available data";
-
-    private static string DisplayPupilCount(int? value) =>
-        value.HasValue ? value.Value.ToString("N0") : "No available data";
 }

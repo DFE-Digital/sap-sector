@@ -96,29 +96,21 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
     {
         var response = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
-        if (response != null)
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(response.SchoolDetails);
+
+        var model = new Ks4HeadlineMeasuresPageViewModel
         {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-            SetSchoolViewData(response.SchoolDetails);
+            SchoolDetails = response.SchoolDetails,
+            SchoolAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SchoolValue,
+            LocalAuthorityAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.LocalAuthorityValue,
+            EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue,
+            SchoolAttainment8YearByYear = response.Attainment8YearByYear.School,
+            LocalAuthorityAttainment8YearByYear = response.Attainment8YearByYear.LocalAuthority,
+            EnglandAttainment8YearByYear = response.Attainment8YearByYear.England
+        };
 
-            var model = new Ks4HeadlineMeasuresPageViewModel
-            {
-                SchoolDetails = response.SchoolDetails,
-                SchoolAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SchoolValue,
-                LocalAuthorityAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.LocalAuthorityValue,
-                EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue,
-                SchoolAttainment8YearByYear = response.Attainment8YearByYear.School,
-                LocalAuthorityAttainment8YearByYear = response.Attainment8YearByYear.LocalAuthority,
-                EnglandAttainment8YearByYear = response.Attainment8YearByYear.England,
-                SchoolTotalPupils = response.SchoolTotalPupils,
-                EnglandTotalPupils = response.EnglandTotalPupils
-            };
-
-            return View(model);
-        }
-
-        _logger.LogInformation("{Urn} was not found on School Controller", urn);
-        return RedirectToAction("Error");
+        return View(model);
     }
 
     [HttpGet]
