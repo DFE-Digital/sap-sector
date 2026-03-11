@@ -33,8 +33,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(BuildNationalSd(ks2AvgSd: sd));
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: sd));
 
         var sut = CreateSut();
 
@@ -54,8 +54,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(BuildNationalSd(ks2AvgSd: 0m));
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 0m));
 
         var sut = CreateSut();
 
@@ -75,8 +75,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(BuildNationalSd(ks2AvgSd: -10m));
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: -10m));
 
         var sut = CreateSut();
 
@@ -95,8 +95,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(BuildNationalSd(ks2AvgSd: 10m));
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 10m));
 
         var sut = CreateSut();
 
@@ -114,8 +114,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(BuildNationalSd(ks2AvgSd: 10m));
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 10m));
 
         var sut = CreateSut();
 
@@ -134,8 +134,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(new SimilarSchoolsSecondaryNationalSD
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviations
             {
                 Ks2AverageScore = 10m,
                 PupilPremiumEligibilityPercentage = 10m,
@@ -193,8 +193,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(new SimilarSchoolsSecondaryNationalSD
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviations
             {
                 Ks2AverageScore = 10m,
                 PupilPremiumEligibilityPercentage = 10m,
@@ -233,15 +233,15 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(BuildNationalSd(ks2AvgSd: 20m));
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 20m));
 
         var sut = CreateSut();
 
         var result = await sut.Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn));
 
         Assert.Equal(SchoolSimilarity.Similar, result.Ks2AverageScore.Similarity);
-        _repo.Verify(r => r.GetSimilarSchoolsSecondaryNationalSdAsync(), Times.Once);
+        _repo.Verify(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync(), Times.Once);
         _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -256,8 +256,8 @@ public class GetCharacteristicsComparisonTests
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(BuildNationalSd(ks2AvgSd: 20m));
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 20m));
 
         var sut = CreateSut();
 
@@ -267,7 +267,7 @@ public class GetCharacteristicsComparisonTests
             SimilarityCalculationMethod.National));
 
         Assert.Equal(SchoolSimilarity.Similar, result.Ks2AverageScore.Similarity);
-        _repo.Verify(r => r.GetSimilarSchoolsSecondaryNationalSdAsync(), Times.Once);
+        _repo.Verify(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync(), Times.Once);
         _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(It.IsAny<string>()), Times.Never);
     }
 
@@ -308,7 +308,7 @@ public class GetCharacteristicsComparisonTests
 
         Assert.Equal(SchoolSimilarity.NotSimilar, result.Ks2AverageScore.Similarity);
         _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(currentUrn), Times.Once);
-        _repo.Verify(r => r.GetSimilarSchoolsSecondaryNationalSdAsync(), Times.Never);
+        _repo.Verify(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync(), Times.Never);
     }
 
     [Fact]
@@ -375,9 +375,9 @@ public class GetCharacteristicsComparisonTests
         };
     }
 
-    private static SimilarSchoolsSecondaryNationalSD BuildNationalSd(decimal ks2AvgSd)
+    private static SimilarSchoolsSecondaryStandardDeviations BuildStandardDeviations(decimal ks2AvgSd)
     {
-        return new SimilarSchoolsSecondaryNationalSD
+        return new SimilarSchoolsSecondaryStandardDeviations
         {
             Ks2AverageScore = ks2AvgSd,
             PupilPremiumEligibilityPercentage = 1m,

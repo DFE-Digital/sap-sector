@@ -162,7 +162,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             .AsReadOnly();
     }
 
-    public async Task<SimilarSchoolsSecondaryNationalSD> GetSimilarSchoolsSecondaryNationalSdAsync()
+    public async Task<SimilarSchoolsSecondaryStandardDeviations> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
     {
         const string sql = """
             SELECT
@@ -180,7 +180,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
         using var conn = await _factory.Create().OpenConnectionAsync();
         var dao = await conn.QuerySingleAsync<SimilarSchoolsSecondaryNationalSdDao>(sql);
-        return new SimilarSchoolsSecondaryNationalSD
+        return new SimilarSchoolsSecondaryStandardDeviations
         {
             Ks2AverageScore = dao.Ks2AverageScore,
             PupilPremiumEligibilityPercentage = dao.PpPerc,

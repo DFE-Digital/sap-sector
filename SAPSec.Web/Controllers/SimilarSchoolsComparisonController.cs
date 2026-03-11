@@ -35,16 +35,22 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    public Task<IActionResult> Index(string urn, string similarSchoolUrn) =>
-        Similarity(urn, similarSchoolUrn);
+    public Task<IActionResult> Index(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null) =>
+        Similarity(urn, similarSchoolUrn, similarityCalculation);
 
     [HttpGet]
     [Route("Similarity")]
-    public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Similarity(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
 
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
         
@@ -54,9 +60,12 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("Ks4HeadlineMeasures")]
-    public async Task<IActionResult> Ks4HeadlineMeasures(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Ks4HeadlineMeasures(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -66,9 +75,12 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("Ks4CoreSubjects")]
-    public async Task<IActionResult> Ks4CoreSubjects(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Ks4CoreSubjects(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -78,9 +90,12 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("attendance")]
-    public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Attendance(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -90,9 +105,12 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("SchoolDetails")]
-    public async Task<IActionResult> SchoolDetails(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> SchoolDetails(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildFullSchoolDetailsModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildFullSchoolDetailsModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -105,7 +123,7 @@ public class SimilarSchoolsComparisonController : Controller
     /// Handles: invalid params, null response, missing SimilarSchoolDetails, exceptions.
     /// </summary>
     private async Task<(SimilarSchoolsComparisonViewModel? Model, IActionResult? Result)>
-        TryBuildBaseModelAsync(string urn, string similarSchoolUrn)
+        TryBuildBaseModelAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
         {
@@ -171,7 +189,7 @@ public class SimilarSchoolsComparisonController : Controller
             SimilarSchoolName = similarName ?? string.Empty
         };
 
-        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn);
+        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn, similarityCalculation);
         return (model, null);
     }
 
@@ -179,9 +197,9 @@ public class SimilarSchoolsComparisonController : Controller
     /// Builds the model for SchoolDetails page (includes coordinates/distance/details).
     /// </summary>
     private async Task<(SimilarSchoolsComparisonViewModel? Model, IActionResult? Result)>
-        TryBuildFullSchoolDetailsModelAsync(string urn, string similarSchoolUrn)
+        TryBuildFullSchoolDetailsModelAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
     {
-        var baseResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var baseResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (baseResult.Result != null)
             return baseResult;
 
@@ -230,12 +248,8 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>
-        BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn)
+        BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
     {
-        var similarityCalculation =
-            HttpContext?.Request?.Query.TryGetValue("similarityCalculation", out var rawValue) == true
-                ? rawValue.ToString()
-                : null;
         var calculationMethod = ParseSimilarityCalculation(similarityCalculation);
         var response = await _getCharacteristicsComparison.Execute(
             new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn, calculationMethod));
@@ -245,8 +259,8 @@ public class SimilarSchoolsComparisonController : Controller
 
     private static SimilarityCalculationMethod ParseSimilarityCalculation(string? value)
     {
-        return string.Equals(value, "group", StringComparison.OrdinalIgnoreCase)
-            ? SimilarityCalculationMethod.Group
+        return Enum.TryParse<SimilarityCalculationMethod>(value, true, out var similarityCalculationMethod)
+            ? similarityCalculationMethod
             : SimilarityCalculationMethod.National;
     }
 }

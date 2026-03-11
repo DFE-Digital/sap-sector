@@ -11,20 +11,20 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
     private readonly IJsonFile<SimilarSchoolsSecondaryValuesRow> _similarSchoolsValuesRepository;
     private readonly IJsonFile<Establishment> _establishmentRepository;
     private readonly IJsonFile<EstablishmentPerformance> _establishmentPerformanceRepository;
-    private readonly IJsonFile<SimilarSchoolsSecondaryNationalSD> _nationalSdRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviations> _standardDeviationsRepository;
 
     public JsonSimilarSchoolsSecondaryRepository(
         IJsonFile<SimilarSchoolsSecondaryGroupsRow> similarSchoolsGroupsRepository,
         IJsonFile<SimilarSchoolsSecondaryValuesRow> similarSchoolsValuesRepository,
         IJsonFile<Establishment> establishmentRepository,
         IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
-        IJsonFile<SimilarSchoolsSecondaryNationalSD> nationalSdRepository)
+        IJsonFile<SimilarSchoolsSecondaryStandardDeviations> standardDeviationsRepository)
     {
         _similarSchoolsGroupsRepository = similarSchoolsGroupsRepository;
         _similarSchoolsValuesRepository = similarSchoolsValuesRepository;
         _establishmentRepository = establishmentRepository;
         _establishmentPerformanceRepository = establishmentPerformanceRepository;
-        _nationalSdRepository = nationalSdRepository;
+        _standardDeviationsRepository = standardDeviationsRepository;
     }
 
     public async Task<IReadOnlyCollection<string>> GetSimilarSchoolUrnsAsync(string urn)
@@ -99,9 +99,9 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             .AsReadOnly();
     }
 
-    public async Task<SimilarSchoolsSecondaryNationalSD> GetSimilarSchoolsSecondaryNationalSdAsync()
+    public async Task<SimilarSchoolsSecondaryStandardDeviations> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
     {
-        var list = await _nationalSdRepository.ReadAllAsync();
+        var list = await _standardDeviationsRepository.ReadAllAsync();
         return list.First();
     }
 

@@ -12,7 +12,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesRow>> _valuesRepo = new();
     private readonly Mock<IJsonFile<Establishment>> _establishmentRepo = new();
     private readonly Mock<IJsonFile<EstablishmentPerformance>> _performanceRepo = new();
-    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryNationalSD>> _nationalSdRepo = new();
+    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>> _standardDeviationsRepo = new();
 
     private JsonSimilarSchoolsSecondaryRepository CreateSut() =>
         new(
@@ -20,7 +20,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
             _valuesRepo.Object,
             _establishmentRepo.Object,
             _performanceRepo.Object,
-            _nationalSdRepo.Object);
+            _standardDeviationsRepo.Object);
 
     [Fact]
     public async Task GetSimilarSchoolUrnsAsync_ReturnsNeighbourUrns()
@@ -133,9 +133,9 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     }
 
     [Fact]
-    public async Task GetSimilarSchoolsSecondaryNationalSdAsync_ReturnsFirstRow()
+    public async Task GetSimilarSchoolsSecondaryStandardDeviationsAsync_ReturnsFirstRow()
     {
-        var rows = new List<SimilarSchoolsSecondaryNationalSD>
+        var rows = new List<SimilarSchoolsSecondaryStandardDeviations>
         {
             new()
             {
@@ -150,22 +150,22 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
                 PupilsWithEhcPlanPercentage = 1.5m
             }
         };
-        _nationalSdRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);
+        _standardDeviationsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);
 
         var sut = CreateSut();
 
-        var result = await sut.GetSimilarSchoolsSecondaryNationalSdAsync();
+        var result = await sut.GetSimilarSchoolsSecondaryStandardDeviationsAsync();
 
         Assert.Equal(2.45m, result.Ks2AverageScore);
     }
 
     [Fact]
-    public async Task GetSimilarSchoolsSecondaryNationalSdAsync_Throws_WhenEmpty()
+    public async Task GetSimilarSchoolsSecondaryStandardDeviationsAsync_Throws_WhenEmpty()
     {
-        _nationalSdRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryNationalSD>());
+        _standardDeviationsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryStandardDeviations>());
 
         var sut = CreateSut();
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSimilarSchoolsSecondaryNationalSdAsync());
+        await Assert.ThrowsAsync<InvalidOperationException>(() => sut.GetSimilarSchoolsSecondaryStandardDeviationsAsync());
     }
 }

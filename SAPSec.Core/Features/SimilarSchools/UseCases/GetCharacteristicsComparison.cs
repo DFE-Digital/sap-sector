@@ -12,7 +12,7 @@ public class GetCharacteristicsComparison(
         var values = await repository.GetSecondaryValuesByUrnsAsync(urns);
         var standardDeviations = request.SimilarityCalculationMethod == SimilarityCalculationMethod.Group
             ? await BuildGroupStandardDeviationsAsync(request.CurrentSchoolUrn)
-            : await repository.GetSimilarSchoolsSecondaryNationalSdAsync();
+            : await repository.GetSimilarSchoolsSecondaryStandardDeviationsAsync();
 
         var current = values.FirstOrDefault(v => v.Urn == request.CurrentSchoolUrn);
         if (current is null)
@@ -65,12 +65,12 @@ public class GetCharacteristicsComparison(
         };
     }
 
-    private async Task<SimilarSchoolsSecondaryNationalSD> BuildGroupStandardDeviationsAsync(string currentSchoolUrn)
+    private async Task<SimilarSchoolsSecondaryStandardDeviations> BuildGroupStandardDeviationsAsync(string currentSchoolUrn)
     {
         var groupUrns = await repository.GetSimilarSchoolUrnsAsync(currentSchoolUrn);
         var groupValues = await repository.GetSecondaryValuesByUrnsAsync(groupUrns);
 
-        return new SimilarSchoolsSecondaryNationalSD
+        return new SimilarSchoolsSecondaryStandardDeviations
         {
             Ks2AverageScore = PopulationStandardDeviation(groupValues.Select(v => v.Ks2AverageScore)),
             PupilPremiumEligibilityPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilPremiumEligibilityPercentage)),
@@ -84,28 +84,31 @@ public class GetCharacteristicsComparison(
         };
     }
 
-    private static SimilarSchoolCharacteristicComparison<decimal> Build(decimal current, decimal similar, decimal sdNational)
+    private static SimilarSchoolCharacteristicComparison<decimal> Build(decimal current, decimal similar, decimal standardDeviation)
     {
         return new SimilarSchoolCharacteristicComparison<decimal>(
             current,
             similar,
-            Calculate(current, similar, sdNational));
+            Calculate(current, similar, standardDeviation));
     }
 
-    private static SimilarSchoolCharacteristicComparison<int> Build(int current, int similar, int sdNational)
+    private static SimilarSchoolCharacteristicComparison<int> Build(int current, int similar, int standardDeviation)
     {
         return new SimilarSchoolCharacteristicComparison<int>(
             current,
             similar,
-            Calculate(current, similar, sdNational));
+            Calculate(current, similar, standardDeviation));
     }
 
-    private static SchoolSimilarity Calculate(decimal xA, decimal xB, decimal sdNational)
+    // Calculates standardized difference: d = (xA - xB) / standardDeviation.
+    // Uses |d| to classify similarity:
+    // <= 0.3 => Similar, <= 0.7 => LessSimilar, > 0.7 => NotSimilar.
+    private static SchoolSimilarity Calculate(decimal xA, decimal xB, decimal standardDeviation)
     {
-        if (sdNational <= 0)
+        if (standardDeviation <= 0)
             return SchoolSimilarity.NotSimilar;
 
-        var d = (xA - xB) / sdNational;
+        var d = (xA - xB) / standardDeviation;
         var absD = Math.Abs(d);
 
         if (absD <= 0.3m) return SchoolSimilarity.Similar;

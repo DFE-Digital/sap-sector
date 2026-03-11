@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.SchoolSearch;
+﻿﻿using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
@@ -24,7 +24,7 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
             services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
             services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
-            services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryNationalSD>, JsonFile<SimilarSchoolsSecondaryNationalSD>>();
+            services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
 
             services.AddSingleton<ILookupRepository, LookupRepository>();

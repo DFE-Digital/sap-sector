@@ -33,8 +33,8 @@ public class SimilarSchoolsComparisonControllerTests
             _repoMock.Object);
 
         _repoMock
-            .Setup(r => r.GetSimilarSchoolsSecondaryNationalSdAsync())
-            .ReturnsAsync(new SimilarSchoolsSecondaryNationalSD
+            .Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviations
             {
                 PupilPremiumEligibilityPercentage = 13.983589m,
                 PupilsWithEalPercentage = 18.755181m,
