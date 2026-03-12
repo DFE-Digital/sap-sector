@@ -24,6 +24,7 @@
 --\ir 05_validation.sql
 \ir 50_v_similar_schools_secondary_groups.sql
 \ir 50_v_similar_schools_secondary_values.sql
+\ir 50_v_similar_schools_secondary_values_national_sd.sql
 \ir 50_v_similar_schools_primary_groups.sql
 \ir 50_v_similar_schools_primary_values.sql
 \ir 51_similar_schools_indexes.sql

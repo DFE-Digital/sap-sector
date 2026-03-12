@@ -62,6 +62,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
                 services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
                 services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
 
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
                 services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();

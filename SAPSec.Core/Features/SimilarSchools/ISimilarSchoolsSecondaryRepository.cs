@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Features.SimilarSchools
+﻿﻿namespace SAPSec.Core.Features.SimilarSchools
 {
     public interface ISimilarSchoolsSecondaryRepository
     {
@@ -6,5 +6,6 @@
         Task<(SimilarSchool, IReadOnlyCollection<SimilarSchool>)> GetSimilarSchoolsGroupAsync(string urn);
         Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
             IEnumerable<string> urns);
+        Task<SimilarSchoolsSecondaryStandardDeviations> GetSimilarSchoolsSecondaryStandardDeviationsAsync();
     }
 }

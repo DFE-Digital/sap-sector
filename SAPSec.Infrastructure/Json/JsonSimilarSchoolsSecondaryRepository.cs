@@ -11,17 +11,20 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
     private readonly IJsonFile<SimilarSchoolsSecondaryValuesRow> _similarSchoolsValuesRepository;
     private readonly IJsonFile<Establishment> _establishmentRepository;
     private readonly IJsonFile<EstablishmentPerformance> _establishmentPerformanceRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviations> _standardDeviationsRepository;
 
     public JsonSimilarSchoolsSecondaryRepository(
         IJsonFile<SimilarSchoolsSecondaryGroupsRow> similarSchoolsGroupsRepository,
         IJsonFile<SimilarSchoolsSecondaryValuesRow> similarSchoolsValuesRepository,
         IJsonFile<Establishment> establishmentRepository,
-        IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository)
+        IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
+        IJsonFile<SimilarSchoolsSecondaryStandardDeviations> standardDeviationsRepository)
     {
         _similarSchoolsGroupsRepository = similarSchoolsGroupsRepository;
         _similarSchoolsValuesRepository = similarSchoolsValuesRepository;
         _establishmentRepository = establishmentRepository;
         _establishmentPerformanceRepository = establishmentPerformanceRepository;
+        _standardDeviationsRepository = standardDeviationsRepository;
     }
 
     public async Task<IReadOnlyCollection<string>> GetSimilarSchoolUrnsAsync(string urn)
@@ -94,6 +97,12 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             })
             .ToList()
             .AsReadOnly();
+    }
+
+    public async Task<SimilarSchoolsSecondaryStandardDeviations> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
+    {
+        var list = await _standardDeviationsRepository.ReadAllAsync();
+        return list.First();
     }
 
     private SimilarSchool FromJson(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)

@@ -161,6 +161,7 @@
     <None Remove="Sql\50_v_similar_schools_primary_values.sql" />
     <None Remove="Sql\50_v_similar_schools_secondary_groups.sql" />
     <None Remove="Sql\50_v_similar_schools_secondary_values.sql" />
+    <None Remove="Sql\50_v_similar_schools_secondary_values_national_sd.sql" />
     <None Remove="Sql\51_similar_schools_indexes.sql" />
   </ItemGroup>
 
