@@ -159,6 +159,10 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
 
         var rows = table.Locator("tbody tr.govuk-table__row");
         (await rows.CountAsync()).Should().Be(9, "Similarity table should list 9 characteristics");
+
+       
+        var tags = table.Locator("tbody .govuk-tag");
+        (await tags.CountAsync()).Should().Be(9, "Each characteristic row should have a similarity tag");
     }
 
     [Fact]
@@ -168,24 +172,33 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')").ClickAsync();
+
         var heading = Page.Locator("h1.govuk-heading-l");
         await heading.WaitForAsync();
+
         var table = Page.Locator("table.govuk-table");
         await table.WaitForAsync();
 
         var headerCells = table.Locator("thead th");
-        (await headerCells.CountAsync()).Should().Be(3, "Similarity table should have 3 columns");
+        (await headerCells.CountAsync()).Should().Be(4, "Similarity table should have 4 columns");
         (await headerCells.Nth(0).TextContentAsync()).Should().Contain("Characteristic");
+        (await headerCells.Nth(3).TextContentAsync()).Should().Contain("Similarity");
 
         var firstRow = table.Locator("tbody tr.govuk-table__row").First;
         (await firstRow.CountAsync()).Should().Be(1);
-
+        
         var cells = firstRow.Locator("th, td");
-        (await cells.CountAsync()).Should().Be(3, "Row should have characteristic + 2 value cells");
+        (await cells.CountAsync()).Should().Be(4, "Row should have characteristic + 2 value cells + similarity cell");
 
-        (await cells.Nth(0).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
-        (await cells.Nth(1).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
-        (await cells.Nth(2).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
+        (await cells.Nth(0).TextContentAsync()).Should().NotBeNullOrWhiteSpace(); 
+        (await cells.Nth(1).TextContentAsync()).Should().NotBeNullOrWhiteSpace(); 
+        (await cells.Nth(2).TextContentAsync()).Should().NotBeNullOrWhiteSpace(); 
+        
+        var similarityText = (await cells.Nth(3).TextContentAsync())?.Trim();
+        similarityText.Should().NotBeNullOrWhiteSpace();
+
+        similarityText!.Should().MatchRegex("^(Similar|Less similar|Not similar)$",
+            "Similarity cell should show one of: Similar, Less similar, Not similar");
     }
 
     #endregion

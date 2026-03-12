@@ -11,47 +11,61 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
+    private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
     private readonly ISimilarSchoolsSecondaryRepository _similarSchoolsSecondaryRepository;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
+        GetCharacteristicsComparison getCharacteristicsComparison,
+        ICharacteristicsComparisonFormatter characteristicsFormatter,
         ILogger<SimilarSchoolsComparisonController> logger,
-        ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
-        ICharacteristicsComparisonFormatter characteristicsFormatter)
+        ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository)
     {
-        _getSimilarSchoolDetails = getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
+        _getSimilarSchoolDetails =
+            getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
+        _getCharacteristicsComparison = getCharacteristicsComparison ??
+                                        throw new ArgumentNullException(nameof(getCharacteristicsComparison));
+        _characteristicsFormatter = characteristicsFormatter ??
+                                    throw new ArgumentNullException(nameof(characteristicsFormatter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _similarSchoolsSecondaryRepository = similarSchoolsSecondaryRepository
             ?? throw new ArgumentNullException(nameof(similarSchoolsSecondaryRepository));
-        _characteristicsFormatter = characteristicsFormatter
-            ?? throw new ArgumentNullException(nameof(characteristicsFormatter));
     }
 
     [HttpGet]
-    public Task<IActionResult> Index(string urn, string similarSchoolUrn) =>
-        Similarity(urn, similarSchoolUrn);
+    public Task<IActionResult> Index(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null) =>
+        Similarity(urn, similarSchoolUrn, similarityCalculation);
 
     [HttpGet]
     [Route("Similarity")]
-    public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Similarity(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
 
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
-
+        
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
     }
 
     [HttpGet]
     [Route("Ks4HeadlineMeasures")]
-    public async Task<IActionResult> Ks4HeadlineMeasures(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Ks4HeadlineMeasures(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -61,9 +75,12 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("Ks4CoreSubjects")]
-    public async Task<IActionResult> Ks4CoreSubjects(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Ks4CoreSubjects(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -73,9 +90,12 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("attendance")]
-    public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Attendance(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -85,9 +105,12 @@ public class SimilarSchoolsComparisonController : Controller
 
     [HttpGet]
     [Route("SchoolDetails")]
-    public async Task<IActionResult> SchoolDetails(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> SchoolDetails(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
     {
-        var modelResult = await TryBuildFullSchoolDetailsModelAsync(urn, similarSchoolUrn);
+        var modelResult = await TryBuildFullSchoolDetailsModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -100,7 +123,7 @@ public class SimilarSchoolsComparisonController : Controller
     /// Handles: invalid params, null response, missing SimilarSchoolDetails, exceptions.
     /// </summary>
     private async Task<(SimilarSchoolsComparisonViewModel? Model, IActionResult? Result)>
-        TryBuildBaseModelAsync(string urn, string similarSchoolUrn)
+        TryBuildBaseModelAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
         {
@@ -166,7 +189,7 @@ public class SimilarSchoolsComparisonController : Controller
             SimilarSchoolName = similarName ?? string.Empty
         };
 
-        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn);
+        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn, similarityCalculation);
         return (model, null);
     }
 
@@ -174,9 +197,9 @@ public class SimilarSchoolsComparisonController : Controller
     /// Builds the model for SchoolDetails page (includes coordinates/distance/details).
     /// </summary>
     private async Task<(SimilarSchoolsComparisonViewModel? Model, IActionResult? Result)>
-        TryBuildFullSchoolDetailsModelAsync(string urn, string similarSchoolUrn)
+        TryBuildFullSchoolDetailsModelAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
     {
-        var baseResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
+        var baseResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (baseResult.Result != null)
             return baseResult;
 
@@ -225,20 +248,19 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>
-        BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn)
+        BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
     {
-        var values = await _similarSchoolsSecondaryRepository.GetSecondaryValuesByUrnsAsync(new[] { urn, similarSchoolUrn });
-        var current = values.FirstOrDefault(v => v.Urn == urn);
-        var similar = values.FirstOrDefault(v => v.Urn == similarSchoolUrn);
+        var calculationMethod = ParseSimilarityCalculation(similarityCalculation);
+        var response = await _getCharacteristicsComparison.Execute(
+            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn, calculationMethod));
 
-        if (current is null || similar is null)
-        {
-            _logger.LogWarning(
-                "Similarity characteristics missing for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
-                urn, similarSchoolUrn);
-            return Array.Empty<SimilarSchoolsComparisonViewModel.CharacteristicRow>();
-        }
+        return _characteristicsFormatter.BuildRows(response);
+    }
 
-        return _characteristicsFormatter.BuildRows(current, similar);
+    private static SimilarityCalculationMethod ParseSimilarityCalculation(string? value)
+    {
+        return Enum.TryParse<SimilarityCalculationMethod>(value, true, out var similarityCalculationMethod)
+            ? similarityCalculationMethod
+            : SimilarityCalculationMethod.National;
     }
 }

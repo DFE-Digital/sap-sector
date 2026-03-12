@@ -38,79 +38,13 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
         const string sql = """
             SELECT
-                "URN",
-                "EstablishmentName",
-                "LAId",
-                "LAName",
-                "Street",
-                "Locality",
-                "Address3",
-                "Town",
-                "Postcode",
-                "Easting",
-                "Northing",
-                "UrbanRuralId",
-                "UrbanRuralName",
-                "RegionId",
-                "RegionName",
-                "TotalCapacity",
-                "TotalPupils",
-                "PhaseOfEducationId",
-                "PhaseOfEducationName",
-                "NurseryProvisionName",
-                "OfficialSixthFormId",
-                "OfficialSixthFormName",
-                "AdmissionsPolicyId",
-                "AdmissionsPolicyName",
-                "GenderId",
-                "GenderName",
-                "ResourcedProvisionId",
-                "ResourcedProvisionName",
-                "TypeOfEstablishmentId",
-                "TypeOfEstablishmentName",
-                "EstablishmentTypeGroupId",
-                "EstablishmentTypeGroupName",
-                "TrustSchoolFlagId",
-                "TrustSchoolFlagName"
-            FROM public.v_establishment 
+                *
+            FROM public.v_establishment
             WHERE "URN" = @urn;
             
             SELECT
-                "URN",
-                "EstablishmentName",
-                "LAId",
-                "LAName",
-                "Street",
-                "Locality",
-                "Address3",
-                "Town",
-                "Postcode",
-                "Easting",
-                "Northing",
-                "UrbanRuralId",
-                "UrbanRuralName",
-                "RegionId",
-                "RegionName",
-                "TotalCapacity",
-                "TotalPupils",
-                "PhaseOfEducationId",
-                "PhaseOfEducationName",
-                "NurseryProvisionName",
-                "OfficialSixthFormId",
-                "OfficialSixthFormName",
-                "AdmissionsPolicyId",
-                "AdmissionsPolicyName",
-                "GenderId",
-                "GenderName",
-                "ResourcedProvisionId",
-                "ResourcedProvisionName",
-                "TypeOfEstablishmentId",
-                "TypeOfEstablishmentName",
-                "EstablishmentTypeGroupId",
-                "EstablishmentTypeGroupName",
-                "TrustSchoolFlagId",
-                "TrustSchoolFlagName"
-            FROM public.v_establishment 
+                *
+            FROM public.v_establishment
             WHERE "URN" IN (
                 SELECT "neighbour_urn" 
                 FROM public.v_similar_schools_secondary_groups 
@@ -139,8 +73,8 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
         var results = await conn.QueryMultipleAsync(sql, new { urn });
 
-        var currentSchoolDao = await results.ReadSingleOrDefaultAsync<SimilarSchoolDao>();
-        var similarSchoolDaos = await results.ReadAsync<SimilarSchoolDao>();
+        var currentSchool = await results.ReadSingleOrDefaultAsync<Establishment>();
+        var similarSchools = await results.ReadAsync<Establishment>();
         var performanceDaos = await results.ReadAsync<SimilarSchoolPerformanceDao>();
 
         var currentSchoolPerformance = performanceDaos.FirstOrDefault(a => a.Id == urn)
@@ -160,15 +94,14 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             };
         var similarSchoolsPerformance = performanceDaos.Where(a => a.Id != urn);
 
-        if (currentSchoolDao == null)
+        if (currentSchool == null)
         {
             return (BuildEmptySchool(urn, currentSchoolPerformance), []);
         }
 
-        var map = SqlMapper.GetTypeMap(typeof(SimilarSchoolDao));
         return (
-            FromDao(currentSchoolDao, currentSchoolPerformance),
-            similarSchoolDaos
+            FromDao(currentSchool, currentSchoolPerformance),
+            similarSchools
                 .Join(similarSchoolsPerformance, d => d.URN, a => a.Id, FromDao)
                 .ToList()
                 .AsReadOnly());
@@ -229,7 +162,39 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             .AsReadOnly();
     }
 
-    private SimilarSchool FromDao(SimilarSchoolDao sch, SimilarSchoolPerformanceDao perf) => new SimilarSchool
+    public async Task<SimilarSchoolsSecondaryStandardDeviations> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
+    {
+        const string sql = """
+            SELECT
+                ks2_avg::numeric(18,6)                  AS "Ks2AverageScore",
+                pp_perc::numeric(18,6)                  AS "PpPerc",
+                percent_eal::numeric(18,6)              AS "PercentEal",
+                polar4quintile_pupils::numeric(18,6)    AS "Polar4QuintilePupils",
+                p_stability::numeric(18,6)              AS "PStability",
+                idaci_pupils::numeric(18,6)             AS "IdaciPupils",
+                percent_sch_support::numeric(18,6)      AS "PercentSchSupport",
+                number_of_pupils::numeric(18,6)         AS "NumberOfPupils",
+                percent_statement_or_ehp::numeric(18,6) AS "PercentStatementOrEhp"
+            FROM public.v_similar_schools_secondary_values_national_sd;
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+        var dao = await conn.QuerySingleAsync<SimilarSchoolsSecondaryNationalSdDao>(sql);
+        return new SimilarSchoolsSecondaryStandardDeviations
+        {
+            Ks2AverageScore = dao.Ks2AverageScore,
+            PupilPremiumEligibilityPercentage = dao.PpPerc,
+            PupilsWithEalPercentage = dao.PercentEal,
+            Polar4Quintile = dao.Polar4QuintilePupils,
+            PupilStabilityRate = dao.PStability,
+            AverageIdaciScore = dao.IdaciPupils,
+            PupilsWithSenSupportPercentage = dao.PercentSchSupport,
+            PupilCount = dao.NumberOfPupils,
+            PupilsWithEhcPlanPercentage = dao.PercentStatementOrEhp
+        };
+    }
+
+    private SimilarSchool FromDao(Establishment sch, SimilarSchoolPerformanceDao perf) => new SimilarSchool
     {
         URN = sch.URN,
         Name = sch.EstablishmentName,
@@ -305,44 +270,6 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Num),
     };
 
-    private class SimilarSchoolDao
-    {
-        public required string URN { get; set; }
-        public required string EstablishmentName { get; set; }
-        public required string Street { get; set; }
-        public required string Locality { get; set; }
-        public required string Address3 { get; set; }
-        public required string Town { get; set; }
-        public required string Postcode { get; set; }
-        public required string LAId { get; set; }
-        public required string LAName { get; set; }
-        public required string Easting { get; set; }
-        public required string Northing { get; set; }
-        public required string RegionId { get; set; }
-        public required string RegionName { get; set; }
-        public required string UrbanRuralId { get; set; }
-        public required string UrbanRuralName { get; set; }
-        public required string TotalCapacity { get; set; }
-        public required string TotalPupils { get; set; }
-        public required string PhaseOfEducationId { get; set; }
-        public required string PhaseOfEducationName { get; set; }
-        public required string NurseryProvisionName { get; set; }
-        public required string OfficialSixthFormId { get; set; }
-        public required string OfficialSixthFormName { get; set; }
-        public required string AdmissionsPolicyId { get; set; }
-        public required string AdmissionsPolicyName { get; set; }
-        public required string GenderId { get; set; }
-        public required string GenderName { get; set; }
-        public required string ResourcedProvisionId { get; set; }
-        public required string ResourcedProvisionName { get; set; }
-        public required string TypeOfEstablishmentId { get; set; }
-        public required string TypeOfEstablishmentName { get; set; }
-        public required string EstablishmentTypeGroupId { get; set; }
-        public required string EstablishmentTypeGroupName { get; set; }
-        public required string TrustSchoolFlagId { get; set; }
-        public required string TrustSchoolFlagName { get; set; }
-    }
-
     private class SimilarSchoolPerformanceDao
     {
         public required string Id { get; set; }
@@ -371,5 +298,18 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         public decimal PercentSchSupport { get; init; }
         public int NumberOfPupils { get; init; }
         public decimal PercentStatementOrEhp { get; init; }
+    }
+
+    private class SimilarSchoolsSecondaryNationalSdDao
+    {
+        public required decimal Ks2AverageScore { get; init; }
+        public required decimal PpPerc { get; init; }
+        public required decimal PercentEal { get; init; }
+        public required decimal Polar4QuintilePupils { get; init; }
+        public required decimal PStability { get; init; }
+        public required decimal IdaciPupils { get; init; }
+        public required decimal PercentSchSupport { get; init; }
+        public required decimal NumberOfPupils { get; init; }
+        public required decimal PercentStatementOrEhp { get; init; }
     }
 }

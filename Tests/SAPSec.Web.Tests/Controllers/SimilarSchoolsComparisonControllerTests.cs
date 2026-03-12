@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -10,6 +11,7 @@ using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
+using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -19,17 +21,40 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
-    private readonly ICharacteristicsComparisonFormatter _formatter = new CharacteristicsComparisonFormatter();
-
     private readonly SimilarSchoolsComparisonController _sut;
 
     public SimilarSchoolsComparisonControllerTests()
     {
-        var useCase = new GetSimilarSchoolDetails(
+        var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
             _repoMock.Object,
             _schoolDetailsServiceMock.Object);
 
-        _sut = new SimilarSchoolsComparisonController(useCase, _loggerMock.Object, _repoMock.Object, _formatter);
+        var getCharacteristicsComparison = new GetCharacteristicsComparison(
+            _repoMock.Object);
+
+        _repoMock
+            .Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviations
+            {
+                PupilPremiumEligibilityPercentage = 13.983589m,
+                PupilsWithEalPercentage = 18.755181m,
+                Polar4Quintile = 1.022255m,
+                PupilStabilityRate = 6.442814m,
+                AverageIdaciScore = 0.078069m,
+                PupilsWithSenSupportPercentage = 5.530940m,
+                PupilCount = 388.664809m,
+                PupilsWithEhcPlanPercentage = 1.678816m,
+                Ks2AverageScore = 2.527329m
+            });
+
+        var characteristicsFormatter = new CharacteristicsComparisonFormatter();
+
+        _sut = new SimilarSchoolsComparisonController(
+            getSimilarSchoolDetails,
+            getCharacteristicsComparison,
+            characteristicsFormatter,
+            _loggerMock.Object,
+            _repoMock.Object);
     }
 
     [Fact]
@@ -42,10 +67,12 @@ public class SimilarSchoolsComparisonControllerTests
             new BNGCoordinates(Easting: 430000, Northing: 380000));
 
         var similarSchool = CreateSimilarSchool(similarUrn, "Similar School Group",
-            new BNGCoordinates(Easting: 431000, Northing: 381000)); // different coords => distance > 0
+            new BNGCoordinates(Easting: 431000, Northing: 381000));
+
         var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
 
-        SetupDependencies(urn, similarUrn, currentSchool, new[] { similarSchool }, similarDetails);
+        SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool, similarDetails);
+        SetupSecondaryValues(urn, similarUrn);
 
         var result = await _sut.Index(urn, similarUrn);
 
@@ -71,11 +98,12 @@ public class SimilarSchoolsComparisonControllerTests
             new BNGCoordinates(Easting: 430000, Northing: 380000));
 
         var similarSchool = CreateSimilarSchool(similarUrn, "Similar School Group",
-            new BNGCoordinates(Easting: 431000, Northing: 381000)); // different coords => distance > 0
+            new BNGCoordinates(Easting: 431000, Northing: 381000));
 
         var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
 
-        SetupDependencies(urn, similarUrn, currentSchool, new[] { similarSchool }, similarDetails);
+        SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool, similarDetails);
+        SetupSecondaryValues(urn, similarUrn);
 
         var result = await _sut.SchoolDetails(urn, similarUrn);
 
@@ -86,59 +114,175 @@ public class SimilarSchoolsComparisonControllerTests
         model.SimilarSchoolDetails.Should().NotBeNull();
         model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
     }
-    private void SetupDependencies(
+
+    [Fact]
+    public async Task Similarity_ReturnsView_WithCharacteristicsRows_AndSimilarityLabels()
+    {
+        var urn = "145327";
+        var similarUrn = "142075";
+
+        var currentSchool = CreateSimilarSchool(urn, "Main School",
+            new BNGCoordinates(Easting: 430000, Northing: 380000));
+
+        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School Group",
+            new BNGCoordinates(Easting: 431000, Northing: 381000));
+
+        var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
+
+        SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool, similarDetails);
+        SetupSecondaryValues(urn, similarUrn);
+
+        var result = await _sut.Similarity(urn, similarUrn);
+
+        var view = result.Should().BeOfType<ViewResult>().Subject;
+        var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
+
+        model.CharacteristicsRows.Should().NotBeNull();
+        model.CharacteristicsRows.Should().HaveCount(9);
+        
+        model.CharacteristicsRows[0].Characteristic.Should().Be("Average KS2 reading and maths score");
+        model.CharacteristicsRows[0].CurrentSchoolValue.Should().NotBeNullOrWhiteSpace();
+        model.CharacteristicsRows[0].SimilarSchoolValue.Should().NotBeNullOrWhiteSpace();
+        
+        model.CharacteristicsRows[4].Characteristic.Should().Be("Average IDACI score");
+        model.CharacteristicsRows[4].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
+
+        model.CharacteristicsRows[5].Characteristic.Should().Be("Average POLAR4 quintile");
+        model.CharacteristicsRows[5].Similarity.Should().Be(SchoolSimilarity.NotSimilar);
+    }
+
+    [Fact]
+    public async Task Similarity_WithGroupCalculationQuery_UsesGroupStandardDeviation()
+    {
+        var urn = "145327";
+        var similarUrn = "142075";
+
+        var currentSchool = CreateSimilarSchool(urn, "Main School",
+            new BNGCoordinates(Easting: 430000, Northing: 380000));
+
+        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School Group",
+            new BNGCoordinates(Easting: 431000, Northing: 381000));
+
+        var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
+
+        SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool, similarDetails);
+        SetupSecondaryValues(urn, similarUrn);
+        SetupGroupSecondaryValues(urn, new[] { similarUrn, "300001", "300002", "300003", "300004" });
+
+        var result = await _sut.Similarity(urn, similarUrn, "group");
+
+        var view = result.Should().BeOfType<ViewResult>().Subject;
+        var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
+
+        model.CharacteristicsRows.Should().NotBeNull();
+        model.CharacteristicsRows[0].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
+    }
+
+    private void SetupBaseDependencies(
         string currentUrn,
         string similarUrn,
         SimilarSchool currentSchool,
-        IReadOnlyCollection<SimilarSchool> group,
+        SimilarSchool similarSchool,
         SchoolDetails similarDetails)
     {
+        similarSchool.URN = similarUrn;
+        currentSchool.URN = currentUrn;
+
+        var group = new List<SimilarSchool> { similarSchool }.AsReadOnly();
+
         _repoMock
-            .Setup(r => r.GetSimilarSchoolsGroupAsync(currentUrn))
+            .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
             .ReturnsAsync((currentSchool, group));
 
-        _repoMock
-            .Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(new List<SimilarSchoolsSecondaryValues>
-            {
-                new()
-                {
-                    Urn = currentUrn,
-                    Ks2ReadingScore = 105.1m,
-                    Ks2MathsScore = 104.9m,
-                    PupilPremiumEligibilityPercentage = 28.4m,
-                    PupilsWithEalPercentage = 12.3m,
-                    Polar4Quintile = 3,
-                    PupilStabilityRate = 91m,
-                    AverageIdaciScore = 0.215m,
-                    PupilsWithSenSupportPercentage = 13.2m,
-                    PupilCount = 920,
-                    PupilsWithEhcPlanPercentage = 1.8m
-                },
-                new()
-                {
-                    Urn = similarUrn,
-                    Ks2ReadingScore = 104.6m,
-                    Ks2MathsScore = 104.1m,
-                    PupilPremiumEligibilityPercentage = 31.7m,
-                    PupilsWithEalPercentage = 9.8m,
-                    Polar4Quintile = 3,
-                    PupilStabilityRate = 89m,
-                    AverageIdaciScore = 0.232m,
-                    PupilsWithSenSupportPercentage = 14.9m,
-                    PupilCount = 870,
-                    PupilsWithEhcPlanPercentage = 2.1m
-                }
-            }.AsReadOnly());
-
         _schoolDetailsServiceMock
-            .Setup(s => s.GetByUrnAsync(similarUrn))
+            .Setup(s => s.GetByUrnAsync(It.IsAny<string>()))
             .ReturnsAsync(similarDetails);
     }
 
-    // ============================
-    // FULLY POPULATED TEST DATA
-    // ============================
+    private void SetupSecondaryValues(string currentUrn, string similarUrn)
+    {
+        var values = new List<SimilarSchoolsSecondaryValues>
+        {
+            new SimilarSchoolsSecondaryValues
+            {
+                Urn = currentUrn,
+                Ks2ReadingScore = 104.5m,
+                Ks2MathsScore = 104.1m,
+                PupilCount = 760,
+                PupilStabilityRate = 90m,
+                PupilPremiumEligibilityPercentage = 52.0m,
+                AverageIdaciScore = 0.316508m,
+                Polar4Quintile = 3,
+                PupilsWithEhcPlanPercentage = 2.105263m,
+                PupilsWithSenSupportPercentage = 16.315789m,
+                PupilsWithEalPercentage = 39.525692m
+            },
+            new SimilarSchoolsSecondaryValues
+            {
+                Urn = similarUrn,
+                Ks2ReadingScore = 103.7m,
+                Ks2MathsScore = 103.6m,
+                PupilCount = 962,
+                PupilStabilityRate = 91.7m,
+                PupilPremiumEligibilityPercentage = 41.2m,
+                AverageIdaciScore = 0.351137m,
+                Polar4Quintile = 2,
+                PupilsWithEhcPlanPercentage = 3.326403m,
+                PupilsWithSenSupportPercentage = 8.939709m,
+                PupilsWithEalPercentage = 61.954262m
+            }
+        };
+
+        _repoMock
+            .Setup(r => r.GetSecondaryValuesByUrnsAsync(
+                It.Is<IEnumerable<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
+            .ReturnsAsync(values);
+    }
+
+    private void SetupGroupSecondaryValues(string currentUrn, IReadOnlyCollection<string> groupUrns)
+    {
+        _repoMock
+            .Setup(r => r.GetSimilarSchoolUrnsAsync(currentUrn))
+            .ReturnsAsync(groupUrns);
+
+        var groupValues = new List<SimilarSchoolsSecondaryValues>
+        {
+            new()
+            {
+                Urn = groupUrns.ElementAt(0),
+                Ks2ReadingScore = 101m,
+                Ks2MathsScore = 101m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(1),
+                Ks2ReadingScore = 102m,
+                Ks2MathsScore = 102m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(2),
+                Ks2ReadingScore = 103m,
+                Ks2MathsScore = 103m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(3),
+                Ks2ReadingScore = 104m,
+                Ks2MathsScore = 104m
+            },
+            new()
+            {
+                Urn = groupUrns.ElementAt(4),
+                Ks2ReadingScore = 105m,
+                Ks2MathsScore = 105m
+            }
+        };
+
+        _repoMock
+            .Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u => u.SequenceEqual(groupUrns))))
+            .ReturnsAsync(groupValues);
+    }
 
     private static SimilarSchool CreateSimilarSchool(string urn, string name, BNGCoordinates coordinates)
     {
@@ -146,7 +290,6 @@ public class SimilarSchoolsComparisonControllerTests
         {
             URN = urn,
             Name = name,
-
             Address = new Address
             {
                 Street = "123 Test Street",
@@ -155,21 +298,21 @@ public class SimilarSchoolsComparisonControllerTests
                 Locality = "",
                 Address3 = ""
             },
+            TotalCapacity = "1200",
+            TotalPupils = "1000",
+            NurseryProvisionName = "No",
+            LocalAuthority = new ReferenceData("373", "Sheffield"),
+            Region = new ReferenceData("R", "Yorkshire and the Humber"),
+            UrbanRural = new ReferenceData("A1", "Urban"),
+            PhaseOfEducation = new ReferenceData("P", "Secondary"),
+            OfficialSixthForm = new ReferenceData("1", "Has sixth form"),
+            AdmissionsPolicy = new ReferenceData("1", "Comprehensive"),
+            Gender = new ReferenceData("M", "Mixed"),
+            ResourcedProvision = new ReferenceData("0", "No"),
+            TypeOfEstablishment = new ReferenceData("27", "Academy"),
+            EstablishmentTypeGroup = new ReferenceData("10", "Academies"),
+            TrustSchoolFlag = new ReferenceData("0", "No"),
             Coordinates = coordinates,
-            TotalCapacity = string.Empty,
-            TotalPupils = string.Empty,
-            NurseryProvisionName = string.Empty,
-            LocalAuthority = new("373", "Sheffield"),
-            UrbanRural = new("A1", "Urban"),
-            Region = new(string.Empty, string.Empty),
-            AdmissionsPolicy = new(string.Empty, string.Empty),
-            PhaseOfEducation = new(string.Empty, string.Empty),
-            Gender = new(string.Empty, string.Empty),
-            TypeOfEstablishment = new(string.Empty, string.Empty),
-            EstablishmentTypeGroup = new(string.Empty, string.Empty),
-            TrustSchoolFlag = new(string.Empty, string.Empty),
-            OfficialSixthForm = new(string.Empty, string.Empty),
-            ResourcedProvision = new(string.Empty, string.Empty),
             Attainment8Score = DataWithAvailability.Available(50m),
             BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.Available(61m),
@@ -190,13 +333,11 @@ public class SimilarSchoolsComparisonControllerTests
             Name = name,
             DfENumber = DataWithAvailability.Available("373/1234"),
             Ukprn = DataWithAvailability.Available("10012345"),
-
             Address = DataWithAvailability.Available("123 Test Street, Sheffield, S1 1AA"),
             LocalAuthorityName = DataWithAvailability.Available("Sheffield"),
             LocalAuthorityCode = DataWithAvailability.Available("373"),
             Region = DataWithAvailability.Available("Yorkshire"),
             UrbanRuralDescription = DataWithAvailability.Available("Urban"),
-
             AgeRangeLow = DataWithAvailability.Available(11),
             AgeRangeHigh = DataWithAvailability.Available(18),
             GenderOfEntry = DataWithAvailability.Available("Mixed"),
@@ -204,16 +345,13 @@ public class SimilarSchoolsComparisonControllerTests
             SchoolType = DataWithAvailability.Available("Academy converter"),
             AdmissionsPolicy = DataWithAvailability.Available("Non-selective"),
             ReligiousCharacter = DataWithAvailability.Available("None"),
-
             GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
             AcademyTrustName = DataWithAvailability.Available("Test Trust"),
             AcademyTrustId = DataWithAvailability.Available("5001"),
-
             HasNurseryProvision = DataWithAvailability.Available(false),
             HasSixthForm = DataWithAvailability.Available(true),
             HasSenUnit = DataWithAvailability.Available(false),
             HasResourcedProvision = DataWithAvailability.Available(false),
-
             HeadteacherName = DataWithAvailability.Available("Mr John Smith"),
             Website = DataWithAvailability.Available("https://www.testacademy.org.uk"),
             Telephone = DataWithAvailability.Available("0114 123 4567"),
