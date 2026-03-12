@@ -55,4 +55,16 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         response.Headers.Location.Should().NotBeNull();
         response.Headers.Location!.ToString().Should().Contain("/school/147788/view-similar-schools");
     }
+
+    [Fact]
+    public async Task ComparisonKs4HeadlineMeasures_ReturnsComparisonContent()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Ks4HeadlineMeasures");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("KS4 headline performance measures");
+        content.Should().Contain("Progress 8");
+        content.Should().Contain("Attainment 8");
+    }
 }

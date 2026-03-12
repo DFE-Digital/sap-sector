@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
@@ -20,6 +22,7 @@ public class SimilarSchoolsComparisonControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
+    private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
     private readonly SimilarSchoolsComparisonController _sut;
 
@@ -27,6 +30,9 @@ public class SimilarSchoolsComparisonControllerTests
     {
         var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
             _repoMock.Object,
+            _schoolDetailsServiceMock.Object);
+        var ks4UseCase = new GetKs4HeadlineMeasures(
+            _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
@@ -51,6 +57,7 @@ public class SimilarSchoolsComparisonControllerTests
 
         _sut = new SimilarSchoolsComparisonController(
             getSimilarSchoolDetails,
+            ks4UseCase,
             getCharacteristicsComparison,
             characteristicsFormatter,
             _loggerMock.Object,
