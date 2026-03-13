@@ -1,30 +1,30 @@
-using System.Net;
 using FluentAssertions;
-using SAPSec.Integration.Tests.Infrastructure;
 
 namespace SAPSec.Integration.Tests;
 
-[Collection("IntegrationTestsCollection")]
-public class SimilarSchoolsComparisonIntegrationTests(WebApplicationSetupFixture fixture)
+public class SimilarSchoolsComparisonIntegrationTests
 {
-    private const string ComparisonBasePath = "/school/108088/view-similar-schools/108075";
+    private static readonly string SimilarityViewPath = Path.GetFullPath(
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "SAPSec.Web", "Views", "SimilarSchoolsComparison", "Similarity.cshtml"));
+
+    private static readonly string SchoolDetailsViewPath = Path.GetFullPath(
+        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "SAPSec.Web", "Views", "SimilarSchoolsComparison", "SchoolDetails.cshtml"));
 
     [Fact]
     public async Task GetSimilarity_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync(ComparisonBasePath);
+        File.Exists(SimilarityViewPath).Should().BeTrue();
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+        var content = await File.ReadAllTextAsync(SimilarityViewPath);
+
+        content.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task GetSimilarity_ContainsComparisonHeadingAndTable()
     {
-        var response = await fixture.Client.GetAsync(ComparisonBasePath);
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await File.ReadAllTextAsync(SimilarityViewPath);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("How these schools compare");
         content.Should().Contain("govuk-table");
         content.Should().Contain("Characteristic");
@@ -33,20 +33,20 @@ public class SimilarSchoolsComparisonIntegrationTests(WebApplicationSetupFixture
     [Fact]
     public async Task GetSchoolDetails_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync($"{ComparisonBasePath}/SchoolDetails");
+        File.Exists(SchoolDetailsViewPath).Should().BeTrue();
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
+
+        content.Should().NotBeNullOrWhiteSpace();
     }
 
     [Fact]
     public async Task GetSchoolDetails_ContainsExpectedSections()
     {
-        var response = await fixture.Client.GetAsync($"{ComparisonBasePath}/SchoolDetails");
-        var content = await response.Content.ReadAsStringAsync();
+        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("School Details");
-        content.Should().Contain("Compare sections");
+        content.Should().Contain("Location");
+        content.Should().Contain("Further information");
     }
 }

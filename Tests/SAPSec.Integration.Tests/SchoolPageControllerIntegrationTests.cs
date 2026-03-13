@@ -7,7 +7,7 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class SchoolPageControllerIntegrationTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
 {
-    private const string SchoolPagePath = "/school/147788";
+    private const string SchoolPagePath = "/SchoolHome";
 
     #region Authentication Tests
 
