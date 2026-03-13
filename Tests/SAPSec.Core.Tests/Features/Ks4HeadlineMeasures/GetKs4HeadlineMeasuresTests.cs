@@ -40,7 +40,10 @@ public class GetKs4HeadlineMeasuresTests
                     Attainment8_Tot_Eng_Current_Num = "45.9",
                     Attainment8_Tot_Eng_Previous_Num = "46.1",
                     Attainment8_Tot_Eng_Previous2_Num = "46.4"
-                }));
+                },
+                null,
+                null,
+                null));
 
         var sut = new GetKs4HeadlineMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);
 
@@ -99,7 +102,10 @@ public class GetKs4HeadlineMeasuresTests
                     Attainment8_Tot_Eng_Current_Num = "c",
                     Attainment8_Tot_Eng_Previous_Num = "s",
                     Attainment8_Tot_Eng_Previous2_Num = "x"
-                }));
+                },
+                null,
+                null,
+                null));
 
         var sut = new GetKs4HeadlineMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);
 
@@ -192,7 +198,10 @@ public class GetKs4HeadlineMeasuresTests
                     EngMaths59_Tot_Eng_Current_Pct = "46.0",
                     EngMaths59_Tot_Eng_Previous_Pct = "47.0",
                     EngMaths59_Tot_Eng_Previous2_Pct = "x"
-                }));
+                },
+                null,
+                null,
+                null));
 
         var sut = new GetKs4HeadlineMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);
 

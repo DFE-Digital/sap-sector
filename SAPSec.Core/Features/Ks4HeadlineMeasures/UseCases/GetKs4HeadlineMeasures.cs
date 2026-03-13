@@ -109,6 +109,96 @@ public class GetKs4HeadlineMeasures(
             ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
             ParseNullableDecimal(data?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct));
 
+        var destinationsSchoolAverage = Average(
+            ParseNullableDecimal(data?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct));
+
+        var destinationsLocalAuthorityAverage = Average(
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.AllDest_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous2_Pct));
+
+        var destinationsEnglandAverage = Average(
+            ParseNullableDecimal(data?.EnglandDestinations?.AllDest_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.AllDest_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.AllDest_Tot_Eng_Previous2_Pct));
+
+        var destinationsSchoolYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct));
+
+        var destinationsLocalAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.AllDest_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous2_Pct));
+
+        var destinationsEnglandYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EnglandDestinations?.AllDest_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.AllDest_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.AllDest_Tot_Eng_Previous2_Pct));
+
+        var destinationsEducationSchoolAverage = Average(
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct));
+
+        var destinationsEducationLocalAuthorityAverage = Average(
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Education_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Education_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Education_Tot_LA_Previous2_Pct));
+
+        var destinationsEducationEnglandAverage = Average(
+            ParseNullableDecimal(data?.EnglandDestinations?.Education_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Education_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Education_Tot_Eng_Previous2_Pct));
+
+        var destinationsEducationSchoolYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct));
+
+        var destinationsEducationLocalAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Education_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Education_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Education_Tot_LA_Previous2_Pct));
+
+        var destinationsEducationEnglandYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EnglandDestinations?.Education_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Education_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Education_Tot_Eng_Previous2_Pct));
+
+        var destinationsEmploymentSchoolAverage = Average(
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct));
+
+        var destinationsEmploymentLocalAuthorityAverage = Average(
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Employment_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous2_Pct));
+
+        var destinationsEmploymentEnglandAverage = Average(
+            ParseNullableDecimal(data?.EnglandDestinations?.Employment_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Employment_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Employment_Tot_Eng_Previous2_Pct));
+
+        var destinationsEmploymentSchoolYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct));
+
+        var destinationsEmploymentLocalAuthorityYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Employment_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous2_Pct));
+
+        var destinationsEmploymentEnglandYearByYear = new Ks4HeadlineMeasureSeries(
+            ParseNullableDecimal(data?.EnglandDestinations?.Employment_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Employment_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandDestinations?.Employment_Tot_Eng_Previous2_Pct));
+
         return new(
             schoolDetails,
             new Ks4HeadlineMeasureAverage(
@@ -134,7 +224,31 @@ public class GetKs4HeadlineMeasures(
             new Ks4HeadlineMeasureYearByYear(
                 engMaths59SchoolYearByYear,
                 engMaths59LocalAuthorityYearByYear,
-                engMaths59EnglandYearByYear));
+                engMaths59EnglandYearByYear),
+            new Ks4HeadlineMeasureAverage(
+                destinationsSchoolAverage,
+                destinationsLocalAuthorityAverage,
+                destinationsEnglandAverage),
+            new Ks4HeadlineMeasureYearByYear(
+                destinationsSchoolYearByYear,
+                destinationsLocalAuthorityYearByYear,
+                destinationsEnglandYearByYear),
+            new Ks4HeadlineMeasureAverage(
+                destinationsEducationSchoolAverage,
+                destinationsEducationLocalAuthorityAverage,
+                destinationsEducationEnglandAverage),
+            new Ks4HeadlineMeasureYearByYear(
+                destinationsEducationSchoolYearByYear,
+                destinationsEducationLocalAuthorityYearByYear,
+                destinationsEducationEnglandYearByYear),
+            new Ks4HeadlineMeasureAverage(
+                destinationsEmploymentSchoolAverage,
+                destinationsEmploymentLocalAuthorityAverage,
+                destinationsEmploymentEnglandAverage),
+            new Ks4HeadlineMeasureYearByYear(
+                destinationsEmploymentSchoolYearByYear,
+                destinationsEmploymentLocalAuthorityYearByYear,
+                destinationsEmploymentEnglandYearByYear));
     }
 
     private static decimal? ParseNullableDecimal(string? value)
@@ -148,6 +262,9 @@ public class GetKs4HeadlineMeasures(
             ? parsed
             : null;
     }
+
+    private static decimal? ParseNullableDecimal(double? value) =>
+        value.HasValue ? Convert.ToDecimal(value.Value) : null;
 
     private static decimal? Average(params decimal?[] values)
     {
@@ -186,6 +303,12 @@ public record GetKs4HeadlineMeasuresResponse(
     Ks4HeadlineMeasureAverage EngMaths49ThreeYearAverage,
     Ks4HeadlineMeasureYearByYear EngMaths49YearByYear,
     Ks4HeadlineMeasureAverage EngMaths59ThreeYearAverage,
-    Ks4HeadlineMeasureYearByYear EngMaths59YearByYear);
+    Ks4HeadlineMeasureYearByYear EngMaths59YearByYear,
+    Ks4HeadlineMeasureAverage DestinationsThreeYearAverage,
+    Ks4HeadlineMeasureYearByYear DestinationsYearByYear,
+    Ks4HeadlineMeasureAverage DestinationsEducationThreeYearAverage,
+    Ks4HeadlineMeasureYearByYear DestinationsEducationYearByYear,
+    Ks4HeadlineMeasureAverage DestinationsEmploymentThreeYearAverage,
+    Ks4HeadlineMeasureYearByYear DestinationsEmploymentYearByYear);
 
 

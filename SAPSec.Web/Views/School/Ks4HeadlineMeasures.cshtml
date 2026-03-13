@@ -4,6 +4,7 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "KS4 headline performance measures";
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
 }
 
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -74,7 +75,7 @@
     @{
         var yearByYearData = new
         {
-            labels = new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" },
+            labels = ks4YearLabels,
             datasets = new object[]
             {
                 new
@@ -145,9 +146,9 @@
         <thead class="govuk-table__head">
             <tr class="govuk-table__row">
                 <th scope="col" class="govuk-table__header">Group</th>
-                <th scope="col" class="govuk-table__header">2023 to 2024</th>
-                <th scope="col" class="govuk-table__header">2024 to 2025</th>
-                <th scope="col" class="govuk-table__header">2025 to 2026</th>
+                <th scope="col" class="govuk-table__header">@ks4YearLabels[0]</th>
+                <th scope="col" class="govuk-table__header">@ks4YearLabels[1]</th>
+                <th scope="col" class="govuk-table__header">@ks4YearLabels[2]</th>
                 <th scope="col" class="govuk-table__header">3 year average</th>
             </tr>
         </thead>
