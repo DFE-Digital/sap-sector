@@ -30,7 +30,7 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var mainSchoolName = Page.Locator("span.govuk-caption-l");
+        var mainSchoolName = Page.Locator("span.govuk-caption-xl");
         var isMainVisible = await mainSchoolName.IsVisibleAsync();
 
         isMainVisible.Should().BeTrue("Main school name caption should be visible");
