@@ -6,6 +6,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.KS4.Destinations;
 using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Services;
 using SAPSec.Web.Formatters;
@@ -27,6 +28,9 @@ namespace SAPSec.Web.Extensions
             services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
             services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
             services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
+            services.AddSingleton<IJsonFile<EstablishmentDestinations>, JsonFile<EstablishmentDestinations>>();
+            services.AddSingleton<IJsonFile<LADestinations>, JsonFile<LADestinations>>();
+            services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
             services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
             services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
             services.AddSingleton<IEstablishmentService, EstablishmentService>();
