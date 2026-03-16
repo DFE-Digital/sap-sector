@@ -42,17 +42,6 @@
                 <option value="persistent">Persistent absence</option>
             </select>
         </div>
-
-        <div class="govuk-form-group">
-            <label class="govuk-label" for="attendancePupilCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select"
-                    id="attendancePupilCharacteristic"
-                    name="attendancePupilCharacteristic">
-                <option value="all" selected>All pupils</option>
-                <option value="disadvantaged">Disadvantaged pupils</option>
-                <option value="send">Pupils with SEND</option>
-            </select>
-        </div>
     </div>
 
     <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs app-attendance-tabs" data-module="govuk-tabs">
@@ -85,19 +74,6 @@
                 </canvas>
             </div>
 
-            <details class="govuk-details app-ks4-copy govuk-!-margin-top-4 govuk-!-margin-bottom-2" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">Number of pupils entered</span>
-                </summary>
-                <div class="govuk-details__text">
-                    <p class="govuk-body">
-                        <span class="govuk-!-font-weight-bold">@Model.Name:</span> 1,252<br>
-                        <span class="govuk-!-font-weight-bold">Local authority:</span> 12,323<br>
-                        <span class="govuk-!-font-weight-bold">England:</span> 1,542,636
-                    </p>
-          
-                </div>
-            </details>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-year-by-year">
@@ -116,8 +92,6 @@
                 </canvas>
             </div>
 
-            <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-1">Number of pupils entered</h3>
-            <a class="govuk-link" href="#">Number of pupils entered</a>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-table">
@@ -156,8 +130,6 @@
                 </tbody>
             </table>
 
-            <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-1">Number of pupils entered</h3>
-            <a class="govuk-link" href="#">Number of pupils entered</a>
         </div>
     </div>
 </section>
@@ -302,8 +274,7 @@
 
             function initAttendanceFilters() {
                 var absenceTypeSelect = document.getElementById("attendanceAbsenceType");
-                var pupilCharacteristicSelect = document.getElementById("attendancePupilCharacteristic");
-                if (!absenceTypeSelect || !pupilCharacteristicSelect) {
+                if (!absenceTypeSelect) {
                     return;
                 }
 
@@ -338,8 +309,7 @@
 
                 function loadAttendanceViews() {
                     var requestUrl = dataEndpoint
-                        + "?absenceType=" + encodeURIComponent(absenceTypeSelect.value)
-                        + "&pupilCharacteristic=" + encodeURIComponent(pupilCharacteristicSelect.value);
+                        + "?absenceType=" + encodeURIComponent(absenceTypeSelect.value);
 
                     return fetch(requestUrl, {
                         headers: {
@@ -361,7 +331,6 @@
                 }
 
                 absenceTypeSelect.addEventListener("change", loadAttendanceViews);
-                pupilCharacteristicSelect.addEventListener("change", loadAttendanceViews);
                 loadAttendanceViews();
             }
 

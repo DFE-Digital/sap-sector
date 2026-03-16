@@ -6,6 +6,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
+using System.Data.Common;
 using System.Globalization;
 
 namespace SAPSec.Web.Controllers;
@@ -346,8 +347,7 @@ public class SimilarSchoolsComparisonController : Controller
     public async Task<IActionResult> AttendanceData(
         string urn,
         string similarSchoolUrn,
-        string absenceType = "overall",
-        string pupilCharacteristic = "all")
+        string absenceType = "overall")
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
         {
@@ -355,11 +355,6 @@ public class SimilarSchoolsComparisonController : Controller
         }
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-        var normalizedPupilCharacteristic = NormalizeAttendanceOption(
-            pupilCharacteristic,
-            "all",
-            "disadvantaged",
-            "send");
 
         GetAttendanceMeasuresResponse thisSchoolAttendance;
         GetAttendanceMeasuresResponse similarSchoolAttendance;
@@ -368,10 +363,10 @@ public class SimilarSchoolsComparisonController : Controller
             thisSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
             similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
         }
-        catch (Exception ex)
+        catch (Exception ex) when (ex is InvalidOperationException or DbException)
         {
             _logger.LogWarning(ex, "Falling back to generated attendance payload for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'", urn, similarSchoolUrn);
-            return Json(BuildFallbackAttendancePayload(urn, similarSchoolUrn, normalizedAbsenceType, normalizedPupilCharacteristic));
+            return Json(BuildFallbackAttendancePayload(urn, similarSchoolUrn, normalizedAbsenceType));
         }
 
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
@@ -400,7 +395,6 @@ public class SimilarSchoolsComparisonController : Controller
         return Json(new
         {
             absenceType = normalizedAbsenceType,
-            pupilCharacteristic = normalizedPupilCharacteristic,
             years = yearLabels,
             bar = new decimal?[]
             {
@@ -602,13 +596,12 @@ public class SimilarSchoolsComparisonController : Controller
     private static object BuildFallbackAttendancePayload(
         string urn,
         string similarSchoolUrn,
-        string normalizedAbsenceType,
-        string normalizedPupilCharacteristic)
+        string normalizedAbsenceType)
     {
         var yearLabels = new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" };
-        var thisSchoolSeries = BuildFallbackAttendanceSeries(urn, normalizedAbsenceType, normalizedPupilCharacteristic, 0m);
-        var similarSchoolSeries = BuildFallbackAttendanceSeries(similarSchoolUrn, normalizedAbsenceType, normalizedPupilCharacteristic, 0.3m);
-        var englandSeries = BuildFallbackEnglandAttendanceSeries(normalizedAbsenceType, normalizedPupilCharacteristic);
+        var thisSchoolSeries = BuildFallbackAttendanceSeries(urn, normalizedAbsenceType, 0m);
+        var similarSchoolSeries = BuildFallbackAttendanceSeries(similarSchoolUrn, normalizedAbsenceType, 0.3m);
+        var englandSeries = BuildFallbackEnglandAttendanceSeries(normalizedAbsenceType);
 
         var thisSchoolThreeYearAverage = AverageFallback(thisSchoolSeries);
         var similarSchoolThreeYearAverage = AverageFallback(similarSchoolSeries);
@@ -617,7 +610,6 @@ public class SimilarSchoolsComparisonController : Controller
         return new
         {
             absenceType = normalizedAbsenceType,
-            pupilCharacteristic = normalizedPupilCharacteristic,
             years = yearLabels,
             bar = new decimal[]
             {
@@ -661,41 +653,28 @@ public class SimilarSchoolsComparisonController : Controller
     private static decimal[] BuildFallbackAttendanceSeries(
         string seed,
         string absenceType,
-        string pupilCharacteristic,
         decimal tweak)
     {
         var hash = seed.Aggregate(0, (acc, c) => acc + c);
         var baseAbsence = absenceType == "persistent" ? 18.5m : 5.2m;
-        var characteristicAdjustment = pupilCharacteristic switch
-        {
-            "disadvantaged" => 1.7m,
-            "send" => 2.1m,
-            _ => 0m
-        };
 
         var drift = (hash % 7) * 0.1m;
-        var previous2 = Math.Round(baseAbsence + characteristicAdjustment + drift + tweak, 1, MidpointRounding.AwayFromZero);
+        var previous2 = Math.Round(baseAbsence + drift + tweak, 1, MidpointRounding.AwayFromZero);
         var previous = Math.Round(previous2 + 0.2m, 1, MidpointRounding.AwayFromZero);
         var current = Math.Round(previous + 0.2m, 1, MidpointRounding.AwayFromZero);
 
         return new[] { previous2, previous, current };
     }
 
-    private static decimal[] BuildFallbackEnglandAttendanceSeries(string absenceType, string pupilCharacteristic)
+    private static decimal[] BuildFallbackEnglandAttendanceSeries(string absenceType)
     {
         var baseAbsence = absenceType == "persistent" ? 17.8m : 4.9m;
-        var characteristicAdjustment = pupilCharacteristic switch
-        {
-            "disadvantaged" => 1.4m,
-            "send" => 1.8m,
-            _ => 0m
-        };
 
         return new[]
         {
-            Math.Round(baseAbsence + characteristicAdjustment, 1, MidpointRounding.AwayFromZero),
-            Math.Round(baseAbsence + characteristicAdjustment + 0.1m, 1, MidpointRounding.AwayFromZero),
-            Math.Round(baseAbsence + characteristicAdjustment + 0.2m, 1, MidpointRounding.AwayFromZero)
+            Math.Round(baseAbsence, 1, MidpointRounding.AwayFromZero),
+            Math.Round(baseAbsence + 0.1m, 1, MidpointRounding.AwayFromZero),
+            Math.Round(baseAbsence + 0.2m, 1, MidpointRounding.AwayFromZero)
         };
     }
 

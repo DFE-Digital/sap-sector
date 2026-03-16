@@ -196,6 +196,32 @@ public class SimilarSchoolsComparisonControllerTests
     [Fact]
     public async Task AttendanceData_ReturnsDefaultPayloadShape()
     {
+        _schoolDetailsServiceMock
+            .Setup(x => x.TryGetByUrnAsync(It.IsAny<string>()))
+            .ReturnsAsync(CreateSchoolDetails("145327", "Main School"));
+
+        _attendanceRepositoryMock
+            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
+            .ReturnsAsync(new AttendanceMeasuresData(
+                new EstablishmentAttendance
+                {
+                    Abs_Tot_Est_Current_Pct = 5.0m,
+                    Abs_Tot_Est_Previous_Pct = 5.2m,
+                    Abs_Tot_Est_Previous2_Pct = 5.4m,
+                    Abs_Persistent_Est_Current_Pct = 16.0m,
+                    Abs_Persistent_Est_Previous_Pct = 16.3m,
+                    Abs_Persistent_Est_Previous2_Pct = 16.7m
+                },
+                new EnglandAttendance
+                {
+                    Abs_Tot_Eng_Current_Pct = 4.8m,
+                    Abs_Tot_Eng_Previous_Pct = 4.9m,
+                    Abs_Tot_Eng_Previous2_Pct = 5.0m,
+                    Abs_Persistent_Eng_Current_Pct = 15.6m,
+                    Abs_Persistent_Eng_Previous_Pct = 15.8m,
+                    Abs_Persistent_Eng_Previous2_Pct = 16.0m
+                }));
+
         var result = await _sut.AttendanceData("145327", "142075");
 
         var json = result.Should().BeOfType<JsonResult>().Subject;
@@ -204,7 +230,6 @@ public class SimilarSchoolsComparisonControllerTests
         var root = document.RootElement;
 
         root.GetProperty("absenceType").GetString().Should().Be("overall");
-        root.GetProperty("pupilCharacteristic").GetString().Should().Be("all");
         root.GetProperty("bar").GetArrayLength().Should().Be(3);
         root.GetProperty("years").GetArrayLength().Should().Be(3);
 

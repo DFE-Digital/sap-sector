@@ -23,9 +23,7 @@ public class SimilarSchoolsComparisonAttendancePageTests(WebApplicationSetupFixt
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Attendance measures" })).ToBeVisibleAsync();
 
         var absenceType = Page.Locator("#attendanceAbsenceType");
-        var pupilCharacteristic = Page.Locator("#attendancePupilCharacteristic");
         await Expect(absenceType).ToHaveValueAsync("overall");
-        await Expect(pupilCharacteristic).ToHaveValueAsync("all");
 
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-three-year-average']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-year-by-year']")).ToBeVisibleAsync();
