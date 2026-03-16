@@ -273,24 +273,24 @@ public class SimilarSchoolsComparisonController : Controller
             {
                 thisSchool = new[]
                 {
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Previous2),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolThreeYear)
                 },
                 similarSchool = new[]
                 {
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Previous2),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolThreeYear)
                 },
                 england = new[]
                 {
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Previous2),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(englandThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandThreeYear)
                 }
             }
         });

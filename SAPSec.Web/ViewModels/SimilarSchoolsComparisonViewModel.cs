@@ -76,9 +76,9 @@ public class SimilarSchoolsComparisonViewModel
     public string ThisSchoolEngMaths59Display => DisplayPercent(ThisSchoolEngMaths59ThreeYearAverage);
     public string SelectedSchoolEngMaths59Display => DisplayPercent(SelectedSchoolEngMaths59ThreeYearAverage);
     public string EnglandEngMaths59Display => DisplayPercent(EnglandEngMaths59ThreeYearAverage);
-    public string ThisSchoolDestinationsDisplay => DisplayPercent(ThisSchoolDestinationsThreeYearAverage);
-    public string SelectedSchoolDestinationsDisplay => DisplayPercent(SelectedSchoolDestinationsThreeYearAverage);
-    public string EnglandDestinationsDisplay => DisplayPercent(EnglandDestinationsThreeYearAverage);
+    public string ThisSchoolDestinationsDisplay => DisplayWholePercent(ThisSchoolDestinationsThreeYearAverage);
+    public string SelectedSchoolDestinationsDisplay => DisplayWholePercent(SelectedSchoolDestinationsThreeYearAverage);
+    public string EnglandDestinationsDisplay => DisplayWholePercent(EnglandDestinationsThreeYearAverage);
 
     public decimal ThisSchoolWidthPercent => WidthPercent(ThisSchoolAttainment8ThreeYearAverage);
     public decimal SelectedSchoolWidthPercent => WidthPercent(SelectedSchoolAttainment8ThreeYearAverage);
@@ -102,4 +102,9 @@ public class SimilarSchoolsComparisonViewModel
 
     public static string DisplayPercent(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) + "%" : "No available data";
+
+    public static string DisplayWholePercent(decimal? value) =>
+        value.HasValue
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
+            : "No available data";
 }

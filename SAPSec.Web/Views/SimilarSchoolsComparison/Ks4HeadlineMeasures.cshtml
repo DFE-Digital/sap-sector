@@ -581,23 +581,23 @@
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.Name</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolDestinationsYearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolDestinationsYearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.ThisSchoolDestinationsYearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Current)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-avg">@Model.ThisSchoolDestinationsDisplay</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolDestinationsYearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolDestinationsYearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.SelectedSchoolDestinationsYearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Current)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-avg">@Model.SelectedSchoolDestinationsDisplay</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Schools in England average</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandDestinationsYearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandDestinationsYearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(Model.EnglandDestinationsYearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Current)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-avg">@Model.EnglandDestinationsDisplay</td>
                     </tr>
                 </tbody>
