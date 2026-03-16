@@ -220,7 +220,8 @@ public class SimilarSchoolsComparisonControllerTests
                     Abs_Persistent_Eng_Current_Pct = 15.6m,
                     Abs_Persistent_Eng_Previous_Pct = 15.8m,
                     Abs_Persistent_Eng_Previous2_Pct = 16.0m
-                }));
+                },
+                new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" }));
 
         var result = await _sut.AttendanceData("145327", "142075");
 

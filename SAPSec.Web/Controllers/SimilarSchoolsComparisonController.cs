@@ -365,12 +365,14 @@ public class SimilarSchoolsComparisonController : Controller
         }
         catch (Exception ex) when (ex is InvalidOperationException or DbException)
         {
-            _logger.LogWarning(ex, "Falling back to generated attendance payload for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'", urn, similarSchoolUrn);
-            return Json(BuildFallbackAttendancePayload(urn, similarSchoolUrn, normalizedAbsenceType));
+            _logger.LogWarning(ex, "Attendance data unavailable for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'", urn, similarSchoolUrn);
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = "Attendance data unavailable." });
         }
 
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
-        var yearLabels = new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" };
+        var yearLabels = thisSchoolAttendance.Years.Any()
+            ? thisSchoolAttendance.Years
+            : (similarSchoolAttendance.Years.Any() ? similarSchoolAttendance.Years : Array.Empty<string>());
 
         var thisSchoolSeries = isPersistentAbsence
             ? thisSchoolAttendance.PersistentAbsenceYearByYear.School
@@ -593,98 +595,4 @@ public class SimilarSchoolsComparisonController : Controller
             _ => response?.DestinationsYearByYear
         };
 
-    private static object BuildFallbackAttendancePayload(
-        string urn,
-        string similarSchoolUrn,
-        string normalizedAbsenceType)
-    {
-        var yearLabels = new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" };
-        var thisSchoolSeries = BuildFallbackAttendanceSeries(urn, normalizedAbsenceType, 0m);
-        var similarSchoolSeries = BuildFallbackAttendanceSeries(similarSchoolUrn, normalizedAbsenceType, 0.3m);
-        var englandSeries = BuildFallbackEnglandAttendanceSeries(normalizedAbsenceType);
-
-        var thisSchoolThreeYearAverage = AverageFallback(thisSchoolSeries);
-        var similarSchoolThreeYearAverage = AverageFallback(similarSchoolSeries);
-        var englandThreeYearAverage = AverageFallback(englandSeries);
-
-        return new
-        {
-            absenceType = normalizedAbsenceType,
-            years = yearLabels,
-            bar = new decimal[]
-            {
-                thisSchoolThreeYearAverage,
-                similarSchoolThreeYearAverage,
-                englandThreeYearAverage
-            },
-            line = new
-            {
-                thisSchool = thisSchoolSeries,
-                similarSchool = similarSchoolSeries,
-                england = englandSeries
-            },
-            table = new
-            {
-                thisSchool = new[]
-                {
-                    DisplayPercentNullable(thisSchoolSeries[0]),
-                    DisplayPercentNullable(thisSchoolSeries[1]),
-                    DisplayPercentNullable(thisSchoolSeries[2]),
-                    DisplayPercentNullable(thisSchoolThreeYearAverage)
-                },
-                similarSchool = new[]
-                {
-                    DisplayPercentNullable(similarSchoolSeries[0]),
-                    DisplayPercentNullable(similarSchoolSeries[1]),
-                    DisplayPercentNullable(similarSchoolSeries[2]),
-                    DisplayPercentNullable(similarSchoolThreeYearAverage)
-                },
-                england = new[]
-                {
-                    DisplayPercentNullable(englandSeries[0]),
-                    DisplayPercentNullable(englandSeries[1]),
-                    DisplayPercentNullable(englandSeries[2]),
-                    DisplayPercentNullable(englandThreeYearAverage)
-                }
-            }
-        };
-    }
-
-    private static decimal[] BuildFallbackAttendanceSeries(
-        string seed,
-        string absenceType,
-        decimal tweak)
-    {
-        var hash = seed.Aggregate(0, (acc, c) => acc + c);
-        var baseAbsence = absenceType == "persistent" ? 18.5m : 5.2m;
-
-        var drift = (hash % 7) * 0.1m;
-        var previous2 = Math.Round(baseAbsence + drift + tweak, 1, MidpointRounding.AwayFromZero);
-        var previous = Math.Round(previous2 + 0.2m, 1, MidpointRounding.AwayFromZero);
-        var current = Math.Round(previous + 0.2m, 1, MidpointRounding.AwayFromZero);
-
-        return new[] { previous2, previous, current };
-    }
-
-    private static decimal[] BuildFallbackEnglandAttendanceSeries(string absenceType)
-    {
-        var baseAbsence = absenceType == "persistent" ? 17.8m : 4.9m;
-
-        return new[]
-        {
-            Math.Round(baseAbsence, 1, MidpointRounding.AwayFromZero),
-            Math.Round(baseAbsence + 0.1m, 1, MidpointRounding.AwayFromZero),
-            Math.Round(baseAbsence + 0.2m, 1, MidpointRounding.AwayFromZero)
-        };
-    }
-
-    private static decimal AverageFallback(decimal[] values)
-    {
-        if (values.Length == 0)
-        {
-            return 0m;
-        }
-
-        return Math.Round(values.Average(), 1, MidpointRounding.AwayFromZero);
-    }
 }

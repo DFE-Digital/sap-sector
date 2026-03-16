@@ -57,7 +57,8 @@ public class GetAttendanceMeasuresTests
                     Abs_Persistent_Eng_Current_Pct = 15.7m,
                     Abs_Persistent_Eng_Previous_Pct = 15.8m,
                     Abs_Persistent_Eng_Previous2_Pct = 16.0m
-                }));
+                },
+                new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" }));
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);
 
@@ -70,6 +71,7 @@ public class GetAttendanceMeasuresTests
         result.PersistentAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(16.4m, 15.8m));
         result.PersistentAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(16.0m, 16.4m, 16.8m));
         result.PersistentAbsenceYearByYear.England.Should().Be(new AttendanceMeasureSeries(15.7m, 15.8m, 16.0m));
+        result.Years.Should().ContainInOrder("2021 to 2022", "2022 to 2023", "2023 to 2024");
     }
 
     [Fact]
@@ -96,6 +98,7 @@ public class GetAttendanceMeasuresTests
         result.PersistentAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(null, null));
         result.PersistentAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(null, null, null));
         result.PersistentAbsenceYearByYear.England.Should().Be(new AttendanceMeasureSeries(null, null, null));
+        result.Years.Should().BeEmpty();
     }
 
     private static SchoolDetails CreateSchoolDetails(string urn)

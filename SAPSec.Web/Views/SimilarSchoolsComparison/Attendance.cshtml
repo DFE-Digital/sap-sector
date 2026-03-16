@@ -2,20 +2,19 @@
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
-    var defaultYears = new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" };
-    var defaultBarData = new
+    var initialBarData = new
     {
         labels = new[] { Model.Name, Model.SimilarSchoolName, "Schools in England average" },
-        data = new decimal[] { 5.2m, 5.5m, 4.9m }
+        data = new decimal?[] { null, null, null }
     };
-    var defaultLineData = new
+    var initialLineData = new
     {
-        labels = defaultYears,
+        labels = Array.Empty<string>(),
         datasets = new object[]
         {
-            new { label = Model.Name, data = new decimal[] { 5.0m, 5.2m, 5.4m }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
-            new { label = Model.SimilarSchoolName, data = new decimal[] { 5.3m, 5.5m, 5.7m }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
-            new { label = "Schools in England average", data = new decimal[] { 4.7m, 4.9m, 5.1m }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
+            new { label = Model.Name, data = new decimal?[] { null, null, null }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = Model.SimilarSchoolName, data = new decimal?[] { null, null, null }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = "Schools in England average", data = new decimal?[] { null, null, null }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
         }
     };
     var chartColors = new[] { "#d53880", "#003078", "#1d8f89" };
@@ -45,7 +44,7 @@
     </div>
 
     <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs app-attendance-tabs" data-module="govuk-tabs">
-        <h2 class="govuk-tabs__title">Attendance views</h2>
+        <h3 class="govuk-tabs__title">Attendance views</h3>
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
                 <a class="govuk-tabs__tab" href="#attendance-three-year-average">3-year average</a>
@@ -69,7 +68,7 @@
                         data-bar-thickness="50"
                         data-category-percentage="0.7"
                         data-bar-percentage="1"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(defaultBarData))'
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(initialBarData))'
                         data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
                 </canvas>
             </div>
@@ -87,7 +86,7 @@
                         data-show-x-grid="true"
                         data-show-legend="true"
                         data-show-datalabels="false"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(defaultLineData))'
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(initialLineData))'
                         data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
                 </canvas>
             </div>
@@ -99,33 +98,33 @@
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">School(s)</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2021 to 2022</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2022 to 2023</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric" data-attendance-year="prev2">Year</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric" data-attendance-year="prev">Year</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric" data-attendance-year="current">Year</th>
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">@Model.Name</th>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev2">5.0%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev">5.2%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-current">5.4%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-avg">5.2%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev2">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-current">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-avg">No available data</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev2">5.3%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev">5.5%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-current">5.7%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-avg">5.5%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev2">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-current">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-avg">No available data</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">Schools in England average</th>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev2">4.7%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev">4.9%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-current">5.1%</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-avg">4.9%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev2">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-current">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-avg">No available data</td>
                 </tr>
                 </tbody>
             </table>
@@ -265,6 +264,17 @@
                     lineChart.data.datasets[1].data = payload.line && payload.line.similarSchool ? payload.line.similarSchool : [];
                     lineChart.data.datasets[2].data = payload.line && payload.line.england ? payload.line.england : [];
                     lineChart.update();
+                }
+
+                if (Array.isArray(payload.years) && payload.years.length >= 3) {
+                    var yearHeaders = {
+                        prev2: document.querySelector("[data-attendance-year='prev2']"),
+                        prev: document.querySelector("[data-attendance-year='prev']"),
+                        current: document.querySelector("[data-attendance-year='current']")
+                    };
+                    if (yearHeaders.prev2) yearHeaders.prev2.textContent = payload.years[0];
+                    if (yearHeaders.prev) yearHeaders.prev.textContent = payload.years[1];
+                    if (yearHeaders.current) yearHeaders.current.textContent = payload.years[2];
                 }
 
                 updateTableRow(tableCellMap.thisSchool, payload.table && payload.table.thisSchool ? payload.table.thisSchool : []);

@@ -47,7 +47,8 @@ public class GetAttendanceMeasures(
                 Average(persistentEnglandSeries.Current, persistentEnglandSeries.Previous, persistentEnglandSeries.Previous2)),
             new AttendanceMeasureYearByYear(
                 persistentSchoolSeries,
-                persistentEnglandSeries));
+                persistentEnglandSeries),
+            data?.Years ?? Array.Empty<string>());
     }
 
     private static decimal? Average(params decimal?[] values)
@@ -82,4 +83,5 @@ public record GetAttendanceMeasuresResponse(
     AttendanceMeasureAverage OverallAbsenceThreeYearAverage,
     AttendanceMeasureYearByYear OverallAbsenceYearByYear,
     AttendanceMeasureAverage PersistentAbsenceThreeYearAverage,
-    AttendanceMeasureYearByYear PersistentAbsenceYearByYear);
+    AttendanceMeasureYearByYear PersistentAbsenceYearByYear,
+    IReadOnlyList<string> Years);
