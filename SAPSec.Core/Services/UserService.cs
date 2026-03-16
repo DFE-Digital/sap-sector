@@ -18,11 +18,11 @@ public class UserService(
     private readonly ILogger<UserService> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     private const string OrganisationSessionKey = "CurrentOrganisationId";
 
-    public async Task<User> GetUserFromClaimsAsync(ClaimsPrincipal principal)
+    public async Task<User?> GetUserFromClaimsAsync(ClaimsPrincipal principal)
     {
         if (principal == null || !principal.Identity?.IsAuthenticated == true)
         {
-            throw new NotFoundException("Authenticated user not found");
+            return null;
         }
 
         try
@@ -66,16 +66,16 @@ public class UserService(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error getting user from claims");
-            throw;
+            return null;
         }
     }
 
-    public async Task<Organisation> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
+    public async Task<Organisation?> GetCurrentOrganisationAsync(ClaimsPrincipal principal)
     {
         var user = await GetUserFromClaimsAsync(principal);
         if (user == null || !user.Organisations.Any())
         {
-            throw new NotFoundException("User's Organisation list is empty.");
+            return null;
         }
 
         var httpContext = _httpContextAccessor.HttpContext;
@@ -116,7 +116,7 @@ public class UserService(
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error setting current organisation {OrganisationId}", organisationId);
-            throw;
+            return Task.FromResult(false);
         }
     }
 

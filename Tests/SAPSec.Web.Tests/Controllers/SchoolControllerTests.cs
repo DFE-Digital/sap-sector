@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
@@ -74,65 +73,6 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public async Task Index_SchoolNotFound_ReturnsNotFound()
-    {
-        // Arrange
-        var urn = "999999";
-
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ThrowsAsync(new NotFoundException("School not found"));
-
-        // Act
-        var result = await _sut.Index(urn);
-
-        // Assert
-        result.Should().BeOfType<NotFoundResult>();
-    }
-
-    [Fact]
-    public async Task Index_SchoolNotFound_LogsInformation()
-    {
-        // Arrange
-        var urn = "999999";
-
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ThrowsAsync(new NotFoundException("School not found"));
-
-        // Act
-        await _sut.Index(urn);
-
-        // Assert
-        _loggerMock.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains(urn)),
-                It.IsAny<Exception?>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData(null)]
-    public async Task Index_InvalidUrn_ReturnsNotFound(string? urn)
-    {
-        // Arrange
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
-            .ThrowsAsync(new NotFoundException("School not found"));
-
-        // Act
-        var result = await _sut.Index(urn!);
-
-        // Assert
-        result.Should().BeOfType<NotFoundResult>();
-    }
-
-    [Fact]
     public async Task Index_ServiceCalled_WithCorrectUrn()
     {
         // Arrange
@@ -181,7 +121,7 @@ public class SchoolControllerTests
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
 
         _ks4PerformanceRepositoryMock
@@ -194,24 +134,6 @@ public class SchoolControllerTests
         // Assert
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel>();
-    }
-
-    [Fact]
-    public async Task Ks4HeadlineMeasures_SchoolNotFound_ThrowsNotFoundException()
-    {
-        // Arrange
-        var urn = "999999";
-
-        _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
-            .ReturnsAsync((SchoolDetails?)null);
-
-        // Act
-        var act = async () => await _sut.Ks4HeadlineMeasures(urn);
-
-        // Assert
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage("*999999*");
     }
 
     #endregion

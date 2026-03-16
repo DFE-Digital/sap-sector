@@ -25,4 +25,12 @@ public class Ks4HeadlineMeasuresIntegrationTests
         content.Should().Contain("Attainment 8");
         content.Should().Contain("3 year average");
     }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasures_WithNonExistentUrn_ReturnsNotFound()
+    {
+        var response = await fixture.Client.GetAsync("/school/999999/ks4-headline-measures");
+
+        response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
 }

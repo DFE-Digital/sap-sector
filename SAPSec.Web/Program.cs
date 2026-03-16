@@ -114,7 +114,6 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
@@ -124,26 +123,41 @@ public class Program
         builder.Services.AddPostgresqlDependencies();
         builder.Services.AddDependencies();
 
+        // Add custom error handler for NotFoundExceptions
+        builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
+
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
+        var isDevelopment = app.Environment.IsDevelopment();
+
+        // Set up error handling
+        // Note: The order of these lines is important!
+        // 1. Status code pages (used by later exception handlers)
+        app.UseStatusCodePagesWithReExecute("/error/{0}");
+        if (isDevelopment)
         {
+            // 2a. Developer exception page
+            // Note: Comes first otherwise it will absorb NotFoundExceptions too which we don't want
             app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
+
+            // 3a. Exception handler to "use" the NotFoundExceptionHandler we registered above
+            // Note: empty configure block is necessary to trigger our custom exception handler
+            // but without triggering the custom error page which would happen if a path was provided
+            // (which would replace the developer exception page!)
+            app.UseExceptionHandler(o => { });
         }
         else
         {
-            app.UseMiddleware<NotFoundExceptionMiddleware>();
-            app.UseExceptionHandler("/Home/Error");
+            // 2b. Custom error page for exceptions
+            app.UseExceptionHandler("/error/500");
+        }
+
+        if (!isDevelopment)
+        {
             app.UseHsts();
         }
         app.UseForwardedHeaders();
-
-        app.UseStatusCodePagesWithReExecute("/error/{0}");
-
-
         app.UseMiddleware<SecurityHeadersMiddleware>();
-
-
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider

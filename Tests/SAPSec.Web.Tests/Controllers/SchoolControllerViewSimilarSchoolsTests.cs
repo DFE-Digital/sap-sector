@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -66,20 +65,6 @@ public class SimilarSchoolsControllerTests
 
         _sut.ViewData["BreadcrumbNode"].Should().NotBeNull();
         _sut.ViewData["SchoolDetails"].Should().BeSameAs(schoolDetails);
-    }
-
-    [Fact]
-    public async Task ViewSimilarSchools_SchoolNotFound_RedirectsToNotFound()
-    {
-        var urn = "999999";
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ThrowsAsync(new NotFoundException("School not found"));
-
-        var result = await _sut.ViewSimilarSchools(urn, "Att8", 1);
-
-        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectResult.ActionName.Should().Be("NotFound");
     }
 
     [Fact]

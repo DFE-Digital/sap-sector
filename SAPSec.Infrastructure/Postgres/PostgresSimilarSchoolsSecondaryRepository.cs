@@ -74,7 +74,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         var results = await conn.QueryMultipleAsync(sql, new { urn });
 
         var currentSchool = await results.ReadSingleOrDefaultAsync<Establishment>();
-        if (currentSchoolDao == null)
+        if (currentSchool == null)
         {
             return (null, []);
         }

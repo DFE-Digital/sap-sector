@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
@@ -144,7 +143,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ThrowsAsync(new NotFoundException("Organisation not found"));
+            .ReturnsAsync((Organisation?)null);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
 
         // Act
@@ -153,8 +152,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]
@@ -163,7 +162,7 @@ public class OrganisationControllerTests
         // Arrange
         var userId = "user-123";
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ThrowsAsync(new NotFoundException("Organisation not found"));
+            .ReturnsAsync((Organisation?)null);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(userId);
 
         // Act
@@ -186,7 +185,7 @@ public class OrganisationControllerTests
         // Arrange
         var userId = "specific-user-id";
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ThrowsAsync(new NotFoundException("Organisation not found"));
+            .ReturnsAsync((Organisation?)null);
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns(userId);
 
         // Act
@@ -243,7 +242,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ThrowsAsync(new NotFoundException("User not found"));
+            .ReturnsAsync((User?)null);
 
         // Act
         var result = await _controller.Switch();
@@ -251,8 +250,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]
@@ -269,8 +268,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]
@@ -356,8 +355,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]
@@ -586,7 +585,7 @@ public class OrganisationControllerTests
     {
         // Arrange
         _mockUserService.Setup(s => s.GetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>()))
-            .ThrowsAsync(new NotFoundException("Organisation not found"));
+            .ReturnsAsync((Organisation?)null);
 
         // Act
         var result = await _controller.GetCurrent();

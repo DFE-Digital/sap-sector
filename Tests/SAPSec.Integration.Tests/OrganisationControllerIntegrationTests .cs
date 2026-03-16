@@ -1,6 +1,6 @@
-﻿using System.Net;
-using FluentAssertions;
+﻿using FluentAssertions;
 using SAPSec.Integration.Tests.Infrastructure;
+using System.Net;
 
 namespace SAPSec.Integration.Tests;
 

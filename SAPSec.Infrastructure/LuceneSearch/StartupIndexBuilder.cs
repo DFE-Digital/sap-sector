@@ -10,6 +10,7 @@ public class StartupIndexBuilder(
     IEstablishmentRepository establishmentRepository)
     : BackgroundService
 {
+    private const int RetryIntervalSeconds = 10;
     private long _indexBuiltSuccessfully = 0;
 
     private bool IndexBuiltSuccessfully
@@ -24,7 +25,7 @@ public class StartupIndexBuilder(
         {
             await TryBuildIndex(cancellationToken);
 
-            using PeriodicTimer timer = new(TimeSpan.FromMinutes(1));
+            using PeriodicTimer timer = new(TimeSpan.FromSeconds(RetryIntervalSeconds));
 
             while (!IndexBuiltSuccessfully
                 && await timer.WaitForNextTickAsync(cancellationToken))
@@ -44,22 +45,25 @@ public class StartupIndexBuilder(
         {
             logger.LogInformation("Reading establishment data at startup...");
 
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return;
-            }
+            cancellationToken.ThrowIfCancellationRequested();
 
             var schools = await establishmentRepository.GetAllEstablishmentsAsync();
 
-            logger.LogInformation("Establishment Data retrieved successfully");
+            if (!schools.Any())
+            {
+                logger.LogInformation("No establishment data was found, waiting for database to be fully generated.");
+
+                return;
+            }
+
+            logger.LogInformation("Establishment Data retrieved successfully.");
 
             logger.LogInformation("Building Lucene index at startup...");
 
             writer.BuildIndex(schools, cancellationToken);
-
-            logger.LogInformation("Lucene index built successfully");
-
             IndexBuiltSuccessfully = true;
+
+            logger.LogInformation("Lucene index built successfully.");
         }
         catch (Exception ex)
         {
