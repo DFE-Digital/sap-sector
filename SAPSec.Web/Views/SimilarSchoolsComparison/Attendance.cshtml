@@ -1,4 +1,369 @@
+@using System.Text.Json
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    var defaultYears = new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" };
+    var defaultBarData = new
+    {
+        labels = new[] { Model.Name, Model.SimilarSchoolName, "Schools in England average" },
+        data = new decimal[] { 5.2m, 5.5m, 4.9m }
+    };
+    var defaultLineData = new
+    {
+        labels = defaultYears,
+        datasets = new object[]
+        {
+            new { label = Model.Name, data = new decimal[] { 5.0m, 5.2m, 5.4m }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = Model.SimilarSchoolName, data = new decimal[] { 5.3m, 5.5m, 5.7m }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = "Schools in England average", data = new decimal[] { 4.7m, 4.9m, 5.1m }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
+        }
+    };
+    var chartColors = new[] { "#d53880", "#003078", "#1d8f89" };
+    var attendanceDataEndpoint = Url.Action("AttendanceData", "SimilarSchoolsComparison",
+        new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn });
+}
+
+<h1 class="govuk-heading-l">Attendance measures</h1>
+<p class="govuk-body">
+    How @Model.Name compares with @Model.SimilarSchoolName based on attendance measures.
+</p>
+
+<section aria-labelledby="attendance-heading" class="app-ks4-attainment">
+    <h2 class="govuk-heading-m" id="attendance-heading">Attendance</h2>
+
+    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="attendanceAbsenceType">Type of absence</label>
+            <select class="govuk-select"
+                    id="attendanceAbsenceType"
+                    name="attendanceAbsenceType"
+                    data-endpoint="@attendanceDataEndpoint">
+                <option value="overall" selected>Overall absence</option>
+                <option value="persistent">Persistent absence</option>
+            </select>
+        </div>
+
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="attendancePupilCharacteristic">Pupil characteristic</label>
+            <select class="govuk-select"
+                    id="attendancePupilCharacteristic"
+                    name="attendancePupilCharacteristic">
+                <option value="all" selected>All pupils</option>
+                <option value="disadvantaged">Disadvantaged pupils</option>
+                <option value="send">Pupils with SEND</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs app-attendance-tabs" data-module="govuk-tabs">
+        <h2 class="govuk-tabs__title">Attendance views</h2>
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#attendance-three-year-average">3-year average</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#attendance-year-by-year">Year by year</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#attendance-table">Table</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="attendance-three-year-average">
+            <div class="app-ks4-chart-container">
+                <canvas id="attendance-comparison-three-year-chart"
+                        class="js-chart"
+                        data-type="bar"
+                        data-axis-step="1"
+                        data-axis-max="10"
+                        data-axis-suffix="%"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(defaultBarData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
+            </div>
+
+            <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-1">Number of pupils entered</h3>
+            <a class="govuk-link" href="#">Number of pupils entered</a>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-year-by-year">
+            <div class="app-ks4-chart-container">
+                <canvas id="attendance-comparison-year-by-year-chart"
+                        class="js-chart"
+                        data-type="line"
+                        data-axis-step="10"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-show-x-grid="true"
+                        data-show-legend="true"
+                        data-show-datalabels="false"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(defaultLineData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
+            </div>
+
+            <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-1">Number of pupils entered</h3>
+            <a class="govuk-link" href="#">Number of pupils entered</a>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-table">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">School(s)</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2021 to 2022</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2022 to 2023</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">@Model.Name</th>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev2">5.0%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev">5.2%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-current">5.4%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-avg">5.2%</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev2">5.3%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev">5.5%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-current">5.7%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-avg">5.5%</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Schools in England average</th>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev2">4.7%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev">4.9%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-current">5.1%</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-avg">4.9%</td>
+                </tr>
+                </tbody>
+            </table>
+
+            <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-1">Number of pupils entered</h3>
+            <a class="govuk-link" href="#">Number of pupils entered</a>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script add-nonce="true">
+        (function () {
+            function updateTableRow(cells, values) {
+                cells.forEach(function (cell, index) {
+                    if (cell) {
+                        cell.textContent = values && values[index] ? values[index] : "No available data";
+                    }
+                });
+            }
+
+            function setActivePanel(tabContainer, targetId) {
+                var tabs = tabContainer.querySelectorAll(".govuk-tabs__tab");
+                var listItems = tabContainer.querySelectorAll(".govuk-tabs__list-item");
+                var panels = tabContainer.querySelectorAll(".govuk-tabs__panel");
+
+                panels.forEach(function (panel) {
+                    var isActive = panel.id === targetId;
+                    panel.classList.toggle("govuk-tabs__panel--hidden", !isActive);
+                });
+
+                listItems.forEach(function (item) {
+                    item.classList.remove("govuk-tabs__list-item--selected");
+                });
+
+                tabs.forEach(function (tab) {
+                    var href = tab.getAttribute("href") || "";
+                    var panelId = href.startsWith("#") ? href.substring(1) : "";
+                    var isActive = panelId === targetId;
+                    tab.setAttribute("aria-selected", isActive ? "true" : "false");
+                    tab.setAttribute("tabindex", isActive ? "0" : "-1");
+
+                    if (isActive) {
+                        var parent = tab.closest(".govuk-tabs__list-item");
+                        if (parent) {
+                            parent.classList.add("govuk-tabs__list-item--selected");
+                        }
+                    }
+                });
+            }
+
+            function getInitialTargetId(tabContainer) {
+                var selectedTab = tabContainer.querySelector(".govuk-tabs__list-item--selected .govuk-tabs__tab");
+                if (selectedTab) {
+                    var selectedHref = selectedTab.getAttribute("href") || "";
+                    if (selectedHref.startsWith("#")) {
+                        return selectedHref.substring(1);
+                    }
+                }
+
+                var firstTab = tabContainer.querySelector(".govuk-tabs__tab");
+                if (!firstTab) {
+                    return null;
+                }
+
+                var firstHref = firstTab.getAttribute("href") || "";
+                return firstHref.startsWith("#") ? firstHref.substring(1) : null;
+            }
+
+            function initAttendanceTabs() {
+                document.querySelectorAll(".app-attendance-tabs").forEach(function (tabContainer) {
+                    var initialTargetId = getInitialTargetId(tabContainer);
+                    if (initialTargetId) {
+                        setActivePanel(tabContainer, initialTargetId);
+                    }
+
+                    tabContainer.addEventListener("click", function (event) {
+                        var tab = event.target.closest(".govuk-tabs__tab");
+                        if (!tab || !tabContainer.contains(tab)) {
+                            return;
+                        }
+
+                        var href = tab.getAttribute("href") || "";
+                        if (!href.startsWith("#")) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        setActivePanel(tabContainer, href.substring(1));
+                    });
+
+                    tabContainer.addEventListener("keydown", function (event) {
+                        if (event.key !== " " && event.key !== "Enter") {
+                            return;
+                        }
+
+                        var tab = event.target.closest(".govuk-tabs__tab");
+                        if (!tab || !tabContainer.contains(tab)) {
+                            return;
+                        }
+
+                        var href = tab.getAttribute("href") || "";
+                        if (!href.startsWith("#")) {
+                            return;
+                        }
+
+                        event.preventDefault();
+                        setActivePanel(tabContainer, href.substring(1));
+                    });
+                });
+            }
+
+            function applyAttendanceViews(payload, barCanvas, lineCanvas, tableCellMap) {
+                if (!payload) {
+                    return;
+                }
+
+                var isPersistentAbsence = payload.absenceType === "persistent";
+                var barAxisMax = isPersistentAbsence ? 30 : 10;
+                var barAxisStep = isPersistentAbsence ? 5 : 1;
+
+                var barChart = window.Chart && barCanvas ? window.Chart.getChart(barCanvas) : null;
+                if (barChart && barChart.data && barChart.data.datasets && barChart.data.datasets[0]) {
+                    barChart.data.datasets[0].data = payload.bar || [];
+                    if (barChart.options && barChart.options.scales && barChart.options.scales.x) {
+                        barChart.options.scales.x.max = barAxisMax;
+                        barChart.options.scales.x.ticks.stepSize = barAxisStep;
+                    }
+                    barChart.update();
+                }
+
+                var lineChart = window.Chart && lineCanvas ? window.Chart.getChart(lineCanvas) : null;
+                if (lineChart && lineChart.data && lineChart.data.datasets && lineChart.data.datasets.length >= 3) {
+                    lineChart.data.labels = payload.years || [];
+                    lineChart.data.datasets[0].data = payload.line && payload.line.thisSchool ? payload.line.thisSchool : [];
+                    lineChart.data.datasets[1].data = payload.line && payload.line.similarSchool ? payload.line.similarSchool : [];
+                    lineChart.data.datasets[2].data = payload.line && payload.line.england ? payload.line.england : [];
+                    lineChart.update();
+                }
+
+                updateTableRow(tableCellMap.thisSchool, payload.table && payload.table.thisSchool ? payload.table.thisSchool : []);
+                updateTableRow(tableCellMap.similarSchool, payload.table && payload.table.similarSchool ? payload.table.similarSchool : []);
+                updateTableRow(tableCellMap.england, payload.table && payload.table.england ? payload.table.england : []);
+            }
+
+            function initAttendanceFilters() {
+                var absenceTypeSelect = document.getElementById("attendanceAbsenceType");
+                var pupilCharacteristicSelect = document.getElementById("attendancePupilCharacteristic");
+                if (!absenceTypeSelect || !pupilCharacteristicSelect) {
+                    return;
+                }
+
+                var dataEndpoint = absenceTypeSelect.getAttribute("data-endpoint");
+                if (!dataEndpoint) {
+                    return;
+                }
+
+                var barChartCanvas = document.getElementById("attendance-comparison-three-year-chart");
+                var lineChartCanvas = document.getElementById("attendance-comparison-year-by-year-chart");
+
+                var tableCellMap = {
+                    thisSchool: [
+                        document.querySelector("[data-attendance-cell='this-prev2']"),
+                        document.querySelector("[data-attendance-cell='this-prev']"),
+                        document.querySelector("[data-attendance-cell='this-current']"),
+                        document.querySelector("[data-attendance-cell='this-avg']")
+                    ],
+                    similarSchool: [
+                        document.querySelector("[data-attendance-cell='similar-prev2']"),
+                        document.querySelector("[data-attendance-cell='similar-prev']"),
+                        document.querySelector("[data-attendance-cell='similar-current']"),
+                        document.querySelector("[data-attendance-cell='similar-avg']")
+                    ],
+                    england: [
+                        document.querySelector("[data-attendance-cell='england-prev2']"),
+                        document.querySelector("[data-attendance-cell='england-prev']"),
+                        document.querySelector("[data-attendance-cell='england-current']"),
+                        document.querySelector("[data-attendance-cell='england-avg']")
+                    ]
+                };
+
+                function loadAttendanceViews() {
+                    var requestUrl = dataEndpoint
+                        + "?absenceType=" + encodeURIComponent(absenceTypeSelect.value)
+                        + "&pupilCharacteristic=" + encodeURIComponent(pupilCharacteristicSelect.value);
+
+                    return fetch(requestUrl, {
+                        headers: {
+                            Accept: "application/json"
+                        }
+                    })
+                        .then(function (response) {
+                            if (!response.ok) {
+                                throw new Error("Request failed with status " + response.status);
+                            }
+                            return response.json();
+                        })
+                        .then(function (payload) {
+                            applyAttendanceViews(payload, barChartCanvas, lineChartCanvas, tableCellMap);
+                        })
+                        .catch(function (error) {
+                            console.error("Failed to load attendance data.", error);
+                        });
+                }
+
+                absenceTypeSelect.addEventListener("change", loadAttendanceViews);
+                pupilCharacteristicSelect.addEventListener("change", loadAttendanceViews);
+                loadAttendanceViews();
+            }
+
+            function init() {
+                initAttendanceTabs();
+                initAttendanceFilters();
+            }
+
+            if (document.readyState === "loading") {
+                document.addEventListener("DOMContentLoaded", init);
+            } else {
+                init();
+            }
+        })();
+    </script>
 }
