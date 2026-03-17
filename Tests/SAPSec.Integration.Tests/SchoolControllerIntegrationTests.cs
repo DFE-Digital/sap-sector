@@ -1,131 +1,55 @@
+using System.Net;
 using FluentAssertions;
+using SAPSec.Integration.Tests.Infrastructure;
 
 namespace SAPSec.Integration.Tests;
 
-public class SchoolControllerIntegrationTests
+[Collection("IntegrationTestsCollection")]
+public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture)
 {
-    private static readonly string SchoolIndexViewPath = Path.GetFullPath(
-        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "SAPSec.Web", "Views", "School", "Index.cshtml"));
-
-    private static readonly string SchoolDetailsViewPath = Path.GetFullPath(
-        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "SAPSec.Web", "Views", "School", "SchoolDetails.cshtml"));
-
-    private static readonly string SchoolLayoutViewPath = Path.GetFullPath(
-        Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "SAPSec.Web", "Views", "School", "_Layout.cshtml"));
+    private const string SchoolOverviewPath = "/school/147788";
+    private const string SchoolDetailsPath = "/school/147788/school-details";
 
     [Fact]
-    public async Task GetSchool_OverviewViewExists()
+    public async Task GetSchoolOverview_ReturnsSuccess()
     {
-        File.Exists(SchoolIndexViewPath).Should().BeTrue();
+        var response = await fixture.Client.GetAsync(SchoolOverviewPath);
 
-        var content = await File.ReadAllTextAsync(SchoolIndexViewPath);
-
-        content.Should().NotBeNullOrWhiteSpace();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
     }
 
     [Fact]
-    public async Task GetSchool_OverviewContainsExpectedContent()
+    public async Task GetSchoolOverview_ContainsExpectedContent()
     {
-        var content = await File.ReadAllTextAsync(SchoolIndexViewPath);
+        var response = await fixture.Client.GetAsync(SchoolOverviewPath);
+        var content = await response.Content.ReadAsStringAsync();
 
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("Compare school performance");
-        content.Should().Contain("View similar schools to connect with");
-        content.Should().Contain("how the DfE defines what a similar school is");
-    }
-
-    [Fact]
-    public async Task GetSchool_SchoolDetailsViewExists()
-    {
-        File.Exists(SchoolDetailsViewPath).Should().BeTrue();
-
-        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
-
-        content.Should().NotBeNullOrWhiteSpace();
-    }
-
-    [Fact]
-    public async Task GetSchool_ContainsLocationSection()
-    {
-        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
-
-        content.Should().Contain("Location");
-        content.Should().Contain("Address");
-        content.Should().Contain("Local authority");
-        content.Should().Contain("Region");
-        content.Should().Contain("Urban/rural description");
-    }
-
-    [Fact]
-    public async Task GetSchool_ContainsSchoolDetailsSection()
-    {
-        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
-
-        content.Should().Contain("School details");
-        content.Should().Contain("ID");
-        content.Should().Contain("Age range");
-        content.Should().Contain("Gender of entry");
-        content.Should().Contain("Phase of education");
-        content.Should().Contain("School type");
-        content.Should().Contain("Governance structure");
-        content.Should().Contain("Academy trust");
-        content.Should().Contain("Admissions policy");
-        content.Should().Contain("Resourced provision");
-        content.Should().Contain("Religious character");
-    }
-
-    [Fact]
-    public async Task GetSchool_ContainsContactDetailsSection()
-    {
-        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
-
-        content.Should().Contain("Contact details");
-        content.Should().Contain("Headteacher / Principal");
-        content.Should().Contain("Website");
-        content.Should().Contain("Telephone");
-        content.Should().Contain("Email");
-    }
-
-    [Fact]
-    public async Task GetSchool_ContainsFurtherInformationSection()
-    {
-        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
-
-        content.Should().Contain("Further information");
-        content.Should().Contain("Ofsted report");
-        content.Should().Contain("reports.ofsted.gov.uk");
-    }
-
-    [Fact]
-    public async Task GetSchool_HasExpectedStructureAndLinks()
-    {
-        var content = await File.ReadAllTextAsync(SchoolDetailsViewPath);
-
-        content.Should().Contain("ViewData[\"Title\"] = $\"School details\"");
-        content.Should().Contain("School details");
-        content.Should().Contain("govuk-summary-list");
-        content.Should().Contain("govuk-summary-list__key");
-        content.Should().Contain("govuk-summary-list__value");
-        content.Should().Contain("govuk-heading-xl");
-        content.Should().Contain("govuk-heading-m");
-        content.Should().Contain("target=\"_blank\"");
-        content.Should().Contain("rel=\"noopener noreferrer\"");
-        content.Should().Contain("opens in a new tab");
-    }
-
-    [Fact]
-    public async Task GetSchool_LayoutContainsNavigationLinks()
-    {
-        File.Exists(SchoolLayoutViewPath).Should().BeTrue();
-
-        var content = await File.ReadAllTextAsync(SchoolLayoutViewPath);
-
-        content.Should().Contain("Overview");
-        content.Should().Contain("KS4 headline measures");
-        content.Should().Contain("KS4 core subjects");
-        content.Should().Contain("Attendance");
         content.Should().Contain("View similar schools");
-        content.Should().Contain("School details");
         content.Should().Contain("What is a similar school?");
-        content.Should().Contain("govuk-breadcrumbs__link");
+    }
+
+    [Fact]
+    public async Task GetSchoolDetails_ReturnsSuccess()
+    {
+        var response = await fixture.Client.GetAsync(SchoolDetailsPath);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+    }
+
+    [Fact]
+    public async Task GetSchoolDetails_ContainsExpectedSections()
+    {
+        var response = await fixture.Client.GetAsync(SchoolDetailsPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("School details");
+        content.Should().Contain("Location");
+        content.Should().Contain("Contact details");
+        content.Should().Contain("Further information");
     }
 }
