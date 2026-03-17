@@ -7,12 +7,10 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class SimilarSchoolsComparisonIntegrationTests(WebApplicationSetupFixture fixture)
 {
-    private const string ComparisonBasePath = "/school/108088/view-similar-schools/108075";
-
     [Fact]
     public async Task GetSimilarity_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync(ComparisonBasePath);
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Similarity");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -21,7 +19,7 @@ public class SimilarSchoolsComparisonIntegrationTests(WebApplicationSetupFixture
     [Fact]
     public async Task GetSimilarity_ContainsComparisonHeadingAndTable()
     {
-        var response = await fixture.Client.GetAsync(ComparisonBasePath);
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Similarity");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -33,7 +31,7 @@ public class SimilarSchoolsComparisonIntegrationTests(WebApplicationSetupFixture
     [Fact]
     public async Task GetSchoolDetails_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync($"{ComparisonBasePath}/SchoolDetails");
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -42,11 +40,12 @@ public class SimilarSchoolsComparisonIntegrationTests(WebApplicationSetupFixture
     [Fact]
     public async Task GetSchoolDetails_ContainsExpectedSections()
     {
-        var response = await fixture.Client.GetAsync($"{ComparisonBasePath}/SchoolDetails");
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("School Details");
-        content.Should().Contain("Compare sections");
+        content.Should().Contain("Location");
+        content.Should().Contain("Further information");
     }
 }

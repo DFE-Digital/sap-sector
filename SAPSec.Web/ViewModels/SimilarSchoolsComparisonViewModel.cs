@@ -60,6 +60,12 @@ public class SimilarSchoolsComparisonViewModel
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolEngMaths59YearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths59YearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandEngMaths59YearByYear { get; set; }
+    public decimal? ThisSchoolDestinationsThreeYearAverage { get; set; }
+    public decimal? SelectedSchoolDestinationsThreeYearAverage { get; set; }
+    public decimal? EnglandDestinationsThreeYearAverage { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolDestinationsYearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolDestinationsYearByYear { get; set; }
+    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandDestinationsYearByYear { get; set; }
 
     public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
     public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
@@ -70,6 +76,9 @@ public class SimilarSchoolsComparisonViewModel
     public string ThisSchoolEngMaths59Display => DisplayPercent(ThisSchoolEngMaths59ThreeYearAverage);
     public string SelectedSchoolEngMaths59Display => DisplayPercent(SelectedSchoolEngMaths59ThreeYearAverage);
     public string EnglandEngMaths59Display => DisplayPercent(EnglandEngMaths59ThreeYearAverage);
+    public string ThisSchoolDestinationsDisplay => DisplayWholePercent(ThisSchoolDestinationsThreeYearAverage);
+    public string SelectedSchoolDestinationsDisplay => DisplayWholePercent(SelectedSchoolDestinationsThreeYearAverage);
+    public string EnglandDestinationsDisplay => DisplayWholePercent(EnglandDestinationsThreeYearAverage);
 
     public decimal ThisSchoolWidthPercent => WidthPercent(ThisSchoolAttainment8ThreeYearAverage);
     public decimal SelectedSchoolWidthPercent => WidthPercent(SelectedSchoolAttainment8ThreeYearAverage);
@@ -93,4 +102,9 @@ public class SimilarSchoolsComparisonViewModel
 
     public static string DisplayPercent(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) + "%" : "No available data";
+
+    public static string DisplayWholePercent(decimal? value) =>
+        value.HasValue
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
+            : "No available data";
 }

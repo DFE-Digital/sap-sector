@@ -107,6 +107,16 @@ public class SimilarSchoolsComparisonController : Controller
         model.EnglandEngMaths59YearByYear =
             thisSchoolKs4?.EngMaths59YearByYear.England
             ?? selectedSchoolKs4?.EngMaths59YearByYear.England;
+        model.ThisSchoolDestinationsThreeYearAverage = thisSchoolKs4?.DestinationsThreeYearAverage.SchoolValue;
+        model.SelectedSchoolDestinationsThreeYearAverage = selectedSchoolKs4?.DestinationsThreeYearAverage.SchoolValue;
+        model.EnglandDestinationsThreeYearAverage =
+            thisSchoolKs4?.DestinationsThreeYearAverage.EnglandValue
+            ?? selectedSchoolKs4?.DestinationsThreeYearAverage.EnglandValue;
+        model.ThisSchoolDestinationsYearByYear = thisSchoolKs4?.DestinationsYearByYear.School;
+        model.SelectedSchoolDestinationsYearByYear = selectedSchoolKs4?.DestinationsYearByYear.School;
+        model.EnglandDestinationsYearByYear =
+            thisSchoolKs4?.DestinationsYearByYear.England
+            ?? selectedSchoolKs4?.DestinationsYearByYear.England;
 
         SetComparisonSchoolViewData(model);
         return View(model);
@@ -199,6 +209,88 @@ public class SimilarSchoolsComparisonController : Controller
                     SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Previous),
                     SimilarSchoolsComparisonViewModel.DisplayPercent(englandSeries?.Current),
                     SimilarSchoolsComparisonViewModel.DisplayPercent(englandThreeYear)
+                }
+            }
+        });
+    }
+
+    [HttpGet]
+    [Route("Ks4DestinationsData")]
+    public async Task<IActionResult> Ks4DestinationsData(string urn, string similarSchoolUrn, string destination = "all")
+    {
+        if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
+        {
+            return BadRequest(new { error = "Missing route parameters." });
+        }
+
+        var normalizedDestination = NormalizeDestinationFilter(destination);
+        var thisSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
+        var selectedSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(similarSchoolUrn));
+
+        var thisSchoolThreeYear = SelectDestinationsAverage(thisSchoolKs4, normalizedDestination)?.SchoolValue;
+        var selectedSchoolThreeYear = SelectDestinationsAverage(selectedSchoolKs4, normalizedDestination)?.SchoolValue;
+        var englandThreeYear =
+            SelectDestinationsAverage(thisSchoolKs4, normalizedDestination)?.EnglandValue
+            ?? SelectDestinationsAverage(selectedSchoolKs4, normalizedDestination)?.EnglandValue;
+
+        var thisSchoolSeries = SelectDestinationsYearByYear(thisSchoolKs4, normalizedDestination)?.School;
+        var selectedSchoolSeries = SelectDestinationsYearByYear(selectedSchoolKs4, normalizedDestination)?.School;
+        var englandSeries =
+            SelectDestinationsYearByYear(thisSchoolKs4, normalizedDestination)?.England
+            ?? SelectDestinationsYearByYear(selectedSchoolKs4, normalizedDestination)?.England;
+
+        return Json(new
+        {
+            destination = normalizedDestination,
+            bar = new decimal?[]
+            {
+                thisSchoolThreeYear,
+                selectedSchoolThreeYear,
+                englandThreeYear
+            },
+            line = new
+            {
+                thisSchool = new decimal?[]
+                {
+                    thisSchoolSeries?.Previous2,
+                    thisSchoolSeries?.Previous,
+                    thisSchoolSeries?.Current
+                },
+                similarSchool = new decimal?[]
+                {
+                    selectedSchoolSeries?.Previous2,
+                    selectedSchoolSeries?.Previous,
+                    selectedSchoolSeries?.Current
+                },
+                england = new decimal?[]
+                {
+                    englandSeries?.Previous2,
+                    englandSeries?.Previous,
+                    englandSeries?.Current
+                }
+            },
+            table = new
+            {
+                thisSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolThreeYear)
+                },
+                similarSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolThreeYear)
+                },
+                england = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandThreeYear)
                 }
             }
         });
@@ -394,4 +486,28 @@ public class SimilarSchoolsComparisonController : Controller
             ? similarityCalculationMethod
             : SimilarityCalculationMethod.National;
     }
+
+    private static string NormalizeDestinationFilter(string? destination) =>
+        destination?.ToLowerInvariant() switch
+        {
+            "education" => "education",
+            "employment" => "employment",
+            _ => "all"
+        };
+
+    private static Ks4HeadlineMeasureAverage? SelectDestinationsAverage(GetKs4HeadlineMeasuresResponse? response, string destination) =>
+        destination switch
+        {
+            "education" => response?.DestinationsEducationThreeYearAverage,
+            "employment" => response?.DestinationsEmploymentThreeYearAverage,
+            _ => response?.DestinationsThreeYearAverage
+        };
+
+    private static Ks4HeadlineMeasureYearByYear? SelectDestinationsYearByYear(GetKs4HeadlineMeasuresResponse? response, string destination) =>
+        destination switch
+        {
+            "education" => response?.DestinationsEducationYearByYear,
+            "employment" => response?.DestinationsEmploymentYearByYear,
+            _ => response?.DestinationsYearByYear
+        };
 }

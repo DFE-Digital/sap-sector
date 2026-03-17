@@ -63,6 +63,7 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
         content.Should().Contain("KS4 headline performance measures");
         content.Should().Contain("Progress 8");
         content.Should().Contain("Attainment 8");

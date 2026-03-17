@@ -2,6 +2,7 @@
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
 }
 
 <h1 class="govuk-heading-l">KS4 headline performance measures</h1>
@@ -47,99 +48,8 @@
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/similar-schools-ks4-grade-switcher.js" asp-append-version="true" add-nonce="true"></script>
-    <script add-nonce="true">
-        (function () {
-            function isMobileView() {
-                return window.matchMedia("(max-width: 40.0625em)").matches;
-            }
-
-            function setActivePanel(tabContainer, targetId) {
-                var tabs = tabContainer.querySelectorAll(".govuk-tabs__tab");
-                var listItems = tabContainer.querySelectorAll(".govuk-tabs__list-item");
-                var panels = tabContainer.querySelectorAll(".govuk-tabs__panel");
-
-                panels.forEach(function (panel) {
-                    if (panel.id === targetId) {
-                        panel.classList.remove("govuk-tabs__panel--hidden");
-                    } else {
-                        panel.classList.add("govuk-tabs__panel--hidden");
-                    }
-                });
-
-                listItems.forEach(function (item) {
-                    item.classList.remove("govuk-tabs__list-item--selected");
-                });
-
-                tabs.forEach(function (tab) {
-                    var href = tab.getAttribute("href") || "";
-                    var id = href.startsWith("#") ? href.substring(1) : "";
-                    if (id === targetId) {
-                        var parent = tab.closest(".govuk-tabs__list-item");
-                        if (parent) {
-                            parent.classList.add("govuk-tabs__list-item--selected");
-                        }
-                    }
-                });
-            }
-
-            function getInitialTargetId(tabContainer) {
-                var selectedTab = tabContainer.querySelector(".govuk-tabs__list-item--selected .govuk-tabs__tab");
-                if (selectedTab) {
-                    var selectedHref = selectedTab.getAttribute("href") || "";
-                    if (selectedHref.startsWith("#")) {
-                        return selectedHref.substring(1);
-                    }
-                }
-
-                var firstTab = tabContainer.querySelector(".govuk-tabs__tab");
-                if (!firstTab) {
-                    return null;
-                }
-
-                var firstHref = firstTab.getAttribute("href") || "";
-                return firstHref.startsWith("#") ? firstHref.substring(1) : null;
-            }
-
-            function initTabContainer(tabContainer) {
-                if (!isMobileView()) {
-                    return;
-                }
-
-                var initialTargetId = getInitialTargetId(tabContainer);
-                if (initialTargetId) {
-                    setActivePanel(tabContainer, initialTargetId);
-                }
-
-                tabContainer.addEventListener("click", function (event) {
-                    var tab = event.target.closest(".govuk-tabs__tab");
-                    if (!tab || !tabContainer.contains(tab)) {
-                        return;
-                    }
-
-                    var href = tab.getAttribute("href") || "";
-                    if (!href.startsWith("#")) {
-                        return;
-                    }
-
-                    event.preventDefault();
-                    setActivePanel(tabContainer, href.substring(1));
-                });
-            }
-
-            function init() {
-                document.querySelectorAll(".app-ks4-tabs").forEach(initTabContainer);
-            }
-
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", init);
-            } else {
-                init();
-            }
-
-            window.addEventListener("load", init);
-            window.setTimeout(init, 100);
-        })();
-    </script>
+    <script src="~/js/similar-schools-ks4-destinations-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
 
 <section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
@@ -228,7 +138,7 @@
             @{
                 var yearByYearData = new
                 {
-                    labels = new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" },
+                    labels = ks4YearLabels,
                     datasets = new object[]
                     {
                         new
@@ -300,9 +210,9 @@
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">School(s)</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2025 to 2026</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                     </tr>
                 </thead>
@@ -404,7 +314,7 @@
             @{
                 var engMathsYearByYearData = new
                 {
-                    labels = new[] { "2023 to 2024", "2024 to 2025", "2025 to 2026" },
+                    labels = ks4YearLabels,
                     datasets = new object[]
                     {
                         new
@@ -474,9 +384,9 @@
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">School(s)</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">2025 to 2026</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                     </tr>
                 </thead>
@@ -508,3 +418,191 @@
         </div>
     </div>
 </section>
+
+<section aria-labelledby="destinations-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+    <h2 class="govuk-heading-m" id="destinations-heading">Staying in education or entering employment</h2>
+    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about staying in education or entering employment data</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                This data shows the number of pupils who either stayed in education, started an apprenticeship, or entered employment for at least two terms after completing key stage 4.
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                The most recent data covers pupils who finished year 11 in 2023. The three-year average is the average of pupils completed year 11 in 2021,2022 and 2023.
+            </p>
+        </div>
+    </details>
+
+
+    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="destinationsType">Destination</label>
+            <select class="govuk-select"
+                    id="destinationsType"
+                    name="destinationsType"
+                    data-endpoint="@Url.Action("Ks4DestinationsData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })">
+                <option value="all" selected>All destinations</option>
+                <option value="education">Education</option>
+                <option value="employment">Employment and apprenticeships</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#destinations-three-year-average">3-year average</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#destinations-year-by-year">Year by year</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#destinations-table-view">Table</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="destinations-three-year-average">
+            @{
+                var destinationsChartData = new
+                {
+                    labels = new[]
+                    {
+                        Model.Name,
+                        Model.SimilarSchoolName,
+                        "Schools in England average"
+                    },
+                    data = new decimal?[]
+                    {
+                        Model.ThisSchoolDestinationsThreeYearAverage,
+                        Model.SelectedSchoolDestinationsThreeYearAverage,
+                        Model.EnglandDestinationsThreeYearAverage
+                    }
+                };
+                var destinationsChartColors = new[] { "#d53780", "#003078", "#003078" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="destinations-comparison-chart"
+                        class="js-chart"
+                        data-type="bar"
+                        data-axis-step="25"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(destinationsChartColors))'>
+                </canvas>
+            </div>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-year-by-year">
+            @{
+                var destinationsYearByYearData = new
+                {
+                    labels = ks4YearLabels,
+                    datasets = new object[]
+                    {
+                        new
+                        {
+                            label = Model.Name,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal?[]
+                            {
+                                Model.ThisSchoolDestinationsYearByYear?.Previous2,
+                                Model.ThisSchoolDestinationsYearByYear?.Previous,
+                                Model.ThisSchoolDestinationsYearByYear?.Current
+                            }
+                        },
+                        new
+                        {
+                            label = Model.SimilarSchoolName,
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal?[]
+                            {
+                                Model.SelectedSchoolDestinationsYearByYear?.Previous2,
+                                Model.SelectedSchoolDestinationsYearByYear?.Previous,
+                                Model.SelectedSchoolDestinationsYearByYear?.Current
+                            }
+                        },
+                        new
+                        {
+                            label = "Schools in England average",
+                            borderWidth = 2,
+                            pointRadius = 4,
+                            pointHoverRadius = 5,
+                            tension = 0,
+                            data = new decimal?[]
+                            {
+                                Model.EnglandDestinationsYearByYear?.Previous2,
+                                Model.EnglandDestinationsYearByYear?.Previous,
+                                Model.EnglandDestinationsYearByYear?.Current
+                            }
+                        }
+                    }
+                };
+                var destinationsYearByYearColors = new[] { "#d53780", "#003078", "#1d8f89" };
+            }
+            <div class="app-ks4-chart-container">
+                <canvas id="destinations-comparison-yearbyyear-chart"
+                        class="js-chart"
+                        data-type="line"
+                        data-axis-step="25"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-show-legend="true"
+                        data-show-datalabels="false"
+                        data-show-x-grid="true"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearColors))'>
+                </canvas>
+            </div>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.Name</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-avg">@Model.ThisSchoolDestinationsDisplay</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-avg">@Model.SelectedSchoolDestinationsDisplay</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Schools in England average</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-avg">@Model.EnglandDestinationsDisplay</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+

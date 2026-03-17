@@ -11,6 +11,7 @@ using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.KS4.Destinations;
 using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.Mocks;
@@ -62,6 +63,9 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
                 services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
                 services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
+                services.AddSingleton<IJsonFile<EstablishmentDestinations>, JsonFile<EstablishmentDestinations>>();
+                services.AddSingleton<IJsonFile<LADestinations>, JsonFile<LADestinations>>();
+                services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
 
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
