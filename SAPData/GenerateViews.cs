@@ -206,11 +206,6 @@ public sealed class GenerateViews
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
             }
-            else if (view.ViewName.Equals("v_england_absence", StringComparison.OrdinalIgnoreCase))
-            {
-                sql = GenerateEnglandAbsenceView(tableMap);
-            }
-
             // 6) Everything else uses DataMap-driven materialized view generation
             else
             {
@@ -393,49 +388,6 @@ public sealed class GenerateViews
         sb.AppendLine();
         sb.AppendLine($"CREATE MATERIALIZED VIEW {viewName} AS");
         sb.AppendLine($"SELECT * FROM {rawTable};");
-        return sb.ToString();
-    }
-
-    private string GenerateEnglandAbsenceView(Dictionary<string, string> tableMap)
-    {
-        const string preferredRawTable = "t_1_absence_3term_nat__2642eb995e";
-
-        var rawTable = preferredRawTable;
-        if (!tableMap.Values.Contains(preferredRawTable, StringComparer.OrdinalIgnoreCase))
-        {
-            return BuildSkippedSql("v_england_absence", $"Preferred raw table '{preferredRawTable}' was not found in table mappings.");
-        }
-
-        var sb = new StringBuilder();
-        sb.AppendLine("-- AUTO-GENERATED MATERIALIZED VIEW: v_england_absence");
-        sb.AppendLine();
-        sb.AppendLine("DROP MATERIALIZED VIEW IF EXISTS v_england_absence;");
-        sb.AppendLine();
-        sb.AppendLine("CREATE MATERIALIZED VIEW v_england_absence AS");
-        sb.AppendLine("WITH base AS (");
-        sb.AppendLine("    SELECT *");
-        sb.AppendLine($"    FROM {rawTable}");
-        sb.AppendLine("    WHERE UPPER(TRIM(\"geographic_level\")) = 'NATIONAL'");
-        sb.AppendLine("      AND UPPER(TRIM(\"education_phase\")) = 'STATE-FUNDED SECONDARY'");
-        sb.AppendLine("      AND \"time_period\" ~ '^[0-9]{6}$'");
-        sb.AppendLine("),");
-        sb.AppendLine("ranked AS (");
-        sb.AppendLine("    SELECT");
-        sb.AppendLine("        *,");
-        sb.AppendLine("        DENSE_RANK() OVER (ORDER BY \"time_period\" DESC) AS rn");
-        sb.AppendLine("    FROM base");
-        sb.AppendLine(")");
-        sb.AppendLine("SELECT");
-        sb.AppendLine("    MAX(CASE WHEN rn = 1 THEN \"sess_overall_percent\" END) AS \"Abs_Tot_Eng_Current_Pct\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 2 THEN \"sess_overall_percent\" END) AS \"Abs_Tot_Eng_Previous_Pct\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 3 THEN \"sess_overall_percent\" END) AS \"Abs_Tot_Eng_Previous2_Pct\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 1 THEN \"enrolments_pa_10_exact_percent\" END) AS \"Abs_Persistent_Eng_Current_Pct\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 2 THEN \"enrolments_pa_10_exact_percent\" END) AS \"Abs_Persistent_Eng_Previous_Pct\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 3 THEN \"enrolments_pa_10_exact_percent\" END) AS \"Abs_Persistent_Eng_Previous2_Pct\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 1 THEN \"time_period\" END) AS \"Current_Time_Period\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 2 THEN \"time_period\" END) AS \"Previous_Time_Period\",");
-        sb.AppendLine("    MAX(CASE WHEN rn = 3 THEN \"time_period\" END) AS \"Previous2_Time_Period\"");
-        sb.AppendLine("FROM ranked;");
         return sb.ToString();
     }
 

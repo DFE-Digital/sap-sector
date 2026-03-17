@@ -29,10 +29,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
                 "Abs_Tot_Eng_Previous2_Pct",
                 "Abs_Persistent_Eng_Current_Pct",
                 "Abs_Persistent_Eng_Previous_Pct",
-                "Abs_Persistent_Eng_Previous2_Pct",
-                "Current_Time_Period",
-                "Previous_Time_Period",
-                "Previous2_Time_Period"
+                "Abs_Persistent_Eng_Previous2_Pct"
             FROM public.v_england_absence
             LIMIT 1;
         """;
@@ -41,17 +38,8 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
 
         var establishmentAttendance = await results.ReadSingleOrDefaultAsync<EstablishmentAttendance>();
         var englandRow = await results.ReadSingleOrDefaultAsync<EnglandAttendanceRow>();
-        var years = new[]
-            {
-                englandRow?.Previous2_Time_Period,
-                englandRow?.Previous_Time_Period,
-                englandRow?.Current_Time_Period
-            }
-            .Select(ToAcademicYearLabel)
-            .Where(x => !string.IsNullOrWhiteSpace(x))
-            .ToArray();
 
-        if (establishmentAttendance is null && englandRow is null && years.Length == 0)
+        if (establishmentAttendance is null && englandRow is null)
         {
             return null;
         }
@@ -59,7 +47,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
         return new AttendanceMeasuresData(
             establishmentAttendance,
             englandRow?.ToEnglandAttendance(),
-            years);
+            Array.Empty<string>());
     }
 
     private sealed class EnglandAttendanceRow
@@ -70,9 +58,6 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
         public decimal? Abs_Persistent_Eng_Current_Pct { get; init; }
         public decimal? Abs_Persistent_Eng_Previous_Pct { get; init; }
         public decimal? Abs_Persistent_Eng_Previous2_Pct { get; init; }
-        public string? Current_Time_Period { get; init; }
-        public string? Previous_Time_Period { get; init; }
-        public string? Previous2_Time_Period { get; init; }
 
         public EnglandAttendance ToEnglandAttendance() => new()
         {
@@ -83,26 +68,5 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
             Abs_Persistent_Eng_Previous_Pct = Abs_Persistent_Eng_Previous_Pct,
             Abs_Persistent_Eng_Previous2_Pct = Abs_Persistent_Eng_Previous2_Pct
         };
-    }
-
-    private static string ToAcademicYearLabel(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value) || value.Length != 6)
-        {
-            return string.Empty;
-        }
-
-        if (!int.TryParse(value[..4], out var startYear) || !int.TryParse(value[4..], out var endYearSuffix))
-        {
-            return string.Empty;
-        }
-
-        var expectedSuffix = startYear % 100 + 1;
-        if (endYearSuffix != expectedSuffix)
-        {
-            return string.Empty;
-        }
-
-        return $"{startYear} to {startYear + 1}";
     }
 }

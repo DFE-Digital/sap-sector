@@ -5,19 +5,19 @@
     var initialBarData = new
     {
         labels = new[] { Model.Name, Model.SimilarSchoolName, "Schools in England average" },
-        data = new decimal?[] { null, null, null }
+        data = Array.Empty<decimal?>()
     };
     var initialLineData = new
     {
-        labels = Array.Empty<string>(),
+        labels = new[] { "Previous year 2", "Previous year", "Current year" },
         datasets = new object[]
         {
-            new { label = Model.Name, data = new decimal?[] { null, null, null }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
-            new { label = Model.SimilarSchoolName, data = new decimal?[] { null, null, null }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
-            new { label = "Schools in England average", data = new decimal?[] { null, null, null }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
+            new { label = Model.Name, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = Model.SimilarSchoolName, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = "Schools in England average", data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
         }
     };
-    var chartColors = new[] { "#d53880", "#003078", "#1d8f89" };
+    var chartColors = new[] { "#d53880", "#003078", "#003078" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "SimilarSchoolsComparison",
         new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn });
 }
@@ -36,7 +36,14 @@
             <select class="govuk-select"
                     id="attendanceAbsenceType"
                     name="attendanceAbsenceType"
-                    data-endpoint="@attendanceDataEndpoint">
+                    data-comparison-switcher="true"
+                    data-endpoint="@attendanceDataEndpoint"
+                    data-query-key="absenceType"
+                    data-bar-chart-id="attendance-comparison-three-year-chart"
+                    data-line-chart-id="attendance-comparison-year-by-year-chart"
+                    data-cell-attribute="data-attendance-cell"
+                    data-axis-config='{"overall":{"max":10,"step":1},"persistent":{"max":30,"step":5}}'
+                    data-axis-config-key="absenceType">
                 <option value="overall" selected>Overall absence</option>
                 <option value="persistent">Persistent absence</option>
             </select>
@@ -98,9 +105,9 @@
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">School(s)</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric" data-attendance-year="prev2">Year</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric" data-attendance-year="prev">Year</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric" data-attendance-year="current">Year</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2025 to 2026</th>
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                 </tr>
                 </thead>
@@ -137,15 +144,10 @@
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/similar-schools-ks4-grade-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script add-nonce="true">
         (function () {
-            function updateTableRow(cells, values) {
-                cells.forEach(function (cell, index) {
-                    if (cell) {
-                        cell.textContent = values && values[index] ? values[index] : "No available data";
-                    }
-                });
-            }
+            var mobileViewQuery = window.matchMedia("(max-width: 40.0625em)");
 
             function setActivePanel(tabContainer, targetId) {
                 var tabs = tabContainer.querySelectorAll(".govuk-tabs__tab");
@@ -202,6 +204,10 @@
                         setActivePanel(tabContainer, initialTargetId);
                     }
 
+                    if (tabContainer.dataset.tabsBound === "true") {
+                        return;
+                    }
+
                     tabContainer.addEventListener("click", function (event) {
                         var tab = event.target.closest(".govuk-tabs__tab");
                         if (!tab || !tabContainer.contains(tab)) {
@@ -235,118 +241,25 @@
                         event.preventDefault();
                         setActivePanel(tabContainer, href.substring(1));
                     });
+
+                    tabContainer.dataset.tabsBound = "true";
                 });
-            }
-
-            function applyAttendanceViews(payload, barCanvas, lineCanvas, tableCellMap) {
-                if (!payload) {
-                    return;
-                }
-
-                var isPersistentAbsence = payload.absenceType === "persistent";
-                var barAxisMax = isPersistentAbsence ? 30 : 10;
-                var barAxisStep = isPersistentAbsence ? 5 : 1;
-
-                var barChart = window.Chart && barCanvas ? window.Chart.getChart(barCanvas) : null;
-                if (barChart && barChart.data && barChart.data.datasets && barChart.data.datasets[0]) {
-                    barChart.data.datasets[0].data = payload.bar || [];
-                    if (barChart.options && barChart.options.scales && barChart.options.scales.x) {
-                        barChart.options.scales.x.max = barAxisMax;
-                        barChart.options.scales.x.ticks.stepSize = barAxisStep;
-                    }
-                    barChart.update();
-                }
-
-                var lineChart = window.Chart && lineCanvas ? window.Chart.getChart(lineCanvas) : null;
-                if (lineChart && lineChart.data && lineChart.data.datasets && lineChart.data.datasets.length >= 3) {
-                    lineChart.data.labels = payload.years || [];
-                    lineChart.data.datasets[0].data = payload.line && payload.line.thisSchool ? payload.line.thisSchool : [];
-                    lineChart.data.datasets[1].data = payload.line && payload.line.similarSchool ? payload.line.similarSchool : [];
-                    lineChart.data.datasets[2].data = payload.line && payload.line.england ? payload.line.england : [];
-                    lineChart.update();
-                }
-
-                if (Array.isArray(payload.years) && payload.years.length >= 3) {
-                    var yearHeaders = {
-                        prev2: document.querySelector("[data-attendance-year='prev2']"),
-                        prev: document.querySelector("[data-attendance-year='prev']"),
-                        current: document.querySelector("[data-attendance-year='current']")
-                    };
-                    if (yearHeaders.prev2) yearHeaders.prev2.textContent = payload.years[0];
-                    if (yearHeaders.prev) yearHeaders.prev.textContent = payload.years[1];
-                    if (yearHeaders.current) yearHeaders.current.textContent = payload.years[2];
-                }
-
-                updateTableRow(tableCellMap.thisSchool, payload.table && payload.table.thisSchool ? payload.table.thisSchool : []);
-                updateTableRow(tableCellMap.similarSchool, payload.table && payload.table.similarSchool ? payload.table.similarSchool : []);
-                updateTableRow(tableCellMap.england, payload.table && payload.table.england ? payload.table.england : []);
-            }
-
-            function initAttendanceFilters() {
-                var absenceTypeSelect = document.getElementById("attendanceAbsenceType");
-                if (!absenceTypeSelect) {
-                    return;
-                }
-
-                var dataEndpoint = absenceTypeSelect.getAttribute("data-endpoint");
-                if (!dataEndpoint) {
-                    return;
-                }
-
-                var barChartCanvas = document.getElementById("attendance-comparison-three-year-chart");
-                var lineChartCanvas = document.getElementById("attendance-comparison-year-by-year-chart");
-
-                var tableCellMap = {
-                    thisSchool: [
-                        document.querySelector("[data-attendance-cell='this-prev2']"),
-                        document.querySelector("[data-attendance-cell='this-prev']"),
-                        document.querySelector("[data-attendance-cell='this-current']"),
-                        document.querySelector("[data-attendance-cell='this-avg']")
-                    ],
-                    similarSchool: [
-                        document.querySelector("[data-attendance-cell='similar-prev2']"),
-                        document.querySelector("[data-attendance-cell='similar-prev']"),
-                        document.querySelector("[data-attendance-cell='similar-current']"),
-                        document.querySelector("[data-attendance-cell='similar-avg']")
-                    ],
-                    england: [
-                        document.querySelector("[data-attendance-cell='england-prev2']"),
-                        document.querySelector("[data-attendance-cell='england-prev']"),
-                        document.querySelector("[data-attendance-cell='england-current']"),
-                        document.querySelector("[data-attendance-cell='england-avg']")
-                    ]
-                };
-
-                function loadAttendanceViews() {
-                    var requestUrl = dataEndpoint
-                        + "?absenceType=" + encodeURIComponent(absenceTypeSelect.value);
-
-                    return fetch(requestUrl, {
-                        headers: {
-                            Accept: "application/json"
-                        }
-                    })
-                        .then(function (response) {
-                            if (!response.ok) {
-                                throw new Error("Request failed with status " + response.status);
-                            }
-                            return response.json();
-                        })
-                        .then(function (payload) {
-                            applyAttendanceViews(payload, barChartCanvas, lineChartCanvas, tableCellMap);
-                        })
-                        .catch(function (error) {
-                            console.error("Failed to load attendance data.", error);
-                        });
-                }
-
-                absenceTypeSelect.addEventListener("change", loadAttendanceViews);
-                loadAttendanceViews();
             }
 
             function init() {
                 initAttendanceTabs();
-                initAttendanceFilters();
+            }
+
+            function handleViewportModeChange() {
+                if (mobileViewQuery.matches) {
+                    initAttendanceTabs();
+                }
+            }
+
+            if (typeof mobileViewQuery.addEventListener === "function") {
+                mobileViewQuery.addEventListener("change", handleViewportModeChange);
+            } else if (typeof mobileViewQuery.addListener === "function") {
+                mobileViewQuery.addListener(handleViewportModeChange);
             }
 
             if (document.readyState === "loading") {
