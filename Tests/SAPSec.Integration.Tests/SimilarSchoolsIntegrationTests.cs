@@ -59,12 +59,11 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task ComparisonKs4HeadlineMeasures_ReturnsComparisonContent()
     {
-        var viewPath = Path.GetFullPath(
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "SAPSec.Web", "Views", "SimilarSchoolsComparison", "Ks4HeadlineMeasures.cshtml"));
-        File.Exists(viewPath).Should().BeTrue();
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Ks4HeadlineMeasures");
+        var content = await response.Content.ReadAsStringAsync();
 
-        var content = await File.ReadAllTextAsync(viewPath);
-
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
         content.Should().Contain("KS4 headline performance measures");
         content.Should().Contain("Progress 8");
         content.Should().Contain("Attainment 8");

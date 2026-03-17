@@ -238,6 +238,80 @@ public class GetKs4HeadlineMeasuresTests
     }
 
     [Fact]
+    public async Task Execute_WhenDestinationsContainNullAndNonNumericValues_TreatsValuesAsMissing()
+    {
+        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
+        var repositoryMock = new Mock<IKs4PerformanceRepository>();
+
+        schoolDetailsServiceMock
+            .Setup(x => x.TryGetByUrnAsync("123456"))
+            .ReturnsAsync(CreateSchoolDetails("123456"));
+
+        repositoryMock
+            .Setup(x => x.GetByUrnAsync("123456"))
+            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+                null,
+                null,
+                null,
+                new EstablishmentDestinations
+                {
+                    AllDest_Tot_Est_Current_Pct = 94.4,
+                    AllDest_Tot_Est_Previous_Pct = null,
+                    AllDest_Tot_Est_Previous2_Pct = double.NaN,
+                    Education_Tot_Est_Current_Pct = null,
+                    Education_Tot_Est_Previous_Pct = 71.2,
+                    Education_Tot_Est_Previous2_Pct = double.PositiveInfinity,
+                    Employment_Tot_Est_Current_Pct = 22.0,
+                    Employment_Tot_Est_Previous_Pct = null,
+                    Employment_Tot_Est_Previous2_Pct = 20.0
+                },
+                new LADestinations
+                {
+                    AllDest_Tot_LA_Current_Pct = null,
+                    AllDest_Tot_LA_Previous_Pct = 90.0,
+                    AllDest_Tot_LA_Previous2_Pct = 89.0,
+                    Education_Tot_LA_Current_Pct = 68.0,
+                    Education_Tot_LA_Previous_Pct = null,
+                    Education_Tot_LA_Previous2_Pct = 66.0,
+                    Employment_Tot_LA_Current_Pct = double.NaN,
+                    Employment_Tot_LA_Previous_Pct = 23.0,
+                    Employment_Tot_LA_Previous2_Pct = null
+                },
+                new EnglandDestinations
+                {
+                    AllDest_Tot_Eng_Current_Pct = 88.5,
+                    AllDest_Tot_Eng_Previous_Pct = double.PositiveInfinity,
+                    AllDest_Tot_Eng_Previous2_Pct = null,
+                    Education_Tot_Eng_Current_Pct = null,
+                    Education_Tot_Eng_Previous_Pct = 63.5,
+                    Education_Tot_Eng_Previous2_Pct = 62.5,
+                    Employment_Tot_Eng_Current_Pct = null,
+                    Employment_Tot_Eng_Previous_Pct = double.NaN,
+                    Employment_Tot_Eng_Previous2_Pct = 25.0
+                }));
+
+        var sut = new GetKs4HeadlineMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);
+
+        var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
+
+        result.Should().NotBeNull();
+        result.DestinationsThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(94.4m, 89.5m, 88.5m));
+        result.DestinationsYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(94.4m, null, null));
+        result.DestinationsYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(null, 90.0m, 89.0m));
+        result.DestinationsYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(88.5m, null, null));
+
+        result.DestinationsEducationThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(71.2m, 67.0m, 63.0m));
+        result.DestinationsEducationYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(null, 71.2m, null));
+        result.DestinationsEducationYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(68.0m, null, 66.0m));
+        result.DestinationsEducationYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(null, 63.5m, 62.5m));
+
+        result.DestinationsEmploymentThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(21.0m, 23.0m, 25.0m));
+        result.DestinationsEmploymentYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(22.0m, null, 20.0m));
+        result.DestinationsEmploymentYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(null, 23.0m, null));
+        result.DestinationsEmploymentYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(null, null, 25.0m));
+    }
+
+    [Fact]
     public async Task Execute_WhenDataContainsMixedNumericAndStringValues_MapsAllResponseProperties()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();

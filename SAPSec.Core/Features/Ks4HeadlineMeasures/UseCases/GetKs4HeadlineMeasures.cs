@@ -264,7 +264,9 @@ public class GetKs4HeadlineMeasures(
     }
 
     private static decimal? ParseNullableDecimal(double? value) =>
-        value.HasValue ? Convert.ToDecimal(value.Value) : null;
+        !value.HasValue || double.IsNaN(value.Value) || double.IsInfinity(value.Value)
+            ? null
+            : Convert.ToDecimal(value.Value);
 
     private static decimal? Average(params decimal?[] values)
     {
