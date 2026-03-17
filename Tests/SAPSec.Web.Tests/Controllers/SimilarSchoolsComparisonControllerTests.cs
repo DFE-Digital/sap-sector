@@ -10,6 +10,7 @@ using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
@@ -24,6 +25,7 @@ namespace SAPSec.Web.Tests.Controllers;
 public class SimilarSchoolsComparisonControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
+    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
     private readonly Mock<IAttendanceRepository> _attendanceRepositoryMock = new();
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
@@ -40,7 +42,7 @@ public class SimilarSchoolsComparisonControllerTests
             _schoolDetailsServiceMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
             _attendanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object);
+            _establishmentRepositoryMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
             _repoMock.Object);
@@ -196,9 +198,9 @@ public class SimilarSchoolsComparisonControllerTests
     [Fact]
     public async Task AttendanceData_ReturnsDefaultPayloadShape()
     {
-        _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(It.IsAny<string>()))
-            .ReturnsAsync(CreateSchoolDetails("145327", "Main School"));
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
+            .ReturnsAsync(new Establishment { URN = "145327" });
 
         _attendanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
@@ -220,8 +222,7 @@ public class SimilarSchoolsComparisonControllerTests
                     Abs_Persistent_Eng_Current_Pct = 15.6m,
                     Abs_Persistent_Eng_Previous_Pct = 15.8m,
                     Abs_Persistent_Eng_Previous2_Pct = 16.0m
-                },
-                new[] { "2021 to 2022", "2022 to 2023", "2023 to 2024" }));
+                }));
 
         var result = await _sut.AttendanceData("145327", "142075");
 
@@ -261,7 +262,7 @@ public class SimilarSchoolsComparisonControllerTests
             .ReturnsAsync(similarDetails);
 
         _schoolDetailsServiceMock
-            .Setup(s => s.TryGetByUrnAsync(It.IsAny<string>()))
+            .Setup(s => s.GetByUrnAsync(It.IsAny<string>()))
             .ReturnsAsync(similarDetails);
     }
 

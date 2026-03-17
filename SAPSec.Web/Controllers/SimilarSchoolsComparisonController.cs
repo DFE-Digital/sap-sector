@@ -6,7 +6,6 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
-using System.Data.Common;
 using System.Globalization;
 
 namespace SAPSec.Web.Controllers;
@@ -356,23 +355,11 @@ public class SimilarSchoolsComparisonController : Controller
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
 
-        GetAttendanceMeasuresResponse thisSchoolAttendance;
-        GetAttendanceMeasuresResponse similarSchoolAttendance;
-        try
-        {
-            thisSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
-            similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
-        }
-        catch (Exception ex) when (ex is InvalidOperationException or DbException)
-        {
-            _logger.LogWarning(ex, "Attendance data unavailable for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'", urn, similarSchoolUrn);
-            return StatusCode(StatusCodes.Status503ServiceUnavailable, new { error = "Attendance data unavailable." });
-        }
+        var thisSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
 
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
-        var yearLabels = thisSchoolAttendance.Years.Any()
-            ? thisSchoolAttendance.Years
-            : (similarSchoolAttendance.Years.Any() ? similarSchoolAttendance.Years : Array.Empty<string>());
+        var yearLabels = Ks4YearLabelConfig.YearByYear;
 
         var thisSchoolSeries = isPersistentAbsence
             ? thisSchoolAttendance.PersistentAbsenceYearByYear.School

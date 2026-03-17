@@ -1,16 +1,16 @@
 using SAPSec.Core;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Interfaces.Repositories;
 
 namespace SAPSec.Core.Features.Attendance.UseCases;
 
 public class GetAttendanceMeasures(
     IAttendanceRepository repository,
-    ISchoolDetailsService schoolDetailsService)
+    IEstablishmentRepository establishmentRepository)
 {
     public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
     {
-        var schoolDetails = await schoolDetailsService.TryGetByUrnAsync(request.Urn);
-        if (schoolDetails is null)
+        var establishment = await establishmentRepository.GetEstablishmentAsync(request.Urn);
+        if (establishment is null)
         {
             throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
@@ -47,8 +47,7 @@ public class GetAttendanceMeasures(
                 Average(persistentEnglandSeries.Current, persistentEnglandSeries.Previous, persistentEnglandSeries.Previous2)),
             new AttendanceMeasureYearByYear(
                 persistentSchoolSeries,
-                persistentEnglandSeries),
-            data?.Years ?? Array.Empty<string>());
+                persistentEnglandSeries));
     }
 
     private static decimal? Average(params decimal?[] values)
@@ -83,5 +82,4 @@ public record GetAttendanceMeasuresResponse(
     AttendanceMeasureAverage OverallAbsenceThreeYearAverage,
     AttendanceMeasureYearByYear OverallAbsenceYearByYear,
     AttendanceMeasureAverage PersistentAbsenceThreeYearAverage,
-    AttendanceMeasureYearByYear PersistentAbsenceYearByYear,
-    IReadOnlyList<string> Years);
+    AttendanceMeasureYearByYear PersistentAbsenceYearByYear);

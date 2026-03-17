@@ -31,6 +31,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
                 "Abs_Persistent_Eng_Previous_Pct",
                 "Abs_Persistent_Eng_Previous2_Pct"
             FROM public.v_england_absence
+            WHERE "Id" = 'National'
             LIMIT 1;
         """;
 
@@ -46,8 +47,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
 
         return new AttendanceMeasuresData(
             establishmentAttendance,
-            englandRow?.ToEnglandAttendance(),
-            Array.Empty<string>());
+            englandRow?.ToEnglandAttendance());
     }
 
     private sealed class EnglandAttendanceRow

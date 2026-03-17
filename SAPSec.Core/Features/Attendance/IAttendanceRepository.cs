@@ -7,8 +7,7 @@ public interface IAttendanceRepository
 
 public record AttendanceMeasuresData(
     EstablishmentAttendance? EstablishmentAttendance,
-    EnglandAttendance? EnglandAttendance,
-    IReadOnlyList<string> Years);
+    EnglandAttendance? EnglandAttendance);
 
 public sealed class EstablishmentAttendance
 {
