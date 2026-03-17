@@ -45,6 +45,7 @@ public sealed class GenerateViews
         new("v_establishment_performance", "Establishment", "KS4_Performance"),
         new("v_establishment_workforce", "Establishment", "Workforce"),
 
+        new("v_england_absence", "England", "PupilAbsence"),
         new("v_england_destinations", "England", "KS4_Destinations"),
         new("v_england_performance", "England", "KS4_Performance"),
 
@@ -205,7 +206,6 @@ public sealed class GenerateViews
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
             }
-
             // 6) Everything else uses DataMap-driven materialized view generation
             else
             {

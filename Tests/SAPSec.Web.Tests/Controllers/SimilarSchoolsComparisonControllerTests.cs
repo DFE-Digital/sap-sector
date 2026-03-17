@@ -3,11 +3,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
@@ -15,13 +18,16 @@ using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
+using System.Text.Json;
 
 namespace SAPSec.Web.Tests.Controllers;
 
 public class SimilarSchoolsComparisonControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
+    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
+    private readonly Mock<IAttendanceRepository> _attendanceRepositoryMock = new();
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
     private readonly SimilarSchoolsComparisonController _sut;
@@ -34,6 +40,9 @@ public class SimilarSchoolsComparisonControllerTests
         var ks4UseCase = new GetKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object);
+        var attendanceUseCase = new GetAttendanceMeasures(
+            _attendanceRepositoryMock.Object,
+            _establishmentRepositoryMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
             _repoMock.Object);
@@ -57,6 +66,7 @@ public class SimilarSchoolsComparisonControllerTests
 
         _sut = new SimilarSchoolsComparisonController(
             getSimilarSchoolDetails,
+            attendanceUseCase,
             ks4UseCase,
             getCharacteristicsComparison,
             characteristicsFormatter,
@@ -185,6 +195,52 @@ public class SimilarSchoolsComparisonControllerTests
         model.CharacteristicsRows[0].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
     }
 
+    [Fact]
+    public async Task AttendanceData_ReturnsDefaultPayloadShape()
+    {
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
+            .ReturnsAsync(new Establishment { URN = "145327" });
+
+        _attendanceRepositoryMock
+            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
+            .ReturnsAsync(new AttendanceMeasuresData(
+                new EstablishmentAttendance
+                {
+                    Abs_Tot_Est_Current_Pct = 5.0m,
+                    Abs_Tot_Est_Previous_Pct = 5.2m,
+                    Abs_Tot_Est_Previous2_Pct = 5.4m,
+                    Abs_Persistent_Est_Current_Pct = 16.0m,
+                    Abs_Persistent_Est_Previous_Pct = 16.3m,
+                    Abs_Persistent_Est_Previous2_Pct = 16.7m
+                },
+                new EnglandAttendance
+                {
+                    Abs_Tot_Eng_Current_Pct = 4.8m,
+                    Abs_Tot_Eng_Previous_Pct = 4.9m,
+                    Abs_Tot_Eng_Previous2_Pct = 5.0m,
+                    Abs_Persistent_Eng_Current_Pct = 15.6m,
+                    Abs_Persistent_Eng_Previous_Pct = 15.8m,
+                    Abs_Persistent_Eng_Previous2_Pct = 16.0m
+                }));
+
+        var result = await _sut.AttendanceData("145327", "142075");
+
+        var json = result.Should().BeOfType<JsonResult>().Subject;
+        var payload = JsonSerializer.Serialize(json.Value);
+        using var document = JsonDocument.Parse(payload);
+        var root = document.RootElement;
+
+        root.GetProperty("absenceType").GetString().Should().Be("overall");
+        root.GetProperty("bar").GetArrayLength().Should().Be(3);
+        root.GetProperty("years").GetArrayLength().Should().Be(3);
+
+        var table = root.GetProperty("table");
+        table.GetProperty("thisSchool").GetArrayLength().Should().Be(4);
+        table.GetProperty("similarSchool").GetArrayLength().Should().Be(4);
+        table.GetProperty("england").GetArrayLength().Should().Be(4);
+    }
+
     private void SetupBaseDependencies(
         string currentUrn,
         string similarUrn,
@@ -200,6 +256,10 @@ public class SimilarSchoolsComparisonControllerTests
         _repoMock
             .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
             .ReturnsAsync((currentSchool, group));
+
+        _schoolDetailsServiceMock
+            .Setup(s => s.GetByUrnAsync(It.IsAny<string>()))
+            .ReturnsAsync(similarDetails);
 
         _schoolDetailsServiceMock
             .Setup(s => s.GetByUrnAsync(It.IsAny<string>()))

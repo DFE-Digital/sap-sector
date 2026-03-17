@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
+using System.Globalization;
 
 namespace SAPSec.Web.Controllers;
 
@@ -12,6 +14,7 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
+    private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
@@ -20,6 +23,7 @@ public class SimilarSchoolsComparisonController : Controller
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
+        GetAttendanceMeasures getAttendanceMeasures,
         GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         GetCharacteristicsComparison getCharacteristicsComparison,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
@@ -28,6 +32,7 @@ public class SimilarSchoolsComparisonController : Controller
     {
         _getSimilarSchoolDetails =
             getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
+        _getAttendanceMeasures = getAttendanceMeasures ?? throw new ArgumentNullException(nameof(getAttendanceMeasures));
         _getKs4HeadlineMeasures = getKs4HeadlineMeasures ?? throw new ArgumentNullException(nameof(getKs4HeadlineMeasures));
         _getCharacteristicsComparison = getCharacteristicsComparison ??
                                         throw new ArgumentNullException(nameof(getCharacteristicsComparison));
@@ -337,6 +342,89 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
+    [Route("AttendanceData")]
+    public async Task<IActionResult> AttendanceData(
+        string urn,
+        string similarSchoolUrn,
+        string absenceType = "overall")
+    {
+        if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
+        {
+            return BadRequest(new { error = "Missing route parameters." });
+        }
+
+        var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
+
+        var thisSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
+
+        var isPersistentAbsence = normalizedAbsenceType == "persistent";
+        var yearLabels = Ks4YearLabelConfig.YearByYear;
+
+        var thisSchoolSeries = isPersistentAbsence
+            ? thisSchoolAttendance.PersistentAbsenceYearByYear.School
+            : thisSchoolAttendance.OverallAbsenceYearByYear.School;
+        var similarSchoolSeries = isPersistentAbsence
+            ? similarSchoolAttendance.PersistentAbsenceYearByYear.School
+            : similarSchoolAttendance.OverallAbsenceYearByYear.School;
+        var englandSeries = isPersistentAbsence
+            ? (thisSchoolAttendance.PersistentAbsenceYearByYear.England ?? similarSchoolAttendance.PersistentAbsenceYearByYear.England)
+            : (thisSchoolAttendance.OverallAbsenceYearByYear.England ?? similarSchoolAttendance.OverallAbsenceYearByYear.England);
+
+        var thisSchoolThreeYearAverage = isPersistentAbsence
+            ? thisSchoolAttendance.PersistentAbsenceThreeYearAverage.SchoolValue
+            : thisSchoolAttendance.OverallAbsenceThreeYearAverage.SchoolValue;
+        var similarSchoolThreeYearAverage = isPersistentAbsence
+            ? similarSchoolAttendance.PersistentAbsenceThreeYearAverage.SchoolValue
+            : similarSchoolAttendance.OverallAbsenceThreeYearAverage.SchoolValue;
+        var englandThreeYearAverage = isPersistentAbsence
+            ? (thisSchoolAttendance.PersistentAbsenceThreeYearAverage.EnglandValue ?? similarSchoolAttendance.PersistentAbsenceThreeYearAverage.EnglandValue)
+            : (thisSchoolAttendance.OverallAbsenceThreeYearAverage.EnglandValue ?? similarSchoolAttendance.OverallAbsenceThreeYearAverage.EnglandValue);
+
+        return Json(new
+        {
+            absenceType = normalizedAbsenceType,
+            years = yearLabels,
+            bar = new decimal?[]
+            {
+                thisSchoolThreeYearAverage,
+                similarSchoolThreeYearAverage,
+                englandThreeYearAverage
+            },
+            line = new
+            {
+                thisSchool = new decimal?[] { thisSchoolSeries.Previous2, thisSchoolSeries.Previous, thisSchoolSeries.Current },
+                similarSchool = new decimal?[] { similarSchoolSeries.Previous2, similarSchoolSeries.Previous, similarSchoolSeries.Current },
+                england = new decimal?[] { englandSeries?.Previous2, englandSeries?.Previous, englandSeries?.Current }
+            },
+            table = new
+            {
+                thisSchool = new[]
+                {
+                    DisplayPercentNullable(thisSchoolSeries.Previous2),
+                    DisplayPercentNullable(thisSchoolSeries.Previous),
+                    DisplayPercentNullable(thisSchoolSeries.Current),
+                    DisplayPercentNullable(thisSchoolThreeYearAverage)
+                },
+                similarSchool = new[]
+                {
+                    DisplayPercentNullable(similarSchoolSeries.Previous2),
+                    DisplayPercentNullable(similarSchoolSeries.Previous),
+                    DisplayPercentNullable(similarSchoolSeries.Current),
+                    DisplayPercentNullable(similarSchoolThreeYearAverage)
+                },
+                england = new[]
+                {
+                    DisplayPercentNullable(englandSeries?.Previous2),
+                    DisplayPercentNullable(englandSeries?.Previous),
+                    DisplayPercentNullable(englandSeries?.Current),
+                    DisplayPercentNullable(englandThreeYearAverage)
+                }
+            }
+        });
+    }
+
+    [HttpGet]
     [Route("SchoolDetails")]
     public async Task<IActionResult> SchoolDetails(
         string urn,
@@ -453,6 +541,22 @@ public class SimilarSchoolsComparisonController : Controller
             : SimilarityCalculationMethod.National;
     }
 
+    private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
+    {
+        if (string.IsNullOrWhiteSpace(requested))
+        {
+            return allowedValues[0];
+        }
+
+        return allowedValues.Contains(requested, StringComparer.OrdinalIgnoreCase)
+            ? requested.ToLowerInvariant()
+            : allowedValues[0];
+    }
+
+    private static string DisplayPercentNullable(decimal? value) =>
+        value.HasValue
+            ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
+            : "No available data";
     private static string NormalizeDestinationFilter(string? destination) =>
         destination?.ToLowerInvariant() switch
         {
@@ -476,4 +580,5 @@ public class SimilarSchoolsComparisonController : Controller
             "employment" => response?.DestinationsEmploymentYearByYear,
             _ => response?.DestinationsYearByYear
         };
+
 }
