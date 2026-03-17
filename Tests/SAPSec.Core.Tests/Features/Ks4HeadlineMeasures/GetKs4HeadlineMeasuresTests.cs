@@ -169,7 +169,7 @@ public class GetKs4HeadlineMeasuresTests
         var repositoryMock = new Mock<IKs4PerformanceRepository>();
 
         schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync("123456"))
+            .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
         repositoryMock
@@ -243,7 +243,7 @@ public class GetKs4HeadlineMeasuresTests
         var repositoryMock = new Mock<IKs4PerformanceRepository>();
 
         schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync("123456"))
+            .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
         repositoryMock
