@@ -1,4 +1,5 @@
 ﻿@using SAPSec.Web.Constants
+@model SAPSec.Web.ViewModels.ErrorViewModel
 @{
     ViewData[ViewDataKeys.Title] = PageTitles.ErrorProblem;
 }
@@ -6,6 +7,27 @@
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
         <h1 class="govuk-heading-l">@ViewData[ViewDataKeys.Title]</h1>
-        <p class="govuk-body">Try again later.</p>
+
+        <h2 class="govuk-heading-m">An error occurred while processing your request.</h2>
+        <p class="govuk-body">A report of the error has been sent to our technical team.</p>
+        <p class="govuk-body">We will fix it as soon as possible. You can:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>use the back button and try another link</li>
+            <li>reload the page</li>
+            <li>come back later</li>
+        </ul>
+
+        @if (Model.ShowErrorCode)
+        {
+            <p class="govuk-body">
+                <strong>Error code:</strong> <code>@Model.ErrorCode</code>
+            </p>
+        }
+        @if (Model.ShowErrorMessage)
+        {
+            <p class="govuk-body">
+                <strong>Error message:</strong> <code>@Model.ErrorMessage</code>
+            </p>
+        }
     </div>
 </div>

@@ -1,7 +1,6 @@
-using System.Globalization;
-using SAPSec.Core;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using System.Globalization;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
@@ -11,11 +10,7 @@ public class GetKs4HeadlineMeasures(
 {
     public async Task<GetKs4HeadlineMeasuresResponse> Execute(GetKs4HeadlineMeasuresRequest request)
     {
-        var schoolDetails = await schoolDetailsService.TryGetByUrnAsync(request.Urn);
-        if (schoolDetails is null)
-        {
-            throw new NotFoundException($"School with URN {request.Urn} was not found");
-        }
+        var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
 
         var data = await repository.GetByUrnAsync(request.Urn);
 

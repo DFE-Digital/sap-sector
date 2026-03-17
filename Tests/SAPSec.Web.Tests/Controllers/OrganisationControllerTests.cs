@@ -152,8 +152,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]
@@ -250,8 +250,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]
@@ -268,8 +268,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]
@@ -355,8 +355,8 @@ public class OrganisationControllerTests
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Error");
-        redirectResult.ControllerName.Should().Be("Home");
+        redirectResult!.ActionName.Should().Be("Problem");
+        redirectResult.ControllerName.Should().Be("Error");
     }
 
     [Fact]

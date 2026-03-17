@@ -14,7 +14,7 @@ public class WebApplicationSetupFixture : IAsyncLifetime
     {
         _factory = new TestWebApplicationFactory();
 
-        if(_factory.Server == null) throw new InvalidOperationException("Test Server not started");
+        if (_factory.Server == null) throw new InvalidOperationException("Test Server not started");
 
         // Client that follows redirects
         Client = _factory.CreateClient(new WebApplicationFactoryClientOptions

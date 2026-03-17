@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
@@ -12,7 +13,7 @@ namespace SAPSec.Core.Services;
 /// </summary>
 public sealed class SchoolDetailsService : ISchoolDetailsService
 {
-    private readonly IEstablishmentService _establishmentService;
+    private readonly IEstablishmentRepository _establishmentRepository;
     private readonly ILogger<SchoolDetailsService> _logger;
 
     // Rules instantiated directly - they are stateless pure functions
@@ -23,40 +24,20 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
     private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
 
     public SchoolDetailsService(
-        IEstablishmentService establishmentService,
+        IEstablishmentRepository establishmentRepository,
         ILogger<SchoolDetailsService> logger)
     {
-        _establishmentService = establishmentService;
+        _establishmentRepository = establishmentRepository;
         _logger = logger;
     }
 
     public async Task<SchoolDetails> GetByUrnAsync(string urn)
     {
-        var establishment = await _establishmentService.GetEstablishmentAsync(urn);
+        var establishment = await _establishmentRepository.GetEstablishmentAsync(urn);
 
-        return MapToSchoolDetails(establishment);
-    }
-
-    public async Task<SchoolDetails?> TryGetByUrnAsync(string urn)
-    {
-        try
+        if (establishment is null)
         {
-            return await GetByUrnAsync(urn);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogDebug(ex, "School not found for URN: {Urn}", urn);
-            return null;
-        }
-    }
-
-    public async Task<SchoolDetails?> GetByIdentifierAsync(string identifier)
-    {
-        var establishment = await _establishmentService.GetEstablishmentByAnyNumberAsync(identifier);
-
-        if (string.IsNullOrWhiteSpace(establishment?.URN))
-        {
-            return null;
+            throw new NotFoundException($"School not found with URN: {urn}");
         }
 
         return MapToSchoolDetails(establishment);

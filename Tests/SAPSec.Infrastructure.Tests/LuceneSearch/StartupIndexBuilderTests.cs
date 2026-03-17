@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
 using SAPSec.Infrastructure.LuceneSearch;
 
@@ -26,7 +26,7 @@ public class StartupIndexBuilderTests
         await sut.StopAsync(CancellationToken.None);
     }
 
-    private sealed class DummyRepo : IEstablishmentService
+    private sealed class DummyRepo : IEstablishmentRepository
     {
         public Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
         {

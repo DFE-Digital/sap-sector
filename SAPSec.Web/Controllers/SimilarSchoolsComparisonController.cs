@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Web.Formatters;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
@@ -57,9 +57,19 @@ public class SimilarSchoolsComparisonController : Controller
         var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
         if (modelResult.Result != null)
             return modelResult.Result;
-        
+
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
+    }
+
+    [HttpGet]
+    [Route("Throw")]
+    public async Task<IActionResult> Throw(
+        string urn,
+        string similarSchoolUrn,
+        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
+    {
+        throw new InvalidOperationException("STU");
     }
 
     [HttpGet]
@@ -357,59 +367,15 @@ public class SimilarSchoolsComparisonController : Controller
             return (null, BadRequest());
         }
 
-        GetSimilarSchoolDetailsResponse? response;
-        try
-        {
-            response = await _getSimilarSchoolDetails.Execute(
-                new GetSimilarSchoolDetailsRequest(urn, similarSchoolUrn));
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(
-                ex,
-                "Error calling GetSimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
-                urn, similarSchoolUrn);
-
-            return (null, StatusCode(StatusCodes.Status500InternalServerError));
-        }
-
-        if (response is null)
-        {
-            _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
-                urn, similarSchoolUrn);
-
-            return (null, NotFound());
-        }
-
-        if (response.SimilarSchoolDetails is null)
-        {
-            _logger.LogWarning(
-                "GetSimilarSchoolDetails returned null SimilarSchoolDetails for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
-                urn, similarSchoolUrn);
-
-            return (null, NotFound());
-        }
-
-        // Name is a "DataWithAvailability", can be null or not available depending on your model.
-        // Display() should handle "not available", but we still guard against null ref.
-        var similarName = response.SimilarSchoolDetails.Name is null
-            ? null
-            : response.SimilarSchoolDetails.Name;
-
-        if (string.IsNullOrWhiteSpace(similarName))
-        {
-            _logger.LogWarning(
-                "SimilarSchoolDetails.Name is missing for urn='{Urn}', similarSchoolUrn='{SimilarUrn}'",
-                urn, similarSchoolUrn);
-        }
+        var response = await _getSimilarSchoolDetails.Execute(
+            new GetSimilarSchoolDetailsRequest(urn, similarSchoolUrn));
 
         var model = new SimilarSchoolsComparisonViewModel
         {
             Urn = urn,
             SimilarSchoolUrn = similarSchoolUrn,
             Name = response.SchoolName,
-            SimilarSchoolName = similarName ?? string.Empty
+            SimilarSchoolName = response.SimilarSchoolDetails.Name
         };
 
         model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn, similarityCalculation);

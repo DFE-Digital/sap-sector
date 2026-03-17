@@ -15,12 +15,15 @@ public class LuceneIndexWriter(LuceneIndexContext context)
         IsStored = true
     };
 
-    public void BuildIndex(IEnumerable<Establishment> schools)
+    public void BuildIndex(IEnumerable<Establishment> schools, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         context.Writer.DeleteAll();
 
         foreach (var e in schools)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             var doc = new Document
             {
                 new StringField(FieldName.Urn, e.URN.ToString(), Field.Store.YES),
@@ -35,8 +38,9 @@ public class LuceneIndexWriter(LuceneIndexContext context)
             context.Writer.AddDocument(doc);
         }
 
-        context.Writer.Flush(triggerMerge: true, applyAllDeletes: true);
+        cancellationToken.ThrowIfCancellationRequested();
 
+        context.Writer.Flush(triggerMerge: true, applyAllDeletes: true);
         context.SearcherManager.MaybeRefreshBlocking();
     }
 }

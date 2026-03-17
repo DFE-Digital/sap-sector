@@ -51,7 +51,7 @@ public class LuceneIndexReaderTests
             FakeEstablishmentOne,
             FakeEstablishmentTwo,
             FakeEstablishmentThree
-        ]);
+        ], CancellationToken.None);
 
         // Act: search using the abbreviation 'St' that should expand to 'saint'
         var results = await _sut.SearchAsync("St Fake Three");
@@ -72,7 +72,7 @@ public class LuceneIndexReaderTests
         _writer.BuildIndex([
             FakeEstablishmentOne,
             FakeEstablishmentTwo
-        ]);
+        ], CancellationToken.None);
 
         var results = await _sut.SearchAsync(input!);
 
@@ -87,7 +87,7 @@ public class LuceneIndexReaderTests
         _writer.BuildIndex([
             FakeEstablishmentOne,
             FakeEstablishmentTwo,
-        ]);
+        ], CancellationToken.None);
 
         var result = await _sut.SearchAsync(Input);
 
@@ -102,7 +102,7 @@ public class LuceneIndexReaderTests
         _writer.BuildIndex([
             FakeEstablishmentOne,
             FakeEstablishmentTwo,
-        ]);
+        ], CancellationToken.None);
 
         var result = await _sut.SearchAsync(Input);
 

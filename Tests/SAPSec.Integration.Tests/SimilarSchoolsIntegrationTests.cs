@@ -1,12 +1,23 @@
-using System.Net;
 using FluentAssertions;
 using SAPSec.Integration.Tests.Infrastructure;
+using System.Net;
 
 namespace SAPSec.Integration.Tests;
 
 [Collection("IntegrationTestsCollection")]
 public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
 {
+    [Fact]
+    public async Task ViewSimilarSchools_SchoolNotFound_RedirectsToNotFound()
+    {
+        var response = await fixture.Client.GetAsync("/school/999999/view-similar-schools");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+        content.Should().Contain("Page not found");
+    }
+
     [Fact]
     public async Task GetSimilarSchools_ReturnsSuccess()
     {

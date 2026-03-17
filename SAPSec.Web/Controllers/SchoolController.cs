@@ -30,13 +30,7 @@ public class SchoolController : Controller
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        var school = await _schoolDetailsService.TryGetByUrnAsync(urn);
-
-        if (school is null)
-        {
-            _logger.LogInformation("School with URN {Urn} was not found", urn);
-            return NotFound();
-        }
+        var school = await _schoolDetailsService.GetByUrnAsync(urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewData(school);
@@ -47,48 +41,30 @@ public class SchoolController : Controller
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        var school = await _schoolDetailsService.TryGetByUrnAsync(urn);
-        if (school != null)
-        {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-            SetSchoolViewData(school);
-            return View(school);
-        }
-
-        _logger.LogInformation("{Urn} was not found on School Controller", urn);
-        return RedirectToAction("Error");
+        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
+        return View(school);
     }
 
     [HttpGet]
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        var school = await _schoolDetailsService.TryGetByUrnAsync(urn);
-        if (school != null)
-        {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-            SetSchoolViewData(school);
-            return View(school);
-        }
-
-        _logger.LogInformation("{Urn} was not found on School Controller", urn);
-        return RedirectToAction("Error");
+        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
+        return View(school);
     }
 
     [HttpGet]
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var school = await _schoolDetailsService.TryGetByUrnAsync(urn);
-        if (school != null)
-        {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-            SetSchoolViewData(school);
-            return View(school);
-        }
-
-        _logger.LogInformation("{Urn} was not found on School Controller", urn);
-        return RedirectToAction("Error");
+        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
+        return View(school);
     }
 
     [HttpGet]
@@ -117,16 +93,10 @@ public class SchoolController : Controller
     [Route("ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
-        var school = await _schoolDetailsService.TryGetByUrnAsync(urn);
-        if (school != null)
-        {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-            SetSchoolViewData(school);
-            return View(school);
-        }
-
-        _logger.LogInformation("{Urn} was not found on School Controller", urn);
-        return RedirectToAction("Error");
+        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
+        return View(school);
     }
 
     private void SetSchoolViewData(Core.Model.SchoolDetails school)

@@ -31,12 +31,7 @@ public class SimilarSchoolsController : Controller
         [FromQuery] string? sortBy,
         [FromQuery] int page = 1)
     {
-        var school = await _schoolDetailsService.TryGetByUrnAsync(urn);
-        if (school is null)
-        {
-            _logger.LogInformation("{Urn} was not found on SimilarSchools Controller", urn);
-            return RedirectToAction("Error", "School");
-        }
+        var school = await _schoolDetailsService.GetByUrnAsync(urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData["SchoolDetails"] = school;

@@ -23,7 +23,7 @@ public class OrganisationController(
             _logger.LogWarning(
                 "No organisation found for user {UserId}",
                 _userService.GetUserId(User));
-            return RedirectToAction("Error", "Home");
+            return RedirectToAction("Problem", "Error");
         }
 
         return View(organisation);
@@ -35,7 +35,7 @@ public class OrganisationController(
         var user = await _userService.GetUserFromClaimsAsync(User);
         if (user == null || !user.Organisations.Any())
         {
-            return RedirectToAction("Error", "Home");
+            return RedirectToAction("Problem", "Error");
         }
 
         return View(user);
@@ -53,7 +53,7 @@ public class OrganisationController(
         var user = await _userService.GetUserFromClaimsAsync(User);
         if (user == null)
         {
-            return RedirectToAction("Error", "Home");
+            return RedirectToAction("Problem", "Error");
         }
 
         var organisation = user.Organisations.FirstOrDefault(o => o.Id == organisationId);
