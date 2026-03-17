@@ -2,6 +2,7 @@
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
     var initialBarData = new
     {
         labels = new[] { Model.Name, Model.SimilarSchoolName, "Schools in England average" },
@@ -9,7 +10,7 @@
     };
     var initialLineData = new
     {
-        labels = new[] { "Previous year 2", "Previous year", "Current year" },
+        labels = ks4YearLabels,
         datasets = new object[]
         {
             new { label = Model.Name, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
@@ -105,9 +106,9 @@
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">School(s)</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2023 to 2024</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">2025 to 2026</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                 </tr>
                 </thead>
