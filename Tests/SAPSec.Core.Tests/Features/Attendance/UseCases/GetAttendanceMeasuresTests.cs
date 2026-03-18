@@ -67,7 +67,7 @@ public class GetAttendanceMeasuresTests
         result.OverallAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(5.0m, 5.2m, 5.4m));
         result.OverallAbsenceYearByYear.England.Should().Be(new AttendanceMeasureSeries(4.8m, 4.9m, 5.0m));
 
-        result.PersistentAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(16.4m, 15.8m));
+        result.PersistentAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(16.4m, 15.83m));
         result.PersistentAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(16.0m, 16.4m, 16.8m));
         result.PersistentAbsenceYearByYear.England.Should().Be(new AttendanceMeasureSeries(15.7m, 15.8m, 16.0m));
     }
