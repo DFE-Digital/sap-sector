@@ -139,7 +139,7 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid) {
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -287,9 +287,9 @@
                     },
                     datalabels: {
                         anchor: CHART_CONFIG.bar.datalabels.anchor,
-                        align: ctx => ctx.dataset.data[ctx.dataIndex] < CHART_CONFIG.bar.datalabels.alignThreshold
+                        align: barLabelAlign || (ctx => ctx.dataset.data[ctx.dataIndex] < CHART_CONFIG.bar.datalabels.alignThreshold
                             ? CHART_CONFIG.bar.datalabels.smallValueAlign
-                            : CHART_CONFIG.bar.datalabels.defaultAlign,
+                            : CHART_CONFIG.bar.datalabels.defaultAlign),
                         offset: CHART_CONFIG.bar.datalabels.offset,
                         color: () => gdsStyles.onBarLabel,
                         font: {
@@ -409,6 +409,8 @@
                 ? parseFloat(canvas.dataset.barPercentage)
                 : null;
 
+            const barLabelAlign = canvas.dataset.barLabelAlign || null;
+
             const config = {
                 type,
                 data: {
@@ -419,7 +421,7 @@
                         barPercentage
                     })
                 },
-                options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid),
+                options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign),
                 plugins: showDataLabels ? [ChartDataLabels] : []
             };
 
