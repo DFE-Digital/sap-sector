@@ -77,10 +77,6 @@
     }
 
     function initTabContainer(tabContainer) {
-        if (!isMobileView()) {
-            return;
-        }
-
         var initialTargetId = getInitialTargetId(tabContainer);
         if (initialTargetId) {
             setActivePanel(tabContainer, initialTargetId);
