@@ -59,7 +59,7 @@ public class GetAttendanceMeasures(
 
         return availableValues.Count == 0
             ? null
-            : Math.Round(availableValues.Average(), 1, MidpointRounding.AwayFromZero);
+            : Math.Round(availableValues.Average(), 2, MidpointRounding.AwayFromZero);
     }
 }
 

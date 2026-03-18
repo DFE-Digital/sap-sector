@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Interfaces.Repositories;
@@ -56,6 +57,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
                 services.RemoveAll<IKs4PerformanceRepository>();
+                services.RemoveAll<IAttendanceRepository>();
 
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsRow>, JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
@@ -71,6 +73,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
                 services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
                 services.AddScoped<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
+                services.AddScoped<IAttendanceRepository, MockAttendanceRepository>();
 
             });
     }
