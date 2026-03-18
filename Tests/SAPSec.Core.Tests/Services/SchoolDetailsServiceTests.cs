@@ -2,6 +2,7 @@
 using Moq;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
 
 namespace SAPSec.Core.Tests.Services;
@@ -444,7 +445,7 @@ public class SchoolDetailsServiceTests
             Website = "https://www.testacademy.org.uk",
             TelephoneNum = "0114 123 4567",
             AgeRangeLow = "11",
-            AgeRangeRange = "18"
+            AgeRangeHigh = "18"
         };
     }
 

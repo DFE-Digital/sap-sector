@@ -244,7 +244,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Fact]
     public async Task GetSearch_WithNumericQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=147788");
+        var response = await fixture.Client.GetAsync("/find-a-school/search?query=105574");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -293,7 +293,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         var formData = new Dictionary<string, string>
         {
             { "Query", "Test" },
-            { "Urn", "147788" }
+            { "Urn", "105574" }
         };
         var content = new FormUrlEncodedContent(formData);
 
@@ -301,7 +301,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/147788");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
     }
 
     [Fact]
@@ -359,14 +359,14 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         var formData = new Dictionary<string, string>
         {
             { "Query", "Test School" },
-            { "Urn", "147788" }
+            { "Urn", "105574" }
         };
         var content = new FormUrlEncodedContent(formData);
 
         var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/147788");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
     }
 
     [Fact]
@@ -375,14 +375,14 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
         var formData = new Dictionary<string, string>
         {
             { "Query", "204/3658" },
-            { "Urn", "147788" }
+            { "Urn", "105574" }
         };
         var content = new FormUrlEncodedContent(formData);
 
         var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/147788");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
     }
 
     #endregion
@@ -527,7 +527,7 @@ public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
     [Theory]
     [InlineData("Test")]
     [InlineData("School Name")]
-    [InlineData("147788")]
+    [InlineData("105574")]
     [InlineData("St. Mary's")]
     public async Task GetSearch_WithVariousQueries_ReturnsSuccess(string query)
     {

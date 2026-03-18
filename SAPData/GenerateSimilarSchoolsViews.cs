@@ -8,31 +8,36 @@ public sealed class GenerateSimilarSchoolsViews
     private readonly IReadOnlyList<DataMapRow> _rows;
     private readonly string _tableMappingPath;
     private readonly string _sqlDir;
+    private readonly string _jsonDir;
 
     private sealed record ViewSpec(
         string ViewName,
         string Range,
-        string Type
+        string Type,
+        string ModelName
     );
 
     private static readonly ViewSpec[] Views =
     {
-        new("v_similar_schools_secondary_groups", "SimilarSchools", "SecondaryGroups"),
-        new("v_similar_schools_secondary_values", "SimilarSchools", "SecondaryValues"),
-        new("v_similar_schools_primary_groups", "SimilarSchools", "PrimaryGroups"),
-        new("v_similar_schools_primary_values", "SimilarSchools", "PrimaryValues"),
+        new("v_similar_schools_secondary_groups", "SimilarSchools", "SecondaryGroups", "SimilarSchoolsSecondaryGroupsEntry"),
+        new("v_similar_schools_secondary_values", "SimilarSchools", "SecondaryValues", "SimilarSchoolsSecondaryValuesEntry"),
+        new("v_similar_schools_primary_groups", "SimilarSchools", "PrimaryGroups", "SimilarSchoolsPrimaryGroupsEntry"),
+        new("v_similar_schools_primary_values", "SimilarSchools", "PrimaryValues", "SimilarSchoolsPrimaryValuesEntry"),
     };
 
-    public GenerateSimilarSchoolsViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir)
+    public GenerateSimilarSchoolsViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir, string jsonDir)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
+        _jsonDir = jsonDir;
     }
 
     public void Run()
     {
         Directory.CreateDirectory(_sqlDir);
+        Directory.CreateDirectory(_jsonDir);
+
         var tableMap = LoadTableMappings();
 
         foreach (var view in Views)
@@ -55,10 +60,31 @@ public sealed class GenerateSimilarSchoolsViews
                 sql,
                 new UTF8Encoding(false));
 
+            var jsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""URN"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);";
+
+            File.WriteAllText(
+                Path.Combine(_sqlDir, $"70_{view.ViewName}.sql"),
+                jsonSql,
+                new UTF8Encoding(false));
+
             Console.WriteLine($"Generated {view.ViewName}");
         }
 
-        GenerateSecondaryValuesNationalSdView(tableMap);
+        var viewName = "v_similar_schools_secondary_values_national_sd";
+        var modelName = "SimilarSchoolsSecondaryStandardDeviationsEntry";
+        var sdSql = GenerateSecondaryValuesNationalSdView(viewName, tableMap);
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, $"50_{viewName}.sql"),
+            sdSql,
+            new UTF8Encoding(false));
+
+        var sdJsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {viewName}) r)) to '{_jsonDir}\{modelName}.json' with(format text);";
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, $"70_{viewName}.sql"),
+            sdJsonSql,
+            new UTF8Encoding(false));
     }
 
     // =====================================================
@@ -89,7 +115,7 @@ public sealed class GenerateSimilarSchoolsViews
                 var prop = props[j].PropertyName;
                 var comma = i == groups.Count - 1 && j == props.Count - 1 ? "" : ",";
 
-                sb.AppendLine($"    src_{i + 1}.\"{prop}\" AS \"{prop}\"{comma}");
+                sb.AppendLine($"    src_{i + 1}.\"{DbCol(props[j].Field)}\" AS \"{prop}\"{comma}");
             }
         }
 
@@ -120,10 +146,8 @@ public sealed class GenerateSimilarSchoolsViews
     // Similar Schools - Secondary Values (National SD)
     // =====================================================
 
-    private void GenerateSecondaryValuesNationalSdView(Dictionary<string, string> tableMap)
+    private string GenerateSecondaryValuesNationalSdView(string viewName, Dictionary<string, string> tableMap)
     {
-        const string viewName = "v_similar_schools_secondary_values_national_sd";
-
         var viewRows = _rows
             .Where(r => r.Range == "SimilarSchools")
             .Where(r => r.Type == "SecondaryValues")
@@ -133,7 +157,7 @@ public sealed class GenerateSimilarSchoolsViews
         if (viewRows.Count == 0)
         {
             Console.WriteLine($"Skipped {viewName}: no DataMap rows found.");
-            return;
+            return string.Empty;
         }
 
         var fileKeys = viewRows
@@ -162,11 +186,11 @@ public sealed class GenerateSimilarSchoolsViews
         sb.AppendLine("TABLESPACE pg_default");
         sb.AppendLine("AS");
         sb.AppendLine("SELECT");
-        sb.AppendLine("    count(*)::int AS row_count,");
+        sb.AppendLine("    count(*)::int AS \"RowCount\",");
         sb.AppendLine();
         sb.AppendLine("    -- Keep these if useful for debugging / reference");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_rp, 'NA'), '')::numeric) AS ks2_rp,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_mp, 'NA'), '')::numeric) AS ks2_mp,");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_rp, 'NA'), '')::numeric) AS \"KS2RP\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_mp, 'NA'), '')::numeric) AS \"KS2MP\",");
         sb.AppendLine();
         sb.AppendLine("    -- SD for the same metric used in UI");
         sb.AppendLine("    stddev_pop(");
@@ -174,26 +198,23 @@ public sealed class GenerateSimilarSchoolsViews
         sb.AppendLine("            NULLIF(NULLIF(ks2_rp, 'NA'), '')::numeric +");
         sb.AppendLine("            NULLIF(NULLIF(ks2_mp, 'NA'), '')::numeric");
         sb.AppendLine("        ) / 2.0");
-        sb.AppendLine("    ) AS ks2_avg,");
+        sb.AppendLine("    ) AS \"KS2AVG\",");
         sb.AppendLine();
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(pp_perc, 'NA'), '')::numeric)                  AS pp_perc,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_eal, 'NA'), '')::numeric)              AS percent_eal,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(polar4quintile_pupils, 'NA'), '')::numeric)    AS polar4quintile_pupils,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(p_stability, 'NA'), '')::numeric)              AS p_stability,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(idaci_pupils, 'NA'), '')::numeric)             AS idaci_pupils,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_sch_support, 'NA'), '')::numeric)      AS percent_sch_support,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(number_of_pupils, 'NA'), '')::numeric)         AS number_of_pupils,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_statement_or_ehp, 'NA'), '')::numeric) AS percent_statement_or_ehp,");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(att8scr, 'NA'), '')::numeric)                  AS att8scr");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(pp_perc, 'NA'), '')::numeric)                  AS \"PPPerc\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_eal, 'NA'), '')::numeric)              AS \"PercentEAL\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(polar4quintile_pupils, 'NA'), '')::numeric)    AS \"Polar4QuintilePupils\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(p_stability, 'NA'), '')::numeric)              AS \"PStability\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(idaci_pupils, 'NA'), '')::numeric)             AS \"IdaciPupils\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_sch_support, 'NA'), '')::numeric)      AS \"PercentSchSupport\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(number_of_pupils, 'NA'), '')::numeric)         AS \"NumberOfPupils\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_statement_or_ehp, 'NA'), '')::numeric) AS \"PercentageStatementOrEHP\",");
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(att8scr, 'NA'), '')::numeric)                  AS \"Att8Scr\"");
         sb.AppendLine($"FROM public.{rawTable}");
         sb.AppendLine("WITH DATA;");
 
-        File.WriteAllText(
-            Path.Combine(_sqlDir, $"50_{viewName}.sql"),
-            sb.ToString(),
-            new UTF8Encoding(false));
-
         Console.WriteLine($"Generated {viewName}");
+
+        return sb.ToString();
     }
 
     // =====================================================
@@ -230,5 +251,22 @@ public sealed class GenerateSimilarSchoolsViews
             return true;
 
         return false;
+    }
+
+    // =====================================================
+    // COLUMN NORMALISATION (DataMap header -> raw table column)
+    // =====================================================
+    private static string DbCol(string? header)
+    {
+        if (string.IsNullOrWhiteSpace(header))
+            return header ?? "";
+
+        // Match GenerateRawTables.Sanitise behaviour (lower + non-alnum -> '_')
+        var s = header.Trim().ToLowerInvariant();
+        var sb = new StringBuilder(s.Length);
+        foreach (var ch in s)
+            sb.Append(char.IsLetterOrDigit(ch) ? ch : '_');
+
+        return sb.ToString();
     }
 }

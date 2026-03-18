@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
@@ -25,8 +25,6 @@ public class SchoolSearchControllerTests
         LAName = "Leeds",
         Easting = "430000",
         Northing = "433000",
-        Latitude = "53.8",
-        Longitude = "-1.55"
     };
 
     private static Establishment FakeEstablishment2 = new()
@@ -39,8 +37,6 @@ public class SchoolSearchControllerTests
         LAName = "Leeds",
         Easting = "430100",
         Northing = "433100",
-        Latitude = "53.81",
-        Longitude = "-1.54"
     };
 
     public SchoolSearchControllerTests()
@@ -978,8 +974,6 @@ public class SchoolSearchControllerTests
             LAName = "Leeds",
             Easting = "430000",
             Northing = "433000",
-            Latitude = "53.8008",
-            Longitude = "-1.5491"
         };
         var establishment2 = new Establishment
         {
@@ -994,7 +988,7 @@ public class SchoolSearchControllerTests
         };
         var searchResults = new List<SchoolSearchResult>
         {
-            SchoolSearchResult.FromNameAndEstablishment("Test School", establishment1),
+            SchoolSearchResult.FromNameAndEstablishment("Test School", establishment1, new(53.8008, -1.5491)),
             SchoolSearchResult.FromNameAndEstablishment("Another School", establishment2)
         };
 
@@ -1074,8 +1068,8 @@ public class SchoolSearchControllerTests
                 LAName = localAuthority,
                 Easting = (430000 + i).ToString(),
                 Northing = (433000 + i).ToString(),
-                Latitude = (53.8 + (i * 0.01)).ToString(),
-                Longitude = (-1.55 + (i * 0.01)).ToString()
+                //Latitude = (53.8 + (i * 0.01)).ToString(),
+                //Longitude = (-1.55 + (i * 0.01)).ToString()
             };
             results.Add(SchoolSearchResult.FromNameAndEstablishment($"School {i}", establishment));
         }

@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Mappers;
 
@@ -23,10 +24,14 @@ public static class DataMapper
     /// <summary>
     /// Maps DfE number, treating "/" as empty.
     /// </summary>
-    public static DataWithAvailability<string> MapDfENumber(string? value) =>
-        value == "/"
+    public static DataWithAvailability<string> MapDfENumber(Establishment establishment)
+    {
+        var dfeNumber = $"{establishment.LAId}/{establishment.EstablishmentNumber}";
+
+        return dfeNumber == "/"
             ? DataWithAvailability.NotAvailable<string>()
-            : DataWithAvailability.FromStringWithoutCodes(value);
+            : DataWithAvailability.FromStringWithoutCodes(dfeNumber);
+    }
 
     /// <summary>
     /// Maps an age value from string to int.

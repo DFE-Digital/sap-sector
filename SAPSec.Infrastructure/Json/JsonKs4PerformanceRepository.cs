@@ -1,7 +1,6 @@
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.KS4.Destinations;
-using SAPSec.Core.Model.KS4.Performance;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.Json;
 

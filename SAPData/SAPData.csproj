@@ -5,6 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>389d9c73-9bb2-4a9a-97ec-578268ea0214</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -143,6 +144,7 @@
     <None Remove="Sql\01_create_raw_tables.sql" />
     <None Remove="Sql\02_copy_into_raw.sql" />
     <None Remove="Sql\02_copy_into_raw_local.sql" />
+    <None Remove="Sql\03_v_england_absence.sql" />
     <None Remove="Sql\03_v_england_destinations.sql" />
     <None Remove="Sql\03_v_england_performance.sql" />
     <None Remove="Sql\03_v_establishment.sql" />
@@ -163,11 +165,39 @@
     <None Remove="Sql\50_v_similar_schools_secondary_values.sql" />
     <None Remove="Sql\50_v_similar_schools_secondary_values_national_sd.sql" />
     <None Remove="Sql\51_similar_schools_indexes.sql" />
+    <None Remove="Sql\60_test_establishments_urns.sql" />
+    <None Remove="Sql\63_v_england_absence.sql" />
+    <None Remove="Sql\63_v_england_destinations.sql" />
+    <None Remove="Sql\63_v_england_performance.sql" />
+    <None Remove="Sql\63_v_establishment.sql" />
+    <None Remove="Sql\63_v_establishment_absence.sql" />
+    <None Remove="Sql\63_v_establishment_destinations.sql" />
+    <None Remove="Sql\63_v_establishment_group_links.sql" />
+    <None Remove="Sql\63_v_establishment_links.sql" />
+    <None Remove="Sql\63_v_establishment_performance.sql" />
+    <None Remove="Sql\63_v_establishment_subject_entries.sql" />
+    <None Remove="Sql\63_v_establishment_workforce.sql" />
+    <None Remove="Sql\63_v_la_destinations.sql" />
+    <None Remove="Sql\63_v_la_performance.sql" />
+    <None Remove="Sql\63_v_la_subject_entries.sql" />
+    <None Remove="Sql\70_v_similar_schools_primary_groups.sql" />
+    <None Remove="Sql\70_v_similar_schools_primary_values.sql" />
+    <None Remove="Sql\70_v_similar_schools_secondary_groups.sql" />
+    <None Remove="Sql\70_v_similar_schools_secondary_values.sql" />
+    <None Remove="Sql\70_v_similar_schools_secondary_values_national_sd.sql" />
+    <None Remove="Sql\tablemapping.csv" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Dapper" Version="2.1.66" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
+    <PackageReference Include="Npgsql" Version="8.0.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

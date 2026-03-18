@@ -10,6 +10,7 @@ public sealed class GenerateViews
     private readonly IReadOnlyList<DataMapRow> _rows;
     private readonly string _tableMappingPath;
     private readonly string _sqlDir;
+    private readonly string _jsonDir;
 
     // raw_sources.json path in repo
     private static readonly string[] RawSourcesCandidates =
@@ -20,10 +21,19 @@ public sealed class GenerateViews
         Path.Combine(AppContext.BaseDirectory, "SAPData", "raw_sources.json")
     };
 
+    private enum ViewRange
+    {
+        Establishment,
+        England,
+        LA
+    }
+
     private sealed record ViewSpec(
         string ViewName,
-        string Range,
-        string Type);
+        string IdColumn,
+        ViewRange Range,
+        string Type,
+        string ModelName);
 
     private sealed record RawSource(
         string Type,
@@ -35,42 +45,55 @@ public sealed class GenerateViews
 
     private static readonly ViewSpec[] Views =
     {
-        new("v_establishment", "Establishment", "Establishment"),
-        new("v_establishment_links", "Establishment", "Establishment"),
-        new("v_establishment_group_links", "Establishment", "Establishment"),
-        new("v_establishment_subject_entries", "Establishment", "KS4_Performance"),
+        new("v_establishment", "URN", ViewRange.Establishment, "Establishment", "Establishment"),
+        new("v_establishment_links", "urn", ViewRange.Establishment, "Establishment", "EstablishmentLinks"),
+        new("v_establishment_group_links", "group_id", ViewRange.Establishment, "Establishment", "EstablishmentGroupLinks"),
+        new("v_establishment_subject_entries", "school_urn", ViewRange.Establishment, "KS4_Performance", "EstablishmentSubjectEntries"),
 
-        new("v_establishment_absence", "Establishment", "PupilAbsence"),
-        new("v_establishment_destinations", "Establishment", "KS4_Destinations"),
-        new("v_establishment_performance", "Establishment", "KS4_Performance"),
-        new("v_establishment_workforce", "Establishment", "Workforce"),
+        new("v_establishment_absence", "Id", ViewRange.Establishment, "PupilAbsence", "EstablishmentAbsence"),
+        new("v_establishment_destinations", "Id", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
+        new("v_establishment_performance", "Id", ViewRange.Establishment, "KS4_Performance", "EstablishmentPerformance"),
+        new("v_establishment_workforce", "Id", ViewRange.Establishment, "Workforce", "EstablishmentWorkforce"),
 
-        new("v_england_absence", "England", "PupilAbsence"),
-        new("v_england_destinations", "England", "KS4_Destinations"),
-        new("v_england_performance", "England", "KS4_Performance"),
+        new("v_england_absence", "Id", ViewRange.England, "PupilAbsence", "EnglandAbsence"),
+        new("v_england_destinations", "Id", ViewRange.England, "KS4_Destinations", "EnglandDestinations"),
+        new("v_england_performance", "Id", ViewRange.England, "KS4_Performance", "EnglandPerformance"),
 
-        new("v_la_destinations", "LA", "KS4_Destinations"),
-        new("v_la_performance", "LA", "KS4_Performance"),
-        new("v_la_subject_entries", "LA", "KS4_Performance")
+        new("v_la_destinations", "Id", ViewRange.LA, "KS4_Destinations", "LADestinations"),
+        new("v_la_performance", "Id", ViewRange.LA, "KS4_Performance", "LAPerformance"),
+        new("v_la_subject_entries", "old_la_code", ViewRange.LA, "KS4_Performance", "LASubjectEntries")
     };
 
-    public GenerateViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir)
+    public GenerateViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir, string jsonDir)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
+        _jsonDir = jsonDir;
     }
 
     public void Run()
     {
         Directory.CreateDirectory(_sqlDir);
+        Directory.CreateDirectory(_jsonDir);
 
         var tableMap = LoadTableMappings();
         var sources = LoadRawSources();
 
+        WriteSql("60", "test_establishments_urns", $"""
+            drop table if exists test_establishments_urns_import;
+            create unlogged table test_establishments_urns_import (doc text);
+
+            drop table if exists test_establishments_urns;
+            create table test_establishments_urns ("URN" text);
+
+            \copy test_establishments_urns_import FROM '{_jsonDir}\..\TestEstablishmentUrns.json' with (format text);
+            insert into test_establishments_urns select jsonb_array_elements_text(string_agg(doc, E' ')::jsonb) from test_establishments_urns_import;
+            """);
+
         foreach (var view in Views)
         {
-            string sql;
+            string sql, jsonSql;
 
             // 1) Establishment dimension (GIAS edubasealldataYYYYmmDD)
             if (view.ViewName.Equals("v_establishment", StringComparison.OrdinalIgnoreCase))
@@ -85,14 +108,14 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (GIAS/All establishment/Metadata/Current).");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
@@ -112,14 +135,14 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (GIAS/All establishment/Links/Current).");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
@@ -139,14 +162,14 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (GIAS/Academy sponsor and trust/Links/Current).");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
@@ -166,14 +189,14 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries_2/Current).");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
@@ -193,14 +216,14 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries/Current).");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
@@ -210,14 +233,14 @@ public sealed class GenerateViews
             else
             {
                 var viewRows = _rows
-                    .Where(r => r.Range == view.Range)
+                    .Where(r => r.Range == view.Range.ToString())
                     .Where(r => r.Type == view.Type)
                     .Where(r => !string.IsNullOrWhiteSpace(r.PropertyName))
                     .Where(r => !IsIgnored(r))
                     .ToList();
 
                 var ignoredRows = _rows
-                    .Where(r => r.Range == view.Range)
+                    .Where(r => r.Range == view.Range.ToString())
                     .Where(r => r.Type == view.Type)
                     .Where(r => !string.IsNullOrWhiteSpace(r.PropertyName))
                     .Where(IsIgnored)
@@ -233,22 +256,40 @@ public sealed class GenerateViews
                 if (viewRows.Count == 0)
                 {
                     sql = BuildSkippedSql(view.ViewName, $"No DataMap rows found for Range='{view.Range}', Type='{view.Type}'.");
-                    Write(view.ViewName, sql);
+                    WriteSql("03", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMaterializedView(view.ViewName, viewRows, tableMap);
             }
 
-            Write(view.ViewName, sql);
+            WriteSql("03", view.ViewName, sql);
+            jsonSql = view switch
+            {
+                _ when view.ViewName == "v_establishment_group_links" =>
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+
+                _ when view.ViewName == "v_la_subject_entries" =>
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" IN (select distinct ""LAId"" from v_establishment where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+
+                _ when view.ViewName == "v_establishment_subject_entries" =>
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+
+                _ when view.Range == ViewRange.Establishment =>
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+
+                _ =>
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);"
+            };
+            WriteSql("63", view.ViewName, jsonSql);
             Console.WriteLine($"Generated {view.ViewName}");
         }
     }
 
-    private void Write(string viewName, string sql)
+    private void WriteSql(string prefix, string viewName, string sql)
     {
         File.WriteAllText(
-            Path.Combine(_sqlDir, $"03_{viewName}.sql"),
+            Path.Combine(_sqlDir, $"{prefix}_{viewName}.sql"),
             sql,
             new UTF8Encoding(false));
     }
@@ -381,14 +422,16 @@ public sealed class GenerateViews
 
     private static string GenerateMirrorMaterializedView(string viewName, string? rawTable)
     {
-        var sb = new StringBuilder();
-        sb.AppendLine($"-- AUTO-GENERATED MIRROR MATERIALIZED VIEW: {viewName}");
-        sb.AppendLine();
-        sb.AppendLine($"DROP MATERIALIZED VIEW IF EXISTS {viewName};");
-        sb.AppendLine();
-        sb.AppendLine($"CREATE MATERIALIZED VIEW {viewName} AS");
-        sb.AppendLine($"SELECT * FROM {rawTable};");
-        return sb.ToString();
+        var sql = new StringBuilder();
+
+        sql.AppendLine($"-- AUTO-GENERATED MIRROR MATERIALIZED VIEW: {viewName}");
+        sql.AppendLine();
+        sql.AppendLine($"DROP MATERIALIZED VIEW IF EXISTS {viewName};");
+        sql.AppendLine();
+        sql.AppendLine($"CREATE MATERIALIZED VIEW {viewName} AS");
+        sql.AppendLine($"SELECT * FROM {rawTable};");
+
+        return sql.ToString();
     }
 
     // =====================================================
@@ -397,14 +440,14 @@ public sealed class GenerateViews
 
     private string GenerateMaterializedView(string viewName, List<DataMapRow> rows, Dictionary<string, string> tableMap)
     {
-        var sb = new StringBuilder();
+        var sql = new StringBuilder();
 
-        sb.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
-        sb.AppendLine();
-        sb.AppendLine($"DROP MATERIALIZED VIEW IF EXISTS {viewName};");
-        sb.AppendLine();
-        sb.AppendLine($"CREATE MATERIALIZED VIEW {viewName} AS");
-        sb.AppendLine("WITH");
+        sql.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
+        sql.AppendLine();
+        sql.AppendLine($"DROP MATERIALIZED VIEW IF EXISTS {viewName};");
+        sql.AppendLine();
+        sql.AppendLine($"CREATE MATERIALIZED VIEW {viewName} AS");
+        sql.AppendLine("WITH");
 
         var groups = rows.GroupBy(r => (r.FileName ?? "").Trim().TrimStart('\uFEFF')).ToList();
 
@@ -420,9 +463,9 @@ public sealed class GenerateViews
 
             var idCol = DbCol(r0.RecordFilterBy);
 
-            sb.AppendLine($"src_{i + 1} AS (");
-            sb.AppendLine("    SELECT");
-            sb.AppendLine($"        t.\"{idCol}\" AS \"Id\",");
+            sql.AppendLine($"src_{i + 1} AS (");
+            sql.AppendLine("    SELECT");
+            sql.AppendLine($"        t.\"{idCol}\" AS \"Id\",");
 
             var props = g
                 .Where(r => !string.IsNullOrWhiteSpace(r.PropertyName))
@@ -431,27 +474,27 @@ public sealed class GenerateViews
                 .ToList();
 
             for (int j = 0; j < props.Count; j++)
-                sb.AppendLine($"        {props[j]}{(j == props.Count - 1 ? "" : ",")}");
+                sql.AppendLine($"        {props[j]}{(j == props.Count - 1 ? "" : ",")}");
 
-            sb.AppendLine($"    FROM {rawTable} t");
-            sb.AppendLine($"    GROUP BY t.\"{idCol}\"");
-            sb.AppendLine(")");
-            sb.AppendLine(i == groups.Count - 1 ? "," : ",");
+            sql.AppendLine($"    FROM {rawTable} t");
+            sql.AppendLine($"    GROUP BY t.\"{idCol}\"");
+            sql.AppendLine(")");
+            sql.AppendLine(i == groups.Count - 1 ? "," : ",");
         }
 
         // all_ids
-        sb.AppendLine("all_ids AS (");
+        sql.AppendLine("all_ids AS (");
         for (int i = 0; i < groups.Count; i++)
         {
             var union = i == 0 ? "    " : "    UNION ";
-            sb.AppendLine($"{union}SELECT \"Id\" FROM src_{i + 1}");
+            sql.AppendLine($"{union}SELECT \"Id\" FROM src_{i + 1}");
         }
-        sb.AppendLine(")");
-        sb.AppendLine();
-        sb.AppendLine("SELECT");
+        sql.AppendLine(")");
+        sql.AppendLine();
+        sql.AppendLine("SELECT");
 
         // Always include Id from all_ids
-        sb.AppendLine("    a.\"Id\" AS \"Id\",");
+        sql.AppendLine("    a.\"Id\" AS \"Id\",");
 
         // If this is an establishment-level fact view, include LA/Region dims
         var includeEstablishmentDims =
@@ -459,20 +502,20 @@ public sealed class GenerateViews
 
         if (includeEstablishmentDims)
         {
-            sb.AppendLine("    e.\"LAId\" AS \"LAId\",");
-            sb.AppendLine("    e.\"LAName\" AS \"LAName\",");
-            sb.AppendLine("    e.\"RegionId\" AS \"RegionId\",");
-            sb.AppendLine("    e.\"RegionName\" AS \"RegionName\",");
+            sql.AppendLine("    e.\"LAId\" AS \"LAId\",");
+            sql.AppendLine("    e.\"LAName\" AS \"LAName\",");
+            sql.AppendLine("    e.\"RegionId\" AS \"RegionId\",");
+            sql.AppendLine("    e.\"RegionName\" AS \"RegionName\",");
         }
 
         // Build property -> sources lookup
         var propertySources = groups
-            .SelectMany((g, idx) => g.Select(r => new { r.PropertyName, Source = idx + 1 }))
+            .SelectMany((g, idx) => g.Select(r => new { r.PropertyName, Source = idx + 1, Type = r.DataType }))
             .Where(x => !string.IsNullOrWhiteSpace(x.PropertyName))
             .GroupBy(x => x.PropertyName!)
             .ToDictionary(
                 g => g.Key,
-                g => g.Select(x => x.Source).Distinct().OrderBy(x => x).ToList()
+                g => new { Sources = g.Select(x => x.Source).Distinct().OrderBy(x => x).ToList(), Type = g.Select(x => x.Type).First() }
             );
 
         var orderedProps = propertySources.Keys.OrderBy(p => p).ToList();
@@ -480,7 +523,7 @@ public sealed class GenerateViews
         for (int i = 0; i < orderedProps.Count; i++)
         {
             var prop = orderedProps[i];
-            var sources = propertySources[prop];
+            var sources = propertySources[prop].Sources;
 
             var isLast = i == orderedProps.Count - 1;
             var comma = isLast ? "" : ",";
@@ -489,20 +532,20 @@ public sealed class GenerateViews
                 ? $"src_{sources[0]}.\"{prop}\""
                 : $"COALESCE({string.Join(", ", sources.Select(s => $"src_{s}.\"{prop}\""))})";
 
-            sb.AppendLine($"    {expr} AS \"{prop}\"{comma}");
+            sql.AppendLine($"    {expr} AS \"{prop}\"{comma}");
         }
 
-        sb.AppendLine("FROM all_ids a");
+        sql.AppendLine("FROM all_ids a");
 
         for (int i = 0; i < groups.Count; i++)
-            sb.AppendLine($"LEFT JOIN src_{i + 1} ON src_{i + 1}.\"Id\" = a.\"Id\"");
+            sql.AppendLine($"LEFT JOIN src_{i + 1} ON src_{i + 1}.\"Id\" = a.\"Id\"");
 
         if (includeEstablishmentDims)
-            sb.AppendLine("LEFT JOIN v_establishment e ON e.\"URN\" = a.\"Id\"");
+            sql.AppendLine("LEFT JOIN v_establishment e ON e.\"URN\" = a.\"Id\"");
 
-        sb.AppendLine(";");
+        sql.AppendLine(";");
 
-        return sb.ToString();
+        return sql.ToString();
     }
 
     // =====================================================

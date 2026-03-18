@@ -1,24 +1,24 @@
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.KS4.Performance;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.Json;
 
 public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
 {
-    private readonly IJsonFile<SimilarSchoolsSecondaryGroupsRow> _similarSchoolsGroupsRepository;
-    private readonly IJsonFile<SimilarSchoolsSecondaryValuesRow> _similarSchoolsValuesRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryGroupsEntry> _similarSchoolsGroupsRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryValuesEntry> _similarSchoolsValuesRepository;
     private readonly IJsonFile<Establishment> _establishmentRepository;
     private readonly IJsonFile<EstablishmentPerformance> _establishmentPerformanceRepository;
-    private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviations> _standardDeviationsRepository;
+    private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> _standardDeviationsRepository;
 
     public JsonSimilarSchoolsSecondaryRepository(
-        IJsonFile<SimilarSchoolsSecondaryGroupsRow> similarSchoolsGroupsRepository,
-        IJsonFile<SimilarSchoolsSecondaryValuesRow> similarSchoolsValuesRepository,
+        IJsonFile<SimilarSchoolsSecondaryGroupsEntry> similarSchoolsGroupsRepository,
+        IJsonFile<SimilarSchoolsSecondaryValuesEntry> similarSchoolsValuesRepository,
         IJsonFile<Establishment> establishmentRepository,
         IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
-        IJsonFile<SimilarSchoolsSecondaryStandardDeviations> standardDeviationsRepository)
+        IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> standardDeviationsRepository)
     {
         _similarSchoolsGroupsRepository = similarSchoolsGroupsRepository;
         _similarSchoolsValuesRepository = similarSchoolsValuesRepository;
@@ -102,7 +102,18 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
     public async Task<SimilarSchoolsSecondaryStandardDeviations> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
     {
         var list = await _standardDeviationsRepository.ReadAllAsync();
-        return list.First();
+        return list.Select(sd => new SimilarSchoolsSecondaryStandardDeviations()
+        {
+            Ks2AverageScore = ParseDecimal(sd.KS2AVG),
+            PupilPremiumEligibilityPercentage = ParseDecimal(sd.PPPerc),
+            PupilsWithEalPercentage = ParseDecimal(sd.PercentEAL),
+            Polar4Quintile = ParseDecimal(sd.Polar4QuintilePupils),
+            PupilStabilityRate = ParseDecimal(sd.PStability),
+            AverageIdaciScore = ParseDecimal(sd.IdaciPupils),
+            PupilsWithSenSupportPercentage = ParseDecimal(sd.PercentSchSupport),
+            PupilCount = ParseDecimal(sd.NumberOfPupils),
+            PupilsWithEhcPlanPercentage = ParseDecimal(sd.PercentageStatementOrEHP),
+        }).First();
     }
 
     private SimilarSchool FromJson(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)

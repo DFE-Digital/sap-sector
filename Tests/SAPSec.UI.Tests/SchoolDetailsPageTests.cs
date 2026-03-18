@@ -10,8 +10,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SchoolDetailsPath = "/school/147788/school-details";
-    private const string SchoolSearchPath = "/search-for-a-school";
+    private const string SchoolDetailsPath = "/school/108088/school-details";
 
     #region Page Load Tests
 
@@ -36,7 +35,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         isVisible.Should().BeTrue("School name caption should be visible");
 
         var nameText = await schoolName.TextContentAsync();
-        nameText.Should().Contain("Bradfield School");
+        nameText.Should().Contain("Wetherby High School");
     }
 
     [Fact]
@@ -204,7 +203,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         var content = await Page.ContentAsync();
 
-        content.Should().Contain("URN: 147788");
+        content.Should().Contain("URN: 108088");
     }
 
     [Fact]
@@ -290,7 +289,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Admissions policy field should be visible");
     }
-    
+
 
     [Fact]
     public async Task SchoolDetails_DisplaysNurseryProvisionField()
@@ -303,7 +302,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Nursery provision field should be visible");
     }
-    
+
     [Fact]
     public async Task SchoolDetails_DisplaysSixthFormField()
     {
@@ -326,7 +325,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("SEN unit field should be visible");
     }
-    
+
     [Fact]
     public async Task SchoolDetails_DisplaysResourcedprovisionField()
     {
@@ -338,7 +337,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Resourced provision field should be visible");
     }
-    
+
     [Fact]
     public async Task SchoolDetails_DisplaysReligiousCharacterField()
     {
@@ -350,9 +349,9 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Religious character field should be visible");
     }
-    
-    
-    
+
+
+
 
     #endregion
 
@@ -455,7 +454,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         var ofstedLink = Page.Locator("a[href*='reports.ofsted.gov.uk']");
         var href = await ofstedLink.GetAttributeAsync("href");
 
-        href.Should().Contain("147788");
+        href.Should().Contain("108088");
     }
 
     [Fact]

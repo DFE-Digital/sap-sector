@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -13,10 +12,10 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 using System.Text.Json;
 
@@ -156,11 +155,11 @@ public class SimilarSchoolsComparisonControllerTests
 
         model.CharacteristicsRows.Should().NotBeNull();
         model.CharacteristicsRows.Should().HaveCount(9);
-        
+
         model.CharacteristicsRows[0].Characteristic.Should().Be("Average KS2 reading and maths score");
         model.CharacteristicsRows[0].CurrentSchoolValue.Should().NotBeNullOrWhiteSpace();
         model.CharacteristicsRows[0].SimilarSchoolValue.Should().NotBeNullOrWhiteSpace();
-        
+
         model.CharacteristicsRows[4].Characteristic.Should().Be("Average IDACI score");
         model.CharacteristicsRows[4].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
 

@@ -10,7 +10,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SchoolPagePath = "/school/147788";
+    private const string SchoolPagePath = "/school/105574";
 
     #region Index Page Tests
 
@@ -32,7 +32,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var title = await Page.TitleAsync();
         var heading = await Page.Locator("h1").TextContentAsync();
 
-        title.Should().Contain("Bradfield School");
+        title.Should().Contain("Loreto High School Chorlton");
     }
 
     #endregion
@@ -153,7 +153,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        Page.Url.Should().EndWith("/school/147788");
+        Page.Url.Should().EndWith("/school/105574");
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        Page.Url.Should().EndWith("/school/147788/ks4-headline-measures");
+        Page.Url.Should().EndWith("/school/105574/ks4-headline-measures");
     }
 
     [Fact]
@@ -187,7 +187,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        Page.Url.Should().EndWith("/school/147788/ks4-core-subjects");
+        Page.Url.Should().EndWith("/school/105574/ks4-core-subjects");
     }
 
     [Fact]
@@ -204,7 +204,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        Page.Url.Should().EndWith("/school/147788/attendance");
+        Page.Url.Should().EndWith("/school/105574/attendance");
     }
 
     [Fact]
@@ -221,7 +221,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        Page.Url.Should().EndWith("/school/147788/view-similar-schools");
+        Page.Url.Should().EndWith("/school/105574/view-similar-schools");
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        Page.Url.Should().EndWith("/school/147788/school-details");
+        Page.Url.Should().EndWith("/school/105574/school-details");
     }
 
     [Fact]
@@ -255,7 +255,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         // Assert
-        Page.Url.Should().EndWith("/school/147788/what-is-a-similar-school");
+        Page.Url.Should().EndWith("/school/105574/what-is-a-similar-school");
     }
 
     #endregion

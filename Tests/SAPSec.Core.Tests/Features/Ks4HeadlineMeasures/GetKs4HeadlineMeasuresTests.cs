@@ -3,8 +3,7 @@ using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.KS4.Destinations;
-using SAPSec.Core.Model.KS4.Performance;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures;
 
@@ -180,39 +179,39 @@ public class GetKs4HeadlineMeasuresTests
                 null,
                 new EstablishmentDestinations
                 {
-                    AllDest_Tot_Est_Current_Pct = 94.4,
-                    AllDest_Tot_Est_Previous_Pct = 93.4,
-                    AllDest_Tot_Est_Previous2_Pct = 92.4,
-                    Education_Tot_Est_Current_Pct = 72.2,
-                    Education_Tot_Est_Previous_Pct = 71.2,
-                    Education_Tot_Est_Previous2_Pct = 70.2,
-                    Employment_Tot_Est_Current_Pct = 22.2,
-                    Employment_Tot_Est_Previous_Pct = 22.2,
-                    Employment_Tot_Est_Previous2_Pct = 22.2
+                    AllDest_Tot_Est_Current_Pct = "94.4",
+                    AllDest_Tot_Est_Previous_Pct = "93.4",
+                    AllDest_Tot_Est_Previous2_Pct = "92.4",
+                    Education_Tot_Est_Current_Pct = "72.2",
+                    Education_Tot_Est_Previous_Pct = "71.2",
+                    Education_Tot_Est_Previous2_Pct = "70.2",
+                    Employment_Tot_Est_Current_Pct = "22.2",
+                    Employment_Tot_Est_Previous_Pct = "22.2",
+                    Employment_Tot_Est_Previous2_Pct = "22.2"
                 },
                 new LADestinations
                 {
-                    AllDest_Tot_LA_Current_Pct = 91.0,
-                    AllDest_Tot_LA_Previous_Pct = 90.0,
-                    AllDest_Tot_LA_Previous2_Pct = 89.0,
-                    Education_Tot_LA_Current_Pct = 68.0,
-                    Education_Tot_LA_Previous_Pct = 67.0,
-                    Education_Tot_LA_Previous2_Pct = 66.0,
-                    Employment_Tot_LA_Current_Pct = 23.0,
-                    Employment_Tot_LA_Previous_Pct = 23.0,
-                    Employment_Tot_LA_Previous2_Pct = 23.0
+                    AllDest_Tot_LA_Current_Pct = "91.0",
+                    AllDest_Tot_LA_Previous_Pct = "90.0",
+                    AllDest_Tot_LA_Previous2_Pct = "89.0",
+                    Education_Tot_LA_Current_Pct = "68.0",
+                    Education_Tot_LA_Previous_Pct = "67.0",
+                    Education_Tot_LA_Previous2_Pct = "66.0",
+                    Employment_Tot_LA_Current_Pct = "23.0",
+                    Employment_Tot_LA_Previous_Pct = "23.0",
+                    Employment_Tot_LA_Previous2_Pct = "23.0"
                 },
                 new EnglandDestinations
                 {
-                    AllDest_Tot_Eng_Current_Pct = 88.5,
-                    AllDest_Tot_Eng_Previous_Pct = 87.5,
-                    AllDest_Tot_Eng_Previous2_Pct = 86.5,
-                    Education_Tot_Eng_Current_Pct = 64.5,
-                    Education_Tot_Eng_Previous_Pct = 63.5,
-                    Education_Tot_Eng_Previous2_Pct = 62.5,
-                    Employment_Tot_Eng_Current_Pct = 24.0,
-                    Employment_Tot_Eng_Previous_Pct = 24.5,
-                    Employment_Tot_Eng_Previous2_Pct = 25.0
+                    AllDest_Tot_Eng_Current_Pct = "88.5",
+                    AllDest_Tot_Eng_Previous_Pct = "87.5",
+                    AllDest_Tot_Eng_Previous2_Pct = "86.5",
+                    Education_Tot_Eng_Current_Pct = "64.5",
+                    Education_Tot_Eng_Previous_Pct = "63.5",
+                    Education_Tot_Eng_Previous2_Pct = "62.5",
+                    Employment_Tot_Eng_Current_Pct = "24.0",
+                    Employment_Tot_Eng_Previous_Pct = "24.5",
+                    Employment_Tot_Eng_Previous2_Pct = "25.0"
                 }));
 
         var sut = new GetKs4HeadlineMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);
@@ -254,39 +253,39 @@ public class GetKs4HeadlineMeasuresTests
                 null,
                 new EstablishmentDestinations
                 {
-                    AllDest_Tot_Est_Current_Pct = 94.4,
-                    AllDest_Tot_Est_Previous_Pct = null,
-                    AllDest_Tot_Est_Previous2_Pct = double.NaN,
-                    Education_Tot_Est_Current_Pct = null,
-                    Education_Tot_Est_Previous_Pct = 71.2,
-                    Education_Tot_Est_Previous2_Pct = double.PositiveInfinity,
-                    Employment_Tot_Est_Current_Pct = 22.0,
-                    Employment_Tot_Est_Previous_Pct = null,
-                    Employment_Tot_Est_Previous2_Pct = 20.0
+                    AllDest_Tot_Est_Current_Pct = "94.4",
+                    AllDest_Tot_Est_Previous_Pct = "",
+                    AllDest_Tot_Est_Previous2_Pct = "x",
+                    Education_Tot_Est_Current_Pct = "",
+                    Education_Tot_Est_Previous_Pct = "71.2",
+                    Education_Tot_Est_Previous2_Pct = "x",
+                    Employment_Tot_Est_Current_Pct = "22.0",
+                    Employment_Tot_Est_Previous_Pct = "",
+                    Employment_Tot_Est_Previous2_Pct = "20.0"
                 },
                 new LADestinations
                 {
-                    AllDest_Tot_LA_Current_Pct = null,
-                    AllDest_Tot_LA_Previous_Pct = 90.0,
-                    AllDest_Tot_LA_Previous2_Pct = 89.0,
-                    Education_Tot_LA_Current_Pct = 68.0,
-                    Education_Tot_LA_Previous_Pct = null,
-                    Education_Tot_LA_Previous2_Pct = 66.0,
-                    Employment_Tot_LA_Current_Pct = double.NaN,
-                    Employment_Tot_LA_Previous_Pct = 23.0,
-                    Employment_Tot_LA_Previous2_Pct = null
+                    AllDest_Tot_LA_Current_Pct = "",
+                    AllDest_Tot_LA_Previous_Pct = "90.0",
+                    AllDest_Tot_LA_Previous2_Pct = "89.0",
+                    Education_Tot_LA_Current_Pct = "68.0",
+                    Education_Tot_LA_Previous_Pct = "",
+                    Education_Tot_LA_Previous2_Pct = "66.0",
+                    Employment_Tot_LA_Current_Pct = "x",
+                    Employment_Tot_LA_Previous_Pct = "23.0",
+                    Employment_Tot_LA_Previous2_Pct = ""
                 },
                 new EnglandDestinations
                 {
-                    AllDest_Tot_Eng_Current_Pct = 88.5,
-                    AllDest_Tot_Eng_Previous_Pct = double.PositiveInfinity,
-                    AllDest_Tot_Eng_Previous2_Pct = null,
-                    Education_Tot_Eng_Current_Pct = null,
-                    Education_Tot_Eng_Previous_Pct = 63.5,
-                    Education_Tot_Eng_Previous2_Pct = 62.5,
-                    Employment_Tot_Eng_Current_Pct = null,
-                    Employment_Tot_Eng_Previous_Pct = double.NaN,
-                    Employment_Tot_Eng_Previous2_Pct = 25.0
+                    AllDest_Tot_Eng_Current_Pct = "88.5",
+                    AllDest_Tot_Eng_Previous_Pct = "x",
+                    AllDest_Tot_Eng_Previous2_Pct = "",
+                    Education_Tot_Eng_Current_Pct = "",
+                    Education_Tot_Eng_Previous_Pct = "63.5",
+                    Education_Tot_Eng_Previous2_Pct = "62.5",
+                    Employment_Tot_Eng_Current_Pct = "",
+                    Employment_Tot_Eng_Previous_Pct = "x",
+                    Employment_Tot_Eng_Previous2_Pct = "25.0"
                 }));
 
         var sut = new GetKs4HeadlineMeasures(repositoryMock.Object, schoolDetailsServiceMock.Object);

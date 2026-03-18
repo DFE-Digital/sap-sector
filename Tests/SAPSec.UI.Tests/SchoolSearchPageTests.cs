@@ -137,7 +137,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        await Page.Locator("input[name='__Query']").FillAsync("147788");
+        await Page.Locator("input[name='__Query']").FillAsync("105574");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -146,9 +146,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788/school-details");
+        Page.Url.Should().Contain("school/105574/school-details");
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        await Page.Locator("input[name='__Query']").FillAsync("Bradfield School");
+        await Page.Locator("input[name='__Query']").FillAsync("Loreto High School Chorlton");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -165,9 +165,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788");
+        Page.Url.Should().Contain("school/105574");
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     #endregion
@@ -295,7 +295,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("373\\4017");
+        await Page.Locator("input[name='__Query']").FillAsync("352\\4753");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -304,9 +304,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788/school-details");
+        Page.Url.Should().Contain("school/105574/school-details");
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     [Fact]
@@ -436,7 +436,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchResultsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("147788");
+        await Page.Locator("input[name='__Query']").FillAsync("105574");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -445,9 +445,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788/school-details");
+        Page.Url.Should().Contain("school/105574/school-details");
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     [Fact]

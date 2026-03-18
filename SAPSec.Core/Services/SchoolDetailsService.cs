@@ -3,6 +3,7 @@ using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Services;
@@ -50,7 +51,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             // Identifiers
             Urn = establishment.URN,
             Name = establishment.EstablishmentName,
-            DfENumber = DataMapper.MapDfENumber(establishment.DfENumber),
+            DfENumber = DataMapper.MapDfENumber(establishment),
             Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
 
             // Location
@@ -62,7 +63,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
 
             // School characteristics
             AgeRangeLow = DataMapper.MapAge(establishment.AgeRangeLow),
-            AgeRangeHigh = DataMapper.MapAge(establishment.AgeRangeRange),
+            AgeRangeHigh = DataMapper.MapAge(establishment.AgeRangeHigh),
             GenderOfEntry = DataMapper.MapString(establishment.GenderName),
             PhaseOfEducation = DataMapper.MapString(establishment.PhaseOfEducationName),
             SchoolType = DataMapper.MapString(establishment.TypeOfEstablishmentName),

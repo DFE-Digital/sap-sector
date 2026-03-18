@@ -1,18 +1,17 @@
 using Moq;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.KS4.Performance;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
 
 public class JsonSimilarSchoolsSecondaryRepositoryTests
 {
-    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryGroupsRow>> _groupsRepo = new();
-    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesRow>> _valuesRepo = new();
+    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>> _groupsRepo = new();
+    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesEntry>> _valuesRepo = new();
     private readonly Mock<IJsonFile<Establishment>> _establishmentRepo = new();
     private readonly Mock<IJsonFile<EstablishmentPerformance>> _performanceRepo = new();
-    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>> _standardDeviationsRepo = new();
+    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>> _standardDeviationsRepo = new();
 
     private JsonSimilarSchoolsSecondaryRepository CreateSut() =>
         new(
@@ -25,7 +24,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     [Fact]
     public async Task GetSimilarSchoolUrnsAsync_ReturnsNeighbourUrns()
     {
-        var rows = new List<SimilarSchoolsSecondaryGroupsRow>
+        var rows = new List<SimilarSchoolsSecondaryGroupsEntry>
         {
             new() { URN = "123456", NeighbourURN = "654321", Dist = "0.1", Rank = "1" },
             new() { URN = "123456", NeighbourURN = "654322", Dist = "0.2", Rank = "2" },
@@ -75,7 +74,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         };
         _establishmentRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<Establishment> { current, similar });
 
-        _groupsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsSecondaryGroupsRow>
+        _groupsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsSecondaryGroupsEntry>
         {
             new() { URN = "123456", NeighbourURN = "654321", Dist = "0.1", Rank = "1" }
         });
@@ -99,7 +98,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     [Fact]
     public async Task GetSecondaryValuesByUrnsAsync_ReturnsParsedValues()
     {
-        _valuesRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsSecondaryValuesRow>
+        _valuesRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsSecondaryValuesEntry>
         {
             new()
             {
@@ -135,19 +134,19 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     [Fact]
     public async Task GetSimilarSchoolsSecondaryStandardDeviationsAsync_ReturnsFirstRow()
     {
-        var rows = new List<SimilarSchoolsSecondaryStandardDeviations>
+        var rows = new List<SimilarSchoolsSecondaryStandardDeviationsEntry>
         {
             new()
             {
-                Ks2AverageScore = 2.45m,
-                PupilPremiumEligibilityPercentage = 10m,
-                PupilsWithEalPercentage = 5m,
-                Polar4Quintile = 1.1m,
-                PupilStabilityRate = 6m,
-                AverageIdaciScore = 0.08m,
-                PupilsWithSenSupportPercentage = 3m,
-                PupilCount = 400m,
-                PupilsWithEhcPlanPercentage = 1.5m
+                KS2AVG = "2.45",
+                PPPerc = "10",
+                PercentEAL = "5",
+                Polar4QuintilePupils = "1.1",
+                PStability = "6",
+                IdaciPupils = "0.08",
+                PercentSchSupport = "3",
+                NumberOfPupils = "400",
+                PercentageStatementOrEHP = "1.5"
             }
         };
         _standardDeviationsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);
@@ -162,7 +161,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     [Fact]
     public async Task GetSimilarSchoolsSecondaryStandardDeviationsAsync_Throws_WhenEmpty()
     {
-        _standardDeviationsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryStandardDeviations>());
+        _standardDeviationsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryStandardDeviationsEntry>());
 
         var sut = CreateSut();
 

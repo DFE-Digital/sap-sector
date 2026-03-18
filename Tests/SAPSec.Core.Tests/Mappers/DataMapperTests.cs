@@ -1,7 +1,6 @@
-﻿using FluentAssertions;
-using SAPSec.Core.Mappers;
+﻿using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
-using Xunit;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Tests.Mappers;
 
@@ -120,21 +119,15 @@ public class DataMapperTests
     public void MapDfENumber_ValidValue_ReturnsAvailable()
     {
         // Act
-        var result = DataMapper.MapDfENumber("373/1234");
+        var result = DataMapper.MapDfENumber(new Establishment
+        {
+            LAId = "373",
+            EstablishmentNumber = "1234"
+        });
 
         // Assert
         result.IsAvailable.Should().BeTrue();
         result.Value.Should().Be("373/1234");
-    }
-
-    [Fact]
-    public void MapDfENumber_SlashOnly_ReturnsNotAvailable()
-    {
-        // Act
-        var result = DataMapper.MapDfENumber("/");
-
-        // Assert
-        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     [Theory]
@@ -143,7 +136,11 @@ public class DataMapperTests
     public void MapDfENumber_Empty_ReturnsNotAvailable(string? value)
     {
         // Act
-        var result = DataMapper.MapDfENumber(value);
+        var result = DataMapper.MapDfENumber(new Establishment
+        {
+            LAId = value!,
+            EstablishmentNumber = value!
+        });
 
         // Assert
         result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);

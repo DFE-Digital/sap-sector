@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -166,15 +167,15 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     {
         const string sql = """
             SELECT
-                ks2_avg::numeric(18,6)                  AS "Ks2AverageScore",
-                pp_perc::numeric(18,6)                  AS "PpPerc",
-                percent_eal::numeric(18,6)              AS "PercentEal",
-                polar4quintile_pupils::numeric(18,6)    AS "Polar4QuintilePupils",
-                p_stability::numeric(18,6)              AS "PStability",
-                idaci_pupils::numeric(18,6)             AS "IdaciPupils",
-                percent_sch_support::numeric(18,6)      AS "PercentSchSupport",
-                number_of_pupils::numeric(18,6)         AS "NumberOfPupils",
-                percent_statement_or_ehp::numeric(18,6) AS "PercentStatementOrEhp"
+                "Ks2AverageScore",
+                "PpPerc",
+                "PercentEal",
+                "Polar4QuintilePupils",
+                "PStability",
+                "IdaciPupils",
+                "PercentSchSupport",
+                "NumberOfPupils",
+                "PercentStatementOrEhp"
             FROM public.v_similar_schools_secondary_values_national_sd;
         """;
 
