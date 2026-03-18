@@ -69,6 +69,14 @@
 
     const charts = {};
 
+    function formatChartValue(value, decimals, axisSuffix) {
+        if (value === null || value === undefined || Number.isNaN(value)) {
+            return null;
+        }
+
+        return `${Number(value).toFixed(decimals)}${axisSuffix}`;
+    }
+
     function gdsVars(canvas) {
         const s = getComputedStyle(canvas);
 
@@ -139,7 +147,7 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid) {
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, valueDecimals) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -298,10 +306,11 @@
                         },
                         display: showDataLabels,
                         formatter: function (value) {
-                            if (!showDataLabels || value === null || value === undefined || Number.isNaN(value)) {
+                            if (!showDataLabels) {
                                 return null;
                             }
-                            return `${value}${axisSuffix}`;
+
+                            return formatChartValue(value, valueDecimals, axisSuffix);
                         },
                         clamp: true,
                         clip: false
@@ -393,6 +402,9 @@
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
+            const valueDecimals = canvas.dataset.valueDecimals !== undefined
+                ? parseInt(canvas.dataset.valueDecimals, 10)
+                : 1;
 
             const rawColors = canvas.dataset.colors
                 ? JSON.parse(canvas.dataset.colors)
@@ -419,7 +431,7 @@
                         barPercentage
                     })
                 },
-                options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid),
+                options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, valueDecimals),
                 plugins: showDataLabels ? [ChartDataLabels] : []
             };
 
