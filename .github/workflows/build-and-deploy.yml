@@ -100,12 +100,12 @@ jobs:
         run: |
           npm ci
           npm run build-fe
-          
+
           echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
           mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
           cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
-          
-          echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="       
+
+          echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="
           mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
           cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
 
@@ -115,10 +115,10 @@ jobs:
           PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
         run: |
           TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
-          
+
           for proj in $TEST_PROJECTS; do
             echo "=== Running tests in $proj ==="
-          
+
             dotnet test "$proj" \
               --no-build \
               --configuration Debug \
@@ -132,7 +132,7 @@ jobs:
               /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
               --verbosity normal
           done
-      
+
       #Example of how to exclude tests from coverage https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
 
       - name: Upload Test Result Files
@@ -264,13 +264,13 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
             -o "$GITHUB_WORKSPACE/konduit.sh"
           chmod +x "$GITHUB_WORKSPACE/konduit.sh"
-          ls -la "$GITHUB_WORKSPACE/konduit.sh"         
+          ls -la "$GITHUB_WORKSPACE/konduit.sh"
 
       - name: Download seed backup from Blob
         shell: bash
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }} 
+          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
         run: |
           set -euo pipefail
           BACKUP_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
@@ -336,7 +336,8 @@ jobs:
           sha: ${{ needs.build.outputs.docker-image-tag }}
           terraform-base: ${{ env.TERRAFORM_BASE }}
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
-          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
           smoke-test: false
 
   manual_deploy:
@@ -366,7 +367,8 @@ jobs:
           sha: ${{ inputs.docker-image-tag }}
           terraform-base: ${{ env.TERRAFORM_BASE }}
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
-          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
           smoke-test: false
 
   deploy_domains_infra:
@@ -387,7 +389,8 @@ jobs:
         azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
         azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
         azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
 
   deploy_domains_env:
     name: Deploy Domains to ${{ matrix.domain_environment }} environment
@@ -413,4 +416,5 @@ jobs:
         azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
         environment: ${{ matrix.domain_environment }}
         healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
