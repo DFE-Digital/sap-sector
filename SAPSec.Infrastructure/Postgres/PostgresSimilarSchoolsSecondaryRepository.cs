@@ -23,9 +23,9 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT "neighbour_urn" 
+            SELECT "NeighbourURN" 
             FROM public.v_similar_schools_secondary_groups 
-            WHERE "urn" = @urn;
+            WHERE "URN" = @urn;
         """;
 
         var urns = await conn.QueryAsync<string>(sql, new { urn });
@@ -47,9 +47,9 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 *
             FROM public.v_establishment
             WHERE "URN" IN (
-                SELECT "neighbour_urn" 
+                SELECT "NeighbourURN" 
                 FROM public.v_similar_schools_secondary_groups 
-                WHERE "urn" = @urn
+                WHERE "URN" = @urn
             );
 
             SELECT
@@ -66,9 +66,9 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Physics59_Sum_Est_Current_Num"
             FROM public.v_establishment_performance
             WHERE "Id" = @urn OR "Id" IN (
-                SELECT "neighbour_urn" 
+                SELECT "NeighbourURN" 
                 FROM public.v_similar_schools_secondary_groups 
-                WHERE "urn" = @urn
+                WHERE "URN" = @urn
             );
         """;
 
@@ -124,40 +124,40 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
         const string sql = """
             SELECT
-                urn                      AS "Urn",
-                ks2_rp                   AS "Ks2Rp",
-                ks2_mp                   AS "Ks2Mp",
-                pp_perc                  AS "PpPerc",
-                percent_eal              AS "PercentEal",
-                polar4quintile_pupils    AS "Polar4QuintilePupils",
-                p_stability              AS "PStability",
-                idaci_pupils             AS "IdaciPupils",
-                percent_sch_support      AS "PercentSchSupport",
-                number_of_pupils         AS "NumberOfPupils",
-                percent_statement_or_ehp AS "PercentStatementOrEhp"
+                "URN",
+                "KS2RP",
+                "KS2MP",
+                "PPPerc",
+                "PercentEAL",
+                "Polar4QuintilePupils",
+                "PStability",
+                "IdaciPupils",
+                "PercentSchSupport",
+                "NumberOfPupils",
+                "PercentageStatementOrEHP"
             FROM public.v_similar_schools_secondary_values
-            WHERE urn = ANY(@Urns);
+            WHERE "URN" = ANY(@Urns);
         """;
 
         using var conn = await _factory.Create().OpenConnectionAsync();
 
-        var daos = await conn.QueryAsync<SimilarSchoolsSecondaryValuesDao>(
+        var daos = await conn.QueryAsync<SimilarSchoolsSecondaryValuesEntry>(
             new CommandDefinition(sql, new { Urns = urnList.ToArray() }));
 
         return daos
             .Select(d => new SimilarSchoolsSecondaryValues
             {
-                Urn = d.Urn,
-                Ks2ReadingScore = d.Ks2Rp,
-                Ks2MathsScore = d.Ks2Mp,
-                PupilPremiumEligibilityPercentage = d.PpPerc,
-                PupilsWithEalPercentage = d.PercentEal,
-                Polar4Quintile = d.Polar4QuintilePupils,
-                PupilStabilityRate = d.PStability,
-                AverageIdaciScore = d.IdaciPupils,
-                PupilsWithSenSupportPercentage = d.PercentSchSupport,
-                PupilCount = d.NumberOfPupils,
-                PupilsWithEhcPlanPercentage = d.PercentStatementOrEhp
+                Urn = d.URN,
+                Ks2ReadingScore = ParseDecimal(d.KS2RP),
+                Ks2MathsScore = ParseDecimal(d.KS2MP),
+                PupilPremiumEligibilityPercentage = ParseDecimal(d.PPPerc),
+                PupilsWithEalPercentage = ParseDecimal(d.PercentEAL),
+                Polar4Quintile = ParseDecimal(d.Polar4QuintilePupils),
+                PupilStabilityRate = ParseDecimal(d.PStability),
+                AverageIdaciScore = ParseDecimal(d.IdaciPupils),
+                PupilsWithSenSupportPercentage = ParseDecimal(d.PercentSchSupport),
+                PupilCount = ParseDecimal(d.NumberOfPupils),
+                PupilsWithEhcPlanPercentage = ParseDecimal(d.PercentageStatementOrEHP)
             })
             .ToList()
             .AsReadOnly();
@@ -167,31 +167,31 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     {
         const string sql = """
             SELECT
-                "Ks2AverageScore",
-                "PpPerc",
-                "PercentEal",
+                "KS2AVG",
+                "PPPerc",
+                "PercentEAL",
                 "Polar4QuintilePupils",
                 "PStability",
                 "IdaciPupils",
                 "PercentSchSupport",
                 "NumberOfPupils",
-                "PercentStatementOrEhp"
+                "PercentageStatementOrEHP"
             FROM public.v_similar_schools_secondary_values_national_sd;
         """;
 
         using var conn = await _factory.Create().OpenConnectionAsync();
-        var dao = await conn.QuerySingleAsync<SimilarSchoolsSecondaryNationalSdDao>(sql);
+        var dao = await conn.QuerySingleAsync<SimilarSchoolsSecondaryStandardDeviationsEntry>(sql);
         return new SimilarSchoolsSecondaryStandardDeviations
         {
-            Ks2AverageScore = dao.Ks2AverageScore,
-            PupilPremiumEligibilityPercentage = dao.PpPerc,
-            PupilsWithEalPercentage = dao.PercentEal,
+            Ks2AverageScore = dao.KS2AVG,
+            PupilPremiumEligibilityPercentage = dao.PPPerc,
+            PupilsWithEalPercentage = dao.PercentEAL,
             Polar4Quintile = dao.Polar4QuintilePupils,
             PupilStabilityRate = dao.PStability,
             AverageIdaciScore = dao.IdaciPupils,
             PupilsWithSenSupportPercentage = dao.PercentSchSupport,
             PupilCount = dao.NumberOfPupils,
-            PupilsWithEhcPlanPercentage = dao.PercentStatementOrEhp
+            PupilsWithEhcPlanPercentage = dao.PercentageStatementOrEHP
         };
     }
 
@@ -233,6 +233,38 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Num),
     };
 
+    private static decimal ParseDecimal(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0m;
+        }
+
+        return decimal.TryParse(
+            value,
+            System.Globalization.NumberStyles.Float,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var parsed)
+            ? parsed
+            : 0m;
+    }
+
+    private static int ParseInt(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return 0;
+        }
+
+        return int.TryParse(
+            value,
+            System.Globalization.NumberStyles.Integer,
+            System.Globalization.CultureInfo.InvariantCulture,
+            out var parsed)
+            ? parsed
+            : 0;
+    }
+
     private class SimilarSchoolPerformanceDao
     {
         public required string Id { get; set; }
@@ -246,33 +278,5 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         public required string EngMaths59_Tot_Est_Current_Pct { get; set; }
         public required string Maths59_Sum_Est_Current_Num { get; set; }
         public required string Physics59_Sum_Est_Current_Num { get; set; }
-    }
-
-    private class SimilarSchoolsSecondaryValuesDao
-    {
-        public string Urn { get; init; } = string.Empty;
-        public decimal Ks2Rp { get; init; }
-        public decimal Ks2Mp { get; init; }
-        public decimal PpPerc { get; init; }
-        public decimal PercentEal { get; init; }
-        public int Polar4QuintilePupils { get; init; }
-        public decimal PStability { get; init; }
-        public decimal IdaciPupils { get; init; }
-        public decimal PercentSchSupport { get; init; }
-        public int NumberOfPupils { get; init; }
-        public decimal PercentStatementOrEhp { get; init; }
-    }
-
-    private class SimilarSchoolsSecondaryNationalSdDao
-    {
-        public required decimal Ks2AverageScore { get; init; }
-        public required decimal PpPerc { get; init; }
-        public required decimal PercentEal { get; init; }
-        public required decimal Polar4QuintilePupils { get; init; }
-        public required decimal PStability { get; init; }
-        public required decimal IdaciPupils { get; init; }
-        public required decimal PercentSchSupport { get; init; }
-        public required decimal NumberOfPupils { get; init; }
-        public required decimal PercentStatementOrEhp { get; init; }
     }
 }

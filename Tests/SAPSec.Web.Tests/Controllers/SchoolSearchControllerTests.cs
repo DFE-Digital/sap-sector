@@ -23,8 +23,8 @@ public class SchoolSearchControllerTests
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment One",
         LAName = "Leeds",
-        Easting = "430000",
-        Northing = "433000",
+        Easting = 430000,
+        Northing = 433000,
     };
 
     private static Establishment FakeEstablishment2 = new()
@@ -35,8 +35,8 @@ public class SchoolSearchControllerTests
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment Two",
         LAName = "Leeds",
-        Easting = "430100",
-        Northing = "433100",
+        Easting = 430100,
+        Northing = 433100,
     };
 
     public SchoolSearchControllerTests()
@@ -972,8 +972,8 @@ public class SchoolSearchControllerTests
             EstablishmentNumber = "1",
             EstablishmentName = "Test School",
             LAName = "Leeds",
-            Easting = "430000",
-            Northing = "433000",
+            Easting = 430000,
+            Northing = 433000,
         };
         var establishment2 = new Establishment
         {
@@ -983,8 +983,8 @@ public class SchoolSearchControllerTests
             EstablishmentNumber = "2",
             EstablishmentName = "Another School",
             LAName = "Leeds",
-            Easting = "430100",
-            Northing = "433100"
+            Easting = 430100,
+            Northing = 433100
         };
         var searchResults = new List<SchoolSearchResult>
         {
@@ -1015,8 +1015,8 @@ public class SchoolSearchControllerTests
             EstablishmentNumber = "1",
             EstablishmentName = "Test School",
             LAName = "Leeds",
-            Easting = "430000",
-            Northing = "433000",
+            Easting = 430000,
+            Northing = 433000,
             Street = "123 Main St",
             Locality = "City Center",
             Postcode = "LS1 1AA"
@@ -1029,8 +1029,8 @@ public class SchoolSearchControllerTests
             EstablishmentNumber = "2",
             EstablishmentName = "Another School",
             LAName = "Leeds",
-            Easting = "430100",
-            Northing = "433100"
+            Easting = 430100,
+            Northing = 433100
         };
         var searchResults = new List<SchoolSearchResult>
         {
@@ -1066,10 +1066,8 @@ public class SchoolSearchControllerTests
                 EstablishmentNumber = i.ToString(),
                 EstablishmentName = $"School {i}",
                 LAName = localAuthority,
-                Easting = (430000 + i).ToString(),
-                Northing = (433000 + i).ToString(),
-                //Latitude = (53.8 + (i * 0.01)).ToString(),
-                //Longitude = (-1.55 + (i * 0.01)).ToString()
+                Easting = 430000 + i,
+                Northing = 433000 + i,
             };
             results.Add(SchoolSearchResult.FromNameAndEstablishment($"School {i}", establishment));
         }

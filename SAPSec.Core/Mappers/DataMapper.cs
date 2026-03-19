@@ -95,7 +95,7 @@ public static class DataMapper
     /// </summary>
     public static DataWithAvailability<string> MapTrustName(Establishment establishment)
     {
-        if (string.IsNullOrWhiteSpace(establishment.TrustsId))
+        if (string.IsNullOrWhiteSpace(establishment.TrustId))
         {
             return DataWithAvailability.NotApplicable<string>();
         }

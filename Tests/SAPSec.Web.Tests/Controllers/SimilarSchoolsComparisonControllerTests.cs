@@ -364,8 +364,8 @@ public class SimilarSchoolsComparisonControllerTests
                 Locality = "",
                 Address3 = ""
             },
-            TotalCapacity = "1200",
-            TotalPupils = "1000",
+            TotalCapacity = 1200,
+            TotalPupils = 1000,
             NurseryProvisionName = "No",
             LocalAuthority = new ReferenceData("373", "Sheffield"),
             Region = new ReferenceData("R", "Yorkshire and the Humber"),

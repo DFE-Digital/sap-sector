@@ -220,8 +220,8 @@ public class SimilarSchoolsControllerTests
                 Postcode = "ZZ1 1ZZ"
             },
             Coordinates = new BNGCoordinates(100, 100),
-            TotalCapacity = string.Empty,
-            TotalPupils = string.Empty,
+            TotalCapacity = null,
+            TotalPupils = null,
             NurseryProvisionName = string.Empty,
             LocalAuthority = new("001", "Authority"),
             UrbanRural = new(urbanId, urbanName),

@@ -1,5 +1,4 @@
 using Moq;
-using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Infrastructure.Json;
 
@@ -53,8 +52,8 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
             Street = "Street",
             Town = "Town",
             Postcode = "PC1 1AA",
-            Easting = "430000",
-            Northing = "380000",
+            Easting = 430000,
+            Northing = 380000,
             UrbanRuralId = "A1",
             UrbanRuralName = "Urban"
         };
@@ -67,8 +66,8 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
             Street = "Street",
             Town = "Town",
             Postcode = "PC1 1AA",
-            Easting = "431000",
-            Northing = "381000",
+            Easting = 431000,
+            Northing = 381000,
             UrbanRuralId = "A1",
             UrbanRuralName = "Urban"
         };
@@ -138,15 +137,15 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         {
             new()
             {
-                KS2AVG = "2.45",
-                PPPerc = "10",
-                PercentEAL = "5",
-                Polar4QuintilePupils = "1.1",
-                PStability = "6",
-                IdaciPupils = "0.08",
-                PercentSchSupport = "3",
-                NumberOfPupils = "400",
-                PercentageStatementOrEHP = "1.5"
+                KS2AVG = 2.45M,
+                PPPerc = 10M,
+                PercentEAL = 5M,
+                Polar4QuintilePupils = 1.1M,
+                PStability = 6M,
+                IdaciPupils = 0.08M,
+                PercentSchSupport = 3M,
+                NumberOfPupils = 400M,
+                PercentageStatementOrEHP = 1.5M
             }
         };
         _standardDeviationsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);

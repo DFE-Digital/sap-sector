@@ -13,7 +13,7 @@ public sealed class GovernanceRule : IBusinessRule<GovernanceType>
     {
         var typeId = establishment.TypeOfEstablishmentId;
         var typeName = establishment.TypeOfEstablishmentName;
-        var hasTrust = !string.IsNullOrWhiteSpace(establishment.TrustsId);
+        var hasTrust = !string.IsNullOrWhiteSpace(establishment.TrustId);
 
         // Academy/Free school types
         if (IsAcademyType(typeId, typeName))

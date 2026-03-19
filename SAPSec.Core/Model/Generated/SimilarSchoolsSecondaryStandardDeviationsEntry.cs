@@ -8,18 +8,18 @@ namespace SAPSec.Core.Model.Generated
     [ExcludeFromCodeCoverage]
     public class SimilarSchoolsSecondaryStandardDeviationsEntry
     {
-        public string RowCount { get; set; } = string.Empty;
-        public string KS2RP { get; set; } = string.Empty;
-        public string KS2MP { get; set; } = string.Empty;
-        public string KS2AVG { get; set; } = string.Empty;
-        public string PPPerc { get; set; } = string.Empty;
-        public string PercentEAL { get; set; } = string.Empty;
-        public string Polar4QuintilePupils { get; set; } = string.Empty;
-        public string PStability { get; set; } = string.Empty;
-        public string IdaciPupils { get; set; } = string.Empty;
-        public string PercentSchSupport { get; set; } = string.Empty;
-        public string NumberOfPupils { get; set; } = string.Empty;
-        public string PercentageStatementOrEHP { get; set; } = string.Empty;
-        public string Att8Scr { get; set; } = string.Empty;
+        public int? RowCount { get; set; } = null;
+        public decimal? KS2RP { get; set; } = null;
+        public decimal? KS2MP { get; set; } = null;
+        public decimal? KS2AVG { get; set; } = null;
+        public decimal? PPPerc { get; set; } = null;
+        public decimal? PercentEAL { get; set; } = null;
+        public decimal? Polar4QuintilePupils { get; set; } = null;
+        public decimal? PStability { get; set; } = null;
+        public decimal? IdaciPupils { get; set; } = null;
+        public decimal? PercentSchSupport { get; set; } = null;
+        public decimal? NumberOfPupils { get; set; } = null;
+        public decimal? PercentageStatementOrEHP { get; set; } = null;
+        public decimal? Att8Scr { get; set; } = null;
     }
 }

@@ -54,9 +54,15 @@ public class Program
                 cs.AppendLine($"    public class {className}");
                 cs.AppendLine("    {");
 
-                foreach (var key in first.Keys)
+                foreach (var (key, value) in first)
                 {
-                    cs.AppendLine($"        public string {key} {{ get; set; }} = string.Empty;");
+                    var (type, deflt) = value switch
+                    {
+                        int or long => ("int?", "null"),
+                        double or float or decimal => ("decimal?", "null"),
+                        _ => ("string", "string.Empty")
+                    };
+                    cs.AppendLine($"        public {type} {key} {{ get; set; }} = {deflt};");
                 }
 
                 cs.AppendLine("    }");

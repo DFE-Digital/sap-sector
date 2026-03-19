@@ -23,7 +23,7 @@ public class GovernanceRuleTests
         var establishment = new Establishment
         {
             TypeOfEstablishmentId = typeId,
-            TrustsId = "5001"
+            TrustId = "5001"
         };
 
         // Act
@@ -48,7 +48,7 @@ public class GovernanceRuleTests
         var establishment = new Establishment
         {
             TypeOfEstablishmentId = typeId,
-            TrustsId = trustId
+            TrustId = trustId
         };
 
         // Act
@@ -200,7 +200,7 @@ public class GovernanceRuleTests
         {
             TypeOfEstablishmentId = "999", // Unknown ID
             TypeOfEstablishmentName = typeName,
-            TrustsId = "5001"
+            TrustId = "5001"
         };
 
         // Act

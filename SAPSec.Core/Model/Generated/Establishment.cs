@@ -15,7 +15,7 @@ namespace SAPSec.Core.Model.Generated
         public string RegionName { get; set; } = string.Empty;
         public string EstablishmentName { get; set; } = string.Empty;
         public string EstablishmentNumber { get; set; } = string.Empty;
-        public string TrustsId { get; set; } = string.Empty;
+        public string TrustId { get; set; } = string.Empty;
         public string TrustName { get; set; } = string.Empty;
         public string AdmissionsPolicyId { get; set; } = string.Empty;
         public string AdmissionsPolicyName { get; set; } = string.Empty;
@@ -28,8 +28,8 @@ namespace SAPSec.Core.Model.Generated
         public string ReligiousCharacterId { get; set; } = string.Empty;
         public string ReligiousCharacterName { get; set; } = string.Empty;
         public string TelephoneNum { get; set; } = string.Empty;
-        public string TotalCapacity { get; set; } = string.Empty;
-        public string TotalPupils { get; set; } = string.Empty;
+        public int? TotalCapacity { get; set; } = null;
+        public int? TotalPupils { get; set; } = null;
         public string TypeOfEstablishmentId { get; set; } = string.Empty;
         public string TypeOfEstablishmentName { get; set; } = string.Empty;
         public string EstablishmentTypeGroupId { get; set; } = string.Empty;
@@ -55,9 +55,9 @@ namespace SAPSec.Core.Model.Generated
         public string UrbanRuralId { get; set; } = string.Empty;
         public string UrbanRuralName { get; set; } = string.Empty;
         public string Website { get; set; } = string.Empty;
-        public string Easting { get; set; } = string.Empty;
-        public string Northing { get; set; } = string.Empty;
-        public string AgeRangeLow { get; set; } = string.Empty;
-        public string AgeRangeHigh { get; set; } = string.Empty;
+        public int? Easting { get; set; } = null;
+        public int? Northing { get; set; } = null;
+        public int? AgeRangeLow { get; set; } = null;
+        public int? AgeRangeHigh { get; set; } = null;
     }
 }

@@ -104,15 +104,15 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
         var list = await _standardDeviationsRepository.ReadAllAsync();
         return list.Select(sd => new SimilarSchoolsSecondaryStandardDeviations()
         {
-            Ks2AverageScore = ParseDecimal(sd.KS2AVG),
-            PupilPremiumEligibilityPercentage = ParseDecimal(sd.PPPerc),
-            PupilsWithEalPercentage = ParseDecimal(sd.PercentEAL),
-            Polar4Quintile = ParseDecimal(sd.Polar4QuintilePupils),
-            PupilStabilityRate = ParseDecimal(sd.PStability),
-            AverageIdaciScore = ParseDecimal(sd.IdaciPupils),
-            PupilsWithSenSupportPercentage = ParseDecimal(sd.PercentSchSupport),
-            PupilCount = ParseDecimal(sd.NumberOfPupils),
-            PupilsWithEhcPlanPercentage = ParseDecimal(sd.PercentageStatementOrEHP),
+            Ks2AverageScore = sd.KS2AVG,
+            PupilPremiumEligibilityPercentage = sd.PPPerc,
+            PupilsWithEalPercentage = sd.PercentEAL,
+            Polar4Quintile = sd.Polar4QuintilePupils,
+            PupilStabilityRate = sd.PStability,
+            AverageIdaciScore = sd.IdaciPupils,
+            PupilsWithSenSupportPercentage = sd.PercentSchSupport,
+            PupilCount = sd.NumberOfPupils,
+            PupilsWithEhcPlanPercentage = sd.PercentageStatementOrEHP,
         }).First();
     }
 

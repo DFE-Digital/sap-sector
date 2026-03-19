@@ -62,8 +62,8 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             UrbanRuralDescription = DataMapper.MapString(establishment.UrbanRuralName),
 
             // School characteristics
-            AgeRangeLow = DataMapper.MapAge(establishment.AgeRangeLow),
-            AgeRangeHigh = DataMapper.MapAge(establishment.AgeRangeHigh),
+            AgeRangeLow = DataWithAvailability.FromNullable(establishment.AgeRangeLow),
+            AgeRangeHigh = DataWithAvailability.FromNullable(establishment.AgeRangeHigh),
             GenderOfEntry = DataMapper.MapString(establishment.GenderName),
             PhaseOfEducation = DataMapper.MapString(establishment.PhaseOfEducationName),
             SchoolType = DataMapper.MapString(establishment.TypeOfEstablishmentName),
@@ -73,7 +73,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             // Governance - business rule
             GovernanceStructure = _governanceRule.Evaluate(establishment),
             AcademyTrustName = DataMapper.MapTrustName(establishment),
-            AcademyTrustId = DataMapper.MapTrustId(establishment.TrustsId),
+            AcademyTrustId = DataMapper.MapTrustId(establishment.TrustId),
 
             // Provisions - business rules
             HasNurseryProvision = _nurseryProvisionRule.Evaluate(establishment),

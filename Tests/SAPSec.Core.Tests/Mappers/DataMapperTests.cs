@@ -412,7 +412,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = "5001",
+            TrustId = "5001",
             TrustName = "Test Academy Trust"
         };
 
@@ -430,7 +430,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = null,
+            TrustId = null,
             TrustName = "Test Academy Trust"
         };
 
@@ -447,7 +447,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = "",
+            TrustId = "",
             TrustName = "Test Academy Trust"
         };
 
@@ -464,7 +464,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = "5001",
+            TrustId = "5001",
             TrustName = null
         };
 
