@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
@@ -14,6 +15,7 @@ public class SchoolControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
+    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
 
@@ -21,13 +23,17 @@ public class SchoolControllerTests
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
         _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
 
         var getKs4HeadlineMeasures = new GetKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object);
+        var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
+            getKs4HeadlineMeasures,
+            _similarSchoolsRepositoryMock.Object);
 
-        _sut = new SchoolController(_schoolDetailsServiceMock.Object, getKs4HeadlineMeasures, _loggerMock.Object);
+        _sut = new SchoolController(_schoolDetailsServiceMock.Object, getSchoolKs4HeadlineMeasures, _loggerMock.Object);
     }
 
     #region Index Action Tests
@@ -123,6 +129,9 @@ public class SchoolControllerTests
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
+        _similarSchoolsRepositoryMock
+            .Setup(x => x.GetSimilarSchoolUrnsAsync(urn))
+            .ReturnsAsync(Array.Empty<string>());
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
