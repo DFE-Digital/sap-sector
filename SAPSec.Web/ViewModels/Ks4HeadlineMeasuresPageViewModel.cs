@@ -84,8 +84,8 @@ public class Ks4HeadlineMeasuresPageViewModel
     public string EnglandDestinationsDisplay => DisplayWholePercent(EnglandDestinationsThreeYearAverage);
 
     public string SchoolLabel => SchoolDetails.Name;
-    public string SimilarSchoolsLabel => $"Average of {(SimilarSchoolsCount > 0 ? SimilarSchoolsCount : 50)} similar schools";
-    public string LocalAuthorityLabel => $"{SchoolDetails.LocalAuthorityName.Display()} local authority";
+    public string SimilarSchoolsLabel => $"Similar schools average";
+    public string LocalAuthorityLabel => $"Local authority schools average";
     public string EnglandLabel => "Schools in England average";
 
     public static string DisplayValue(decimal? value) =>
