@@ -175,8 +175,8 @@ public class SimilarSchoolBuilder(string urn)
                 Town = "",
                 Postcode = ""
             },
-            TotalCapacity = "",
-            TotalPupils = "",
+            TotalCapacity = null,
+            TotalPupils = null,
             NurseryProvisionName = "",
             Coordinates = _coordinates,
             LocalAuthority = _localAuthority ?? new("", ""),

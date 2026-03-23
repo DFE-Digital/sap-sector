@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Rules;
 

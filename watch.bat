@@ -1,0 +1,1 @@
+start /d SAPSec.Web dotnet watch && start /d SAPSec.Web npm run build-fe

@@ -7,8 +7,8 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture)
 {
-    private const string SchoolOverviewPath = "/school/147788";
-    private const string SchoolDetailsPath = "/school/147788/school-details";
+    private const string SchoolOverviewPath = "/school/105574";
+    private const string SchoolDetailsPath = "/school/105574/school-details";
 
     [Fact]
     public async Task GetSchoolOverview_ReturnsSuccess()

@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Json\SimilarSchoolsPrimaryGroupsRow.cs" />
+    <Compile Remove="Json\SimilarSchoolsPrimaryValuesRow.cs" />
+    <Compile Remove="Json\SimilarSchoolsSecondaryGroupsRow.cs" />
+    <Compile Remove="Json\SimilarSchoolsSecondaryValuesRow.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.66" />
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00017" />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00017" />
@@ -30,28 +37,64 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\Files\Establishment.json">
+    <None Update="Data\Files\Generated\EnglandAbsence.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Files\EstablishmentPerformance.json">
+    <None Update="Data\Files\Generated\EnglandDestinations.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Files\Lookup.json">
+    <None Update="Data\Files\Generated\EnglandPerformance.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Files\SimilarSchoolsPrimaryGroupsRow.json">
+    <None Update="Data\Files\Generated\Establishment.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Files\SimilarSchoolsPrimaryValuesRow.json">
+    <None Update="Data\Files\Generated\EstablishmentAbsence.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Files\SimilarSchoolsSecondaryGroupsRow.json">
+    <None Update="Data\Files\Generated\EstablishmentDestinations.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Files\SimilarSchoolsSecondaryValuesRow.json">
+    <None Update="Data\Files\Generated\EstablishmentGroupLinks.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Data\Files\SimilarSchoolsSecondaryStandardDeviations.json">
+    <None Update="Data\Files\Generated\EstablishmentLinks.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\EstablishmentPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\EstablishmentSubjectEntries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\EstablishmentWorkforce.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\LADestinations.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\LAPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\LASubjectEntries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\placeholder.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\SimilarSchoolsPrimaryGroupsEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\SimilarSchoolsPrimaryValuesEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

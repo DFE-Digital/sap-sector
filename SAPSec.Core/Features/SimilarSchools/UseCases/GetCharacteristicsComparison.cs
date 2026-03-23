@@ -1,5 +1,3 @@
-using SAPSec.Core.Features.SimilarSchools;
-
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class GetCharacteristicsComparison(
@@ -41,11 +39,11 @@ public class GetCharacteristicsComparison(
             Polar4Quintile = Build(
                 RoundInt(current.Polar4Quintile),
                 RoundInt(similar.Polar4Quintile),
-                RoundInt(standardDeviations.Polar4Quintile)),
+                standardDeviations.Polar4Quintile),
             PupilCount = Build(
                 RoundInt(current.PupilCount),
                 RoundInt(similar.PupilCount),
-                RoundInt(standardDeviations.PupilCount)),
+                standardDeviations.PupilCount),
             PupilStabilityRate = Build(
                 current.PupilStabilityRate,
                 similar.PupilStabilityRate,
@@ -84,7 +82,7 @@ public class GetCharacteristicsComparison(
         };
     }
 
-    private static SimilarSchoolCharacteristicComparison<decimal> Build(decimal current, decimal similar, decimal standardDeviation)
+    private static SimilarSchoolCharacteristicComparison<decimal> Build(decimal current, decimal similar, decimal? standardDeviation)
     {
         return new SimilarSchoolCharacteristicComparison<decimal>(
             current,
@@ -92,7 +90,7 @@ public class GetCharacteristicsComparison(
             Calculate(current, similar, standardDeviation));
     }
 
-    private static SimilarSchoolCharacteristicComparison<int> Build(int current, int similar, int standardDeviation)
+    private static SimilarSchoolCharacteristicComparison<int> Build(int current, int similar, decimal? standardDeviation)
     {
         return new SimilarSchoolCharacteristicComparison<int>(
             current,
@@ -103,12 +101,12 @@ public class GetCharacteristicsComparison(
     // Calculates standardized difference: d = (xA - xB) / standardDeviation.
     // Uses |d| to classify similarity:
     // <= 0.3 => Similar, <= 0.7 => LessSimilar, > 0.7 => NotSimilar.
-    private static SchoolSimilarity Calculate(decimal xA, decimal xB, decimal standardDeviation)
+    private static SchoolSimilarity Calculate(decimal xA, decimal xB, decimal? standardDeviation)
     {
-        if (standardDeviation <= 0)
+        if (standardDeviation is null || standardDeviation <= 0)
             return SchoolSimilarity.NotSimilar;
 
-        var d = (xA - xB) / standardDeviation;
+        var d = (xA - xB) / standardDeviation.Value;
         var absD = Math.Abs(d);
 
         if (absD <= 0.3m) return SchoolSimilarity.Similar;

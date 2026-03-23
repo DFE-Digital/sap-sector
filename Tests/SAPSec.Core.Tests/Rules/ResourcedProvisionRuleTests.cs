@@ -1,10 +1,5 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAPSec.Core.Tests.Rules;
 

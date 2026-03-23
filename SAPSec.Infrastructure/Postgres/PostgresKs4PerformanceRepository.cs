@@ -1,8 +1,7 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Model.KS4.Destinations;
-using SAPSec.Core.Model.KS4.Performance;
+using SAPSec.Core.Model.Generated;
 using System.Globalization;
 
 namespace SAPSec.Infrastructure.Postgres;
@@ -49,15 +48,15 @@ public class PostgresKs4PerformanceRepository(
 
             SELECT
                 "Id",
-                "AllDest_Tot_Eng_Current_Pct"::text AS "AllDestCurrentPct",
-                "AllDest_Tot_Eng_Previous_Pct"::text AS "AllDestPreviousPct",
-                "AllDest_Tot_Eng_Previous2_Pct"::text AS "AllDestPrevious2Pct",
-                "Education_Tot_Eng_Current_Pct"::text AS "EducationCurrentPct",
-                "Education_Tot_Eng_Previous_Pct"::text AS "EducationPreviousPct",
-                "Education_Tot_Eng_Previous2_Pct"::text AS "EducationPrevious2Pct",
-                "Employment_Tot_Eng_Current_Pct"::text AS "EmploymentCurrentPct",
-                "Employment_Tot_Eng_Previous_Pct"::text AS "EmploymentPreviousPct",
-                "Employment_Tot_Eng_Previous2_Pct"::text AS "EmploymentPrevious2Pct"
+                "AllDest_Tot_Eng_Current_Pct",
+                "AllDest_Tot_Eng_Previous_Pct",
+                "AllDest_Tot_Eng_Previous2_Pct",
+                "Education_Tot_Eng_Current_Pct",
+                "Education_Tot_Eng_Previous_Pct",
+                "Education_Tot_Eng_Previous2_Pct",
+                "Employment_Tot_Eng_Current_Pct",
+                "Employment_Tot_Eng_Previous_Pct",
+                "Employment_Tot_Eng_Previous2_Pct"
             FROM public.v_england_destinations
             WHERE "Id" = 'National'
             LIMIT 1;
@@ -68,10 +67,8 @@ public class PostgresKs4PerformanceRepository(
         var establishmentInfo = await results.ReadSingleOrDefaultAsync<EstablishmentInfo>();
         var establishmentPerformance = await results.ReadSingleOrDefaultAsync<EstablishmentPerformance>();
         var englandPerformance = await results.ReadSingleOrDefaultAsync<EnglandPerformance>();
-        var establishmentDestinationsDao = await results.ReadSingleOrDefaultAsync<DestinationTotalsDao>();
-        var englandDestinationsDao = await results.ReadSingleOrDefaultAsync<DestinationTotalsDao>();
-        var establishmentDestinations = ToEstablishmentDestinations(establishmentDestinationsDao);
-        var englandDestinations = ToEnglandDestinations(englandDestinationsDao);
+        var establishmentDestinations = await results.ReadSingleOrDefaultAsync<EstablishmentDestinations>();
+        var englandDestinations = await results.ReadSingleOrDefaultAsync<EnglandDestinations>();
 
         LAPerformance? localAuthorityPerformance = null;
         LADestinations? localAuthorityDestinations = null;
@@ -85,23 +82,22 @@ public class PostgresKs4PerformanceRepository(
 
                 SELECT
                     "Id",
-                    "AllDest_Tot_LA_Current_Pct"::text AS "AllDestCurrentPct",
-                    "AllDest_Tot_LA_Previous_Pct"::text AS "AllDestPreviousPct",
-                    "AllDest_Tot_LA_Previous2_Pct"::text AS "AllDestPrevious2Pct",
-                    "Education_Tot_LA_Current_Pct"::text AS "EducationCurrentPct",
-                    "Education_Tot_LA_Previous_Pct"::text AS "EducationPreviousPct",
-                    "Education_Tot_LA_Previous2_Pct"::text AS "EducationPrevious2Pct",
-                    "Employment_Tot_LA_Current_Pct"::text AS "EmploymentCurrentPct",
-                    "Employment_Tot_LA_Previous_Pct"::text AS "EmploymentPreviousPct",
-                    "Employment_Tot_LA_Previous2_Pct"::text AS "EmploymentPrevious2Pct"
+                    "AllDest_Tot_LA_Current_Pct",
+                    "AllDest_Tot_LA_Previous_Pct",
+                    "AllDest_Tot_LA_Previous2_Pct",
+                    "Education_Tot_LA_Current_Pct",
+                    "Education_Tot_LA_Previous_Pct",
+                    "Education_Tot_LA_Previous2_Pct",
+                    "Employment_Tot_LA_Current_Pct",
+                    "Employment_Tot_LA_Previous_Pct",
+                    "Employment_Tot_LA_Previous2_Pct"
                 FROM public.v_la_destinations
                 WHERE "Id" = @laId
                 LIMIT 1;
             """;
             using var laResults = await conn.QueryMultipleAsync(laSql, new { laId = establishmentInfo!.LAId });
             localAuthorityPerformance = await laResults.ReadSingleOrDefaultAsync<LAPerformance>();
-            var localAuthorityDestinationsDao = await laResults.ReadSingleOrDefaultAsync<DestinationTotalsDao>();
-            localAuthorityDestinations = ToLocalAuthorityDestinations(localAuthorityDestinationsDao);
+            localAuthorityDestinations = await laResults.ReadSingleOrDefaultAsync<LADestinations>();
         }
         else
         {
@@ -144,62 +140,6 @@ public class PostgresKs4PerformanceRepository(
         public string? EmploymentCurrentPct { get; init; }
         public string? EmploymentPreviousPct { get; init; }
         public string? EmploymentPrevious2Pct { get; init; }
-    }
-
-    private static EstablishmentDestinations? ToEstablishmentDestinations(DestinationTotalsDao? dao)
-    {
-        if (dao is null) return null;
-
-        return new EstablishmentDestinations
-        {
-            Id = dao.Id ?? string.Empty,
-            AllDest_Tot_Est_Current_Pct = ParseNullableDouble(dao.AllDestCurrentPct),
-            AllDest_Tot_Est_Previous_Pct = ParseNullableDouble(dao.AllDestPreviousPct),
-            AllDest_Tot_Est_Previous2_Pct = ParseNullableDouble(dao.AllDestPrevious2Pct),
-            Education_Tot_Est_Current_Pct = ParseNullableDouble(dao.EducationCurrentPct),
-            Education_Tot_Est_Previous_Pct = ParseNullableDouble(dao.EducationPreviousPct),
-            Education_Tot_Est_Previous2_Pct = ParseNullableDouble(dao.EducationPrevious2Pct),
-            Employment_Tot_Est_Current_Pct = ParseNullableDouble(dao.EmploymentCurrentPct),
-            Employment_Tot_Est_Previous_Pct = ParseNullableDouble(dao.EmploymentPreviousPct),
-            Employment_Tot_Est_Previous2_Pct = ParseNullableDouble(dao.EmploymentPrevious2Pct)
-        };
-    }
-
-    private static LADestinations? ToLocalAuthorityDestinations(DestinationTotalsDao? dao)
-    {
-        if (dao is null) return null;
-
-        return new LADestinations
-        {
-            Id = dao.Id ?? string.Empty,
-            AllDest_Tot_LA_Current_Pct = ParseNullableDouble(dao.AllDestCurrentPct),
-            AllDest_Tot_LA_Previous_Pct = ParseNullableDouble(dao.AllDestPreviousPct),
-            AllDest_Tot_LA_Previous2_Pct = ParseNullableDouble(dao.AllDestPrevious2Pct),
-            Education_Tot_LA_Current_Pct = ParseNullableDouble(dao.EducationCurrentPct),
-            Education_Tot_LA_Previous_Pct = ParseNullableDouble(dao.EducationPreviousPct),
-            Education_Tot_LA_Previous2_Pct = ParseNullableDouble(dao.EducationPrevious2Pct),
-            Employment_Tot_LA_Current_Pct = ParseNullableDouble(dao.EmploymentCurrentPct),
-            Employment_Tot_LA_Previous_Pct = ParseNullableDouble(dao.EmploymentPreviousPct),
-            Employment_Tot_LA_Previous2_Pct = ParseNullableDouble(dao.EmploymentPrevious2Pct)
-        };
-    }
-
-    private static EnglandDestinations? ToEnglandDestinations(DestinationTotalsDao? dao)
-    {
-        if (dao is null) return null;
-
-        return new EnglandDestinations
-        {
-            AllDest_Tot_Eng_Current_Pct = ParseNullableDouble(dao.AllDestCurrentPct),
-            AllDest_Tot_Eng_Previous_Pct = ParseNullableDouble(dao.AllDestPreviousPct),
-            AllDest_Tot_Eng_Previous2_Pct = ParseNullableDouble(dao.AllDestPrevious2Pct),
-            Education_Tot_Eng_Current_Pct = ParseNullableDouble(dao.EducationCurrentPct),
-            Education_Tot_Eng_Previous_Pct = ParseNullableDouble(dao.EducationPreviousPct),
-            Education_Tot_Eng_Previous2_Pct = ParseNullableDouble(dao.EducationPrevious2Pct),
-            Employment_Tot_Eng_Current_Pct = ParseNullableDouble(dao.EmploymentCurrentPct),
-            Employment_Tot_Eng_Previous_Pct = ParseNullableDouble(dao.EmploymentPreviousPct),
-            Employment_Tot_Eng_Previous2_Pct = ParseNullableDouble(dao.EmploymentPrevious2Pct)
-        };
     }
 
     private static double? ParseNullableDouble(string? value)

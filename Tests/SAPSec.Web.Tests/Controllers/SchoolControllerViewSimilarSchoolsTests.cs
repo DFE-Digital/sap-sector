@@ -35,7 +35,7 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_ValidUrn_ReturnsViewWithSimilarSchoolsPageViewModel()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
@@ -54,7 +54,7 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_SetsBreadcrumbAndSchoolDetailsInViewData()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
@@ -85,7 +85,7 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_PaginatesResults()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
@@ -103,7 +103,7 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_AppliesUrbanRuralFilterFromQuery()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
@@ -121,7 +121,7 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_SetsSortByFromQuery()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
@@ -138,7 +138,7 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_MapSchools_MatchesFilteredResults()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
@@ -190,7 +190,7 @@ public class SimilarSchoolsControllerTests
 
     private void SetupSimilarSchoolsRepo()
     {
-        var currentSchool = CreateSimilarSchool("147788", "Current School", "UR1", "Urban");
+        var currentSchool = CreateSimilarSchool("105574", "Current School", "UR1", "Urban");
         var similarSchools = new List<SimilarSchool>();
         for (var i = 0; i < 12; i++)
         {
@@ -220,8 +220,8 @@ public class SimilarSchoolsControllerTests
                 Postcode = "ZZ1 1ZZ"
             },
             Coordinates = new BNGCoordinates(100, 100),
-            TotalCapacity = string.Empty,
-            TotalPupils = string.Empty,
+            TotalCapacity = null,
+            TotalPupils = null,
             NurseryProvisionName = string.Empty,
             LocalAuthority = new("001", "Authority"),
             UrbanRural = new(urbanId, urbanName),

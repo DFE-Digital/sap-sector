@@ -1,9 +1,8 @@
 using Moq;
-using SAPSec.Core;
 using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Tests.Features.Attendance.UseCases;
 

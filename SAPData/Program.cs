@@ -1,5 +1,6 @@
-﻿using SAPData.Models;
-using CsvHelper;
+﻿using CsvHelper;
+using Microsoft.Extensions.Configuration;
+using SAPData.Models;
 using System.Globalization;
 
 namespace SAPData;
@@ -8,6 +9,14 @@ internal class Program
 {
     static void Main(string[] args)
     {
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddUserSecrets<Program>()
+            .Build();
+
+        var runningLocally = bool.TryParse(configuration["RunningLocally"], out var val) && val;
+
+        Console.WriteLine($"RunningLocally: {runningLocally}");
+
         Console.WriteLine("Generating Raw Data Tables and Scripts...");
 
         // In CI the working directory is often the repo root.
@@ -19,6 +28,8 @@ internal class Program
         string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
         string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
         string sqlDir = Path.Combine(baseDir, "Sql");
+        string csDir = Path.Combine(baseDir, "..\\SAPSec.Core\\Model\\Generated");
+        string jsonDir = Path.Combine(baseDir, "..\\SAPSec.Infrastructure\\Data\\Files\\Generated");
         string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
 
         // -------------------------------------------------
@@ -49,7 +60,8 @@ internal class Program
         new GenerateViews(
             dataMaps,
             tableMappingPath,
-            sqlDir
+            sqlDir,
+            jsonDir
         ).Run();
 
         // -------------------------------------------------
@@ -63,14 +75,14 @@ internal class Program
         new GenerateSimilarSchoolsViews(
             dataMaps,
             tableMappingPath,
-            sqlDir
+            sqlDir,
+            jsonDir
         ).Run();
 
         // -------------------------------------------------
         // 51. Generate similar schools indexes
         // -------------------------------------------------
         new GenerateSimilarSchoolsIndexes(sqlDir).Run();
-
 
         Console.WriteLine("Run Complete.");
 
