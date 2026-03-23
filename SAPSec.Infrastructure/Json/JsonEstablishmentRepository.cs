@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.Json;
 
@@ -43,6 +43,6 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
     {
         var allEstablishments = await _establishmentMetadataRepository.ReadAllAsync();
 
-        return allEstablishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.DfENumberSearchable == number);
+        return allEstablishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || $"{x.LAId}{x.EstablishmentNumber}" == number);
     }
 }

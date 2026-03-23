@@ -6,7 +6,7 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixture)
 {
-    private const string Ks4HeadlineMeasuresPath = "/school/147788/ks4-headline-measures";
+    private const string Ks4HeadlineMeasuresPath = "/school/105574/ks4-headline-measures";
 
     [Fact]
     public async Task Ks4HeadlineMeasures_ReturnsSuccess()

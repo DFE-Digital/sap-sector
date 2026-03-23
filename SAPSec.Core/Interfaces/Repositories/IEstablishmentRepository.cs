@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Interfaces.Repositories;
 

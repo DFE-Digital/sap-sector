@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 namespace SAPSec.Core.Features.Geography;
 
@@ -7,12 +6,11 @@ public record BNGCoordinates(double Easting, double Northing)
 {
     private const double KilometersToMiles = 0.6213712;
 
-    public static bool TryParse([NotNullWhen(true)] string? easting, [NotNullWhen(true)] string? northing, [NotNullWhen(true)] out BNGCoordinates? coordinates)
+    public static bool TryParse([NotNullWhen(true)] int? easting, [NotNullWhen(true)] int? northing, [NotNullWhen(true)] out BNGCoordinates? coordinates)
     {
-        if (double.TryParse(easting, NumberStyles.Any, CultureInfo.InvariantCulture, out var e) &&
-            double.TryParse(northing, NumberStyles.Any, CultureInfo.InvariantCulture, out var n))
+        if (easting.HasValue && northing.HasValue)
         {
-            coordinates = new BNGCoordinates(e, n);
+            coordinates = new BNGCoordinates(easting.Value, northing.Value);
             return true;
         }
 

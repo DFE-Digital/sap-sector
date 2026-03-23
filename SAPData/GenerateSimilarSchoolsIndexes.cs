@@ -29,10 +29,10 @@ public class GenerateSimilarSchoolsIndexes
         // View → column mapping (EXACT column names)
         var indexes = new Dictionary<string, string>
         {
-            { "v_similar_schools_primary_groups",   "\"urn\"" },
-            { "v_similar_schools_primary_values",   "\"urn\"" },
-            { "v_similar_schools_secondary_groups", "\"urn\"" },
-            { "v_similar_schools_secondary_values", "\"urn\"" },
+            { "v_similar_schools_primary_groups",   "\"URN\"" },
+            { "v_similar_schools_primary_values",   "\"URN\"" },
+            { "v_similar_schools_secondary_groups", "\"URN\"" },
+            { "v_similar_schools_secondary_values", "\"URN\"" },
         };
 
         foreach (var kvp in indexes)

@@ -34,7 +34,7 @@ public class SimilarSchoolsSchoolCapacityInUseFilter(SimilarSchool currentSchool
             : DataWithAvailability.NotAvailable<string>());
 
     private decimal? CalculateCapacityInUse(SimilarSchool school) =>
-        decimal.TryParse(school.TotalPupils, out decimal totalPupils) && decimal.TryParse(school.TotalCapacity, out decimal totalCapacity)
-            ? (totalPupils / totalCapacity) * 100.0M
+        school.TotalPupils is not null && school.TotalCapacity is not null
+            ? (school.TotalPupils / school.TotalCapacity) * 100.0M
             : null;
 }

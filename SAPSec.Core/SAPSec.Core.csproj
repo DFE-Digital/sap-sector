@@ -7,12 +7,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Model\KS4\**" />
     <Compile Remove="Model\Search\**" />
     <Compile Remove="UseCases\**" />
+    <EmbeddedResource Remove="Model\KS4\**" />
     <EmbeddedResource Remove="Model\Search\**" />
     <EmbeddedResource Remove="UseCases\**" />
+    <None Remove="Model\KS4\**" />
     <None Remove="Model\Search\**" />
     <None Remove="UseCases\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Model\Establishment.cs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -9,8 +9,8 @@ public record SimilarSchool
     public required string Name { get; set; }
     public required Address Address { get; set; }
     public required BNGCoordinates? Coordinates { get; set; }
-    public required string TotalCapacity { get; set; }
-    public required string TotalPupils { get; set; }
+    public required int? TotalCapacity { get; set; }
+    public required int? TotalPupils { get; set; }
     // TODO: convert into reference data (no ID in source data)
     public required string NurseryProvisionName { get; set; }
     public required ReferenceData LocalAuthority { get; set; }

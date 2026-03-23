@@ -1,7 +1,6 @@
 ﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model;
-using System.Globalization;
+using SAPSec.Core.Model.Generated;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;
@@ -34,15 +33,11 @@ public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablis
                 continue;
             }
 
-            if (BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords))
-            {
-                var latLong = CoordinateConverter.Convert(coords);
+            var latLong = BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
+                ? CoordinateConverter.Convert(coords)
+                : null;
 
-                r.School.Latitude = latLong.Latitude.ToString(CultureInfo.InvariantCulture);
-                r.School.Longitude = latLong.Longitude.ToString(CultureInfo.InvariantCulture);
-            }
-
-            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School));
+            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
         }
 
         return results;
@@ -71,7 +66,7 @@ public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablis
                 continue;
             }
 
-            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School));
+            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, null));
         }
 
         return results;

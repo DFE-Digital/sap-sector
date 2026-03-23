@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 /// <summary>
 /// Business rule: Determines governance structure based on establishment type and trust membership.
@@ -12,7 +13,7 @@ public sealed class GovernanceRule : IBusinessRule<GovernanceType>
     {
         var typeId = establishment.TypeOfEstablishmentId;
         var typeName = establishment.TypeOfEstablishmentName;
-        var hasTrust = !string.IsNullOrWhiteSpace(establishment.TrustsId);
+        var hasTrust = !string.IsNullOrWhiteSpace(establishment.TrustId);
 
         // Academy/Free school types
         if (IsAcademyType(typeId, typeName))
