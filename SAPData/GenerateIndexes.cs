@@ -6,16 +6,16 @@ public class GenerateIndexes
 {
     private readonly string _sqlDir;
     private static readonly Encoding Utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+    private readonly List<string> _sqlFiles;
 
-    public GenerateIndexes(string sqlDir)
+    public GenerateIndexes(string sqlDir, List<string> sqlFiles)
     {
         _sqlDir = sqlDir;
+        _sqlFiles = sqlFiles;
     }
 
     public void Run()
     {
-        string outputPath = Path.Combine(_sqlDir, "04_indexes.sql");
-
         var sb = new StringBuilder();
 
         sb.AppendLine("-- ================================================================");
@@ -92,11 +92,21 @@ public class GenerateIndexes
             sb.AppendLine();
         }
 
-        File.WriteAllText(outputPath, sb.ToString(), Utf8NoBom);
-
-        Console.WriteLine("Generated view index script:");
-        Console.WriteLine(outputPath);
+        WriteSql("04", "indexes", sb.ToString());
     }
 
     private static string EscapeSqlLiteral(string s) => (s ?? "").Replace("'", "''");
+
+    private void WriteSql(string prefix, string viewName, string sql)
+    {
+        var fileName = $"{prefix}_{viewName}.sql";
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, fileName),
+            sql,
+            new UTF8Encoding(false));
+        _sqlFiles.Add($"{prefix}_{viewName}.sql");
+
+        Console.WriteLine($"Generated view index script: {fileName}");
+    }
 }

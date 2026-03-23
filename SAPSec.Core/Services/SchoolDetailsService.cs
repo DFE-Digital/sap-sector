@@ -41,10 +41,12 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             throw new NotFoundException($"School not found with URN: {urn}");
         }
 
-        return MapToSchoolDetails(establishment);
+        var establishmentEmail = await _establishmentRepository.GetEstablishmentEmailAsync(urn);
+
+        return MapToSchoolDetails(establishment, establishmentEmail);
     }
 
-    private SchoolDetails MapToSchoolDetails(Establishment establishment)
+    private SchoolDetails MapToSchoolDetails(Establishment establishment, EstablishmentEmail? establishmentEmail)
     {
         return new SchoolDetails
         {
@@ -85,7 +87,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             HeadteacherName = DataMapper.MapHeadteacher(establishment),
             Website = DataMapper.MapWebsite(establishment.Website),
             Telephone = DataMapper.MapString(establishment.TelephoneNum),
-            Email = DataWithAvailability.NotAvailable<string>()
+            Email = DataMapper.MapString(establishmentEmail?.MainEmail)
         };
     }
 }

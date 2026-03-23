@@ -150,6 +150,8 @@
     <None Remove="Sql\03_v_establishment.sql" />
     <None Remove="Sql\03_v_establishment_absence.sql" />
     <None Remove="Sql\03_v_establishment_destinations.sql" />
+    <None Remove="Sql\03_v_establishment_email.sql" />
+    <None Remove="Sql\03_v_establishment_emails.sql" />
     <None Remove="Sql\03_v_establishment_group_links.sql" />
     <None Remove="Sql\03_v_establishment_links.sql" />
     <None Remove="Sql\03_v_establishment_performance.sql" />
@@ -172,6 +174,8 @@
     <None Remove="Sql\63_v_establishment.sql" />
     <None Remove="Sql\63_v_establishment_absence.sql" />
     <None Remove="Sql\63_v_establishment_destinations.sql" />
+    <None Remove="Sql\63_v_establishment_email.sql" />
+    <None Remove="Sql\63_v_establishment_emails.sql" />
     <None Remove="Sql\63_v_establishment_group_links.sql" />
     <None Remove="Sql\63_v_establishment_links.sql" />
     <None Remove="Sql\63_v_establishment_performance.sql" />

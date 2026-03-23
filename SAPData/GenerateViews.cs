@@ -12,6 +12,7 @@ public sealed class GenerateViews
     private readonly string _sqlDir;
     private readonly string _jsonDir;
     private readonly string _generatedJsonDir;
+    private readonly List<string> _sqlFiles;
 
     // raw_sources.json path in repo
     private static readonly string[] RawSourcesCandidates =
@@ -50,6 +51,7 @@ public sealed class GenerateViews
         new("v_establishment_links", "urn", ViewRange.Establishment, "Establishment", "EstablishmentLinks"),
         new("v_establishment_group_links", "group_id", ViewRange.Establishment, "Establishment", "EstablishmentGroupLinks"),
         new("v_establishment_subject_entries", "school_urn", ViewRange.Establishment, "KS4_Performance", "EstablishmentSubjectEntries"),
+        new("v_establishment_email", "URN", ViewRange.Establishment, "Email", "EstablishmentEmail"),
 
         new("v_establishment_absence", "Id", ViewRange.Establishment, "PupilAbsence", "EstablishmentAbsence"),
         new("v_establishment_destinations", "Id", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
@@ -66,13 +68,20 @@ public sealed class GenerateViews
         new("v_la_subject_entries", "old_la_code", ViewRange.LA, "KS4_Performance", "LASubjectEntries")
     };
 
-    public GenerateViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir, string jsonDir, string generatedJsonDir)
+    public GenerateViews(
+        IReadOnlyList<DataMapRow> rows,
+        string tableMappingPath,
+        string sqlDir,
+        string jsonDir,
+        string generatedJsonDir,
+        List<string> sqlFiles)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
         _jsonDir = jsonDir;
         _generatedJsonDir = generatedJsonDir;
+        _sqlFiles = sqlFiles;
     }
 
     public void Run()
@@ -284,17 +293,9 @@ public sealed class GenerateViews
                 _ =>
                     $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{modelFile}' with(format text);"
             };
-            WriteSql("63", view.ViewName, jsonSql);
-            Console.WriteLine($"Generated {view.ViewName}");
-        }
-    }
 
-    private void WriteSql(string prefix, string viewName, string sql)
-    {
-        File.WriteAllText(
-            Path.Combine(_sqlDir, $"{prefix}_{viewName}.sql"),
-            sql,
-            new UTF8Encoding(false));
+            WriteSql("63", view.ViewName, jsonSql);
+        }
     }
 
     private static string BuildSkippedSql(string viewName, string reason)
@@ -805,5 +806,18 @@ public sealed class GenerateViews
             r.IgnoreMapping?.Trim(),
             "Y",
             StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void WriteSql(string prefix, string viewName, string sql)
+    {
+        var fileName = $"{prefix}_{viewName}.sql";
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, fileName),
+            sql,
+            new UTF8Encoding(false));
+        _sqlFiles.Add($"{prefix}_{viewName}.sql");
+
+        Console.WriteLine($"Generated view script: {fileName}");
     }
 }

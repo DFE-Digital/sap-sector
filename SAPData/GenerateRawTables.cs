@@ -9,14 +9,16 @@ public class GenerateRawTables
     private readonly string _inputDir;
     private readonly string _cleanDir;
     private readonly string _sqlDir;
+    private readonly List<string> _sqlFiles;
 
     private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
 
-    public GenerateRawTables(string inputDir, string cleanDir, string sqlDir)
+    public GenerateRawTables(string inputDir, string cleanDir, string sqlDir, List<string> sqlFiles)
     {
         _inputDir = inputDir;
         _cleanDir = cleanDir;
         _sqlDir = sqlDir;
+        _sqlFiles = sqlFiles;
     }
 
     public void Run()
@@ -36,9 +38,9 @@ public class GenerateRawTables
 
         var utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
 
-        File.WriteAllText(Path.Combine(_sqlDir, "01_create_raw_tables.sql"), createSql.ToString(), utf8NoBom);
-        File.WriteAllText(Path.Combine(_sqlDir, "02_copy_into_raw.sql"), copySql.ToString(), utf8NoBom);
-        File.WriteAllText(Path.Combine(_sqlDir, "02_copy_into_raw_local.sql"), copyLocalSql.ToString(), utf8NoBom);
+        WriteSql("01", "create_raw_tables", createSql.ToString());
+        WriteSql("02", "copy_into_raw", copySql.ToString(), false);
+        WriteSql("02", "copy_into_raw_local", copyLocalSql.ToString());
 
         // Add alias rows BEFORE writing tablemapping.csv
         AddLegacyAliasesFromRawSources();
@@ -403,5 +405,22 @@ public class GenerateRawTables
             return "\"" + value.Replace("\"", "\"\"") + "\"";
 
         return value;
+    }
+
+    private void WriteSql(string prefix, string viewName, string sql, bool addToRunAll = true)
+    {
+        var fileName = $"{prefix}_{viewName}.sql";
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, fileName),
+            sql,
+            new UTF8Encoding(false));
+
+        if (addToRunAll)
+        {
+            _sqlFiles.Add($"{prefix}_{viewName}.sql");
+        }
+
+        Console.WriteLine($"Generated view index script: {fileName}");
     }
 }

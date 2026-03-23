@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using SAPData.Models;
 using System.Globalization;
+using System.Text;
 
 namespace SAPData;
 
@@ -28,6 +29,8 @@ internal class Program
         string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
         string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
         string sqlDir = Path.Combine(baseDir, "Sql");
+        string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
+        List<string> sqlFiles = new();
 
         string infrastructureDir = Path.Combine(Directory.GetParent(baseDir)!.FullName, "SAPSec.Infrastructure");
         string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
@@ -58,7 +61,8 @@ internal class Program
         new GenerateRawTables(
             rawInputDir,
             cleanedDir,
-            sqlDir
+            sqlDir,
+            sqlFiles
         ).Run();
 
         // -------------------------------------------------
@@ -69,13 +73,17 @@ internal class Program
             tableMappingPath,
             sqlDir,
             jsonDir,
-            generatedJsonDir
+            generatedJsonDir,
+            sqlFiles
         ).Run();
 
         // -------------------------------------------------
         // 4. Generate indexes
         // -------------------------------------------------
-        new GenerateIndexes(sqlDir).Run();
+        new GenerateIndexes(
+            sqlDir,
+            sqlFiles
+        ).Run();
 
         // -------------------------------------------------
         // 50. Generate similar schools views
@@ -84,14 +92,33 @@ internal class Program
             dataMaps,
             tableMappingPath,
             sqlDir,
-            jsonDir,
-            generatedJsonDir
+            generatedJsonDir,
+            sqlFiles
         ).Run();
 
         // -------------------------------------------------
         // 51. Generate similar schools indexes
         // -------------------------------------------------
-        new GenerateSimilarSchoolsIndexes(sqlDir).Run();
+        new GenerateSimilarSchoolsIndexes(
+            sqlDir,
+            sqlFiles
+        ).Run();
+
+        var runAllSql = new StringBuilder();
+        runAllSql.AppendLine(@"-- ================================================================");
+        runAllSql.AppendLine(@"-- run_all.sql");
+        runAllSql.AppendLine(@"-- ================================================================");
+        runAllSql.AppendLine(@"");
+        runAllSql.AppendLine(@"\set ON_ERROR_STOP on");
+        runAllSql.AppendLine(@"");
+        runAllSql.AppendLine(@"\ir 00_cleanup.sql");
+
+        foreach (var line in sqlFiles.Order())
+        {
+            runAllSql.AppendLine(@$"\ir {line}");
+        }
+
+        File.WriteAllText(runAllSqlFile, runAllSql.ToString());
 
         Console.WriteLine("Run Complete.");
 

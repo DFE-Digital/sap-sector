@@ -5,16 +5,16 @@ namespace SAPData;
 public class GenerateSimilarSchoolsIndexes
 {
     private readonly string _sqlDir;
+    private readonly List<string> _sqlFiles;
 
-    public GenerateSimilarSchoolsIndexes(string sqlDir)
+    public GenerateSimilarSchoolsIndexes(string sqlDir, List<string> sqlFiles)
     {
         _sqlDir = sqlDir;
+        _sqlFiles = sqlFiles;
     }
 
     public void Run()
     {
-        string outputPath = Path.Combine(_sqlDir, "51_similar_schools_indexes.sql");
-
         var sb = new StringBuilder();
 
         sb.AppendLine("-- ================================================================");
@@ -46,9 +46,19 @@ public class GenerateSimilarSchoolsIndexes
             sb.AppendLine();
         }
 
-        File.WriteAllText(outputPath, sb.ToString(), new UTF8Encoding(false));
+        WriteSql("51", "similar_schools_indexes", sb.ToString());
+    }
 
-        Console.WriteLine("Generated view index script:");
-        Console.WriteLine(outputPath);
+    private void WriteSql(string prefix, string viewName, string sql)
+    {
+        var fileName = $"{prefix}_{viewName}.sql";
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, fileName),
+            sql,
+            new UTF8Encoding(false));
+        _sqlFiles.Add($"{prefix}_{viewName}.sql");
+
+        Console.WriteLine($"Generated view index script: {fileName}");
     }
 }
