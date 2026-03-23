@@ -1,7 +1,8 @@
+using SAPSec.Data;
+
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class GetCharacteristicsComparison(
-    ISimilarSchoolsSecondaryRepository repository)
+public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository repository)
 {
     public async Task<GetCharacteristicsComparisonResponse> Execute(GetCharacteristicsComparisonRequest request)
     {
@@ -65,8 +66,10 @@ public class GetCharacteristicsComparison(
 
     private async Task<SimilarSchoolsSecondaryStandardDeviations> BuildGroupStandardDeviationsAsync(string currentSchoolUrn)
     {
-        var groupUrns = await repository.GetSimilarSchoolUrnsAsync(currentSchoolUrn);
-        var groupValues = await repository.GetSecondaryValuesByUrnsAsync(groupUrns);
+        var groupUrns = await repository.GetSimilarSchoolsGroupAsync(currentSchoolUrn);
+
+        // TODO: Test standard deviation calculations include current school
+        var groupValues = await repository.GetSecondaryValuesByUrnsAsync(groupUrns.Select(g => g.NeighbourURN).Concat([currentSchoolUrn]));
 
         return new SimilarSchoolsSecondaryStandardDeviations
         {

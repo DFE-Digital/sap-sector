@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPData", "SAPData\SAPData.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapSec.ModelGenerator", "SapSec.ModelGenerator\SapSec.ModelGenerator.csproj", "{36BD1833-7ADA-3BCB-5E07-307070A83000}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPSec.Data", "SAPSec.Data\SAPSec.Data.csproj", "{2AEE11B0-1358-4904-B34C-013BCF7D70B1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -165,6 +167,18 @@ Global
 		{36BD1833-7ADA-3BCB-5E07-307070A83000}.Release|x64.Build.0 = Release|Any CPU
 		{36BD1833-7ADA-3BCB-5E07-307070A83000}.Release|x86.ActiveCfg = Release|Any CPU
 		{36BD1833-7ADA-3BCB-5E07-307070A83000}.Release|x86.Build.0 = Release|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Debug|x64.Build.0 = Debug|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Debug|x86.Build.0 = Debug|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Release|x64.ActiveCfg = Release|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Release|x64.Build.0 = Release|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Release|x86.ActiveCfg = Release|Any CPU
+		{2AEE11B0-1358-4904-B34C-013BCF7D70B1}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,10 +1,11 @@
 using SAPSec.Core.Model.Generated;
 
-namespace SAPSec.Core.Features.Ks4HeadlineMeasures;
+namespace SAPSec.Data;
 
 public interface IKs4PerformanceRepository
 {
     Task<Ks4HeadlineMeasuresData?> GetByUrnAsync(string urn);
+    Task<IReadOnlyCollection<EstablishmentPerformance>> GetEstablishmentPerformanceAsync(IEnumerable<string> urns);
 }
 
 public record Ks4HeadlineMeasuresData(

@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
 using System.Globalization;
 
 namespace SAPSec.Infrastructure.Postgres;
@@ -121,6 +121,20 @@ public class PostgresKs4PerformanceRepository(
             establishmentDestinations,
             localAuthorityDestinations,
             englandDestinations);
+    }
+
+    public async Task<IReadOnlyCollection<EstablishmentPerformance>> GetEstablishmentPerformanceAsync(IEnumerable<string> urns)
+    {
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        const string sql = """
+            SELECT *
+            FROM public.v_establishment_performance
+            WHERE "Id"  = ANY(@urns);
+        """;
+
+        var result = await conn.QueryAsync<EstablishmentPerformance>(sql, new { urns = urns.ToArray() });
+        return result.ToList().AsReadOnly();
     }
 
     private sealed class EstablishmentInfo

@@ -4,12 +4,11 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
 using SAPSec.Web.Controllers;
 
 namespace SAPSec.Web.Tests.Controllers;
