@@ -1,6 +1,6 @@
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
 
 namespace SAPSec.Infrastructure.Json;
 
@@ -66,5 +66,15 @@ public class JsonKs4PerformanceRepository(
         }
 
         return results;
+    }
+
+    public async Task<IReadOnlyCollection<EstablishmentPerformance>> GetEstablishmentPerformanceAsync(IEnumerable<string> urns)
+    {
+        var establishmentPerformance = await establishmentPerformanceRepository.ReadAllAsync();
+
+        return establishmentPerformance
+            .Where(p => urns.Contains(p.Id))
+            .ToList()
+            .AsReadOnly();
     }
 }

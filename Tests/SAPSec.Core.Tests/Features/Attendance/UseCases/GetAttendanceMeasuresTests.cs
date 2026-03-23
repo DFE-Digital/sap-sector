@@ -12,7 +12,7 @@ public class GetAttendanceMeasuresTests
     public async Task Execute_WhenSchoolMissing_ThrowsNotFoundException()
     {
         var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAttendanceRepository>();
+        var repositoryMock = new Mock<IAbsenceRepository>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("999999"))
@@ -30,7 +30,7 @@ public class GetAttendanceMeasuresTests
     public async Task Execute_WhenDataExists_MapsOverallAndPersistentValues()
     {
         var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAttendanceRepository>();
+        var repositoryMock = new Mock<IAbsenceRepository>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -86,7 +86,7 @@ public class GetAttendanceMeasuresTests
     public async Task Execute_WhenRepositoryReturnsNull_ReturnsNullMeasures()
     {
         var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAttendanceRepository>();
+        var repositoryMock = new Mock<IAbsenceRepository>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -94,7 +94,7 @@ public class GetAttendanceMeasuresTests
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("123456", "373"))
-            .ReturnsAsync((AttendanceMeasuresData?)null);
+            .ReturnsAsync((AbsenceData?)null);
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object);
 

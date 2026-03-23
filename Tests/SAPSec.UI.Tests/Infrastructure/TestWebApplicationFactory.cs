@@ -7,11 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.Mocks;
 using SAPSec.Web;
@@ -33,8 +33,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
-        var testDataFilePath = GetTestDataFilePath();
-        var configurationValues = CreateConfigurationValues(testDataFilePath);
+        var configurationValues = CreateConfigurationValues();
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(configurationValues)
             .Build();
@@ -56,25 +55,26 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
                 services.RemoveAll<IKs4PerformanceRepository>();
                 services.RemoveAll<IKs4DestinationsRepository>();
-                services.RemoveAll<IAttendanceRepository>();
+                services.RemoveAll<IAbsenceRepository>();
 
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
                 services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
                 services.AddSingleton<IJsonFile<EstablishmentEmail>, JsonFile<EstablishmentEmail>>();
                 services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
-                services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
-                services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
                 services.AddSingleton<IJsonFile<EstablishmentDestinations>, JsonFile<EstablishmentDestinations>>();
-                services.AddSingleton<IJsonFile<LADestinations>, JsonFile<LADestinations>>();
+                services.AddSingleton<IJsonFile<EnglandAbsence>, JsonFile<EnglandAbsence>>();
+                services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
                 services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
+                services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
+                services.AddSingleton<IJsonFile<LADestinations>, JsonFile<LADestinations>>();
 
                 services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
                 services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
                 services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
                 services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
-                services.AddSingleton<IAttendanceRepository, MockAttendanceRepository>();
+                services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
             });
     }
 
@@ -161,43 +161,14 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         return _cachedWebProjectPath;
     }
 
-    private static string GetTestDataFilePath()
-    {
-        // First try test project's TestData folder
-        var testProjectPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(testProjectPath))
-        {
-            return testProjectPath;
-        }
-
-        // Try web project's TestData folder
-        var webProjectPath = Path.Combine(
-            GetWebProjectPath(),
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(webProjectPath))
-        {
-            return webProjectPath;
-        }
-
-        throw new FileNotFoundException(
-            $"Test data file not found. Searched:\n- {testProjectPath}\n- {webProjectPath}");
-    }
-
     #endregion
 
     #region Configuration
 
-    private static Dictionary<string, string?> CreateConfigurationValues(string testDataFilePath)
+    private static Dictionary<string, string?> CreateConfigurationValues()
     {
         return new Dictionary<string, string?>
         {
-            { "Establishments:CsvPath", testDataFilePath },
             { "DsiConfiguration:ClientId", TestValues.ClientId },
             { "DsiConfiguration:ClientSecret", TestValues.ClientSecret },
             { "DsiConfiguration:Authority", TestValues.Authority },

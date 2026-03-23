@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
 
 namespace SAPSec.Infrastructure.Postgres;
 
