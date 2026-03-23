@@ -393,6 +393,9 @@
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
+            const labelDecimals = canvas.dataset.labelDecimals
+                ? parseInt(canvas.dataset.labelDecimals, 10)
+                : null;
 
             const rawColors = canvas.dataset.colors
                 ? JSON.parse(canvas.dataset.colors)
@@ -424,6 +427,15 @@
                 options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign),
                 plugins: showDataLabels ? [ChartDataLabels] : []
             };
+
+            if (type === 'bar' && labelDecimals !== null && config.options?.plugins?.datalabels) {
+                config.options.plugins.datalabels.formatter = function (value) {
+                    if (!showDataLabels || value === null || value === undefined || Number.isNaN(value)) {
+                        return null;
+                    }
+                    return `${Number(value).toFixed(labelDecimals)}${axisSuffix}`;
+                };
+            }
 
             const chart = new Chart(canvas, config);
             charts[canvas.id] = chart;

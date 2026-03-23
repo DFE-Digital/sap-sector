@@ -213,6 +213,7 @@ public class SimilarSchoolsComparisonControllerTests
                     Abs_Persistent_Est_Previous_Pct = 16.3m,
                     Abs_Persistent_Est_Previous2_Pct = 16.7m
                 },
+                new LocalAuthorityAttendance(),
                 new EnglandAttendance
                 {
                     Abs_Tot_Eng_Current_Pct = 4.8m,

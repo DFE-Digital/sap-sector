@@ -23,9 +23,9 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT "NeighbourURN" 
+            SELECT "neighbour_urn" AS "NeighbourURN"
             FROM public.v_similar_schools_secondary_groups 
-            WHERE "URN" = @urn;
+            WHERE "urn" = @urn;
         """;
 
         var urns = await conn.QueryAsync<string>(sql, new { urn });
@@ -47,9 +47,9 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 *
             FROM public.v_establishment
             WHERE "URN" IN (
-                SELECT "NeighbourURN" 
+                SELECT "neighbour_urn"
                 FROM public.v_similar_schools_secondary_groups 
-                WHERE "URN" = @urn
+                WHERE "urn" = @urn
             );
 
             SELECT
@@ -66,9 +66,9 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
                 "Physics59_Sum_Est_Current_Num"
             FROM public.v_establishment_performance
             WHERE "Id" = @urn OR "Id" IN (
-                SELECT "NeighbourURN" 
+                SELECT "neighbour_urn"
                 FROM public.v_similar_schools_secondary_groups 
-                WHERE "URN" = @urn
+                WHERE "urn" = @urn
             );
         """;
 
@@ -124,19 +124,19 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
         const string sql = """
             SELECT
-                "URN",
-                "KS2RP",
-                "KS2MP",
-                "PPPerc",
-                "PercentEAL",
-                "Polar4QuintilePupils",
-                "PStability",
-                "IdaciPupils",
-                "PercentSchSupport",
-                "NumberOfPupils",
-                "PercentageStatementOrEHP"
+                "urn" AS "URN",
+                "ks2_rp" AS "KS2RP",
+                "ks2_mp" AS "KS2MP",
+                "pp_perc" AS "PPPerc",
+                "percent_eal" AS "PercentEAL",
+                "polar4quintile_pupils" AS "Polar4QuintilePupils",
+                "p_stability" AS "PStability",
+                "idaci_pupils" AS "IdaciPupils",
+                "percent_sch_support" AS "PercentSchSupport",
+                "number_of_pupils" AS "NumberOfPupils",
+                "percent_statement_or_ehp" AS "PercentageStatementOrEHP"
             FROM public.v_similar_schools_secondary_values
-            WHERE "URN" = ANY(@Urns);
+            WHERE "urn" = ANY(@Urns);
         """;
 
         using var conn = await _factory.Create().OpenConnectionAsync();
@@ -167,15 +167,15 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     {
         const string sql = """
             SELECT
-                "KS2AVG",
-                "PPPerc",
-                "PercentEAL",
-                "Polar4QuintilePupils",
-                "PStability",
-                "IdaciPupils",
-                "PercentSchSupport",
-                "NumberOfPupils",
-                "PercentageStatementOrEHP"
+                CAST("ks2_avg" AS numeric(18,6)) AS "KS2AVG",
+                CAST("pp_perc" AS numeric(18,6)) AS "PPPerc",
+                CAST("percent_eal" AS numeric(18,6)) AS "PercentEAL",
+                CAST("polar4quintile_pupils" AS numeric(18,6)) AS "Polar4QuintilePupils",
+                CAST("p_stability" AS numeric(18,6)) AS "PStability",
+                CAST("idaci_pupils" AS numeric(18,6)) AS "IdaciPupils",
+                CAST("percent_sch_support" AS numeric(18,6)) AS "PercentSchSupport",
+                CAST("number_of_pupils" AS numeric(18,6)) AS "NumberOfPupils",
+                CAST("percent_statement_or_ehp" AS numeric(18,6)) AS "PercentageStatementOrEHP"
             FROM public.v_similar_schools_secondary_values_national_sd;
         """;
 
