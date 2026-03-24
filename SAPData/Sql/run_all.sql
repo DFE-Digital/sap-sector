@@ -18,6 +18,7 @@
 \ir 03_v_establishment_destinations.sql
 \ir 03_v_establishment_performance.sql
 \ir 03_v_establishment_workforce.sql
+\ir 03_v_la_absence.sql
 \ir 03_v_la_destinations.sql
 \ir 03_v_la_performance.sql
 \ir 03_v_la_subject_entries.sql
@@ -41,6 +42,7 @@
 \ir 63_v_establishment_destinations.sql
 \ir 63_v_establishment_performance.sql
 \ir 63_v_establishment_workforce.sql
+\ir 63_v_la_absence.sql
 \ir 63_v_la_destinations.sql
 \ir 63_v_la_performance.sql
 \ir 63_v_la_subject_entries.sql
