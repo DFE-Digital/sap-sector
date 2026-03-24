@@ -28,9 +28,16 @@ internal class Program
         string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
         string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
         string sqlDir = Path.Combine(baseDir, "Sql");
-        string csDir = Path.Combine(baseDir, "..\\SAPSec.Core\\Model\\Generated");
-        string jsonDir = Path.Combine(baseDir, "..\\SAPSec.Infrastructure\\Data\\Files\\Generated");
+
+        string infrastructureDir = Path.Combine(Directory.GetParent(baseDir)!.FullName, "SAPSec.Infrastructure");
+        string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
+        string generatedJsonDir = Path.Combine(jsonDir, "Generated");
         string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
+
+        Directory.CreateDirectory(cleanedDir);
+        Directory.CreateDirectory(sqlDir);
+        Directory.CreateDirectory(jsonDir);
+        Directory.CreateDirectory(generatedJsonDir);
 
         // -------------------------------------------------
         // 1. Load DataMap
@@ -61,7 +68,8 @@ internal class Program
             dataMaps,
             tableMappingPath,
             sqlDir,
-            jsonDir
+            jsonDir,
+            generatedJsonDir
         ).Run();
 
         // -------------------------------------------------
@@ -76,7 +84,8 @@ internal class Program
             dataMaps,
             tableMappingPath,
             sqlDir,
-            jsonDir
+            jsonDir,
+            generatedJsonDir
         ).Run();
 
         // -------------------------------------------------

@@ -11,6 +11,7 @@ public sealed class GenerateViews
     private readonly string _tableMappingPath;
     private readonly string _sqlDir;
     private readonly string _jsonDir;
+    private readonly string _generatedJsonDir;
 
     // raw_sources.json path in repo
     private static readonly string[] RawSourcesCandidates =
@@ -65,21 +66,20 @@ public sealed class GenerateViews
         new("v_la_subject_entries", "old_la_code", ViewRange.LA, "KS4_Performance", "LASubjectEntries")
     };
 
-    public GenerateViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir, string jsonDir)
+    public GenerateViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir, string jsonDir, string generatedJsonDir)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
         _jsonDir = jsonDir;
+        _generatedJsonDir = generatedJsonDir;
     }
 
     public void Run()
     {
-        Directory.CreateDirectory(_sqlDir);
-        Directory.CreateDirectory(_jsonDir);
-
         var tableMap = LoadTableMappings();
         var sources = LoadRawSources();
+        var testEstablishmentUrnsFile = Path.Combine(_jsonDir, "TestEstablishmentUrns.json");
 
         WriteSql("60", "test_establishments_urns", $"""
             drop table if exists test_establishments_urns_import;
@@ -88,7 +88,7 @@ public sealed class GenerateViews
             drop table if exists test_establishments_urns;
             create table test_establishments_urns ("URN" text);
 
-            \copy test_establishments_urns_import FROM '{_jsonDir}\..\TestEstablishmentUrns.json' with (format text);
+            \copy test_establishments_urns_import FROM '{testEstablishmentUrnsFile}' with (format text);
             insert into test_establishments_urns select jsonb_array_elements_text(string_agg(doc, E' ')::jsonb) from test_establishments_urns_import;
             """);
 
@@ -265,22 +265,24 @@ public sealed class GenerateViews
             }
 
             WriteSql("03", view.ViewName, sql);
+            var modelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
+
             jsonSql = view switch
             {
                 _ when view.ViewName == "v_establishment_group_links" =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{modelFile}' with(format text);",
 
                 _ when view.ViewName == "v_la_subject_entries" =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" IN (select distinct ""LAId"" from v_establishment where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" IN (select distinct ""LAId"" from v_establishment where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{modelFile}' with(format text);",
 
                 _ when view.ViewName == "v_establishment_subject_entries" =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{modelFile}' with(format text);",
 
                 _ when view.Range == ViewRange.Establishment =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);",
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{modelFile}' with(format text);",
 
                 _ =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{_jsonDir}\{view.ModelName}.json' with(format text);"
+                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{modelFile}' with(format text);"
             };
             WriteSql("63", view.ViewName, jsonSql);
             Console.WriteLine($"Generated {view.ViewName}");
