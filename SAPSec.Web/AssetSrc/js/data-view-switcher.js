@@ -16,14 +16,20 @@
             return;
         }
 
-        var axisKey = chart.config && chart.config.type === "bar" ? "x" : "y";
+        var isBarChart = chart.config && chart.config.type === "bar";
+        var axisKey = isBarChart ? "x" : "y";
         var axis = chart.options.scales[axisKey];
         if (!axis || !axis.ticks) {
             return;
         }
 
         if (typeof axisSettings.max === "number") {
-            axis.max = axisSettings.max;
+            if (isBarChart) {
+                axis.max = axisSettings.max;
+            } else {
+                axis.max = undefined;
+                axis.suggestedMax = axisSettings.max;
+            }
         }
 
         if (typeof axisSettings.step === "number") {
