@@ -19,6 +19,7 @@
         }
     };
     var chartColors = new[] { "#d53880", "#003078", "#003078" };
+    var lineChartColors = new[] { "#D53780", "#003078", "#28A197" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "SimilarSchoolsComparison",
         new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn });
 }
@@ -98,7 +99,7 @@
                         data-show-legend="true"
                         data-show-datalabels="false"
                         data-chart='@Html.Raw(JsonSerializer.Serialize(initialLineData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(lineChartColors))'>
                 </canvas>
             </div>
 

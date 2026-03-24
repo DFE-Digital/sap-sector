@@ -29,6 +29,7 @@
         }
     };
     var chartColors = new[] { "#D53780", "#003078", "#003078" };
+    var lineChartColors = new[] { "#D53780", "#5694CA", "#28A197" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
 }
 
@@ -122,7 +123,7 @@
                         data-show-legend="true"
                         data-show-datalabels="false"
                         data-chart='@Html.Raw(JsonSerializer.Serialize(initialLineData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(lineChartColors))'>
                 </canvas>
             </div>
         </div>
