@@ -12,6 +12,7 @@ public sealed class GenerateViews
     private readonly string _sqlDir;
     private readonly string _jsonDir;
     private readonly string _generatedJsonDir;
+    private readonly List<string> _sqlFiles;
 
     // raw_sources.json path in repo
     private static readonly string[] RawSourcesCandidates =
@@ -50,6 +51,7 @@ public sealed class GenerateViews
         new("v_establishment_links", "urn", ViewRange.Establishment, "Establishment", "EstablishmentLinks"),
         new("v_establishment_group_links", "group_id", ViewRange.Establishment, "Establishment", "EstablishmentGroupLinks"),
         new("v_establishment_subject_entries", "school_urn", ViewRange.Establishment, "KS4_Performance", "EstablishmentSubjectEntries"),
+        new("v_establishment_email", "URN", ViewRange.Establishment, "Email", "EstablishmentEmail"),
 
         new("v_establishment_absence", "Id", ViewRange.Establishment, "PupilAbsence", "EstablishmentAbsence"),
         new("v_establishment_destinations", "Id", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
@@ -66,13 +68,20 @@ public sealed class GenerateViews
         new("v_la_subject_entries", "old_la_code", ViewRange.LA, "KS4_Performance", "LASubjectEntries")
     };
 
-    public GenerateViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir, string jsonDir, string generatedJsonDir)
+    public GenerateViews(
+        IReadOnlyList<DataMapRow> rows,
+        string tableMappingPath,
+        string sqlDir,
+        string jsonDir,
+        string generatedJsonDir,
+        List<string> sqlFiles)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
         _jsonDir = jsonDir;
         _generatedJsonDir = generatedJsonDir;
+        _sqlFiles = sqlFiles;
     }
 
     public void Run()
@@ -121,6 +130,7 @@ public sealed class GenerateViews
                 }
 
                 sql = GenerateEstablishmentDimensionView(rawTable);
+                WriteSql("03", view.ViewName, sql);
             }
 
             // 2) Mirror view (GIAS: all establishment links)
@@ -136,18 +146,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (GIAS/All establishment/Links/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
 
             // 3) Mirror view (GIAS: academy sponsor/trust links)
@@ -163,18 +174,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (GIAS/Academy sponsor and trust/Links/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
 
             // 4) Mirror view (EES: SubjectEntries_2 = school / establishment subject entries)
@@ -190,18 +202,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries_2/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
 
             // 5) Mirror view (EES: SubjectEntries = LA subject entries)
@@ -217,18 +230,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
             // 6) Everything else uses DataMap-driven materialized view generation
             else
@@ -257,14 +271,14 @@ public sealed class GenerateViews
                 if (viewRows.Count == 0)
                 {
                     sql = BuildSkippedSql(view.ViewName, $"No DataMap rows found for Range='{view.Range}', Type='{view.Type}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMaterializedView(view.ViewName, viewRows, tableMap);
+                WriteSql("04", view.ViewName, sql);
             }
 
-            WriteSql("03", view.ViewName, sql);
             var modelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
 
             jsonSql = view switch
@@ -284,17 +298,9 @@ public sealed class GenerateViews
                 _ =>
                     $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{modelFile}' with(format text);"
             };
-            WriteSql("63", view.ViewName, jsonSql);
-            Console.WriteLine($"Generated {view.ViewName}");
-        }
-    }
 
-    private void WriteSql(string prefix, string viewName, string sql)
-    {
-        File.WriteAllText(
-            Path.Combine(_sqlDir, $"{prefix}_{viewName}.sql"),
-            sql,
-            new UTF8Encoding(false));
+            WriteSql("61", view.ViewName, jsonSql);
+        }
     }
 
     private static string BuildSkippedSql(string viewName, string reason)
@@ -805,5 +811,18 @@ public sealed class GenerateViews
             r.IgnoreMapping?.Trim(),
             "Y",
             StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void WriteSql(string prefix, string viewName, string sql)
+    {
+        var fileName = $"{prefix}_{viewName}.sql";
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, fileName),
+            sql,
+            new UTF8Encoding(false));
+        _sqlFiles.Add($"{prefix}_{viewName}.sql");
+
+        Console.WriteLine($"Generated view script: {fileName}");
     }
 }

@@ -38,14 +38,19 @@ public class StartupIndexBuilderTests
             return Task.FromResult<IReadOnlyCollection<Establishment>>([]);
         }
 
-        public Task<Establishment> GetEstablishmentAsync(string urn)
+        public Task<Establishment?> GetEstablishmentAsync(string urn)
         {
-            return Task.FromResult<Establishment>(null!);
+            return Task.FromResult<Establishment?>(null);
         }
 
-        public Task<Establishment> GetEstablishmentByAnyNumberAsync(string number)
+        public Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
         {
-            return Task.FromResult<Establishment>(null!);
+            return Task.FromResult<Establishment?>(null);
+        }
+
+        public Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
+        {
+            return Task.FromResult<EstablishmentEmail?>(null);
         }
     }
 }

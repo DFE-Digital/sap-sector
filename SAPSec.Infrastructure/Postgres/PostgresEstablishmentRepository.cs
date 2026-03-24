@@ -23,8 +23,8 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         const string sql = """
             SELECT "URN",
                    "EstablishmentName",
-                   "Street" AS "AddressStreet",
-                   "Postcode" AS "AddressPostcode"
+                   "Street",
+                   "Postcode"
             FROM public.v_establishment;
         """;
 
@@ -54,12 +54,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT *,
-                   "Street" AS "AddressStreet",
-                   "Locality" AS "AddressLocality",
-                   "Address3" AS "AddressAddress3",
-                   "Town" AS "AddressTown",
-                   "Postcode" AS "AddressPostcode"
+            SELECT *
             FROM public.v_establishment
             WHERE "URN" = @urn
             LIMIT 1;
@@ -81,12 +76,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
 
         //Missing Field "DfENumberSearchable" in database
         const string sql = """
-            SELECT *,
-                   "Street" AS "AddressStreet",
-                   "Locality" AS "AddressLocality",
-                   "Address3" AS "AddressAddress3",
-                   "Town" AS "AddressTown",
-                   "Postcode" AS "AddressPostcode"
+            SELECT *
             FROM public.v_establishment
             WHERE "URN" = @number
                 OR (@ukprn IS NOT NULL AND "UKPRN" = @ukprn)
@@ -94,6 +84,25 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         """;
 
         var result = await conn.QuerySingleOrDefaultAsync<Establishment>(sql, new { number, ukprn });
+
+        return result;
+    }
+
+    public async Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
+    {
+        if (string.IsNullOrWhiteSpace(urn))
+            return null;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        const string sql = """
+            SELECT *
+            FROM public.v_establishment_email
+            WHERE "URN" = @urn
+            LIMIT 1;
+        """;
+
+        var result = await conn.QuerySingleOrDefaultAsync<EstablishmentEmail>(sql, new { urn });
 
         return result;
     }
