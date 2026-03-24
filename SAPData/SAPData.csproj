@@ -181,6 +181,7 @@
     <None Remove="Sql\04_v_establishment_performance.sql" />
     <None Remove="Sql\04_v_establishment_subject_entries.sql" />
     <None Remove="Sql\04_v_establishment_workforce.sql" />
+    <None Remove="Sql\04_v_la_absence.sql" />
     <None Remove="Sql\04_v_la_destinations.sql" />
     <None Remove="Sql\04_v_la_performance.sql" />
     <None Remove="Sql\04_v_la_subject_entries.sql" />
@@ -205,6 +206,7 @@
     <None Remove="Sql\61_v_establishment_performance.sql" />
     <None Remove="Sql\61_v_establishment_subject_entries.sql" />
     <None Remove="Sql\61_v_establishment_workforce.sql" />
+    <None Remove="Sql\61_v_la_absence.sql" />
     <None Remove="Sql\61_v_la_destinations.sql" />
     <None Remove="Sql\61_v_la_performance.sql" />
     <None Remove="Sql\61_v_la_subject_entries.sql" />
