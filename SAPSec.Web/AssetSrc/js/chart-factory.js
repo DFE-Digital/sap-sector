@@ -22,6 +22,9 @@
                 major: 2,
                 minor: 1
             },
+            axis: {
+                grace: '5%'
+            },
             series: {
                 tension: 0.2,
                 pointRadius: 4,
@@ -34,7 +37,7 @@
                 endOnly: true
             },
             layout: {
-                topPadding: 12,
+                topPadding: 24,
                 rightPaddingWithDatalabels: 100
             }
         },
@@ -177,7 +180,8 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: axisMax ?? undefined,
+                        suggestedMax: axisMax ?? undefined,
+                        grace: CHART_CONFIG.line.axis.grace,
                         grid: {
                             display: true,
                             drawBorder: false,
