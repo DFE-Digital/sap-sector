@@ -299,29 +299,29 @@ jobs:
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
-            "${APP_NAME}" -- bash -lc '
+            "${APP_NAME}" -- bash -lc "
               set -euo pipefail
 
-              : "${DATABASE_URL:?DATABASE_URL is not set}"
+              : \"\${DATABASE_URL:?DATABASE_URL is not set}\"
 
-              TARGET_DB="$(printf "%s" "$DATABASE_URL" | sed -E "s#.*//[^/]+/([^?]+).*#\1#")"
-              ADMIN_DATABASE_URL="$(printf "%s" "$DATABASE_URL" | sed -E "s#(postgres(ql)?://[^/]+/)[^?]+#\1postgres#")"
-              DB_EXISTS="$(psql "$ADMIN_DATABASE_URL" -tA -v ON_ERROR_STOP=1 -X -c "SELECT 1 FROM pg_database WHERE datname = '$TARGET_DB' LIMIT 1;")"
+              TARGET_DB=\"\$(printf \"%s\" \"\$DATABASE_URL\" | sed -E \"s#.*//[^/]+/([^?]+).*#\\\\1#\")\"
+              ADMIN_DATABASE_URL=\"\$(printf \"%s\" \"\$DATABASE_URL\" | sed -E \"s#(postgres(ql)?://[^/]+/)[^?]+#\\\\1postgres#\")\"
+              DB_EXISTS=\"\$(psql \"\$ADMIN_DATABASE_URL\" -tA -v ON_ERROR_STOP=1 -X -c \"SELECT 1 FROM pg_database WHERE datname = '\$TARGET_DB' LIMIT 1;\")\"
 
-              if [ "$DB_EXISTS" = "1" ]; then
-                psql "$ADMIN_DATABASE_URL" -v ON_ERROR_STOP=1 -X <<SQL
+              if [ \"\$DB_EXISTS\" = \"1\" ]; then
+                psql \"\$ADMIN_DATABASE_URL\" -v ON_ERROR_STOP=1 -X <<SQL
                 SELECT pg_terminate_backend(pid)
                 FROM pg_stat_activity
-                WHERE datname = '$TARGET_DB'
+                WHERE datname = '\$TARGET_DB'
                   AND pid <> pg_backend_pid();
 
-                DROP DATABASE "$TARGET_DB";
-                CREATE DATABASE "$TARGET_DB";
+                DROP DATABASE \"\$TARGET_DB\";
+                CREATE DATABASE \"\$TARGET_DB\";
                 SQL
               else
-                psql "$ADMIN_DATABASE_URL" -v ON_ERROR_STOP=1 -X -c "CREATE DATABASE \"$TARGET_DB\";"
+                psql \"\$ADMIN_DATABASE_URL\" -v ON_ERROR_STOP=1 -X -c \"CREATE DATABASE \\\"\$TARGET_DB\\\";\"
               fi
-            '
+            "
 
       - name: Restore backup into PR review DB
         shell: bash
