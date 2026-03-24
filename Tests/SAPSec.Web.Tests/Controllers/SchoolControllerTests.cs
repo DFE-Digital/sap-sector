@@ -155,12 +155,12 @@ public class SchoolControllerTests
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(urn))
-            .ReturnsAsync(new Establishment { URN = urn });
+            .ReturnsAsync(new Establishment { URN = urn, LAId = "373" });
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         _attendanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn, "373"))
             .ReturnsAsync(new AttendanceMeasuresData(
                 new EstablishmentAttendance(),
                 new LocalAuthorityAttendance(),
@@ -181,9 +181,9 @@ public class SchoolControllerTests
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(urn))
-            .ReturnsAsync(new Establishment { URN = urn });
+            .ReturnsAsync(new Establishment { URN = urn, LAId = "373" });
         _attendanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn, "373"))
             .ReturnsAsync(new AttendanceMeasuresData(
                 new EstablishmentAttendance
                 {

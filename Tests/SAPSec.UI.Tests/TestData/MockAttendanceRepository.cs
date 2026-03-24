@@ -4,7 +4,7 @@ namespace SAPSec.UI.Tests.Mocks;
 
 public class MockAttendanceRepository : IAttendanceRepository
 {
-    public Task<AttendanceMeasuresData?> GetByUrnAsync(string urn)
+    public Task<AttendanceMeasuresData?> GetByUrnAsync(string urn, string? laId = null)
     {
         return Task.FromResult<AttendanceMeasuresData?>(new AttendanceMeasuresData(
             new EstablishmentAttendance

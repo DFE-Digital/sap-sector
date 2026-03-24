@@ -7,7 +7,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
 {
     private readonly NpgsqlDataSourceFactory _factory = factory;
 
-    public async Task<AttendanceMeasuresData?> GetByUrnAsync(string urn)
+    public async Task<AttendanceMeasuresData?> GetByUrnAsync(string urn, string? laId = null)
     {
         using var conn = await _factory.Create().OpenConnectionAsync();
 
@@ -31,8 +31,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
                 la."Abs_Persistent_LA_Previous_Pct",
                 la."Abs_Persistent_LA_Previous2_Pct"
             FROM public.v_la_absence la
-            INNER JOIN public.v_establishment e ON e."LAId" = la."Id"
-            WHERE e."URN" = @urn
+            WHERE la."Id" = @laId
             LIMIT 1;
 
             SELECT
@@ -47,7 +46,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
             LIMIT 1;
         """;
 
-        using var results = await conn.QueryMultipleAsync(sql, new { urn });
+        using var results = await conn.QueryMultipleAsync(sql, new { urn, laId });
 
         var establishmentAttendance = await results.ReadSingleOrDefaultAsync<EstablishmentAttendance>();
         var localAuthorityAttendance = await results.ReadSingleOrDefaultAsync<LocalAuthorityAttendance>();

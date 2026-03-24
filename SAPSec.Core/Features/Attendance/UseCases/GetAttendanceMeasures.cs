@@ -15,7 +15,7 @@ public class GetAttendanceMeasures(
             throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
 
-        var data = await repository.GetByUrnAsync(request.Urn);
+        var data = await repository.GetByUrnAsync(request.Urn, establishment.LAId);
 
         var overallSchoolSeries = new AttendanceMeasureSeries(
             data?.EstablishmentAttendance?.Abs_Tot_Est_Current_Pct,

@@ -199,10 +199,10 @@ public class SimilarSchoolsComparisonControllerTests
     {
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
-            .ReturnsAsync(new Establishment { URN = "145327" });
+            .ReturnsAsync(new Establishment { URN = "145327", LAId = "373" });
 
         _attendanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
+            .Setup(x => x.GetByUrnAsync(It.IsAny<string>(), It.IsAny<string?>()))
             .ReturnsAsync(new AttendanceMeasuresData(
                 new EstablishmentAttendance
                 {

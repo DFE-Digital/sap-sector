@@ -2,7 +2,7 @@ namespace SAPSec.Core.Features.Attendance;
 
 public interface IAttendanceRepository
 {
-    Task<AttendanceMeasuresData?> GetByUrnAsync(string urn);
+    Task<AttendanceMeasuresData?> GetByUrnAsync(string urn, string? laId = null);
 }
 
 public record AttendanceMeasuresData(

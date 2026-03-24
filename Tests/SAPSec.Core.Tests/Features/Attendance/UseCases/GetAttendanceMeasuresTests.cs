@@ -34,10 +34,10 @@ public class GetAttendanceMeasuresTests
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
-            .ReturnsAsync(new Establishment { URN = "123456" });
+            .ReturnsAsync(new Establishment { URN = "123456", LAId = "373" });
 
         repositoryMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+            .Setup(x => x.GetByUrnAsync("123456", "373"))
             .ReturnsAsync(new AttendanceMeasuresData(
                 new EstablishmentAttendance
                 {
@@ -93,7 +93,7 @@ public class GetAttendanceMeasuresTests
             .ReturnsAsync(new Establishment { URN = "123456" });
 
         repositoryMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+            .Setup(x => x.GetByUrnAsync("123456", "373"))
             .ReturnsAsync((AttendanceMeasuresData?)null);
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object);
@@ -118,10 +118,10 @@ public class GetAttendanceMeasuresTests
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
-            .ReturnsAsync(new Establishment { URN = "123456" });
+            .ReturnsAsync(new Establishment { URN = "123456", LAId = "373" });
 
         repositoryMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+            .Setup(x => x.GetByUrnAsync("123456", "373"))
             .ReturnsAsync(new AttendanceMeasuresData(
                 new EstablishmentAttendance
                 {
