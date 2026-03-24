@@ -199,10 +199,10 @@ public class SimilarSchoolsComparisonControllerTests
     {
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
-            .ReturnsAsync(new Establishment { URN = "145327" });
+            .ReturnsAsync(new Establishment { URN = "145327", LAId = "373" });
 
         _attendanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
+            .Setup(x => x.GetByUrnAsync(It.IsAny<string>(), It.IsAny<string?>()))
             .ReturnsAsync(new AttendanceMeasuresData(
                 new EstablishmentAttendance
                 {
@@ -213,6 +213,7 @@ public class SimilarSchoolsComparisonControllerTests
                     Abs_Persistent_Est_Previous_Pct = 16.3m,
                     Abs_Persistent_Est_Previous2_Pct = 16.7m
                 },
+                new LocalAuthorityAttendance(),
                 new EnglandAttendance
                 {
                     Abs_Tot_Eng_Current_Pct = 4.8m,

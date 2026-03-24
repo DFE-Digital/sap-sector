@@ -22,6 +22,9 @@
                 major: 2,
                 minor: 1
             },
+            axis: {
+                grace: '5%'
+            },
             series: {
                 tension: 0.2,
                 pointRadius: 4,
@@ -34,6 +37,7 @@
                 endOnly: true
             },
             layout: {
+                topPadding: 24,
                 rightPaddingWithDatalabels: 100
             }
         },
@@ -168,12 +172,16 @@
             return {
                 ...common,
                 layout: {
-                    padding: { right: showDataLabels ? CHART_CONFIG.line.layout.rightPaddingWithDatalabels : 0 }
+                    padding: {
+                        top: CHART_CONFIG.line.layout.topPadding,
+                        right: showDataLabels ? CHART_CONFIG.line.layout.rightPaddingWithDatalabels : 0
+                    }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: axisMax ?? undefined,
+                        suggestedMax: axisMax ?? undefined,
+                        grace: CHART_CONFIG.line.axis.grace,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -393,6 +401,9 @@
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
+            const labelDecimals = canvas.dataset.labelDecimals
+                ? parseInt(canvas.dataset.labelDecimals, 10)
+                : null;
 
             const rawColors = canvas.dataset.colors
                 ? JSON.parse(canvas.dataset.colors)
@@ -424,6 +435,15 @@
                 options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign),
                 plugins: showDataLabels ? [ChartDataLabels] : []
             };
+
+            if (type === 'bar' && labelDecimals !== null && config.options?.plugins?.datalabels) {
+                config.options.plugins.datalabels.formatter = function (value) {
+                    if (!showDataLabels || value === null || value === undefined || Number.isNaN(value)) {
+                        return null;
+                    }
+                    return `${Number(value).toFixed(labelDecimals)}${axisSuffix}`;
+                };
+            }
 
             const chart = new Chart(canvas, config);
             charts[canvas.id] = chart;

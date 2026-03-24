@@ -9,6 +9,7 @@ namespace SAPSec.UI.Tests;
 public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private const string SimilarSchoolsPath = "/school/108088/view-similar-schools";
+    private const string NoResultsSimilarSchoolsPath = "/school/116482/view-similar-schools";
 
     [Fact]
     public async Task SimilarSchoolsPage_LoadsSuccessfully()
@@ -134,5 +135,20 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
         var type = await schoolsData.GetAttributeAsync("type");
 
         type.Should().Be("application/json", "Schools data should have correct type attribute");
+    }
+
+    [Fact]
+    public async Task SimilarSchoolsPage_NoResults_HidesMapToggle()
+    {
+        await Page.GotoAsync(NoResultsSimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var toggleLink = Page.Locator("#toggleViewLink");
+        var toggleWrap = Page.Locator("#toggleWrap");
+        var mapView = Page.Locator("#mapView");
+
+        (await toggleLink.CountAsync()).Should().Be(0);
+        (await toggleWrap.CountAsync()).Should().Be(0);
+        (await mapView.CountAsync()).Should().Be(0);
     }
 }

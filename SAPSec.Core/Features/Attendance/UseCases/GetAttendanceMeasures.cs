@@ -15,7 +15,7 @@ public class GetAttendanceMeasures(
             throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
 
-        var data = await repository.GetByUrnAsync(request.Urn);
+        var data = await repository.GetByUrnAsync(request.Urn, establishment.LAId);
 
         var overallSchoolSeries = new AttendanceMeasureSeries(
             data?.EstablishmentAttendance?.Abs_Tot_Est_Current_Pct,
@@ -25,6 +25,15 @@ public class GetAttendanceMeasures(
             data?.EstablishmentAttendance?.Abs_Persistent_Est_Current_Pct,
             data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous_Pct,
             data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous2_Pct);
+
+        var overallLocalAuthoritySeries = new AttendanceMeasureSeries(
+            data?.LocalAuthorityAttendance?.Abs_Tot_La_Current_Pct,
+            data?.LocalAuthorityAttendance?.Abs_Tot_La_Previous_Pct,
+            data?.LocalAuthorityAttendance?.Abs_Tot_La_Previous2_Pct);
+        var persistentLocalAuthoritySeries = new AttendanceMeasureSeries(
+            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Current_Pct,
+            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Previous_Pct,
+            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Previous2_Pct);
 
         var overallEnglandSeries = new AttendanceMeasureSeries(
             data?.EnglandAttendance?.Abs_Tot_Eng_Current_Pct,
@@ -38,28 +47,30 @@ public class GetAttendanceMeasures(
         return new(
             new AttendanceMeasureAverage(
                 Average(overallSchoolSeries.Current, overallSchoolSeries.Previous, overallSchoolSeries.Previous2),
+                Average(overallLocalAuthoritySeries.Current, overallLocalAuthoritySeries.Previous, overallLocalAuthoritySeries.Previous2),
                 Average(overallEnglandSeries.Current, overallEnglandSeries.Previous, overallEnglandSeries.Previous2)),
             new AttendanceMeasureYearByYear(
                 overallSchoolSeries,
+                overallLocalAuthoritySeries,
                 overallEnglandSeries),
             new AttendanceMeasureAverage(
                 Average(persistentSchoolSeries.Current, persistentSchoolSeries.Previous, persistentSchoolSeries.Previous2),
+                Average(persistentLocalAuthoritySeries.Current, persistentLocalAuthoritySeries.Previous, persistentLocalAuthoritySeries.Previous2),
                 Average(persistentEnglandSeries.Current, persistentEnglandSeries.Previous, persistentEnglandSeries.Previous2)),
             new AttendanceMeasureYearByYear(
                 persistentSchoolSeries,
+                persistentLocalAuthoritySeries,
                 persistentEnglandSeries));
     }
 
     private static decimal? Average(params decimal?[] values)
     {
-        var availableValues = values
-            .Where(v => v.HasValue)
-            .Select(v => v!.Value)
-            .ToList();
+        if (values.Any(v => !v.HasValue))
+        {
+            return null;
+        }
 
-        return availableValues.Count == 0
-            ? null
-            : Math.Round(availableValues.Average(), 2, MidpointRounding.AwayFromZero);
+        return Math.Round(values.Average(v => v!.Value), 2, MidpointRounding.AwayFromZero);
     }
 }
 
@@ -67,6 +78,7 @@ public record GetAttendanceMeasuresRequest(string Urn);
 
 public record AttendanceMeasureAverage(
     decimal? SchoolValue,
+    decimal? LocalAuthorityValue,
     decimal? EnglandValue);
 
 public record AttendanceMeasureSeries(
@@ -76,6 +88,7 @@ public record AttendanceMeasureSeries(
 
 public record AttendanceMeasureYearByYear(
     AttendanceMeasureSeries School,
+    AttendanceMeasureSeries LocalAuthority,
     AttendanceMeasureSeries England);
 
 public record GetAttendanceMeasuresResponse(

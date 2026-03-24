@@ -7,7 +7,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
 {
     private readonly NpgsqlDataSourceFactory _factory = factory;
 
-    public async Task<AttendanceMeasuresData?> GetByUrnAsync(string urn)
+    public async Task<AttendanceMeasuresData?> GetByUrnAsync(string urn, string? laId = null)
     {
         using var conn = await _factory.Create().OpenConnectionAsync();
 
@@ -24,6 +24,17 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
             LIMIT 1;
 
             SELECT
+                la."Abs_Tot_LA_Current_Pct",
+                la."Abs_Tot_LA_Previous_Pct",
+                la."Abs_Tot_LA_Previous2_Pct",
+                la."Abs_Persistent_LA_Current_Pct",
+                la."Abs_Persistent_LA_Previous_Pct",
+                la."Abs_Persistent_LA_Previous2_Pct"
+            FROM public.v_la_absence la
+            WHERE la."Id" = @laId
+            LIMIT 1;
+
+            SELECT
                 "Abs_Tot_Eng_Current_Pct",
                 "Abs_Tot_Eng_Previous_Pct",
                 "Abs_Tot_Eng_Previous2_Pct",
@@ -35,18 +46,20 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
             LIMIT 1;
         """;
 
-        using var results = await conn.QueryMultipleAsync(sql, new { urn });
+        using var results = await conn.QueryMultipleAsync(sql, new { urn, laId });
 
         var establishmentAttendance = await results.ReadSingleOrDefaultAsync<EstablishmentAttendance>();
+        var localAuthorityAttendance = await results.ReadSingleOrDefaultAsync<LocalAuthorityAttendance>();
         var englandRow = await results.ReadSingleOrDefaultAsync<EnglandAttendanceRow>();
 
-        if (establishmentAttendance is null && englandRow is null)
+        if (establishmentAttendance is null && localAuthorityAttendance is null && englandRow is null)
         {
             return null;
         }
 
         return new AttendanceMeasuresData(
             establishmentAttendance,
+            localAuthorityAttendance,
             englandRow?.ToEnglandAttendance());
     }
 

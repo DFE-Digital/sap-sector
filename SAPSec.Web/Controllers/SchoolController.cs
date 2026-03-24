@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
+using System.Globalization;
 
 namespace SAPSec.Web.Controllers;
 
@@ -14,15 +16,18 @@ namespace SAPSec.Web.Controllers;
 public class SchoolController : Controller
 {
     private readonly ISchoolDetailsService _schoolDetailsService;
+    private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly ILogger<SchoolController> _logger;
 
     public SchoolController(
         ISchoolDetailsService schoolDetailsService,
+        GetAttendanceMeasures getAttendanceMeasures,
         GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         ILogger<SchoolController> logger)
     {
         _schoolDetailsService = schoolDetailsService;
+        _getAttendanceMeasures = getAttendanceMeasures;
         _getKs4HeadlineMeasures = getKs4HeadlineMeasures;
         _logger = logger;
     }
@@ -62,9 +67,91 @@ public class SchoolController : Controller
     public async Task<IActionResult> Attendance(string urn)
     {
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var attendanceMeasures = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewData(school);
-        return View(school);
+        return View(new SchoolAttendancePageViewModel
+        {
+            SchoolDetails = school,
+            AttendanceMeasures = attendanceMeasures
+        });
+    }
+
+    [HttpGet]
+    [Route("attendance-data")]
+    public async Task<IActionResult> AttendanceData(string urn, string absenceType = "overall")
+    {
+        if (string.IsNullOrWhiteSpace(urn))
+        {
+            return BadRequest(new { error = "Missing route parameters." });
+        }
+
+        var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
+        var response = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var yearLabels = Ks4YearLabelConfig.YearByYear;
+        var isPersistentAbsence = normalizedAbsenceType == "persistent";
+
+        var selectedSchoolSeries = isPersistentAbsence
+            ? response.PersistentAbsenceYearByYear.School
+            : response.OverallAbsenceYearByYear.School;
+        var localAuthoritySeries = isPersistentAbsence
+            ? response.PersistentAbsenceYearByYear.LocalAuthority
+            : response.OverallAbsenceYearByYear.LocalAuthority;
+        var englandSeries = isPersistentAbsence
+            ? response.PersistentAbsenceYearByYear.England
+            : response.OverallAbsenceYearByYear.England;
+
+        var selectedSchoolThreeYearAverage = isPersistentAbsence
+            ? response.PersistentAbsenceThreeYearAverage.SchoolValue
+            : response.OverallAbsenceThreeYearAverage.SchoolValue;
+        var localAuthorityThreeYearAverage = isPersistentAbsence
+            ? response.PersistentAbsenceThreeYearAverage.LocalAuthorityValue
+            : response.OverallAbsenceThreeYearAverage.LocalAuthorityValue;
+        var englandThreeYearAverage = isPersistentAbsence
+            ? response.PersistentAbsenceThreeYearAverage.EnglandValue
+            : response.OverallAbsenceThreeYearAverage.EnglandValue;
+
+        return Json(new
+        {
+            absenceType = normalizedAbsenceType,
+            years = yearLabels,
+            bar = new decimal?[]
+            {
+                selectedSchoolThreeYearAverage,
+                localAuthorityThreeYearAverage,
+                englandThreeYearAverage
+            },
+            line = new
+            {
+                school = new decimal?[] { selectedSchoolSeries.Previous2, selectedSchoolSeries.Previous, selectedSchoolSeries.Current },
+                localAuthority = new decimal?[] { localAuthoritySeries.Previous2, localAuthoritySeries.Previous, localAuthoritySeries.Current },
+                england = new decimal?[] { englandSeries.Previous2, englandSeries.Previous, englandSeries.Current }
+            },
+            table = new
+            {
+                school = new[]
+                {
+                    DisplayPercentNullable(selectedSchoolSeries.Previous2),
+                    DisplayPercentNullable(selectedSchoolSeries.Previous),
+                    DisplayPercentNullable(selectedSchoolSeries.Current),
+                    DisplayPercentNullable(selectedSchoolThreeYearAverage)
+                },
+                localAuthority = new[]
+                {
+                    DisplayPercentNullable(localAuthoritySeries.Previous2),
+                    DisplayPercentNullable(localAuthoritySeries.Previous),
+                    DisplayPercentNullable(localAuthoritySeries.Current),
+                    DisplayPercentNullable(localAuthorityThreeYearAverage)
+                },
+                england = new[]
+                {
+                    DisplayPercentNullable(englandSeries.Previous2),
+                    DisplayPercentNullable(englandSeries.Previous),
+                    DisplayPercentNullable(englandSeries.Current),
+                    DisplayPercentNullable(englandThreeYearAverage)
+                }
+            }
+        });
     }
 
     [HttpGet]
@@ -103,4 +190,21 @@ public class SchoolController : Controller
     {
         ViewData["SchoolDetails"] = school;
     }
+
+    private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
+    {
+        if (string.IsNullOrWhiteSpace(requested))
+        {
+            return allowedValues[0];
+        }
+
+        return allowedValues.Contains(requested, StringComparer.OrdinalIgnoreCase)
+            ? requested.ToLowerInvariant()
+            : allowedValues[0];
+    }
+
+    private static string DisplayPercentNullable(decimal? value) =>
+        value.HasValue
+            ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
+            : "No available data";
 }

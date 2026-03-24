@@ -342,7 +342,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("AttendanceData")]
+    [Route("attendance-data")]
     public async Task<IActionResult> AttendanceData(
         string urn,
         string similarSchoolUrn,

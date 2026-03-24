@@ -2,11 +2,12 @@ namespace SAPSec.Core.Features.Attendance;
 
 public interface IAttendanceRepository
 {
-    Task<AttendanceMeasuresData?> GetByUrnAsync(string urn);
+    Task<AttendanceMeasuresData?> GetByUrnAsync(string urn, string? laId = null);
 }
 
 public record AttendanceMeasuresData(
     EstablishmentAttendance? EstablishmentAttendance,
+    LocalAuthorityAttendance? LocalAuthorityAttendance,
     EnglandAttendance? EnglandAttendance);
 
 public sealed class EstablishmentAttendance
@@ -27,4 +28,14 @@ public sealed class EnglandAttendance
     public decimal? Abs_Persistent_Eng_Current_Pct { get; set; }
     public decimal? Abs_Persistent_Eng_Previous_Pct { get; set; }
     public decimal? Abs_Persistent_Eng_Previous2_Pct { get; set; }
+}
+
+public sealed class LocalAuthorityAttendance
+{
+    public decimal? Abs_Tot_La_Current_Pct { get; set; }
+    public decimal? Abs_Tot_La_Previous_Pct { get; set; }
+    public decimal? Abs_Tot_La_Previous2_Pct { get; set; }
+    public decimal? Abs_Persistent_La_Current_Pct { get; set; }
+    public decimal? Abs_Persistent_La_Previous_Pct { get; set; }
+    public decimal? Abs_Persistent_La_Previous2_Pct { get; set; }
 }
