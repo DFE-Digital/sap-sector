@@ -18,7 +18,6 @@ public class GenerateSimilarSchoolsIndexes
         var sb = new StringBuilder();
 
         sb.AppendLine("-- ================================================================");
-        sb.AppendLine("-- 51_similar_schools_indexes.sql");
         sb.AppendLine("-- Indexes for materialized views (AUTO-GENERATED)");
         sb.AppendLine("-- ================================================================");
         sb.AppendLine();
@@ -46,7 +45,7 @@ public class GenerateSimilarSchoolsIndexes
             sb.AppendLine();
         }
 
-        WriteSql("51", "similar_schools_indexes", sb.ToString());
+        WriteSql("60", "similar_schools_indexes", sb.ToString());
     }
 
     private void WriteSql(string prefix, string viewName, string sql)

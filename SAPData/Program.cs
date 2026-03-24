@@ -62,6 +62,7 @@ internal class Program
             rawInputDir,
             cleanedDir,
             sqlDir,
+            tableMappingPath,
             sqlFiles
         ).Run();
 
@@ -78,7 +79,7 @@ internal class Program
         ).Run();
 
         // -------------------------------------------------
-        // 4. Generate indexes
+        // 10. Generate indexes
         // -------------------------------------------------
         new GenerateIndexes(
             sqlDir,
@@ -97,7 +98,7 @@ internal class Program
         ).Run();
 
         // -------------------------------------------------
-        // 51. Generate similar schools indexes
+        // 60. Generate similar schools indexes
         // -------------------------------------------------
         new GenerateSimilarSchoolsIndexes(
             sqlDir,

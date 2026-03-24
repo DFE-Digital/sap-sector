@@ -9,15 +9,17 @@ public class GenerateRawTables
     private readonly string _inputDir;
     private readonly string _cleanDir;
     private readonly string _sqlDir;
+    private readonly string _tableMappingPath;
     private readonly List<string> _sqlFiles;
 
     private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
 
-    public GenerateRawTables(string inputDir, string cleanDir, string sqlDir, List<string> sqlFiles)
+    public GenerateRawTables(string inputDir, string cleanDir, string sqlDir, string tableMappingPath, List<string> sqlFiles)
     {
         _inputDir = inputDir;
         _cleanDir = cleanDir;
         _sqlDir = sqlDir;
+        _tableMappingPath = tableMappingPath;
         _sqlFiles = sqlFiles;
     }
 
@@ -305,15 +307,16 @@ public class GenerateRawTables
     // =====================================================
     private void WriteTableMappings()
     {
-        string mappingPath = Path.Combine(_sqlDir, "tablemapping.csv");
+        Console.WriteLine($"Generating: {_tableMappingPath}");
 
-        using var writer = new StreamWriter(mappingPath, false, Encoding.UTF8);
+        using var writer = new StreamWriter(_tableMappingPath, false, Encoding.UTF8);
         foreach (var kvp in _tableMappings.OrderBy(k => k.Key, StringComparer.OrdinalIgnoreCase))
         {
             writer.WriteLine($"{kvp.Key},{kvp.Value}");
+            Console.WriteLine($"{kvp.Key},{kvp.Value}");
         }
 
-        Console.WriteLine($"Generated: {mappingPath}");
+        Console.WriteLine($"Generated: {_tableMappingPath}");
     }
 
     // =====================================================

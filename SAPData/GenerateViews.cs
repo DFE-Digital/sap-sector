@@ -130,6 +130,7 @@ public sealed class GenerateViews
                 }
 
                 sql = GenerateEstablishmentDimensionView(rawTable);
+                WriteSql("03", view.ViewName, sql);
             }
 
             // 2) Mirror view (GIAS: all establishment links)
@@ -145,18 +146,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (GIAS/All establishment/Links/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
 
             // 3) Mirror view (GIAS: academy sponsor/trust links)
@@ -172,18 +174,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (GIAS/Academy sponsor and trust/Links/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
 
             // 4) Mirror view (EES: SubjectEntries_2 = school / establishment subject entries)
@@ -199,18 +202,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries_2/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
 
             // 5) Mirror view (EES: SubjectEntries = LA subject entries)
@@ -226,18 +230,19 @@ public sealed class GenerateViews
                         out var datasetKey))
                 {
                     sql = BuildSkippedSql(view.ViewName, "Could not resolve dataset key from raw_sources.json (EES/KS4_Performance/SubjectEntries/Current).");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 if (!TryResolveRawTable(tableMap, datasetKey, out var rawTable))
                 {
                     sql = BuildSkippedSql(view.ViewName, $"Could not resolve raw table mapping for datasetKey='{datasetKey}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMirrorMaterializedView(view.ViewName, rawTable);
+                WriteSql("04", view.ViewName, sql);
             }
             // 6) Everything else uses DataMap-driven materialized view generation
             else
@@ -266,14 +271,14 @@ public sealed class GenerateViews
                 if (viewRows.Count == 0)
                 {
                     sql = BuildSkippedSql(view.ViewName, $"No DataMap rows found for Range='{view.Range}', Type='{view.Type}'.");
-                    WriteSql("03", view.ViewName, sql);
+                    WriteSql("04", view.ViewName, sql);
                     continue;
                 }
 
                 sql = GenerateMaterializedView(view.ViewName, viewRows, tableMap);
+                WriteSql("04", view.ViewName, sql);
             }
 
-            WriteSql("03", view.ViewName, sql);
             var modelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
 
             jsonSql = view switch
@@ -294,7 +299,7 @@ public sealed class GenerateViews
                     $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{modelFile}' with(format text);"
             };
 
-            WriteSql("63", view.ViewName, jsonSql);
+            WriteSql("61", view.ViewName, jsonSql);
         }
     }
 

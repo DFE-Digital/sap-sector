@@ -47,6 +47,7 @@ public class GenerateIndexes
             { "v_establishment_workforce",    "\"Id\"" },
 
             // England
+            { "v_england_absence",      "\"Id\"" },
             { "v_england_destinations", "\"Id\"" },
             { "v_england_performance",  "\"Id\"" },
 
@@ -92,7 +93,7 @@ public class GenerateIndexes
             sb.AppendLine();
         }
 
-        WriteSql("04", "indexes", sb.ToString());
+        WriteSql("10", "indexes", sb.ToString());
     }
 
     private static string EscapeSqlLiteral(string s) => (s ?? "").Replace("'", "''");
