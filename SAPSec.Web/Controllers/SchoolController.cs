@@ -78,7 +78,7 @@ public class SchoolController : Controller
     }
 
     [HttpGet]
-    [Route("AttendanceData")]
+    [Route("attendance-data")]
     public async Task<IActionResult> AttendanceData(string urn, string absenceType = "overall")
     {
         if (string.IsNullOrWhiteSpace(urn))

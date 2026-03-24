@@ -16,12 +16,18 @@ namespace SAPSec.Web.Tests.Controllers;
 
 public class SchoolControllerTests
 {
+    #region Fields
+
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
     private readonly Mock<IAttendanceRepository> _attendanceRepositoryMock;
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
+
+    #endregion
+
+    #region Constructor
 
     public SchoolControllerTests()
     {
@@ -44,6 +50,10 @@ public class SchoolControllerTests
             getKs4HeadlineMeasures,
             _loggerMock.Object);
     }
+
+    #endregion
+
+    #region Index Tests
 
     [Fact]
     public async Task Index_ValidUrn_ReturnsViewWithSchoolDetails()
@@ -109,6 +119,10 @@ public class SchoolControllerTests
         viewResult.ViewName.Should().BeNull();
     }
 
+    #endregion
+
+    #region KS4 Headline Measures Tests
+
     [Fact]
     public async Task Ks4HeadlineMeasures_ValidUrn_ReturnsViewWithExpectedModel()
     {
@@ -128,6 +142,10 @@ public class SchoolControllerTests
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel>();
     }
+
+    #endregion
+
+    #region Attendance Tests
 
     [Fact]
     public async Task Attendance_ValidUrn_ReturnsViewWithExpectedModel()
@@ -201,6 +219,10 @@ public class SchoolControllerTests
         json.Value.Should().NotBeNull();
     }
 
+    #endregion
+
+    #region Test Data Builders
+
     private static SchoolDetails CreateTestSchoolDetails(string urn, string name)
     {
         return new SchoolDetails
@@ -234,4 +256,6 @@ public class SchoolControllerTests
             Email = DataWithAvailability.NotAvailable<string>()
         };
     }
+
+    #endregion
 }

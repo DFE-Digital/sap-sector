@@ -61,10 +61,16 @@
             <select class="govuk-select"
                     id="attendanceAbsenceType"
                     name="attendanceAbsenceType"
+                    data-view-switcher="true"
                     data-endpoint="@attendanceDataEndpoint"
+                    data-query-key="absenceType"
                     data-bar-chart-id="school-attendance-three-year-chart"
                     data-line-chart-id="school-attendance-year-by-year-chart"
-                    data-axis-config='{"overall":{"max":10,"step":1},"persistent":{"max":30,"step":5}}'>
+                    data-cell-attribute="data-attendance-cell"
+                    data-cell-prefixes='{"school":"school","localAuthority":"la","england":"england"}'
+                    data-axis-config='{"overall":{"max":10,"step":1},"persistent":{"max":30,"step":5}}'
+                    data-axis-config-key="absenceType"
+                    data-series-keys='["school","localAuthority","england"]'>
                 <option value="overall" selected>Overall absence</option>
                 <option value="persistent">Persistent absence</option>
             </select>
@@ -164,6 +170,6 @@
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/school-attendance-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
