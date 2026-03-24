@@ -61,10 +61,19 @@
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "Attendance")">
-                    <a href=@Url.Action("Attendance", "School", routeAttributes) 
-                        class="app-side-navigation__link @selected("link", currentAction == "Attendance")">
-                        Attendance
-                    </a>
+                    @if (currentAction == "Attendance")
+                    {
+                        <span class="app-side-navigation__link @selected("link", true)" aria-current="page">
+                            Attendance
+                        </span>
+                    }
+                    else
+                    {
+                        <a href=@Url.Action("Attendance", "School", routeAttributes) 
+                           class="app-side-navigation__link">
+                            Attendance
+                        </a>
+                    }
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "ViewSimilarSchools")">
                     <a href=@Url.Action("ViewSimilarSchools", "SimilarSchools", routeAttributes) 

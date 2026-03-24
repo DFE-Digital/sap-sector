@@ -60,6 +60,7 @@ public sealed class GenerateViews
         new("v_england_destinations", "Id", ViewRange.England, "KS4_Destinations", "EnglandDestinations"),
         new("v_england_performance", "Id", ViewRange.England, "KS4_Performance", "EnglandPerformance"),
 
+        new("v_la_absence", "Id", ViewRange.LA, "PupilAbsence", "LAAbsence"),
         new("v_la_destinations", "Id", ViewRange.LA, "KS4_Destinations", "LADestinations"),
         new("v_la_performance", "Id", ViewRange.LA, "KS4_Performance", "LAPerformance"),
         new("v_la_subject_entries", "old_la_code", ViewRange.LA, "KS4_Performance", "LASubjectEntries")

@@ -209,8 +209,8 @@ jobs:
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
           db-seed: false
           smoke-test: false
-
- # ---------------------------
+      
+      # ---------------------------
       # REVIEW APP DATABASE DEPLOYMENT (PR)
       # ---------------------------
       - name: Checkout (needed for workspace consistency)
@@ -427,14 +427,14 @@ jobs:
       id-token: write
 
     steps:
-    - name: Deploy Domains Infrastructure
-      uses: DFE-Digital/github-actions/deploy-domains-infra@master
-      with:
-        azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
-        azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
-        azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+      - name: Deploy Domains Infrastructure
+        uses: DFE-Digital/github-actions/deploy-domains-infra@master
+        with:
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
+          azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
+          azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
 
   deploy_domains_env:
     name: Deploy Domains to ${{ matrix.domain_environment }} environment
@@ -452,13 +452,13 @@ jobs:
       id-token: write
 
     steps:
-    - name: Deploy Domains Environment
-      uses: DFE-Digital/github-actions/deploy-domains-env@master
-      with:
-        azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
-        azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
-        azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-        environment: ${{ matrix.domain_environment }}
-        healthcheck: ${{ env.HEALTHCHECK_CMD }}
-        teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
-        service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+      - name: Deploy Domains Environment
+        uses: DFE-Digital/github-actions/deploy-domains-env@master
+        with:
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
+          azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
+          azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
+          environment: ${{ matrix.domain_environment }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}

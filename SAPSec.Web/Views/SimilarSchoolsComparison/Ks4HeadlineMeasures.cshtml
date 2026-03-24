@@ -50,8 +50,7 @@
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-ks4-grade-switcher.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-ks4-destinations-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
 
@@ -261,7 +260,14 @@
             <select class="govuk-select"
                     id="engMathsGrade"
                     name="engMathsGrade"
-                    data-endpoint="@Url.Action("Ks4HeadlineMeasuresData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })">
+                    data-view-switcher="true"
+                    data-endpoint="@Url.Action("Ks4HeadlineMeasuresData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })"
+                    data-query-key="grade"
+                    data-bar-chart-id="eng-maths-comparison-chart"
+                    data-line-chart-id="eng-maths-comparison-yearbyyear-chart"
+                    data-cell-attribute="data-eng-maths-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchool":"similar","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchool","england"]'>
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
             </select>
@@ -455,7 +461,14 @@
             <select class="govuk-select"
                     id="destinationsType"
                     name="destinationsType"
-                    data-endpoint="@Url.Action("Ks4DestinationsData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })">
+                    data-view-switcher="true"
+                    data-endpoint="@Url.Action("Ks4DestinationsData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn })"
+                    data-query-key="destination"
+                    data-bar-chart-id="destinations-comparison-chart"
+                    data-line-chart-id="destinations-comparison-yearbyyear-chart"
+                    data-cell-attribute="data-destinations-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchool":"similar","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchool","england"]'>
                 <option value="all" selected>All destinations</option>
                 <option value="education">Education</option>
                 <option value="employment">Employment and apprenticeships</option>
