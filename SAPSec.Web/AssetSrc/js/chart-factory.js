@@ -34,6 +34,7 @@
                 endOnly: true
             },
             layout: {
+                topPadding: 12,
                 rightPaddingWithDatalabels: 100
             }
         },
@@ -168,7 +169,10 @@
             return {
                 ...common,
                 layout: {
-                    padding: { right: showDataLabels ? CHART_CONFIG.line.layout.rightPaddingWithDatalabels : 0 }
+                    padding: {
+                        top: CHART_CONFIG.line.layout.topPadding,
+                        right: showDataLabels ? CHART_CONFIG.line.layout.rightPaddingWithDatalabels : 0
+                    }
                 },
                 scales: {
                     y: {
