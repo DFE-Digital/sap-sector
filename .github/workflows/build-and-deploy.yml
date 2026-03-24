@@ -299,16 +299,16 @@ jobs:
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
-            "${APP_NAME}" -- psql -tA -v ON_ERROR_STOP=1 -X \
-            -c "SELECT current_database();")"
+            "${APP_NAME}" -- psql -At --set=ON_ERROR_STOP=1 --no-psqlrc \
+            --command="SELECT current_database();")"
 
           DB_EXISTS="$("$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
             -t 7200 \
             -x \
             -b postgres \
-            "${APP_NAME}" -- psql -tA -v ON_ERROR_STOP=1 -X \
-            -c "SELECT 1 FROM pg_database WHERE datname = '${TARGET_DB}' LIMIT 1;")"
+            "${APP_NAME}" -- psql -At --set=ON_ERROR_STOP=1 --no-psqlrc \
+            --command="SELECT 1 FROM pg_database WHERE datname = '${TARGET_DB}' LIMIT 1;")"
 
           if [ "$DB_EXISTS" = "1" ]; then
             "$GITHUB_WORKSPACE/konduit.sh" \
@@ -316,18 +316,18 @@ jobs:
               -t 7200 \
               -x \
               -b postgres \
-              "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X \
-              -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${TARGET_DB}' AND pid <> pg_backend_pid();" \
-              -c "DROP DATABASE \"${TARGET_DB}\";" \
-              -c "CREATE DATABASE \"${TARGET_DB}\";"
+              "${APP_NAME}" -- psql --set=ON_ERROR_STOP=1 --no-psqlrc \
+              --command="SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '${TARGET_DB}' AND pid <> pg_backend_pid();" \
+              --command="DROP DATABASE \"${TARGET_DB}\";" \
+              --command="CREATE DATABASE \"${TARGET_DB}\";"
           else
             "$GITHUB_WORKSPACE/konduit.sh" \
               -n "${AKS_NAMESPACE}" \
               -t 7200 \
               -x \
               -b postgres \
-              "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X \
-              -c "CREATE DATABASE \"${TARGET_DB}\";"
+              "${APP_NAME}" -- psql --set=ON_ERROR_STOP=1 --no-psqlrc \
+              --command="CREATE DATABASE \"${TARGET_DB}\";"
           fi
 
       - name: Restore backup into PR review DB
