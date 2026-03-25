@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Infrastructure.Json;
+﻿namespace SAPSec.Data.Json;
 
 public interface IJsonFile<T> where T : class
 {

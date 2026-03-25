@@ -3,22 +3,21 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class SimilarSchoolsSecondaryValuesEntry
 {
-    [ExcludeFromCodeCoverage]
-    public class SimilarSchoolsSecondaryValuesEntry
-    {
-        public string URN { get; set; } = string.Empty;
-        public string KS2RP { get; set; } = string.Empty;
-        public string KS2MP { get; set; } = string.Empty;
-        public string PPPerc { get; set; } = string.Empty;
-        public string PercentEAL { get; set; } = string.Empty;
-        public string Polar4QuintilePupils { get; set; } = string.Empty;
-        public string PStability { get; set; } = string.Empty;
-        public string IdaciPupils { get; set; } = string.Empty;
-        public string PercentSchSupport { get; set; } = string.Empty;
-        public string NumberOfPupils { get; set; } = string.Empty;
-        public string PercentageStatementOrEHP { get; set; } = string.Empty;
-        public string Att8Scr { get; set; } = string.Empty;
-    }
+    public string URN { get; set; } = string.Empty;
+    public string KS2RP { get; set; } = string.Empty;
+    public string KS2MP { get; set; } = string.Empty;
+    public string PPPerc { get; set; } = string.Empty;
+    public string PercentEAL { get; set; } = string.Empty;
+    public string Polar4QuintilePupils { get; set; } = string.Empty;
+    public string PStability { get; set; } = string.Empty;
+    public string IdaciPupils { get; set; } = string.Empty;
+    public string PercentSchSupport { get; set; } = string.Empty;
+    public string NumberOfPupils { get; set; } = string.Empty;
+    public string PercentageStatementOrEHP { get; set; } = string.Empty;
+    public string Att8Scr { get; set; } = string.Empty;
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
-namespace SAPSec.Infrastructure.Json;
+namespace SAPSec.Data.Json;
 
 public class JsonFile<T> : IJsonFile<T> where T : class
 {

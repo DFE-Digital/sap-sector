@@ -1,8 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
-namespace SAPSec.Infrastructure.Json;
+namespace SAPSec.Data.Json;
 
 public class JsonEstablishmentRepository : IEstablishmentRepository
 {

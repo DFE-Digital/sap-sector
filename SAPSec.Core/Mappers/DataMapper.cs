@@ -1,5 +1,5 @@
 ﻿using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Core.Mappers;
 

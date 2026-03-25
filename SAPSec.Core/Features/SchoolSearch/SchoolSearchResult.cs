@@ -1,5 +1,5 @@
 ﻿using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Model.Generated;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 

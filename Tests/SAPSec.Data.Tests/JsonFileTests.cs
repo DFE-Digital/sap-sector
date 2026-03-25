@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Json;
 
-namespace SAPSec.Infrastructure.Tests.Repositories;
+namespace SAPSec.Data.Tests;
 
 public class TestEntity
 {

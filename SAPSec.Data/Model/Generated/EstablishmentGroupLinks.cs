@@ -3,31 +3,30 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class EstablishmentGroupLinks
 {
-    [ExcludeFromCodeCoverage]
-    public class EstablishmentGroupLinks
-    {
-        public string group_uid { get; set; } = string.Empty;
-        public string group_id { get; set; } = string.Empty;
-        public string group_name { get; set; } = string.Empty;
-        public string companies_house_number { get; set; } = string.Empty;
-        public string group_type__code_ { get; set; } = string.Empty;
-        public string group_type { get; set; } = string.Empty;
-        public string closed_date { get; set; } = string.Empty;
-        public string open_date { get; set; } = string.Empty;
-        public string incorporated_on__open_date_ { get; set; } = string.Empty;
-        public string group_status__code_ { get; set; } = string.Empty;
-        public string group_status { get; set; } = string.Empty;
-        public string group_street { get; set; } = string.Empty;
-        public string group_locality { get; set; } = string.Empty;
-        public string group_address_3 { get; set; } = string.Empty;
-        public string group_town { get; set; } = string.Empty;
-        public string group_county { get; set; } = string.Empty;
-        public string group_postcode { get; set; } = string.Empty;
-        public string head_of_group_title { get; set; } = string.Empty;
-        public string head_of_group_first_name { get; set; } = string.Empty;
-        public string head_of_group_last_name { get; set; } = string.Empty;
-        public string ukprn { get; set; } = string.Empty;
-    }
+    public string group_uid { get; set; } = string.Empty;
+    public string group_id { get; set; } = string.Empty;
+    public string group_name { get; set; } = string.Empty;
+    public string companies_house_number { get; set; } = string.Empty;
+    public string group_type__code_ { get; set; } = string.Empty;
+    public string group_type { get; set; } = string.Empty;
+    public string closed_date { get; set; } = string.Empty;
+    public string open_date { get; set; } = string.Empty;
+    public string incorporated_on__open_date_ { get; set; } = string.Empty;
+    public string group_status__code_ { get; set; } = string.Empty;
+    public string group_status { get; set; } = string.Empty;
+    public string group_street { get; set; } = string.Empty;
+    public string group_locality { get; set; } = string.Empty;
+    public string group_address_3 { get; set; } = string.Empty;
+    public string group_town { get; set; } = string.Empty;
+    public string group_county { get; set; } = string.Empty;
+    public string group_postcode { get; set; } = string.Empty;
+    public string head_of_group_title { get; set; } = string.Empty;
+    public string head_of_group_first_name { get; set; } = string.Empty;
+    public string head_of_group_last_name { get; set; } = string.Empty;
+    public string ukprn { get; set; } = string.Empty;
 }

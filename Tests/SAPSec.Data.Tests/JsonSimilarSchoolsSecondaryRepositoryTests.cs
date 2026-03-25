@@ -1,8 +1,8 @@
 using Moq;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Model.Generated;
+using SAPSec.Data.Json;
 
-namespace SAPSec.Infrastructure.Tests.Repositories;
+namespace SAPSec.Data.Tests;
 
 public class JsonSimilarSchoolsSecondaryRepositoryTests
 {

@@ -1,18 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Json;
+using SAPSec.Data.Model.Generated;
 
-namespace SAPSec.Infrastructure.Tests.Repositories;
+namespace SAPSec.Data.Tests;
 
-public class EstablishmentRepositoryTests
+public class JsonEstablishmentRepositoryTests
 {
     private readonly Mock<IJsonFile<Establishment>> _mockEstablishmentJsonFile;
     private readonly Mock<IJsonFile<EstablishmentEmail>> _mockEstablishmentEmailJsonFile;
     private readonly Mock<ILogger<Establishment>> _mockLogger;
     private readonly JsonEstablishmentRepository _sut;
 
-    public EstablishmentRepositoryTests()
+    public JsonEstablishmentRepositoryTests()
     {
         _mockEstablishmentJsonFile = new Mock<IJsonFile<Establishment>>();
         _mockEstablishmentEmailJsonFile = new Mock<IJsonFile<EstablishmentEmail>>();

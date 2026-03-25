@@ -3,15 +3,14 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class EstablishmentLinks
 {
-    [ExcludeFromCodeCoverage]
-    public class EstablishmentLinks
-    {
-        public string urn { get; set; } = string.Empty;
-        public string linkurn { get; set; } = string.Empty;
-        public string linkname { get; set; } = string.Empty;
-        public string linktype { get; set; } = string.Empty;
-        public string linkestablisheddate { get; set; } = string.Empty;
-    }
+    public string urn { get; set; } = string.Empty;
+    public string linkurn { get; set; } = string.Empty;
+    public string linkname { get; set; } = string.Empty;
+    public string linktype { get; set; } = string.Empty;
+    public string linkestablisheddate { get; set; } = string.Empty;
 }

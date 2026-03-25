@@ -8,9 +8,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Json;
+using SAPSec.Data.Model.Generated;
 using SAPSec.UI.Tests.Mocks;
 using SAPSec.Web;
 

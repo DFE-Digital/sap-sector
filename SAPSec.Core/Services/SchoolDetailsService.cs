@@ -2,9 +2,9 @@
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
 using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Core.Services;
 

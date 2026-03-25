@@ -1,4 +1,3 @@
-using SAPSec.Core.Model.Generated;
 using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Data;

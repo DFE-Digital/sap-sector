@@ -3,23 +3,22 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class SimilarSchoolsSecondaryStandardDeviationsEntry
 {
-    [ExcludeFromCodeCoverage]
-    public class SimilarSchoolsSecondaryStandardDeviationsEntry
-    {
-        public int? RowCount { get; set; } = null;
-        public decimal? KS2RP { get; set; } = null;
-        public decimal? KS2MP { get; set; } = null;
-        public decimal? KS2AVG { get; set; } = null;
-        public decimal? PPPerc { get; set; } = null;
-        public decimal? PercentEAL { get; set; } = null;
-        public decimal? Polar4QuintilePupils { get; set; } = null;
-        public decimal? PStability { get; set; } = null;
-        public decimal? IdaciPupils { get; set; } = null;
-        public decimal? PercentSchSupport { get; set; } = null;
-        public decimal? NumberOfPupils { get; set; } = null;
-        public decimal? PercentageStatementOrEHP { get; set; } = null;
-        public decimal? Att8Scr { get; set; } = null;
-    }
+    public int? RowCount { get; set; } = null;
+    public decimal? KS2RP { get; set; } = null;
+    public decimal? KS2MP { get; set; } = null;
+    public decimal? KS2AVG { get; set; } = null;
+    public decimal? PPPerc { get; set; } = null;
+    public decimal? PercentEAL { get; set; } = null;
+    public decimal? Polar4QuintilePupils { get; set; } = null;
+    public decimal? PStability { get; set; } = null;
+    public decimal? IdaciPupils { get; set; } = null;
+    public decimal? PercentSchSupport { get; set; } = null;
+    public decimal? NumberOfPupils { get; set; } = null;
+    public decimal? PercentageStatementOrEHP { get; set; } = null;
+    public decimal? Att8Scr { get; set; } = null;
 }

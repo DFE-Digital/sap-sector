@@ -7,9 +7,9 @@ using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Json;
+using SAPSec.Data.Model.Generated;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
 

@@ -1,7 +1,6 @@
-using SAPSec.Core.Model.Generated;
-using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
-namespace SAPSec.Infrastructure.Json;
+namespace SAPSec.Data.Json;
 
 public class JsonKs4PerformanceRepository(
     IEstablishmentRepository establishmentRepository,

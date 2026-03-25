@@ -8,7 +8,7 @@ public class Program
     public static async Task Main(string[] args)
     {
         string baseDir = FindProjectDirectoryDownwards("SapSec.ModelGenerator");
-        string jsonDir = Path.Combine(baseDir, "..\\SAPSec.Infrastructure\\Data\\Files\\Generated");
+        string jsonDir = Path.Combine(baseDir, "..\\SAPSec.Data\\Files\\Generated");
         string csDir = Path.Combine(baseDir, "..\\SAPSec.Data\\Model\\Generated");
 
         foreach (var csFile in Directory.GetFiles(csDir))
@@ -48,7 +48,7 @@ public class Program
                 cs.AppendLine();
                 cs.AppendLine("using System.Diagnostics.CodeAnalysis;");
                 cs.AppendLine();
-                cs.AppendLine("namespace SAPSec.Core.Model.Generated;");
+                cs.AppendLine("namespace SAPSec.Data.Model.Generated;");
                 cs.AppendLine();
                 cs.AppendLine("[ExcludeFromCodeCoverage]");
                 cs.AppendLine($"public class {className}");

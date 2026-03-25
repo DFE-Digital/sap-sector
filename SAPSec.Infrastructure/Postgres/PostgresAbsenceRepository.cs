@@ -1,5 +1,5 @@
 using Dapper;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Model.Generated;
 using SAPSec.Data;
 using SAPSec.Data.Model.Generated;
 
