@@ -9,7 +9,7 @@ public class Program
     {
         string baseDir = FindProjectDirectoryDownwards("SapSec.ModelGenerator");
         string jsonDir = Path.Combine(baseDir, "..\\SAPSec.Infrastructure\\Data\\Files\\Generated");
-        string csDir = Path.Combine(baseDir, "..\\SAPSec.Core\\Model\\Generated");
+        string csDir = Path.Combine(baseDir, "..\\SAPSec.Data\\Model\\Generated");
 
         foreach (var csFile in Directory.GetFiles(csDir))
         {

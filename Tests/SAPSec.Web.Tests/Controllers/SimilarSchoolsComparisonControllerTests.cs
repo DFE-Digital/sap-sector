@@ -2,7 +2,6 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;

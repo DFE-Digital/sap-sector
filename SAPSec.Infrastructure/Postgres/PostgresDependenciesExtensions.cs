@@ -1,6 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Data;
 

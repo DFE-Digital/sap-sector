@@ -1,23 +1,33 @@
 ﻿using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class GetSimilarSchoolDetails(
-    ISimilarSchoolsSecondaryRepository repository,
-    ISchoolDetailsService schoolDetailsService)
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    ISchoolDetailsService schoolDetailsService,
+    IKs4PerformanceRepository performanceRepository)
 {
     public async Task<GetSimilarSchoolDetailsResponse> Execute(GetSimilarSchoolDetailsRequest request)
     {
         // TODO: Validate SimilarSchoolUrn actually belongs in similar schools group for current school
-        var (currentSchool, similarSchools) = await repository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
+        var performances = await performanceRepository.GetEstablishmentPerformanceAsync(urns);
+        var schools = establishments.GroupJoin(performances, e => e.URN, p => p.Id, SimilarSchool.FromData).ToList();
+        var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
+        var similarSchool = schools.FirstOrDefault(s => s.URN == request.SimilarSchoolUrn);
+
         if (currentSchool is null)
         {
             throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
         }
 
-        var similarSchool = similarSchools.SingleOrDefault(s => s.URN == request.SimilarSchoolUrn);
         if (similarSchool is null)
         {
             throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
