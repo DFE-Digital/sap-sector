@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Data;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 
@@ -278,8 +277,8 @@ public class SchoolSearchController(
 
         try
         {
-            var similarSchoolUrns = await _similarSchoolsSecondaryRepository.GetSimilarSchoolUrnsAsync(urn);
-            return similarSchoolUrns.Any();
+            var similarSchools = await _similarSchoolsSecondaryRepository.GetSimilarSchoolsGroupAsync(urn);
+            return similarSchools.Any();
         }
         catch (Exception ex)
         {

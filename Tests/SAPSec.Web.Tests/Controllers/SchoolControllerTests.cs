@@ -2,13 +2,14 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 using SAPSec.Web.Controllers;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -18,7 +19,7 @@ public class SchoolControllerTests
     #region Fields
 
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
-    private readonly Mock<IAttendanceRepository> _attendanceRepositoryMock;
+    private readonly Mock<IAbsenceRepository> _absenceRepositoryMock;
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
@@ -31,13 +32,13 @@ public class SchoolControllerTests
     public SchoolControllerTests()
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        _attendanceRepositoryMock = new Mock<IAttendanceRepository>();
+        _absenceRepositoryMock = new Mock<IAbsenceRepository>();
         _establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
         _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
 
         var getAttendanceMeasures = new GetAttendanceMeasures(
-            _attendanceRepositoryMock.Object,
+            _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object);
         var getKs4HeadlineMeasures = new GetKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
@@ -158,12 +159,12 @@ public class SchoolControllerTests
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
-        _attendanceRepositoryMock
+        _absenceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn, "373"))
-            .ReturnsAsync(new AttendanceMeasuresData(
-                new EstablishmentAttendance(),
-                new LocalAuthorityAttendance(),
-                new EnglandAttendance()));
+            .ReturnsAsync(new AbsenceData(
+                new EstablishmentAbsence(),
+                new LAAbsence(),
+                new EnglandAbsence()));
 
         var result = await _sut.Attendance(urn);
 
@@ -181,35 +182,35 @@ public class SchoolControllerTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(urn))
             .ReturnsAsync(new Establishment { URN = urn, LAId = "373" });
-        _attendanceRepositoryMock
+        _absenceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn, "373"))
-            .ReturnsAsync(new AttendanceMeasuresData(
-                new EstablishmentAttendance
+            .ReturnsAsync(new AbsenceData(
+                new EstablishmentAbsence
                 {
-                    Abs_Tot_Est_Current_Pct = 5.1m,
-                    Abs_Tot_Est_Previous_Pct = 5.0m,
-                    Abs_Tot_Est_Previous2_Pct = 4.9m,
-                    Abs_Persistent_Est_Current_Pct = 16.2m,
-                    Abs_Persistent_Est_Previous_Pct = 16.0m,
-                    Abs_Persistent_Est_Previous2_Pct = 15.8m
+                    Abs_Tot_Est_Current_Pct = "5.1",
+                    Abs_Tot_Est_Previous_Pct = "5.0",
+                    Abs_Tot_Est_Previous2_Pct = "4.9",
+                    Abs_Persistent_Est_Current_Pct = "16.2",
+                    Abs_Persistent_Est_Previous_Pct = "16.0",
+                    Abs_Persistent_Est_Previous2_Pct = "15.8"
                 },
-                new LocalAuthorityAttendance
+                new LAAbsence
                 {
-                    Abs_Tot_La_Current_Pct = 4.8m,
-                    Abs_Tot_La_Previous_Pct = 4.7m,
-                    Abs_Tot_La_Previous2_Pct = 4.6m,
-                    Abs_Persistent_La_Current_Pct = 15.2m,
-                    Abs_Persistent_La_Previous_Pct = 15.0m,
-                    Abs_Persistent_La_Previous2_Pct = 14.8m
+                    Abs_Tot_LA_Current_Pct = "4.8",
+                    Abs_Tot_LA_Previous_Pct = "4.7",
+                    Abs_Tot_LA_Previous2_Pct = "4.6",
+                    Abs_Persistent_LA_Current_Pct = "15.2",
+                    Abs_Persistent_LA_Previous_Pct = "15.0",
+                    Abs_Persistent_LA_Previous2_Pct = "14.8"
                 },
-                new EnglandAttendance
+                new EnglandAbsence
                 {
-                    Abs_Tot_Eng_Current_Pct = 4.7m,
-                    Abs_Tot_Eng_Previous_Pct = 4.6m,
-                    Abs_Tot_Eng_Previous2_Pct = 4.5m,
-                    Abs_Persistent_Eng_Current_Pct = 15.1m,
-                    Abs_Persistent_Eng_Previous_Pct = 14.9m,
-                    Abs_Persistent_Eng_Previous2_Pct = 14.7m
+                    Abs_Tot_Eng_Current_Pct = "4.7",
+                    Abs_Tot_Eng_Previous_Pct = "4.6",
+                    Abs_Tot_Eng_Previous2_Pct = "4.5",
+                    Abs_Persistent_Eng_Current_Pct = "15.1",
+                    Abs_Persistent_Eng_Previous_Pct = "14.9",
+                    Abs_Persistent_Eng_Previous2_Pct = "14.7"
                 }));
 
         var result = await _sut.AttendanceData(urn, "overall");

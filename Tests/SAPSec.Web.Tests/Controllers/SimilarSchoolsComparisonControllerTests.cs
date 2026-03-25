@@ -12,6 +12,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
@@ -33,8 +34,10 @@ public class SimilarSchoolsComparisonControllerTests
     public SimilarSchoolsComparisonControllerTests()
     {
         var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
+            _establishmentRepositoryMock.Object,
             _repoMock.Object,
-            _schoolDetailsServiceMock.Object);
+            _schoolDetailsServiceMock.Object,
+            _ks4PerformanceRepositoryMock.Object);
         var ks4UseCase = new GetKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object);
@@ -47,17 +50,17 @@ public class SimilarSchoolsComparisonControllerTests
 
         _repoMock
             .Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
-            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviations
+            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviationsEntry
             {
-                PupilPremiumEligibilityPercentage = 13.983589m,
-                PupilsWithEalPercentage = 18.755181m,
-                Polar4Quintile = 1.022255m,
-                PupilStabilityRate = 6.442814m,
-                AverageIdaciScore = 0.078069m,
-                PupilsWithSenSupportPercentage = 5.530940m,
-                PupilCount = 388.664809m,
-                PupilsWithEhcPlanPercentage = 1.678816m,
-                Ks2AverageScore = 2.527329m
+                PPPerc = 13.983589m,
+                PercentEAL = 18.755181m,
+                Polar4QuintilePupils = 1.022255m,
+                PStability = 6.442814m,
+                IdaciPupils = 0.078069m,
+                PercentSchSupport = 5.530940m,
+                NumberOfPupils = 388.664809m,
+                PercentageStatementOrEHP = 1.678816m,
+                KS2AVG = 2.527329m
             });
 
         var characteristicsFormatter = new CharacteristicsComparisonFormatter();
@@ -202,25 +205,25 @@ public class SimilarSchoolsComparisonControllerTests
 
         _attendanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(It.IsAny<string>(), It.IsAny<string?>()))
-            .ReturnsAsync(new AttendanceMeasuresData(
-                new EstablishmentAttendance
+            .ReturnsAsync(new AbsenceData(
+                new EstablishmentAbsence
                 {
-                    Abs_Tot_Est_Current_Pct = 5.0m,
-                    Abs_Tot_Est_Previous_Pct = 5.2m,
-                    Abs_Tot_Est_Previous2_Pct = 5.4m,
-                    Abs_Persistent_Est_Current_Pct = 16.0m,
-                    Abs_Persistent_Est_Previous_Pct = 16.3m,
-                    Abs_Persistent_Est_Previous2_Pct = 16.7m
+                    Abs_Tot_Est_Current_Pct = "5.0",
+                    Abs_Tot_Est_Previous_Pct = "5.2",
+                    Abs_Tot_Est_Previous2_Pct = "5.4",
+                    Abs_Persistent_Est_Current_Pct = "16.0",
+                    Abs_Persistent_Est_Previous_Pct = "16.3",
+                    Abs_Persistent_Est_Previous2_Pct = "16.7"
                 },
-                new LocalAuthorityAttendance(),
-                new EnglandAttendance
+                new LAAbsence(),
+                new EnglandAbsence
                 {
-                    Abs_Tot_Eng_Current_Pct = 4.8m,
-                    Abs_Tot_Eng_Previous_Pct = 4.9m,
-                    Abs_Tot_Eng_Previous2_Pct = 5.0m,
-                    Abs_Persistent_Eng_Current_Pct = 15.6m,
-                    Abs_Persistent_Eng_Previous_Pct = 15.8m,
-                    Abs_Persistent_Eng_Previous2_Pct = 16.0m
+                    Abs_Tot_Eng_Current_Pct = "4.8",
+                    Abs_Tot_Eng_Previous_Pct = "4.9",
+                    Abs_Tot_Eng_Previous2_Pct = "5.0",
+                    Abs_Persistent_Eng_Current_Pct = "15.6",
+                    Abs_Persistent_Eng_Previous_Pct = "15.8",
+                    Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
 
         var result = await _sut.AttendanceData("145327", "142075");
@@ -254,7 +257,7 @@ public class SimilarSchoolsComparisonControllerTests
 
         _repoMock
             .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
-            .ReturnsAsync((currentSchool, group));
+            .ReturnsAsync(group.Select(g => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = g.URN }).ToList());
 
         _schoolDetailsServiceMock
             .Setup(s => s.GetByUrnAsync(It.IsAny<string>()))
@@ -267,35 +270,35 @@ public class SimilarSchoolsComparisonControllerTests
 
     private void SetupSecondaryValues(string currentUrn, string similarUrn)
     {
-        var values = new List<SimilarSchoolsSecondaryValues>
+        var values = new List<SimilarSchoolsSecondaryValuesEntry>
         {
-            new SimilarSchoolsSecondaryValues
+            new SimilarSchoolsSecondaryValuesEntry
             {
-                Urn = currentUrn,
-                Ks2ReadingScore = 104.5m,
-                Ks2MathsScore = 104.1m,
-                PupilCount = 760,
-                PupilStabilityRate = 90m,
-                PupilPremiumEligibilityPercentage = 52.0m,
-                AverageIdaciScore = 0.316508m,
-                Polar4Quintile = 3,
-                PupilsWithEhcPlanPercentage = 2.105263m,
-                PupilsWithSenSupportPercentage = 16.315789m,
-                PupilsWithEalPercentage = 39.525692m
+                URN = currentUrn,
+                KS2RP = "104.5",
+                KS2MP = "104.1",
+                NumberOfPupils = "760",
+                PStability = "90",
+                PPPerc = "52.0",
+                IdaciPupils = "0.316508",
+                Polar4QuintilePupils = "3",
+                PercentageStatementOrEHP = "2.105263",
+                PercentSchSupport = "16.315789",
+                PercentEAL = "39.525692"
             },
-            new SimilarSchoolsSecondaryValues
+            new SimilarSchoolsSecondaryValuesEntry
             {
-                Urn = similarUrn,
-                Ks2ReadingScore = 103.7m,
-                Ks2MathsScore = 103.6m,
-                PupilCount = 962,
-                PupilStabilityRate = 91.7m,
-                PupilPremiumEligibilityPercentage = 41.2m,
-                AverageIdaciScore = 0.351137m,
-                Polar4Quintile = 2,
-                PupilsWithEhcPlanPercentage = 3.326403m,
-                PupilsWithSenSupportPercentage = 8.939709m,
-                PupilsWithEalPercentage = 61.954262m
+                URN = similarUrn,
+                KS2RP = "103.7",
+                KS2MP = "103.6",
+                NumberOfPupils = "962",
+                PStability = "91.7",
+                PPPerc = "41.2",
+                IdaciPupils = "0.351137",
+                Polar4QuintilePupils = "2",
+                PercentageStatementOrEHP = "3.326403",
+                PercentSchSupport = "8.939709",
+                PercentEAL = "61.954262"
             }
         };
 
@@ -308,40 +311,40 @@ public class SimilarSchoolsComparisonControllerTests
     private void SetupGroupSecondaryValues(string currentUrn, IReadOnlyCollection<string> groupUrns)
     {
         _repoMock
-            .Setup(r => r.GetSimilarSchoolUrnsAsync(currentUrn))
-            .ReturnsAsync(groupUrns);
+            .Setup(r => r.GetSimilarSchoolsGroupAsync(currentUrn))
+            .ReturnsAsync(groupUrns.Select(urn => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = urn }).ToList());
 
-        var groupValues = new List<SimilarSchoolsSecondaryValues>
+        var groupValues = new List<SimilarSchoolsSecondaryValuesEntry>
         {
             new()
             {
-                Urn = groupUrns.ElementAt(0),
-                Ks2ReadingScore = 101m,
-                Ks2MathsScore = 101m
+                URN = groupUrns.ElementAt(0),
+                KS2RP = "101",
+                KS2MP = "101"
             },
             new()
             {
-                Urn = groupUrns.ElementAt(1),
-                Ks2ReadingScore = 102m,
-                Ks2MathsScore = 102m
+                URN = groupUrns.ElementAt(1),
+                KS2RP = "102",
+                KS2MP = "102"
             },
             new()
             {
-                Urn = groupUrns.ElementAt(2),
-                Ks2ReadingScore = 103m,
-                Ks2MathsScore = 103m
+                URN = groupUrns.ElementAt(2),
+                KS2RP = "103",
+                KS2MP = "103"
             },
             new()
             {
-                Urn = groupUrns.ElementAt(3),
-                Ks2ReadingScore = 104m,
-                Ks2MathsScore = 104m
+                URN = groupUrns.ElementAt(3),
+                KS2RP = "104",
+                KS2MP = "104"
             },
             new()
             {
-                Urn = groupUrns.ElementAt(4),
-                Ks2ReadingScore = 105m,
-                Ks2MathsScore = 105m
+                URN = groupUrns.ElementAt(4),
+                KS2RP = "105",
+                KS2MP = "105"
             }
         };
 
