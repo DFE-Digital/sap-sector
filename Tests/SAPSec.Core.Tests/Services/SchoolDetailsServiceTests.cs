@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
+using SAPSec.Data;
 
 namespace SAPSec.Core.Tests.Services;
 

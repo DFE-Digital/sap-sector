@@ -1,4 +1,3 @@
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
 using SAPSec.Data.Model.Generated;

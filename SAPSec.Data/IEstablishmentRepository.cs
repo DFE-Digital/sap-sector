@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Model.Generated;
 
-namespace SAPSec.Core.Interfaces.Repositories;
+namespace SAPSec.Data;
 
 public interface IEstablishmentRepository
 {
