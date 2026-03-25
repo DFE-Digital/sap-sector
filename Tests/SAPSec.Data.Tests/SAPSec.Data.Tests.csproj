@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SAPSec.Data\SAPSec.Data.csproj" />
+    <ProjectReference Include="..\..\Data\SAPSec.Data\SAPSec.Data.csproj" />
   </ItemGroup>
 
   <ItemGroup>

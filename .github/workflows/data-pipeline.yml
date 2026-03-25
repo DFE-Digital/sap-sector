@@ -159,9 +159,9 @@ jobs:
           $conn = $env:AZURE_STORAGE_CONNECTION_STRING
           $container = $env:AZURE_STORAGE_CONTAINER
           $manifestBlobName = "versions.json"
-          $sourcesPathRepo = "SAPData/raw_sources.json"
+          $sourcesPathRepo = "Data/SAPSec.SqlGenerator/raw_sources.json"
           if (-not (Test-Path $sourcesPathRepo)) { throw "Could not find $sourcesPathRepo in the repo." }
-          $workDir = "SAPData/Work/Versioning"
+          $workDir = "Data/SAPSec.SqlGenerator/Work/Versioning"
           New-Item -ItemType Directory -Force -Path $workDir | Out-Null
           $reportPath = Join-Path $workDir "step6_report.json"
           $report = [System.Collections.Generic.List[object]]::new()
@@ -510,7 +510,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: step6-report
-          path: SAPData/Work/Versioning/step6_report.json
+          path: Data/SAPSec.SqlGenerator/Work/Versioning/step6_report.json
           if-no-files-found: warn
 
       # ==============================
@@ -526,7 +526,7 @@ jobs:
           LATEST_FILES: ${{ steps.version.outputs.latest_files }}
         run: |
           $ErrorActionPreference = "Stop"
-          $rawDir = "SAPData/DataMap/SourceFiles"
+          $rawDir = "Data/SAPSec.SqlGenerator/DataMap/SourceFiles"
           New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
           Get-ChildItem -Path $rawDir -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
           # ---- Load latest managed filenames from step 6 output ----
@@ -592,22 +592,22 @@ jobs:
 
       - name: Generate SQL Scripts
         run: |
-          dotnet run --configuration Release --project SAPData/SAPData.csproj
+          dotnet run --configuration Release --project Data/SAPSec.SqlGenerator/SAPSec.SqlGenerator.csproj
           echo "Generated SQL scripts."
 
       # ==============================
       # 9. Run ETL via konduit (private DB) WITH RETRY on transient disconnects
       # ==============================
       - name: Run ETL pipeline via konduit (retry on transient DB disconnect)
-        working-directory: SAPData/Sql
+        working-directory: Data/SAPSec.SqlGenerator/Sql
         shell: bash
         run: |
           set -euo pipefail
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
-          ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
+          ls -la "$GITHUB_WORKSPACE/Data/SAPSec.SqlGenerator/Sql" || true
           max_attempts=5
           delay=10
-          log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
+          log_file="$GITHUB_WORKSPACE/Data/SAPSec.SqlGenerator/Sql/psql.log"
           attempt=1
           while [ $attempt -le $max_attempts ]; do
             echo "ETL attempt $attempt/$max_attempts"
@@ -616,7 +616,7 @@ jobs:
               -n "${AKS_NAMESPACE}" \
               -t 28800 \
               -x \
-              -i "$GITHUB_WORKSPACE/SAPData/Sql/run_all.sql" \
+              -i "$GITHUB_WORKSPACE/Data/SAPSec.SqlGenerator/Sql/run_all.sql" \
               "${KONDUIT_APP_NAME}" -- psql 2>&1 | tee "$log_file"
             exit_code=${PIPESTATUS[0]}
             set -e
