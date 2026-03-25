@@ -1,9 +1,9 @@
-﻿using SAPData.Models;
+﻿using SAPSec.SqlGenerator.Models;
 using System.Text;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 
-namespace SAPData;
+namespace SAPSec.SqlGenerator;
 
 public sealed class GenerateViews
 {
@@ -18,9 +18,9 @@ public sealed class GenerateViews
     private static readonly string[] RawSourcesCandidates =
     {
         "raw_sources.json",
-        Path.Combine("SAPData", "raw_sources.json"),
+        Path.Combine("Data", "SAPSec.SqlGenerator", "raw_sources.json"),
         Path.Combine(AppContext.BaseDirectory, "raw_sources.json"),
-        Path.Combine(AppContext.BaseDirectory, "SAPData", "raw_sources.json")
+        Path.Combine(AppContext.BaseDirectory, "Data", "SAPSec.SqlGenerator", "raw_sources.json")
     };
 
     private enum ViewRange
