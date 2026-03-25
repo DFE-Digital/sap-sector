@@ -3,6 +3,7 @@ using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Core.Tests.Features.Attendance.UseCases;
 
@@ -38,33 +39,33 @@ public class GetAttendanceMeasuresTests
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("123456", "373"))
-            .ReturnsAsync(new AttendanceMeasuresData(
-                new EstablishmentAttendance
+            .ReturnsAsync(new AbsenceData(
+                new EstablishmentAbsence
                 {
-                    Abs_Tot_Est_Current_Pct = 5.0m,
-                    Abs_Tot_Est_Previous_Pct = 5.2m,
-                    Abs_Tot_Est_Previous2_Pct = 5.4m,
-                    Abs_Persistent_Est_Current_Pct = 16.0m,
-                    Abs_Persistent_Est_Previous_Pct = 16.4m,
-                    Abs_Persistent_Est_Previous2_Pct = 16.8m
+                    Abs_Tot_Est_Current_Pct = "5.0",
+                    Abs_Tot_Est_Previous_Pct = "5.2",
+                    Abs_Tot_Est_Previous2_Pct = "5.4",
+                    Abs_Persistent_Est_Current_Pct = "16.0",
+                    Abs_Persistent_Est_Previous_Pct = "16.4",
+                    Abs_Persistent_Est_Previous2_Pct = "16.8"
                 },
-                new LocalAuthorityAttendance
+                new LAAbsence
                 {
-                    Abs_Tot_La_Current_Pct = 4.7m,
-                    Abs_Tot_La_Previous_Pct = 4.8m,
-                    Abs_Tot_La_Previous2_Pct = 5.0m,
-                    Abs_Persistent_La_Current_Pct = 15.1m,
-                    Abs_Persistent_La_Previous_Pct = 15.3m,
-                    Abs_Persistent_La_Previous2_Pct = 15.5m
+                    Abs_Tot_LA_Current_Pct = "4.7",
+                    Abs_Tot_LA_Previous_Pct = "4.8",
+                    Abs_Tot_LA_Previous2_Pct = "5.0",
+                    Abs_Persistent_LA_Current_Pct = "15.1",
+                    Abs_Persistent_LA_Previous_Pct = "15.3",
+                    Abs_Persistent_LA_Previous2_Pct = "15.5"
                 },
-                new EnglandAttendance
+                new EnglandAbsence
                 {
-                    Abs_Tot_Eng_Current_Pct = 4.8m,
-                    Abs_Tot_Eng_Previous_Pct = 4.9m,
-                    Abs_Tot_Eng_Previous2_Pct = 5.0m,
-                    Abs_Persistent_Eng_Current_Pct = 15.7m,
-                    Abs_Persistent_Eng_Previous_Pct = 15.8m,
-                    Abs_Persistent_Eng_Previous2_Pct = 16.0m
+                    Abs_Tot_Eng_Current_Pct = "4.8",
+                    Abs_Tot_Eng_Previous_Pct = "4.9",
+                    Abs_Tot_Eng_Previous2_Pct = "5.0",
+                    Abs_Persistent_Eng_Current_Pct = "15.7",
+                    Abs_Persistent_Eng_Previous_Pct = "15.8",
+                    Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object);
@@ -114,7 +115,7 @@ public class GetAttendanceMeasuresTests
     public async Task Execute_WhenAnyYearMissing_ThreeYearAverageIsNull()
     {
         var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAttendanceRepository>();
+        var repositoryMock = new Mock<IAbsenceRepository>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -122,33 +123,33 @@ public class GetAttendanceMeasuresTests
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("123456", "373"))
-            .ReturnsAsync(new AttendanceMeasuresData(
-                new EstablishmentAttendance
+            .ReturnsAsync(new AbsenceData(
+                new EstablishmentAbsence
                 {
-                    Abs_Tot_Est_Current_Pct = 5.0m,
-                    Abs_Tot_Est_Previous_Pct = 5.2m,
+                    Abs_Tot_Est_Current_Pct = "5.0",
+                    Abs_Tot_Est_Previous_Pct = "5.2",
                     Abs_Tot_Est_Previous2_Pct = null,
-                    Abs_Persistent_Est_Current_Pct = 16.0m,
+                    Abs_Persistent_Est_Current_Pct = "16.0",
                     Abs_Persistent_Est_Previous_Pct = null,
-                    Abs_Persistent_Est_Previous2_Pct = 16.8m
+                    Abs_Persistent_Est_Previous2_Pct = "16.8"
                 },
-                new LocalAuthorityAttendance
+                new LAAbsence
                 {
-                    Abs_Tot_La_Current_Pct = 4.7m,
-                    Abs_Tot_La_Previous_Pct = 4.8m,
-                    Abs_Tot_La_Previous2_Pct = null,
-                    Abs_Persistent_La_Current_Pct = 15.1m,
-                    Abs_Persistent_La_Previous_Pct = null,
-                    Abs_Persistent_La_Previous2_Pct = 15.5m
+                    Abs_Tot_LA_Current_Pct = "4.7",
+                    Abs_Tot_LA_Previous_Pct = "4.8",
+                    Abs_Tot_LA_Previous2_Pct = null,
+                    Abs_Persistent_LA_Current_Pct = "15.1",
+                    Abs_Persistent_LA_Previous_Pct = null,
+                    Abs_Persistent_LA_Previous2_Pct = "15.5"
                 },
-                new EnglandAttendance
+                new EnglandAbsence
                 {
-                    Abs_Tot_Eng_Current_Pct = 4.8m,
-                    Abs_Tot_Eng_Previous_Pct = 4.9m,
+                    Abs_Tot_Eng_Current_Pct = "4.8",
+                    Abs_Tot_Eng_Previous_Pct = "4.9",
                     Abs_Tot_Eng_Previous2_Pct = null,
-                    Abs_Persistent_Eng_Current_Pct = 15.7m,
+                    Abs_Persistent_Eng_Current_Pct = "15.7",
                     Abs_Persistent_Eng_Previous_Pct = null,
-                    Abs_Persistent_Eng_Previous2_Pct = 16.0m
+                    Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object);
