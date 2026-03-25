@@ -4,6 +4,7 @@ using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
 
 namespace SAPSec.Infrastructure.Postgres;
 

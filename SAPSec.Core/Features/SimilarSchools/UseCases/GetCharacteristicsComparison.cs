@@ -8,10 +8,11 @@ public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository rep
     {
         var urns = new[] { request.CurrentSchoolUrn, request.SimilarSchoolUrn };
 
-        var values = await repository.GetSecondaryValuesByUrnsAsync(urns);
+        var values = SimilarSchoolsSecondaryValues.FromData(await repository.GetSecondaryValuesByUrnsAsync(urns));
+
         var standardDeviations = request.SimilarityCalculationMethod == SimilarityCalculationMethod.Group
             ? await BuildGroupStandardDeviationsAsync(request.CurrentSchoolUrn)
-            : await repository.GetSimilarSchoolsSecondaryStandardDeviationsAsync();
+            : SimilarSchoolsSecondaryStandardDeviations.FromData(await repository.GetSimilarSchoolsSecondaryStandardDeviationsAsync());
 
         var current = values.FirstOrDefault(v => v.Urn == request.CurrentSchoolUrn);
         if (current is null)
@@ -69,7 +70,7 @@ public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository rep
         var groupUrns = await repository.GetSimilarSchoolsGroupAsync(currentSchoolUrn);
 
         // TODO: Test standard deviation calculations include current school
-        var groupValues = await repository.GetSecondaryValuesByUrnsAsync(groupUrns.Select(g => g.NeighbourURN).Concat([currentSchoolUrn]));
+        var groupValues = SimilarSchoolsSecondaryValues.FromData(await repository.GetSecondaryValuesByUrnsAsync(groupUrns.Select(g => g.NeighbourURN).Concat([currentSchoolUrn])));
 
         return new SimilarSchoolsSecondaryStandardDeviations
         {

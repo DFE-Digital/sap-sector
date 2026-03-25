@@ -14,8 +14,4 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
-  </ItemGroup>
-
 </Project>

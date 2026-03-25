@@ -1,4 +1,5 @@
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data;
 using System.Globalization;
 
 namespace SAPSec.Core.Features.Attendance.UseCases;
@@ -27,13 +28,13 @@ public class GetAttendanceMeasures(
             ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous2_Pct));
 
         var overallLocalAuthoritySeries = new AttendanceMeasureSeries(
-            data?.LocalAuthorityAttendance?.Abs_Tot_La_Current_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Tot_La_Previous_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Tot_La_Previous2_Pct);
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Previous2_Pct));
         var persistentLocalAuthoritySeries = new AttendanceMeasureSeries(
-            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Current_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Previous_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Previous2_Pct);
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Previous2_Pct));
 
         var overallEnglandSeries = new AttendanceMeasureSeries(
             ParseNullableDecimal(data?.EnglandAttendance?.Abs_Tot_Eng_Current_Pct),
