@@ -248,7 +248,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

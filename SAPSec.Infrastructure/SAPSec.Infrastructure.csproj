@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Data\SAPSec.Data\SAPSec.Data.csproj" />
     <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
-    <ProjectReference Include="..\SAPSec.Data\SAPSec.Data.csproj" />
   </ItemGroup>
 
 </Project>
