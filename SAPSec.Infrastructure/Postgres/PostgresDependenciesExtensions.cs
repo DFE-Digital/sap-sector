@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Data;
 
 namespace SAPSec.Infrastructure.Postgres;

@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
+using SAPSec.Data;
 
 namespace SAPSec.Core.Services;
 

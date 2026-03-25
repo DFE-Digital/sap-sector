@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 

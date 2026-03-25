@@ -48,11 +48,11 @@ public class Program
                 cs.AppendLine();
                 cs.AppendLine("using System.Diagnostics.CodeAnalysis;");
                 cs.AppendLine();
-                cs.AppendLine("namespace SAPSec.Core.Model.Generated");
+                cs.AppendLine("namespace SAPSec.Core.Model.Generated;");
+                cs.AppendLine();
+                cs.AppendLine("[ExcludeFromCodeCoverage]");
+                cs.AppendLine($"public class {className}");
                 cs.AppendLine("{");
-                cs.AppendLine("    [ExcludeFromCodeCoverage]");
-                cs.AppendLine($"    public class {className}");
-                cs.AppendLine("    {");
 
                 foreach (var (key, value) in first)
                 {
@@ -62,10 +62,9 @@ public class Program
                         double or float or decimal => ("decimal?", "null"),
                         _ => ("string", "string.Empty")
                     };
-                    cs.AppendLine($"        public {type} {key} {{ get; set; }} = {deflt};");
+                    cs.AppendLine($"    public {type} {key} {{ get; set; }} = {deflt};");
                 }
 
-                cs.AppendLine("    }");
                 cs.AppendLine("}");
 
                 var csFilePath = Path.Combine(csDir, $"{className}.cs");

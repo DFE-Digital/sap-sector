@@ -4,7 +4,6 @@ using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
 using SAPSec.Data;
 

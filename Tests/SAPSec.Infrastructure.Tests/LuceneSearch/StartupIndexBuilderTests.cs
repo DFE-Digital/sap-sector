@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
 using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
