@@ -2,8 +2,8 @@ using Moq;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures;
 

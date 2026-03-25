@@ -1,4 +1,4 @@
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Model.Generated;
 using System.Globalization;
 
 namespace SAPSec.Core.Features.SimilarSchools;

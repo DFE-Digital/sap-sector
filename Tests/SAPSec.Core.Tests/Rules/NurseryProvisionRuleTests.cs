@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Core.Tests.Rules;
 

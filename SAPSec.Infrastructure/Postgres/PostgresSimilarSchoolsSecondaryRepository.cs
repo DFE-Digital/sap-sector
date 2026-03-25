@@ -3,8 +3,8 @@ using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Infrastructure.Postgres;
 

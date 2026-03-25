@@ -3,14 +3,13 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class SimilarSchoolsPrimaryGroupsEntry
 {
-    [ExcludeFromCodeCoverage]
-    public class SimilarSchoolsPrimaryGroupsEntry
-    {
-        public string URN { get; set; } = string.Empty;
-        public string NeighbourURN { get; set; } = string.Empty;
-        public string Dist { get; set; } = string.Empty;
-        public string Rank { get; set; } = string.Empty;
-    }
+    public string URN { get; set; } = string.Empty;
+    public string NeighbourURN { get; set; } = string.Empty;
+    public string Dist { get; set; } = string.Empty;
+    public string Rank { get; set; } = string.Empty;
 }

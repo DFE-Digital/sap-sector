@@ -3,17 +3,16 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class EstablishmentWorkforce
 {
-    [ExcludeFromCodeCoverage]
-    public class EstablishmentWorkforce
-    {
-        public string Id { get; set; } = string.Empty;
-        public string LAId { get; set; } = string.Empty;
-        public string LAName { get; set; } = string.Empty;
-        public string RegionId { get; set; } = string.Empty;
-        public string RegionName { get; set; } = string.Empty;
-        public string Workforce_PupTeaRatio_Est_Current_Num { get; set; } = string.Empty;
-        public string Workforce_TotPupils_Est_Current_Num { get; set; } = string.Empty;
-    }
+    public string Id { get; set; } = string.Empty;
+    public string LAId { get; set; } = string.Empty;
+    public string LAName { get; set; } = string.Empty;
+    public string RegionId { get; set; } = string.Empty;
+    public string RegionName { get; set; } = string.Empty;
+    public string Workforce_PupTeaRatio_Est_Current_Num { get; set; } = string.Empty;
+    public string Workforce_TotPupils_Est_Current_Num { get; set; } = string.Empty;
 }

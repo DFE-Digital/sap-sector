@@ -1,6 +1,5 @@
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Data;
 using SAPSec.Data.Model.Generated;
 

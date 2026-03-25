@@ -3,19 +3,18 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class EnglandAbsence
 {
-    [ExcludeFromCodeCoverage]
-    public class EnglandAbsence
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Abs_Persistent_Eng_Current_Pct { get; set; } = string.Empty;
-        public string Abs_Persistent_Eng_Previous_Pct { get; set; } = string.Empty;
-        public string Abs_Persistent_Eng_Previous2_Pct { get; set; } = string.Empty;
-        public string Abs_Tot_Eng_Current_Pct { get; set; } = string.Empty;
-        public string Abs_Tot_Eng_Previous_Pct { get; set; } = string.Empty;
-        public string Abs_Tot_Eng_Previous2_Pct { get; set; } = string.Empty;
-        public string Auth_Tot_Eng_Current_Pct { get; set; } = string.Empty;
-        public string UnAuth_Tot_Eng_Current_Pct { get; set; } = string.Empty;
-    }
+    public string Id { get; set; } = string.Empty;
+    public string Abs_Persistent_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Auth_Tot_Eng_Current_Pct { get; set; } = string.Empty;
+    public string UnAuth_Tot_Eng_Current_Pct { get; set; } = string.Empty;
 }

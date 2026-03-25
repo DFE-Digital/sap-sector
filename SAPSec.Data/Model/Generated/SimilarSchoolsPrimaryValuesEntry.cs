@@ -3,20 +3,19 @@
 
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Core.Model.Generated
+namespace SAPSec.Data.Model.Generated;
+
+[ExcludeFromCodeCoverage]
+public class SimilarSchoolsPrimaryValuesEntry
 {
-    [ExcludeFromCodeCoverage]
-    public class SimilarSchoolsPrimaryValuesEntry
-    {
-        public string URN { get; set; } = string.Empty;
-        public string PPPerc { get; set; } = string.Empty;
-        public string Polar4QuintilePupils { get; set; } = string.Empty;
-        public string PStability { get; set; } = string.Empty;
-        public string PercentSchSupport { get; set; } = string.Empty;
-        public string PercentEAL { get; set; } = string.Empty;
-        public string IdaciPupils { get; set; } = string.Empty;
-        public string PercentageStatementOrEhp { get; set; } = string.Empty;
-        public string NumberOfPupils { get; set; } = string.Empty;
-        public string ReadMatAverage { get; set; } = string.Empty;
-    }
+    public string URN { get; set; } = string.Empty;
+    public string PPPerc { get; set; } = string.Empty;
+    public string Polar4QuintilePupils { get; set; } = string.Empty;
+    public string PStability { get; set; } = string.Empty;
+    public string PercentSchSupport { get; set; } = string.Empty;
+    public string PercentEAL { get; set; } = string.Empty;
+    public string IdaciPupils { get; set; } = string.Empty;
+    public string PercentageStatementOrEhp { get; set; } = string.Empty;
+    public string NumberOfPupils { get; set; } = string.Empty;
+    public string ReadMatAverage { get; set; } = string.Empty;
 }
