@@ -55,15 +55,14 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             SELECT
                 "Id",
                 "Attainment8_Tot_Est_Current_Num",
-                "Bio59_Sum_Est_Current_Num",
-                "Chem59_Sum_Est_Current_Num",
-                "CombSci59_Sum_Est_Current_Num",
-                "EngLang59_Sum_Est_Current_Num",
-                "EngLit59_Sum_Est_Current_Num",
-                "EngMaths59_Tot_Est_Current_Num",
+                "Bio59_Sum_Est_Current_Pct",
+                "Chem59_Sum_Est_Current_Pct",
+                "CombSci59_Sum_Est_Current_Pct",
+                "EngLang59_Sum_Est_Current_Pct",
+                "EngLit59_Sum_Est_Current_Pct",
                 "EngMaths59_Tot_Est_Current_Pct",
-                "Maths59_Sum_Est_Current_Num",
-                "Physics59_Sum_Est_Current_Num"
+                "Maths59_Sum_Est_Current_Pct",
+                "Physics59_Sum_Est_Current_Pct"
             FROM public.v_establishment_performance
             WHERE "Id" = @urn OR "Id" IN (
                 SELECT "NeighbourURN" 
@@ -88,15 +87,14 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             {
                 Id = urn,
                 Attainment8_Tot_Est_Current_Num = string.Empty,
-                Bio59_Sum_Est_Current_Num = string.Empty,
-                Chem59_Sum_Est_Current_Num = string.Empty,
-                CombSci59_Sum_Est_Current_Num = string.Empty,
-                EngLang59_Sum_Est_Current_Num = string.Empty,
-                EngLit59_Sum_Est_Current_Num = string.Empty,
-                EngMaths59_Tot_Est_Current_Num = string.Empty,
+                Bio59_Sum_Est_Current_Pct = string.Empty,
+                Chem59_Sum_Est_Current_Pct = string.Empty,
+                CombSci59_Sum_Est_Current_Pct = string.Empty,
+                EngLang59_Sum_Est_Current_Pct = string.Empty,
+                EngLit59_Sum_Est_Current_Pct = string.Empty,
                 EngMaths59_Tot_Est_Current_Pct = string.Empty,
-                Maths59_Sum_Est_Current_Num = string.Empty,
-                Physics59_Sum_Est_Current_Num = string.Empty,
+                Maths59_Sum_Est_Current_Pct = string.Empty,
+                Physics59_Sum_Est_Current_Pct = string.Empty,
             };
         var similarSchoolsPerformance = performanceDaos.Where(a => a.Id != urn);
 
@@ -223,14 +221,14 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         OfficialSixthForm = new(sch.OfficialSixthFormId, sch.OfficialSixthFormName),
         ResourcedProvision = new(sch.ResourcedProvisionId, sch.ResourcedProvisionName),
         Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
-        BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
-        ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),
-        CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Num),
-        EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Num),
-        EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Num),
-        EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Num),
-        MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Num),
-        PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Num),
+        BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Pct),
+        ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Pct),
+        CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Pct),
+        EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Pct),
+        EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Pct),
+        EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Pct),
+        MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Pct),
+        PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Pct),
     };
 
     private static decimal ParseDecimal(string? value)
@@ -269,14 +267,13 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     {
         public required string Id { get; set; }
         public required string Attainment8_Tot_Est_Current_Num { get; set; }
-        public required string Bio59_Sum_Est_Current_Num { get; set; }
-        public required string Chem59_Sum_Est_Current_Num { get; set; }
-        public required string CombSci59_Sum_Est_Current_Num { get; set; }
-        public required string EngLang59_Sum_Est_Current_Num { get; set; }
-        public required string EngLit59_Sum_Est_Current_Num { get; set; }
-        public required string EngMaths59_Tot_Est_Current_Num { get; set; }
+        public required string Bio59_Sum_Est_Current_Pct { get; set; }
+        public required string Chem59_Sum_Est_Current_Pct { get; set; }
+        public required string CombSci59_Sum_Est_Current_Pct { get; set; }
+        public required string EngLang59_Sum_Est_Current_Pct { get; set; }
+        public required string EngLit59_Sum_Est_Current_Pct { get; set; }
         public required string EngMaths59_Tot_Est_Current_Pct { get; set; }
-        public required string Maths59_Sum_Est_Current_Num { get; set; }
-        public required string Physics59_Sum_Est_Current_Num { get; set; }
+        public required string Maths59_Sum_Est_Current_Pct { get; set; }
+        public required string Physics59_Sum_Est_Current_Pct { get; set; }
     }
 }

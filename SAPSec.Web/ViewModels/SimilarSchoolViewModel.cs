@@ -27,7 +27,6 @@ public class SimilarSchoolViewModel
     public double? PercentSchSupport { get; set; }
     public int? NumberOfPupils { get; set; }
     public double? PercentStatementOrEhp { get; set; }
-    public double? Att8Scr { get; set; }
 
     // From v_establishment (for the neighbour)
     public string EstablishmentName { get; set; } = string.Empty;
@@ -47,7 +46,7 @@ public class SimilarSchoolViewModel
     public int? SchoolCapacity { get; set; }
     public double? OverallAbsenceRate { get; set; }
     public double? PersistentAbsenceRate { get; set; }
-    
+
     public string? Latitude { get; set; }
     public string? Longitude { get; set; }
     public string SortMetricName { get; set; } = "Attainment 8";
