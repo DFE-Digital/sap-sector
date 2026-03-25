@@ -130,7 +130,7 @@ public class Program
             );
         }
 
-        // Prefer SAPData project if multiple found
+        // Prefer SAPSec.SqlGenerator project if multiple found
         var preferred = matches
             .FirstOrDefault(p =>
                 string.Equals(

@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.Json;
 
-namespace SAPData;
+namespace SAPSec.SqlGenerator;
 
 public class GenerateRawTables
 {
@@ -158,7 +158,7 @@ public class GenerateRawTables
     // =====================================================
     private void AddLegacyAliasesFromRawSources()
     {
-        var rawSourcesPath = Path.Combine("SAPData", "raw_sources.json");
+        var rawSourcesPath = Path.Combine("Data", "SAPSec.SqlGenerator", "raw_sources.json");
         var manifestPath = Path.Combine(_inputDir, "versions.json");
 
         if (!File.Exists(rawSourcesPath))

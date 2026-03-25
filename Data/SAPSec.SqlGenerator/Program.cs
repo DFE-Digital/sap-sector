@@ -1,10 +1,10 @@
 ﻿using CsvHelper;
 using Microsoft.Extensions.Configuration;
-using SAPData.Models;
+using SAPSec.SqlGenerator.Models;
 using System.Globalization;
 using System.Text;
 
-namespace SAPData;
+namespace SAPSec.SqlGenerator;
 
 internal class Program
 {
@@ -21,8 +21,8 @@ internal class Program
         Console.WriteLine("Generating Raw Data Tables and Scripts...");
 
         // In CI the working directory is often the repo root.
-        // Find SAPData.csproj anywhere under the current directory and use its folder.
-        string baseDir = FindProjectDirectoryDownwards("SAPData.csproj");
+        // Find SAPSec.SqlGenerator.csproj anywhere under the current directory and use its folder.
+        string baseDir = FindProjectDirectoryDownwards("SAPSec.SqlGenerator.csproj");
 
         string dataMapDir = Path.Combine(baseDir, "DataMap");
         string rawInputDir = Path.Combine(dataMapDir, "SourceFiles");
@@ -168,7 +168,7 @@ internal class Program
                         .FirstOrDefault(p =>
                             string.Equals(
                                 new DirectoryInfo(Path.GetDirectoryName(p)!).Name,
-                                "SAPData",
+                                "SAPSec.SqlGenerator",
                                 StringComparison.OrdinalIgnoreCase))
                         ?? fallbackMatches[0];
 
@@ -181,12 +181,12 @@ internal class Program
             );
         }
 
-        // Prefer SAPData project if multiple found
+        // Prefer SAPSec.SqlGenerator project if multiple found
         var preferred = matches
             .FirstOrDefault(p =>
                 string.Equals(
                     new DirectoryInfo(Path.GetDirectoryName(p)!).Name,
-                    "SAPData",
+                    "SAPSec.SqlGenerator",
                     StringComparison.OrdinalIgnoreCase))
             ?? matches[0];
 
