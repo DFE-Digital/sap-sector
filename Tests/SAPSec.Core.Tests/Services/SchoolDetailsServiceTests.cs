@@ -414,6 +414,63 @@ public class SchoolDetailsServiceTests
         result.Website.Value.Should().Be("https://www.testacademy.org.uk");
     }
 
+    [Fact]
+    public async Task GetByUrn_MapsEmailAddress()
+    {
+        // Arrange
+        var establishment = CreateTestAcademy();
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync("123456"))
+            .ReturnsAsync(establishment);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
+            .ReturnsAsync(new EstablishmentEmail { URN = "123456", MainEmail = "establishment@email.com" });
+
+        // Act
+        var result = await _sut.GetByUrnAsync("123456");
+
+        // Assert
+        result.Email.Value.Should().Be("establishment@email.com");
+    }
+
+    [Fact]
+    public async Task GetByUrn_MapsMissingEmailAddressToNotAvailable()
+    {
+        // Arrange
+        var establishment = CreateTestAcademy();
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync("123456"))
+            .ReturnsAsync(establishment);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
+            .ReturnsAsync((EstablishmentEmail?)null);
+
+        // Act
+        var result = await _sut.GetByUrnAsync("123456");
+
+        // Assert
+        result.Email.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
+    }
+
+    [Fact]
+    public async Task GetByUrn_MapsEmptyEmailAddressToNotAvailable()
+    {
+        // Arrange
+        var establishment = CreateTestAcademy();
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync("123456"))
+            .ReturnsAsync(establishment);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
+            .ReturnsAsync(new EstablishmentEmail { URN = "123456", MainEmail = "" });
+
+        // Act
+        var result = await _sut.GetByUrnAsync("123456");
+
+        // Assert
+        result.Email.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
+    }
+
     #endregion
 
     #region Test Data Helpers

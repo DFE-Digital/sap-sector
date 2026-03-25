@@ -60,6 +60,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
                 services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
+                services.AddSingleton<IJsonFile<EstablishmentEmail>, JsonFile<EstablishmentEmail>>();
                 services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
                 services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
                 services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();

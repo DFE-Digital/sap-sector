@@ -8,8 +8,8 @@ public sealed class GenerateSimilarSchoolsViews
     private readonly IReadOnlyList<DataMapRow> _rows;
     private readonly string _tableMappingPath;
     private readonly string _sqlDir;
-    private readonly string _jsonDir;
     private readonly string _generatedJsonDir;
+    private readonly List<string> _sqlFiles;
 
     private sealed record ViewSpec(
         string ViewName,
@@ -26,13 +26,18 @@ public sealed class GenerateSimilarSchoolsViews
         new("v_similar_schools_primary_values", "SimilarSchools", "PrimaryValues", "SimilarSchoolsPrimaryValuesEntry"),
     };
 
-    public GenerateSimilarSchoolsViews(IReadOnlyList<DataMapRow> rows, string tableMappingPath, string sqlDir, string jsonDir, string generatedJsonDir)
+    public GenerateSimilarSchoolsViews(
+        IReadOnlyList<DataMapRow> rows,
+        string tableMappingPath,
+        string sqlDir,
+        string generatedJsonDir,
+        List<string> sqlFiles)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
-        _jsonDir = jsonDir;
         _generatedJsonDir = generatedJsonDir;
+        _sqlFiles = sqlFiles;
     }
 
     public void Run()
@@ -53,19 +58,11 @@ public sealed class GenerateSimilarSchoolsViews
                 continue;
 
             sql = GenerateMaterializedView(view.ViewName, viewRows, tableMap);
-
-            File.WriteAllText(
-                Path.Combine(_sqlDir, $"50_{view.ViewName}.sql"),
-                sql,
-                new UTF8Encoding(false));
+            WriteSql("50", view.ViewName, sql);
 
             var modelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
             var jsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""URN"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{modelFile}' with(format text);";
-
-            File.WriteAllText(
-                Path.Combine(_sqlDir, $"70_{view.ViewName}.sql"),
-                jsonSql,
-                new UTF8Encoding(false));
+            WriteSql("70", view.ViewName, jsonSql);
 
             Console.WriteLine($"Generated {view.ViewName}");
         }
@@ -73,19 +70,12 @@ public sealed class GenerateSimilarSchoolsViews
         var viewName = "v_similar_schools_secondary_values_national_sd";
         var modelName = "SimilarSchoolsSecondaryStandardDeviationsEntry";
         var sdModelFile = Path.Combine(_generatedJsonDir, $"{modelName}.json");
-        var sdSql = GenerateSecondaryValuesNationalSdView(viewName, tableMap);
 
-        File.WriteAllText(
-            Path.Combine(_sqlDir, $"50_{viewName}.sql"),
-            sdSql,
-            new UTF8Encoding(false));
+        var sdSql = GenerateSecondaryValuesNationalSdView(viewName, tableMap);
+        WriteSql("50", viewName, sdSql);
 
         var sdJsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {viewName}) r)) to '{sdModelFile}' with(format text);";
-
-        File.WriteAllText(
-            Path.Combine(_sqlDir, $"70_{viewName}.sql"),
-            sdJsonSql,
-            new UTF8Encoding(false));
+        WriteSql("70", viewName, sdJsonSql);
     }
 
     // =====================================================
@@ -269,5 +259,18 @@ public sealed class GenerateSimilarSchoolsViews
             sb.Append(char.IsLetterOrDigit(ch) ? ch : '_');
 
         return sb.ToString();
+    }
+
+    private void WriteSql(string prefix, string viewName, string sql)
+    {
+        var fileName = $"{prefix}_{viewName}.sql";
+
+        File.WriteAllText(
+            Path.Combine(_sqlDir, fileName),
+            sql,
+            new UTF8Encoding(false));
+        _sqlFiles.Add($"{prefix}_{viewName}.sql");
+
+        Console.WriteLine($"Generated view script: {fileName}");
     }
 }
