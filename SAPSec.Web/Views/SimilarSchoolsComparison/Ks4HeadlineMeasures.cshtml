@@ -305,27 +305,23 @@
                         Model.EnglandEngMaths49ThreeYearAverage
                     }
                 };
+                var hasEngMathsBarData = HasAnyData(engMathsChartData.data);
             }
             <div class="app-ks4-chart-container">
-                @if (HasAnyData(engMathsChartData.data))
-                {
-                    <canvas id="eng-maths-comparison-chart"
-                            class="js-chart"
-                            data-type="bar"
-                            data-axis-step="25"
-                            data-axis-max="100"
-                            data-axis-suffix="%"
-                            data-bar-thickness="50"
-                            data-category-percentage="0.7"
-                            data-bar-percentage="1"
-                            data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
-                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                    </canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
+                <canvas id="eng-maths-comparison-chart"
+                        class="js-chart"
+                        hidden="@(!hasEngMathsBarData)"
+                        data-type="bar"
+                        data-axis-step="25"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
+                <p class="govuk-body" data-no-data-message="true" hidden="@hasEngMathsBarData">No available data</p>
             </div>
 
         </div>
@@ -506,27 +502,24 @@
                         Model.EnglandDestinationsThreeYearAverage
                     }
                 };
+                var hasDestinationsBarData = HasAnyData(destinationsChartData.data);
             }
             <div class="app-ks4-chart-container">
-                @if (HasAnyData(destinationsChartData.data))
-                {
-                    <canvas id="destinations-comparison-chart"
-                            class="js-chart"
-                            data-type="bar"
-                            data-axis-step="25"
-                            data-axis-max="100"
-                            data-axis-suffix="%"
-                            data-bar-thickness="50"
-                            data-category-percentage="0.7"
-                            data-bar-percentage="1"
-                            data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
-                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                    </canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
+                <canvas id="destinations-comparison-chart"
+                        class="js-chart"
+                        hidden="@(!hasDestinationsBarData)"
+                        data-type="bar"
+                        data-show-no-data-labels="true"
+                        data-axis-step="25"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
+                <p class="govuk-body" data-no-data-message="true" hidden="@hasDestinationsBarData">No available data</p>
             </div>
         </div>
 

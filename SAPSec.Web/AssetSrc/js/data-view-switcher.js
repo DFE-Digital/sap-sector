@@ -37,6 +37,46 @@
         }
     }
 
+    function hasAnyValue(values) {
+        return Array.isArray(values) && values.some(function (value) {
+            return value !== null && value !== undefined;
+        });
+    }
+
+    function getOrCreateNoDataMessage(container) {
+        if (!container) {
+            return null;
+        }
+
+        var message = container.querySelector("[data-no-data-message='true']");
+        if (message) {
+            return message;
+        }
+
+        message = document.createElement("p");
+        message.className = "govuk-body";
+        message.setAttribute("data-no-data-message", "true");
+        message.textContent = "No available data";
+        container.appendChild(message);
+        return message;
+    }
+
+    function toggleBarChartDisplay(barChartCanvas, values) {
+        if (!barChartCanvas) {
+            return;
+        }
+
+        var container = barChartCanvas.parentElement;
+        var message = getOrCreateNoDataMessage(container);
+        var shouldShowChart = hasAnyValue(values);
+
+        barChartCanvas.hidden = !shouldShowChart;
+
+        if (message) {
+            message.hidden = shouldShowChart;
+        }
+    }
+
     function readJsonAttribute(element, attributeName) {
         var raw = element.getAttribute(attributeName);
         if (!raw) {
@@ -91,6 +131,8 @@
         if (!data) {
             return;
         }
+
+        toggleBarChartDisplay(config.barChartCanvas, data.bar || []);
 
         var barChart = window.Chart && config.barChartCanvas ? window.Chart.getChart(config.barChartCanvas) : null;
         if (barChart && barChart.data && barChart.data.datasets && barChart.data.datasets[0]) {

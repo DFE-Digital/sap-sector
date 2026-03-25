@@ -208,15 +208,10 @@
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                 @{
                     var engMathsBarData = new decimal?[] { Model.SchoolEngMaths49ThreeYearAverage, Model.SimilarSchoolsEngMaths49ThreeYearAverage, Model.LocalAuthorityEngMaths49ThreeYearAverage, Model.EnglandEngMaths49ThreeYearAverage };
+                    var hasEngMathsBarData = HasAnyData(engMathsBarData);
                 }
-                @if (HasAnyData(engMathsBarData))
-                {
-                    <canvas id="eng-maths-school-chart" class="js-chart" data-type="bar" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))' data-colors='@Html.Raw(JsonSerializer.Serialize(colors))'></canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
+                <canvas id="eng-maths-school-chart" class="js-chart" hidden="@(!hasEngMathsBarData)" data-type="bar" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))' data-colors='@Html.Raw(JsonSerializer.Serialize(colors))'></canvas>
+                <p class="govuk-body" data-no-data-message="true" hidden="@hasEngMathsBarData">No available data</p>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-year-by-year">
@@ -279,15 +274,10 @@
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                 @{
                     var destinationsBarData = new decimal?[] { Model.SchoolDestinationsThreeYearAverage, Model.SimilarSchoolsDestinationsThreeYearAverage, Model.LocalAuthorityDestinationsThreeYearAverage, Model.EnglandDestinationsThreeYearAverage };
+                    var hasDestinationsBarData = HasAnyData(destinationsBarData);
                 }
-                @if (HasAnyData(destinationsBarData))
-                {
-                    <canvas id="destinations-school-chart" class="js-chart" data-type="bar" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-value-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = destinationsBarData }))' data-colors='@Html.Raw(JsonSerializer.Serialize(colors))'></canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
+                <canvas id="destinations-school-chart" class="js-chart" hidden="@(!hasDestinationsBarData)" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-value-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = destinationsBarData }))' data-colors='@Html.Raw(JsonSerializer.Serialize(colors))'></canvas>
+                <p class="govuk-body" data-no-data-message="true" hidden="@hasDestinationsBarData">No available data</p>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-year-by-year">

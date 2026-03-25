@@ -47,7 +47,8 @@
                 minor: 1
             },
             labels: {
-                yTickPadding: 10
+                yTickPadding: 10,
+                noDataOffset: 12
             },
             dataset: {
                 borderWidth: 1,
@@ -64,6 +65,9 @@
                 defaultAlign: 'start',
                 offset: 10,
                 fontWeight: 'bold'
+            },
+            noData: {
+                text: 'No available data'
             }
         },
         fallbacks: {
@@ -321,6 +325,50 @@
         return common;
     }
 
+    const noDataBarLabelsPlugin = {
+        id: 'noDataBarLabels',
+        afterDatasetsDraw(chart, args, pluginOptions) {
+            if (chart.config.type !== 'bar' || !pluginOptions || !pluginOptions.enabled) {
+                return;
+            }
+
+            const { ctx, scales } = chart;
+            const yScale = scales.y;
+            const xScale = scales.x;
+
+            if (!yScale || !xScale) {
+                return;
+            }
+
+            const labels = chart.data.labels || [];
+            const dataset = Array.isArray(chart.data.datasets) ? chart.data.datasets[0] : null;
+            const values = dataset && Array.isArray(dataset.data) ? dataset.data : [];
+
+            ctx.save();
+            ctx.fillStyle = pluginOptions.color;
+            ctx.font = pluginOptions.font;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'middle';
+
+            values.forEach((value, index) => {
+                if (value !== null && value !== undefined && !Number.isNaN(value)) {
+                    return;
+                }
+
+                const label = labels[index];
+                if (label === undefined) {
+                    return;
+                }
+
+                const y = yScale.getPixelForValue(index);
+                const x = xScale.left + pluginOptions.offset;
+                ctx.fillText(pluginOptions.text, x, y);
+            });
+
+            ctx.restore();
+        }
+    };
+
     function buildDatasets(type, chartData, colorConfig, barOptions) {
         if (type === 'line') {
             return chartData.datasets.map((ds, i) => {
@@ -421,6 +469,7 @@
                 : null;
 
             const barLabelAlign = canvas.dataset.barLabelAlign || null;
+            const showNoDataLabels = canvas.dataset.showNoDataLabels === 'true';
 
             const config = {
                 type,
@@ -433,7 +482,18 @@
                     })
                 },
                 options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign),
-                plugins: showDataLabels ? [ChartDataLabels] : []
+                plugins: [
+                    ...(showDataLabels ? [ChartDataLabels] : []),
+                    noDataBarLabelsPlugin
+                ]
+            };
+
+            config.options.plugins.noDataBarLabels = {
+                enabled: type === 'bar' && showNoDataLabels,
+                text: CHART_CONFIG.bar.noData.text,
+                offset: CHART_CONFIG.bar.labels.noDataOffset,
+                color: gdsStyles.text,
+                font: `${gdsStyles.fontSize}px ${gdsStyles.fontFamily}`
             };
 
             if (type === 'bar' && labelDecimals !== null && config.options?.plugins?.datalabels) {

@@ -1,4 +1,44 @@
 (function () {
+    function hasAnyValue(values) {
+        return Array.isArray(values) && values.some(function (value) {
+            return value !== null && value !== undefined;
+        });
+    }
+
+    function getOrCreateNoDataMessage(container) {
+        if (!container) {
+            return null;
+        }
+
+        var message = container.querySelector("[data-no-data-message='true']");
+        if (message) {
+            return message;
+        }
+
+        message = document.createElement("p");
+        message.className = "govuk-body";
+        message.setAttribute("data-no-data-message", "true");
+        message.textContent = "No available data";
+        container.appendChild(message);
+        return message;
+    }
+
+    function toggleBarChartDisplay(barChartCanvas, values) {
+        if (!barChartCanvas) {
+            return;
+        }
+
+        var container = barChartCanvas.parentElement;
+        var message = getOrCreateNoDataMessage(container);
+        var shouldShowChart = hasAnyValue(values);
+
+        barChartCanvas.hidden = !shouldShowChart;
+
+        if (message) {
+            message.hidden = shouldShowChart;
+        }
+    }
+
     function updateTableRow(cells, values) {
         cells.forEach(function (cell, index) {
             if (cell) {
@@ -11,6 +51,8 @@
         if (!gradeData) {
             return;
         }
+
+        toggleBarChartDisplay(barChartCanvas, gradeData.bar || []);
 
         var barChart = window.Chart && barChartCanvas ? window.Chart.getChart(barChartCanvas) : null;
         if (barChart && barChart.data && barChart.data.datasets && barChart.data.datasets[0]) {
