@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Tests.Rules;
@@ -13,7 +13,7 @@ public class SenUnitRuleTests
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = "Has SEN unit"
+            ResourcedProvisionName = "Has SEN unit"
         };
 
         // Act
@@ -34,7 +34,7 @@ public class SenUnitRuleTests
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = provision
+            ResourcedProvisionName = provision
         };
 
         // Act
@@ -51,7 +51,7 @@ public class SenUnitRuleTests
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = "Has resourced provision"
+            ResourcedProvisionName = "Has resourced provision"
         };
 
         // Act
@@ -68,7 +68,7 @@ public class SenUnitRuleTests
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = "Has SEN unit and resourced provision"
+            ResourcedProvisionName = "Has SEN unit and resourced provision"
         };
 
         // Act

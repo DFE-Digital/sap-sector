@@ -6,7 +6,6 @@ using Moq;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
@@ -36,10 +35,10 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_ValidUrn_ReturnsViewWithSimilarSchoolsPageViewModel()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -55,10 +54,10 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_SetsBreadcrumbAndSchoolDetailsInViewData()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -69,26 +68,12 @@ public class SimilarSchoolsControllerTests
     }
 
     [Fact]
-    public async Task ViewSimilarSchools_SchoolNotFound_RedirectsToError()
-    {
-        var urn = "999999";
-        _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
-            .ReturnsAsync((SchoolDetails?)null);
-
-        var result = await _sut.ViewSimilarSchools(urn, "Att8", 1);
-
-        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectResult.ActionName.Should().Be("Error");
-    }
-
-    [Fact]
     public async Task ViewSimilarSchools_InvalidUrn_ReturnsView()
     {
         var urn = "not-a-number";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -100,10 +85,10 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_PaginatesResults()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -118,10 +103,10 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_AppliesUrbanRuralFilterFromQuery()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
         _sut.ControllerContext.HttpContext!.Request.QueryString = new QueryString("?ur=UR1&sortBy=Att8");
@@ -136,10 +121,10 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_SetsSortByFromQuery()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -153,10 +138,10 @@ public class SimilarSchoolsControllerTests
     [Fact]
     public async Task ViewSimilarSchools_MapSchools_MatchesFilteredResults()
     {
-        var urn = "147788";
+        var urn = "105574";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
         _schoolDetailsServiceMock
-            .Setup(x => x.TryGetByUrnAsync(urn))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         SetupSimilarSchoolsRepo();
 
@@ -173,8 +158,8 @@ public class SimilarSchoolsControllerTests
     {
         return new SchoolDetails
         {
-            Name = DataWithAvailability.Available(name),
-            Urn = DataWithAvailability.Available(urn),
+            Name = name,
+            Urn = urn,
             DfENumber = DataWithAvailability.Available("373/1234"),
             Ukprn = DataWithAvailability.Available("10012345"),
             Address = DataWithAvailability.Available("123 Test Street, Sheffield, S1 1AA"),
@@ -205,7 +190,7 @@ public class SimilarSchoolsControllerTests
 
     private void SetupSimilarSchoolsRepo()
     {
-        var currentSchool = CreateSimilarSchool("147788", "Current School", "UR1", "Urban");
+        var currentSchool = CreateSimilarSchool("105574", "Current School", "UR1", "Urban");
         var similarSchools = new List<SimilarSchool>();
         for (var i = 0; i < 12; i++)
         {
@@ -234,14 +219,25 @@ public class SimilarSchoolsControllerTests
                 Town = "Town",
                 Postcode = "ZZ1 1ZZ"
             },
-            LocalAuthority = new SAPSec.Core.Features.SimilarSchools.LocalAuthority("001", "Authority"),
             Coordinates = new BNGCoordinates(100, 100),
-            UrbanRuralId = urbanId,
-            UrbanRuralName = urbanName,
+            TotalCapacity = null,
+            TotalPupils = null,
+            NurseryProvisionName = string.Empty,
+            LocalAuthority = new("001", "Authority"),
+            UrbanRural = new(urbanId, urbanName),
+            Region = new(string.Empty, string.Empty),
+            AdmissionsPolicy = new(string.Empty, string.Empty),
+            PhaseOfEducation = new(string.Empty, string.Empty),
+            Gender = new(string.Empty, string.Empty),
+            TypeOfEstablishment = new(string.Empty, string.Empty),
+            EstablishmentTypeGroup = new(string.Empty, string.Empty),
+            TrustSchoolFlag = new(string.Empty, string.Empty),
+            OfficialSixthForm = new(string.Empty, string.Empty),
+            ResourcedProvision = new(string.Empty, string.Empty),
             Attainment8Score = DataWithAvailability.Available(50m),
             BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
-            CombinedSciencGcseGrade55AndAbovePercentage = DataWithAvailability.Available(60m),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.Available(60m),
             EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),

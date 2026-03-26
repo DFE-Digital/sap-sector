@@ -1,10 +1,5 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SAPSec.Core.Tests.Rules;
 
@@ -18,7 +13,7 @@ public class ResourcedProvisionRuleTests
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = "Has resourced provision"
+            ResourcedProvisionName = "Has resourced provision"
         };
 
         // Act
@@ -39,7 +34,7 @@ public class ResourcedProvisionRuleTests
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = provision
+            ResourcedProvisionName = provision
         };
 
         // Act
@@ -56,7 +51,7 @@ public class ResourcedProvisionRuleTests
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = "Has SEN unit"
+            ResourcedProvisionName = "Has SEN unit"
         };
 
         // Act

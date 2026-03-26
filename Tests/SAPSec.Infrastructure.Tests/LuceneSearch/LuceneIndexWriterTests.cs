@@ -1,7 +1,6 @@
 ﻿using Lucene.Net.Index;
 using Lucene.Net.Search;
-using SAPSec.Core.Model;
-using SAPSec.Infrastructure.Entities;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
@@ -18,7 +17,7 @@ public class LuceneIndexWriterTests
             new Establishment{URN = "1", UKPRN = "10", LAId = "100", EstablishmentNumber =  "1000", EstablishmentName = "Saint Peter School" },
             new Establishment{URN = "2", UKPRN = "20", LAId = "200", EstablishmentNumber =  "2000", EstablishmentName = "Green Lane Primary" },
             new Establishment{URN = "3", UKPRN = "30", LAId = "300", EstablishmentNumber =  "3000", EstablishmentName = "Green Park High" }
-        ]);
+        ], CancellationToken.None);
 
         ctx.SearcherManager.MaybeRefreshBlocking();
         var searcher = ctx.SearcherManager.Acquire();
@@ -36,5 +35,10 @@ public class LuceneIndexWriterTests
         {
             ctx.SearcherManager.Release(searcher);
         }
+    }
+
+    [Fact(Skip = "TODO")]
+    public void BuildIndex_HonoursCancellationToken()
+    {
     }
 }

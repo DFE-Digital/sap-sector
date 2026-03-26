@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Services;
@@ -12,7 +14,7 @@ namespace SAPSec.Core.Services;
 /// </summary>
 public sealed class SchoolDetailsService : ISchoolDetailsService
 {
-    private readonly IEstablishmentService _establishmentService;
+    private readonly IEstablishmentRepository _establishmentRepository;
     private readonly ILogger<SchoolDetailsService> _logger;
 
     // Rules instantiated directly - they are stateless pure functions
@@ -23,53 +25,35 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
     private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
 
     public SchoolDetailsService(
-        IEstablishmentService establishmentService,
+        IEstablishmentRepository establishmentRepository,
         ILogger<SchoolDetailsService> logger)
     {
-        _establishmentService = establishmentService;
+        _establishmentRepository = establishmentRepository;
         _logger = logger;
     }
 
     public async Task<SchoolDetails> GetByUrnAsync(string urn)
     {
-        var establishment = await _establishmentService.GetEstablishmentAsync(urn);
+        var establishment = await _establishmentRepository.GetEstablishmentAsync(urn);
 
-        return MapToSchoolDetails(establishment);
-    }
-
-    public async Task<SchoolDetails?> TryGetByUrnAsync(string urn)
-    {
-        try
+        if (establishment is null)
         {
-            return await GetByUrnAsync(urn);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogDebug(ex, "School not found for URN: {Urn}", urn);
-            return null;
-        }
-    }
-
-    public async Task<SchoolDetails?> GetByIdentifierAsync(string identifier)
-    {
-        var establishment = await _establishmentService.GetEstablishmentByAnyNumberAsync(identifier);
-
-        if (string.IsNullOrWhiteSpace(establishment?.URN))
-        {
-            return null;
+            throw new NotFoundException($"School not found with URN: {urn}");
         }
 
-        return MapToSchoolDetails(establishment);
+        var establishmentEmail = await _establishmentRepository.GetEstablishmentEmailAsync(urn);
+
+        return MapToSchoolDetails(establishment, establishmentEmail);
     }
 
-    private SchoolDetails MapToSchoolDetails(Establishment establishment)
+    private SchoolDetails MapToSchoolDetails(Establishment establishment, EstablishmentEmail? establishmentEmail)
     {
         return new SchoolDetails
         {
             // Identifiers
-            Name = DataMapper.MapRequiredString(establishment.EstablishmentName),
-            Urn = DataMapper.MapRequiredString(establishment.URN),
-            DfENumber = DataMapper.MapDfENumber(establishment.DfENumber),
+            Urn = establishment.URN,
+            Name = establishment.EstablishmentName,
+            DfENumber = DataMapper.MapDfENumber(establishment),
             Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
 
             // Location
@@ -80,18 +64,18 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             UrbanRuralDescription = DataMapper.MapString(establishment.UrbanRuralName),
 
             // School characteristics
-            AgeRangeLow = DataMapper.MapAge(establishment.AgeRangeLow),
-            AgeRangeHigh = DataMapper.MapAge(establishment.AgeRangeRange),
+            AgeRangeLow = DataWithAvailability.FromNullable(establishment.AgeRangeLow),
+            AgeRangeHigh = DataWithAvailability.FromNullable(establishment.AgeRangeHigh),
             GenderOfEntry = DataMapper.MapString(establishment.GenderName),
             PhaseOfEducation = DataMapper.MapString(establishment.PhaseOfEducationName),
             SchoolType = DataMapper.MapString(establishment.TypeOfEstablishmentName),
-            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionPolicy),
+            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionsPolicyId),
             ReligiousCharacter = DataMapper.MapString(establishment.ReligiousCharacterName),
 
             // Governance - business rule
             GovernanceStructure = _governanceRule.Evaluate(establishment),
             AcademyTrustName = DataMapper.MapTrustName(establishment),
-            AcademyTrustId = DataMapper.MapTrustId(establishment.TrustsId),
+            AcademyTrustId = DataMapper.MapTrustId(establishment.TrustId),
 
             // Provisions - business rules
             HasNurseryProvision = _nurseryProvisionRule.Evaluate(establishment),
@@ -103,7 +87,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             HeadteacherName = DataMapper.MapHeadteacher(establishment),
             Website = DataMapper.MapWebsite(establishment.Website),
             Telephone = DataMapper.MapString(establishment.TelephoneNum),
-            Email = DataWithAvailability.NotAvailable<string>()
+            Email = DataMapper.MapString(establishmentEmail?.MainEmail)
         };
     }
 }

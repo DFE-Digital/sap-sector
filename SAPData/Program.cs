@@ -1,6 +1,8 @@
-﻿using SAPData.Models;
-using CsvHelper;
+﻿using CsvHelper;
+using Microsoft.Extensions.Configuration;
+using SAPData.Models;
 using System.Globalization;
+using System.Text;
 
 namespace SAPData;
 
@@ -8,6 +10,14 @@ internal class Program
 {
     static void Main(string[] args)
     {
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddUserSecrets<Program>()
+            .Build();
+
+        var runningLocally = bool.TryParse(configuration["RunningLocally"], out var val) && val;
+
+        Console.WriteLine($"RunningLocally: {runningLocally}");
+
         Console.WriteLine("Generating Raw Data Tables and Scripts...");
 
         // In CI the working directory is often the repo root.
@@ -19,7 +29,18 @@ internal class Program
         string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
         string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
         string sqlDir = Path.Combine(baseDir, "Sql");
+        string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
+        List<string> sqlFiles = new();
+
+        string infrastructureDir = Path.Combine(Directory.GetParent(baseDir)!.FullName, "SAPSec.Infrastructure");
+        string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
+        string generatedJsonDir = Path.Combine(jsonDir, "Generated");
         string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
+
+        Directory.CreateDirectory(cleanedDir);
+        Directory.CreateDirectory(sqlDir);
+        Directory.CreateDirectory(jsonDir);
+        Directory.CreateDirectory(generatedJsonDir);
 
         // -------------------------------------------------
         // 1. Load DataMap
@@ -40,7 +61,9 @@ internal class Program
         new GenerateRawTables(
             rawInputDir,
             cleanedDir,
-            sqlDir
+            sqlDir,
+            tableMappingPath,
+            sqlFiles
         ).Run();
 
         // -------------------------------------------------
@@ -49,13 +72,19 @@ internal class Program
         new GenerateViews(
             dataMaps,
             tableMappingPath,
-            sqlDir
+            sqlDir,
+            jsonDir,
+            generatedJsonDir,
+            sqlFiles
         ).Run();
 
         // -------------------------------------------------
-        // 4. Generate indexes
+        // 10. Generate indexes
         // -------------------------------------------------
-        new GenerateIndexes(sqlDir).Run();
+        new GenerateIndexes(
+            sqlDir,
+            sqlFiles
+        ).Run();
 
         // -------------------------------------------------
         // 50. Generate similar schools views
@@ -63,14 +92,34 @@ internal class Program
         new GenerateSimilarSchoolsViews(
             dataMaps,
             tableMappingPath,
-            sqlDir
+            sqlDir,
+            generatedJsonDir,
+            sqlFiles
         ).Run();
 
         // -------------------------------------------------
-        // 51. Generate similar schools indexes
+        // 60. Generate similar schools indexes
         // -------------------------------------------------
-        new GenerateSimilarSchoolsIndexes(sqlDir).Run();
+        new GenerateSimilarSchoolsIndexes(
+            sqlDir,
+            sqlFiles
+        ).Run();
 
+        var runAllSql = new StringBuilder();
+        runAllSql.AppendLine(@"-- ================================================================");
+        runAllSql.AppendLine(@"-- run_all.sql");
+        runAllSql.AppendLine(@"-- ================================================================");
+        runAllSql.AppendLine(@"");
+        runAllSql.AppendLine(@"\set ON_ERROR_STOP on");
+        runAllSql.AppendLine(@"");
+        runAllSql.AppendLine(@"\ir 00_cleanup.sql");
+
+        foreach (var line in sqlFiles.Order())
+        {
+            runAllSql.AppendLine(@$"\ir {line}");
+        }
+
+        File.WriteAllText(runAllSqlFile, runAllSql.ToString());
 
         Console.WriteLine("Run Complete.");
 

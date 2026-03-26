@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Rules;
 
@@ -12,7 +13,7 @@ public sealed class SenUnitRule : IBusinessRule<bool>
 {
     public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
-        var provision = establishment.ResourcedProvision;
+        var provision = establishment.ResourcedProvisionName;
 
         // Empty or explicitly no provision
         if (ResourcedProvisionValues.IsNoProvision(provision))

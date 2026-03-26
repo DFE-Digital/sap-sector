@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
@@ -26,7 +26,7 @@ public class StartupIndexBuilderTests
         await sut.StopAsync(CancellationToken.None);
     }
 
-    private sealed class DummyRepo : IEstablishmentService
+    private sealed class DummyRepo : IEstablishmentRepository
     {
         public Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
         {
@@ -38,14 +38,19 @@ public class StartupIndexBuilderTests
             return Task.FromResult<IReadOnlyCollection<Establishment>>([]);
         }
 
-        public Task<Establishment> GetEstablishmentAsync(string urn)
+        public Task<Establishment?> GetEstablishmentAsync(string urn)
         {
-            return Task.FromResult<Establishment>(null!);
+            return Task.FromResult<Establishment?>(null);
         }
 
-        public Task<Establishment> GetEstablishmentByAnyNumberAsync(string number)
+        public Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
         {
-            return Task.FromResult<Establishment>(null!);
+            return Task.FromResult<Establishment?>(null);
+        }
+
+        public Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
+        {
+            return Task.FromResult<EstablishmentEmail?>(null);
         }
     }
 }

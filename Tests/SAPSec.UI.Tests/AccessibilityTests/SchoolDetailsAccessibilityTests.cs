@@ -9,7 +9,7 @@ namespace SAPSec.UI.Tests.AccessibilityTests;
 [Collection("UITestsCollection")]
 public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolDetailsPath = "/school/147788/school-details";
+    private const string SchoolDetailsPath = "/school/105574/school-details";
 
     private async Task NavigateToSchoolDetailsAsync()
     {

@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Mappers;
 
@@ -23,10 +24,14 @@ public static class DataMapper
     /// <summary>
     /// Maps DfE number, treating "/" as empty.
     /// </summary>
-    public static DataWithAvailability<string> MapDfENumber(string? value) =>
-        value == "/"
+    public static DataWithAvailability<string> MapDfENumber(Establishment establishment)
+    {
+        var dfeNumber = $"{establishment.LAId}/{establishment.EstablishmentNumber}";
+
+        return dfeNumber == "/"
             ? DataWithAvailability.NotAvailable<string>()
-            : DataWithAvailability.FromStringWithoutCodes(value);
+            : DataWithAvailability.FromStringWithoutCodes(dfeNumber);
+    }
 
     /// <summary>
     /// Maps an age value from string to int.
@@ -57,9 +62,9 @@ public static class DataMapper
     {
         var parts = new List<string>();
 
-        AddIfNotEmpty(parts, establishment.HeadteacherTitle);
-        AddIfNotEmpty(parts, establishment.HeadteacherFirstName);
-        AddIfNotEmpty(parts, establishment.HeadteacherLastName);
+        AddIfNotEmpty(parts, establishment.HeadTitle);
+        AddIfNotEmpty(parts, establishment.HeadFirstName);
+        AddIfNotEmpty(parts, establishment.HeadLastName);
 
         return DataWithAvailability.FromStringWithoutCodes(string.Join(" ", parts));
     }
@@ -90,7 +95,7 @@ public static class DataMapper
     /// </summary>
     public static DataWithAvailability<string> MapTrustName(Establishment establishment)
     {
-        if (string.IsNullOrWhiteSpace(establishment.TrustsId))
+        if (string.IsNullOrWhiteSpace(establishment.TrustId))
         {
             return DataWithAvailability.NotApplicable<string>();
         }

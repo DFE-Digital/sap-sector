@@ -12,16 +12,27 @@ public class GetSimilarSchoolDetails(
     {
         // TODO: Validate SimilarSchoolUrn actually belongs in similar schools group for current school
         var (currentSchool, similarSchools) = await repository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
-        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
+        if (currentSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
+        }
 
-        var similarSchool = similarSchools.Single(s => s.URN == request.SimilarSchoolUrn);
+        var similarSchool = similarSchools.SingleOrDefault(s => s.URN == request.SimilarSchoolUrn);
+        if (similarSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
+        }
+
+        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
 
         return new(
             currentSchool.Name,
             // TODO: Validate coordinates exist
-            CoordinateConverter.Convert(currentSchool.Coordinates!),
-            CoordinateConverter.Convert(similarSchool.Coordinates!),
-            currentSchool.Coordinates!.DistanceMiles(similarSchool.Coordinates!),
+            currentSchool.Coordinates is null ? null : CoordinateConverter.Convert(currentSchool.Coordinates),
+            similarSchool.Coordinates is null ? null : CoordinateConverter.Convert(similarSchool.Coordinates),
+            currentSchool.Coordinates is null || similarSchool.Coordinates is null
+                ? null
+                : currentSchool.Coordinates.DistanceMiles(similarSchool.Coordinates),
             similarSchoolDetails
         );
     }
@@ -33,7 +44,7 @@ public record GetSimilarSchoolDetailsRequest(
 
 public record GetSimilarSchoolDetailsResponse(
     string SchoolName,
-    GeographicCoordinates CurrentSchoolCoordinates,
-    GeographicCoordinates SimilarSchoolCoordinates,
-    double DistanceMiles,
+    GeographicCoordinates? CurrentSchoolCoordinates,
+    GeographicCoordinates? SimilarSchoolCoordinates,
+    double? DistanceMiles,
     SchoolDetails SimilarSchoolDetails);

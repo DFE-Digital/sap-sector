@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Model;
+using System.Security.Claims;
 
 namespace SAPSec.Core.Interfaces.Services;
 

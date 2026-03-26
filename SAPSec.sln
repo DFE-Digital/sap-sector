@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPSec.Infrastructure", "SA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAPData", "SAPData\SAPData.csproj", "{CA1E3DB8-1DE2-D4CA-4E19-E74D4B952F2E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapSec.SimilarSchoolsJsonGenerator", "SapSec.SimilarSchoolsJsonGenerator\SapSec.SimilarSchoolsJsonGenerator.csproj", "{36BD1833-7ADA-3BCB-5E07-307070A83000}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SapSec.ModelGenerator", "SapSec.ModelGenerator\SapSec.ModelGenerator.csproj", "{36BD1833-7ADA-3BCB-5E07-307070A83000}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

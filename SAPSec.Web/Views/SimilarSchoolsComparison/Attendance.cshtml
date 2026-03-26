@@ -1,4 +1,154 @@
+@using System.Text.Json
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var initialBarData = new
+    {
+        labels = new[] { Model.Name, Model.SimilarSchoolName, "Schools in England average" },
+        data = Array.Empty<decimal?>()
+    };
+    var initialLineData = new
+    {
+        labels = ks4YearLabels,
+        datasets = new object[]
+        {
+            new { label = Model.Name, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = Model.SimilarSchoolName, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = "Schools in England average", data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
+        }
+    };
+    var chartColors = new[] { "#d53880", "#003078", "#003078" };
+    var lineChartColors = new[] { "#D53780", "#003078", "#28A197" };
+    var attendanceDataEndpoint = Url.Action("AttendanceData", "SimilarSchoolsComparison",
+        new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn });
+}
+
+<h1 class="govuk-heading-l">Attendance measures</h1>
+<p class="govuk-body">
+    How @Model.Name compares with @Model.SimilarSchoolName based on attendance measures.
+</p>
+
+<section aria-labelledby="attendance-heading" class="govuk-!-margin-top-9 app-ks4-attainment">
+    <h2 class="govuk-heading-m" id="attendance-heading">Attendance</h2>
+
+    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label" for="attendanceAbsenceType">Type of absence</label>
+            <select class="govuk-select"
+                    id="attendanceAbsenceType"
+                    name="attendanceAbsenceType"
+                    data-view-switcher="true"
+                    data-endpoint="@attendanceDataEndpoint"
+                    data-query-key="absenceType"
+                    data-bar-chart-id="attendance-comparison-three-year-chart"
+                    data-line-chart-id="attendance-comparison-year-by-year-chart"
+                    data-cell-attribute="data-attendance-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchool":"similar","england":"england"}'
+                    data-axis-config='{"overall":{"max":10,"step":1},"persistent":{"max":30,"step":5}}'
+                    data-axis-config-key="absenceType"
+                    data-series-keys='["thisSchool","similarSchool","england"]'>
+                <option value="overall" selected>Overall absence</option>
+                <option value="persistent">Persistent absence</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs app-attendance-tabs" data-module="govuk-tabs">
+        <h3 class="govuk-tabs__title">Attendance views</h3>
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#attendance-three-year-average">3-year average</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#attendance-year-by-year">Year by year</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#attendance-table">Table</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="attendance-three-year-average">
+            <div class="app-ks4-chart-container">
+                <canvas id="attendance-comparison-three-year-chart"
+                        class="js-chart"
+                        data-type="bar"
+                        data-bar-label-align="start"
+                        data-axis-step="1"
+                        data-axis-max="10"
+                        data-axis-suffix="%"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(initialBarData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
+            </div>
+
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-year-by-year">
+            <div class="app-ks4-chart-container">
+                <canvas id="attendance-comparison-year-by-year-chart"
+                        class="js-chart"
+                        data-type="line"
+                        data-axis-step="10"
+                        data-axis-max="100"
+                        data-axis-suffix="%"
+                        data-show-x-grid="true"
+                        data-show-legend="true"
+                        data-show-datalabels="false"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(initialLineData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(lineChartColors))'>
+                </canvas>
+            </div>
+
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-table">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                <tr class="govuk-table__row">
+                    <th scope="col" class="govuk-table__header">School(s)</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">@Model.Name</th>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev2">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-current">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-avg">No available data</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev2">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-current">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-avg">No available data</td>
+                </tr>
+                <tr class="govuk-table__row">
+                    <th scope="row" class="govuk-table__header">Schools in England average</th>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev2">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-current">No available data</td>
+                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-avg">No available data</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }

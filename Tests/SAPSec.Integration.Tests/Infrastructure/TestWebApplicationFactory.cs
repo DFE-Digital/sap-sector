@@ -4,13 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model;
-using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Repositories.Json;
-using SAPSec.Infrastructure.Repositories;
+using SAPSec.Core.Model.Generated;
+using SAPSec.Infrastructure.Json;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
 
@@ -37,7 +36,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         var configurationValues = new Dictionary<string, string?>
         {
             { "Establishments:CsvPath", testDataFilePath },
-			{ "DsiConfiguration:ClientId", TestValues.ClientId },
+            { "DsiConfiguration:ClientId", TestValues.ClientId },
             { "DsiConfiguration:ClientSecret", TestValues.ClientSecret },
             { "DsiConfiguration:Authority", TestValues.Authority },
             { "DsiConfiguration:RequireHttpsMetadata", "false" },
@@ -63,21 +62,30 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
             .ConfigureServices(services =>
             {
                 // Add or replace any services that the application needs during testing.
-				services.RemoveAll<IUserService>();
-		        services.RemoveAll<IDsiClient>();
-				services.AddScoped<IUserService, MockDsiUserService>();
-        		services.AddScoped<IDsiClient, MockDsiApiService>();
-                
+                services.RemoveAll<IUserService>();
+                services.RemoveAll<IDsiClient>();
+                services.AddScoped<IUserService, MockDsiUserService>();
+                services.AddScoped<IDsiClient, MockDsiApiService>();
+
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
+                services.RemoveAll<IKs4PerformanceRepository>();
 
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsRow>, JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
                 services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
+                services.AddSingleton<IJsonFile<EstablishmentEmail>, JsonFile<EstablishmentEmail>>();
                 services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
+                services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
+                services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
+                services.AddSingleton<IJsonFile<EstablishmentDestinations>, JsonFile<EstablishmentDestinations>>();
+                services.AddSingleton<IJsonFile<LADestinations>, JsonFile<LADestinations>>();
+                services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
+                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
 
                 services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
                 services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
+                services.AddScoped<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
 
             });
     }

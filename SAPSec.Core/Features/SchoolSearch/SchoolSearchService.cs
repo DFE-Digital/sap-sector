@@ -1,92 +1,86 @@
 ﻿using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
-using System.Globalization;
+using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Model.Generated;
 using System.Text.RegularExpressions;
 
-namespace SAPSec.Core.Features.SchoolSearch
+namespace SAPSec.Core.Features.SchoolSearch;
+
+public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablishmentRepository _establishmentRepository) : ISchoolSearchService
 {
-    public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablishmentService _establishmentService) : ISchoolSearchService
+    private const int MaxResults = 1000;
+    private const int MaxSuggestions = 10;
+
+    public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
     {
-        private const int MaxResults = 1000;
-        private const int MaxSuggestions = 10;
+        var searchResults = await indexReader.SearchAsync(query, MaxResults);
 
-        public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
+        var results = new List<SchoolSearchResult>();
+
+        if (!searchResults.Any())
         {
-            var searchResults = await indexReader.SearchAsync(query, MaxResults);
-
-            var results = new List<SchoolSearchResult>();
-
-            if (!searchResults.Any())
-            {
-                return results;
-            }
-
-            var schools = await _establishmentService.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
-
-            foreach (var r in searchResults.GroupJoin(schools,
-                r => r.urn.ToString(),
-                s => s.URN,
-                (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
-            {
-                if (r.School == null)
-                {
-                    continue;
-                }
-
-                if (BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords))
-                {
-                    var latLong = CoordinateConverter.Convert(coords);
-
-                    r.School.Latitude = latLong.Latitude.ToString(CultureInfo.InvariantCulture);
-                    r.School.Longitude = latLong.Longitude.ToString(CultureInfo.InvariantCulture);
-                }
-
-                results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School));
-            }
-
             return results;
         }
 
-        public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
+        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
+
+        foreach (var r in searchResults.GroupJoin(schools,
+            r => r.urn.ToString(),
+            s => s.URN,
+            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
         {
-            var searchResults = await indexReader.SearchAsync(queryPart, MaxSuggestions);
-
-            var results = new List<SchoolSearchResult>();
-
-            if (!searchResults.Any())
+            if (r.School == null)
             {
-                return results;
+                continue;
             }
 
-            var schools = await _establishmentService.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
+            var latLong = BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
+                ? CoordinateConverter.Convert(coords)
+                : null;
 
-            foreach (var r in searchResults.GroupJoin(schools,
-                r => r.urn.ToString(),
-                s => s.URN,
-                (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
-            {
-                if (r.School == null)
-                {
-                    continue;
-                }
+            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
+        }
 
-                results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School));
-            }
+        return results;
+    }
 
+    public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
+    {
+        var searchResults = await indexReader.SearchAsync(queryPart, MaxSuggestions);
+
+        var results = new List<SchoolSearchResult>();
+
+        if (!searchResults.Any())
+        {
             return results;
         }
 
-        public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
-        {
-            var isNumber = Regex.IsMatch(schoolNumber, @"^\d+$");
-            var isDfENumber = Regex.IsMatch(schoolNumber, @"^\d+\\|/\d+$");
+        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
 
-            return isNumber
-                ? (await _establishmentService.GetEstablishmentByAnyNumberAsync(schoolNumber))
-                : isDfENumber
-                    ? (await _establishmentService.GetEstablishmentByAnyNumberAsync(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty)))
-                    : null;
+        foreach (var r in searchResults.GroupJoin(schools,
+            r => r.urn.ToString(),
+            s => s.URN,
+            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
+        {
+            if (r.School == null)
+            {
+                continue;
+            }
+
+            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, null));
         }
+
+        return results;
+    }
+
+    public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
+    {
+        var isNumber = Regex.IsMatch(schoolNumber, @"^\d+$");
+        var isDfENumber = Regex.IsMatch(schoolNumber, @"^\d+\\|/\d+$");
+
+        return isNumber
+            ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(schoolNumber))
+            : isDfENumber
+                ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty)))
+                : null;
     }
 }

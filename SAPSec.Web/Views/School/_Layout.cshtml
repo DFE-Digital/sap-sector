@@ -7,7 +7,7 @@
     Layout = "Views/Shared/_Layout";
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var urnValue = school?.Urn.Display() ?? ViewContext.RouteData.Values["urn"]?.ToString() ?? string.Empty;
+    var urnValue = school?.Urn ?? ViewContext.RouteData.Values["urn"]?.ToString() ?? string.Empty;
     var routeAttributes = new Dictionary<string, string> { { "urn", urnValue } };
 }
 @section Breadcrumbs {
@@ -61,21 +61,24 @@
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "Attendance")">
-                    <a href=@Url.Action("Attendance", "School", routeAttributes) 
-                        class="app-side-navigation__link @selected("link", currentAction == "Attendance")">
-                        Attendance
-                    </a>
+                    @if (currentAction == "Attendance")
+                    {
+                        <span class="app-side-navigation__link @selected("link", true)" aria-current="page">
+                            Attendance
+                        </span>
+                    }
+                    else
+                    {
+                        <a href=@Url.Action("Attendance", "School", routeAttributes) 
+                           class="app-side-navigation__link">
+                            Attendance
+                        </a>
+                    }
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "ViewSimilarSchools")">
                     <a href=@Url.Action("ViewSimilarSchools", "SimilarSchools", routeAttributes) 
                         class="app-side-navigation__link @selected("link", currentAction == "ViewSimilarSchools")">
                         View similar schools
-                    </a>
-                </li>
-                <li class="app-side-navigation__item @selected("item", currentController == "DemoSimilarSchools")">
-                    <a href=@Url.Action("Index", "DemoSimilarSchools", routeAttributes) 
-                        class="app-side-navigation__link @selected("link", currentController == "DemoSimilarSchools")">
-                        View (DEMO) similar schools
                     </a>
                 </li>
                 <li class="app-side-navigation__item @selected("item", currentAction == "SchoolDetails")">

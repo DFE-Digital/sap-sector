@@ -100,12 +100,12 @@ jobs:
         run: |
           npm ci
           npm run build-fe
-          
+
           echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
           mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
           cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
-          
-          echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="       
+
+          echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="
           mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
           cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
 
@@ -115,10 +115,10 @@ jobs:
           PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
         run: |
           TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
-          
+
           for proj in $TEST_PROJECTS; do
             echo "=== Running tests in $proj ==="
-          
+
             dotnet test "$proj" \
               --no-build \
               --configuration Debug \
@@ -132,7 +132,7 @@ jobs:
               /p:ExcludeByAttribute='GeneratedCodeAttribute*%2cObsoleteAttribute*%2cExcludeFromCodeCoverage' \
               --verbosity normal
           done
-      
+
       #Example of how to exclude tests from coverage https://github.com/coverlet-coverage/coverlet/blob/master/Documentation/MSBuildIntegration.md#filters
 
       - name: Upload Test Result Files
@@ -209,8 +209,8 @@ jobs:
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
           db-seed: false
           smoke-test: false
-
- # ---------------------------
+      
+      # ---------------------------
       # REVIEW APP DATABASE DEPLOYMENT (PR)
       # ---------------------------
       - name: Checkout (needed for workspace consistency)
@@ -264,13 +264,13 @@ jobs:
           curl -fsSL https://raw.githubusercontent.com/DFE-Digital/teacher-services-cloud/main/scripts/konduit.sh \
             -o "$GITHUB_WORKSPACE/konduit.sh"
           chmod +x "$GITHUB_WORKSPACE/konduit.sh"
-          ls -la "$GITHUB_WORKSPACE/konduit.sh"         
+          ls -la "$GITHUB_WORKSPACE/konduit.sh"
 
       - name: Download seed backup from Blob
         shell: bash
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
-          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }} 
+          AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
         run: |
           set -euo pipefail
           BACKUP_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
@@ -285,8 +285,52 @@ jobs:
 
           ls -lh "${BACKUP_FILE}"
 
+      - name: Reset PR review DB
+        shell: bash
+        env:
+          AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
+        run: |
+          set -euo pipefail
+          PR_NUMBER="${{ github.event.pull_request.number }}"
+          APP_NAME="get-school-improvement-insights-pr-${PR_NUMBER}"
+          : "${AKS_NAMESPACE:?AKS_NAMESPACE is not set}"
+
+          CURRENT_DB_SQL="$(mktemp)"
+          cat > "${CURRENT_DB_SQL}" <<'SQL'
+          \set ON_ERROR_STOP on
+          \t
+          \a
+          SELECT current_database();
+          SQL
+
+          TARGET_DB="$("$GITHUB_WORKSPACE/konduit.sh" \
+            -n "${AKS_NAMESPACE}" \
+            -t 7200 \
+            -x \
+            -i "${CURRENT_DB_SQL}" \
+            "${APP_NAME}" -- psql | tr -d '\r' | tail -n 1 | xargs)"
+
+          RESET_DB_SQL="$(mktemp)"
+          cat > "${RESET_DB_SQL}" <<SQL
+          \set ON_ERROR_STOP on
+          SELECT pg_terminate_backend(pid)
+          FROM pg_stat_activity
+          WHERE datname = '${TARGET_DB}'
+            AND pid <> pg_backend_pid();
+
+          DROP DATABASE IF EXISTS "${TARGET_DB}";
+          CREATE DATABASE "${TARGET_DB}";
+          SQL
+
+          "$GITHUB_WORKSPACE/konduit.sh" \
+            -n "${AKS_NAMESPACE}" \
+            -t 7200 \
+            -x \
+            -b postgres \
+            -i "${RESET_DB_SQL}" \
+            "${APP_NAME}" -- psql
+
       - name: Restore backup into PR review DB
-        continue-on-error: true
         shell: bash
         env:
           AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
@@ -336,7 +380,8 @@ jobs:
           sha: ${{ needs.build.outputs.docker-image-tag }}
           terraform-base: ${{ env.TERRAFORM_BASE }}
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
-          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
           smoke-test: false
 
   manual_deploy:
@@ -366,5 +411,54 @@ jobs:
           sha: ${{ inputs.docker-image-tag }}
           terraform-base: ${{ env.TERRAFORM_BASE }}
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
-          slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
           smoke-test: false
+
+  deploy_domains_infra:
+    name: Deploy Domains Infrastructure
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    concurrency: deploy_domains_infra
+    needs: [deploy]
+    environment:
+      name: production
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Deploy Domains Infrastructure
+        uses: DFE-Digital/github-actions/deploy-domains-infra@master
+        with:
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
+          azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
+          azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+
+  deploy_domains_env:
+    name: Deploy Domains to ${{ matrix.domain_environment }} environment
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    concurrency: deploy_domains_${{ matrix.domain_environment }}
+    needs: [deploy_domains_infra]
+    strategy:
+      max-parallel: 1
+      matrix:
+        domain_environment: [test, production]
+    environment:
+      name: production
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Deploy Domains Environment
+        uses: DFE-Digital/github-actions/deploy-domains-env@master
+        with:
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
+          azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
+          azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
+          environment: ${{ matrix.domain_environment }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}

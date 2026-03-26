@@ -1,7 +1,6 @@
-﻿using FluentAssertions;
-using SAPSec.Core.Mappers;
+﻿using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
-using Xunit;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Tests.Mappers;
 
@@ -120,21 +119,15 @@ public class DataMapperTests
     public void MapDfENumber_ValidValue_ReturnsAvailable()
     {
         // Act
-        var result = DataMapper.MapDfENumber("373/1234");
+        var result = DataMapper.MapDfENumber(new Establishment
+        {
+            LAId = "373",
+            EstablishmentNumber = "1234"
+        });
 
         // Assert
         result.IsAvailable.Should().BeTrue();
         result.Value.Should().Be("373/1234");
-    }
-
-    [Fact]
-    public void MapDfENumber_SlashOnly_ReturnsNotAvailable()
-    {
-        // Act
-        var result = DataMapper.MapDfENumber("/");
-
-        // Assert
-        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 
     [Theory]
@@ -143,7 +136,11 @@ public class DataMapperTests
     public void MapDfENumber_Empty_ReturnsNotAvailable(string? value)
     {
         // Act
-        var result = DataMapper.MapDfENumber(value);
+        var result = DataMapper.MapDfENumber(new Establishment
+        {
+            LAId = value!,
+            EstablishmentNumber = value!
+        });
 
         // Assert
         result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
@@ -302,9 +299,9 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            HeadteacherTitle = "Mrs",
-            HeadteacherFirstName = "Jane",
-            HeadteacherLastName = "Smith"
+            HeadTitle = "Mrs",
+            HeadFirstName = "Jane",
+            HeadLastName = "Smith"
         };
 
         // Act
@@ -321,8 +318,8 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            HeadteacherFirstName = "Jane",
-            HeadteacherLastName = "Smith"
+            HeadFirstName = "Jane",
+            HeadLastName = "Smith"
         };
 
         // Act
@@ -339,7 +336,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            HeadteacherLastName = "Smith"
+            HeadLastName = "Smith"
         };
 
         // Act
@@ -415,7 +412,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = "5001",
+            TrustId = "5001",
             TrustName = "Test Academy Trust"
         };
 
@@ -433,7 +430,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = null,
+            TrustId = null,
             TrustName = "Test Academy Trust"
         };
 
@@ -450,7 +447,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = "",
+            TrustId = "",
             TrustName = "Test Academy Trust"
         };
 
@@ -467,7 +464,7 @@ public class DataMapperTests
         // Arrange
         var establishment = new Establishment
         {
-            TrustsId = "5001",
+            TrustId = "5001",
             TrustName = null
         };
 

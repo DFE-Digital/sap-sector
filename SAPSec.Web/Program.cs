@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using GovUk.Frontend.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using SAPSec.Infrastructure.LuceneSearch;
+using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -14,9 +16,6 @@ using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using GovUk.Frontend.AspNetCore;
-using Npgsql;
-using SAPSec.Infrastructure.Extensions;
 
 namespace SAPSec.Web;
 
@@ -26,7 +25,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+
         builder.Services.AddGovUkFrontend(options =>
         {
             options.Rebrand = true;
@@ -115,42 +114,50 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
-
-
-
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
-        var enableLuceneStartupIndexBuilder =
-            builder.Configuration.GetValue("Lucene:EnableStartupIndexBuilder", true);
-        builder.Services.AddLuceneDependencies(enableLuceneStartupIndexBuilder);
+        builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
         builder.Services.AddDependencies();
 
-        //builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
+        // Add custom error handler for NotFoundExceptions
+        builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
+        var isDevelopment = app.Environment.IsDevelopment();
+
+        // Set up error handling
+        // Note: The order of these lines is important!
+        // 1. Status code pages (used by later exception handlers)
+        app.UseStatusCodePagesWithReExecute("/error/{0}");
+        if (isDevelopment)
         {
+            // 2a. Developer exception page
+            // Note: Comes first otherwise it will absorb NotFoundExceptions too which we don't want
             app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
+
+            // 3a. Exception handler to "use" the NotFoundExceptionHandler we registered above
+            // Note: empty configure block is necessary to trigger our custom exception handler
+            // but without triggering the custom error page which would happen if a path was provided
+            // (which would replace the developer exception page!)
+            app.UseExceptionHandler(o => { });
         }
         else
         {
-            app.UseExceptionHandler("/Home/Error");
+            // 2b. Custom error page for exceptions
+            app.UseExceptionHandler("/error/500");
+        }
+
+        if (!isDevelopment)
+        {
             app.UseHsts();
         }
         app.UseForwardedHeaders();
-
-        app.UseStatusCodePagesWithReExecute("/error/{0}");
-
-
         app.UseMiddleware<SecurityHeadersMiddleware>();
-
-
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider
@@ -185,7 +192,7 @@ public class Program
         app.UseRouting();
 
         app.UseSession();
-        
+
         app.UseGovUkFrontend();
 
         app.UseAuthentication();

@@ -96,7 +96,7 @@ public class AuthController(
     [HttpGet(Routes.SignOut)]
     [HttpGet(Routes.SignOutCallback)]
     [Authorize]
-    public async Task<IActionResult> SignOut()
+    public new async Task<IActionResult> SignOut()
     {
         LogUserSigningOut();
 
