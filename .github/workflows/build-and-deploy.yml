@@ -358,13 +358,45 @@ jobs:
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
+          max_attempts=3
+          delay=10
+          log_file="$(mktemp)"
+          attempt=1
 
-          "$GITHUB_WORKSPACE/konduit.sh" \
-            -n "${AKS_NAMESPACE}" \
-            -t 7200 \
-            -x \
-            -i "${BACKUP_FILE}" -c \
-            "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X
+          while [ $attempt -le $max_attempts ]; do
+            echo "Review DB restore attempt $attempt/$max_attempts"
+            set +e
+            "$GITHUB_WORKSPACE/konduit.sh" \
+              -n "${AKS_NAMESPACE}" \
+              -t 7200 \
+              -x \
+              -i "${BACKUP_FILE}" -c \
+              "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X 2>&1 | tee "$log_file"
+            exit_code=${PIPESTATUS[0]}
+            set -e
+
+            if [ $exit_code -eq 0 ]; then
+              echo "Review DB restore succeeded on attempt $attempt"
+              exit 0
+            fi
+
+            if grep -Eqi \
+              "server closed the connection unexpectedly|connection to server .* failed|SSL error: unexpected eof|could not receive data from server|Broken pipe|EOF detected" \
+              "$log_file"; then
+              echo "Detected transient DB restore failure. Retrying after ${delay}s..."
+              sleep $delay
+              delay=$((delay * 2))
+              if [ $delay -gt 120 ]; then delay=120; fi
+              attempt=$((attempt + 1))
+              continue
+            fi
+
+            echo "Review DB restore failed with exit code $exit_code (not classified as transient)."
+            exit $exit_code
+          done
+
+          echo "Review DB restore failed after $max_attempts attempts."
+          exit 2
 
 
   deploy:
@@ -573,13 +605,45 @@ jobs:
 
           ls -lh "${BACKUP_FILE}"
           gzip -t "${BACKUP_FILE}"
+          max_attempts=3
+          delay=10
+          log_file="$(mktemp)"
+          attempt=1
 
-          "$GITHUB_WORKSPACE/konduit.sh" \
-            -n "${AKS_NAMESPACE}" \
-            -t 7200 \
-            -x \
-            -i "${BACKUP_FILE}" -c \
-            "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X
+          while [ $attempt -le $max_attempts ]; do
+            echo "Review DB restore attempt $attempt/$max_attempts"
+            set +e
+            "$GITHUB_WORKSPACE/konduit.sh" \
+              -n "${AKS_NAMESPACE}" \
+              -t 7200 \
+              -x \
+              -i "${BACKUP_FILE}" -c \
+              "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X 2>&1 | tee "$log_file"
+            exit_code=${PIPESTATUS[0]}
+            set -e
+
+            if [ $exit_code -eq 0 ]; then
+              echo "Review DB restore succeeded on attempt $attempt"
+              exit 0
+            fi
+
+            if grep -Eqi \
+              "server closed the connection unexpectedly|connection to server .* failed|SSL error: unexpected eof|could not receive data from server|Broken pipe|EOF detected" \
+              "$log_file"; then
+              echo "Detected transient DB restore failure. Retrying after ${delay}s..."
+              sleep $delay
+              delay=$((delay * 2))
+              if [ $delay -gt 120 ]; then delay=120; fi
+              attempt=$((attempt + 1))
+              continue
+            fi
+
+            echo "Review DB restore failed with exit code $exit_code (not classified as transient)."
+            exit $exit_code
+          done
+
+          echo "Review DB restore failed after $max_attempts attempts."
+          exit 2
 
   deploy_domains_infra:
     name: Deploy Domains Infrastructure
