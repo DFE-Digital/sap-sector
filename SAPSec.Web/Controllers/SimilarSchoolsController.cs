@@ -215,9 +215,8 @@ public class SimilarSchoolsController : Controller
             Latitude = result.Coordinates?.Latitude.ToString(),
             Longitude = result.Coordinates?.Longitude.ToString(),
             UrbanOrRural = school.UrbanRural.Name,
-            Att8Scr = school.Attainment8Score.HasValue ? (double?)school.Attainment8Score.Value : null,
             SortMetricName = result.SortValue.Name,
-            SortMetricDisplayValue = result.SortValue.Value.Display(v => v.ToString("0.#"))
+            SortMetricDisplayValue = result.SortValue.Value.Display()
         };
     }
 }

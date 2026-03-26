@@ -1,8 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -17,7 +14,7 @@ public static class PostgresDependenciesExtensions
         services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
         services.AddSingleton<ISimilarSchoolsSecondaryRepository, PostgresSimilarSchoolsSecondaryRepository>();
         services.AddSingleton<IKs4PerformanceRepository, PostgresKs4PerformanceRepository>();
-        services.AddSingleton<IAttendanceRepository, PostgresAttendanceRepository>();
+        services.AddSingleton<IAbsenceRepository, PostgresAbsenceRepository>();
 
         return services;
     }

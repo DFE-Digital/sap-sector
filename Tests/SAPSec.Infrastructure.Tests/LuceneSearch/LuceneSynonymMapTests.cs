@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model.Generated;
+﻿using SAPSec.Data.Model.Generated;
 using SAPSec.Infrastructure.LuceneSearch;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;

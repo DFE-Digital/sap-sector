@@ -3,7 +3,8 @@ using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -18,152 +19,119 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         _factory = factory;
     }
 
-    public async Task<IReadOnlyCollection<string>> GetSimilarSchoolUrnsAsync(string urn)
+    //public async Task<IReadOnlyCollection<string>> GetSimilarSchoolUrnsAsync(string urn)
+    //{
+    //    using var conn = await _factory.Create().OpenConnectionAsync();
+
+    //    const string sql = """
+    //        SELECT "NeighbourURN" 
+    //        FROM public.v_similar_schools_secondary_groups 
+    //        WHERE "URN" = @urn;
+    //    """;
+
+    //    var urns = await conn.QueryAsync<string>(sql, new { urn });
+
+    //    return urns.ToList().AsReadOnly();
+    //}
+
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)
     {
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT "NeighbourURN" 
+            SELECT *
             FROM public.v_similar_schools_secondary_groups 
-            WHERE "URN" = @urn;
+            WHERE "URN" = @urn
         """;
 
-        var urns = await conn.QueryAsync<string>(sql, new { urn });
+        var results = await conn.QueryAsync<SimilarSchoolsSecondaryGroupsEntry>(sql, new { urn });
 
-        return urns.ToList().AsReadOnly();
-    }
+        //var currentSchool = await results.ReadSingleOrDefaultAsync<Establishment>();
+        //if (currentSchool == null)
+        //{
+        //    return (null, []);
+        //}
 
-    public async Task<(SimilarSchool?, IReadOnlyCollection<SimilarSchool>)> GetSimilarSchoolsGroupAsync(string urn)
-    {
-        using var conn = await _factory.Create().OpenConnectionAsync();
+        //var similarSchools = await results.ReadAsync<Establishment>();
+        //var performanceDaos = await results.ReadAsync<SimilarSchoolPerformanceDao>();
 
-        const string sql = """
-            SELECT
-                *
-            FROM public.v_establishment
-            WHERE "URN" = @urn;
-            
-            SELECT
-                *
-            FROM public.v_establishment
-            WHERE "URN" IN (
-                SELECT "NeighbourURN" 
-                FROM public.v_similar_schools_secondary_groups 
-                WHERE "URN" = @urn
-            );
+        //var currentSchoolPerformance = performanceDaos.FirstOrDefault(a => a.Id == urn)
+        //    ?? new SimilarSchoolPerformanceDao
+        //    {
+        //        Id = urn,
+        //        Attainment8_Tot_Est_Current_Num = string.Empty,
+        //        Bio59_Sum_Est_Current_Pct = string.Empty,
+        //        Chem59_Sum_Est_Current_Pct = string.Empty,
+        //        CombSci59_Sum_Est_Current_Pct = string.Empty,
+        //        EngLang59_Sum_Est_Current_Pct = string.Empty,
+        //        EngLit59_Sum_Est_Current_Pct = string.Empty,
+        //        EngMaths59_Tot_Est_Current_Pct = string.Empty,
+        //        Maths59_Sum_Est_Current_Pct = string.Empty,
+        //        Physics59_Sum_Est_Current_Pct = string.Empty,
+        //    };
+        //var similarSchoolsPerformance = performanceDaos.Where(a => a.Id != urn);
 
-            SELECT
-                "Id",
-                "Attainment8_Tot_Est_Current_Num",
-                "Bio59_Sum_Est_Current_Num",
-                "Chem59_Sum_Est_Current_Num",
-                "CombSci59_Sum_Est_Current_Num",
-                "EngLang59_Sum_Est_Current_Num",
-                "EngLit59_Sum_Est_Current_Num",
-                "EngMaths59_Tot_Est_Current_Num",
-                "EngMaths59_Tot_Est_Current_Pct",
-                "Maths59_Sum_Est_Current_Num",
-                "Physics59_Sum_Est_Current_Num"
-            FROM public.v_establishment_performance
-            WHERE "Id" = @urn OR "Id" IN (
-                SELECT "NeighbourURN" 
-                FROM public.v_similar_schools_secondary_groups 
-                WHERE "URN" = @urn
-            );
-        """;
-
-        var results = await conn.QueryMultipleAsync(sql, new { urn });
-
-        var currentSchool = await results.ReadSingleOrDefaultAsync<Establishment>();
-        if (currentSchool == null)
-        {
-            return (null, []);
-        }
-
-        var similarSchools = await results.ReadAsync<Establishment>();
-        var performanceDaos = await results.ReadAsync<SimilarSchoolPerformanceDao>();
-
-        var currentSchoolPerformance = performanceDaos.FirstOrDefault(a => a.Id == urn)
-            ?? new SimilarSchoolPerformanceDao
-            {
-                Id = urn,
-                Attainment8_Tot_Est_Current_Num = string.Empty,
-                Bio59_Sum_Est_Current_Num = string.Empty,
-                Chem59_Sum_Est_Current_Num = string.Empty,
-                CombSci59_Sum_Est_Current_Num = string.Empty,
-                EngLang59_Sum_Est_Current_Num = string.Empty,
-                EngLit59_Sum_Est_Current_Num = string.Empty,
-                EngMaths59_Tot_Est_Current_Num = string.Empty,
-                EngMaths59_Tot_Est_Current_Pct = string.Empty,
-                Maths59_Sum_Est_Current_Num = string.Empty,
-                Physics59_Sum_Est_Current_Num = string.Empty,
-            };
-        var similarSchoolsPerformance = performanceDaos.Where(a => a.Id != urn);
-
-        return (
-            FromDao(currentSchool, currentSchoolPerformance),
-            similarSchools
-                .Join(similarSchoolsPerformance, d => d.URN, a => a.Id, FromDao)
-                .ToList()
-                .AsReadOnly());
-    }
-
-    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValues>> GetSecondaryValuesByUrnsAsync(
-        IEnumerable<string> urns)
-    {
-        if (urns is null)
-        {
-            return [];
-        }
-
-        var urnList = urns as IList<string> ?? urns.ToList();
-        if (urnList.Count == 0)
-        {
-            return [];
-        }
-
-        const string sql = """
-            SELECT
-                "URN",
-                "KS2RP",
-                "KS2MP",
-                "PPPerc",
-                "PercentEAL",
-                "Polar4QuintilePupils",
-                "PStability",
-                "IdaciPupils",
-                "PercentSchSupport",
-                "NumberOfPupils",
-                "PercentageStatementOrEHP"
-            FROM public.v_similar_schools_secondary_values
-            WHERE "URN" = ANY(@Urns);
-        """;
-
-        using var conn = await _factory.Create().OpenConnectionAsync();
-
-        var daos = await conn.QueryAsync<SimilarSchoolsSecondaryValuesEntry>(
-            new CommandDefinition(sql, new { Urns = urnList.ToArray() }));
-
-        return daos
-            .Select(d => new SimilarSchoolsSecondaryValues
-            {
-                Urn = d.URN,
-                Ks2ReadingScore = ParseDecimal(d.KS2RP),
-                Ks2MathsScore = ParseDecimal(d.KS2MP),
-                PupilPremiumEligibilityPercentage = ParseDecimal(d.PPPerc),
-                PupilsWithEalPercentage = ParseDecimal(d.PercentEAL),
-                Polar4Quintile = ParseDecimal(d.Polar4QuintilePupils),
-                PupilStabilityRate = ParseDecimal(d.PStability),
-                AverageIdaciScore = ParseDecimal(d.IdaciPupils),
-                PupilsWithSenSupportPercentage = ParseDecimal(d.PercentSchSupport),
-                PupilCount = ParseDecimal(d.NumberOfPupils),
-                PupilsWithEhcPlanPercentage = ParseDecimal(d.PercentageStatementOrEHP)
-            })
+        //return (
+        //    FromDao(currentSchool, currentSchoolPerformance),
+        //    similarSchools
+        //        .Join(similarSchoolsPerformance, d => d.URN, a => a.Id, FromDao)
+        return results
             .ToList()
             .AsReadOnly();
     }
 
-    public async Task<SimilarSchoolsSecondaryStandardDeviations> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetSecondaryValuesByUrnsAsync(IEnumerable<string> urns)
+    {
+        if (!urns.Any())
+        {
+            return [];
+        }
+
+        //if (urns is null)
+        //{
+        //    return [];
+        //}
+
+        //var urnList = urns as IList<string> ?? urns.ToList();
+        //if (urnList.Count == 0)
+        //{
+        //    return [];
+        //}
+
+        const string sql = """
+            SELECT *
+            FROM public.v_similar_schools_secondary_values
+            WHERE "URN" = ANY(@urns);
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        var results = await conn.QueryAsync<SimilarSchoolsSecondaryValuesEntry>(sql, new { urns = urns.ToArray() });
+
+        return results
+            .ToList()
+            .AsReadOnly();
+
+        //return daos
+        //    .Select(d => new SimilarSchoolsSecondaryValues
+        //    {
+        //        Urn = d.URN,
+        //        Ks2ReadingScore = ParseDecimal(d.KS2RP),
+        //        Ks2MathsScore = ParseDecimal(d.KS2MP),
+        //        PupilPremiumEligibilityPercentage = ParseDecimal(d.PPPerc),
+        //        PupilsWithEalPercentage = ParseDecimal(d.PercentEAL),
+        //        Polar4Quintile = ParseDecimal(d.Polar4QuintilePupils),
+        //        PupilStabilityRate = ParseDecimal(d.PStability),
+        //        AverageIdaciScore = ParseDecimal(d.IdaciPupils),
+        //        PupilsWithSenSupportPercentage = ParseDecimal(d.PercentSchSupport),
+        //        PupilCount = ParseDecimal(d.NumberOfPupils),
+        //        PupilsWithEhcPlanPercentage = ParseDecimal(d.PercentageStatementOrEHP)
+        //    })
+        //    .ToList()
+        //    .AsReadOnly();
+    }
+
+    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
     {
         const string sql = """
             SELECT
@@ -180,19 +148,22 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         """;
 
         using var conn = await _factory.Create().OpenConnectionAsync();
-        var dao = await conn.QuerySingleAsync<SimilarSchoolsSecondaryStandardDeviationsEntry>(sql);
-        return new SimilarSchoolsSecondaryStandardDeviations
-        {
-            Ks2AverageScore = dao.KS2AVG,
-            PupilPremiumEligibilityPercentage = dao.PPPerc,
-            PupilsWithEalPercentage = dao.PercentEAL,
-            Polar4Quintile = dao.Polar4QuintilePupils,
-            PupilStabilityRate = dao.PStability,
-            AverageIdaciScore = dao.IdaciPupils,
-            PupilsWithSenSupportPercentage = dao.PercentSchSupport,
-            PupilCount = dao.NumberOfPupils,
-            PupilsWithEhcPlanPercentage = dao.PercentageStatementOrEHP
-        };
+        var result = await conn.QuerySingleOrDefaultAsync<SimilarSchoolsSecondaryStandardDeviationsEntry>(sql);
+
+        return result;
+
+        //return new SimilarSchoolsSecondaryStandardDeviations
+        //{
+        //    Ks2AverageScore = dao.KS2AVG,
+        //    PupilPremiumEligibilityPercentage = dao.PPPerc,
+        //    PupilsWithEalPercentage = dao.PercentEAL,
+        //    Polar4Quintile = dao.Polar4QuintilePupils,
+        //    PupilStabilityRate = dao.PStability,
+        //    AverageIdaciScore = dao.IdaciPupils,
+        //    PupilsWithSenSupportPercentage = dao.PercentSchSupport,
+        //    PupilCount = dao.NumberOfPupils,
+        //    PupilsWithEhcPlanPercentage = dao.PercentageStatementOrEHP
+        //};
     }
 
     private SimilarSchool FromDao(Establishment sch, SimilarSchoolPerformanceDao perf) => new SimilarSchool
@@ -223,14 +194,14 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         OfficialSixthForm = new(sch.OfficialSixthFormId, sch.OfficialSixthFormName),
         ResourcedProvision = new(sch.ResourcedProvisionId, sch.ResourcedProvisionName),
         Attainment8Score = DataWithAvailability.FromDecimalString(perf.Attainment8_Tot_Est_Current_Num),
-        BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Num),
-        ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Num),
-        CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Num),
-        EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Num),
-        EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Num),
-        EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Num),
-        MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Num),
-        PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Num),
+        BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Bio59_Sum_Est_Current_Pct),
+        ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Chem59_Sum_Est_Current_Pct),
+        CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.CombSci59_Sum_Est_Current_Pct),
+        EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLang59_Sum_Est_Current_Pct),
+        EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngLit59_Sum_Est_Current_Pct),
+        EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.EngMaths59_Tot_Est_Current_Pct),
+        MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Maths59_Sum_Est_Current_Pct),
+        PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(perf.Physics59_Sum_Est_Current_Pct),
     };
 
     private static decimal ParseDecimal(string? value)
@@ -269,14 +240,13 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     {
         public required string Id { get; set; }
         public required string Attainment8_Tot_Est_Current_Num { get; set; }
-        public required string Bio59_Sum_Est_Current_Num { get; set; }
-        public required string Chem59_Sum_Est_Current_Num { get; set; }
-        public required string CombSci59_Sum_Est_Current_Num { get; set; }
-        public required string EngLang59_Sum_Est_Current_Num { get; set; }
-        public required string EngLit59_Sum_Est_Current_Num { get; set; }
-        public required string EngMaths59_Tot_Est_Current_Num { get; set; }
+        public required string Bio59_Sum_Est_Current_Pct { get; set; }
+        public required string Chem59_Sum_Est_Current_Pct { get; set; }
+        public required string CombSci59_Sum_Est_Current_Pct { get; set; }
+        public required string EngLang59_Sum_Est_Current_Pct { get; set; }
+        public required string EngLit59_Sum_Est_Current_Pct { get; set; }
         public required string EngMaths59_Tot_Est_Current_Pct { get; set; }
-        public required string Maths59_Sum_Est_Current_Num { get; set; }
-        public required string Physics59_Sum_Est_Current_Num { get; set; }
+        public required string Maths59_Sum_Est_Current_Pct { get; set; }
+        public required string Physics59_Sum_Est_Current_Pct { get; set; }
     }
 }

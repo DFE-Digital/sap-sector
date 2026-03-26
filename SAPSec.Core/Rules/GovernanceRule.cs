@@ -1,7 +1,7 @@
 ﻿using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Model.Generated;
 
 /// <summary>
 /// Business rule: Determines governance structure based on establishment type and trust membership.
