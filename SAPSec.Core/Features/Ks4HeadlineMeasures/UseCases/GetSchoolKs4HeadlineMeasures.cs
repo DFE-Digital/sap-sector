@@ -34,36 +34,54 @@ public class GetSchoolKs4HeadlineMeasures(
             BuildComparisonAverage(
                 schoolResponse.Attainment8ThreeYearAverage,
                 similarSchoolResponses.Select(x => x.Attainment8ThreeYearAverage.SchoolValue)),
+            BuildTopPerformers(
+                similarSchoolResponses,
+                x => x.Attainment8ThreeYearAverage.SchoolValue),
             BuildComparisonYearByYear(
                 schoolResponse.Attainment8YearByYear,
                 similarSchoolResponses.Select(x => x.Attainment8YearByYear.School)),
             BuildComparisonAverage(
                 schoolResponse.EngMaths49ThreeYearAverage,
                 similarSchoolResponses.Select(x => x.EngMaths49ThreeYearAverage.SchoolValue)),
+            BuildTopPerformers(
+                similarSchoolResponses,
+                x => x.EngMaths49ThreeYearAverage.SchoolValue),
             BuildComparisonYearByYear(
                 schoolResponse.EngMaths49YearByYear,
                 similarSchoolResponses.Select(x => x.EngMaths49YearByYear.School)),
             BuildComparisonAverage(
                 schoolResponse.EngMaths59ThreeYearAverage,
                 similarSchoolResponses.Select(x => x.EngMaths59ThreeYearAverage.SchoolValue)),
+            BuildTopPerformers(
+                similarSchoolResponses,
+                x => x.EngMaths59ThreeYearAverage.SchoolValue),
             BuildComparisonYearByYear(
                 schoolResponse.EngMaths59YearByYear,
                 similarSchoolResponses.Select(x => x.EngMaths59YearByYear.School)),
             BuildComparisonAverage(
                 schoolResponse.DestinationsThreeYearAverage,
                 similarSchoolResponses.Select(x => x.DestinationsThreeYearAverage.SchoolValue)),
+            BuildTopPerformers(
+                similarSchoolResponses,
+                x => x.DestinationsThreeYearAverage.SchoolValue),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsYearByYear,
                 similarSchoolResponses.Select(x => x.DestinationsYearByYear.School)),
             BuildComparisonAverage(
                 schoolResponse.DestinationsEducationThreeYearAverage,
                 similarSchoolResponses.Select(x => x.DestinationsEducationThreeYearAverage.SchoolValue)),
+            BuildTopPerformers(
+                similarSchoolResponses,
+                x => x.DestinationsEducationThreeYearAverage.SchoolValue),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsEducationYearByYear,
                 similarSchoolResponses.Select(x => x.DestinationsEducationYearByYear.School)),
             BuildComparisonAverage(
                 schoolResponse.DestinationsEmploymentThreeYearAverage,
                 similarSchoolResponses.Select(x => x.DestinationsEmploymentThreeYearAverage.SchoolValue)),
+            BuildTopPerformers(
+                similarSchoolResponses,
+                x => x.DestinationsEmploymentThreeYearAverage.SchoolValue),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsEmploymentYearByYear,
                 similarSchoolResponses.Select(x => x.DestinationsEmploymentYearByYear.School)));
@@ -105,6 +123,24 @@ public class GetSchoolKs4HeadlineMeasures(
             ? null
             : Math.Round(availableValues.Average(), 1, MidpointRounding.AwayFromZero);
     }
+
+    private static IReadOnlyList<Ks4TopPerformer> BuildTopPerformers(
+        IEnumerable<GetKs4HeadlineMeasuresResponse> similarSchoolResponses,
+        Func<GetKs4HeadlineMeasuresResponse, decimal?> selector) =>
+        similarSchoolResponses
+            .Select(response => new
+            {
+                response.SchoolDetails.Urn,
+                response.SchoolDetails.Name,
+                Value = selector(response)
+            })
+            .Where(x => x.Value.HasValue)
+            .OrderByDescending(x => x.Value)
+            .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+            .Take(3)
+            .Select((x, index) => new Ks4TopPerformer(index + 1, x.Urn, x.Name, x.Value))
+            .ToList()
+            .AsReadOnly();
 }
 
 public record GetSchoolKs4HeadlineMeasuresRequest(string Urn);
@@ -114,6 +150,12 @@ public record SchoolKs4ComparisonAverage(
     decimal? SimilarSchoolsValue,
     decimal? LocalAuthorityValue,
     decimal? EnglandValue);
+
+public record Ks4TopPerformer(
+    int Rank,
+    string Urn,
+    string Name,
+    decimal? Value);
 
 public record SchoolKs4ComparisonYearByYear(
     Ks4HeadlineMeasureSeries School,
@@ -125,14 +167,20 @@ public record GetSchoolKs4HeadlineMeasuresResponse(
     SchoolDetails SchoolDetails,
     int SimilarSchoolsCount,
     SchoolKs4ComparisonAverage Attainment8ThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> Attainment8TopPerformers,
     SchoolKs4ComparisonYearByYear Attainment8YearByYear,
     SchoolKs4ComparisonAverage EngMaths49ThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> EngMaths49TopPerformers,
     SchoolKs4ComparisonYearByYear EngMaths49YearByYear,
     SchoolKs4ComparisonAverage EngMaths59ThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> EngMaths59TopPerformers,
     SchoolKs4ComparisonYearByYear EngMaths59YearByYear,
     SchoolKs4ComparisonAverage DestinationsThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> DestinationsTopPerformers,
     SchoolKs4ComparisonYearByYear DestinationsYearByYear,
     SchoolKs4ComparisonAverage DestinationsEducationThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> DestinationsEducationTopPerformers,
     SchoolKs4ComparisonYearByYear DestinationsEducationYearByYear,
     SchoolKs4ComparisonAverage DestinationsEmploymentThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> DestinationsEmploymentTopPerformers,
     SchoolKs4ComparisonYearByYear DestinationsEmploymentYearByYear);

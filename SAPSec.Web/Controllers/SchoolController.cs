@@ -5,6 +5,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
+using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
 
 namespace SAPSec.Web.Controllers;
 
@@ -221,7 +222,9 @@ public class SchoolController : Controller
                     Ks4HeadlineMeasuresPageViewModel.DisplayPercent((isGrade5 ? model.EnglandEngMaths59YearByYear : model.EnglandEngMaths49YearByYear).Current),
                     isGrade5 ? model.EnglandEngMaths59Display : model.EnglandEngMaths49Display
                 }
-            }
+            },
+            topPerformers = (isGrade5 ? model.EngMaths59TopPerformers : model.EngMaths49TopPerformers)
+                .Select(x => new { x.Rank, x.Urn, x.Name, x.DisplayValue })
         });
     }
 
@@ -330,7 +333,13 @@ public class SchoolController : Controller
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(englandSeries.Current),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(englandAverage)
                 }
-            }
+            },
+            topPerformers = (normalizedDestination switch
+            {
+                "education" => model.DestinationsEducationTopPerformers,
+                "employment" => model.DestinationsEmploymentTopPerformers,
+                _ => model.DestinationsTopPerformers
+            }).Select(x => new { x.Rank, x.Urn, x.Name, x.DisplayValue })
         });
     }
 
@@ -362,6 +371,7 @@ public class SchoolController : Controller
             SimilarSchoolsAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.LocalAuthorityValue,
             EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue,
+            Attainment8TopPerformers = MapTopPerformers(response.Attainment8TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayValue),
             SchoolAttainment8YearByYear = response.Attainment8YearByYear.School,
             SimilarSchoolsAttainment8YearByYear = response.Attainment8YearByYear.SimilarSchools,
             LocalAuthorityAttainment8YearByYear = response.Attainment8YearByYear.LocalAuthority,
@@ -370,6 +380,7 @@ public class SchoolController : Controller
             SimilarSchoolsEngMaths49ThreeYearAverage = response.EngMaths49ThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityEngMaths49ThreeYearAverage = response.EngMaths49ThreeYearAverage.LocalAuthorityValue,
             EnglandEngMaths49ThreeYearAverage = response.EngMaths49ThreeYearAverage.EnglandValue,
+            EngMaths49TopPerformers = MapTopPerformers(response.EngMaths49TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayPercent),
             SchoolEngMaths49YearByYear = response.EngMaths49YearByYear.School,
             SimilarSchoolsEngMaths49YearByYear = response.EngMaths49YearByYear.SimilarSchools,
             LocalAuthorityEngMaths49YearByYear = response.EngMaths49YearByYear.LocalAuthority,
@@ -378,6 +389,7 @@ public class SchoolController : Controller
             SimilarSchoolsEngMaths59ThreeYearAverage = response.EngMaths59ThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityEngMaths59ThreeYearAverage = response.EngMaths59ThreeYearAverage.LocalAuthorityValue,
             EnglandEngMaths59ThreeYearAverage = response.EngMaths59ThreeYearAverage.EnglandValue,
+            EngMaths59TopPerformers = MapTopPerformers(response.EngMaths59TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayPercent),
             SchoolEngMaths59YearByYear = response.EngMaths59YearByYear.School,
             SimilarSchoolsEngMaths59YearByYear = response.EngMaths59YearByYear.SimilarSchools,
             LocalAuthorityEngMaths59YearByYear = response.EngMaths59YearByYear.LocalAuthority,
@@ -386,6 +398,7 @@ public class SchoolController : Controller
             SimilarSchoolsDestinationsThreeYearAverage = response.DestinationsThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityDestinationsThreeYearAverage = response.DestinationsThreeYearAverage.LocalAuthorityValue,
             EnglandDestinationsThreeYearAverage = response.DestinationsThreeYearAverage.EnglandValue,
+            DestinationsTopPerformers = MapTopPerformers(response.DestinationsTopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent),
             SchoolDestinationsYearByYear = response.DestinationsYearByYear.School,
             SimilarSchoolsDestinationsYearByYear = response.DestinationsYearByYear.SimilarSchools,
             LocalAuthorityDestinationsYearByYear = response.DestinationsYearByYear.LocalAuthority,
@@ -394,6 +407,7 @@ public class SchoolController : Controller
             SimilarSchoolsDestinationsEducationThreeYearAverage = response.DestinationsEducationThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityDestinationsEducationThreeYearAverage = response.DestinationsEducationThreeYearAverage.LocalAuthorityValue,
             EnglandDestinationsEducationThreeYearAverage = response.DestinationsEducationThreeYearAverage.EnglandValue,
+            DestinationsEducationTopPerformers = MapTopPerformers(response.DestinationsEducationTopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent),
             SchoolDestinationsEducationYearByYear = response.DestinationsEducationYearByYear.School,
             SimilarSchoolsDestinationsEducationYearByYear = response.DestinationsEducationYearByYear.SimilarSchools,
             LocalAuthorityDestinationsEducationYearByYear = response.DestinationsEducationYearByYear.LocalAuthority,
@@ -402,11 +416,20 @@ public class SchoolController : Controller
             SimilarSchoolsDestinationsEmploymentThreeYearAverage = response.DestinationsEmploymentThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityDestinationsEmploymentThreeYearAverage = response.DestinationsEmploymentThreeYearAverage.LocalAuthorityValue,
             EnglandDestinationsEmploymentThreeYearAverage = response.DestinationsEmploymentThreeYearAverage.EnglandValue,
+            DestinationsEmploymentTopPerformers = MapTopPerformers(response.DestinationsEmploymentTopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent),
             SchoolDestinationsEmploymentYearByYear = response.DestinationsEmploymentYearByYear.School,
             SimilarSchoolsDestinationsEmploymentYearByYear = response.DestinationsEmploymentYearByYear.SimilarSchools,
             LocalAuthorityDestinationsEmploymentYearByYear = response.DestinationsEmploymentYearByYear.LocalAuthority,
             EnglandDestinationsEmploymentYearByYear = response.DestinationsEmploymentYearByYear.England
         };
+
+    private static IReadOnlyList<TopPerformerRow> MapTopPerformers(
+        IReadOnlyList<SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4TopPerformer> topPerformers,
+        Func<decimal?, string> formatter) =>
+        topPerformers
+            .Select(x => new TopPerformerRow(x.Rank, x.Urn, x.Name, x.Value, formatter(x.Value)))
+            .ToList()
+            .AsReadOnly();
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
     {

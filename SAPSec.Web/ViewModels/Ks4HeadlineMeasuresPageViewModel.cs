@@ -6,6 +6,8 @@ namespace SAPSec.Web.ViewModels;
 
 public class Ks4HeadlineMeasuresPageViewModel
 {
+    public record TopPerformerRow(int Rank, string Urn, string Name, decimal? Value, string DisplayValue);
+
     public required SchoolDetails SchoolDetails { get; set; }
     public required int SimilarSchoolsCount { get; set; }
 
@@ -13,6 +15,7 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required decimal? SimilarSchoolsAttainment8ThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityAttainment8ThreeYearAverage { get; set; }
     public required decimal? EnglandAttainment8ThreeYearAverage { get; set; }
+    public required IReadOnlyList<TopPerformerRow> Attainment8TopPerformers { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolAttainment8YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsAttainment8YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityAttainment8YearByYear { get; set; }
@@ -22,6 +25,7 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required decimal? SimilarSchoolsEngMaths49ThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityEngMaths49ThreeYearAverage { get; set; }
     public required decimal? EnglandEngMaths49ThreeYearAverage { get; set; }
+    public required IReadOnlyList<TopPerformerRow> EngMaths49TopPerformers { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolEngMaths49YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsEngMaths49YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityEngMaths49YearByYear { get; set; }
@@ -31,6 +35,7 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required decimal? SimilarSchoolsEngMaths59ThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityEngMaths59ThreeYearAverage { get; set; }
     public required decimal? EnglandEngMaths59ThreeYearAverage { get; set; }
+    public required IReadOnlyList<TopPerformerRow> EngMaths59TopPerformers { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolEngMaths59YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsEngMaths59YearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityEngMaths59YearByYear { get; set; }
@@ -40,6 +45,7 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required decimal? SimilarSchoolsDestinationsThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityDestinationsThreeYearAverage { get; set; }
     public required decimal? EnglandDestinationsThreeYearAverage { get; set; }
+    public required IReadOnlyList<TopPerformerRow> DestinationsTopPerformers { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolDestinationsYearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsDestinationsYearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityDestinationsYearByYear { get; set; }
@@ -49,6 +55,7 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required decimal? SimilarSchoolsDestinationsEducationThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityDestinationsEducationThreeYearAverage { get; set; }
     public required decimal? EnglandDestinationsEducationThreeYearAverage { get; set; }
+    public required IReadOnlyList<TopPerformerRow> DestinationsEducationTopPerformers { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolDestinationsEducationYearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsDestinationsEducationYearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityDestinationsEducationYearByYear { get; set; }
@@ -58,6 +65,7 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required decimal? SimilarSchoolsDestinationsEmploymentThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityDestinationsEmploymentThreeYearAverage { get; set; }
     public required decimal? EnglandDestinationsEmploymentThreeYearAverage { get; set; }
+    public required IReadOnlyList<TopPerformerRow> DestinationsEmploymentTopPerformers { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolDestinationsEmploymentYearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsDestinationsEmploymentYearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityDestinationsEmploymentYearByYear { get; set; }

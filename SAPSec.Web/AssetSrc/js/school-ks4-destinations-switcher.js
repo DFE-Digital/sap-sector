@@ -7,7 +7,39 @@
         });
     }
 
-    function applyDestinationViews(data, barChartCanvas, lineChartCanvas, tableCellMap) {
+    function updateTopPerformers(tableBody, rows) {
+        if (!tableBody) {
+            return;
+        }
+
+        var items = Array.isArray(rows) ? rows : [];
+        tableBody.innerHTML = "";
+
+        items.forEach(function (row) {
+            var tr = document.createElement("tr");
+            tr.className = "govuk-table__row";
+
+            var rank = document.createElement("td");
+            rank.className = "govuk-table__cell";
+            rank.textContent = row.rank;
+
+            var name = document.createElement("th");
+            name.scope = "row";
+            name.className = "govuk-table__header";
+            name.textContent = row.name;
+
+            var value = document.createElement("td");
+            value.className = "govuk-table__cell govuk-table__cell--numeric";
+            value.textContent = row.displayValue;
+
+            tr.appendChild(rank);
+            tr.appendChild(name);
+            tr.appendChild(value);
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function applyDestinationViews(data, barChartCanvas, lineChartCanvas, tableCellMap, topPerformersBody) {
         if (!data) {
             return;
         }
@@ -31,6 +63,7 @@
         updateTableRow(tableCellMap.similarSchools, data.table && data.table.similarSchools ? data.table.similarSchools : []);
         updateTableRow(tableCellMap.localAuthority, data.table && data.table.localAuthority ? data.table.localAuthority : []);
         updateTableRow(tableCellMap.england, data.table && data.table.england ? data.table.england : []);
+        updateTopPerformers(topPerformersBody, data.topPerformers);
     }
 
     function init() {
@@ -46,6 +79,7 @@
 
         var barChartCanvas = document.getElementById("destinations-school-chart");
         var lineChartCanvas = document.getElementById("destinations-school-yearbyyear-chart");
+        var topPerformersBody = document.querySelector("#destinations-top-performers-table tbody");
 
         var tableCellMap = {
             thisSchool: [
@@ -87,7 +121,7 @@
                     return response.json();
                 })
                 .then(function (destinationData) {
-                    applyDestinationViews(destinationData, barChartCanvas, lineChartCanvas, tableCellMap);
+                    applyDestinationViews(destinationData, barChartCanvas, lineChartCanvas, tableCellMap, topPerformersBody);
                 })
                 .catch(function (error) {
                     console.error("Failed to load school KS4 destinations data.", error);

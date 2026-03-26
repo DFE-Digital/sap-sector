@@ -32,6 +32,8 @@
         (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.LocalAuthorityDestinationsYearByYear, Display: Model.LocalAuthorityDestinationsDisplay),
         (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandDestinationsYearByYear, Display: Model.EnglandDestinationsDisplay)
     };
+
+    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
 }
 
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -118,6 +120,7 @@
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#three-year-average">3-year average</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#year-by-year">Year by year</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#top-performers">Top performers</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#table-view">Table</a></li>
         </ul>
 
@@ -166,6 +169,36 @@
             </div>
         </div>
 
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.Attainment8TopPerformers)
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">@row.Rank</td>
+                            <th scope="row" class="govuk-table__header">@row.Name</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils selected</span>
+                </summary>
+                <div class="govuk-details__text">@Model.SimilarSchoolsCount similar schools</div>
+            </details>
+        </div>
+
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="table-view">
             <table class="govuk-table">
                 <thead class="govuk-table__head">
@@ -203,6 +236,7 @@
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#eng-maths-three-year-average">3-year average</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-year-by-year">Year by year</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-top-performers">Top performers</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-table-view">Table</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="eng-maths-three-year-average">
@@ -224,6 +258,35 @@
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                 <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMaths49YearByYear.Previous2, Model.SchoolEngMaths49YearByYear.Previous, Model.SchoolEngMaths49YearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMaths49YearByYear.Previous2, Model.SimilarSchoolsEngMaths49YearByYear.Previous, Model.SimilarSchoolsEngMaths49YearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMaths49YearByYear.Previous2, Model.LocalAuthorityEngMaths49YearByYear.Previous, Model.LocalAuthorityEngMaths49YearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMaths49YearByYear.Previous2, Model.EnglandEngMaths49YearByYear.Previous, Model.EnglandEngMaths49YearByYear.Current } } } }))' data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'></canvas>
             </div>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table" id="eng-maths-top-performers-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.EngMaths49TopPerformers)
+                    {
+                        <tr class="govuk-table__row" data-top-performer-row="eng-maths">
+                            <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>@row.Name</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils selected</span>
+                </summary>
+                <div class="govuk-details__text">@Model.SimilarSchoolsCount similar schools</div>
+            </details>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-table-view">
             <table class="govuk-table">
@@ -274,6 +337,7 @@
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#destinations-three-year-average">3-year average</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-year-by-year">Year by year</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-top-performers">Top performers</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-table-view">Table</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="destinations-three-year-average">
@@ -295,6 +359,35 @@
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                 <canvas id="destinations-school-yearbyyear-chart" class="js-chart" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolDestinationsYearByYear.Previous2, Model.SchoolDestinationsYearByYear.Previous, Model.SchoolDestinationsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsDestinationsYearByYear.Previous2, Model.SimilarSchoolsDestinationsYearByYear.Previous, Model.SimilarSchoolsDestinationsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityDestinationsYearByYear.Previous2, Model.LocalAuthorityDestinationsYearByYear.Previous, Model.LocalAuthorityDestinationsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandDestinationsYearByYear.Previous2, Model.EnglandDestinationsYearByYear.Previous, Model.EnglandDestinationsYearByYear.Current } } } }))' data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'></canvas>
             </div>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table" id="destinations-top-performers-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.DestinationsTopPerformers)
+                    {
+                        <tr class="govuk-table__row" data-top-performer-row="destinations">
+                            <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>@row.Name</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+            <details class="govuk-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Number of pupils selected</span>
+                </summary>
+                <div class="govuk-details__text">@Model.SimilarSchoolsCount similar schools</div>
+            </details>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-table-view">
             <table class="govuk-table">

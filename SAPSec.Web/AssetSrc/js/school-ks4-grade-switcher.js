@@ -7,7 +7,39 @@
         });
     }
 
-    function applyEngMathsViews(gradeData, barChartCanvas, lineChartCanvas, tableCellMap) {
+    function updateTopPerformers(tableBody, rows) {
+        if (!tableBody) {
+            return;
+        }
+
+        var items = Array.isArray(rows) ? rows : [];
+        tableBody.innerHTML = "";
+
+        items.forEach(function (row) {
+            var tr = document.createElement("tr");
+            tr.className = "govuk-table__row";
+
+            var rank = document.createElement("td");
+            rank.className = "govuk-table__cell";
+            rank.textContent = row.rank;
+
+            var name = document.createElement("th");
+            name.scope = "row";
+            name.className = "govuk-table__header";
+            name.textContent = row.name;
+
+            var value = document.createElement("td");
+            value.className = "govuk-table__cell govuk-table__cell--numeric";
+            value.textContent = row.displayValue;
+
+            tr.appendChild(rank);
+            tr.appendChild(name);
+            tr.appendChild(value);
+            tableBody.appendChild(tr);
+        });
+    }
+
+    function applyEngMathsViews(gradeData, barChartCanvas, lineChartCanvas, tableCellMap, topPerformersBody) {
         if (!gradeData) {
             return;
         }
@@ -31,6 +63,7 @@
         updateTableRow(tableCellMap.similarSchools, gradeData.table && gradeData.table.similarSchools ? gradeData.table.similarSchools : []);
         updateTableRow(tableCellMap.localAuthority, gradeData.table && gradeData.table.localAuthority ? gradeData.table.localAuthority : []);
         updateTableRow(tableCellMap.england, gradeData.table && gradeData.table.england ? gradeData.table.england : []);
+        updateTopPerformers(topPerformersBody, gradeData.topPerformers);
     }
 
     function init() {
@@ -46,6 +79,7 @@
 
         var barChartCanvas = document.getElementById("eng-maths-school-chart");
         var lineChartCanvas = document.getElementById("eng-maths-school-yearbyyear-chart");
+        var topPerformersBody = document.querySelector("#eng-maths-top-performers-table tbody");
 
         var tableCellMap = {
             thisSchool: [
@@ -87,7 +121,7 @@
                     return response.json();
                 })
                 .then(function (gradeData) {
-                    applyEngMathsViews(gradeData, barChartCanvas, lineChartCanvas, tableCellMap);
+                    applyEngMathsViews(gradeData, barChartCanvas, lineChartCanvas, tableCellMap, topPerformersBody);
                 })
                 .catch(function (error) {
                     console.error("Failed to load school KS4 grade data.", error);
