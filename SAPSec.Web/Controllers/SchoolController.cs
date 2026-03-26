@@ -5,6 +5,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace SAPSec.Web.Controllers;
 
@@ -15,6 +16,12 @@ namespace SAPSec.Web.Controllers;
 [Route("school/{urn}")]
 public class SchoolController : Controller
 {
+    private const decimal AxisHeadroomMultiplier = 1.1m;
+    private const decimal OverallAbsenceAxisDefaultMax = 10m;
+    private const decimal PersistentAbsenceAxisDefaultMax = 30m;
+    private const decimal OverallAbsenceAxisStep = 1m;
+    private const decimal PersistentAbsenceAxisStep = 5m;
+
     private readonly ISchoolDetailsService _schoolDetailsService;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
@@ -110,10 +117,47 @@ public class SchoolController : Controller
         var englandThreeYearAverage = isPersistentAbsence
             ? response.PersistentAbsenceThreeYearAverage.EnglandValue
             : response.OverallAbsenceThreeYearAverage.EnglandValue;
+        var axisStep = isPersistentAbsence ? PersistentAbsenceAxisStep : OverallAbsenceAxisStep;
+        var axisDefaultMax = isPersistentAbsence ? PersistentAbsenceAxisDefaultMax : OverallAbsenceAxisDefaultMax;
+        var barAxisMax = CalculateAxisMax(
+            [
+                selectedSchoolThreeYearAverage,
+                localAuthorityThreeYearAverage,
+                englandThreeYearAverage
+            ],
+            axisDefaultMax,
+            axisStep);
+        var lineAxisMax = CalculateAxisMax(
+            [
+                selectedSchoolSeries.Previous2,
+                selectedSchoolSeries.Previous,
+                selectedSchoolSeries.Current,
+                localAuthoritySeries.Previous2,
+                localAuthoritySeries.Previous,
+                localAuthoritySeries.Current,
+                englandSeries.Previous2,
+                englandSeries.Previous,
+                englandSeries.Current
+            ],
+            axisDefaultMax,
+            axisStep);
 
         return Json(new
         {
             absenceType = normalizedAbsenceType,
+            axis = new
+            {
+                bar = new
+                {
+                    max = barAxisMax,
+                    step = axisStep
+                },
+                line = new
+                {
+                    max = lineAxisMax,
+                    step = axisStep
+                }
+            },
             years = yearLabels,
             bar = new decimal?[]
             {
@@ -207,4 +251,24 @@ public class SchoolController : Controller
         value.HasValue
             ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
             : "No available data";
+
+    private static decimal CalculateAxisMax(
+        IEnumerable<decimal?> values,
+        decimal defaultMax,
+        decimal step)
+    {
+        var maxValue = values
+            .Where(v => v.HasValue)
+            .Select(v => v!.Value)
+            .DefaultIfEmpty(0m)
+            .Max();
+
+        if (maxValue <= defaultMax)
+        {
+            return defaultMax;
+        }
+
+        var adjustedMax = maxValue * AxisHeadroomMultiplier;
+        return Math.Ceiling(adjustedMax / step) * step;
+    }
 }
