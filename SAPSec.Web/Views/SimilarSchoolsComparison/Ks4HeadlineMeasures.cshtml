@@ -3,6 +3,9 @@
 @{
     Layout = "_Layout";
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
+    var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
+    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
 }
 
 <h1 class="govuk-heading-l">KS4 headline performance measures</h1>
@@ -115,21 +118,28 @@
                         Model.EnglandAttainment8ThreeYearAverage
                     }
                 };
-                var chartColors = new[] { "#d53780", "#003078", "#003078" };
             }
             <div class="app-ks4-chart-container">
-                <canvas id="ks4-attainment8-comparison-chart"
-                        class="js-chart"
-                        data-type="bar"
-                        data-axis-step="30"
-                        data-axis-max="90"
-                        data-bar-thickness="50"
-                        data-category-percentage="0.7"
-                        data-bar-percentage="1"
-                        data-axis-suffix=""
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                </canvas>
+                @if (HasAnyData(chartData.data))
+                {
+                    <canvas id="ks4-attainment8-comparison-chart"
+                            class="js-chart"
+                            data-type="bar"
+                            data-show-no-data-labels="true"
+                            data-axis-step="30"
+                            data-axis-max="90"
+                            data-bar-thickness="50"
+                            data-category-percentage="0.7"
+                            data-bar-percentage="1"
+                            data-axis-suffix=""
+                            data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                    </canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
             </div>
         </div>
 
@@ -172,8 +182,8 @@
                         {
                             label = "Schools in England average",
                             borderWidth = 2,
-                            borderColor = "#1d8f89",
-                            backgroundColor = "#1d8f89",
+                            borderColor = yearByYearColors[2],
+                            backgroundColor = yearByYearColors[2],
                             pointRadius = 4,
                             pointHoverRadius = 5,
                             tension = 0,
@@ -186,7 +196,6 @@
                         }
                     }
                 };
-                var yearByYearColors = new[] { "#d53880", "#003078", "#1d8f89" };
             }
             <div class="app-ks4-chart-container">
                 <canvas id="ks4-attainment8-comparison-yearbyyear-chart"
@@ -297,21 +306,28 @@
                         Model.EnglandEngMaths49ThreeYearAverage
                     }
                 };
-                var engMathsChartColors = new[] { "#d53780", "#003078", "#003078" };
             }
             <div class="app-ks4-chart-container">
-                <canvas id="eng-maths-comparison-chart"
-                        class="js-chart"
-                        data-type="bar"
-                        data-axis-step="25"
-                        data-axis-max="100"
-                        data-axis-suffix="%"
-                        data-bar-thickness="50"
-                        data-category-percentage="0.7"
-                        data-bar-percentage="1"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(engMathsChartColors))'>
-                </canvas>
+                @if (HasAnyData(engMathsChartData.data))
+                {
+                    <canvas id="eng-maths-comparison-chart"
+                            class="js-chart"
+                            data-type="bar"
+                            data-show-no-data-labels="true"
+                            data-axis-step="25"
+                            data-axis-max="100"
+                            data-axis-suffix="%"
+                            data-bar-thickness="50"
+                            data-category-percentage="0.7"
+                            data-bar-percentage="1"
+                            data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
+                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                    </canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
             </div>
 
         </div>
@@ -367,7 +383,6 @@
                         }
                     }
                 };
-                var engMathsYearByYearColors = new[] { "#d53780", "#003078", "#1d8f89" };
             }
             <div class="app-ks4-chart-container">
                 <canvas id="eng-maths-comparison-yearbyyear-chart"
@@ -380,7 +395,7 @@
                         data-show-datalabels="false"
                         data-show-x-grid="true"
                         data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearColors))'>
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
                 </canvas>
             </div>
         </div>
@@ -493,21 +508,28 @@
                         Model.EnglandDestinationsThreeYearAverage
                     }
                 };
-                var destinationsChartColors = new[] { "#d53780", "#003078", "#003078" };
             }
             <div class="app-ks4-chart-container">
-                <canvas id="destinations-comparison-chart"
-                        class="js-chart"
-                        data-type="bar"
-                        data-axis-step="25"
-                        data-axis-max="100"
-                        data-axis-suffix="%"
-                        data-bar-thickness="50"
-                        data-category-percentage="0.7"
-                        data-bar-percentage="1"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(destinationsChartColors))'>
-                </canvas>
+                @if (HasAnyData(destinationsChartData.data))
+                {
+                    <canvas id="destinations-comparison-chart"
+                            class="js-chart"
+                            data-type="bar"
+                            data-show-no-data-labels="true"
+                            data-axis-step="25"
+                            data-axis-max="100"
+                            data-axis-suffix="%"
+                            data-bar-thickness="50"
+                            data-category-percentage="0.7"
+                            data-bar-percentage="1"
+                            data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
+                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                    </canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
             </div>
         </div>
 
@@ -562,7 +584,6 @@
                         }
                     }
                 };
-                var destinationsYearByYearColors = new[] { "#d53780", "#003078", "#1d8f89" };
             }
             <div class="app-ks4-chart-container">
                 <canvas id="destinations-comparison-yearbyyear-chart"
@@ -575,7 +596,7 @@
                         data-show-datalabels="false"
                         data-show-x-grid="true"
                         data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearColors))'>
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
                 </canvas>
             </div>
         </div>
