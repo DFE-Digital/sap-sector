@@ -124,10 +124,15 @@
     <None Remove="DataMap\SourceFiles\manual_1a_absence_3term_school.csv" />
     <None Remove="DataMap\SourceFiles\manual_1_absence_3term_nat_reg_la.csv" />
     <None Remove="DataMap\SourceFiles\manual_2022-2023_england_ks4final.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202223_subject_school_pupil_entriesachievements_final.csv" />
     <None Remove="DataMap\SourceFiles\manual_202324_la_char_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\manual_202324_performance_tables_schools_final.csv" />
     <None Remove="DataMap\SourceFiles\manual_202324_subject_pupil_level_la_data_revised.csv" />
     <None Remove="DataMap\SourceFiles\manual_202324_subject_school_all_exam_entriesgrades_final.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202324_subject_school_pupil_entriesachievements_final.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202325_subject_local_authority_pupil_entriesachievements.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202325_subject_national_pupil_entriesachievements_characteristics.csv" />
+    <None Remove="DataMap\SourceFiles\manual_202425_subject_school_pupil_entriesachievements_revised.csv" />
     <None Remove="DataMap\SourceFiles\manual_2026-01-13_off_sen_primary_sim_sch_grps.csv" />
     <None Remove="DataMap\SourceFiles\manual_2026-01-13_off_sen_primary_sim_sch_var_vals.csv" />
     <None Remove="DataMap\SourceFiles\manual_2026-01-13_off_sen_secondary_sim_sch_grps.csv" />
