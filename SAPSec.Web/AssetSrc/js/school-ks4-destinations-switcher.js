@@ -7,12 +7,29 @@
         });
     }
 
+    function buildSimilarSchoolComparisonHref(currentPath, similarSchoolUrn) {
+        if (!currentPath || !similarSchoolUrn) {
+            return "";
+        }
+
+        var normalizedPath = currentPath.replace(/\/+$/, "");
+        var schoolMatch = normalizedPath.match(/^\/school\/([^/]+)/i);
+        if (!schoolMatch || !schoolMatch[1]) {
+            return "";
+        }
+
+        return "/school/" + encodeURIComponent(schoolMatch[1]) + "/view-similar-schools/" + encodeURIComponent(similarSchoolUrn);
+    }
+
     function updateTopPerformers(tableBody, rows) {
         if (!tableBody) {
             return;
         }
 
         var items = Array.isArray(rows) ? rows : [];
+        var currentPath = window.location && typeof window.location.pathname === "string"
+            ? window.location.pathname
+            : "";
         tableBody.innerHTML = "";
 
         items.forEach(function (row) {
@@ -26,7 +43,12 @@
             var name = document.createElement("th");
             name.scope = "row";
             name.className = "govuk-table__header";
-            name.textContent = row.name;
+
+            var link = document.createElement("a");
+            link.className = "govuk-link";
+            link.href = buildSimilarSchoolComparisonHref(currentPath, row.urn);
+            link.textContent = row.name;
+            name.appendChild(link);
 
             var value = document.createElement("td");
             value.className = "govuk-table__cell govuk-table__cell--numeric";

@@ -34,6 +34,7 @@
     };
 
     string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
 }
 
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -120,8 +121,8 @@
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#three-year-average">3-year average</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#year-by-year">Year by year</a></li>
-            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#top-performers">Top performers</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#top-performers">Top performers</a></li>
         </ul>
 
         <div class="govuk-tabs__panel" id="three-year-average">
@@ -184,7 +185,7 @@
                     {
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell">@row.Rank</td>
-                            <th scope="row" class="govuk-table__header">@row.Name</th>
+                            <th scope="row" class="govuk-table__header"><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
                             <td class="govuk-table__cell govuk-table__cell--numeric">@row.DisplayValue</td>
                         </tr>
                     }
@@ -236,8 +237,8 @@
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#eng-maths-three-year-average">3-year average</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-year-by-year">Year by year</a></li>
-            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-top-performers">Top performers</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="eng-maths-three-year-average">
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
@@ -274,7 +275,7 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="eng-maths">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name>@row.Name</th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -337,8 +338,8 @@
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#destinations-three-year-average">3-year average</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-year-by-year">Year by year</a></li>
-            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-top-performers">Top performers</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="destinations-three-year-average">
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
@@ -375,19 +376,13 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="destinations">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name>@row.Name</th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
                 </tbody>
             </table>
             <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
-            <details class="govuk-details" data-module="govuk-details">
-                <summary class="govuk-details__summary">
-                    <span class="govuk-details__summary-text">Number of pupils selected</span>
-                </summary>
-                <div class="govuk-details__text">@Model.SimilarSchoolsCount similar schools</div>
-            </details>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-table-view">
             <table class="govuk-table">

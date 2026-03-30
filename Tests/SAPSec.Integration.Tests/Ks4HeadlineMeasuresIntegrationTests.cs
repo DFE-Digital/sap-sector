@@ -29,6 +29,15 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasures_TopPerformersContainLinksToSimilarSchoolComparison()
+    {
+        var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("/school/105574/view-similar-schools/");
+    }
+
+    [Fact]
     public async Task Ks4HeadlineMeasures_WithNonExistentUrn_ReturnsNotFound()
     {
         var response = await fixture.Client.GetAsync("/school/999999/ks4-headline-measures");
