@@ -775,6 +775,16 @@ public sealed class GenerateViews
             conditions.Add(Condition(r.Filter3, r.Filter3Value));
         }
 
+        if (!string.IsNullOrWhiteSpace(r.Filter4))
+        {
+            conditions.Add(Condition(r.Filter4, r.Filter4Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter5))
+        {
+            conditions.Add(Condition(r.Filter5, r.Filter5Value));
+        }
+
         var whenClause = conditions.Count == 0 ? "TRUE" : string.Join(" AND ", conditions);
 
         return $"MAX(CASE WHEN {whenClause} THEN {BuildValueExpression(r)} END) AS \"{r.PropertyName}\"";

@@ -2,6 +2,21 @@ name: School Data Ingestion Pipeline
 
 on:
   workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to run against
+        required: true
+        default: test
+        type: choice
+        options:
+        - test
+        - review
+        - production
+      review-app-number:
+        description: Pull request number of the review app (optional, this will generate a backup file for that review app)
+        type: string
+        required: false
+
   schedule:
     - cron: "0 6 * * *"   # every day at 06:00 UTC
 
@@ -13,7 +28,7 @@ jobs:
   ingest:
     name: Ingest Raw Data & Build Warehouse
     runs-on: ubuntu-latest
-    environment: test
+    environment: ${{ case(inputs.environment == '', 'test', inputs.environment) }}
 
     env:
       # Blob (currently from GitHub secrets)
@@ -32,6 +47,7 @@ jobs:
       AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
+      
     steps:
       # ==============================
       # 1. Checkout repo
@@ -580,7 +596,7 @@ jobs:
           set -euo pipefail
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
           ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
-          max_attempts=3
+          max_attempts=5
           delay=10
           log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
           attempt=1
@@ -589,7 +605,7 @@ jobs:
             set +e
             "$GITHUB_WORKSPACE/konduit.sh" \
               -n "${AKS_NAMESPACE}" \
-              -t 7200 \
+              -t 28800 \
               -x \
               -i "$GITHUB_WORKSPACE/SAPData/Sql/run_all.sql" \
               "${KONDUIT_APP_NAME}" -- psql 2>&1 | tee "$log_file"
@@ -626,14 +642,14 @@ jobs:
           TODAY=$(TZ=Europe/London date +"%F")
           LOCAL_FILE="sapsec_review_seed_${TODAY}.sql.gz"
           # Only ever keep this single blob in storage
-          LATEST_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
+          LATEST_BLOB="db-backups/sapsec_review_seed_${{ case(github.event.inputs.review-app-number == '', 'test', github.event.inputs.review-app-number) }}.sql.gz"
           echo "Creating DB dump -> ${LOCAL_FILE}"
           echo "AKS_NAMESPACE=${AKS_NAMESPACE}"
           echo "KONDUIT_APP_NAME=${KONDUIT_APP_NAME}"
           set +e
           "$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
-            -t 7200 \
+            -t 28800 \
             -x \
             "${KONDUIT_APP_NAME}" -- \
             pg_dump --format=plain --no-owner --no-privileges 2> konduit_pg_dump.log | gzip -c > "${LOCAL_FILE}"

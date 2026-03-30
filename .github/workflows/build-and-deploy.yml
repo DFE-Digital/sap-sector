@@ -280,24 +280,66 @@ jobs:
 
       - name: Download seed backup from Blob
         if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
-        shell: bash
+        shell: pwsh
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
           AZURE_STORAGE_CONTAINER: ${{ secrets.AZURE_STORAGE_CONTAINER }}
+          BACKUP_BLOB_PR: db-backups/sapsec_review_seed_${{ github.event.pull_request.number }}.sql.gz
+          BACKUP_BLOB_TEST: db-backups/sapsec_review_seed_test.sql.gz
+          BACKUP_FILE: seed.sql.gz
         run: |
-          set -euo pipefail
-          BACKUP_BLOB="db-backups/sapsec_review_seed_latest.sql.gz"
-          BACKUP_FILE="seed.sql.gz"
+          $ErrorActionPreference = "Stop"
 
-          az storage blob download \
-            --container-name "${AZURE_STORAGE_CONTAINER}" \
-            --name "${BACKUP_BLOB}" \
-            --file "${BACKUP_FILE}" \
-            --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
-            --overwrite true
+          # -----------------------------
+          # Helpers (retries + reporting)
+          # -----------------------------
+          function Invoke-WithRetry([scriptblock]$Action, [int]$MaxAttempts = 5, [int]$InitialDelaySeconds = 2, [string]$Label = "operation") {
+            $attempt = 0
+            $delay = $InitialDelaySeconds
+            while ($true) {
+              try {
+                $attempt++
+                return & $Action
+              } catch {
+                if ($attempt -ge $MaxAttempts) {
+                  throw "Failed $Label after $attempt attempts. Last error: $($_.Exception.Message)"
+                }
+                Write-Host "Retrying $Label (attempt $attempt/$MaxAttempts). Waiting ${delay}s. Error: $($_.Exception.Message)"
+                Start-Sleep -Seconds $delay
+                $delay = [Math]::Min($delay * 2, 30)
+              }
+            }
+          }
 
-          ls -lh "${BACKUP_FILE}"
+          $exists = Invoke-WithRetry {
+            az storage blob exists `
+              --container-name $env:AZURE_STORAGE_CONTAINER `
+              --name $env:BACKUP_BLOB_PR `
+              --connection-string $env:AZURE_STORAGE_CONNECTION_STRING | ConvertFrom-Json
+          } -Label "exists $env:BACKUP_BLOB_PR"
+          if ($exists.exists -eq $true) {
+            Write-Host "Downloading blob: $env:BACKUP_BLOB_PR"
 
+            Invoke-WithRetry {
+              az storage blob download `
+                --container-name $env:AZURE_STORAGE_CONTAINER `
+                --name $env:BACKUP_BLOB_PR `
+                --file $env:BACKUP_FILE `
+                --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+                --overwrite true | Out-Null
+            } -Label "download $env:BACKUP_BLOB_PR"
+          } else {
+            Write-Host "Downloading blob: $env:BACKUP_BLOB_TEST"
+
+            Invoke-WithRetry {
+              az storage blob download `
+                --container-name $env:AZURE_STORAGE_CONTAINER `
+                --name $env:BACKUP_BLOB_TEST `
+                --file $env:BACKUP_FILE `
+                --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+                --overwrite true | Out-Null
+            } -Label "download $env:BACKUP_BLOB_TEST"
+          }
       - name: Reset PR review DB
         if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
         shell: bash
@@ -319,7 +361,7 @@ jobs:
 
           TARGET_DB="$("$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
-            -t 7200 \
+            -t 28800 \
             -x \
             -i "${CURRENT_DB_SQL}" \
             "${APP_NAME}" -- psql | tr -d '\r' | tail -n 1 | xargs)"
@@ -338,7 +380,7 @@ jobs:
 
           "$GITHUB_WORKSPACE/konduit.sh" \
             -n "${AKS_NAMESPACE}" \
-            -t 7200 \
+            -t 28800 \
             -x \
             -b postgres \
             -i "${RESET_DB_SQL}" \

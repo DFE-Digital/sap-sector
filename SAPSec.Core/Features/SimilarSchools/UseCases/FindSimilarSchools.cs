@@ -67,4 +67,4 @@ public record SimilarSchoolsAvailableFilter(
 public record SimilarSchoolResult(
     SimilarSchool SimilarSchool,
     GeographicCoordinates? Coordinates,
-    SortOptionValue<DataWithAvailability<decimal>> SortValue);
+    SortOptionValue<DataWithAvailability<string>> SortValue);
