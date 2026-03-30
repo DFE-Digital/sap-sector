@@ -1114,6 +1114,13 @@ $app-ks4-color-track: #f3f2f1;
   margin-top: 4px;
 }
 
+.app-ks4-school-page {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
+}
+
 .app-ks4-attainment {
   background: $app-ks4-color-panel-bg;
   padding: 16px;

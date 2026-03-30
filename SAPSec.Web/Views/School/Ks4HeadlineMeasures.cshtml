@@ -35,6 +35,7 @@
     string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
 }
 
+<div class="app-ks4-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
@@ -352,6 +353,8 @@
         </div>
     </div>
 </section>
+
+</div>
 
 @section Scripts {
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
