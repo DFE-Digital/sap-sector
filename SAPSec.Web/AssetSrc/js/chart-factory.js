@@ -1,5 +1,5 @@
 (function () {
-    const datasetColorKeys = ['school', 'comparator', 'england'];
+    const datasetColorKeys = ['school', 'similarSchools', 'localAuthority', 'england'];
     const CHART_CONFIG = {
         defaults: {
             axisStep: 20,
@@ -82,7 +82,8 @@
 
         const colorDefaults = {
             school: s.getPropertyValue('--chart-color-school').trim(),
-            comparator: s.getPropertyValue('--chart-color-comparator').trim(),
+            similarSchools: s.getPropertyValue('--chart-color-similar-schools').trim() || s.getPropertyValue('--chart-color-comparator').trim(),
+            localAuthority: s.getPropertyValue('--chart-color-local-authority').trim(),
             england: s.getPropertyValue('--chart-color-england').trim(),
             fallback: s.getPropertyValue('--chart-color-fallback').trim()
         };
@@ -109,8 +110,9 @@
         if (Array.isArray(rawColors)) {
             const byKey = {
                 school: rawColors[0] || defaults.school,
-                comparator: rawColors[1] || defaults.comparator,
-                england: rawColors[2] || defaults.england,
+                similarSchools: rawColors[1] || defaults.similarSchools,
+                localAuthority: rawColors[2] || defaults.localAuthority,
+                england: rawColors[3] || rawColors[2] || defaults.england,
                 fallback: defaults.fallback
             };
 
@@ -123,7 +125,8 @@
         if (rawColors && typeof rawColors === 'object') {
             const byKey = {
                 school: rawColors.school || defaults.school,
-                comparator: rawColors.comparator || defaults.comparator,
+                similarSchools: rawColors.similarSchools || rawColors.comparator || defaults.similarSchools,
+                localAuthority: rawColors.localAuthority || defaults.localAuthority,
                 england: rawColors.england || defaults.england,
                 fallback: defaults.fallback
             };
@@ -136,14 +139,15 @@
 
         const byKey = {
             school: defaults.school,
-            comparator: defaults.comparator,
+            similarSchools: defaults.similarSchools,
+            localAuthority: defaults.localAuthority,
             england: defaults.england,
             fallback: defaults.fallback
         };
 
         return {
             byKey,
-            palette: [byKey.school, byKey.comparator, byKey.england]
+            palette: [byKey.school, byKey.similarSchools, byKey.localAuthority, byKey.england]
         };
     }
 

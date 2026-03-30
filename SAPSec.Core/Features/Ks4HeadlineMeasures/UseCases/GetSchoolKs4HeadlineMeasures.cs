@@ -1,90 +1,149 @@
 using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
 public class GetSchoolKs4HeadlineMeasures(
-    GetKs4HeadlineMeasures getKs4HeadlineMeasures,
+    IKs4PerformanceRepository repository,
+    ISchoolDetailsService schoolDetailsService,
+    IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
 {
     public async Task<GetSchoolKs4HeadlineMeasuresResponse> Execute(GetSchoolKs4HeadlineMeasuresRequest request)
     {
-        var schoolResponse = await getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(request.Urn));
+        var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
+        var schoolResponse = Ks4HeadlineMeasuresResponseFactory.Create(
+            schoolDetails,
+            await repository.GetByUrnAsync(request.Urn));
         var similarSchoolUrns = await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn);
+        var similarSchoolData = await repository.GetByUrnsAsync(similarSchoolUrns)
+            ?? new Dictionary<string, Ks4HeadlineMeasuresData?>(StringComparer.Ordinal);
+        var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
+                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
+            .Where(x => !string.IsNullOrWhiteSpace(x.URN))
+            .ToDictionary(x => x.URN, StringComparer.Ordinal);
 
-        var similarSchoolResponses = (await Task.WhenAll(
-                similarSchoolUrns.Select(async urn =>
-                {
-                    try
-                    {
-                        return await getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
-                    }
-                    catch (NotFoundException)
-                    {
-                        return null;
-                    }
-                })))
-            .Where(response => response is not null)
-            .Cast<GetKs4HeadlineMeasuresResponse>()
+        var similarSchools = similarSchoolUrns
+            .Where(similarSchoolDetails.ContainsKey)
+            .Select(urn => new SimilarSchoolMeasure(
+                urn,
+                similarSchoolDetails[urn].EstablishmentName,
+                similarSchoolData.GetValueOrDefault(urn)))
             .ToArray();
 
         return new(
             schoolResponse.SchoolDetails,
-            similarSchoolResponses.Length,
+            similarSchools.Length,
             BuildComparisonAverage(
                 schoolResponse.Attainment8ThreeYearAverage,
-                similarSchoolResponses.Select(x => x.Attainment8ThreeYearAverage.SchoolValue)),
+                similarSchools.Select(x => MeasureValue(
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num))),
             BuildTopPerformers(
-                similarSchoolResponses,
-                x => x.Attainment8ThreeYearAverage.SchoolValue),
+                similarSchools,
+                x => MeasureValue(
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num)),
             BuildComparisonYearByYear(
                 schoolResponse.Attainment8YearByYear,
-                similarSchoolResponses.Select(x => x.Attainment8YearByYear.School)),
+                similarSchools.Select(x => SeriesFrom(
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
+                    x.Data?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num))),
             BuildComparisonAverage(
                 schoolResponse.EngMaths49ThreeYearAverage,
-                similarSchoolResponses.Select(x => x.EngMaths49ThreeYearAverage.SchoolValue)),
+                similarSchools.Select(x => MeasureValue(
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
-                similarSchoolResponses,
-                x => x.EngMaths49ThreeYearAverage.SchoolValue),
+                similarSchools,
+                x => MeasureValue(
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct)),
             BuildComparisonYearByYear(
                 schoolResponse.EngMaths49YearByYear,
-                similarSchoolResponses.Select(x => x.EngMaths49YearByYear.School)),
+                similarSchools.Select(x => SeriesFrom(
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct))),
             BuildComparisonAverage(
                 schoolResponse.EngMaths59ThreeYearAverage,
-                similarSchoolResponses.Select(x => x.EngMaths59ThreeYearAverage.SchoolValue)),
+                similarSchools.Select(x => MeasureValue(
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
-                similarSchoolResponses,
-                x => x.EngMaths59ThreeYearAverage.SchoolValue),
+                similarSchools,
+                x => MeasureValue(
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct)),
             BuildComparisonYearByYear(
                 schoolResponse.EngMaths59YearByYear,
-                similarSchoolResponses.Select(x => x.EngMaths59YearByYear.School)),
+                similarSchools.Select(x => SeriesFrom(
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct))),
             BuildComparisonAverage(
                 schoolResponse.DestinationsThreeYearAverage,
-                similarSchoolResponses.Select(x => x.DestinationsThreeYearAverage.SchoolValue)),
+                similarSchools.Select(x => MeasureValue(
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
-                similarSchoolResponses,
-                x => x.DestinationsThreeYearAverage.SchoolValue),
+                similarSchools,
+                x => MeasureValue(
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct)),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsYearByYear,
-                similarSchoolResponses.Select(x => x.DestinationsYearByYear.School)),
+                similarSchools.Select(x => SeriesFrom(
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct))),
             BuildComparisonAverage(
                 schoolResponse.DestinationsEducationThreeYearAverage,
-                similarSchoolResponses.Select(x => x.DestinationsEducationThreeYearAverage.SchoolValue)),
+                similarSchools.Select(x => MeasureValue(
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
-                similarSchoolResponses,
-                x => x.DestinationsEducationThreeYearAverage.SchoolValue),
+                similarSchools,
+                x => MeasureValue(
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct)),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsEducationYearByYear,
-                similarSchoolResponses.Select(x => x.DestinationsEducationYearByYear.School)),
+                similarSchools.Select(x => SeriesFrom(
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct))),
             BuildComparisonAverage(
                 schoolResponse.DestinationsEmploymentThreeYearAverage,
-                similarSchoolResponses.Select(x => x.DestinationsEmploymentThreeYearAverage.SchoolValue)),
+                similarSchools.Select(x => MeasureValue(
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
-                similarSchoolResponses,
-                x => x.DestinationsEmploymentThreeYearAverage.SchoolValue),
+                similarSchools,
+                x => MeasureValue(
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct)),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsEmploymentYearByYear,
-                similarSchoolResponses.Select(x => x.DestinationsEmploymentYearByYear.School)));
+                similarSchools.Select(x => SeriesFrom(
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
+                    x.Data?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct))));
     }
 
     private static SchoolKs4ComparisonAverage BuildComparisonAverage(
@@ -112,6 +171,18 @@ public class GetSchoolKs4HeadlineMeasures(
             current.England);
     }
 
+    private static decimal? MeasureValue(string? current, string? previous, string? previous2) =>
+        Ks4HeadlineMeasuresResponseFactory.Average(
+            Ks4HeadlineMeasuresResponseFactory.ParseNullableDecimal(current),
+            Ks4HeadlineMeasuresResponseFactory.ParseNullableDecimal(previous),
+            Ks4HeadlineMeasuresResponseFactory.ParseNullableDecimal(previous2));
+
+    private static Ks4HeadlineMeasureSeries SeriesFrom(string? current, string? previous, string? previous2) =>
+        new(
+            Ks4HeadlineMeasuresResponseFactory.ParseNullableDecimal(current),
+            Ks4HeadlineMeasuresResponseFactory.ParseNullableDecimal(previous),
+            Ks4HeadlineMeasuresResponseFactory.ParseNullableDecimal(previous2));
+
     private static decimal? Average(IEnumerable<decimal?> values)
     {
         var availableValues = values
@@ -125,13 +196,13 @@ public class GetSchoolKs4HeadlineMeasures(
     }
 
     private static IReadOnlyList<Ks4TopPerformer> BuildTopPerformers(
-        IEnumerable<GetKs4HeadlineMeasuresResponse> similarSchoolResponses,
-        Func<GetKs4HeadlineMeasuresResponse, decimal?> selector) =>
+        IEnumerable<SimilarSchoolMeasure> similarSchoolResponses,
+        Func<SimilarSchoolMeasure, decimal?> selector) =>
         similarSchoolResponses
             .Select(response => new
             {
-                response.SchoolDetails.Urn,
-                response.SchoolDetails.Name,
+                response.Urn,
+                response.Name,
                 Value = selector(response)
             })
             .Where(x => x.Value.HasValue)
@@ -184,3 +255,5 @@ public record GetSchoolKs4HeadlineMeasuresResponse(
     SchoolKs4ComparisonAverage DestinationsEmploymentThreeYearAverage,
     IReadOnlyList<Ks4TopPerformer> DestinationsEmploymentTopPerformers,
     SchoolKs4ComparisonYearByYear DestinationsEmploymentYearByYear);
+
+internal sealed record SimilarSchoolMeasure(string Urn, string Name, Ks4HeadlineMeasuresData? Data);

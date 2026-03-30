@@ -410,7 +410,7 @@ jobs:
             set +e
             "$GITHUB_WORKSPACE/konduit.sh" \
               -n "${AKS_NAMESPACE}" \
-              -t 7200 \
+              -t 28800 \
               -x \
               -i "${BACKUP_FILE}" -c \
               "${APP_NAME}" -- psql -v ON_ERROR_STOP=1 -X 2>&1 | tee "$log_file"

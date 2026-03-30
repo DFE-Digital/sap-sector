@@ -43,11 +43,10 @@ public class SchoolControllerTests
         var getAttendanceMeasures = new GetAttendanceMeasures(
             _attendanceRepositoryMock.Object,
             _establishmentRepositoryMock.Object);
-        var getKs4HeadlineMeasures = new GetKs4HeadlineMeasures(
-            _ks4PerformanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object);
         var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
-            getKs4HeadlineMeasures,
+            _ks4PerformanceRepositoryMock.Object,
+            _schoolDetailsServiceMock.Object,
+            _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
 
         _sut = new SchoolController(
