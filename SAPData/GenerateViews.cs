@@ -33,6 +33,7 @@ public sealed class GenerateViews
     private sealed record ViewSpec(
         string ViewName,
         string IdColumn,
+        string? EstablishmentIdentifier,
         ViewRange Range,
         string Type,
         string ModelName);
@@ -47,25 +48,25 @@ public sealed class GenerateViews
 
     private static readonly ViewSpec[] Views =
     {
-        new("v_establishment", "URN", ViewRange.Establishment, "Establishment", "Establishment"),
-        new("v_establishment_links", "urn", ViewRange.Establishment, "Establishment", "EstablishmentLinks"),
-        new("v_establishment_group_links", "group_id", ViewRange.Establishment, "Establishment", "EstablishmentGroupLinks"),
-        new("v_establishment_subject_entries", "school_urn", ViewRange.Establishment, "KS4_Performance", "EstablishmentSubjectEntries"),
-        new("v_establishment_email", "URN", ViewRange.Establishment, "Email", "EstablishmentEmail"),
+        new("v_establishment", "URN", null, ViewRange.Establishment, "Establishment", "Establishment"),
+        new("v_establishment_links", "urn", "URN", ViewRange.Establishment, "Establishment", "EstablishmentLinks"),
+        new("v_establishment_group_links", "group_id", "URN", ViewRange.Establishment, "Establishment", "EstablishmentGroupLinks"),
+        new("v_establishment_subject_entries", "school_urn", "URN", ViewRange.Establishment, "KS4_Performance", "EstablishmentSubjectEntries"),
+        new("v_establishment_email", "URN", "URN", ViewRange.Establishment, "Email", "EstablishmentEmail"),
 
-        new("v_establishment_absence", "Id", ViewRange.Establishment, "PupilAbsence", "EstablishmentAbsence"),
-        new("v_establishment_destinations", "Id", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
-        new("v_establishment_performance", "Id", ViewRange.Establishment, "KS4_Performance", "EstablishmentPerformance"),
-        new("v_establishment_workforce", "Id", ViewRange.Establishment, "Workforce", "EstablishmentWorkforce"),
+        new("v_establishment_absence", "Id", "URN", ViewRange.Establishment, "PupilAbsence", "EstablishmentAbsence"),
+        new("v_establishment_destinations", "Id", "LAESTAB", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
+        new("v_establishment_performance", "Id", "URN", ViewRange.Establishment, "KS4_Performance", "EstablishmentPerformance"),
+        new("v_establishment_workforce", "Id", "URN", ViewRange.Establishment, "Workforce", "EstablishmentWorkforce"),
 
-        new("v_england_absence", "Id", ViewRange.England, "PupilAbsence", "EnglandAbsence"),
-        new("v_england_destinations", "Id", ViewRange.England, "KS4_Destinations", "EnglandDestinations"),
-        new("v_england_performance", "Id", ViewRange.England, "KS4_Performance", "EnglandPerformance"),
+        new("v_england_absence", "Id", null, ViewRange.England, "PupilAbsence", "EnglandAbsence"),
+        new("v_england_destinations", "Id", null, ViewRange.England, "KS4_Destinations", "EnglandDestinations"),
+        new("v_england_performance", "Id", null, ViewRange.England, "KS4_Performance", "EnglandPerformance"),
 
-        new("v_la_absence", "Id", ViewRange.LA, "PupilAbsence", "LAAbsence"),
-        new("v_la_destinations", "Id", ViewRange.LA, "KS4_Destinations", "LADestinations"),
-        new("v_la_performance", "Id", ViewRange.LA, "KS4_Performance", "LAPerformance"),
-        new("v_la_subject_entries", "old_la_code", ViewRange.LA, "KS4_Performance", "LASubjectEntries")
+        new("v_la_absence", "Id", null, ViewRange.LA, "PupilAbsence", "LAAbsence"),
+        new("v_la_destinations", "Id", null, ViewRange.LA, "KS4_Destinations", "LADestinations"),
+        new("v_la_performance", "Id", null, ViewRange.LA, "KS4_Performance", "LAPerformance"),
+        new("v_la_subject_entries", "old_la_code", null, ViewRange.LA, "KS4_Performance", "LASubjectEntries")
     };
 
     public GenerateViews(
@@ -275,28 +276,137 @@ public sealed class GenerateViews
                     continue;
                 }
 
-                sql = GenerateMaterializedView(view.ViewName, viewRows, tableMap);
+                sql = GenerateMaterializedView(view.ViewName, view.EstablishmentIdentifier, viewRows, tableMap);
                 WriteSql("04", view.ViewName, sql);
             }
 
             var modelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
 
+            var establishmentFilterSubquery =
+                        //view.EstablishmentIdentifier switch
+                        //{
+                        //    "LAESTAB" =>
+                        //        """
+                        //        select "LAESTAB"
+                        //        from v_establishment
+                        //        where "URN" in (
+                        //            select "URN" 
+                        //            from test_establishments_urns 
+                        //            union all 
+                        //            select "NeighbourURN" 
+                        //            from v_similar_schools_secondary_groups 
+                        //            where "URN" in (
+                        //                select "URN" 
+                        //                from test_establishments_urns
+                        //            )
+                        //        )
+                        //        """,
+
+                        //    _ =>
+                        """
+                        select "URN" 
+                        from test_establishments_urns 
+                        union all 
+                        select "NeighbourURN" 
+                        from v_similar_schools_secondary_groups 
+                        where "URN" in (
+                            select "URN" 
+                            from test_establishments_urns
+                        )
+                        """;
+            //};
+
             jsonSql = view switch
             {
                 _ when view.ViewName == "v_establishment_group_links" =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{modelFile}' with(format text);",
+                    $"""
+                    \copy (
+                        select json_array(
+                            select row_to_json(r) 
+                            from (select * from {view.ViewName}) r
+                        )
+                    )
+                    to '{modelFile}'
+                    with(format text);
+                    """.ReplaceLineEndings(" "),
 
                 _ when view.ViewName == "v_la_subject_entries" =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" IN (select distinct ""LAId"" from v_establishment where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{modelFile}' with(format text);",
+                    $"""
+                    \copy (
+                        select json_array(
+                            select row_to_json(r) 
+                            from (
+                                select * 
+                                from {view.ViewName} 
+                                where "{view.IdColumn}" IN (
+                                    select distinct "LAId"
+                                    from v_establishment 
+                                    where "URN" in (
+                                        select "URN" from test_establishments_urns
+                                    )
+                                ) 
+                                and "subject" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])
+                            ) r
+                        )
+                    )
+                    to '{modelFile}'
+                    with(format text);
+                    """.ReplaceLineEndings(" "),
+
 
                 _ when view.ViewName == "v_establishment_subject_entries" =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns)) and ""subject"" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])) r)) to '{modelFile}' with(format text);",
+                    $"""
+                    \copy (
+                        select json_array(
+                            select row_to_json(r)
+                            from (
+                                select * 
+                                from {view.ViewName} 
+                                where "{view.IdColumn}" in (
+                                    {establishmentFilterSubquery}
+                                ) 
+                                and "subject" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])
+                            ) r
+                        )
+                    )
+                    to '{modelFile}'
+                    with(format text);
+                    """.ReplaceLineEndings(" "),
+
 
                 _ when view.Range == ViewRange.Establishment =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""{view.IdColumn}"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{modelFile}' with(format text);",
+                    $"""
+                    \copy (
+                        select json_array(
+                            select row_to_json(r)
+                            from (
+                                select * 
+                                from {view.ViewName}
+                                where "{view.IdColumn}" in (
+                                    {establishmentFilterSubquery}
+                                )
+                            ) r
+                        )
+                    )
+                    to '{modelFile}'
+                    with(format text);
+                    """.ReplaceLineEndings(" "),
+
 
                 _ =>
-                    $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName}) r)) to '{modelFile}' with(format text);"
+                    $"""
+                    \copy (
+                        select json_array(
+                            select row_to_json(r)
+                            from (
+                                select * 
+                                from {view.ViewName}
+                            ) r
+                        )
+                    )
+                    to '{modelFile}' 
+                    with(format text);
+                    """.ReplaceLineEndings(" ")
             };
 
             WriteSql("61", view.ViewName, jsonSql);
@@ -354,6 +464,7 @@ public sealed class GenerateViews
         sb.AppendLine("    t.\"gor__name_\"                               AS \"RegionName\",");
         sb.AppendLine("    t.\"establishmentname\"                        AS \"EstablishmentName\",");
         sb.AppendLine("    t.\"establishmentnumber\"                      AS \"EstablishmentNumber\",");
+        sb.AppendLine("    t.\"la__code_\" || t.\"establishmentnumber\"     AS \"LAESTAB\",");
         sb.AppendLine();
         sb.AppendLine("    t.\"trusts__code_\"                            AS \"TrustId\",");
         sb.AppendLine("    t.\"trusts__name_\"                            AS \"TrustName\",");
@@ -447,7 +558,7 @@ public sealed class GenerateViews
     // GENERIC MATERIALIZED VIEW (DataMap-driven)
     // =====================================================
 
-    private string GenerateMaterializedView(string viewName, List<DataMapRow> rows, Dictionary<string, string> tableMap)
+    private string GenerateMaterializedView(string viewName, string? establishmentIdentifier, List<DataMapRow> rows, Dictionary<string, string> tableMap)
     {
         var sql = new StringBuilder();
 
@@ -502,14 +613,21 @@ public sealed class GenerateViews
         sql.AppendLine();
         sql.AppendLine("SELECT");
 
-        // Always include Id from all_ids
-        sql.AppendLine("    a.\"Id\" AS \"Id\",");
-
-        // If this is an establishment-level fact view, include LA/Region dims
-        var includeEstablishmentDims =
+        var isEstablishmentFact =
             viewName.StartsWith("v_establishment_", StringComparison.OrdinalIgnoreCase);
 
-        if (includeEstablishmentDims)
+        // Always include Id from all_ids
+        if (isEstablishmentFact && establishmentIdentifier != null && establishmentIdentifier != "URN")
+        {
+            sql.AppendLine("    e.\"URN\" AS \"Id\",");
+        }
+        else
+        {
+            sql.AppendLine("    a.\"Id\" AS \"Id\",");
+        }
+
+        // If this is an establishment-level fact view, include LA/Region dims
+        if (isEstablishmentFact)
         {
             sql.AppendLine("    e.\"LAId\" AS \"LAId\",");
             sql.AppendLine("    e.\"LAName\" AS \"LAName\",");
@@ -549,8 +667,11 @@ public sealed class GenerateViews
         for (int i = 0; i < groups.Count; i++)
             sql.AppendLine($"LEFT JOIN src_{i + 1} ON src_{i + 1}.\"Id\" = a.\"Id\"");
 
-        if (includeEstablishmentDims)
-            sql.AppendLine("LEFT JOIN v_establishment e ON e.\"URN\" = a.\"Id\"");
+        if (isEstablishmentFact)
+        {
+            var id = establishmentIdentifier ?? "URN";
+            sql.AppendLine($"LEFT JOIN v_establishment e ON e.\"{id}\" = a.\"Id\"");
+        }
 
         sql.AppendLine(";");
 
