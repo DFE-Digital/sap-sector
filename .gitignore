@@ -506,4 +506,3 @@ wwwroot/**/*.min.js
 **/wwwroot/*
 **/wwwroot/*
 /coveragereport
-/SAPData/Sql
