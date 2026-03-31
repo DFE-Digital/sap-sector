@@ -172,12 +172,12 @@ public class SchoolController : Controller
     {
         var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
         var model = BuildKs4HeadlineMeasuresViewModel(response);
-        var gradeFilter = GetSchoolKs4HeadlineMeasuresResponse.ParseGradeFilter(grade);
-        var selectedEngMaths = response.GetEngMaths(gradeFilter);
+        var gradeFilter = SchoolKs4EngMathsSelection.ParseFilter(grade);
+        var selectedEngMaths = SchoolKs4EngMathsSelection.From(response, gradeFilter);
 
         return Json(new
         {
-            grade = GetSchoolKs4HeadlineMeasuresResponse.ToFilterValue(gradeFilter),
+            grade = SchoolKs4EngMathsSelection.ToFilterValue(gradeFilter),
             bar = new decimal?[]
             {
                 selectedEngMaths.ThreeYearAverage.SchoolValue,
@@ -240,12 +240,12 @@ public class SchoolController : Controller
     {
         var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
         var model = BuildKs4HeadlineMeasuresViewModel(response);
-        var destinationFilter = GetSchoolKs4HeadlineMeasuresResponse.ParseDestinationFilter(destination);
-        var selectedDestinations = response.GetDestinations(destinationFilter);
+        var destinationFilter = SchoolKs4DestinationsSelection.ParseFilter(destination);
+        var selectedDestinations = SchoolKs4DestinationsSelection.From(response, destinationFilter);
 
         return Json(new
         {
-            destination = GetSchoolKs4HeadlineMeasuresResponse.ToFilterValue(destinationFilter),
+            destination = SchoolKs4DestinationsSelection.ToFilterValue(destinationFilter),
             bar = new decimal?[]
             {
                 selectedDestinations.ThreeYearAverage.SchoolValue,
@@ -323,8 +323,8 @@ public class SchoolController : Controller
     private static Ks4HeadlineMeasuresPageViewModel BuildKs4HeadlineMeasuresViewModel(
         GetSchoolKs4HeadlineMeasuresResponse response)
     {
-        var defaultEngMaths = response.GetEngMaths(SchoolKs4GradeFilter.Grade4);
-        var defaultDestinations = response.GetDestinations(SchoolKs4DestinationFilter.All);
+        var defaultEngMaths = SchoolKs4EngMathsSelection.From(response, SchoolKs4GradeFilter.Grade4);
+        var defaultDestinations = SchoolKs4DestinationsSelection.From(response, SchoolKs4DestinationFilter.All);
 
         return new()
         {

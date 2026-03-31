@@ -15,26 +15,26 @@ public class GetSchoolKs4HeadlineMeasuresTests
     [Fact]
     public void ParseDestinationFilter_NormalizesSupportedValues()
     {
-        GetSchoolKs4HeadlineMeasuresResponse.ParseDestinationFilter("education")
+        SchoolKs4DestinationsSelection.ParseFilter("education")
             .Should().Be(SchoolKs4DestinationFilter.Education);
-        GetSchoolKs4HeadlineMeasuresResponse.ParseDestinationFilter("employment")
+        SchoolKs4DestinationsSelection.ParseFilter("employment")
             .Should().Be(SchoolKs4DestinationFilter.Employment);
-        GetSchoolKs4HeadlineMeasuresResponse.ParseDestinationFilter("unexpected")
+        SchoolKs4DestinationsSelection.ParseFilter("unexpected")
             .Should().Be(SchoolKs4DestinationFilter.All);
-        GetSchoolKs4HeadlineMeasuresResponse.ParseDestinationFilter(null)
+        SchoolKs4DestinationsSelection.ParseFilter(null)
             .Should().Be(SchoolKs4DestinationFilter.All);
     }
 
     [Fact]
     public void ParseGradeFilter_NormalizesSupportedValues()
     {
-        GetSchoolKs4HeadlineMeasuresResponse.ParseGradeFilter("4")
+        SchoolKs4EngMathsSelection.ParseFilter("4")
             .Should().Be(SchoolKs4GradeFilter.Grade4);
-        GetSchoolKs4HeadlineMeasuresResponse.ParseGradeFilter("5")
+        SchoolKs4EngMathsSelection.ParseFilter("5")
             .Should().Be(SchoolKs4GradeFilter.Grade5);
-        GetSchoolKs4HeadlineMeasuresResponse.ParseGradeFilter("unexpected")
+        SchoolKs4EngMathsSelection.ParseFilter("unexpected")
             .Should().Be(SchoolKs4GradeFilter.Grade4);
-        GetSchoolKs4HeadlineMeasuresResponse.ParseGradeFilter(null)
+        SchoolKs4EngMathsSelection.ParseFilter(null)
             .Should().Be(SchoolKs4GradeFilter.Grade4);
     }
 
@@ -78,9 +78,9 @@ public class GetSchoolKs4HeadlineMeasuresTests
             Array.Empty<Ks4TopPerformer>(),
             new SchoolKs4ComparisonYearByYear(new(null, null, null), new(null, null, null), new(null, null, null), new(null, null, null)));
 
-        response.GetEngMaths(SchoolKs4GradeFilter.Grade4).Should().BeEquivalentTo(
+        SchoolKs4EngMathsSelection.From(response, SchoolKs4GradeFilter.Grade4).Should().BeEquivalentTo(
             new SchoolKs4EngMathsSelection(grade4Average, grade4TopPerformers, grade4YearByYear));
-        response.GetEngMaths(SchoolKs4GradeFilter.Grade5).Should().BeEquivalentTo(
+        SchoolKs4EngMathsSelection.From(response, SchoolKs4GradeFilter.Grade5).Should().BeEquivalentTo(
             new SchoolKs4EngMathsSelection(grade5Average, grade5TopPerformers, grade5YearByYear));
     }
 
@@ -131,11 +131,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             employmentTopPerformers,
             employmentYearByYear);
 
-        response.GetDestinations(SchoolKs4DestinationFilter.All).Should().BeEquivalentTo(
+        SchoolKs4DestinationsSelection.From(response, SchoolKs4DestinationFilter.All).Should().BeEquivalentTo(
             new SchoolKs4DestinationsSelection(allAverage, allTopPerformers, allYearByYear));
-        response.GetDestinations(SchoolKs4DestinationFilter.Education).Should().BeEquivalentTo(
+        SchoolKs4DestinationsSelection.From(response, SchoolKs4DestinationFilter.Education).Should().BeEquivalentTo(
             new SchoolKs4DestinationsSelection(educationAverage, educationTopPerformers, educationYearByYear));
-        response.GetDestinations(SchoolKs4DestinationFilter.Employment).Should().BeEquivalentTo(
+        SchoolKs4DestinationsSelection.From(response, SchoolKs4DestinationFilter.Employment).Should().BeEquivalentTo(
             new SchoolKs4DestinationsSelection(employmentAverage, employmentTopPerformers, employmentYearByYear));
     }
 
