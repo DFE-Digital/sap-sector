@@ -118,7 +118,7 @@
 
             return {
                 byKey,
-                palette: rawColors.length ? rawColors : [byKey.school, byKey.comparator, byKey.england]
+                palette: rawColors.length ? rawColors : [byKey.school, byKey.similarSchools, byKey.localAuthority, byKey.england]
             };
         }
 
@@ -133,7 +133,7 @@
 
             return {
                 byKey,
-                palette: Object.values(byKey).filter((_, i) => i < 3)
+                palette: Object.values(byKey).filter((_, i) => i < 4)
             };
         }
 
