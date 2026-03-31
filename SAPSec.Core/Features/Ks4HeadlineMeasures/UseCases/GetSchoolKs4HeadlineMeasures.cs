@@ -18,8 +18,9 @@ public class GetSchoolKs4HeadlineMeasures(
             schoolDetails,
             await repository.GetByUrnAsync(request.Urn));
         var similarSchoolUrns = await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn);
-        var similarSchoolData = await repository.GetByUrnsAsync(similarSchoolUrns)
-            ?? new Dictionary<string, Ks4HeadlineMeasuresData?>(StringComparer.Ordinal);
+        var similarSchoolData = ((await repository.GetByUrnsAsync(similarSchoolUrns))
+                ?? Array.Empty<Ks4HeadlineMeasuresByUrn>())
+            .ToDictionary(x => x.Urn, x => x.Data, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
                 ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
@@ -234,6 +235,29 @@ public record SchoolKs4ComparisonYearByYear(
     Ks4HeadlineMeasureSeries LocalAuthority,
     Ks4HeadlineMeasureSeries England);
 
+public enum SchoolKs4DestinationFilter
+{
+    All,
+    Education,
+    Employment
+}
+
+public enum SchoolKs4GradeFilter
+{
+    Grade4,
+    Grade5
+}
+
+public record SchoolKs4DestinationsSelection(
+    SchoolKs4ComparisonAverage ThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> TopPerformers,
+    SchoolKs4ComparisonYearByYear YearByYear);
+
+public record SchoolKs4EngMathsSelection(
+    SchoolKs4ComparisonAverage ThreeYearAverage,
+    IReadOnlyList<Ks4TopPerformer> TopPerformers,
+    SchoolKs4ComparisonYearByYear YearByYear);
+
 public record GetSchoolKs4HeadlineMeasuresResponse(
     SchoolDetails SchoolDetails,
     int SimilarSchoolsCount,
@@ -254,6 +278,61 @@ public record GetSchoolKs4HeadlineMeasuresResponse(
     SchoolKs4ComparisonYearByYear DestinationsEducationYearByYear,
     SchoolKs4ComparisonAverage DestinationsEmploymentThreeYearAverage,
     IReadOnlyList<Ks4TopPerformer> DestinationsEmploymentTopPerformers,
-    SchoolKs4ComparisonYearByYear DestinationsEmploymentYearByYear);
+    SchoolKs4ComparisonYearByYear DestinationsEmploymentYearByYear)
+{
+    public static SchoolKs4GradeFilter ParseGradeFilter(string? grade) =>
+        grade == "5"
+            ? SchoolKs4GradeFilter.Grade5
+            : SchoolKs4GradeFilter.Grade4;
+
+    public static string ToFilterValue(SchoolKs4GradeFilter filter) =>
+        filter == SchoolKs4GradeFilter.Grade5 ? "5" : "4";
+
+    public static SchoolKs4DestinationFilter ParseDestinationFilter(string? destination) =>
+        destination?.ToLowerInvariant() switch
+        {
+            "education" => SchoolKs4DestinationFilter.Education,
+            "employment" => SchoolKs4DestinationFilter.Employment,
+            _ => SchoolKs4DestinationFilter.All
+        };
+
+    public static string ToFilterValue(SchoolKs4DestinationFilter filter) =>
+        filter switch
+        {
+            SchoolKs4DestinationFilter.Education => "education",
+            SchoolKs4DestinationFilter.Employment => "employment",
+            _ => "all"
+        };
+
+    public SchoolKs4EngMathsSelection GetEngMaths(SchoolKs4GradeFilter filter) =>
+        filter switch
+        {
+            SchoolKs4GradeFilter.Grade5 => new(
+                EngMaths59ThreeYearAverage,
+                EngMaths59TopPerformers,
+                EngMaths59YearByYear),
+            _ => new(
+                EngMaths49ThreeYearAverage,
+                EngMaths49TopPerformers,
+                EngMaths49YearByYear)
+        };
+
+    public SchoolKs4DestinationsSelection GetDestinations(SchoolKs4DestinationFilter filter) =>
+        filter switch
+        {
+            SchoolKs4DestinationFilter.Education => new(
+                DestinationsEducationThreeYearAverage,
+                DestinationsEducationTopPerformers,
+                DestinationsEducationYearByYear),
+            SchoolKs4DestinationFilter.Employment => new(
+                DestinationsEmploymentThreeYearAverage,
+                DestinationsEmploymentTopPerformers,
+                DestinationsEmploymentYearByYear),
+            _ => new(
+                DestinationsThreeYearAverage,
+                DestinationsTopPerformers,
+                DestinationsYearByYear)
+        };
+}
 
 internal sealed record SimilarSchoolMeasure(string Urn, string Name, Ks4HeadlineMeasuresData? Data);

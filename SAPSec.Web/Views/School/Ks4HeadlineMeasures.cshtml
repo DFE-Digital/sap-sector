@@ -17,10 +17,10 @@
 
     var engMathsRows = new[]
     {
-        (Key: "this", Label: Model.SchoolLabel, Series: Model.SchoolEngMaths49YearByYear, Display: Model.SchoolEngMaths49Display),
-        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.SimilarSchoolsEngMaths49YearByYear, Display: Model.SimilarSchoolsEngMaths49Display),
-        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.LocalAuthorityEngMaths49YearByYear, Display: Model.LocalAuthorityEngMaths49Display),
-        (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandEngMaths49YearByYear, Display: Model.EnglandEngMaths49Display)
+        (Key: "this", Label: Model.SchoolLabel, Series: Model.SchoolEngMathsYearByYear, Display: Model.SchoolEngMathsDisplay),
+        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.SimilarSchoolsEngMathsYearByYear, Display: Model.SimilarSchoolsEngMathsDisplay),
+        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.LocalAuthorityEngMathsYearByYear, Display: Model.LocalAuthorityEngMathsDisplay),
+        (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandEngMathsYearByYear, Display: Model.EnglandEngMathsDisplay)
     };
 
     var destinationsRows = new[]
@@ -187,7 +187,7 @@
         <div class="govuk-tabs__panel" id="eng-maths-three-year-average">
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                 @{
-                    var engMathsBarData = new decimal?[] { Model.SchoolEngMaths49ThreeYearAverage, Model.SimilarSchoolsEngMaths49ThreeYearAverage, Model.LocalAuthorityEngMaths49ThreeYearAverage, Model.EnglandEngMaths49ThreeYearAverage };
+                    var engMathsBarData = new decimal?[] { Model.SchoolEngMathsThreeYearAverage, Model.SimilarSchoolsEngMathsThreeYearAverage, Model.LocalAuthorityEngMathsThreeYearAverage, Model.EnglandEngMathsThreeYearAverage };
                 }
                 @if (HasAnyData(engMathsBarData))
                 {
@@ -201,7 +201,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-year-by-year">
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMaths49YearByYear.Previous2, Model.SchoolEngMaths49YearByYear.Previous, Model.SchoolEngMaths49YearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMaths49YearByYear.Previous2, Model.SimilarSchoolsEngMaths49YearByYear.Previous, Model.SimilarSchoolsEngMaths49YearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMaths49YearByYear.Previous2, Model.LocalAuthorityEngMaths49YearByYear.Previous, Model.LocalAuthorityEngMaths49YearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMaths49YearByYear.Previous2, Model.EnglandEngMaths49YearByYear.Previous, Model.EnglandEngMaths49YearByYear.Current } } } }))'></canvas>
+                <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMathsYearByYear.Previous2, Model.SchoolEngMathsYearByYear.Previous, Model.SchoolEngMathsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMathsYearByYear.Previous2, Model.SimilarSchoolsEngMathsYearByYear.Previous, Model.SimilarSchoolsEngMathsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMathsYearByYear.Previous2, Model.LocalAuthorityEngMathsYearByYear.Previous, Model.LocalAuthorityEngMathsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMathsYearByYear.Previous2, Model.EnglandEngMathsYearByYear.Previous, Model.EnglandEngMathsYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-top-performers">
@@ -215,7 +215,7 @@
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
-                    @foreach (var row in Model.EngMaths49TopPerformers)
+                    @foreach (var row in Model.EngMathsTopPerformers)
                     {
                         <tr class="govuk-table__row" data-top-performer-row="eng-maths">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>

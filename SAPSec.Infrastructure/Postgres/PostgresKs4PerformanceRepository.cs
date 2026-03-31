@@ -15,10 +15,10 @@ public class PostgresKs4PerformanceRepository(
     public async Task<Ks4HeadlineMeasuresData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.GetValueOrDefault(urn);
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal))?.Data;
     }
 
-    public async Task<IReadOnlyDictionary<string, Ks4HeadlineMeasuresData?>> GetByUrnsAsync(IEnumerable<string> urns)
+    public async Task<IReadOnlyCollection<Ks4HeadlineMeasuresByUrn>> GetByUrnsAsync(IEnumerable<string> urns)
     {
         var requestedUrns = urns
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
@@ -27,7 +27,7 @@ public class PostgresKs4PerformanceRepository(
 
         if (requestedUrns.Length == 0)
         {
-            return new Dictionary<string, Ks4HeadlineMeasuresData?>(StringComparer.Ordinal);
+            return Array.Empty<Ks4HeadlineMeasuresByUrn>();
         }
 
         using var conn = await _factory.Create().OpenConnectionAsync();
@@ -100,7 +100,7 @@ public class PostgresKs4PerformanceRepository(
             _logger.LogWarning("No LAIds found when loading KS4 performance for URNs {Urns}.", requestedUrns);
         }
 
-        var output = new Dictionary<string, Ks4HeadlineMeasuresData?>(StringComparer.Ordinal);
+        var output = new List<Ks4HeadlineMeasuresByUrn>(requestedUrns.Length);
 
         foreach (var urn in requestedUrns)
         {
@@ -114,13 +114,15 @@ public class PostgresKs4PerformanceRepository(
             localAuthorityPerformance.TryGetValue(establishment.LAId ?? string.Empty, out var laPerformance);
             localAuthorityDestinations.TryGetValue(establishment.LAId ?? string.Empty, out var laDestinations);
 
-            output[urn] = new Ks4HeadlineMeasuresData(
-                schoolPerformance,
-                laPerformance,
-                englandPerformance,
-                schoolDestinations,
-                laDestinations,
-                englandDestinations);
+            output.Add(new Ks4HeadlineMeasuresByUrn(
+                urn,
+                new Ks4HeadlineMeasuresData(
+                    schoolPerformance,
+                    laPerformance,
+                    englandPerformance,
+                    schoolDestinations,
+                    laDestinations,
+                    englandDestinations)));
         }
 
         return output;
