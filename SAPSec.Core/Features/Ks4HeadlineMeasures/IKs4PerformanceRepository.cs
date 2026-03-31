@@ -13,7 +13,5 @@ public record Ks4HeadlineMeasuresByUrn(string Urn, Ks4HeadlineMeasuresData? Data
 public record Ks4HeadlineMeasuresData(
     EstablishmentPerformance? EstablishmentPerformance,
     LAPerformance? LocalAuthorityPerformance,
-    EnglandPerformance? EnglandPerformance,
-    EstablishmentDestinations? EstablishmentDestinations,
-    LADestinations? LocalAuthorityDestinations,
-    EnglandDestinations? EnglandDestinations);
+    EnglandPerformance? EnglandPerformance);
+

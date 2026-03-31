@@ -4,7 +4,8 @@ using SAPSec.Core.Model;
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
 public class GetKs4HeadlineMeasures(
-    IKs4PerformanceRepository repository,
+    IKs4PerformanceRepository performanceRepository,
+    IKs4DestinationsRepository destinationsRepository,
     ISchoolDetailsService schoolDetailsService)
 {
     public async Task<GetKs4HeadlineMeasuresResponse> Execute(GetKs4HeadlineMeasuresRequest request)

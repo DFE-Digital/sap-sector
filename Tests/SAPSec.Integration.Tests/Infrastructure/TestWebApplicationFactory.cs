@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
@@ -70,6 +71,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
                 services.RemoveAll<IKs4PerformanceRepository>();
+                services.RemoveAll<IKs4DestinationsRepository>();
 
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
@@ -83,10 +85,11 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
 
-                services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
-                services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-                services.AddScoped<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
-
+                services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
+                services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
+                services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
+                services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
+                services.AddSingleton<IAttendanceRepository, MockAttendanceRepository>();
             });
     }
 

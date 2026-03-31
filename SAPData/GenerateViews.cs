@@ -283,38 +283,17 @@ public sealed class GenerateViews
             var modelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
 
             var establishmentFilterSubquery =
-                        //view.EstablishmentIdentifier switch
-                        //{
-                        //    "LAESTAB" =>
-                        //        """
-                        //        select "LAESTAB"
-                        //        from v_establishment
-                        //        where "URN" in (
-                        //            select "URN" 
-                        //            from test_establishments_urns 
-                        //            union all 
-                        //            select "NeighbourURN" 
-                        //            from v_similar_schools_secondary_groups 
-                        //            where "URN" in (
-                        //                select "URN" 
-                        //                from test_establishments_urns
-                        //            )
-                        //        )
-                        //        """,
-
-                        //    _ =>
-                        """
-                        select "URN" 
-                        from test_establishments_urns 
-                        union all 
-                        select "NeighbourURN" 
-                        from v_similar_schools_secondary_groups 
-                        where "URN" in (
-                            select "URN" 
-                            from test_establishments_urns
-                        )
-                        """;
-            //};
+                """
+                select "URN" 
+                from test_establishments_urns 
+                union all 
+                select "NeighbourURN" 
+                from v_similar_schools_secondary_groups 
+                where "URN" in (
+                    select "URN" 
+                    from test_establishments_urns
+                )
+                """;
 
             jsonSql = view switch
             {
