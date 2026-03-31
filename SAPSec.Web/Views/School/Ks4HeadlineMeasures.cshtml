@@ -73,7 +73,7 @@
                 @if (HasAnyData(attainmentBarData))
                 {
                     <canvas id="ks4-attainment8-school-chart"
-                            class="js-chart"
+                            class="js-chart js-chart--school-ks4-bar"
                             data-type="bar"
                             data-show-no-data-labels="true"
                             data-axis-step="30"
@@ -95,7 +95,7 @@
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="year-by-year">
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                 <canvas id="ks4-attainment8-school-yearbyyear-chart"
-                        class="js-chart"
+                        class="js-chart js-chart--school-ks4-line"
                         data-type="line"
                         data-axis-step="30"
                         data-axis-max="90"
@@ -191,7 +191,7 @@
                 }
                 @if (HasAnyData(engMathsBarData))
                 {
-                    <canvas id="eng-maths-school-chart" class="js-chart" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))'></canvas>
+                    <canvas id="eng-maths-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))'></canvas>
                 }
                 else
                 {
@@ -201,7 +201,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-year-by-year">
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMaths49YearByYear.Previous2, Model.SchoolEngMaths49YearByYear.Previous, Model.SchoolEngMaths49YearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMaths49YearByYear.Previous2, Model.SimilarSchoolsEngMaths49YearByYear.Previous, Model.SimilarSchoolsEngMaths49YearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMaths49YearByYear.Previous2, Model.LocalAuthorityEngMaths49YearByYear.Previous, Model.LocalAuthorityEngMaths49YearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMaths49YearByYear.Previous2, Model.EnglandEngMaths49YearByYear.Previous, Model.EnglandEngMaths49YearByYear.Current } } } }))'></canvas>
+                <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMaths49YearByYear.Previous2, Model.SchoolEngMaths49YearByYear.Previous, Model.SchoolEngMaths49YearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMaths49YearByYear.Previous2, Model.SimilarSchoolsEngMaths49YearByYear.Previous, Model.SimilarSchoolsEngMaths49YearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMaths49YearByYear.Previous2, Model.LocalAuthorityEngMaths49YearByYear.Previous, Model.LocalAuthorityEngMaths49YearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMaths49YearByYear.Previous2, Model.EnglandEngMaths49YearByYear.Previous, Model.EnglandEngMaths49YearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-top-performers">
@@ -298,7 +298,7 @@
                 }
                 @if (HasAnyData(destinationsBarData))
                 {
-                    <canvas id="destinations-school-chart" class="js-chart" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-value-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = destinationsBarData }))'></canvas>
+                    <canvas id="destinations-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-value-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = destinationsBarData }))'></canvas>
                 }
                 else
                 {
@@ -308,7 +308,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-year-by-year">
             <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="destinations-school-yearbyyear-chart" class="js-chart" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolDestinationsYearByYear.Previous2, Model.SchoolDestinationsYearByYear.Previous, Model.SchoolDestinationsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsDestinationsYearByYear.Previous2, Model.SimilarSchoolsDestinationsYearByYear.Previous, Model.SimilarSchoolsDestinationsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityDestinationsYearByYear.Previous2, Model.LocalAuthorityDestinationsYearByYear.Previous, Model.LocalAuthorityDestinationsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandDestinationsYearByYear.Previous2, Model.EnglandDestinationsYearByYear.Previous, Model.EnglandDestinationsYearByYear.Current } } } }))'></canvas>
+                <canvas id="destinations-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolDestinationsYearByYear.Previous2, Model.SchoolDestinationsYearByYear.Previous, Model.SchoolDestinationsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsDestinationsYearByYear.Previous2, Model.SimilarSchoolsDestinationsYearByYear.Previous, Model.SimilarSchoolsDestinationsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityDestinationsYearByYear.Previous2, Model.LocalAuthorityDestinationsYearByYear.Previous, Model.LocalAuthorityDestinationsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandDestinationsYearByYear.Previous2, Model.EnglandDestinationsYearByYear.Previous, Model.EnglandDestinationsYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-top-performers">

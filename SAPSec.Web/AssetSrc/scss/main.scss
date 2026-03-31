@@ -1232,6 +1232,20 @@ $app-ks4-color-track: #f3f2f1;
   --chart-color-fallback: #6f777b;
 }
 
+.js-chart--school-ks4-bar {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #2a1950;
+  --chart-color-england: #2a1950;
+}
+
+.js-chart--school-ks4-line {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
+}
+
 @media (max-width: 40.0625em) {
   .app-ks4-bar-row {
     grid-template-columns: 1fr;
