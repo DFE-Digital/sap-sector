@@ -7,12 +7,6 @@ namespace SAPSec.Web.ViewModels;
 
 public class SchoolAttendancePageViewModel
 {
-    private const decimal AxisHeadroomMultiplier = 1.1m;
-    private const decimal OverallAbsenceAxisDefaultMax = 10m;
-    private const decimal PersistentAbsenceAxisDefaultMax = 30m;
-    private const decimal OverallAbsenceAxisStep = 1m;
-    private const decimal PersistentAbsenceAxisStep = 5m;
-
     public required SchoolDetails SchoolDetails { get; init; }
     public required GetAttendanceMeasuresResponse AttendanceMeasures { get; init; }
 
@@ -36,8 +30,7 @@ public class SchoolAttendancePageViewModel
             LocalAuthorityOverallAbsenceThreeYearAverage,
             EnglandOverallAbsenceThreeYearAverage
         ],
-        OverallAbsenceAxisDefaultMax,
-        OverallAbsenceAxisStep);
+        AttendanceAxisCalculator.OverallAbsence);
 
     public decimal OverallAbsenceLineAxisMax => CalculateAxisMax(
         [
@@ -51,8 +44,7 @@ public class SchoolAttendancePageViewModel
             AttendanceMeasures.OverallAbsenceYearByYear.England.Previous,
             AttendanceMeasures.OverallAbsenceYearByYear.England.Current
         ],
-        OverallAbsenceAxisDefaultMax,
-        OverallAbsenceAxisStep);
+        AttendanceAxisCalculator.OverallAbsence);
 
     public decimal PersistentAbsenceBarAxisMax => CalculateAxisMax(
         [
@@ -60,8 +52,7 @@ public class SchoolAttendancePageViewModel
             LocalAuthorityPersistentAbsenceThreeYearAverage,
             EnglandPersistentAbsenceThreeYearAverage
         ],
-        PersistentAbsenceAxisDefaultMax,
-        PersistentAbsenceAxisStep);
+        AttendanceAxisCalculator.PersistentAbsence);
 
     public decimal PersistentAbsenceLineAxisMax => CalculateAxisMax(
         [
@@ -75,31 +66,13 @@ public class SchoolAttendancePageViewModel
             AttendanceMeasures.PersistentAbsenceYearByYear.England.Previous,
             AttendanceMeasures.PersistentAbsenceYearByYear.England.Current
         ],
-        PersistentAbsenceAxisDefaultMax,
-        PersistentAbsenceAxisStep);
+        AttendanceAxisCalculator.PersistentAbsence);
 
     public static string DisplayPercentNullable(decimal? value) =>
         value.HasValue
             ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
             : "No available data";
 
-    public static decimal CalculateAxisMax(
-        IEnumerable<decimal?> values,
-        decimal defaultMax,
-        decimal step)
-    {
-        var maxValue = values
-            .Where(v => v.HasValue)
-            .Select(v => v!.Value)
-            .DefaultIfEmpty(0m)
-            .Max();
-
-        if (maxValue <= defaultMax)
-        {
-            return defaultMax;
-        }
-
-        var adjustedMax = maxValue * AxisHeadroomMultiplier;
-        return Math.Ceiling(adjustedMax / step) * step;
-    }
+    public static decimal CalculateAxisMax(IEnumerable<decimal?> values, AttendanceAxisSettings settings) =>
+        AttendanceAxisCalculator.CalculateMax(values, settings);
 }
