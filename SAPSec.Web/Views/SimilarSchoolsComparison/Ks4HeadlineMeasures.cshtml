@@ -3,6 +3,9 @@
 @{
     Layout = "_Layout";
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
+    var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
+    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
 }
 
 <h1 class="govuk-heading-l">KS4 headline performance measures</h1>
@@ -11,36 +14,7 @@
     How @Model.Name compares with @Model.SimilarSchoolName based on KS4 headline performance measures.
 </p>
 
-<section class="govuk-!-margin-bottom-7 govuk-!-margin-top-9 app-ks4-progress" aria-labelledby="progress8-heading">
-    <h2 class="govuk-heading-m" id="progress8-heading">Progress 8</h2>
-    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Information about Progress 8</span>
-        </summary>
-        <div class="govuk-details__text">
-            <p class="govuk-body-s govuk-!-margin-bottom-2">
-                Progress 8 shows how much progress a pupil made compared to other pupils with similar prior attainment.
-            </p>
-            <p class="govuk-body-s govuk-!-margin-bottom-2">
-                The score shows progress compared to the national average:
-            </p>
-            <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-bottom-3 app-ks4-copy-list">
-                <li>a score of 0 means pupils in this school made similar progress to others with similar starting points</li>
-                <li>a score of above 0 means pupils made more progress than average</li>
-                <li>a score of below 0 means pupils made less progress than average</li>
-            </ul>
-            <p class="govuk-body-s govuk-!-margin-bottom-0">
-                The confidence interval gives a range of scores the school could have achieved based on the cohort of pupils and natural variation in pupil performance across England.
-            </p>
-        </div>
-    </details>
-
-    <div class="app-ks4-message-panel">
-        <p class="govuk-body govuk-!-margin-bottom-0">
-            There are no Progress 8 scores for the academic years 2024 to 2025 and 2025 to 2026, as there is no KS2 assessment data available to calculate the baseline. This is due to COVID-19 disruption.
-        </p>
-    </div>
-</section>
+<partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
 
 
 @section Scripts {
@@ -52,37 +26,7 @@
 }
 
 <section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
-    <h2 class="govuk-heading-m" id="attainment8-heading">Attainment 8</h2>
-    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-4 app-ks4-details" data-module="govuk-details">
-        <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Information about Attainment 8</span>
-        </summary>
-        <div class="govuk-details__text">
-            <p class="govuk-body-s govuk-!-margin-bottom-2">
-                Attainment 8 is used to assess a pupil's achievement across their best performing 8 subjects.
-            </p>
-            <p class="govuk-body-s govuk-!-margin-bottom-2">
-                The 8 subjects that are used in Attainment 8 are split into 3 groups:
-            </p>
-            <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-bottom-2 app-ks4-copy-list">
-                <li>
-                    EBacc qualifications, which are both double weighted:
-                    <ul class="govuk-list govuk-list--bullet govuk-!-font-size-16 govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                        <li>English, if both language and literature are taken</li>
-                        <li>Maths</li>
-                    </ul>
-                </li>
-                <li>EBacc subjects, which include sciences, geography, history, and languages</li>
-                <li>Open group subjects, which can include GCSEs or vocational qualifications (including any other approved GCSEs or vocational qualifications)</li>
-            </ul>
-            <p class="govuk-body-s govuk-!-margin-bottom-2">
-                Each GCSE grade is given a points score, for example grade 9 = 9 points, grade 8 = 8 points, and so on. The score from the best 8 subjects (with English and maths counting twice) are added together to give an Attainment 8 score.
-            </p>
-            <p class="govuk-body-s govuk-!-margin-bottom-0">
-                If a student scores high grades across these subjects, their Attainment 8 score will be higher. The maximum score a pupil can have is 90.
-            </p>
-        </div>
-    </details>
+    <partial name="~/Views/Shared/_Ks4Attainment8Intro.cshtml" />
 
     <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
         <h3 class="govuk-tabs__title">Attainment 8 views</h3>
@@ -115,21 +59,28 @@
                         Model.EnglandAttainment8ThreeYearAverage
                     }
                 };
-                var chartColors = new[] { "#d53780", "#003078", "#003078" };
             }
             <div class="app-ks4-chart-container">
-                <canvas id="ks4-attainment8-comparison-chart"
-                        class="js-chart"
-                        data-type="bar"
-                        data-axis-step="30"
-                        data-axis-max="90"
-                        data-bar-thickness="50"
-                        data-category-percentage="0.7"
-                        data-bar-percentage="1"
-                        data-axis-suffix=""
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                </canvas>
+                @if (HasAnyData(chartData.data))
+                {
+                    <canvas id="ks4-attainment8-comparison-chart"
+                            class="js-chart"
+                            data-type="bar"
+                            data-show-no-data-labels="true"
+                            data-axis-step="30"
+                            data-axis-max="90"
+                            data-bar-thickness="50"
+                            data-category-percentage="0.7"
+                            data-bar-percentage="1"
+                            data-axis-suffix=""
+                            data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                    </canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
             </div>
         </div>
 
@@ -172,8 +123,8 @@
                         {
                             label = "Schools in England average",
                             borderWidth = 2,
-                            borderColor = "#1d8f89",
-                            backgroundColor = "#1d8f89",
+                            borderColor = yearByYearColors[2],
+                            backgroundColor = yearByYearColors[2],
                             pointRadius = 4,
                             pointHoverRadius = 5,
                             tension = 0,
@@ -186,7 +137,6 @@
                         }
                     }
                 };
-                var yearByYearColors = new[] { "#d53880", "#003078", "#1d8f89" };
             }
             <div class="app-ks4-chart-container">
                 <canvas id="ks4-attainment8-comparison-yearbyyear-chart"
@@ -297,21 +247,28 @@
                         Model.EnglandEngMaths49ThreeYearAverage
                     }
                 };
-                var engMathsChartColors = new[] { "#d53780", "#003078", "#003078" };
             }
             <div class="app-ks4-chart-container">
-                <canvas id="eng-maths-comparison-chart"
-                        class="js-chart"
-                        data-type="bar"
-                        data-axis-step="25"
-                        data-axis-max="100"
-                        data-axis-suffix="%"
-                        data-bar-thickness="50"
-                        data-category-percentage="0.7"
-                        data-bar-percentage="1"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(engMathsChartColors))'>
-                </canvas>
+                @if (HasAnyData(engMathsChartData.data))
+                {
+                    <canvas id="eng-maths-comparison-chart"
+                            class="js-chart"
+                            data-type="bar"
+                            data-show-no-data-labels="true"
+                            data-axis-step="25"
+                            data-axis-max="100"
+                            data-axis-suffix="%"
+                            data-bar-thickness="50"
+                            data-category-percentage="0.7"
+                            data-bar-percentage="1"
+                            data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
+                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                    </canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
             </div>
 
         </div>
@@ -367,7 +324,6 @@
                         }
                     }
                 };
-                var engMathsYearByYearColors = new[] { "#d53780", "#003078", "#1d8f89" };
             }
             <div class="app-ks4-chart-container">
                 <canvas id="eng-maths-comparison-yearbyyear-chart"
@@ -380,7 +336,7 @@
                         data-show-datalabels="false"
                         data-show-x-grid="true"
                         data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearColors))'>
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
                 </canvas>
             </div>
         </div>
@@ -493,21 +449,28 @@
                         Model.EnglandDestinationsThreeYearAverage
                     }
                 };
-                var destinationsChartColors = new[] { "#d53780", "#003078", "#003078" };
             }
             <div class="app-ks4-chart-container">
-                <canvas id="destinations-comparison-chart"
-                        class="js-chart"
-                        data-type="bar"
-                        data-axis-step="25"
-                        data-axis-max="100"
-                        data-axis-suffix="%"
-                        data-bar-thickness="50"
-                        data-category-percentage="0.7"
-                        data-bar-percentage="1"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(destinationsChartColors))'>
-                </canvas>
+                @if (HasAnyData(destinationsChartData.data))
+                {
+                    <canvas id="destinations-comparison-chart"
+                            class="js-chart"
+                            data-type="bar"
+                            data-show-no-data-labels="true"
+                            data-axis-step="25"
+                            data-axis-max="100"
+                            data-axis-suffix="%"
+                            data-bar-thickness="50"
+                            data-category-percentage="0.7"
+                            data-bar-percentage="1"
+                            data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
+                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                    </canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
             </div>
         </div>
 
@@ -562,7 +525,6 @@
                         }
                     }
                 };
-                var destinationsYearByYearColors = new[] { "#d53780", "#003078", "#1d8f89" };
             }
             <div class="app-ks4-chart-container">
                 <canvas id="destinations-comparison-yearbyyear-chart"
@@ -575,7 +537,7 @@
                         data-show-datalabels="false"
                         data-show-x-grid="true"
                         data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearColors))'>
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
                 </canvas>
             </div>
         </div>

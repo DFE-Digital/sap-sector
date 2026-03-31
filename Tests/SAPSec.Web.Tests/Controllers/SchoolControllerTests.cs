@@ -6,6 +6,7 @@ using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
@@ -22,6 +23,7 @@ public class SchoolControllerTests
     private readonly Mock<IAttendanceRepository> _attendanceRepositoryMock;
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
+    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
 
@@ -35,19 +37,22 @@ public class SchoolControllerTests
         _attendanceRepositoryMock = new Mock<IAttendanceRepository>();
         _establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
         _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
 
         var getAttendanceMeasures = new GetAttendanceMeasures(
             _attendanceRepositoryMock.Object,
             _establishmentRepositoryMock.Object);
-        var getKs4HeadlineMeasures = new GetKs4HeadlineMeasures(
+        var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object);
+            _schoolDetailsServiceMock.Object,
+            _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object);
 
         _sut = new SchoolController(
             _schoolDetailsServiceMock.Object,
+            getSchoolKs4HeadlineMeasures,
             getAttendanceMeasures,
-            getKs4HeadlineMeasures,
             _loggerMock.Object);
     }
 
@@ -132,6 +137,9 @@ public class SchoolControllerTests
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
+        _similarSchoolsRepositoryMock
+            .Setup(x => x.GetSimilarSchoolUrnsAsync(urn))
+            .ReturnsAsync(Array.Empty<string>());
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))

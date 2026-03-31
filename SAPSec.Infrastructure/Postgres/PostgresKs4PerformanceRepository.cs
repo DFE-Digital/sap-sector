@@ -2,7 +2,6 @@ using Dapper;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Model.Generated;
-using System.Globalization;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -15,142 +14,123 @@ public class PostgresKs4PerformanceRepository(
 
     public async Task<Ks4HeadlineMeasuresData?> GetByUrnAsync(string urn)
     {
+        var results = await GetByUrnsAsync([urn]);
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal))?.Data;
+    }
+
+    public async Task<IReadOnlyCollection<Ks4HeadlineMeasuresByUrn>> GetByUrnsAsync(IEnumerable<string> urns)
+    {
+        var requestedUrns = urns
+            .Where(urn => !string.IsNullOrWhiteSpace(urn))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        if (requestedUrns.Length == 0)
+        {
+            return Array.Empty<Ks4HeadlineMeasuresByUrn>();
+        }
+
         using var conn = await _factory.Create().OpenConnectionAsync();
 
         const string sql = """
-            SELECT "LAId"
+            SELECT "URN", "LAId"
             FROM public.v_establishment
-            WHERE "URN" = @urn
-            LIMIT 1;
+            WHERE "URN" = ANY(@urns);
 
             SELECT *
             FROM public.v_establishment_performance
-            WHERE "Id" = @urn;
+            WHERE "Id" = ANY(@urns);
+
+            SELECT *
+            FROM public.v_establishment_destinations
+            WHERE "Id" = ANY(@urns);
 
             SELECT *
             FROM public.v_england_performance
             WHERE "Id" = 'National'
             LIMIT 1;
 
-            SELECT
-                "Id",
-                "AllDest_Tot_Est_Current_Pct"::text AS "AllDestCurrentPct",
-                "AllDest_Tot_Est_Previous_Pct"::text AS "AllDestPreviousPct",
-                "AllDest_Tot_Est_Previous2_Pct"::text AS "AllDestPrevious2Pct",
-                "Education_Tot_Est_Current_Pct"::text AS "EducationCurrentPct",
-                "Education_Tot_Est_Previous_Pct"::text AS "EducationPreviousPct",
-                "Education_Tot_Est_Previous2_Pct"::text AS "EducationPrevious2Pct",
-                "Employment_Tot_Est_Current_Pct"::text AS "EmploymentCurrentPct",
-                "Employment_Tot_Est_Previous_Pct"::text AS "EmploymentPreviousPct",
-                "Employment_Tot_Est_Previous2_Pct"::text AS "EmploymentPrevious2Pct"
-            FROM public.v_establishment_destinations
-            WHERE "Id" = @urn;
-
-            SELECT
-                "Id",
-                "AllDest_Tot_Eng_Current_Pct",
-                "AllDest_Tot_Eng_Previous_Pct",
-                "AllDest_Tot_Eng_Previous2_Pct",
-                "Education_Tot_Eng_Current_Pct",
-                "Education_Tot_Eng_Previous_Pct",
-                "Education_Tot_Eng_Previous2_Pct",
-                "Employment_Tot_Eng_Current_Pct",
-                "Employment_Tot_Eng_Previous_Pct",
-                "Employment_Tot_Eng_Previous2_Pct"
+            SELECT *
             FROM public.v_england_destinations
             WHERE "Id" = 'National'
             LIMIT 1;
         """;
 
-        using var results = await conn.QueryMultipleAsync(sql, new { urn });
+        using var results = await conn.QueryMultipleAsync(sql, new { urns = requestedUrns });
 
-        var establishmentInfo = await results.ReadSingleOrDefaultAsync<EstablishmentInfo>();
-        var establishmentPerformance = await results.ReadSingleOrDefaultAsync<EstablishmentPerformance>();
+        var establishments = (await results.ReadAsync<EstablishmentInfo>())
+            .Where(x => !string.IsNullOrWhiteSpace(x.URN))
+            .ToDictionary(x => x.URN!, StringComparer.Ordinal);
+        var establishmentPerformance = (await results.ReadAsync<EstablishmentPerformance>())
+            .ToDictionary(x => x.Id, StringComparer.Ordinal);
+        var establishmentDestinations = (await results.ReadAsync<EstablishmentDestinations>())
+            .ToDictionary(x => x.Id, StringComparer.Ordinal);
         var englandPerformance = await results.ReadSingleOrDefaultAsync<EnglandPerformance>();
-        var establishmentDestinations = await results.ReadSingleOrDefaultAsync<EstablishmentDestinations>();
         var englandDestinations = await results.ReadSingleOrDefaultAsync<EnglandDestinations>();
 
-        LAPerformance? localAuthorityPerformance = null;
-        LADestinations? localAuthorityDestinations = null;
-        if (!string.IsNullOrWhiteSpace(establishmentInfo?.LAId))
+        var laIds = establishments.Values
+            .Select(x => x.LAId)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+
+        var localAuthorityPerformance = new Dictionary<string, LAPerformance>(StringComparer.Ordinal);
+        var localAuthorityDestinations = new Dictionary<string, LADestinations>(StringComparer.Ordinal);
+
+        if (laIds.Length > 0)
         {
             const string laSql = """
                 SELECT *
                 FROM public.v_la_performance
-                WHERE "Id" = @laId
-                LIMIT 1;
+                WHERE "Id" = ANY(@laIds);
 
-                SELECT
-                    "Id",
-                    "AllDest_Tot_LA_Current_Pct",
-                    "AllDest_Tot_LA_Previous_Pct",
-                    "AllDest_Tot_LA_Previous2_Pct",
-                    "Education_Tot_LA_Current_Pct",
-                    "Education_Tot_LA_Previous_Pct",
-                    "Education_Tot_LA_Previous2_Pct",
-                    "Employment_Tot_LA_Current_Pct",
-                    "Employment_Tot_LA_Previous_Pct",
-                    "Employment_Tot_LA_Previous2_Pct"
+                SELECT *
                 FROM public.v_la_destinations
-                WHERE "Id" = @laId
-                LIMIT 1;
+                WHERE "Id" = ANY(@laIds);
             """;
-            using var laResults = await conn.QueryMultipleAsync(laSql, new { laId = establishmentInfo!.LAId });
-            localAuthorityPerformance = await laResults.ReadSingleOrDefaultAsync<LAPerformance>();
-            localAuthorityDestinations = await laResults.ReadSingleOrDefaultAsync<LADestinations>();
+
+            using var laResults = await conn.QueryMultipleAsync(laSql, new { laIds });
+            localAuthorityPerformance = (await laResults.ReadAsync<LAPerformance>())
+                .ToDictionary(x => x.Id, StringComparer.Ordinal);
+            localAuthorityDestinations = (await laResults.ReadAsync<LADestinations>())
+                .ToDictionary(x => x.Id, StringComparer.Ordinal);
         }
         else
         {
-            _logger.LogWarning("No LAId found for URN {Urn} when loading KS4 performance.", urn);
+            _logger.LogWarning("No LAIds found when loading KS4 performance for URNs {Urns}.", requestedUrns);
         }
 
-        if (establishmentPerformance is null
-            && localAuthorityPerformance is null
-            && englandPerformance is null
-            && establishmentDestinations is null
-            && localAuthorityDestinations is null
-            && englandDestinations is null)
+        var output = new List<Ks4HeadlineMeasuresByUrn>(requestedUrns.Length);
+
+        foreach (var urn in requestedUrns)
         {
-            return null;
+            if (!establishments.TryGetValue(urn, out var establishment))
+            {
+                continue;
+            }
+
+            establishmentPerformance.TryGetValue(urn, out var schoolPerformance);
+            establishmentDestinations.TryGetValue(urn, out var schoolDestinations);
+            localAuthorityPerformance.TryGetValue(establishment.LAId ?? string.Empty, out var laPerformance);
+            localAuthorityDestinations.TryGetValue(establishment.LAId ?? string.Empty, out var laDestinations);
+
+            output.Add(new Ks4HeadlineMeasuresByUrn(
+                urn,
+                new Ks4HeadlineMeasuresData(
+                    schoolPerformance,
+                    laPerformance,
+                    englandPerformance,
+                    schoolDestinations,
+                    laDestinations,
+                    englandDestinations)));
         }
 
-        return new(
-            establishmentPerformance,
-            localAuthorityPerformance,
-            englandPerformance,
-            establishmentDestinations,
-            localAuthorityDestinations,
-            englandDestinations);
+        return output;
     }
 
     private sealed class EstablishmentInfo
     {
+        public string? URN { get; set; }
         public string? LAId { get; set; }
-    }
-
-    private sealed class DestinationTotalsDao
-    {
-        public string? Id { get; init; }
-        public string? AllDestCurrentPct { get; init; }
-        public string? AllDestPreviousPct { get; init; }
-        public string? AllDestPrevious2Pct { get; init; }
-        public string? EducationCurrentPct { get; init; }
-        public string? EducationPreviousPct { get; init; }
-        public string? EducationPrevious2Pct { get; init; }
-        public string? EmploymentCurrentPct { get; init; }
-        public string? EmploymentPreviousPct { get; init; }
-        public string? EmploymentPrevious2Pct { get; init; }
-    }
-
-    private static double? ParseNullableDouble(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return null;
-        }
-
-        return double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
-            ? parsed
-            : null;
     }
 }
