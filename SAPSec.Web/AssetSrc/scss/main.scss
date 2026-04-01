@@ -1114,6 +1114,13 @@ $app-ks4-color-track: #f3f2f1;
   margin-top: 4px;
 }
 
+.app-ks4-school-page {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
+}
+
 .app-ks4-attainment {
   background: $app-ks4-color-panel-bg;
   padding: 16px;
@@ -1177,6 +1184,10 @@ $app-ks4-color-track: #f3f2f1;
   max-width: 760px;
 }
 
+.app-ks4-chart-container--school-headline {
+  height: 330px;
+}
+
 .app-ks4-copy {
   max-width: 660px;
   line-height: 1.45;
@@ -1214,9 +1225,25 @@ $app-ks4-color-track: #f3f2f1;
   --gds-label-border: #b1b4b6;
   --gds-label-padding: 4;
   --chart-color-school: #de6b24;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
   --chart-color-comparator: #27a0cc;
   --chart-color-england: #003c56;
   --chart-color-fallback: #6f777b;
+}
+
+.js-chart--school-ks4-bar {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #2a1950;
+  --chart-color-england: #2a1950;
+}
+
+.js-chart--school-ks4-line {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
 }
 
 @media (max-width: 40.0625em) {

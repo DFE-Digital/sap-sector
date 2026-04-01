@@ -11,6 +11,51 @@
         });
     }
 
+    function buildTopPerformerHref(baseUrl, urn) {
+        if (!baseUrl || !urn) {
+            return "";
+        }
+
+        return baseUrl.replace(/\/+$/, "") + "/" + encodeURIComponent(urn);
+    }
+
+    function updateTopPerformers(tableBody, rows, baseUrl) {
+        if (!tableBody) {
+            return;
+        }
+
+        var items = Array.isArray(rows) ? rows : [];
+        tableBody.innerHTML = "";
+
+        items.forEach(function (row) {
+            var tr = document.createElement("tr");
+            tr.className = "govuk-table__row";
+
+            var rank = document.createElement("td");
+            rank.className = "govuk-table__cell";
+            rank.textContent = row.rank;
+
+            var name = document.createElement("th");
+            name.scope = "row";
+            name.className = "govuk-table__header";
+
+            var link = document.createElement("a");
+            link.className = "govuk-link";
+            link.href = buildTopPerformerHref(baseUrl, row.urn);
+            link.textContent = row.name;
+            name.appendChild(link);
+
+            var value = document.createElement("td");
+            value.className = "govuk-table__cell govuk-table__cell--numeric";
+            value.textContent = row.displayValue;
+
+            tr.appendChild(rank);
+            tr.appendChild(name);
+            tr.appendChild(value);
+            tableBody.appendChild(tr);
+        });
+    }
+
     function updateChartAxis(chart, axisSettings) {
         if (!chart || !chart.options || !chart.options.scales || !axisSettings) {
             return;
@@ -119,6 +164,11 @@
                 config.tableCellMap[seriesKey] || [],
                 data.table && data.table[seriesKey] ? data.table[seriesKey] : []);
         });
+
+        updateTopPerformers(
+            config.topPerformersTableBody,
+            data.topPerformers,
+            config.topPerformerBaseUrl);
     }
 
     function init() {
@@ -131,12 +181,17 @@
             var cellAttribute = select.getAttribute("data-cell-attribute") || "data-view-cell";
             var seriesKeys = readJsonAttribute(select, "data-series-keys") || [];
             var cellPrefixes = readJsonAttribute(select, "data-cell-prefixes") || {};
+            var topPerformersTableId = select.getAttribute("data-top-performers-table-id");
 
             var config = {
                 barChartCanvas: barChartId ? document.getElementById(barChartId) : null,
                 lineChartCanvas: lineChartId ? document.getElementById(lineChartId) : null,
                 seriesKeys: seriesKeys,
-                tableCellMap: buildTableCellMap(seriesKeys, cellAttribute, cellPrefixes)
+                tableCellMap: buildTableCellMap(seriesKeys, cellAttribute, cellPrefixes),
+                topPerformersTableBody: topPerformersTableId
+                    ? document.querySelector("#" + topPerformersTableId + " tbody")
+                    : null,
+                topPerformerBaseUrl: select.getAttribute("data-top-performer-base-url") || ""
             };
             var activeRequestId = 0;
 
