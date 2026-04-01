@@ -2,7 +2,6 @@
     const datasetColorKeys = ['school', 'comparator', 'england'];
     const CHART_CONFIG = {
         defaults: {
-            axisStep: 20,
             axisSuffix: '%',
             maxDevicePixelRatio: 2,
             resizeDebounceMs: 100,
@@ -143,7 +142,7 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function buildChartOptions(type, gdsStyles, axisSuffix, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -155,7 +154,6 @@
             size: gdsStyles.fontSize
         };
 
-        const stepSize = axisStep;
         const legendOptions = {
             display: showLegend,
             position: CHART_CONFIG.legend.position,
@@ -180,7 +178,6 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        suggestedMax: axisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         grid: {
                             display: true,
@@ -196,7 +193,6 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
-                            stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -251,7 +247,6 @@
                 scales: {
                     x: {
                         beginAtZero: true,
-                        max: axisMax ?? undefined,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -266,7 +261,6 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
-                            stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -392,12 +386,6 @@
             const showLegend = canvas.dataset.showLegend === "true";
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
-            const axisStep = canvas.dataset.axisStep
-                ? parseInt(canvas.dataset.axisStep, 10)
-                : CHART_CONFIG.defaults.axisStep;
-            const axisMax = canvas.dataset.axisMax
-                ? parseFloat(canvas.dataset.axisMax)
-                : null;
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
@@ -432,7 +420,14 @@
                         barPercentage
                     })
                 },
-                options: buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign),
+                options: buildChartOptions(
+                    type,
+                    gdsStyles,
+                    axisSuffix,
+                    showLegend,
+                    showDataLabels,
+                    showXGrid,
+                    barLabelAlign),
                 plugins: showDataLabels ? [ChartDataLabels] : []
             };
 

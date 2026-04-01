@@ -5,10 +5,8 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
-using System.Collections.Generic;
 
 namespace SAPSec.Web.Controllers;
 
@@ -361,7 +359,6 @@ public class SimilarSchoolsComparisonController : Controller
         var similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
 
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
-        var axisSettings = AttendanceAxisCalculator.ForAbsenceType(isPersistentAbsence);
         var yearLabels = Ks4YearLabelConfig.YearByYear;
 
         var thisSchoolSeries = isPersistentAbsence
@@ -383,43 +380,10 @@ public class SimilarSchoolsComparisonController : Controller
         var englandThreeYearAverage = isPersistentAbsence
             ? (thisSchoolAttendance.PersistentAbsenceThreeYearAverage.EnglandValue ?? similarSchoolAttendance.PersistentAbsenceThreeYearAverage.EnglandValue)
             : (thisSchoolAttendance.OverallAbsenceThreeYearAverage.EnglandValue ?? similarSchoolAttendance.OverallAbsenceThreeYearAverage.EnglandValue);
-        var barAxisMax = AttendanceAxisCalculator.CalculateMax(
-            [
-                thisSchoolThreeYearAverage,
-                similarSchoolThreeYearAverage,
-                englandThreeYearAverage
-            ],
-            axisSettings);
-        var lineAxisMax = AttendanceAxisCalculator.CalculateMax(
-            [
-                thisSchoolSeries.Previous2,
-                thisSchoolSeries.Previous,
-                thisSchoolSeries.Current,
-                similarSchoolSeries.Previous2,
-                similarSchoolSeries.Previous,
-                similarSchoolSeries.Current,
-                englandSeries?.Previous2,
-                englandSeries?.Previous,
-                englandSeries?.Current
-            ],
-            axisSettings);
 
         return Json(new
         {
             absenceType = normalizedAbsenceType,
-            axis = new
-            {
-                bar = new
-                {
-                    max = barAxisMax,
-                    step = axisSettings.Step
-                },
-                line = new
-                {
-                    max = lineAxisMax,
-                    step = axisSettings.Step
-                }
-            },
             years = yearLabels,
             bar = new decimal?[]
             {

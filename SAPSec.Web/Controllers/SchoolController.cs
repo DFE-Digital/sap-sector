@@ -3,10 +3,8 @@ using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
-using System.Collections.Generic;
 
 namespace SAPSec.Web.Controllers;
 
@@ -92,7 +90,6 @@ public class SchoolController : Controller
         var response = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
         var yearLabels = Ks4YearLabelConfig.YearByYear;
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
-        var axisSettings = AttendanceAxisCalculator.ForAbsenceType(isPersistentAbsence);
 
         var selectedSchoolSeries = isPersistentAbsence
             ? response.PersistentAbsenceYearByYear.School
@@ -113,43 +110,10 @@ public class SchoolController : Controller
         var englandThreeYearAverage = isPersistentAbsence
             ? response.PersistentAbsenceThreeYearAverage.EnglandValue
             : response.OverallAbsenceThreeYearAverage.EnglandValue;
-        var barAxisMax = AttendanceAxisCalculator.CalculateMax(
-            [
-                selectedSchoolThreeYearAverage,
-                localAuthorityThreeYearAverage,
-                englandThreeYearAverage
-            ],
-            axisSettings);
-        var lineAxisMax = AttendanceAxisCalculator.CalculateMax(
-            [
-                selectedSchoolSeries.Previous2,
-                selectedSchoolSeries.Previous,
-                selectedSchoolSeries.Current,
-                localAuthoritySeries.Previous2,
-                localAuthoritySeries.Previous,
-                localAuthoritySeries.Current,
-                englandSeries.Previous2,
-                englandSeries.Previous,
-                englandSeries.Current
-            ],
-            axisSettings);
 
         return Json(new
         {
             absenceType = normalizedAbsenceType,
-            axis = new
-            {
-                bar = new
-                {
-                    max = barAxisMax,
-                    step = axisSettings.Step
-                },
-                line = new
-                {
-                    max = lineAxisMax,
-                    step = axisSettings.Step
-                }
-            },
             years = yearLabels,
             bar = new decimal?[]
             {

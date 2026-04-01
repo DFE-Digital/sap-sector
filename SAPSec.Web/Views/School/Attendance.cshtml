@@ -1,5 +1,4 @@
 ﻿@using System.Text.Json
-@using System.Globalization
 @model SAPSec.Web.ViewModels.SchoolAttendancePageViewModel
 @{
     Layout = "_Layout";
@@ -32,10 +31,6 @@
     var chartColors = new[] { "#D53780", "#003078", "#003078" };
     var lineChartColors = new[] { "#D53780", "#5694CA", "#28A197" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
-    var initialOverallBarAxisMax = Model.OverallAbsenceBarAxisMax.ToString(CultureInfo.InvariantCulture);
-    var initialOverallLineAxisMax = Model.OverallAbsenceLineAxisMax.ToString(CultureInfo.InvariantCulture);
-    var initialPersistentBarAxisMax = Model.PersistentAbsenceBarAxisMax.ToString(CultureInfo.InvariantCulture);
-    var initialPersistentLineAxisMax = Model.PersistentAbsenceLineAxisMax.ToString(CultureInfo.InvariantCulture);
 }
 
 <span class="govuk-caption-xl">@Model.SchoolName</span>
@@ -74,8 +69,6 @@
                     data-line-chart-id="school-attendance-year-by-year-chart"
                     data-cell-attribute="data-attendance-cell"
                     data-cell-prefixes='{"school":"school","localAuthority":"la","england":"england"}'
-                    data-axis-config='{"overall":{"bar":{"max":@initialOverallBarAxisMax,"step":1},"line":{"max":@initialOverallLineAxisMax,"step":1}},"persistent":{"bar":{"max":@initialPersistentBarAxisMax,"step":5},"line":{"max":@initialPersistentLineAxisMax,"step":5}}}'
-                    data-axis-config-key="absenceType"
                     data-series-keys='["school","localAuthority","england"]'>
                 <option value="overall" selected>Overall absence</option>
                 <option value="persistent">Persistent absence</option>
@@ -102,9 +95,8 @@
                 <canvas id="school-attendance-three-year-chart"
                         class="js-chart"
                         data-type="bar"
+                        data-axis-mode="auto"
                         data-bar-label-align="start"
-                        data-axis-step="1"
-                        data-axis-max="@initialOverallBarAxisMax"
                         data-axis-suffix="%"
                         data-label-decimals="2"
                         data-bar-thickness="50"
@@ -121,8 +113,7 @@
                 <canvas id="school-attendance-year-by-year-chart"
                         class="js-chart"
                         data-type="line"
-                        data-axis-step="1"
-                        data-axis-max="@initialOverallLineAxisMax"
+                        data-axis-mode="auto"
                         data-axis-suffix="%"
                         data-show-x-grid="true"
                         data-show-legend="true"

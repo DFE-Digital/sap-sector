@@ -1,40 +1,10 @@
 (function () {
-    function hasOwnProperty(obj, key) {
-        return Object.prototype.hasOwnProperty.call(obj, key);
-    }
-
     function updateTableRow(cells, values) {
         cells.forEach(function (cell, index) {
             if (cell) {
                 cell.textContent = values && values[index] ? values[index] : "No available data";
             }
         });
-    }
-
-    function updateChartAxis(chart, axisSettings) {
-        if (!chart || !chart.options || !chart.options.scales || !axisSettings) {
-            return;
-        }
-
-        var isBarChart = chart.config && chart.config.type === "bar";
-        var axisKey = isBarChart ? "x" : "y";
-        var axis = chart.options.scales[axisKey];
-        if (!axis || !axis.ticks) {
-            return;
-        }
-
-        if (typeof axisSettings.max === "number") {
-            if (isBarChart) {
-                axis.max = axisSettings.max;
-            } else {
-                axis.max = undefined;
-                axis.suggestedMax = axisSettings.max;
-            }
-        }
-
-        if (typeof axisSettings.step === "number") {
-            axis.ticks.stepSize = axisSettings.step;
-        }
     }
 
     function readJsonAttribute(element, attributeName) {
@@ -49,19 +19,6 @@
             console.error("Failed to parse data view switcher config.", error);
             return null;
         }
-    }
-
-    function readAxisSettings(select, responseKey, responseData) {
-        if (responseData && responseData.axis) {
-            return responseData.axis;
-        }
-
-        var config = readJsonAttribute(select, "data-axis-config");
-        if (!config || !responseKey) {
-            return null;
-        }
-
-        return config[responseKey] || null;
     }
 
     function buildTableCellMap(seriesKeys, cellAttribute, cellPrefixes) {
@@ -91,7 +48,7 @@
         return endpoint + separator + queryKey + "=" + encodeURIComponent(selectedValue);
     }
 
-    function applyDataView(data, config, axisSettings) {
+    function applyDataView(data, config) {
         if (!data) {
             return;
         }
@@ -99,7 +56,6 @@
         var barChart = window.Chart && config.barChartCanvas ? window.Chart.getChart(config.barChartCanvas) : null;
         if (barChart && barChart.data && barChart.data.datasets && barChart.data.datasets[0]) {
             barChart.data.datasets[0].data = data.bar || [];
-            updateChartAxis(barChart, axisSettings && axisSettings.bar ? axisSettings.bar : axisSettings);
             barChart.update();
         }
 
@@ -113,7 +69,6 @@
                 config.seriesKeys.forEach(function (seriesKey, index) {
                     lineChart.data.datasets[index].data = data.line && data.line[seriesKey] ? data.line[seriesKey] : [];
                 });
-                updateChartAxis(lineChart, axisSettings && axisSettings.line ? axisSettings.line : axisSettings);
                 lineChart.update();
             }
         }
@@ -131,7 +86,6 @@
             var barChartId = select.getAttribute("data-bar-chart-id");
             var lineChartId = select.getAttribute("data-line-chart-id");
             var queryKey = select.getAttribute("data-query-key");
-            var axisConfigKey = select.getAttribute("data-axis-config-key") || queryKey;
             var cellAttribute = select.getAttribute("data-cell-attribute") || "data-view-cell";
             var seriesKeys = readJsonAttribute(select, "data-series-keys") || [];
             var cellPrefixes = readJsonAttribute(select, "data-cell-prefixes") || {};
@@ -175,11 +129,7 @@
 
                         applyDataView(
                             data,
-                            config,
-                            readAxisSettings(
-                                select,
-                                hasOwnProperty(data, axisConfigKey) ? data[axisConfigKey] : selectedValue,
-                                data));
+                            config);
                     })
                     .catch(function (error) {
                         console.error("Failed to load view data.", error);

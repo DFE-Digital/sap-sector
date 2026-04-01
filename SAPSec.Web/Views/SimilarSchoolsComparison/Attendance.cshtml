@@ -45,8 +45,6 @@
                     data-line-chart-id="attendance-comparison-year-by-year-chart"
                     data-cell-attribute="data-attendance-cell"
                     data-cell-prefixes='{"thisSchool":"this","similarSchool":"similar","england":"england"}'
-                    data-axis-config='{"overall":{"bar":{"max":10,"step":1},"line":{"max":100,"step":10}},"persistent":{"bar":{"max":30,"step":5},"line":{"max":100,"step":10}}}'
-                    data-axis-config-key="absenceType"
                     data-series-keys='["thisSchool","similarSchool","england"]'>
                 <option value="overall" selected>Overall absence</option>
                 <option value="persistent">Persistent absence</option>
@@ -73,9 +71,8 @@
                 <canvas id="attendance-comparison-three-year-chart"
                         class="js-chart"
                         data-type="bar"
+                        data-axis-mode="auto"
                         data-bar-label-align="start"
-                        data-axis-step="1"
-                        data-axis-max="10"
                         data-axis-suffix="%"
                         data-bar-thickness="50"
                         data-category-percentage="0.7"
@@ -92,8 +89,7 @@
                 <canvas id="attendance-comparison-year-by-year-chart"
                         class="js-chart"
                         data-type="line"
-                        data-axis-step="10"
-                        data-axis-max="100"
+                        data-axis-mode="auto"
                         data-axis-suffix="%"
                         data-show-x-grid="true"
                         data-show-legend="true"
