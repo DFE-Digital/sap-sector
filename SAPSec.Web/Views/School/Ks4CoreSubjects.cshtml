@@ -23,6 +23,14 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglishLiterature.EnglandYearByYear, Display: Model.EnglishLiterature.EnglandDisplay)
     };
 
+    var mathsRows = new[]
+    {
+        (Key: "this", Label: Model.SchoolLabel, Series: Model.Maths.SchoolYearByYear, Display: Model.Maths.SchoolDisplay),
+        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.Maths.SimilarSchoolsYearByYear, Display: Model.Maths.SimilarSchoolsDisplay),
+        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.Maths.LocalAuthorityYearByYear, Display: Model.Maths.LocalAuthorityDisplay),
+        (Key: "england", Label: Model.EnglandLabel, Series: Model.Maths.EnglandYearByYear, Display: Model.Maths.EnglandDisplay)
+    };
+
     string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
     string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
 }
@@ -137,6 +145,106 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-avg")">@row.Display</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section aria-labelledby="maths-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+    <h2 class="govuk-heading-m" id="maths-heading">Maths</h2>
+    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="mathsGrade">Grade</label>
+            <select class="govuk-select"
+                    id="mathsGrade"
+                    name="mathsGrade"
+                    data-view-switcher="true"
+                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "maths" })"
+                    data-query-key="grade"
+                    data-bar-chart-id="maths-school-chart"
+                    data-line-chart-id="maths-school-yearbyyear-chart"
+                    data-cell-attribute="data-maths-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
+                    data-top-performers-table-id="maths-top-performers-table"
+                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                <option value="4" selected>Grade 4 and above</option>
+                <option value="5">Grade 5 and above</option>
+                <option value="7">Grade 7 and above</option>
+            </select>
+        </div>
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="mathsCharacteristic">Pupil characteristic</label>
+            <select class="govuk-select" id="mathsCharacteristic" name="mathsCharacteristic" disabled>
+                <option selected>All pupils</option>
+            </select>
+        </div>
+    </div>
+    <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6 govuk-!-margin-bottom-3" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#maths-three-year-average">3-year average</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#maths-year-by-year">Year by year</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#maths-table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#maths-top-performers">Top performers</a></li>
+        </ul>
+        <div class="govuk-tabs__panel" id="maths-three-year-average">
+            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                @{
+                    var mathsBarData = new decimal?[] { Model.Maths.SchoolThreeYearAverage, Model.Maths.SimilarSchoolsThreeYearAverage, Model.Maths.LocalAuthorityThreeYearAverage, Model.Maths.EnglandThreeYearAverage };
+                }
+                @if (HasAnyData(mathsBarData))
+                {
+                    <canvas id="maths-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = mathsBarData }))'></canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
+            </div>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="maths-year-by-year">
+            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                <canvas id="maths-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Maths.SchoolYearByYear.Previous2, Model.Maths.SchoolYearByYear.Previous, Model.Maths.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Maths.SimilarSchoolsYearByYear.Previous2, Model.Maths.SimilarSchoolsYearByYear.Previous, Model.Maths.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Maths.LocalAuthorityYearByYear.Previous2, Model.Maths.LocalAuthorityYearByYear.Previous, Model.Maths.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Maths.EnglandYearByYear.Previous2, Model.Maths.EnglandYearByYear.Previous, Model.Maths.EnglandYearByYear.Current } } } }))'></canvas>
+            </div>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="maths-top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table" id="maths-top-performers-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.Maths.TopPerformers)
+                    {
+                        <tr class="govuk-table__row" data-top-performer-row="maths">
+                            <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="maths-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th></tr></thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in mathsRows)
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">@row.Label</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>

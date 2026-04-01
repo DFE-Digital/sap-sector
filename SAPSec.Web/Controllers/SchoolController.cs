@@ -452,13 +452,18 @@ public class SchoolController : Controller
             response,
             SchoolKs4CoreSubject.EnglishLiterature,
             SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var defaultMaths = SchoolKs4CoreSubjectSelection.From(
+            response,
+            SchoolKs4CoreSubject.Maths,
+            SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         return new()
         {
             SchoolDetails = response.SchoolDetails,
             SimilarSchoolsCount = response.SimilarSchoolsCount,
             EnglishLanguage = MapCoreSubjectSection(defaultEnglishLanguage),
-            EnglishLiterature = MapCoreSubjectSection(defaultEnglishLiterature)
+            EnglishLiterature = MapCoreSubjectSection(defaultEnglishLiterature),
+            Maths = MapCoreSubjectSection(defaultMaths)
         };
     }
 

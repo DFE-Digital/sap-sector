@@ -37,7 +37,7 @@ public class GetSchoolKs4CoreSubjectsTests
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
-            .ReturnsAsync(CreateMeasures("52", "51", "50", "42", "41", "40", "18", "17", "16", "54", "53", "52", "44", "43", "42", "20", "19", "18"));
+            .ReturnsAsync(CreateMeasures("52", "51", "50", "42", "41", "40", "18", "17", "16", "54", "53", "52", "44", "43", "42", "20", "19", "18", "56", "55", "54", "46", "45", "44", "22", "21", "20"));
 
         similarSchoolsRepositoryMock
             .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
@@ -47,8 +47,8 @@ public class GetSchoolKs4CoreSubjectsTests
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
-                new Ks4HeadlineMeasuresByUrn("200", CreateMeasures("62", "61", "60", "52", "51", "50", "28", "27", "26", "64", "63", "62", "54", "53", "52", "30", "29", "28")),
-                new Ks4HeadlineMeasuresByUrn("300", CreateMeasures("58", "57", "56", "48", "47", "46", "24", "23", "22", "60", "59", "58", "50", "49", "48", "26", "25", "24"))
+                new Ks4HeadlineMeasuresByUrn("200", CreateMeasures("62", "61", "60", "52", "51", "50", "28", "27", "26", "64", "63", "62", "54", "53", "52", "30", "29", "28", "66", "65", "64", "56", "55", "54", "32", "31", "30")),
+                new Ks4HeadlineMeasuresByUrn("300", CreateMeasures("58", "57", "56", "48", "47", "46", "24", "23", "22", "60", "59", "58", "50", "49", "48", "26", "25", "24", "62", "61", "60", "52", "51", "50", "28", "27", "26"))
             });
 
         establishmentRepositoryMock
@@ -68,12 +68,14 @@ public class GetSchoolKs4CoreSubjectsTests
         var result = await sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
         var englishLanguage = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
         var englishLiterature = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLiterature, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var maths = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         result.SimilarSchoolsCount.Should().Be(2);
         englishLanguage.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(51m, 59m, 60m, 61m));
         englishLanguage.TopPerformers.Select(x => x.Name).Should().ContainInOrder("Alpha school", "Beta school");
         englishLiterature.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(53m, 61m, 62m, 63m));
         englishLiterature.YearByYear.SimilarSchools.Should().Be(new Ks4HeadlineMeasureSeries(62m, 61m, 60m));
+        maths.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(55m, 63m, 64m, 65m));
     }
 
     private static SchoolDetails CreateSchoolDetails(string urn, string name) =>
@@ -114,7 +116,10 @@ public class GetSchoolKs4CoreSubjectsTests
         string? lang7Current, string? lang7Previous, string? lang7Previous2,
         string? lit4Current, string? lit4Previous, string? lit4Previous2,
         string? lit5Current, string? lit5Previous, string? lit5Previous2,
-        string? lit7Current, string? lit7Previous, string? lit7Previous2) =>
+        string? lit7Current, string? lit7Previous, string? lit7Previous2,
+        string? maths4Current, string? maths4Previous, string? maths4Previous2,
+        string? maths5Current, string? maths5Previous, string? maths5Previous2,
+        string? maths7Current, string? maths7Previous, string? maths7Previous2) =>
         new(
             new EstablishmentPerformance
             {
@@ -135,7 +140,16 @@ public class GetSchoolKs4CoreSubjectsTests
                 EngLit59_Sum_Est_Previous2_Pct = lit5Previous2 ?? string.Empty,
                 EngLit79_Sum_Est_Current_Pct = lit7Current ?? string.Empty,
                 EngLit79_Sum_Est_Previous_Pct = lit7Previous ?? string.Empty,
-                EngLit79_Sum_Est_Previous2_Pct = lit7Previous2 ?? string.Empty
+                EngLit79_Sum_Est_Previous2_Pct = lit7Previous2 ?? string.Empty,
+                Maths49_Sum_Est_Current_Pct = maths4Current ?? string.Empty,
+                Maths49_Sum_Est_Previous_Pct = maths4Previous ?? string.Empty,
+                Maths49_Sum_Est_Previous2_Pct = maths4Previous2 ?? string.Empty,
+                Maths59_Sum_Est_Current_Pct = maths5Current ?? string.Empty,
+                Maths59_Sum_Est_Previous_Pct = maths5Previous ?? string.Empty,
+                Maths59_Sum_Est_Previous2_Pct = maths5Previous2 ?? string.Empty,
+                Maths79_Sum_Est_Current_Pct = maths7Current ?? string.Empty,
+                Maths79_Sum_Est_Previous_Pct = maths7Previous ?? string.Empty,
+                Maths79_Sum_Est_Previous2_Pct = maths7Previous2 ?? string.Empty
             },
             new LAPerformance
             {
@@ -144,7 +158,10 @@ public class GetSchoolKs4CoreSubjectsTests
                 EngLang79_Tot_LA_Current_Pct = "27", EngLang79_Tot_LA_Previous_Pct = "26", EngLang79_Tot_LA_Previous2_Pct = "25",
                 EngLit49_Tot_LA_Current_Pct = "63", EngLit49_Tot_LA_Previous_Pct = "62", EngLit49_Tot_LA_Previous2_Pct = "61",
                 EngLit59_Tot_LA_Current_Pct = "53", EngLit59_Tot_LA_Previous_Pct = "52", EngLit59_Tot_LA_Previous2_Pct = "51",
-                EngLit79_Tot_LA_Current_Pct = "29", EngLit79_Tot_LA_Previous_Pct = "28", EngLit79_Tot_LA_Previous2_Pct = "27"
+                EngLit79_Tot_LA_Current_Pct = "29", EngLit79_Tot_LA_Previous_Pct = "28", EngLit79_Tot_LA_Previous2_Pct = "27",
+                Maths49_Tot_LA_Current_Pct = "65", Maths49_Tot_LA_Previous_Pct = "64", Maths49_Tot_LA_Previous2_Pct = "63",
+                Maths59_Tot_LA_Current_Pct = "55", Maths59_Tot_LA_Previous_Pct = "54", Maths59_Tot_LA_Previous2_Pct = "53",
+                Maths79_Tot_LA_Current_Pct = "31", Maths79_Tot_LA_Previous_Pct = "30", Maths79_Tot_LA_Previous2_Pct = "29"
             },
             new EnglandPerformance
             {
@@ -153,7 +170,10 @@ public class GetSchoolKs4CoreSubjectsTests
                 EngLang79_Tot_Eng_Current_Pct = "28", EngLang79_Tot_Eng_Previous_Pct = "27", EngLang79_Tot_Eng_Previous2_Pct = "26",
                 EngLit49_Tot_Eng_Current_Pct = "64", EngLit49_Tot_Eng_Previous_Pct = "63", EngLit49_Tot_Eng_Previous2_Pct = "62",
                 EngLit59_Tot_Eng_Current_Pct = "54", EngLit59_Tot_Eng_Previous_Pct = "53", EngLit59_Tot_Eng_Previous2_Pct = "52",
-                EngLit79_Tot_Eng_Current_Pct = "30", EngLit79_Tot_Eng_Previous_Pct = "29", EngLit79_Tot_Eng_Previous2_Pct = "28"
+                EngLit79_Tot_Eng_Current_Pct = "30", EngLit79_Tot_Eng_Previous_Pct = "29", EngLit79_Tot_Eng_Previous2_Pct = "28",
+                Maths49_Tot_Eng_Current_Pct = "66", Maths49_Tot_Eng_Previous_Pct = "65", Maths49_Tot_Eng_Previous2_Pct = "64",
+                Maths59_Tot_Eng_Current_Pct = "56", Maths59_Tot_Eng_Previous_Pct = "55", Maths59_Tot_Eng_Previous2_Pct = "54",
+                Maths79_Tot_Eng_Current_Pct = "32", Maths79_Tot_Eng_Previous_Pct = "31", Maths79_Tot_Eng_Previous2_Pct = "30"
             },
             null,
             null,

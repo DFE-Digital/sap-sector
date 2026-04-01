@@ -59,7 +59,17 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.LocalAuthorityPerformance?.EngLit49_Tot_LA_Previous2_Pct,
                     x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Current_Pct,
                     x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Previous2_Pct)),
+                    x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths49_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths49_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths49_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Maths49_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Maths49_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Maths49_Tot_Eng_Previous2_Pct)),
             BuildGradeSelections(
                 schoolData,
                 similarSchools,
@@ -82,7 +92,17 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.LocalAuthorityPerformance?.EngLit59_Tot_LA_Previous2_Pct,
                     x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Current_Pct,
                     x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Previous2_Pct)),
+                    x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths59_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths59_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths59_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Maths59_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Maths59_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Maths59_Tot_Eng_Previous2_Pct)),
             BuildGradeSelections(
                 schoolData,
                 similarSchools,
@@ -105,17 +125,29 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.LocalAuthorityPerformance?.EngLit79_Tot_LA_Previous2_Pct,
                     x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Current_Pct,
                     x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Previous2_Pct)));
+                    x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths79_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths79_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Maths79_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Maths79_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Maths79_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Maths79_Tot_Eng_Previous2_Pct)));
     }
 
     private static SchoolKs4CoreSubjectsGradeSelections BuildGradeSelections(
         Ks4HeadlineMeasuresData? schoolData,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors englishLanguageSelectors,
-        SubjectFieldSelectors englishLiteratureSelectors) =>
+        SubjectFieldSelectors englishLiteratureSelectors,
+        SubjectFieldSelectors mathsSelectors) =>
         new(
             BuildSelection(schoolData, similarSchools, englishLanguageSelectors),
-            BuildSelection(schoolData, similarSchools, englishLiteratureSelectors));
+            BuildSelection(schoolData, similarSchools, englishLiteratureSelectors),
+            BuildSelection(schoolData, similarSchools, mathsSelectors));
 
     private static SchoolKs4CoreSubjectSelection BuildSelection(
         Ks4HeadlineMeasuresData? schoolData,
@@ -272,7 +304,8 @@ public record GetSchoolKs4CoreSubjectsRequest(string Urn);
 public enum SchoolKs4CoreSubject
 {
     EnglishLanguage,
-    EnglishLiterature
+    EnglishLiterature,
+    Maths
 }
 
 public enum SchoolKs4CoreSubjectGradeFilter
@@ -307,11 +340,17 @@ public record SchoolKs4CoreSubjectSelection(
         subject?.ToLowerInvariant() switch
         {
             "english-literature" => SchoolKs4CoreSubject.EnglishLiterature,
+            "maths" => SchoolKs4CoreSubject.Maths,
             _ => SchoolKs4CoreSubject.EnglishLanguage
         };
 
     public static string ToSubjectValue(SchoolKs4CoreSubject subject) =>
-        subject == SchoolKs4CoreSubject.EnglishLiterature ? "english-literature" : "english-language";
+        subject switch
+        {
+            SchoolKs4CoreSubject.EnglishLiterature => "english-literature",
+            SchoolKs4CoreSubject.Maths => "maths",
+            _ => "english-language"
+        };
 
     public static SchoolKs4CoreSubjectSelection From(
         GetSchoolKs4CoreSubjectsResponse response,
@@ -319,6 +358,9 @@ public record SchoolKs4CoreSubjectSelection(
         SchoolKs4CoreSubjectGradeFilter grade) =>
         (subject, grade) switch
         {
+            (SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade5) => response.Grade5AndAbove.Maths,
+            (SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade7) => response.Grade7AndAbove.Maths,
+            (SchoolKs4CoreSubject.Maths, _) => response.Grade4AndAbove.Maths,
             (SchoolKs4CoreSubject.EnglishLiterature, SchoolKs4CoreSubjectGradeFilter.Grade5) => response.Grade5AndAbove.EnglishLiterature,
             (SchoolKs4CoreSubject.EnglishLiterature, SchoolKs4CoreSubjectGradeFilter.Grade7) => response.Grade7AndAbove.EnglishLiterature,
             (SchoolKs4CoreSubject.EnglishLiterature, _) => response.Grade4AndAbove.EnglishLiterature,
@@ -330,7 +372,8 @@ public record SchoolKs4CoreSubjectSelection(
 
 public record SchoolKs4CoreSubjectsGradeSelections(
     SchoolKs4CoreSubjectSelection EnglishLanguage,
-    SchoolKs4CoreSubjectSelection EnglishLiterature);
+    SchoolKs4CoreSubjectSelection EnglishLiterature,
+    SchoolKs4CoreSubjectSelection Maths);
 
 public record GetSchoolKs4CoreSubjectsResponse(
     SchoolDetails SchoolDetails,

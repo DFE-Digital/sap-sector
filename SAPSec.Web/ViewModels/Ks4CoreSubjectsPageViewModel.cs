@@ -28,6 +28,7 @@ public class Ks4CoreSubjectsPageViewModel
     public required int SimilarSchoolsCount { get; set; }
     public required SubjectSection EnglishLanguage { get; set; }
     public required SubjectSection EnglishLiterature { get; set; }
+    public required SubjectSection Maths { get; set; }
 
     public string SchoolLabel => SchoolDetails.Name;
     public string SimilarSchoolsLabel => "Similar schools average";
