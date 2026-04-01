@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
@@ -48,10 +49,16 @@ public class SchoolControllerTests
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
+        var getSchoolKs4EnglishLanguage = new GetSchoolKs4EnglishLanguage(
+            _ks4PerformanceRepositoryMock.Object,
+            _schoolDetailsServiceMock.Object,
+            _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object);
 
         _sut = new SchoolController(
             _schoolDetailsServiceMock.Object,
             getSchoolKs4HeadlineMeasures,
+            getSchoolKs4EnglishLanguage,
             getAttendanceMeasures,
             _loggerMock.Object);
     }
@@ -149,6 +156,77 @@ public class SchoolControllerTests
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel>();
+    }
+
+    #endregion
+
+    #region KS4 Core Subjects Tests
+
+    [Fact]
+    public async Task Ks4CoreSubjects_ValidUrn_ReturnsViewWithExpectedModel()
+    {
+        var urn = "123456";
+        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
+
+        _schoolDetailsServiceMock
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ReturnsAsync(schoolDetails);
+        _similarSchoolsRepositoryMock
+            .Setup(x => x.GetSimilarSchoolUrnsAsync(urn))
+            .ReturnsAsync(Array.Empty<string>());
+
+        _ks4PerformanceRepositoryMock
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ReturnsAsync(new Ks4HeadlineMeasuresData(new EstablishmentPerformance(), new LAPerformance(), new EnglandPerformance(), null, null, null));
+
+        var result = await _sut.Ks4CoreSubjects(urn);
+
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel>();
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsEnglishLanguageData_ValidUrn_ReturnsPayload()
+    {
+        var urn = "123456";
+        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
+
+        _schoolDetailsServiceMock
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ReturnsAsync(schoolDetails);
+        _similarSchoolsRepositoryMock
+            .Setup(x => x.GetSimilarSchoolUrnsAsync(urn))
+            .ReturnsAsync(Array.Empty<string>());
+
+        _ks4PerformanceRepositoryMock
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+                new EstablishmentPerformance
+                {
+                    EngLang49_Sum_Est_Current_Pct = "52",
+                    EngLang49_Sum_Est_Previous_Pct = "51",
+                    EngLang49_Sum_Est_Previous2_Pct = "50"
+                },
+                new LAPerformance
+                {
+                    EngLang49_Tot_LA_Current_Pct = "60",
+                    EngLang49_Tot_LA_Previous_Pct = "59",
+                    EngLang49_Tot_LA_Previous2_Pct = "58"
+                },
+                new EnglandPerformance
+                {
+                    EngLang49_Tot_Eng_Current_Pct = "61",
+                    EngLang49_Tot_Eng_Previous_Pct = "60",
+                    EngLang49_Tot_Eng_Previous2_Pct = "59"
+                },
+                null,
+                null,
+                null));
+
+        var result = await _sut.Ks4CoreSubjectsEnglishLanguageData(urn, "4");
+
+        var json = result.Should().BeOfType<JsonResult>().Subject;
+        json.Value.Should().NotBeNull();
     }
 
     #endregion

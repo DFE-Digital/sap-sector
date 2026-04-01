@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
@@ -18,17 +19,20 @@ public class SchoolController : Controller
 {
     private readonly ISchoolDetailsService _schoolDetailsService;
     private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
+    private readonly GetSchoolKs4EnglishLanguage _getSchoolKs4EnglishLanguage;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly ILogger<SchoolController> _logger;
 
     public SchoolController(
         ISchoolDetailsService schoolDetailsService,
         GetSchoolKs4HeadlineMeasures getSchoolKs4HeadlineMeasures,
+        GetSchoolKs4EnglishLanguage getSchoolKs4EnglishLanguage,
         GetAttendanceMeasures getAttendanceMeasures,
         ILogger<SchoolController> logger)
     {
         _schoolDetailsService = schoolDetailsService;
         _getSchoolKs4HeadlineMeasures = getSchoolKs4HeadlineMeasures;
+        _getSchoolKs4EnglishLanguage = getSchoolKs4EnglishLanguage;
         _getAttendanceMeasures = getAttendanceMeasures;
         _logger = logger;
     }
@@ -306,10 +310,77 @@ public class SchoolController : Controller
     [Route("ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var response = await _getSchoolKs4EnglishLanguage.Execute(new GetSchoolKs4EnglishLanguageRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
-        return View(school);
+        SetSchoolViewData(response.SchoolDetails);
+        return View(BuildKs4CoreSubjectsViewModel(response));
+    }
+
+    [HttpGet]
+    [Route("ks4-core-subjects/english-language/data")]
+    public async Task<IActionResult> Ks4CoreSubjectsEnglishLanguageData(string urn, string grade = "4")
+    {
+        var response = await _getSchoolKs4EnglishLanguage.Execute(new GetSchoolKs4EnglishLanguageRequest(urn));
+        var gradeFilter = SchoolKs4EnglishLanguageSelection.ParseFilter(grade);
+        var selectedEnglishLanguage = SchoolKs4EnglishLanguageSelection.From(response, gradeFilter);
+
+        return Json(new
+        {
+            grade = SchoolKs4EnglishLanguageSelection.ToFilterValue(gradeFilter),
+            bar = new decimal?[]
+            {
+                selectedEnglishLanguage.ThreeYearAverage.SchoolValue,
+                selectedEnglishLanguage.ThreeYearAverage.SimilarSchoolsValue,
+                selectedEnglishLanguage.ThreeYearAverage.LocalAuthorityValue,
+                selectedEnglishLanguage.ThreeYearAverage.EnglandValue
+            },
+            line = new
+            {
+                thisSchool = SeriesToArray(selectedEnglishLanguage.YearByYear.School),
+                similarSchools = SeriesToArray(selectedEnglishLanguage.YearByYear.SimilarSchools),
+                localAuthority = SeriesToArray(selectedEnglishLanguage.YearByYear.LocalAuthority),
+                england = SeriesToArray(selectedEnglishLanguage.YearByYear.England)
+            },
+            table = new
+            {
+                thisSchool = new[]
+                {
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.School.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.School.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.School.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.ThreeYearAverage.SchoolValue)
+                },
+                similarSchools = new[]
+                {
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.SimilarSchools.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.SimilarSchools.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.SimilarSchools.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.ThreeYearAverage.SimilarSchoolsValue)
+                },
+                localAuthority = new[]
+                {
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.LocalAuthority.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.LocalAuthority.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.LocalAuthority.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.ThreeYearAverage.LocalAuthorityValue)
+                },
+                england = new[]
+                {
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.England.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.England.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.YearByYear.England.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedEnglishLanguage.ThreeYearAverage.EnglandValue)
+                }
+            },
+            topPerformers = selectedEnglishLanguage.TopPerformers
+                .Select(x => new
+                {
+                    x.Rank,
+                    x.Urn,
+                    x.Name,
+                    DisplayValue = Ks4CoreSubjectsPageViewModel.DisplayPercent(x.Value)
+                })
+        });
     }
 
     private void SetSchoolViewData(Core.Model.SchoolDetails school)
@@ -367,6 +438,37 @@ public class SchoolController : Controller
             .Select(x => new TopPerformerRow(x.Rank, x.Urn, x.Name, x.Value, formatter(x.Value)))
             .ToList()
             .AsReadOnly();
+
+    private static Ks4CoreSubjectsPageViewModel BuildKs4CoreSubjectsViewModel(
+        GetSchoolKs4EnglishLanguageResponse response)
+    {
+        var defaultEnglishLanguage = SchoolKs4EnglishLanguageSelection.From(
+            response,
+            SchoolKs4EnglishLanguageGradeFilter.Grade4);
+
+        return new()
+        {
+            SchoolDetails = response.SchoolDetails,
+            SimilarSchoolsCount = response.SimilarSchoolsCount,
+            SchoolEnglishLanguageThreeYearAverage = defaultEnglishLanguage.ThreeYearAverage.SchoolValue,
+            SimilarSchoolsEnglishLanguageThreeYearAverage = defaultEnglishLanguage.ThreeYearAverage.SimilarSchoolsValue,
+            LocalAuthorityEnglishLanguageThreeYearAverage = defaultEnglishLanguage.ThreeYearAverage.LocalAuthorityValue,
+            EnglandEnglishLanguageThreeYearAverage = defaultEnglishLanguage.ThreeYearAverage.EnglandValue,
+            EnglishLanguageTopPerformers = defaultEnglishLanguage.TopPerformers
+                .Select(x => new Ks4CoreSubjectsPageViewModel.TopPerformerRow(
+                    x.Rank,
+                    x.Urn,
+                    x.Name,
+                    x.Value,
+                    Ks4CoreSubjectsPageViewModel.DisplayPercent(x.Value)))
+                .ToList()
+                .AsReadOnly(),
+            SchoolEnglishLanguageYearByYear = defaultEnglishLanguage.YearByYear.School,
+            SimilarSchoolsEnglishLanguageYearByYear = defaultEnglishLanguage.YearByYear.SimilarSchools,
+            LocalAuthorityEnglishLanguageYearByYear = defaultEnglishLanguage.YearByYear.LocalAuthority,
+            EnglandEnglishLanguageYearByYear = defaultEnglishLanguage.YearByYear.England
+        };
+    }
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
     {
