@@ -22,7 +22,8 @@ public class GetKs4HeadlineMeasuresTests
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+            .ReturnsAsync(new Ks4PerformanceData(
+                "123456",
                 new EstablishmentPerformance
                 {
                     Attainment8_Tot_Est_Current_Num = "45.0",
@@ -45,6 +46,7 @@ public class GetKs4HeadlineMeasuresTests
         destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
+                "123456",
                 null,
                 null,
                 null));
@@ -90,7 +92,8 @@ public class GetKs4HeadlineMeasuresTests
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+            .ReturnsAsync(new Ks4PerformanceData(
+                "123456",
                 new EstablishmentPerformance
                 {
                     Attainment8_Tot_Est_Current_Num = "45.0",
@@ -112,6 +115,7 @@ public class GetKs4HeadlineMeasuresTests
         destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
+                "123456",
                 null,
                 null,
                 null));
@@ -139,7 +143,7 @@ public class GetKs4HeadlineMeasuresTests
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
-            .ReturnsAsync((Ks4HeadlineMeasuresData?)null);
+            .ReturnsAsync((Ks4PerformanceData?)null);
         destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync((Ks4DestinationsData?)null);
@@ -188,13 +192,15 @@ public class GetKs4HeadlineMeasuresTests
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+            .ReturnsAsync(new Ks4PerformanceData(
+                "123456",
                 null,
                 null,
                 null));
         destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
+                "123456",
                 new EstablishmentDestinations
                 {
                     AllDest_Tot_Est_Current_Pct = "94.4",
@@ -266,13 +272,15 @@ public class GetKs4HeadlineMeasuresTests
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+            .ReturnsAsync(new Ks4PerformanceData(
+                "123456",
                 null,
                 null,
                 null));
         destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
+                "123456",
                 new EstablishmentDestinations
                 {
                     AllDest_Tot_Est_Current_Pct = "94.4",
@@ -344,7 +352,8 @@ public class GetKs4HeadlineMeasuresTests
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+            .ReturnsAsync(new Ks4PerformanceData(
+                "123456",
                 new EstablishmentPerformance
                 {
                     Attainment8_Tot_Est_Current_Num = "45.0",
@@ -384,6 +393,7 @@ public class GetKs4HeadlineMeasuresTests
         destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
+                "123456",
                 null,
                 null,
                 null));

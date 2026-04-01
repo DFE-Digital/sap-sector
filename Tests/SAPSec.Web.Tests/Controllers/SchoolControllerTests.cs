@@ -140,17 +140,18 @@ public class SchoolControllerTests
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
+
         _similarSchoolsRepositoryMock
             .Setup(x => x.GetSimilarSchoolUrnsAsync(urn))
             .ReturnsAsync(Array.Empty<string>());
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(null, null, null));
+            .ReturnsAsync(new Ks4PerformanceData(urn, null, null, null));
 
         _ks4DestinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4DestinationsData(null, null, null));
+            .ReturnsAsync(new Ks4DestinationsData(urn, null, null, null));
 
         var result = await _sut.Ks4HeadlineMeasures(urn);
 

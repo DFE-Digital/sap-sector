@@ -8,18 +8,15 @@ public class JsonKs4PerformanceRepository(
     IEstablishmentRepository establishmentRepository,
     IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
     IJsonFile<LAPerformance> localAuthorityPerformanceRepository,
-    IJsonFile<EnglandPerformance> englandPerformanceRepository,
-    IJsonFile<EstablishmentDestinations> establishmentDestinationsRepository,
-    IJsonFile<LADestinations> localAuthorityDestinationsRepository,
-    IJsonFile<EnglandDestinations> englandDestinationsRepository) : IKs4PerformanceRepository
+    IJsonFile<EnglandPerformance> englandPerformanceRepository) : IKs4PerformanceRepository
 {
-    public async Task<Ks4HeadlineMeasuresData?> GetByUrnAsync(string urn)
+    public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal))?.Data;
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal));
     }
 
-    public async Task<IReadOnlyCollection<Ks4HeadlineMeasuresByUrn>> GetByUrnsAsync(IEnumerable<string> urns)
+    public async Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)
     {
         var requestedUrns = urns
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
@@ -28,16 +25,13 @@ public class JsonKs4PerformanceRepository(
 
         if (requestedUrns.Length == 0)
         {
-            return Array.Empty<Ks4HeadlineMeasuresByUrn>();
+            return [];
         }
 
         var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var performanceByUrn = (await establishmentPerformanceRepository.ReadAllAsync())
-            .Where(x => establishments.ContainsKey(x.Id))
-            .ToDictionary(x => x.Id, StringComparer.Ordinal);
-        var destinationsByUrn = (await establishmentDestinationsRepository.ReadAllAsync())
             .Where(x => establishments.ContainsKey(x.Id))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
@@ -49,14 +43,10 @@ public class JsonKs4PerformanceRepository(
         var localAuthorityPerformanceByLaId = (await localAuthorityPerformanceRepository.ReadAllAsync())
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
-        var localAuthorityDestinationsByLaId = (await localAuthorityDestinationsRepository.ReadAllAsync())
-            .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
-            .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
         var englandPerformance = (await englandPerformanceRepository.ReadAllAsync()).FirstOrDefault();
-        var englandDestinations = (await englandDestinationsRepository.ReadAllAsync()).FirstOrDefault();
 
-        var results = new List<Ks4HeadlineMeasuresByUrn>(requestedUrns.Length);
+        var results = new List<Ks4PerformanceData>(requestedUrns.Length);
 
         foreach (var urn in requestedUrns)
         {
@@ -66,19 +56,13 @@ public class JsonKs4PerformanceRepository(
             }
 
             performanceByUrn.TryGetValue(urn, out var establishmentPerformance);
-            destinationsByUrn.TryGetValue(urn, out var establishmentDestinations);
             localAuthorityPerformanceByLaId.TryGetValue(establishment.LAId, out var localAuthorityPerformance);
-            localAuthorityDestinationsByLaId.TryGetValue(establishment.LAId, out var localAuthorityDestinations);
 
-            results.Add(new Ks4HeadlineMeasuresByUrn(
+            results.Add(new Ks4PerformanceData(
                 urn,
-                new Ks4HeadlineMeasuresData(
-                    establishmentPerformance,
-                    localAuthorityPerformance,
-                    englandPerformance,
-                    establishmentDestinations,
-                    localAuthorityDestinations,
-                    englandDestinations)));
+                establishmentPerformance,
+                localAuthorityPerformance,
+                englandPerformance));
         }
 
         return results;
