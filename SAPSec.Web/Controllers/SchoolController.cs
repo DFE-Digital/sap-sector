@@ -456,6 +456,10 @@ public class SchoolController : Controller
             response,
             SchoolKs4CoreSubject.Maths,
             SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var defaultCombinedScienceDoubleAward = SchoolKs4CoreSubjectSelection.From(
+            response,
+            SchoolKs4CoreSubject.CombinedScienceDoubleAward,
+            SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         return new()
         {
@@ -463,7 +467,8 @@ public class SchoolController : Controller
             SimilarSchoolsCount = response.SimilarSchoolsCount,
             EnglishLanguage = MapCoreSubjectSection(defaultEnglishLanguage),
             EnglishLiterature = MapCoreSubjectSection(defaultEnglishLiterature),
-            Maths = MapCoreSubjectSection(defaultMaths)
+            Maths = MapCoreSubjectSection(defaultMaths),
+            CombinedScienceDoubleAward = MapCoreSubjectSection(defaultCombinedScienceDoubleAward)
         };
     }
 

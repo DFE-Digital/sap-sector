@@ -31,6 +31,14 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.Maths.EnglandYearByYear, Display: Model.Maths.EnglandDisplay)
     };
 
+    var combinedScienceRows = new[]
+    {
+        (Key: "this", Label: Model.SchoolLabel, Series: Model.CombinedScienceDoubleAward.SchoolYearByYear, Display: Model.CombinedScienceDoubleAward.SchoolDisplay),
+        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear, Display: Model.CombinedScienceDoubleAward.SimilarSchoolsDisplay),
+        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear, Display: Model.CombinedScienceDoubleAward.LocalAuthorityDisplay),
+        (Key: "england", Label: Model.EnglandLabel, Series: Model.CombinedScienceDoubleAward.EnglandYearByYear, Display: Model.CombinedScienceDoubleAward.EnglandDisplay)
+    };
+
     string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
     string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
 }
@@ -145,6 +153,106 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-avg")">@row.Display</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section aria-labelledby="combined-science-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+    <h2 class="govuk-heading-m" id="combined-science-heading">Combined science (double award)</h2>
+    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="combinedScienceGrade">Grade</label>
+            <select class="govuk-select"
+                    id="combinedScienceGrade"
+                    name="combinedScienceGrade"
+                    data-view-switcher="true"
+                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "combined-science-double-award" })"
+                    data-query-key="grade"
+                    data-bar-chart-id="combined-science-school-chart"
+                    data-line-chart-id="combined-science-school-yearbyyear-chart"
+                    data-cell-attribute="data-combined-science-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
+                    data-top-performers-table-id="combined-science-top-performers-table"
+                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                <option value="4" selected>Grade 4 and above</option>
+                <option value="5">Grade 5 and above</option>
+                <option value="7">Grade 7 and above</option>
+            </select>
+        </div>
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="combinedScienceCharacteristic">Pupil characteristic</label>
+            <select class="govuk-select" id="combinedScienceCharacteristic" name="combinedScienceCharacteristic" disabled>
+                <option selected>All pupils</option>
+            </select>
+        </div>
+    </div>
+    <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6 govuk-!-margin-bottom-3" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#combined-science-three-year-average">3-year average</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#combined-science-year-by-year">Year by year</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#combined-science-table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#combined-science-top-performers">Top performers</a></li>
+        </ul>
+        <div class="govuk-tabs__panel" id="combined-science-three-year-average">
+            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                @{
+                    var combinedScienceBarData = new decimal?[] { Model.CombinedScienceDoubleAward.SchoolThreeYearAverage, Model.CombinedScienceDoubleAward.SimilarSchoolsThreeYearAverage, Model.CombinedScienceDoubleAward.LocalAuthorityThreeYearAverage, Model.CombinedScienceDoubleAward.EnglandThreeYearAverage };
+                }
+                @if (HasAnyData(combinedScienceBarData))
+                {
+                    <canvas id="combined-science-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = combinedScienceBarData }))'></canvas>
+                }
+                else
+                {
+                    <p class="govuk-body">No available data</p>
+                }
+            </div>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="combined-science-year-by-year">
+            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                <canvas id="combined-science-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.SchoolYearByYear.Previous2, Model.CombinedScienceDoubleAward.SchoolYearByYear.Previous, Model.CombinedScienceDoubleAward.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Previous2, Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Previous, Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Previous2, Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Previous, Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.EnglandYearByYear.Previous2, Model.CombinedScienceDoubleAward.EnglandYearByYear.Previous, Model.CombinedScienceDoubleAward.EnglandYearByYear.Current } } } }))'></canvas>
+            </div>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="combined-science-top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table" id="combined-science-top-performers-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.CombinedScienceDoubleAward.TopPerformers)
+                    {
+                        <tr class="govuk-table__row" data-top-performer-row="combined-science">
+                            <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="combined-science-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th></tr></thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in combinedScienceRows)
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">@row.Label</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
