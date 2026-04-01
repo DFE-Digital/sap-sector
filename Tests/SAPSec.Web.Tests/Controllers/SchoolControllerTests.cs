@@ -49,7 +49,7 @@ public class SchoolControllerTests
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
-        var getSchoolKs4EnglishLanguage = new GetSchoolKs4EnglishLanguage(
+        var getSchoolKs4CoreSubjects = new GetSchoolKs4CoreSubjects(
             _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
@@ -58,7 +58,7 @@ public class SchoolControllerTests
         _sut = new SchoolController(
             _schoolDetailsServiceMock.Object,
             getSchoolKs4HeadlineMeasures,
-            getSchoolKs4EnglishLanguage,
+            getSchoolKs4CoreSubjects,
             getAttendanceMeasures,
             _loggerMock.Object);
     }
@@ -186,7 +186,7 @@ public class SchoolControllerTests
     }
 
     [Fact]
-    public async Task Ks4CoreSubjectsEnglishLanguageData_ValidUrn_ReturnsPayload()
+    public async Task Ks4CoreSubjectsData_ValidUrn_ReturnsPayload()
     {
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
@@ -223,7 +223,7 @@ public class SchoolControllerTests
                 null,
                 null));
 
-        var result = await _sut.Ks4CoreSubjectsEnglishLanguageData(urn, "4");
+        var result = await _sut.Ks4CoreSubjectsData(urn, "english-language", "4");
 
         var json = result.Should().BeOfType<JsonResult>().Subject;
         json.Value.Should().NotBeNull();

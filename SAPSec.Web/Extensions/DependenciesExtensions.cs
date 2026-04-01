@@ -40,7 +40,7 @@ public static class DependenciesExtensions
         // Use cases
         services.AddSingleton<GetKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4HeadlineMeasures>();
-        services.AddSingleton<GetSchoolKs4EnglishLanguage>();
+        services.AddSingleton<GetSchoolKs4CoreSubjects>();
         services.AddSingleton<GetAttendanceMeasures>();
         services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<GetSimilarSchoolDetails>();

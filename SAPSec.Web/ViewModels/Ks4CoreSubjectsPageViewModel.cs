@@ -7,24 +7,27 @@ namespace SAPSec.Web.ViewModels;
 public class Ks4CoreSubjectsPageViewModel
 {
     public record TopPerformerRow(int Rank, string Urn, string Name, decimal? Value, string DisplayValue);
+    public record SubjectSection(
+        decimal? SchoolThreeYearAverage,
+        decimal? SimilarSchoolsThreeYearAverage,
+        decimal? LocalAuthorityThreeYearAverage,
+        decimal? EnglandThreeYearAverage,
+        IReadOnlyList<TopPerformerRow> TopPerformers,
+        Ks4HeadlineMeasureSeries SchoolYearByYear,
+        Ks4HeadlineMeasureSeries SimilarSchoolsYearByYear,
+        Ks4HeadlineMeasureSeries LocalAuthorityYearByYear,
+        Ks4HeadlineMeasureSeries EnglandYearByYear)
+    {
+        public string SchoolDisplay => DisplayPercent(SchoolThreeYearAverage);
+        public string SimilarSchoolsDisplay => DisplayPercent(SimilarSchoolsThreeYearAverage);
+        public string LocalAuthorityDisplay => DisplayPercent(LocalAuthorityThreeYearAverage);
+        public string EnglandDisplay => DisplayPercent(EnglandThreeYearAverage);
+    }
 
     public required SchoolDetails SchoolDetails { get; set; }
     public required int SimilarSchoolsCount { get; set; }
-
-    public required decimal? SchoolEnglishLanguageThreeYearAverage { get; set; }
-    public required decimal? SimilarSchoolsEnglishLanguageThreeYearAverage { get; set; }
-    public required decimal? LocalAuthorityEnglishLanguageThreeYearAverage { get; set; }
-    public required decimal? EnglandEnglishLanguageThreeYearAverage { get; set; }
-    public required IReadOnlyList<TopPerformerRow> EnglishLanguageTopPerformers { get; set; }
-    public required Ks4HeadlineMeasureSeries SchoolEnglishLanguageYearByYear { get; set; }
-    public required Ks4HeadlineMeasureSeries SimilarSchoolsEnglishLanguageYearByYear { get; set; }
-    public required Ks4HeadlineMeasureSeries LocalAuthorityEnglishLanguageYearByYear { get; set; }
-    public required Ks4HeadlineMeasureSeries EnglandEnglishLanguageYearByYear { get; set; }
-
-    public string SchoolEnglishLanguageDisplay => DisplayPercent(SchoolEnglishLanguageThreeYearAverage);
-    public string SimilarSchoolsEnglishLanguageDisplay => DisplayPercent(SimilarSchoolsEnglishLanguageThreeYearAverage);
-    public string LocalAuthorityEnglishLanguageDisplay => DisplayPercent(LocalAuthorityEnglishLanguageThreeYearAverage);
-    public string EnglandEnglishLanguageDisplay => DisplayPercent(EnglandEnglishLanguageThreeYearAverage);
+    public required SubjectSection EnglishLanguage { get; set; }
+    public required SubjectSection EnglishLiterature { get; set; }
 
     public string SchoolLabel => SchoolDetails.Name;
     public string SimilarSchoolsLabel => "Similar schools average";

@@ -19,6 +19,7 @@ public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) 
         response!.Status.Should().Be(200);
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "KS4 core subject GCSE results" })).ToBeVisibleAsync();
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "English language" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "English literature" })).ToBeVisibleAsync();
     }
 
     [Fact]
