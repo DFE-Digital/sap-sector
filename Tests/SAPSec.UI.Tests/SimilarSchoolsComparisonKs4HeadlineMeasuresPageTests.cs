@@ -37,7 +37,7 @@ public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplication
 
         var barChartColours = await barChart.GetAttributeAsync("data-colors");
         barChartColours.Should().NotBeNullOrWhiteSpace();
-        barChartColours.Should().Contain("#d53780");
-        barChartColours.Should().Contain("#003078");
+        barChartColours.Should().Contain("#ca357c");
+        barChartColours.Should().Contain("#2a1950");
     }
 }

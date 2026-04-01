@@ -25,7 +25,16 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
         content.Should().Contain("KS4 headline performance measures");
         content.Should().Contain("Progress 8");
         content.Should().Contain("Attainment 8");
-        content.Should().Contain("3 year average");
+        content.Should().Contain("3-year average");
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasures_TopPerformersContainLinksToSimilarSchoolComparison()
+    {
+        var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("/school/105574/view-similar-schools/");
     }
 
     [Fact]
