@@ -65,7 +65,7 @@
             window.setAppInsightsCookieEnabled(enabled);
         }
 
-        document.cookie = `@Model.CookieName=${enabled ? "enabled" : "disabled"}; path=/; max-age=${60 * 60 * 24 * 365}; secure; samesite=lax`;
+        document.cookie = `@Model.CookieName=${enabled ? "enabled" : "disabled"}; path=/; max-age=${60 * 60 * 24 * 365}; secure`;
         document.getElementById("unselected-cookies-banner").setAttribute("hidden", "hidden");
         if (enabled) {
             showBannerMessage("accepted-cookies-banner");
