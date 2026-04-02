@@ -452,6 +452,18 @@ public class SchoolController : Controller
             response,
             SchoolKs4CoreSubject.EnglishLiterature,
             SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var defaultBiology = SchoolKs4CoreSubjectSelection.From(
+            response,
+            SchoolKs4CoreSubject.Biology,
+            SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var defaultChemistry = SchoolKs4CoreSubjectSelection.From(
+            response,
+            SchoolKs4CoreSubject.Chemistry,
+            SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var defaultPhysics = SchoolKs4CoreSubjectSelection.From(
+            response,
+            SchoolKs4CoreSubject.Physics,
+            SchoolKs4CoreSubjectGradeFilter.Grade4);
         var defaultMaths = SchoolKs4CoreSubjectSelection.From(
             response,
             SchoolKs4CoreSubject.Maths,
@@ -467,6 +479,9 @@ public class SchoolController : Controller
             SimilarSchoolsCount = response.SimilarSchoolsCount,
             EnglishLanguage = MapCoreSubjectSection(defaultEnglishLanguage),
             EnglishLiterature = MapCoreSubjectSection(defaultEnglishLiterature),
+            Biology = MapCoreSubjectSection(defaultBiology),
+            Chemistry = MapCoreSubjectSection(defaultChemistry),
+            Physics = MapCoreSubjectSection(defaultPhysics),
             Maths = MapCoreSubjectSection(defaultMaths),
             CombinedScienceDoubleAward = MapCoreSubjectSection(defaultCombinedScienceDoubleAward)
         };

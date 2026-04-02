@@ -21,6 +21,9 @@ public class GetSchoolKs4CoreSubjectsTests
         SchoolKs4CoreSubjectSelection.ParseGradeFilter("7").Should().Be(SchoolKs4CoreSubjectGradeFilter.Grade7);
         SchoolKs4CoreSubjectSelection.ParseSubject("english-language").Should().Be(SchoolKs4CoreSubject.EnglishLanguage);
         SchoolKs4CoreSubjectSelection.ParseSubject("english-literature").Should().Be(SchoolKs4CoreSubject.EnglishLiterature);
+        SchoolKs4CoreSubjectSelection.ParseSubject("biology").Should().Be(SchoolKs4CoreSubject.Biology);
+        SchoolKs4CoreSubjectSelection.ParseSubject("chemistry").Should().Be(SchoolKs4CoreSubject.Chemistry);
+        SchoolKs4CoreSubjectSelection.ParseSubject("physics").Should().Be(SchoolKs4CoreSubject.Physics);
         SchoolKs4CoreSubjectSelection.ParseSubject("combined-science-double-award").Should().Be(SchoolKs4CoreSubject.CombinedScienceDoubleAward);
     }
 
@@ -38,7 +41,7 @@ public class GetSchoolKs4CoreSubjectsTests
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
-            .ReturnsAsync(CreateMeasures("52", "51", "50", "42", "41", "40", "18", "17", "16", "54", "53", "52", "44", "43", "42", "20", "19", "18", "56", "55", "54", "46", "45", "44", "22", "21", "20", "48", "47", "46", "38", "37", "36", "14", "13", "12"));
+            .ReturnsAsync(CreateMeasures("52", "51", "50", "42", "41", "40", "18", "17", "16", "54", "53", "52", "44", "43", "42", "20", "19", "18", "74", "73", "72", "64", "63", "62", "40", "39", "38", "56", "55", "54", "46", "45", "44", "22", "21", "20", "48", "47", "46", "38", "37", "36", "14", "13", "12", "56", "55", "54", "46", "45", "44", "22", "21", "20", "48", "47", "46", "38", "37", "36", "14", "13", "12"));
 
         similarSchoolsRepositoryMock
             .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
@@ -48,8 +51,8 @@ public class GetSchoolKs4CoreSubjectsTests
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
-                new Ks4HeadlineMeasuresByUrn("200", CreateMeasures("62", "61", "60", "52", "51", "50", "28", "27", "26", "64", "63", "62", "54", "53", "52", "30", "29", "28", "66", "65", "64", "56", "55", "54", "32", "31", "30", "58", "57", "56", "48", "47", "46", "24", "23", "22")),
-                new Ks4HeadlineMeasuresByUrn("300", CreateMeasures("58", "57", "56", "48", "47", "46", "24", "23", "22", "60", "59", "58", "50", "49", "48", "26", "25", "24", "62", "61", "60", "52", "51", "50", "28", "27", "26", "54", "53", "52", "44", "43", "42", "20", "19", "18"))
+                new Ks4HeadlineMeasuresByUrn("200", CreateMeasures("62", "61", "60", "52", "51", "50", "28", "27", "26", "64", "63", "62", "54", "53", "52", "30", "29", "28", "84", "83", "82", "74", "73", "72", "50", "49", "48", "66", "65", "64", "56", "55", "54", "32", "31", "30", "58", "57", "56", "48", "47", "46", "24", "23", "22", "66", "65", "64", "56", "55", "54", "32", "31", "30", "58", "57", "56", "48", "47", "46", "24", "23", "22")),
+                new Ks4HeadlineMeasuresByUrn("300", CreateMeasures("58", "57", "56", "48", "47", "46", "24", "23", "22", "60", "59", "58", "50", "49", "48", "26", "25", "24", "80", "79", "78", "70", "69", "68", "46", "45", "44", "62", "61", "60", "52", "51", "50", "28", "27", "26", "54", "53", "52", "44", "43", "42", "20", "19", "18", "62", "61", "60", "52", "51", "50", "28", "27", "26", "54", "53", "52", "44", "43", "42", "20", "19", "18"))
             });
 
         establishmentRepositoryMock
@@ -69,6 +72,7 @@ public class GetSchoolKs4CoreSubjectsTests
         var result = await sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
         var englishLanguage = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
         var englishLiterature = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLiterature, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var physics = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Physics, SchoolKs4CoreSubjectGradeFilter.Grade4);
         var maths = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade4);
         var combinedScience = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
@@ -77,6 +81,7 @@ public class GetSchoolKs4CoreSubjectsTests
         englishLanguage.TopPerformers.Select(x => x.Name).Should().ContainInOrder("Alpha school", "Beta school");
         englishLiterature.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(53m, 61m, 62m, 63m));
         englishLiterature.YearByYear.SimilarSchools.Should().Be(new Ks4HeadlineMeasureSeries(62m, 61m, 60m));
+        physics.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(47m, 55m, 77m, 78m));
         maths.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(55m, 63m, 64m, 65m));
         combinedScience.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(47m, 55m, 56m, 57m));
     }
@@ -120,6 +125,15 @@ public class GetSchoolKs4CoreSubjectsTests
         string? lit4Current, string? lit4Previous, string? lit4Previous2,
         string? lit5Current, string? lit5Previous, string? lit5Previous2,
         string? lit7Current, string? lit7Previous, string? lit7Previous2,
+        string? bio4Current, string? bio4Previous, string? bio4Previous2,
+        string? bio5Current, string? bio5Previous, string? bio5Previous2,
+        string? bio7Current, string? bio7Previous, string? bio7Previous2,
+        string? chem4Current, string? chem4Previous, string? chem4Previous2,
+        string? chem5Current, string? chem5Previous, string? chem5Previous2,
+        string? chem7Current, string? chem7Previous, string? chem7Previous2,
+        string? physics4Current, string? physics4Previous, string? physics4Previous2,
+        string? physics5Current, string? physics5Previous, string? physics5Previous2,
+        string? physics7Current, string? physics7Previous, string? physics7Previous2,
         string? maths4Current, string? maths4Previous, string? maths4Previous2,
         string? maths5Current, string? maths5Previous, string? maths5Previous2,
         string? maths7Current, string? maths7Previous, string? maths7Previous2,
@@ -147,6 +161,33 @@ public class GetSchoolKs4CoreSubjectsTests
                 EngLit79_Sum_Est_Current_Pct = lit7Current ?? string.Empty,
                 EngLit79_Sum_Est_Previous_Pct = lit7Previous ?? string.Empty,
                 EngLit79_Sum_Est_Previous2_Pct = lit7Previous2 ?? string.Empty,
+                Bio49_Sum_Est_Current_Pct = bio4Current ?? string.Empty,
+                Bio49_Sum_Est_Previous_Pct = bio4Previous ?? string.Empty,
+                Bio49_Sum_Est_Previous2_Pct = bio4Previous2 ?? string.Empty,
+                Bio59_Sum_Est_Current_Pct = bio5Current ?? string.Empty,
+                Bio59_Sum_Est_Previous_Pct = bio5Previous ?? string.Empty,
+                Bio59_Sum_Est_Previous2_Pct = bio5Previous2 ?? string.Empty,
+                Bio79_Sum_Est_Current_Pct = bio7Current ?? string.Empty,
+                Bio79_Sum_Est_Previous_Pct = bio7Previous ?? string.Empty,
+                Bio79_Sum_Est_Previous2_Pct = bio7Previous2 ?? string.Empty,
+                Chem49_Sum_Est_Current_Pct = chem4Current ?? string.Empty,
+                Chem49_Sum_Est_Previous_Pct = chem4Previous ?? string.Empty,
+                Chem49_Sum_Est_Previous2_Pct = chem4Previous2 ?? string.Empty,
+                Chem59_Sum_Est_Current_Pct = chem5Current ?? string.Empty,
+                Chem59_Sum_Est_Previous_Pct = chem5Previous ?? string.Empty,
+                Chem59_Sum_Est_Previous2_Pct = chem5Previous2 ?? string.Empty,
+                Chem79_Sum_Est_Current_Pct = chem7Current ?? string.Empty,
+                Chem79_Sum_Est_Previous_Pct = chem7Previous ?? string.Empty,
+                Chem79_Sum_Est_Previous2_Pct = chem7Previous2 ?? string.Empty,
+                Physics49_Sum_Est_Current_Pct = physics4Current ?? string.Empty,
+                Physics49_Sum_Est_Previous_Pct = physics4Previous ?? string.Empty,
+                Physics49_Sum_Est_Previous2_Pct = physics4Previous2 ?? string.Empty,
+                Physics59_Sum_Est_Current_Pct = physics5Current ?? string.Empty,
+                Physics59_Sum_Est_Previous_Pct = physics5Previous ?? string.Empty,
+                Physics59_Sum_Est_Previous2_Pct = physics5Previous2 ?? string.Empty,
+                Physics79_Sum_Est_Current_Pct = physics7Current ?? string.Empty,
+                Physics79_Sum_Est_Previous_Pct = physics7Previous ?? string.Empty,
+                Physics79_Sum_Est_Previous2_Pct = physics7Previous2 ?? string.Empty,
                 Maths49_Sum_Est_Current_Pct = maths4Current ?? string.Empty,
                 Maths49_Sum_Est_Previous_Pct = maths4Previous ?? string.Empty,
                 Maths49_Sum_Est_Previous2_Pct = maths4Previous2 ?? string.Empty,
@@ -174,6 +215,15 @@ public class GetSchoolKs4CoreSubjectsTests
                 EngLit49_Tot_LA_Current_Pct = "63", EngLit49_Tot_LA_Previous_Pct = "62", EngLit49_Tot_LA_Previous2_Pct = "61",
                 EngLit59_Tot_LA_Current_Pct = "53", EngLit59_Tot_LA_Previous_Pct = "52", EngLit59_Tot_LA_Previous2_Pct = "51",
                 EngLit79_Tot_LA_Current_Pct = "29", EngLit79_Tot_LA_Previous_Pct = "28", EngLit79_Tot_LA_Previous2_Pct = "27",
+                Bio49_Tot_LA_Current_Pct = "83", Bio49_Tot_LA_Previous_Pct = "82", Bio49_Tot_LA_Previous2_Pct = "81",
+                Bio59_Tot_LA_Current_Pct = "73", Bio59_Tot_LA_Previous_Pct = "72", Bio59_Tot_LA_Previous2_Pct = "71",
+                Bio79_Tot_LA_Current_Pct = "49", Bio79_Tot_LA_Previous_Pct = "48", Bio79_Tot_LA_Previous2_Pct = "47",
+                Chem49_Tot_LA_Current_Pct = "79", Chem49_Tot_LA_Previous_Pct = "78", Chem49_Tot_LA_Previous2_Pct = "77",
+                Chem59_Tot_LA_Current_Pct = "69", Chem59_Tot_LA_Previous_Pct = "68", Chem59_Tot_LA_Previous2_Pct = "67",
+                Chem79_Tot_LA_Current_Pct = "45", Chem79_Tot_LA_Previous_Pct = "44", Chem79_Tot_LA_Previous2_Pct = "43",
+                Physics49_Tot_LA_Current_Pct = "78", Physics49_Tot_LA_Previous_Pct = "77", Physics49_Tot_LA_Previous2_Pct = "76",
+                Physics59_Tot_LA_Current_Pct = "68", Physics59_Tot_LA_Previous_Pct = "67", Physics59_Tot_LA_Previous2_Pct = "66",
+                Physics79_Tot_LA_Current_Pct = "44", Physics79_Tot_LA_Previous_Pct = "43", Physics79_Tot_LA_Previous2_Pct = "42",
                 Maths49_Tot_LA_Current_Pct = "65", Maths49_Tot_LA_Previous_Pct = "64", Maths49_Tot_LA_Previous2_Pct = "63",
                 Maths59_Tot_LA_Current_Pct = "55", Maths59_Tot_LA_Previous_Pct = "54", Maths59_Tot_LA_Previous2_Pct = "53",
                 Maths79_Tot_LA_Current_Pct = "31", Maths79_Tot_LA_Previous_Pct = "30", Maths79_Tot_LA_Previous2_Pct = "29",
@@ -189,6 +239,15 @@ public class GetSchoolKs4CoreSubjectsTests
                 EngLit49_Tot_Eng_Current_Pct = "64", EngLit49_Tot_Eng_Previous_Pct = "63", EngLit49_Tot_Eng_Previous2_Pct = "62",
                 EngLit59_Tot_Eng_Current_Pct = "54", EngLit59_Tot_Eng_Previous_Pct = "53", EngLit59_Tot_Eng_Previous2_Pct = "52",
                 EngLit79_Tot_Eng_Current_Pct = "30", EngLit79_Tot_Eng_Previous_Pct = "29", EngLit79_Tot_Eng_Previous2_Pct = "28",
+                Bio49_Tot_Eng_Current_Pct = "84", Bio49_Tot_Eng_Previous_Pct = "83", Bio49_Tot_Eng_Previous2_Pct = "82",
+                Bio59_Tot_Eng_Current_Pct = "74", Bio59_Tot_Eng_Previous_Pct = "73", Bio59_Tot_Eng_Previous2_Pct = "72",
+                Bio79_Tot_Eng_Current_Pct = "50", Bio79_Tot_Eng_Previous_Pct = "49", Bio79_Tot_Eng_Previous2_Pct = "48",
+                Chem49_Tot_Eng_Current_Pct = "80", Chem49_Tot_Eng_Previous_Pct = "79", Chem49_Tot_Eng_Previous2_Pct = "78",
+                Chem59_Tot_Eng_Current_Pct = "70", Chem59_Tot_Eng_Previous_Pct = "69", Chem59_Tot_Eng_Previous2_Pct = "68",
+                Chem79_Tot_Eng_Current_Pct = "46", Chem79_Tot_Eng_Previous_Pct = "45", Chem79_Tot_Eng_Previous2_Pct = "44",
+                Physics49_Tot_Eng_Current_Pct = "79", Physics49_Tot_Eng_Previous_Pct = "78", Physics49_Tot_Eng_Previous2_Pct = "77",
+                Physics59_Tot_Eng_Current_Pct = "69", Physics59_Tot_Eng_Previous_Pct = "68", Physics59_Tot_Eng_Previous2_Pct = "67",
+                Physics79_Tot_Eng_Current_Pct = "45", Physics79_Tot_Eng_Previous_Pct = "44", Physics79_Tot_Eng_Previous2_Pct = "43",
                 Maths49_Tot_Eng_Current_Pct = "66", Maths49_Tot_Eng_Previous_Pct = "65", Maths49_Tot_Eng_Previous2_Pct = "64",
                 Maths59_Tot_Eng_Current_Pct = "56", Maths59_Tot_Eng_Previous_Pct = "55", Maths59_Tot_Eng_Previous2_Pct = "54",
                 Maths79_Tot_Eng_Current_Pct = "32", Maths79_Tot_Eng_Previous_Pct = "31", Maths79_Tot_Eng_Previous2_Pct = "30",

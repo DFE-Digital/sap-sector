@@ -61,6 +61,36 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Previous_Pct,
                     x => x?.EnglandPerformance?.EngLit49_Tot_Eng_Previous2_Pct),
                 new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Bio49_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Bio49_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Bio49_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio49_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio49_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio49_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Bio49_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Bio49_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Bio49_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Chem49_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Chem49_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Chem49_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem49_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem49_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem49_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Chem49_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Chem49_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Chem49_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Physics49_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Physics49_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Physics49_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics49_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics49_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics49_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Physics49_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Physics49_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Physics49_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
                     x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Previous_Pct,
                     x => x?.EstablishmentPerformance?.Maths49_Sum_Est_Previous2_Pct,
@@ -103,6 +133,36 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Current_Pct,
                     x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Previous_Pct,
                     x => x?.EnglandPerformance?.EngLit59_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Bio59_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Bio59_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Bio59_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio59_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio59_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio59_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Bio59_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Bio59_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Bio59_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Chem59_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Chem59_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Chem59_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem59_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem59_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem59_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Chem59_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Chem59_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Chem59_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Physics59_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Physics59_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Physics59_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics59_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics59_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics59_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Physics59_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Physics59_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Physics59_Tot_Eng_Previous2_Pct),
                 new SubjectFieldSelectors(
                     x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.Maths59_Sum_Est_Previous_Pct,
@@ -147,6 +207,36 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Previous_Pct,
                     x => x?.EnglandPerformance?.EngLit79_Tot_Eng_Previous2_Pct),
                 new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Bio79_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Bio79_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Bio79_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio79_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio79_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Bio79_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Bio79_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Bio79_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Bio79_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Chem79_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Chem79_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Chem79_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem79_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem79_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Chem79_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Chem79_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Chem79_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Chem79_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
+                    x => x?.EstablishmentPerformance?.Physics79_Sum_Est_Current_Pct,
+                    x => x?.EstablishmentPerformance?.Physics79_Sum_Est_Previous_Pct,
+                    x => x?.EstablishmentPerformance?.Physics79_Sum_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics79_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics79_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityPerformance?.Physics79_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandPerformance?.Physics79_Tot_Eng_Current_Pct,
+                    x => x?.EnglandPerformance?.Physics79_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandPerformance?.Physics79_Tot_Eng_Previous2_Pct),
+                new SubjectFieldSelectors(
                     x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Previous_Pct,
                     x => x?.EstablishmentPerformance?.Maths79_Sum_Est_Previous2_Pct,
@@ -173,11 +263,17 @@ public class GetSchoolKs4CoreSubjects(
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors englishLanguageSelectors,
         SubjectFieldSelectors englishLiteratureSelectors,
+        SubjectFieldSelectors biologySelectors,
+        SubjectFieldSelectors chemistrySelectors,
+        SubjectFieldSelectors physicsSelectors,
         SubjectFieldSelectors mathsSelectors,
         SubjectFieldSelectors combinedScienceSelectors) =>
         new(
             BuildSelection(schoolData, similarSchools, englishLanguageSelectors),
             BuildSelection(schoolData, similarSchools, englishLiteratureSelectors),
+            BuildSelection(schoolData, similarSchools, biologySelectors),
+            BuildSelection(schoolData, similarSchools, chemistrySelectors),
+            BuildSelection(schoolData, similarSchools, physicsSelectors),
             BuildSelection(schoolData, similarSchools, mathsSelectors),
             BuildSelection(schoolData, similarSchools, combinedScienceSelectors));
 
@@ -337,6 +433,9 @@ public enum SchoolKs4CoreSubject
 {
     EnglishLanguage,
     EnglishLiterature,
+    Biology,
+    Chemistry,
+    Physics,
     Maths,
     CombinedScienceDoubleAward
 }
@@ -373,6 +472,9 @@ public record SchoolKs4CoreSubjectSelection(
         subject?.ToLowerInvariant() switch
         {
             "english-literature" => SchoolKs4CoreSubject.EnglishLiterature,
+            "biology" => SchoolKs4CoreSubject.Biology,
+            "chemistry" => SchoolKs4CoreSubject.Chemistry,
+            "physics" => SchoolKs4CoreSubject.Physics,
             "maths" => SchoolKs4CoreSubject.Maths,
             "combined-science-double-award" => SchoolKs4CoreSubject.CombinedScienceDoubleAward,
             _ => SchoolKs4CoreSubject.EnglishLanguage
@@ -382,6 +484,9 @@ public record SchoolKs4CoreSubjectSelection(
         subject switch
         {
             SchoolKs4CoreSubject.EnglishLiterature => "english-literature",
+            SchoolKs4CoreSubject.Biology => "biology",
+            SchoolKs4CoreSubject.Chemistry => "chemistry",
+            SchoolKs4CoreSubject.Physics => "physics",
             SchoolKs4CoreSubject.Maths => "maths",
             SchoolKs4CoreSubject.CombinedScienceDoubleAward => "combined-science-double-award",
             _ => "english-language"
@@ -396,6 +501,15 @@ public record SchoolKs4CoreSubjectSelection(
             (SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade5) => response.Grade5AndAbove.CombinedScienceDoubleAward,
             (SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade7) => response.Grade7AndAbove.CombinedScienceDoubleAward,
             (SchoolKs4CoreSubject.CombinedScienceDoubleAward, _) => response.Grade4AndAbove.CombinedScienceDoubleAward,
+            (SchoolKs4CoreSubject.Biology, SchoolKs4CoreSubjectGradeFilter.Grade5) => response.Grade5AndAbove.Biology,
+            (SchoolKs4CoreSubject.Biology, SchoolKs4CoreSubjectGradeFilter.Grade7) => response.Grade7AndAbove.Biology,
+            (SchoolKs4CoreSubject.Biology, _) => response.Grade4AndAbove.Biology,
+            (SchoolKs4CoreSubject.Chemistry, SchoolKs4CoreSubjectGradeFilter.Grade5) => response.Grade5AndAbove.Chemistry,
+            (SchoolKs4CoreSubject.Chemistry, SchoolKs4CoreSubjectGradeFilter.Grade7) => response.Grade7AndAbove.Chemistry,
+            (SchoolKs4CoreSubject.Chemistry, _) => response.Grade4AndAbove.Chemistry,
+            (SchoolKs4CoreSubject.Physics, SchoolKs4CoreSubjectGradeFilter.Grade5) => response.Grade5AndAbove.Physics,
+            (SchoolKs4CoreSubject.Physics, SchoolKs4CoreSubjectGradeFilter.Grade7) => response.Grade7AndAbove.Physics,
+            (SchoolKs4CoreSubject.Physics, _) => response.Grade4AndAbove.Physics,
             (SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade5) => response.Grade5AndAbove.Maths,
             (SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade7) => response.Grade7AndAbove.Maths,
             (SchoolKs4CoreSubject.Maths, _) => response.Grade4AndAbove.Maths,
@@ -411,6 +525,9 @@ public record SchoolKs4CoreSubjectSelection(
 public record SchoolKs4CoreSubjectsGradeSelections(
     SchoolKs4CoreSubjectSelection EnglishLanguage,
     SchoolKs4CoreSubjectSelection EnglishLiterature,
+    SchoolKs4CoreSubjectSelection Biology,
+    SchoolKs4CoreSubjectSelection Chemistry,
+    SchoolKs4CoreSubjectSelection Physics,
     SchoolKs4CoreSubjectSelection Maths,
     SchoolKs4CoreSubjectSelection CombinedScienceDoubleAward);
 

@@ -28,6 +28,9 @@ public class Ks4CoreSubjectsPageViewModel
     public required int SimilarSchoolsCount { get; set; }
     public required SubjectSection EnglishLanguage { get; set; }
     public required SubjectSection EnglishLiterature { get; set; }
+    public required SubjectSection Biology { get; set; }
+    public required SubjectSection Chemistry { get; set; }
+    public required SubjectSection Physics { get; set; }
     public required SubjectSection Maths { get; set; }
     public required SubjectSection CombinedScienceDoubleAward { get; set; }
 
