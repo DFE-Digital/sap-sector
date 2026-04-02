@@ -557,6 +557,7 @@ public class SimilarSchoolsComparisonController : Controller
         value.HasValue
             ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
             : "No available data";
+
     private static string NormalizeDestinationFilter(string? destination) =>
         destination?.ToLowerInvariant() switch
         {
