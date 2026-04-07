@@ -17,8 +17,8 @@ public class GetSimilarSchoolDetails(
         var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
         var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-        var performances = await performanceRepository.GetEstablishmentPerformanceAsync(urns);
-        var schools = establishments.GroupJoin(performances, e => e.URN, p => p.Id, SimilarSchool.FromData).ToList();
+        var performances = await performanceRepository.GetByUrnsAsync(urns);
+        var schools = establishments.GroupJoin(performances, e => e.URN, p => p.Urn, SimilarSchool.FromData).ToList();
         var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
         var similarSchool = schools.FirstOrDefault(s => s.URN == request.SimilarSchoolUrn);
 

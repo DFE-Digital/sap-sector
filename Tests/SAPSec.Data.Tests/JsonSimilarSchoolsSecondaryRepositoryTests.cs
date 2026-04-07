@@ -1,6 +1,6 @@
 using Moq;
-using SAPSec.Data.Model.Generated;
 using SAPSec.Data.Json;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Data.Tests;
 
@@ -36,8 +36,8 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         var result = await sut.GetSimilarSchoolsGroupAsync("123456");
 
         Assert.Equal(2, result.Count);
-        Assert.Contains("654321", result.Select(r => r.URN));
-        Assert.Contains("654322", result.Select(r => r.URN));
+        Assert.Contains("654321", result.Select(r => r.NeighbourURN));
+        Assert.Contains("654322", result.Select(r => r.NeighbourURN));
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         //Assert.Equal("123456", currentSchool.URN);
         //Assert.Equal("Current School", currentSchool.Name);
         Assert.Single(group);
-        Assert.Equal("654321", group.First().URN);
+        Assert.Equal("654321", group.First().NeighbourURN);
     }
 
     [Fact]

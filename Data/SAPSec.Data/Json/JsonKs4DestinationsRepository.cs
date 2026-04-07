@@ -1,8 +1,6 @@
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Model.Generated;
 
-namespace SAPSec.Infrastructure.Json;
+namespace SAPSec.Data.Json;
 
 public class JsonKs4DestinationsRepository(
     IEstablishmentRepository establishmentRepository,

@@ -4,10 +4,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Data.Model.Generated;
 using SAPSec.Data;
 using SAPSec.Data.Model.Generated;
 using SAPSec.Web.Controllers;
@@ -141,8 +139,8 @@ public class SchoolControllerTests
             .ReturnsAsync(schoolDetails);
 
         _similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolUrnsAsync(urn))
-            .ReturnsAsync(Array.Empty<string>());
+            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))

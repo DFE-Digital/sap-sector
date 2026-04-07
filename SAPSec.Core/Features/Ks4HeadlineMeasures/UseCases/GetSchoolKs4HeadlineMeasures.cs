@@ -1,7 +1,7 @@
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
@@ -20,13 +20,14 @@ public class GetSchoolKs4HeadlineMeasures(
             await performanceRepository.GetByUrnAsync(request.Urn),
             await destinationsRepository.GetByUrnAsync(request.Urn));
 
-        var similarSchoolUrns = await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn);
+        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.Urn))
+            .Select(s => s.NeighbourURN);
         var similarSchoolPerformanceData = ((await performanceRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDestinationsData = ((await destinationsRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
+                ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
 

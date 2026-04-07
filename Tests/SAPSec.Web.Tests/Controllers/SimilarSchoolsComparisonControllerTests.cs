@@ -9,7 +9,6 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Data.Model.Generated;
 using SAPSec.Data;
 using SAPSec.Data.Model.Generated;
 using SAPSec.Web.Constants;

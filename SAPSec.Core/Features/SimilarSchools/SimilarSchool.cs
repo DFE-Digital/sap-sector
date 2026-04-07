@@ -1,5 +1,6 @@
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Model;
+using SAPSec.Data;
 using SAPSec.Data.Model.Generated;
 
 namespace SAPSec.Core.Features.SimilarSchools;
@@ -35,9 +36,10 @@ public record SimilarSchool
     public required DataWithAvailability<decimal> MathsGcseGrade5AndAbovePercentage { get; set; }
     public required DataWithAvailability<decimal> PhysicsGcseGrade5AndAbovePercentage { get; set; }
 
-    public static SimilarSchool FromData(Establishment currentEstab, IEnumerable<EstablishmentPerformance> currentSchoolPerformances)
+    public static SimilarSchool FromData(Establishment currentEstab, IEnumerable<Ks4PerformanceData> currentSchoolPerformances)
     {
-        var currentSchoolPerformance = currentSchoolPerformances.FirstOrDefault();
+        var currentSchoolPerformance = currentSchoolPerformances.FirstOrDefault()?.EstablishmentPerformance;
+
         return new SimilarSchool
         {
             URN = currentEstab.URN,
