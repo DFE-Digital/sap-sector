@@ -1,13 +1,14 @@
 using Dapper;
 using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.Postgres;
 
-public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAttendanceRepository
+public class PostgresAbsenceRepository(NpgsqlDataSourceFactory factory) : IAbsenceRepository
 {
     private readonly NpgsqlDataSourceFactory _factory = factory;
 
-    public async Task<AttendanceMeasuresData?> GetByUrnAsync(string urn, string? laId = null)
+    public async Task<AbsenceData?> GetByUrnAsync(string urn, string? laId = null)
     {
         using var conn = await _factory.Create().OpenConnectionAsync();
 
@@ -33,7 +34,7 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
             FROM public.v_la_absence la
             WHERE la."Id" = @laId
             LIMIT 1;
-
+        
             SELECT
                 "Abs_Tot_Eng_Current_Pct",
                 "Abs_Tot_Eng_Previous_Pct",
@@ -48,38 +49,18 @@ public class PostgresAttendanceRepository(NpgsqlDataSourceFactory factory) : IAt
 
         using var results = await conn.QueryMultipleAsync(sql, new { urn, laId });
 
-        var establishmentAttendance = await results.ReadSingleOrDefaultAsync<EstablishmentAttendance>();
-        var localAuthorityAttendance = await results.ReadSingleOrDefaultAsync<LocalAuthorityAttendance>();
-        var englandRow = await results.ReadSingleOrDefaultAsync<EnglandAttendanceRow>();
+        var establishmentAbsence = await results.ReadSingleOrDefaultAsync<EstablishmentAbsence>();
+        var laAbsence = await results.ReadSingleOrDefaultAsync<LAAbsence>();
+        var englandAbsence = await results.ReadSingleOrDefaultAsync<EnglandAbsence>();
 
-        if (establishmentAttendance is null && localAuthorityAttendance is null && englandRow is null)
+        if (establishmentAbsence is null && englandAbsence is null)
         {
             return null;
         }
 
-        return new AttendanceMeasuresData(
-            establishmentAttendance,
-            localAuthorityAttendance,
-            englandRow?.ToEnglandAttendance());
-    }
-
-    private sealed class EnglandAttendanceRow
-    {
-        public decimal? Abs_Tot_Eng_Current_Pct { get; init; }
-        public decimal? Abs_Tot_Eng_Previous_Pct { get; init; }
-        public decimal? Abs_Tot_Eng_Previous2_Pct { get; init; }
-        public decimal? Abs_Persistent_Eng_Current_Pct { get; init; }
-        public decimal? Abs_Persistent_Eng_Previous_Pct { get; init; }
-        public decimal? Abs_Persistent_Eng_Previous2_Pct { get; init; }
-
-        public EnglandAttendance ToEnglandAttendance() => new()
-        {
-            Abs_Tot_Eng_Current_Pct = Abs_Tot_Eng_Current_Pct,
-            Abs_Tot_Eng_Previous_Pct = Abs_Tot_Eng_Previous_Pct,
-            Abs_Tot_Eng_Previous2_Pct = Abs_Tot_Eng_Previous2_Pct,
-            Abs_Persistent_Eng_Current_Pct = Abs_Persistent_Eng_Current_Pct,
-            Abs_Persistent_Eng_Previous_Pct = Abs_Persistent_Eng_Previous_Pct,
-            Abs_Persistent_Eng_Previous2_Pct = Abs_Persistent_Eng_Previous2_Pct
-        };
+        return new AbsenceData(
+            establishmentAbsence,
+            laAbsence,
+            englandAbsence);
     }
 }

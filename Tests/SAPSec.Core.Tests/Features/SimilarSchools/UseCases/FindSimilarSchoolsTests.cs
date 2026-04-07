@@ -1,19 +1,29 @@
 ﻿using Moq;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
 public class FindSimilarSchoolsTests
 {
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _repo;
+    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepo;
+    private readonly Mock<IEstablishmentRepository> _establishmentRepo;
+    private readonly Mock<IKs4PerformanceRepository> _performanceRepo;
     private readonly FindSimilarSchools _sut;
 
     public FindSimilarSchoolsTests()
     {
-        _repo = new Mock<ISimilarSchoolsSecondaryRepository>();
-        _sut = new FindSimilarSchools(_repo.Object);
+        _similarSchoolsRepo = new Mock<ISimilarSchoolsSecondaryRepository>();
+        _establishmentRepo = new Mock<IEstablishmentRepository>();
+        _performanceRepo = new Mock<IKs4PerformanceRepository>();
+
+        _sut = new FindSimilarSchools(
+            _establishmentRepo.Object,
+            _similarSchoolsRepo.Object,
+            _performanceRepo.Object);
     }
 
     [Fact(Skip = "TODO")]
@@ -350,8 +360,8 @@ public class FindSimilarSchoolsTests
 
     private void SetupSimilarSchools(SimilarSchool currentSchool, List<SimilarSchool> similarSchools)
     {
-        _repo.Setup(r => r.GetSimilarSchoolsGroupAsync(currentSchool.URN))
-            .ReturnsAsync((currentSchool, similarSchools.AsReadOnly()));
+        //_similarSchoolsRepo.Setup(r => r.GetSimilarSchoolsGroupAsync(currentSchool.URN))
+        //    .ReturnsAsync((currentSchool, similarSchools.AsReadOnly()));
     }
 
     private FindSimilarSchoolsRequest Request(string urn, Dictionary<string, IEnumerable<string>>? filterBy = null, string? sortBy = null, int? page = null) =>

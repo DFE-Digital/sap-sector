@@ -1,7 +1,7 @@
 using Moq;
-using SAPSec.Core;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
@@ -28,8 +28,8 @@ public class GetCharacteristicsComparisonTests
         var sd = 10m;
         var diff = (decimal)diffInSd * sd;
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
-        var similar = BuildValues(similarUrn, ks2Avg: 100m + diff);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
+        var similar = BuildValues(similarUrn, ks2Avg: (100m + diff).ToString());
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
@@ -49,8 +49,8 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
-        var similar = BuildValues(similarUrn, ks2Avg: 120m);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
+        var similar = BuildValues(similarUrn, ks2Avg: "120");
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
@@ -70,8 +70,8 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
-        var similar = BuildValues(similarUrn, ks2Avg: 120m);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
+        var similar = BuildValues(similarUrn, ks2Avg: "120");
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
@@ -91,7 +91,7 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var similar = BuildValues(similarUrn, ks2Avg: 120m);
+        var similar = BuildValues(similarUrn, ks2Avg: "120");
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { similar });
@@ -110,7 +110,7 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current });
@@ -129,23 +129,23 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m, pupilCount: 100.5m, polar4Quintile: 1.4m);
-        var similar = BuildValues(similarUrn, ks2Avg: 102m, pupilCount: 102.5m, polar4Quintile: 2.6m);
+        var current = BuildValues(currentUrn, ks2Avg: "100", pupilCount: "100.5", polar4Quintile: "1.4");
+        var similar = BuildValues(similarUrn, ks2Avg: "102", pupilCount: "102.5", polar4Quintile: "2.6");
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
         _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
-            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviations
+            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviationsEntry
             {
-                Ks2AverageScore = 10m,
-                PupilPremiumEligibilityPercentage = 10m,
-                PupilsWithEalPercentage = 10m,
-                Polar4Quintile = 1m,
-                PupilStabilityRate = 10m,
-                AverageIdaciScore = 10m,
-                PupilsWithSenSupportPercentage = 10m,
-                PupilCount = 2m,
-                PupilsWithEhcPlanPercentage = 10m
+                KS2AVG = 10m,
+                PPPerc = 10m,
+                PercentEAL = 10m,
+                Polar4QuintilePupils = 1m,
+                PStability = 10m,
+                IdaciPupils = 10m,
+                PercentSchSupport = 10m,
+                NumberOfPupils = 2m,
+                PercentageStatementOrEHP = 10m
             });
 
         var sut = CreateSut();
@@ -169,42 +169,42 @@ public class GetCharacteristicsComparisonTests
 
         var current = BuildValues(
             currentUrn,
-            ks2Avg: 100m,
-            pp: 50m,
-            eal: 20m,
-            polar4Quintile: 2m,
-            stability: 90m,
-            idaci: 0.3m,
-            senSupport: 10m,
-            pupilCount: 600m,
-            ehcp: 2m);
+            ks2Avg: "100",
+            pp: "50",
+            eal: "20",
+            polar4Quintile: "2",
+            stability: "90",
+            idaci: "0.3",
+            senSupport: "10",
+            pupilCount: "600",
+            ehcp: "2");
 
         var similar = BuildValues(
             similarUrn,
-            ks2Avg: 102m,          // diff 2 / sd10 => Similar
-            pp: 56m,               // diff 6 / sd10 => LessSimilar
-            eal: 30m,              // diff 10 / sd10 => NotSimilar
-            polar4Quintile: 3m,    // diff 1 / sd1 => NotSimilar
-            stability: 91m,        // diff 1 / sd10 => Similar
-            idaci: 0.8m,           // diff 0.5 / sd1 => LessSimilar
-            senSupport: 15m,       // diff 5 / sd10 => LessSimilar
-            pupilCount: 603m,      // diff 3 / sd10 => Similar
-            ehcp: 6m);             // diff 4 / sd10 => LessSimilar
+            ks2Avg: "102",          // diff 2 / sd10 => Similar
+            pp: "56",               // diff 6 / sd10 => LessSimilar
+            eal: "30",              // diff 10 / sd10 => NotSimilar
+            polar4Quintile: "3",    // diff 1 / sd1 => NotSimilar
+            stability: "91",        // diff 1 / sd10 => Similar
+            idaci: "0.8",           // diff 0.5 / sd1 => LessSimilar
+            senSupport: "15",       // diff 5 / sd10 => LessSimilar
+            pupilCount: "603",      // diff 3 / sd10 => Similar
+            ehcp: "6");             // diff 4 / sd10 => LessSimilar
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
         _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
-            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviations
+            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviationsEntry
             {
-                Ks2AverageScore = 10m,
-                PupilPremiumEligibilityPercentage = 10m,
-                PupilsWithEalPercentage = 10m,
-                Polar4Quintile = 1m,
-                PupilStabilityRate = 10m,
-                AverageIdaciScore = 1m,
-                PupilsWithSenSupportPercentage = 10m,
-                PupilCount = 10m,
-                PupilsWithEhcPlanPercentage = 10m
+                KS2AVG = 10m,
+                PPPerc = 10m,
+                PercentEAL = 10m,
+                Polar4QuintilePupils = 1m,
+                PStability = 10m,
+                IdaciPupils = 1m,
+                PercentSchSupport = 10m,
+                NumberOfPupils = 10m,
+                PercentageStatementOrEHP = 10m
             });
 
         var sut = CreateSut();
@@ -228,8 +228,8 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
-        var similar = BuildValues(similarUrn, ks2Avg: 106m);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
+        var similar = BuildValues(similarUrn, ks2Avg: "106");
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
@@ -242,7 +242,7 @@ public class GetCharacteristicsComparisonTests
 
         Assert.Equal(SchoolSimilarity.Similar, result.Ks2AverageScore.Similarity);
         _repo.Verify(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync(), Times.Once);
-        _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(It.IsAny<string>()), Times.Never);
+        _repo.Verify(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
@@ -251,8 +251,8 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
-        var similar = BuildValues(similarUrn, ks2Avg: 106m);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
+        var similar = BuildValues(similarUrn, ks2Avg: "106");
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[] { current, similar });
@@ -268,7 +268,7 @@ public class GetCharacteristicsComparisonTests
 
         Assert.Equal(SchoolSimilarity.Similar, result.Ks2AverageScore.Similarity);
         _repo.Verify(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync(), Times.Once);
-        _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(It.IsAny<string>()), Times.Never);
+        _repo.Verify(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
@@ -277,24 +277,24 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
-        var similar = BuildValues(similarUrn, ks2Avg: 106m);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
+        var similar = BuildValues(similarUrn, ks2Avg: "106");
 
         var groupUrns = new[] { "200", "300", "400", "500", "600" };
         var groupValues = new[]
         {
-            BuildValues("200", ks2Avg: 100m),
-            BuildValues("300", ks2Avg: 102m),
-            BuildValues("400", ks2Avg: 104m),
-            BuildValues("500", ks2Avg: 106m),
-            BuildValues("600", ks2Avg: 108m)
+            BuildValues("200", ks2Avg: "100"),
+            BuildValues("300", ks2Avg: "102"),
+            BuildValues("400", ks2Avg: "104"),
+            BuildValues("500", ks2Avg: "106"),
+            BuildValues("600", ks2Avg: "108")
         };
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
                 u.Contains(currentUrn) && u.Contains(similarUrn) && u.Count() == 2)))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolUrnsAsync(currentUrn))
-            .ReturnsAsync(groupUrns);
+        _repo.Setup(r => r.GetSimilarSchoolsGroupAsync(currentUrn))
+            .ReturnsAsync(groupUrns.Select(urn => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = urn }).ToList());
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
                 u.SequenceEqual(groupUrns))))
             .ReturnsAsync(groupValues);
@@ -307,7 +307,7 @@ public class GetCharacteristicsComparisonTests
             SimilarityCalculationMethod.Group));
 
         Assert.Equal(SchoolSimilarity.NotSimilar, result.Ks2AverageScore.Similarity);
-        _repo.Verify(r => r.GetSimilarSchoolUrnsAsync(currentUrn), Times.Once);
+        _repo.Verify(r => r.GetSimilarSchoolsGroupAsync(currentUrn), Times.Once);
         _repo.Verify(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync(), Times.Never);
     }
 
@@ -317,22 +317,22 @@ public class GetCharacteristicsComparisonTests
         var currentUrn = "100";
         var similarUrn = "200";
 
-        var current = BuildValues(currentUrn, ks2Avg: 100m);
-        var similar = BuildValues(similarUrn, ks2Avg: 120m);
+        var current = BuildValues(currentUrn, ks2Avg: "100");
+        var similar = BuildValues(similarUrn, ks2Avg: "120");
 
         var groupUrns = new[] { "300", "400", "500" };
         var groupValues = new[]
         {
-            BuildValues("300", ks2Avg: 110m),
-            BuildValues("400", ks2Avg: 110m),
-            BuildValues("500", ks2Avg: 110m)
+            BuildValues("300", ks2Avg: "110"),
+            BuildValues("400", ks2Avg: "110"),
+            BuildValues("500", ks2Avg: "110")
         };
 
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
                 u.Contains(currentUrn) && u.Contains(similarUrn) && u.Count() == 2)))
             .ReturnsAsync(new[] { current, similar });
-        _repo.Setup(r => r.GetSimilarSchoolUrnsAsync(currentUrn))
-            .ReturnsAsync(groupUrns);
+        _repo.Setup(r => r.GetSimilarSchoolsGroupAsync(currentUrn))
+            .ReturnsAsync(groupUrns.Select(urn => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = urn }).ToList());
         _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u =>
                 u.SequenceEqual(groupUrns))))
             .ReturnsAsync(groupValues);
@@ -347,47 +347,49 @@ public class GetCharacteristicsComparisonTests
         Assert.Equal(SchoolSimilarity.NotSimilar, result.Ks2AverageScore.Similarity);
     }
 
-    private static SimilarSchoolsSecondaryValues BuildValues(
+    private static SimilarSchoolsSecondaryValuesEntry BuildValues(
         string urn,
-        decimal ks2Avg,
-        decimal pp = 0m,
-        decimal eal = 0m,
-        decimal polar4Quintile = 0m,
-        decimal stability = 0m,
-        decimal idaci = 0m,
-        decimal senSupport = 0m,
-        decimal pupilCount = 0m,
-        decimal ehcp = 0m)
+        string ks2Avg,
+        string pp = "0",
+        string eal = "0",
+        string polar4Quintile = "0",
+        string stability = "0",
+        string idaci = "0",
+        string senSupport = "0",
+        string pupilCount = "0",
+        string ehcp = "0")
     {
-        return new SimilarSchoolsSecondaryValues
+        return new SimilarSchoolsSecondaryValuesEntry
         {
-            Urn = urn,
-            Ks2ReadingScore = ks2Avg,
-            Ks2MathsScore = ks2Avg,
-            PupilPremiumEligibilityPercentage = pp,
-            PupilsWithEalPercentage = eal,
-            Polar4Quintile = polar4Quintile,
-            PupilStabilityRate = stability,
-            AverageIdaciScore = idaci,
-            PupilsWithSenSupportPercentage = senSupport,
-            PupilCount = pupilCount,
-            PupilsWithEhcPlanPercentage = ehcp
+            URN = urn,
+            KS2RP = ks2Avg,
+            KS2MP = ks2Avg,
+            PPPerc = pp,
+            PercentEAL = eal,
+            Polar4QuintilePupils = polar4Quintile,
+            PStability = stability,
+            IdaciPupils = idaci,
+            PercentSchSupport = senSupport,
+            NumberOfPupils = pupilCount,
+            PercentageStatementOrEHP = ehcp
         };
     }
 
-    private static SimilarSchoolsSecondaryStandardDeviations BuildStandardDeviations(decimal ks2AvgSd)
+    private static SimilarSchoolsSecondaryStandardDeviationsEntry BuildStandardDeviations(decimal ks2AvgSd)
     {
-        return new SimilarSchoolsSecondaryStandardDeviations
+        return new SimilarSchoolsSecondaryStandardDeviationsEntry
         {
-            Ks2AverageScore = ks2AvgSd,
-            PupilPremiumEligibilityPercentage = 1m,
-            PupilsWithEalPercentage = 1m,
-            Polar4Quintile = 1m,
-            PupilStabilityRate = 1m,
-            AverageIdaciScore = 1m,
-            PupilsWithSenSupportPercentage = 1m,
-            PupilCount = 1m,
-            PupilsWithEhcPlanPercentage = 1m
+            KS2RP = ks2AvgSd,
+            KS2MP = ks2AvgSd,
+            KS2AVG = ks2AvgSd,
+            PPPerc = 1m,
+            PercentEAL = 1m,
+            Polar4QuintilePupils = 1m,
+            PStability = 1m,
+            IdaciPupils = 1m,
+            PercentSchSupport = 1m,
+            NumberOfPupils = 1m,
+            PercentageStatementOrEHP = 1m
         };
     }
 }

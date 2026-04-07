@@ -1,14 +1,19 @@
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class FindSimilarSchools(ISimilarSchoolsSecondaryRepository repository)
+public class FindSimilarSchools(
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    IKs4PerformanceRepository performanceRepository)
 {
     public const int ItemsPerPage = 10;
 
@@ -16,7 +21,13 @@ public class FindSimilarSchools(ISimilarSchoolsSecondaryRepository repository)
     {
         // TODO: Validate inputs
 
-        var (currentSchool, similarSchools) = await repository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
+        var performances = await performanceRepository.GetByUrnsAsync(urns);
+        var schools = establishments.GroupJoin(performances, e => e.URN, p => p.Urn, SimilarSchool.FromData).ToList();
+        var currentSchool = schools.First(s => s.URN == request.CurrentSchoolUrn);
+        var similarSchools = schools.Except([currentSchool]);
 
         var filters = new SimilarSchoolsFilters(request.FilterBy, currentSchool);
         var sorting = new SimilarSchoolsSorting(request.SortBy);

@@ -1,10 +1,10 @@
-using SAPSec.Core;
 using SAPSec.Core.Interfaces.Repositories;
+using System.Globalization;
 
 namespace SAPSec.Core.Features.Attendance.UseCases;
 
 public class GetAttendanceMeasures(
-    IAttendanceRepository repository,
+    IAbsenceRepository repository,
     IEstablishmentRepository establishmentRepository)
 {
     public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
@@ -18,31 +18,31 @@ public class GetAttendanceMeasures(
         var data = await repository.GetByUrnAsync(request.Urn, establishment.LAId);
 
         var overallSchoolSeries = new AttendanceMeasureSeries(
-            data?.EstablishmentAttendance?.Abs_Tot_Est_Current_Pct,
-            data?.EstablishmentAttendance?.Abs_Tot_Est_Previous_Pct,
-            data?.EstablishmentAttendance?.Abs_Tot_Est_Previous2_Pct);
+            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Tot_Est_Previous2_Pct));
         var persistentSchoolSeries = new AttendanceMeasureSeries(
-            data?.EstablishmentAttendance?.Abs_Persistent_Est_Current_Pct,
-            data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous_Pct,
-            data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous2_Pct);
+            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Persistent_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous2_Pct));
 
         var overallLocalAuthoritySeries = new AttendanceMeasureSeries(
-            data?.LocalAuthorityAttendance?.Abs_Tot_La_Current_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Tot_La_Previous_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Tot_La_Previous2_Pct);
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Previous2_Pct));
         var persistentLocalAuthoritySeries = new AttendanceMeasureSeries(
-            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Current_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Previous_Pct,
-            data?.LocalAuthorityAttendance?.Abs_Persistent_La_Previous2_Pct);
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Previous2_Pct));
 
         var overallEnglandSeries = new AttendanceMeasureSeries(
-            data?.EnglandAttendance?.Abs_Tot_Eng_Current_Pct,
-            data?.EnglandAttendance?.Abs_Tot_Eng_Previous_Pct,
-            data?.EnglandAttendance?.Abs_Tot_Eng_Previous2_Pct);
+            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Tot_Eng_Previous2_Pct));
         var persistentEnglandSeries = new AttendanceMeasureSeries(
-            data?.EnglandAttendance?.Abs_Persistent_Eng_Current_Pct,
-            data?.EnglandAttendance?.Abs_Persistent_Eng_Previous_Pct,
-            data?.EnglandAttendance?.Abs_Persistent_Eng_Previous2_Pct);
+            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Persistent_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Persistent_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Persistent_Eng_Previous2_Pct));
 
         return new(
             new AttendanceMeasureAverage(
@@ -61,6 +61,18 @@ public class GetAttendanceMeasures(
                 persistentSchoolSeries,
                 persistentLocalAuthoritySeries,
                 persistentEnglandSeries));
+    }
+
+    private static decimal? ParseNullableDecimal(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return null;
+        }
+
+        return decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
+            ? parsed
+            : null;
     }
 
     private static decimal? Average(params decimal?[] values)
