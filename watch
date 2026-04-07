@@ -1,0 +1,1 @@
+(cd SAPSec.Web && npm run watch)

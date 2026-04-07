@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Moq;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
@@ -532,8 +531,8 @@ public class GetSchoolKs4CoreSubjectsTests
             var similarSchoolsArray = similarSchools.ToArray();
 
             _similarSchoolsRepositoryMock
-                .Setup(x => x.GetSimilarSchoolUrnsAsync("100001"))
-                .ReturnsAsync(similarSchoolsArray.Select(x => x.Urn).ToArray());
+                .Setup(x => x.GetSimilarSchoolsGroupAsync("100001"))
+                .ReturnsAsync(similarSchoolsArray.Select(x => new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = x.Urn }).ToArray());
 
             _repositoryMock
                 .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))

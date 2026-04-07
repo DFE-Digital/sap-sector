@@ -57,6 +57,18 @@ public sealed record DataWithAvailability<T>
     public T GetValueOrDefault(T defaultValue)
         => HasValue && Value is not null ? Value : defaultValue;
 
+    public static bool operator <(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) < 0;
+
+    public static bool operator >(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) > 0;
+
+    public static bool operator <=(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) <= 0;
+
+    public static bool operator >=(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) >= 0;
+
     #endregion
 
     public static readonly DataWithAvailabilityComparer Comparer = new DataWithAvailabilityComparer();

@@ -18,6 +18,7 @@
   },
   "devDependencies": {
     "browser-sync": "^3.0.4",
+    "concurrently": "^9.2.1",
     "copyfiles": "^2.4.1",
     "gulp": "^5.0.1",
     "gulp-clean-css": "^4.3.0",
@@ -30,7 +31,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npm run build-fe",
     "build-fe": "gulp build-fe",
-    "watch": "cd SAPSec.Web && dotnet watch"
+    "watch-fe": "gulp watch-fe",
+    "watch": "concurrently --kill-others \"dotnet watch\" \"gulp watch-fe\""
   },
   "author": "",
   "license": "MIT",

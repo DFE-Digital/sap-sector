@@ -30,22 +30,21 @@ public class SimilarSchoolsController : Controller
     [Route("view-similar-schools")]
     public async Task<IActionResult> ViewSimilarSchools(
         string urn,
-        [FromQuery] string? sortBy,
-        [FromQuery] int page = 1)
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? page = null)
     {
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData["SchoolDetails"] = school;
 
-        var coreSortBy = string.IsNullOrWhiteSpace(sortBy) ? "Att8" : sortBy;
         var filterBy = BuildCoreFilters(Request.Query);
         var currentFilters = ExtractCurrentFilters(Request.Query);
 
         var response = await _findSimilarSchools.Execute(new FindSimilarSchoolsRequest(
             urn,
             filterBy,
-            coreSortBy,
+            sortBy,
             page));
 
         var schools = response.ResultsPage
@@ -55,6 +54,8 @@ public class SimilarSchoolsController : Controller
         var allSchools = response.AllResults
             .Select(MapToViewModel)
             .ToList();
+
+        var responseSortBy = response.SortOptions.First(o => o.Selected).Key;
 
         var viewModel = new SimilarSchoolsPageViewModel
         {
@@ -67,11 +68,12 @@ public class SimilarSchoolsController : Controller
             SortOptions = response.SortOptions,
             CurrentFilters = currentFilters,
             FilterGroups = BuildFilterGroups(response.FilterOptions),
-            SelectedFilterTags = BuildSelectedFilterTags(response.FilterOptions, currentFilters, coreSortBy, urn),
-            SortBy = coreSortBy,
+            SelectedFilterTags = BuildSelectedFilterTags(response.FilterOptions, currentFilters, responseSortBy, urn),
+            SortBy = responseSortBy,
             CurrentPage = response.ResultsPage.CurrentPage,
             PageSize = response.ResultsPage.ItemsPerPage,
-            TotalResults = response.AllResults.Count
+            TotalResults = response.AllResults.Count,
+            ValidationErrors = response.ValidationErrors
         };
 
         return View(viewModel);
@@ -118,8 +120,8 @@ public class SimilarSchoolsController : Controller
         var categoryKeys = new List<(string Heading, List<string> Keys)>
         {
             ("Location", new List<string> { "dist", "reg", "ur" }),
-            ("School characteristics", new List<string> { "poe", "sc", "np", "sf", "ap", "sp", "goe" }),
-            ("Attendance", new List<string> { "oa", "pa" })
+            ("School characteristics", new List<string> { "poe", "sciu", "np", "sf", "ap", "sp", "goe" }),
+            ("Attendance", new List<string> { "oar", "par" })
         };
 
         var grouped = new List<SimilarSchoolsFilterGroupViewModel>();
@@ -161,10 +163,39 @@ public class SimilarSchoolsController : Controller
 
         foreach (var filter in filterOptions)
         {
-            foreach (var option in filter.Options.Where(o => o.Selected))
+            if (filter is SimilarSchoolsSingleValueAvailableFilter single)
             {
-                var queryString = BuildQueryStringWithout(currentFilters, sortBy, filter.Key, option.Key);
-                tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, baseUrl + queryString));
+                foreach (var option in single.Options.Where(o => o.Selected))
+                {
+                    var queryString = BuildQueryStringWithout(currentFilters, sortBy, [(filter.Key, option.Key)]);
+                    tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, baseUrl + queryString));
+                }
+            }
+            if (filter is SimilarSchoolsMultiValueAvailableFilter multi)
+            {
+                foreach (var option in multi.Options.Where(o => o.Selected))
+                {
+                    var queryString = BuildQueryStringWithout(currentFilters, sortBy, [(filter.Key, option.Key)]);
+                    tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, baseUrl + queryString));
+                }
+            }
+            if (filter is SimilarSchoolsNumericRangeAvailableFilter range
+                && !range.ValidationErrors.Any()
+                && (!string.IsNullOrWhiteSpace(range.From.Value) || !string.IsNullOrWhiteSpace(range.To.Value)))
+            {
+                IEnumerable<(string, string)> exclude = [
+                    (range.From.Key, range.From.Value),
+                    (range.To.Key, range.To.Value)
+                ];
+                var queryString = BuildQueryStringWithout(currentFilters, sortBy, exclude);
+                var rangeText = (string.IsNullOrWhiteSpace(range.From.Value), string.IsNullOrWhiteSpace(range.To.Value)) switch
+                {
+                    (false, false) => $"from {range.From.Value}% to {range.To.Value}%",
+                    (false, true) => $"over {range.From.Value}%",
+                    (true, false) => $"up to {range.To.Value}%",
+                    _ => ""
+                };
+                tags.Add(new SimilarSchoolsSelectedFilterTagViewModel($"{range.Name} {rangeText}", baseUrl + queryString));
             }
         }
 
@@ -174,8 +205,7 @@ public class SimilarSchoolsController : Controller
     private static string BuildQueryStringWithout(
         Dictionary<string, List<string>> currentFilters,
         string sortBy,
-        string excludeParam,
-        string excludeValue)
+        IEnumerable<(string Key, string Value)> exclude)
     {
         var parts = new List<string>();
 
@@ -188,8 +218,8 @@ public class SimilarSchoolsController : Controller
         {
             foreach (var value in values)
             {
-                if (key.Equals(excludeParam, StringComparison.InvariantCultureIgnoreCase) &&
-                    value.Equals(excludeValue, StringComparison.InvariantCultureIgnoreCase))
+                if (exclude.Any(e => key.Equals(e.Key, StringComparison.InvariantCultureIgnoreCase)
+                    && value.Equals(e.Value, StringComparison.InvariantCultureIgnoreCase)))
                 {
                     continue;
                 }

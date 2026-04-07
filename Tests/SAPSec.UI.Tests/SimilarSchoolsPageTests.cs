@@ -27,7 +27,7 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
         await Page.GotoAsync(SimilarSchoolsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var filterForm = Page.Locator("#similar-schools-filter-form");
+        var filterForm = Page.Locator("#app-filter-panel");
         var count = await filterForm.CountAsync();
 
         count.Should().Be(1, "Filter form should be present");

@@ -1,6 +1,6 @@
 ﻿@model SAPSec.Web.ViewModels.SchoolSearchFilterViewModel
 
-<div class="govuk-grid-column-one-third app-filter-column">
+<div class="govuk-grid-column-one-third app-filter__column">
     @{
         var hasSelectedFilters = Model.SelectedLocalAuthorities?.Any() == true;
         var isExpanded = hasSelectedFilters ? "true" : "false";
@@ -16,8 +16,8 @@
         <input type="hidden" name="secondaryOnly" value="@Model.SecondaryOnly.ToString().ToLowerInvariant()" />
         <input type="hidden" name="similarSchoolsOnly" value="@Model.SimilarSchoolsOnly.ToString().ToLowerInvariant()" />
 
-        <div class="moj-filter">
-            <div class="moj-filter__header">
+        <div class="moj-filter app-filter">
+            <div class="moj-filter__header app-filter__header">
                 <div class="moj-filter__header-title">
                     <h2 class="govuk-heading-m">Filters</h2>
                 </div>
@@ -26,22 +26,16 @@
             <div class="moj-filter__content">
                 @if (Model.SelectedLocalAuthorities?.Any() == true)
                 {
-                    <div class="moj-filter__selected">
-                        <div class="moj-filter__selected-heading">
+                    <div class="moj-filter__selected app-filter__selected">
+                        <div class="moj-filter__selected-heading app-filter__selected-heading">
                             <div class="moj-filter__heading-title">
                                 <h2 class="govuk-heading-s">Selected filters</h2>
                             </div>
                             <div class="moj-filter__heading-action">
-                                <p>
-                                    <a class="govuk-link govuk-link--no-visited-state"
-                                       href="@Url.Action("Search", "SchoolSearch", new { query = Model.Query, secondaryOnly = Model.SecondaryOnly, similarSchoolsOnly = Model.SimilarSchoolsOnly })">
-                                        Clear filters
-                                    </a>
-                                </p>
                             </div>
                         </div>
 
-                        <ul class="moj-filter-tags">
+                        <ul class="moj-filter-tags app-filter__tags">
                             @foreach (var la in Model.SelectedLocalAuthorities)
                             {
                                 var remainingFilters = Model.SelectedLocalAuthorities.Where(x => x != la).ToArray();
@@ -53,17 +47,24 @@
                                     similarSchoolsOnly = Model.SimilarSchoolsOnly
                                 });
                                 <li>
-                                    <a class="moj-filter__tag" href="@removeUrl">
+                                    <a class="moj-filter__tag app-filter__tag" href="@removeUrl">
                                         <span class="govuk-visually-hidden">Remove this filter</span> @la
                                     </a>
                                 </li>
                             }
                         </ul>
+
+                        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0 app-clear-filters-spacing">
+                            <a class="govuk-link govuk-link--no-visited-state"
+                                href="@Url.Action("Search", "SchoolSearch", new { query = Model.Query, secondaryOnly = Model.SecondaryOnly, similarSchoolsOnly = Model.SimilarSchoolsOnly })">
+                                Clear filters
+                            </a>
+                        </p>
                     </div>
                 }
 
-                <div class="moj-filter__options">
-                    <button type="submit" class="govuk-button" data-module="govuk-button" id="apply-filters-btn">
+                <div class="moj-filter__options app-filter__options">
+                    <button type="submit" class="govuk-button app-filter__apply-button" data-module="govuk-button">
                         <span class="app-button-spinner" aria-hidden="true"></span>
                         <span class="app-button-text">Apply filters</span>
                     </button>
@@ -71,7 +72,7 @@
                     @if (Model.LocalAuthorities.Any())
                     {
                         <div class="govuk-form-group">
-                            <fieldset class="govuk-fieldset">
+                            <fieldset class="govuk-fieldset app-filter__fieldset">
                                 <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">
                                     Location
                                 </legend>
@@ -116,6 +117,11 @@
                             </fieldset>
                         </div>
                     }
+
+                    <button type="submit" class="govuk-button app-filter__apply-button" data-module="govuk-button">
+                        <span class="app-button-spinner" aria-hidden="true"></span>
+                        <span class="app-button-text">Apply filters</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -134,19 +140,19 @@
             const filterForm = document.getElementById('app-filter-panel');
             if (!filterForm) return;
 
-            const applyButton = document.getElementById('apply-filters-btn');
+            const applyButtons = document.getElementsByClassName('app-filter__apply-button');
 
-            filterForm.onsubmit = function(e) {
+            filterForm.onsubmit = function (e) {
                 const submitEvent = e;
                 const submitter = submitEvent.submitter;
-                const isApplyButton = submitter === applyButton;
+                const isApplyButton = [...applyButtons].indexOf(submitter) > -1;
 
                 if (!isApplyButton) {
                     e.preventDefault();
                     return false;
                 }
 
-                if (applyButton) {
+                for(var applyButton of applyButtons) {
                     applyButton.classList.add('govuk-button--loading');
                     applyButton.disabled = true;
                 }

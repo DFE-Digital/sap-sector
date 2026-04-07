@@ -1,11 +1,9 @@
-using FluentAssertions;
 using Moq;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;
@@ -17,7 +15,7 @@ public class GetFilteredSchoolKs4CoreSubjectTests
     {
         var context = new TestContext();
 
-        var act = () => context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100", "unknown-subject", "4"));
+        var act = () => context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100001", "unknown-subject", "4"));
 
         await act.Should().ThrowAsync<ArgumentOutOfRangeException>()
             .WithParameterName("subject");
@@ -28,7 +26,7 @@ public class GetFilteredSchoolKs4CoreSubjectTests
     {
         var context = new TestContext();
 
-        var act = () => context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100", "english-language", "99"));
+        var act = () => context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100001", "english-language", "99"));
 
         await act.Should().ThrowAsync<ArgumentOutOfRangeException>()
             .WithParameterName("grade");
@@ -45,7 +43,7 @@ public class GetFilteredSchoolKs4CoreSubjectTests
             data.CombSci79_Sum_Est_Previous2_Pct = "76";
         });
 
-        var result = await context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100", "combined-science-double-award", "7"));
+        var result = await context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100001", "combined-science-double-award", "7"));
 
         result.Subject.Should().Be(SchoolKs4CoreSubject.CombinedScienceDoubleAward);
         result.Grade.Should().Be(SchoolKs4CoreSubjectGradeFilter.Grade7);
@@ -64,8 +62,8 @@ public class GetFilteredSchoolKs4CoreSubjectTests
         public TestContext()
         {
             _similarSchoolsRepositoryMock
-                .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
-                .ReturnsAsync(Array.Empty<string>());
+                .Setup(x => x.GetSimilarSchoolsGroupAsync("100001"))
+                .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
             _schoolDetailsServiceMock
                 .Setup(x => x.GetByUrnAsync("100"))
                 .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
