@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data;
+using SAPSec.Data.Model.Generated;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;

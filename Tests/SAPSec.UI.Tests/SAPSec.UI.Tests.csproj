@@ -38,12 +38,5 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SAPSec.Web\SAPSec.Web.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="TestData\Establishments-UI-Test-Data.csv" />
-    <Content Include="TestData\Establishments-UI-Test-Data.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
   
 </Project>

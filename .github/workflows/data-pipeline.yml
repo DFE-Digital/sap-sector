@@ -10,10 +10,9 @@ on:
         type: choice
         options:
         - test
-        - review
         - production
       review-app-number:
-        description: Pull request number of the review app (optional, this will generate a backup file for that review app)
+        description: Pull request number of the review app (optional, this will run against the target environment to generate a backup file for that review app to use, and then restore the target DB from backup)
         type: string
         required: false
 
@@ -40,13 +39,16 @@ jobs:
       SENSITIVE_ESTABLISHMENT_LINKS_URL: ${{ secrets.SENSITIVE_ESTABLISHMENT_LINKS_URL }}
       SENSITIVE_MAT_LINKS_URL: ${{ secrets.SENSITIVE_MAT_LINKS_URL }}
 
-
       # Konduit / AKS settings (also in GitHub secrets)
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
       AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
       AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
+      SERVICE_NAME: get-school-improvement-insights
+      SERVICE_SHORT: sapsec
+      TF_VARS_PATH: terraform/application/config
+      DEPLOY_ENV: ${{ inputs.environment || 'test' }}
       
     steps:
       # ==============================
@@ -75,6 +77,7 @@ jobs:
       - name: Install Azure CLI
         run: |
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+
       # ==============================
       # 3. Azure login (needed for az aks get-credentials)
       # ==============================
@@ -119,6 +122,7 @@ jobs:
             -o "$GITHUB_WORKSPACE/konduit.sh"
           chmod +x "$GITHUB_WORKSPACE/konduit.sh"
           ls -la "$GITHUB_WORKSPACE/konduit.sh"
+
       # ==============================
       # 5. Ensure Blob container exists (idempotent)
       # ==============================
@@ -129,6 +133,7 @@ jobs:
             --name $env:AZURE_STORAGE_CONTAINER `
             --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
             --public-access off | Out-Null
+
       # ==============================
       # 6. Download source data and store latest versions in Blob
       #
@@ -154,9 +159,9 @@ jobs:
           $conn = $env:AZURE_STORAGE_CONNECTION_STRING
           $container = $env:AZURE_STORAGE_CONTAINER
           $manifestBlobName = "versions.json"
-          $sourcesPathRepo = "SAPData/raw_sources.json"
+          $sourcesPathRepo = "Data/SAPSec.SqlGenerator/raw_sources.json"
           if (-not (Test-Path $sourcesPathRepo)) { throw "Could not find $sourcesPathRepo in the repo." }
-          $workDir = "SAPData/Work/Versioning"
+          $workDir = "Data/SAPSec.SqlGenerator/Work/Versioning"
           New-Item -ItemType Directory -Force -Path $workDir | Out-Null
           $reportPath = Join-Path $workDir "step6_report.json"
           $report = [System.Collections.Generic.List[object]]::new()
@@ -495,6 +500,7 @@ jobs:
           "changed=$anyChanged" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           $latestFilesJson = ($latestFiles | ConvertTo-Json -Depth 10 -Compress)
           "latest_files=$latestFilesJson" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
       # ==============================
       # 6b. Upload the report
       # ==============================
@@ -504,7 +510,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: step6-report
-          path: SAPData/Work/Versioning/step6_report.json
+          path: Data/SAPSec.SqlGenerator/Work/Versioning/step6_report.json
           if-no-files-found: warn
 
       # ==============================
@@ -520,7 +526,7 @@ jobs:
           LATEST_FILES: ${{ steps.version.outputs.latest_files }}
         run: |
           $ErrorActionPreference = "Stop"
-          $rawDir = "SAPData/DataMap/SourceFiles"
+          $rawDir = "Data/SAPSec.SqlGenerator/DataMap/SourceFiles"
           New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
           Get-ChildItem -Path $rawDir -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
           # ---- Load latest managed filenames from step 6 output ----
@@ -576,29 +582,32 @@ jobs:
           Write-Host "Downloaded files:"
           $files = Get-ChildItem -Path $rawDir -File | Sort-Object Name
           $files | Select-Object Name, Length | Format-Table -AutoSize
+
       # ==============================
       # 8. Build + Run SQL generator
       # ==============================
       - name: Build SQL Generator
         run: |
           dotnet build SAPSec.sln --configuration Release
+
       - name: Generate SQL Scripts
         run: |
-          dotnet run --configuration Release --project SAPData/SAPData.csproj
+          dotnet run --configuration Release --project Data/SAPSec.SqlGenerator/SAPSec.SqlGenerator.csproj
           echo "Generated SQL scripts."
+
       # ==============================
       # 9. Run ETL via konduit (private DB) WITH RETRY on transient disconnects
       # ==============================
       - name: Run ETL pipeline via konduit (retry on transient DB disconnect)
-        working-directory: SAPData/Sql
+        working-directory: Data/SAPSec.SqlGenerator/Sql
         shell: bash
         run: |
           set -euo pipefail
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
-          ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
+          ls -la "$GITHUB_WORKSPACE/Data/SAPSec.SqlGenerator/Sql" || true
           max_attempts=5
           delay=10
-          log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
+          log_file="$GITHUB_WORKSPACE/Data/SAPSec.SqlGenerator/Sql/psql.log"
           attempt=1
           while [ $attempt -le $max_attempts ]; do
             echo "ETL attempt $attempt/$max_attempts"
@@ -607,7 +616,7 @@ jobs:
               -n "${AKS_NAMESPACE}" \
               -t 28800 \
               -x \
-              -i "$GITHUB_WORKSPACE/SAPData/Sql/run_all.sql" \
+              -i "$GITHUB_WORKSPACE/Data/SAPSec.SqlGenerator/Sql/run_all.sql" \
               "${KONDUIT_APP_NAME}" -- psql 2>&1 | tee "$log_file"
             exit_code=${PIPESTATUS[0]}
             set -e
@@ -632,6 +641,7 @@ jobs:
             echo "ETL failed after $max_attempts attempts."
             exit 2
           fi
+
       # ==============================
       # 10. Create & upload DB backup (used to restore db in review app env)
       # ==============================
@@ -670,3 +680,53 @@ jobs:
           echo "Seed backup uploaded:"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
+      
+      # ==============================
+      # 11. Backup target DB (if pipeline was run normally)
+      # ==============================
+      - name: Set environment variables
+        run: |
+          source global_config/${DEPLOY_ENV}.sh
+          tf_vars_file=${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json
+          echo "CLUSTER=$(jq -r '.cluster' ${tf_vars_file})" >> $GITHUB_ENV
+          echo "NAMESPACE=$(jq -r '.namespace' ${tf_vars_file})" >> $GITHUB_ENV
+          echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
+          echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
+          echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
+          TODAY=$(date +"%F")
+          BACKUP_FILE=${SERVICE_SHORT}_${CONFIG_SHORT}_post_data_pipeline_${TODAY}
+          echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
+          echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
+
+      - name: Backup ${{ env.DEPLOY_ENV }} postgres (if pipeline was run normally)
+        if: ${{ inputs.environment == 'test' && inputs.review-app-number == '' }}
+        uses: DFE-Digital/github-actions/backup-postgres@master
+        with:
+          storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
+          resource-group: ${{ env.RESOURCE_GROUP_NAME }}
+          app-name: ${{ env.SERVICE_NAME }}-${{ inputs.environment }}
+          namespace: ${{ env.NAMESPACE }}
+          cluster: ${{ env.CLUSTER }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          backup-file: ${{ env.BACKUP_FILE }}.sql
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+      
+      # ==============================
+      # 12. Restore DB backup (if pipeline was run to to create a backup for a review app)
+      # ==============================
+      - name: Restore ${{ env.DEPLOY_ENV }} postgres (if pipeline was run to to create a backup for a review app)
+        if: ${{ inputs.environment == 'test' && inputs.review-app-number != '' }}
+        uses: DFE-Digital/github-actions/restore-postgres-backup@master
+        with:
+          storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
+          resource-group: ${{ env.RESOURCE_GROUP_NAME }}
+          app-name: ${{ env.SERVICE_NAME }}-${{ inputs.environment }}
+          namespace: ${{ env.NAMESPACE }}
+          cluster: ${{ env.CLUSTER }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          backup-file: ${{ env.BACKUP_FILE }}.sql.gz

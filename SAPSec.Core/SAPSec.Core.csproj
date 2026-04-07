@@ -7,12 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Interfaces\Repositories\**" />
     <Compile Remove="Model\KS4\**" />
     <Compile Remove="Model\Search\**" />
     <Compile Remove="UseCases\**" />
+    <EmbeddedResource Remove="Interfaces\Repositories\**" />
     <EmbeddedResource Remove="Model\KS4\**" />
     <EmbeddedResource Remove="Model\Search\**" />
     <EmbeddedResource Remove="UseCases\**" />
+    <None Remove="Interfaces\Repositories\**" />
     <None Remove="Model\KS4\**" />
     <None Remove="Model\Search\**" />
     <None Remove="UseCases\**" />
@@ -26,9 +29,12 @@
     <PackageReference Include="IeuanWalker.GeoUK" Version="1.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.0" />
 	<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data\SAPSec.Data\SAPSec.Data.csproj" />
   </ItemGroup>
 
 </Project>

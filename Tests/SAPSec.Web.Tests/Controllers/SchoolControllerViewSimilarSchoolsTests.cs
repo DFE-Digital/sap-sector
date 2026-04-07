@@ -8,6 +8,7 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
@@ -17,6 +18,8 @@ public class SimilarSchoolsControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepoMock;
+    private readonly Mock<IEstablishmentRepository> _establishmentRepo;
+    private readonly Mock<IKs4PerformanceRepository> _performanceRepo;
     private readonly Mock<ILogger<SimilarSchoolsController>> _loggerMock;
     private readonly SimilarSchoolsController _sut;
 
@@ -24,8 +27,15 @@ public class SimilarSchoolsControllerTests
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
         _similarSchoolsRepoMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        _establishmentRepo = new Mock<IEstablishmentRepository>();
+        _performanceRepo = new Mock<IKs4PerformanceRepository>();
         _loggerMock = new Mock<ILogger<SimilarSchoolsController>>();
-        _sut = new SimilarSchoolsController(_schoolDetailsServiceMock.Object, new FindSimilarSchools(_similarSchoolsRepoMock.Object), _loggerMock.Object);
+        _sut = new SimilarSchoolsController(_schoolDetailsServiceMock.Object,
+            new FindSimilarSchools(
+                _establishmentRepo.Object,
+                _similarSchoolsRepoMock.Object,
+                _performanceRepo.Object),
+            _loggerMock.Object);
         _sut.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()
@@ -200,9 +210,9 @@ public class SimilarSchoolsControllerTests
             similarSchools.Add(CreateSimilarSchool(urn, $"Similar {i + 1}", urbanId, urbanName));
         }
 
-        _similarSchoolsRepoMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
-            .ReturnsAsync((currentSchool, similarSchools));
+        //_similarSchoolsRepoMock
+        //    .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+        //    .ReturnsAsync((currentSchool, similarSchools));
     }
 
     private static SimilarSchool CreateSimilarSchool(string urn, string name, string urbanId, string urbanName)
