@@ -3,7 +3,7 @@
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
 @using SAPSec.Web.TagHelpers
-@using SAPSec.Core.Configuration
+@using SAPSec.Web.Configuration
 @inject Microsoft.Extensions.Options.IOptions<AnalyticsSettings> AnalyticsOptions
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
