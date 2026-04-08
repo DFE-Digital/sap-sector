@@ -55,6 +55,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
                 services.RemoveAll<IKs4PerformanceRepository>();
+                services.RemoveAll<IKs4DestinationsRepository>();
                 services.RemoveAll<IAttendanceRepository>();
 
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
@@ -69,11 +70,11 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviations>, JsonFile<SimilarSchoolsSecondaryStandardDeviations>>();
 
-                services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
-                services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-                services.AddScoped<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
-                services.AddScoped<IAttendanceRepository, MockAttendanceRepository>();
-
+                services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
+                services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
+                services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
+                services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
+                services.AddSingleton<IAttendanceRepository, MockAttendanceRepository>();
             });
     }
 

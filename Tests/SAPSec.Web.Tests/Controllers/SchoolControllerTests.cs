@@ -23,6 +23,7 @@ public class SchoolControllerTests
     private readonly Mock<IAttendanceRepository> _attendanceRepositoryMock;
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
+    private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
@@ -37,6 +38,7 @@ public class SchoolControllerTests
         _attendanceRepositoryMock = new Mock<IAttendanceRepository>();
         _establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
         _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        _ks4DestinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
 
@@ -45,6 +47,7 @@ public class SchoolControllerTests
             _establishmentRepositoryMock.Object);
         var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
+            _ks4DestinationsRepositoryMock.Object,
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
@@ -137,13 +140,18 @@ public class SchoolControllerTests
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
+
         _similarSchoolsRepositoryMock
             .Setup(x => x.GetSimilarSchoolUrnsAsync(urn))
             .ReturnsAsync(Array.Empty<string>());
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(null, null, null, null, null, null));
+            .ReturnsAsync(new Ks4PerformanceData(urn, null, null, null));
+
+        _ks4DestinationsRepositoryMock
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ReturnsAsync(new Ks4DestinationsData(urn, null, null, null));
 
         var result = await _sut.Ks4HeadlineMeasures(urn);
 
