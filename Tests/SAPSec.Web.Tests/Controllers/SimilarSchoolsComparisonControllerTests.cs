@@ -28,6 +28,7 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
     private readonly Mock<IAttendanceRepository> _attendanceRepositoryMock = new();
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
+    private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
     private readonly SimilarSchoolsComparisonController _sut;
 
@@ -38,6 +39,7 @@ public class SimilarSchoolsComparisonControllerTests
             _schoolDetailsServiceMock.Object);
         var ks4UseCase = new GetKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
+            _ks4DestinationsRepositoryMock.Object,
             _schoolDetailsServiceMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
             _attendanceRepositoryMock.Object,
