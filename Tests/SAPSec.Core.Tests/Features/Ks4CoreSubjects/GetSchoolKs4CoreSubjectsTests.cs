@@ -41,7 +41,7 @@ public class GetSchoolKs4CoreSubjectsTests
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
-            .ReturnsAsync(CreateMeasures("52", "51", "50", "42", "41", "40", "18", "17", "16", "54", "53", "52", "44", "43", "42", "20", "19", "18", "74", "73", "72", "64", "63", "62", "40", "39", "38", "56", "55", "54", "46", "45", "44", "22", "21", "20", "48", "47", "46", "38", "37", "36", "14", "13", "12", "56", "55", "54", "46", "45", "44", "22", "21", "20", "48", "47", "46", "38", "37", "36", "14", "13", "12"));
+            .ReturnsAsync(CreateMeasures("100", "52", "51", "50", "42", "41", "40", "18", "17", "16", "54", "53", "52", "44", "43", "42", "20", "19", "18", "74", "73", "72", "64", "63", "62", "40", "39", "38", "56", "55", "54", "46", "45", "44", "22", "21", "20", "48", "47", "46", "38", "37", "36", "14", "13", "12", "56", "55", "54", "46", "45", "44", "22", "21", "20", "48", "47", "46", "38", "37", "36", "14", "13", "12"));
 
         similarSchoolsRepositoryMock
             .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
@@ -51,8 +51,8 @@ public class GetSchoolKs4CoreSubjectsTests
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
-                new Ks4HeadlineMeasuresByUrn("200", CreateMeasures("62", "61", "60", "52", "51", "50", "28", "27", "26", "64", "63", "62", "54", "53", "52", "30", "29", "28", "84", "83", "82", "74", "73", "72", "50", "49", "48", "66", "65", "64", "56", "55", "54", "32", "31", "30", "58", "57", "56", "48", "47", "46", "24", "23", "22", "66", "65", "64", "56", "55", "54", "32", "31", "30", "58", "57", "56", "48", "47", "46", "24", "23", "22")),
-                new Ks4HeadlineMeasuresByUrn("300", CreateMeasures("58", "57", "56", "48", "47", "46", "24", "23", "22", "60", "59", "58", "50", "49", "48", "26", "25", "24", "80", "79", "78", "70", "69", "68", "46", "45", "44", "62", "61", "60", "52", "51", "50", "28", "27", "26", "54", "53", "52", "44", "43", "42", "20", "19", "18", "62", "61", "60", "52", "51", "50", "28", "27", "26", "54", "53", "52", "44", "43", "42", "20", "19", "18"))
+                CreateMeasures("200", "62", "61", "60", "52", "51", "50", "28", "27", "26", "64", "63", "62", "54", "53", "52", "30", "29", "28", "84", "83", "82", "74", "73", "72", "50", "49", "48", "66", "65", "64", "56", "55", "54", "32", "31", "30", "58", "57", "56", "48", "47", "46", "24", "23", "22", "66", "65", "64", "56", "55", "54", "32", "31", "30", "58", "57", "56", "48", "47", "46", "24", "23", "22"),
+                CreateMeasures("300", "58", "57", "56", "48", "47", "46", "24", "23", "22", "60", "59", "58", "50", "49", "48", "26", "25", "24", "80", "79", "78", "70", "69", "68", "46", "45", "44", "62", "61", "60", "52", "51", "50", "28", "27", "26", "54", "53", "52", "44", "43", "42", "20", "19", "18", "62", "61", "60", "52", "51", "50", "28", "27", "26", "54", "53", "52", "44", "43", "42", "20", "19", "18")
             });
 
         establishmentRepositoryMock
@@ -118,7 +118,8 @@ public class GetSchoolKs4CoreSubjectsTests
             Email = DataWithAvailability.NotAvailable<string>()
         };
 
-    private static Ks4HeadlineMeasuresData CreateMeasures(
+    private static Ks4PerformanceData CreateMeasures(
+        string urn,
         string? lang4Current, string? lang4Previous, string? lang4Previous2,
         string? lang5Current, string? lang5Previous, string? lang5Previous2,
         string? lang7Current, string? lang7Previous, string? lang7Previous2,
@@ -141,6 +142,7 @@ public class GetSchoolKs4CoreSubjectsTests
         string? comb5Current, string? comb5Previous, string? comb5Previous2,
         string? comb7Current, string? comb7Previous, string? comb7Previous2) =>
         new(
+            urn,
             new EstablishmentPerformance
             {
                 EngLang49_Sum_Est_Current_Pct = lang4Current ?? string.Empty,
@@ -254,8 +256,5 @@ public class GetSchoolKs4CoreSubjectsTests
                 CombSci49_Tot_Eng_Current_Pct = "58", CombSci49_Tot_Eng_Previous_Pct = "57", CombSci49_Tot_Eng_Previous2_Pct = "56",
                 CombSci59_Tot_Eng_Current_Pct = "48", CombSci59_Tot_Eng_Previous_Pct = "47", CombSci59_Tot_Eng_Previous2_Pct = "46",
                 CombSci79_Tot_Eng_Current_Pct = "24", CombSci79_Tot_Eng_Previous_Pct = "23", CombSci79_Tot_Eng_Previous2_Pct = "22"
-            },
-            null,
-            null,
-            null);
+            });
 }

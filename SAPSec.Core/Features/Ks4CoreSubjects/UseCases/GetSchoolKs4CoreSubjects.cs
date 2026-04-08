@@ -18,9 +18,8 @@ public class GetSchoolKs4CoreSubjects(
         var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
         var schoolData = await repository.GetByUrnAsync(request.Urn);
         var similarSchoolUrns = await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn);
-        var similarSchoolData = ((await repository.GetByUrnsAsync(similarSchoolUrns))
-                ?? Array.Empty<Ks4HeadlineMeasuresByUrn>())
-            .ToDictionary(x => x.Urn, x => x.Data, StringComparer.Ordinal);
+        var similarSchoolData = ((await repository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
+            .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
                 ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
@@ -259,7 +258,7 @@ public class GetSchoolKs4CoreSubjects(
     }
 
     private static SchoolKs4CoreSubjectsGradeSelections BuildGradeSelections(
-        Ks4HeadlineMeasuresData? schoolData,
+        Ks4PerformanceData? schoolData,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors englishLanguageSelectors,
         SubjectFieldSelectors englishLiteratureSelectors,
@@ -278,7 +277,7 @@ public class GetSchoolKs4CoreSubjects(
             BuildSelection(schoolData, similarSchools, combinedScienceSelectors));
 
     private static SchoolKs4CoreSubjectSelection BuildSelection(
-        Ks4HeadlineMeasuresData? schoolData,
+        Ks4PerformanceData? schoolData,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors selectors)
     {
@@ -539,14 +538,14 @@ public record GetSchoolKs4CoreSubjectsResponse(
     SchoolKs4CoreSubjectsGradeSelections Grade7AndAbove);
 
 internal sealed record SubjectFieldSelectors(
-    Func<Ks4HeadlineMeasuresData?, string?> SchoolCurrent,
-    Func<Ks4HeadlineMeasuresData?, string?> SchoolPrevious,
-    Func<Ks4HeadlineMeasuresData?, string?> SchoolPrevious2,
-    Func<Ks4HeadlineMeasuresData?, string?> LocalAuthorityCurrent,
-    Func<Ks4HeadlineMeasuresData?, string?> LocalAuthorityPrevious,
-    Func<Ks4HeadlineMeasuresData?, string?> LocalAuthorityPrevious2,
-    Func<Ks4HeadlineMeasuresData?, string?> EnglandCurrent,
-    Func<Ks4HeadlineMeasuresData?, string?> EnglandPrevious,
-    Func<Ks4HeadlineMeasuresData?, string?> EnglandPrevious2);
+    Func<Ks4PerformanceData?, string?> SchoolCurrent,
+    Func<Ks4PerformanceData?, string?> SchoolPrevious,
+    Func<Ks4PerformanceData?, string?> SchoolPrevious2,
+    Func<Ks4PerformanceData?, string?> LocalAuthorityCurrent,
+    Func<Ks4PerformanceData?, string?> LocalAuthorityPrevious,
+    Func<Ks4PerformanceData?, string?> LocalAuthorityPrevious2,
+    Func<Ks4PerformanceData?, string?> EnglandCurrent,
+    Func<Ks4PerformanceData?, string?> EnglandPrevious,
+    Func<Ks4PerformanceData?, string?> EnglandPrevious2);
 
-internal sealed record SimilarSchoolMeasure(string Urn, string Name, Ks4HeadlineMeasuresData? Data);
+internal sealed record SimilarSchoolMeasure(string Urn, string Name, Ks4PerformanceData? Data);
