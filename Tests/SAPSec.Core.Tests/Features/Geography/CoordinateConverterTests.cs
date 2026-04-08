@@ -8,8 +8,8 @@ public class CoordinateConverterTests
     public void Convert_WithValidLondonCoordinates_ReturnsCorrectLatLon()
     {
         // Arrange - London (Big Ben approximate coordinates)
-        double easting = 530047;
-        double northing = 179951;
+        int easting = 530047;
+        int northing = 179951;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -23,8 +23,8 @@ public class CoordinateConverterTests
     public void Convert_WithValidLeedsCoordinates_ReturnsCorrectLatLon()
     {
         // Arrange - Leeds City Centre
-        double easting = 430000;
-        double northing = 433000;
+        int easting = 430000;
+        int northing = 433000;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -38,8 +38,8 @@ public class CoordinateConverterTests
     public void Convert_WithValidManchesterCoordinates_ReturnsCorrectLatLon()
     {
         // Arrange - Manchester City Centre
-        double easting = 384000;
-        double northing = 398000;
+        int easting = 384000;
+        int northing = 398000;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -53,8 +53,8 @@ public class CoordinateConverterTests
     public void Convert_WithValidEdinburghCoordinates_ReturnsCorrectLatLon()
     {
         // Arrange - Edinburgh Castle
-        double easting = 325776;
-        double northing = 673919;
+        int easting = 325776;
+        int northing = 673919;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -68,8 +68,8 @@ public class CoordinateConverterTests
     public void Convert_WithValidBrightonCoordinates_ReturnsCorrectLatLon()
     {
         // Arrange - Brighton Pier
-        double easting = 531000;
-        double northing = 104000;
+        int easting = 531000;
+        int northing = 104000;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -83,8 +83,8 @@ public class CoordinateConverterTests
     public void Convert_WithZeroCoordinates_ReturnsSpecificLatLon()
     {
         // Arrange - Origin of British National Grid
-        double easting = 0;
-        double northing = 0;
+        int easting = 0;
+        int northing = 0;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -98,8 +98,8 @@ public class CoordinateConverterTests
     public void Convert_WithMaxBritishGridCoordinates_ReturnsValidLatLon()
     {
         // Arrange - Near max valid BNG coordinates
-        double easting = 700000;
-        double northing = 1250000;
+        int easting = 700000;
+        int northing = 1250000;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -113,8 +113,8 @@ public class CoordinateConverterTests
     public void Convert_ReturnsLatitudeFirst_ThenLongitude()
     {
         // Arrange
-        double easting = 530047;
-        double northing = 179951;
+        int easting = 530047;
+        int northing = 179951;
 
         // Act
         var result = CoordinateConverter.Convert(new(easting, northing));
@@ -128,8 +128,8 @@ public class CoordinateConverterTests
     public void Convert_WithSchoolTypicalCoordinates_ReturnsValidLatLon()
     {
         // Arrange - Typical school location in Yorkshire
-        double easting = 445000;
-        double northing = 450000;
+        int easting = 445000;
+        int northing = 450000;
 
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -146,7 +146,7 @@ public class CoordinateConverterTests
     [InlineData(530000, 180000, 51.5, -0.12)]    // London
     [InlineData(430000, 433000, 53.8, -1.55)]    // Leeds
     public void Convert_WithKnownLocations_ReturnsExpectedValues(
-        double easting, double northing, double expectedLat, double expectedLon)
+        int easting, int northing, double expectedLat, double expectedLon)
     {
         // Act
         var (latitude, longitude) = CoordinateConverter.Convert(new(easting, northing));
@@ -160,8 +160,8 @@ public class CoordinateConverterTests
     public void Convert_ConsistentResults_ForSameInput()
     {
         // Arrange
-        double easting = 430000;
-        double northing = 433000;
+        int easting = 430000;
+        int northing = 433000;
 
         // Act
         var result1 = CoordinateConverter.Convert(new(easting, northing));
@@ -176,8 +176,8 @@ public class CoordinateConverterTests
     public void Convert_DifferentInputs_ProduceDifferentOutputs()
     {
         // Arrange
-        double easting1 = 430000, northing1 = 433000;
-        double easting2 = 530000, northing2 = 180000;
+        int easting1 = 430000, northing1 = 433000;
+        int easting2 = 530000, northing2 = 180000;
 
         // Act
         var result1 = CoordinateConverter.Convert(new(easting1, northing1));

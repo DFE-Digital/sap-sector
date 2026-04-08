@@ -101,7 +101,7 @@ public class SimilarSchoolBuilder(string urn)
         return this;
     }
 
-    public SimilarSchoolBuilder WithCoordinates(double easting, double northing)
+    public SimilarSchoolBuilder WithCoordinates(int easting, int northing)
     {
         _coordinates = new(easting, northing);
         return this;

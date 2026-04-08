@@ -1,29 +1,24 @@
-﻿using Moq;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
 public class FindSimilarSchoolsTests
 {
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepo;
-    private readonly Mock<IEstablishmentRepository> _establishmentRepo;
-    private readonly Mock<IKs4PerformanceRepository> _performanceRepo;
+    private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
+    private readonly InMemoryEstablishmentRepository _establishmentRepo;
+    private readonly InMemoryKs4PerformanceRepository _performanceRepo;
     private readonly FindSimilarSchools _sut;
 
     public FindSimilarSchoolsTests()
     {
-        _similarSchoolsRepo = new Mock<ISimilarSchoolsSecondaryRepository>();
-        _establishmentRepo = new Mock<IEstablishmentRepository>();
-        _performanceRepo = new Mock<IKs4PerformanceRepository>();
+        _similarSchoolsRepo = new InMemorySimilarSchoolsSecondaryRepository();
+        _establishmentRepo = new InMemoryEstablishmentRepository();
+        _performanceRepo = new InMemoryKs4PerformanceRepository();
 
         _sut = new FindSimilarSchools(
-            _establishmentRepo.Object,
-            _similarSchoolsRepo.Object,
-            _performanceRepo.Object);
+            _establishmentRepo,
+            _similarSchoolsRepo,
+            _performanceRepo);
     }
 
     [Fact(Skip = "TODO")]
@@ -44,19 +39,33 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task AllResults_ContainsAllResults()
     {
-        SetupSimilarSchools(CurrentSchool("100001"), [
-            SimilarSchool("100002"),
-            SimilarSchool("100003"),
-            SimilarSchool("100004"),
-            SimilarSchool("100005"),
-            SimilarSchool("100006"),
-            SimilarSchool("100007"),
-            SimilarSchool("100008"),
-            SimilarSchool("100009"),
-            SimilarSchool("100010"),
-            SimilarSchool("100011"),
-            SimilarSchool("100012"),
-        ]);
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" },
+            new() { URN = "100006" },
+            new() { URN = "100007" },
+            new() { URN = "100008" },
+            new() { URN = "100009" },
+            new() { URN = "100010" },
+            new() { URN = "100011" },
+            new() { URN = "100012" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" },
+            new() { URN = "100001", NeighbourURN = "100007" },
+            new() { URN = "100001", NeighbourURN = "100008" },
+            new() { URN = "100001", NeighbourURN = "100009" },
+            new() { URN = "100001", NeighbourURN = "100010" },
+            new() { URN = "100001", NeighbourURN = "100011" },
+            new() { URN = "100001", NeighbourURN = "100012" }
+        );
 
         var response = await _sut.Execute(Request("100001"));
 
@@ -79,19 +88,33 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task ResultsPage_ContainsFirst10Results()
     {
-        SetupSimilarSchools(CurrentSchool("100001"), [
-            SimilarSchool("100002"),
-            SimilarSchool("100003"),
-            SimilarSchool("100004"),
-            SimilarSchool("100005"),
-            SimilarSchool("100006"),
-            SimilarSchool("100007"),
-            SimilarSchool("100008"),
-            SimilarSchool("100009"),
-            SimilarSchool("100010"),
-            SimilarSchool("100011"),
-            SimilarSchool("100012"),
-        ]);
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" },
+            new() { URN = "100006" },
+            new() { URN = "100007" },
+            new() { URN = "100008" },
+            new() { URN = "100009" },
+            new() { URN = "100010" },
+            new() { URN = "100011" },
+            new() { URN = "100012" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" },
+            new() { URN = "100001", NeighbourURN = "100007" },
+            new() { URN = "100001", NeighbourURN = "100008" },
+            new() { URN = "100001", NeighbourURN = "100009" },
+            new() { URN = "100001", NeighbourURN = "100010" },
+            new() { URN = "100001", NeighbourURN = "100011" },
+            new() { URN = "100001", NeighbourURN = "100012" }
+        );
 
         var response = await _sut.Execute(Request("100001"));
 
@@ -123,12 +146,19 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task FilterBy_UrbanRural()
     {
-        SetupSimilarSchools(CurrentSchool("100001"), [
-            SimilarSchool("100002", b => b.WithUrbanRural("UN1", "Urban: Nearer")),
-            SimilarSchool("100003", b => b.WithUrbanRural("UF1", "Urban: Further")),
-            SimilarSchool("100004", b => b.WithUrbanRural("RLN1", "Larger rural: Nearer")),
-            SimilarSchool("100005", b => b.WithUrbanRural("RLF1", "Larger rural: Further"))
-        ]);
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002", UrbanRuralId = "UN1", UrbanRuralName = "Urban: Nearer" },
+            new() { URN = "100003", UrbanRuralId = "UF1", UrbanRuralName = "Urban: Further" },
+            new() { URN = "100004", UrbanRuralId = "RLN1", UrbanRuralName = "Larger rural: Nearer" },
+            new() { URN = "100005", UrbanRuralId = "RLF1", UrbanRuralName = "Larger rural: Further" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
         {
@@ -164,13 +194,21 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task FilterBy_Distance()
     {
-        SetupSimilarSchools(CurrentSchool("100001", b => b.WithCoordinates(100000, 100000)), [
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001", Easting = 100000, Northing = 100000 },
             // 5 miles ~ 8046.72m
-            SimilarSchool("100002", b => b.WithCoordinates(108046, 100000)),
-            SimilarSchool("100003", b => b.WithCoordinates(108047, 100000)),
-            SimilarSchool("100004", b => b.WithCoordinates(100000, 108046)),
-            SimilarSchool("100005", b => b.WithCoordinates(100000, 108047))
-        ]);
+            new() { URN = "100002", Easting = 108046, Northing = 100000 },
+            new() { URN = "100003", Easting = 108047, Northing = 100000 },
+            new() { URN = "100004", Easting = 100000, Northing = 108046 },
+            new() { URN = "100005", Easting = 100000, Northing = 108047 }
+        );
+
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
         {
@@ -231,12 +269,25 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task SortBy_Attainment8()
     {
-        SetupSimilarSchools(CurrentSchool("100001"), [
-            SimilarSchool("100002", b => b.WithAttainment8(DataWithAvailability.Available(10M))),
-            SimilarSchool("100003", b => b.WithAttainment8(DataWithAvailability.NotAvailable<decimal>())),
-            SimilarSchool("100004", b => b.WithAttainment8(DataWithAvailability.Available(30M))),
-            SimilarSchool("100005", b => b.WithAttainment8(DataWithAvailability.Available(20M)))
-        ]);
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" }
+        );
+        _performanceRepo.SetupEstablishmentPerformance(
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "10" },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "z" },
+            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = "30" },
+            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = "20" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
 
         var response = await _sut.Execute(Request("100001", sortBy: "Att8"));
 
@@ -254,12 +305,25 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task SortBy_EnglishMaths()
     {
-        SetupSimilarSchools(CurrentSchool("100001"), [
-            SimilarSchool("100002", b => b.WithEnglishMaths(DataWithAvailability.Available(10M))),
-            SimilarSchool("100003", b => b.WithEnglishMaths(DataWithAvailability.NotAvailable<decimal>())),
-            SimilarSchool("100004", b => b.WithEnglishMaths(DataWithAvailability.Available(30M))),
-            SimilarSchool("100005", b => b.WithEnglishMaths(DataWithAvailability.Available(20M)))
-        ]);
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" }
+        );
+        _performanceRepo.SetupEstablishmentPerformance(
+            new() { Id = "100002", EngMaths59_Tot_Est_Current_Pct = "10" },
+            new() { Id = "100003", EngMaths59_Tot_Est_Current_Pct = "z" },
+            new() { Id = "100004", EngMaths59_Tot_Est_Current_Pct = "30" },
+            new() { Id = "100005", EngMaths59_Tot_Est_Current_Pct = "20" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
 
         var response = await _sut.Execute(Request("100001", sortBy: "EngMat"));
 
@@ -277,12 +341,25 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task SortBy_DefaultsToAttainment8()
     {
-        SetupSimilarSchools(CurrentSchool("100001"), [
-            SimilarSchool("100002", b => b.WithAttainment8(DataWithAvailability.Available(10M))),
-            SimilarSchool("100003", b => b.WithAttainment8(DataWithAvailability.NotAvailable<decimal>())),
-            SimilarSchool("100004", b => b.WithAttainment8(DataWithAvailability.Available(30M))),
-            SimilarSchool("100005", b => b.WithAttainment8(DataWithAvailability.Available(20M)))
-        ]);
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" }
+        );
+        _performanceRepo.SetupEstablishmentPerformance(
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "10" },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "z" },
+            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = "30" },
+            new() { Id = "100005", Attainment8_Tot_Est_Current_Num = "20" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
 
         var response = await _sut.Execute(Request("100001"));
 
@@ -315,19 +392,33 @@ public class FindSimilarSchoolsTests
     [Fact]
     public async Task Pagination_SelectsAppropriatePageOfResults()
     {
-        SetupSimilarSchools(CurrentSchool("100001"), [
-            SimilarSchool("100002"),
-            SimilarSchool("100003"),
-            SimilarSchool("100004"),
-            SimilarSchool("100005"),
-            SimilarSchool("100006"),
-            SimilarSchool("100007"),
-            SimilarSchool("100008"),
-            SimilarSchool("100009"),
-            SimilarSchool("100010"),
-            SimilarSchool("100011"),
-            SimilarSchool("100012"),
-        ]);
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" },
+            new() { URN = "100006" },
+            new() { URN = "100007" },
+            new() { URN = "100008" },
+            new() { URN = "100009" },
+            new() { URN = "100010" },
+            new() { URN = "100011" },
+            new() { URN = "100012" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" },
+            new() { URN = "100001", NeighbourURN = "100007" },
+            new() { URN = "100001", NeighbourURN = "100008" },
+            new() { URN = "100001", NeighbourURN = "100009" },
+            new() { URN = "100001", NeighbourURN = "100010" },
+            new() { URN = "100001", NeighbourURN = "100011" },
+            new() { URN = "100001", NeighbourURN = "100012" }
+        );
 
         var response = await _sut.Execute(Request("100001", page: 2));
 
@@ -358,27 +449,6 @@ public class FindSimilarSchoolsTests
     {
     }
 
-    private void SetupSimilarSchools(SimilarSchool currentSchool, List<SimilarSchool> similarSchools)
-    {
-        //_similarSchoolsRepo.Setup(r => r.GetSimilarSchoolsGroupAsync(currentSchool.URN))
-        //    .ReturnsAsync((currentSchool, similarSchools.AsReadOnly()));
-    }
-
     private FindSimilarSchoolsRequest Request(string urn, Dictionary<string, IEnumerable<string>>? filterBy = null, string? sortBy = null, int? page = null) =>
         new(urn, filterBy ?? [], sortBy ?? "", page ?? 1);
-
-    private SimilarSchool CurrentSchool(string urn, Func<SimilarSchoolBuilder, SimilarSchoolBuilder> build = null)
-    {
-        build ??= b => b;
-        var builder = new SimilarSchoolBuilder(urn);
-        return build(builder).Build();
-    }
-
-    private SimilarSchool SimilarSchool(string urn, Func<SimilarSchoolBuilder, SimilarSchoolBuilder> build = null)
-    {
-        build ??= b => b;
-        var builder = new SimilarSchoolBuilder(urn);
-        return build(builder).Build();
-    }
 }
-

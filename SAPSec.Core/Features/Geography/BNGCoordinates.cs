@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Core.Features.Geography;
 
-public record BNGCoordinates(double Easting, double Northing)
+public record BNGCoordinates(int Easting, int Northing)
 {
     private const double KilometersToMiles = 0.6213712;
 
