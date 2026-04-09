@@ -185,7 +185,7 @@ public class SchoolControllerTests
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(new EstablishmentPerformance(), new LAPerformance(), new EnglandPerformance(), null, null, null));
+            .ReturnsAsync(new Ks4PerformanceData(urn, new EstablishmentPerformance(), new LAPerformance(), new EnglandPerformance()));
 
         var result = await _sut.Ks4CoreSubjects(urn);
 
@@ -208,7 +208,8 @@ public class SchoolControllerTests
 
         _ks4PerformanceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4HeadlineMeasuresData(
+            .ReturnsAsync(new Ks4PerformanceData(
+                urn,
                 new EstablishmentPerformance
                 {
                     EngLang49_Sum_Est_Current_Pct = "52",
@@ -226,10 +227,7 @@ public class SchoolControllerTests
                     EngLang49_Tot_Eng_Current_Pct = "61",
                     EngLang49_Tot_Eng_Previous_Pct = "60",
                     EngLang49_Tot_Eng_Previous2_Pct = "59"
-                },
-                null,
-                null,
-                null));
+                }));
 
         var result = await _sut.Ks4CoreSubjectsData(urn, "english-language", "4");
 
