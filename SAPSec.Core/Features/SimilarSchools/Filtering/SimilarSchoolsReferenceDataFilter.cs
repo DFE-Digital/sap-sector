@@ -18,7 +18,7 @@ public abstract class SimilarSchoolsReferenceDataFilter(
             return items;
         }
 
-        return items.Where(i => values.Contains(field(i).Id));
+        return items.Where(i => values.Contains(field(i).Id, StringComparer.OrdinalIgnoreCase));
     }
 
     public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
@@ -35,5 +35,5 @@ public abstract class SimilarSchoolsReferenceDataFilter(
                 g.Key.Id,
                 g.Key.Name,
                 g.Count(),
-                values.Contains(g.Key.Id)));
+                values.Contains(g.Key.Id, StringComparer.OrdinalIgnoreCase)));
 }

@@ -19,9 +19,9 @@ public class InMemorySimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         _values = values.ToList();
     }
 
-    public void SetupStandardDeviations(params SimilarSchoolsSecondaryStandardDeviationsEntry[] standardDeviations)
+    public void SetupStandardDeviations(SimilarSchoolsSecondaryStandardDeviationsEntry standardDeviations)
     {
-        _standardDeviations = standardDeviations.ToList();
+        _standardDeviations = [standardDeviations];
     }
 
     public Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)

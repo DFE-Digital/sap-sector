@@ -7,6 +7,7 @@ using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
@@ -15,18 +16,29 @@ public class FindSimilarSchools(
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
     IKs4PerformanceRepository performanceRepository)
 {
+    private static readonly Regex UrnRegex = new Regex(@"^\d{6}$", RegexOptions.Compiled);
     public const int ItemsPerPage = 10;
 
     public async Task<FindSimilarSchoolsResponse> Execute(FindSimilarSchoolsRequest request)
     {
-        // TODO: Validate inputs
+        if (!UrnRegex.IsMatch(request.CurrentSchoolUrn))
+        {
+            var ex = new ValidationException();
+            ex.AddError("Current School URN should be a valid URN");
+            throw ex;
+        }
 
         var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
         var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
         var performances = await performanceRepository.GetByUrnsAsync(urns);
         var schools = establishments.GroupJoin(performances, e => e.URN, p => p.Urn, SimilarSchool.FromData).ToList();
-        var currentSchool = schools.First(s => s.URN == request.CurrentSchoolUrn);
+        var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
+        if (currentSchool is null)
+        {
+            throw new NotFoundException($"School with URN {request.CurrentSchoolUrn} was not found");
+        }
+
         var similarSchools = schools.Except([currentSchool]);
 
         var filters = new SimilarSchoolsFilters(request.FilterBy, currentSchool);

@@ -4,7 +4,10 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filterValues, SimilarSchool currentSchool)
 {
-    private Dictionary<string, ISimilarSchoolsFilter> _filters = new()
+    private readonly Dictionary<string, IEnumerable<string>> _filterValues = filterValues
+        .ToDictionary(x => x.Key, x => x.Value, StringComparer.OrdinalIgnoreCase);
+
+    private Dictionary<string, ISimilarSchoolsFilter> _filters = new(StringComparer.OrdinalIgnoreCase)
     {
         ["dist"] = new SimilarSchoolsDistanceFilter(currentSchool),
         ["reg"] = new SimilarSchoolsRegionFilter(currentSchool),
@@ -28,18 +31,18 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
         {
             if (filter is ISimilarSchoolsMultiValueFilter mvf)
             {
-                var values = filterValues.ContainsKey(key) ? filterValues[key] : [];
+                var values = _filterValues.ContainsKey(key) ? _filterValues[key] : [];
                 filteredItems = mvf.Filter(filteredItems, values);
             }
             else if (filter is ISimilarSchoolsSingleValueFilter svf)
             {
-                var value = (filterValues.ContainsKey(key) ? filterValues[key] : []).LastOrDefault();
+                var value = (_filterValues.ContainsKey(key) ? _filterValues[key] : []).LastOrDefault();
                 filteredItems = svf.Filter(filteredItems, value);
             }
             else if (filter is ISimilarSchoolsNumericRangeFilter rf)
             {
-                var from = (filterValues.ContainsKey(key + "_f") ? filterValues[key + "_f"] : []).LastOrDefault();
-                var to = (filterValues.ContainsKey(key + "_t") ? filterValues[key + "_t"] : []).LastOrDefault();
+                var from = (_filterValues.ContainsKey(key + "_f") ? _filterValues[key + "_f"] : []).LastOrDefault();
+                var to = (_filterValues.ContainsKey(key + "_t") ? _filterValues[key + "_t"] : []).LastOrDefault();
                 filteredItems = rf.Filter(filteredItems, from, to);
             }
         }
@@ -55,18 +58,18 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
         {
             if (filter is ISimilarSchoolsMultiValueFilter mvf)
             {
-                var values = filterValues.ContainsKey(key) ? filterValues[key] : [];
+                var values = _filterValues.ContainsKey(key) ? _filterValues[key] : [];
                 availableFilters.Add(mvf.AsAvailableFilter(key, items, values));
             }
             else if (filter is ISimilarSchoolsSingleValueFilter svf)
             {
-                var value = (filterValues.ContainsKey(key) ? filterValues[key] : []).LastOrDefault();
+                var value = (_filterValues.ContainsKey(key) ? _filterValues[key] : []).LastOrDefault();
                 availableFilters.Add(svf.AsAvailableFilter(key, items, value));
             }
             else if (filter is ISimilarSchoolsNumericRangeFilter rf)
             {
-                var from = (filterValues.ContainsKey(key + "_f") ? filterValues[key + "_f"] : []).LastOrDefault();
-                var to = (filterValues.ContainsKey(key + "_t") ? filterValues[key + "_t"] : []).LastOrDefault();
+                var from = (_filterValues.ContainsKey(key + "_f") ? _filterValues[key + "_f"] : []).LastOrDefault();
+                var to = (_filterValues.ContainsKey(key + "_t") ? _filterValues[key + "_t"] : []).LastOrDefault();
                 availableFilters.Add(rf.AsAvailableFilter(key, items, from, to));
             }
         }
