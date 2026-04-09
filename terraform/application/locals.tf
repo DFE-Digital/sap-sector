@@ -10,6 +10,7 @@ locals {
       issuer           = "https://test-oidc.signin.education.gov.uk"
       metadata_address = "https://test-oidc.signin.education.gov.uk/.well-known/openid-configuration"
       require_https    = "true"
+      audience         = "SAP"
     }
     production = {
       api_uri          = "https://pp-api.signin.education.gov.uk"
@@ -17,6 +18,7 @@ locals {
       issuer           = "https://pp-oidc.signin.education.gov.uk"
       metadata_address = "https://pp-oidc.signin.education.gov.uk/.well-known/openid-configuration"
       require_https    = "true"
+      audience         = "schoolsAccountabilityandPerformance"
     }
   }
 
