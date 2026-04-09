@@ -56,7 +56,7 @@ module "application_configuration" {
     DsiConfiguration__ApiUri                = local.dsi_urls.api_uri
     DsiConfiguration__Authority             = local.dsi_urls.authority
     DsiConfiguration__Issuer                = local.dsi_urls.issuer
-    DsiConfiguration__Audience              = "SAP"
+    DsiConfiguration__Audience              = local.dsi_urls.audience
     DsiConfiguration__MetadataAddress       = local.dsi_urls.metadata_address
     DsiConfiguration__CallbackPath          = "/signin-oidc"
     DsiConfiguration__SignedOutCallbackPath = "/signout-callback-oidc"
