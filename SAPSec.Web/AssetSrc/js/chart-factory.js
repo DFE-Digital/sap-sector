@@ -443,6 +443,12 @@
             const showLegend = canvas.dataset.showLegend === "true";
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
+            const axisStep = canvas.dataset.axisStep
+                ? parseInt(canvas.dataset.axisStep, 10)
+                : CHART_CONFIG.defaults.axisStep;
+            const axisMax = canvas.dataset.axisMax
+                ? parseFloat(canvas.dataset.axisMax)
+                : null;
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
@@ -481,7 +487,9 @@
                 options: buildChartOptions(
                     type,
                     gdsStyles,
+                    axisStep,
                     axisSuffix,
+                    axisMax,
                     showLegend,
                     showDataLabels,
                     showXGrid,
