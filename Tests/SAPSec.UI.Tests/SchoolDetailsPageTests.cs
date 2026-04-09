@@ -99,8 +99,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await backLink.ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Page.Url.Should().Contain("search-for-a-school");
-        Page.Url.Should().Contain("SchoolHome");
+        Page.Url.Should().Contain("/school/108088");
     }
 
     #endregion

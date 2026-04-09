@@ -2,7 +2,7 @@
 using SAPSec.Core.Model;
 using System.Security.Claims;
 
-namespace SAPSec.UI.Tests.Mocks;
+namespace SAPSec.UI.Tests.TestData;
 
 /// <summary>
 /// Mock implementation of IUserService for UI testing.
@@ -19,8 +19,9 @@ public class MockUserService : IUserService
         public const string UserEmail = "test.user@school.gov.uk";
 
         public const string OrganisationId = "test-org-id";
-        public const string OrganisationName = "Test Academy";
-        public const string EstablishmentCategory = "Establishment";
+        public const string OrganisationName = "Wetherby High School";
+        public const string OrganisationCategory = "Establishment";
+        public const string EstablishmentUrn = "108088";
 
         public const int CategoryId = 1;
     }
@@ -38,8 +39,9 @@ public class MockUserService : IUserService
             Category = new Category
             {
                 Id = TestData.CategoryId.ToString(),
-                Name = TestData.EstablishmentCategory
-            }
+                Name = TestData.OrganisationCategory
+            },
+            Urn = TestData.EstablishmentUrn
         };
     }
 
