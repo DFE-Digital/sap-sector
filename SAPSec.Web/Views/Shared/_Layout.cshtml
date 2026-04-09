@@ -3,6 +3,37 @@
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Extensions
 @using SAPSec.Web.TagHelpers
+@inject IHostEnvironment hostEnvironment
+@inject IConfiguration configuration
+<!--
+    hostEnvironment.EnvironmentName: @hostEnvironment.EnvironmentName
+    hostEnvironment.IsDevelopment:   @hostEnvironment.IsDevelopment()
+    hostEnvironment.IsProduction:    @hostEnvironment.IsProduction()
+    hostEnvironment.IsStaging:       @hostEnvironment.IsStaging()
+    
+    Configuration:
+    @foreach ((string k, string? v) in configuration.AsEnumerable())
+    {
+        @:@k: @v
+    }
+
+    @foreach (var sect in configuration.GetChildren())
+    {
+        @:Section: @sect.Key
+        foreach ((string k, string? v) in sect.AsEnumerable()) {
+            @:@k: @v
+        }
+    }
+
+    @{
+        var vars = Environment.GetEnvironmentVariables();
+    }
+    Environment variables:
+    @foreach (var k in vars.Keys)
+    {
+        @:@k: @vars[k]
+    }
+-->
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
 }
