@@ -17,26 +17,26 @@ public class SchoolHomeController(
     public async Task<IActionResult> Index()
     {
         var user = await _userService.GetUserFromClaimsAsync(User);
-        var currentOrg = await _userService.GetCurrentOrganisationAsync(User);
-
-        if (!HasValidOrganisation(currentOrg))
+        if (user is null)
         {
+            _logger.LogWarning("User claim was null.");
             return AccessDenied();
         }
 
-        if (!IsEstablishment(currentOrg))
+        var org = await _userService.GetCurrentOrganisationAsync(User);
+        if (org is null)
         {
+            _logger.LogWarning("User Organisation claim was null.");
+            return AccessDenied();
+        }
+
+        if (!IsEstablishment(org) || org.Urn is null)
+        {
+            _logger.LogInformation("User Organisation is not an Establishment or has a null Urn, redirecting to school search.");
             return Redirect(Routes.SchoolSearch);
         }
 
-        SetViewBagProperties(user, currentOrg);
-
-        return View();
-    }
-
-    private static bool HasValidOrganisation(Organisation? organisation)
-    {
-        return organisation?.Category != null;
+        return Redirect(Routes.School(org.Urn));
     }
 
     private static bool IsEstablishment(Organisation organisation)
@@ -52,26 +52,9 @@ public class SchoolHomeController(
         return RedirectToAction("StatusCodeError", "Error", new { statusCode = 403 });
     }
 
-    private void SetViewBagProperties(User user, Organisation currentOrg)
-    {
-        var (schoolName, schoolUrn) = GetSchoolInfo(user, currentOrg);
-        ViewBag.SchoolName = schoolName;
-        ViewBag.Urn = schoolUrn;
-        ViewBag.UserName = user.Name;
-    }
-
-    private static (string SchoolName, string SchoolUrn) GetSchoolInfo(User user, Organisation currentOrg)
-    {
-        var org = user.Organisations.FirstOrDefault(o => o.Id == currentOrg.Id);
-
-        return (
-            org?.Name ?? "School",
-            org?.Urn ?? "138337"
-        );
-    }
-
     private static class Routes
     {
         public const string SchoolSearch = "/find-a-school";
+        public static string School(string urn) => $"/school/{urn}";
     }
 }
