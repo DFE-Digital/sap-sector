@@ -150,7 +150,7 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisSuffix, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -161,6 +161,8 @@
             family: gdsStyles.fontFamily,
             size: gdsStyles.fontSize
         };
+
+        const stepSize = axisStep;
 
         const legendOptions = {
             display: showLegend,
@@ -186,6 +188,7 @@
                 scales: {
                     y: {
                         beginAtZero: true,
+                        max: axisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         grid: {
                             display: true,
@@ -201,6 +204,7 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -255,6 +259,7 @@
                 scales: {
                     x: {
                         beginAtZero: true,
+                        max: axisMax ?? undefined,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -269,6 +274,7 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
