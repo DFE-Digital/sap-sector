@@ -347,31 +347,31 @@ public class SchoolController : Controller
             {
                 thisSchool = new[]
                 {
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.School.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.School.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.School.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.ThreeYearAverage.SchoolValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.SchoolValue)
                 },
                 similarSchools = new[]
                 {
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.SimilarSchools.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.SimilarSchools.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.SimilarSchools.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.ThreeYearAverage.SimilarSchoolsValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.SimilarSchoolsValue)
                 },
                 localAuthority = new[]
                 {
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.LocalAuthority.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.LocalAuthority.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.LocalAuthority.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.ThreeYearAverage.LocalAuthorityValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.LocalAuthorityValue)
                 },
                 england = new[]
                 {
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.England.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.England.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.YearByYear.England.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(selectedSubject.ThreeYearAverage.EnglandValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Previous2),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Previous),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Current),
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.EnglandValue)
                 }
             },
             topPerformers = selectedSubject.TopPerformers
@@ -380,7 +380,7 @@ public class SchoolController : Controller
                     x.Rank,
                     x.Urn,
                     x.Name,
-                    DisplayValue = Ks4CoreSubjectsPageViewModel.DisplayPercent(x.Value)
+                    DisplayValue = Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value)
                 })
         });
     }
@@ -500,7 +500,7 @@ public class SchoolController : Controller
                     x.Urn,
                     x.Name,
                     x.Value,
-                    Ks4CoreSubjectsPageViewModel.DisplayPercent(x.Value)))
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value)))
                 .ToList()
                 .AsReadOnly(),
             selection.YearByYear.School,
