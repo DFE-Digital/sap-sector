@@ -36,4 +36,13 @@ public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) 
         await Expect(Page.Locator("#englishLanguageCharacteristic")).ToBeDisabledAsync();
         await Expect(Page.Locator(".app-side-navigation__item--selected").GetByText("KS4 core subjects")).ToBeVisibleAsync();
     }
+
+    [Fact]
+    public async Task Ks4CoreSubjects_ThreeYearBarChartsUseWholePercentLabels()
+    {
+        await Page.GotoAsync(PagePath);
+
+        var charts = Page.Locator("canvas.js-chart--school-ks4-bar[data-label-decimals='0']");
+        await Expect(charts).ToHaveCountAsync(7);
+    }
 }

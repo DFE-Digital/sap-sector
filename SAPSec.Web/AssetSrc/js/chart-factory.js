@@ -150,6 +150,23 @@
         };
     }
 
+    function getBarLabelAlignment(value, barLabelAlign) {
+        if (barLabelAlign) {
+            return barLabelAlign;
+        }
+
+        return value < CHART_CONFIG.bar.datalabels.alignThreshold
+            ? CHART_CONFIG.bar.datalabels.smallValueAlign
+            : CHART_CONFIG.bar.datalabels.defaultAlign;
+    }
+
+    function getBarLabelColor(value, gdsStyles, barLabelAlign) {
+        const align = getBarLabelAlignment(value, barLabelAlign);
+        return align === CHART_CONFIG.bar.datalabels.defaultAlign
+            ? gdsStyles.onBarLabel
+            : gdsStyles.text;
+    }
+
     function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
@@ -303,11 +320,13 @@
                     },
                     datalabels: {
                         anchor: CHART_CONFIG.bar.datalabels.anchor,
-                        align: barLabelAlign || (ctx => ctx.dataset.data[ctx.dataIndex] < CHART_CONFIG.bar.datalabels.alignThreshold
-                            ? CHART_CONFIG.bar.datalabels.smallValueAlign
-                            : CHART_CONFIG.bar.datalabels.defaultAlign),
+                        align: function (ctx) {
+                            return getBarLabelAlignment(ctx.dataset.data[ctx.dataIndex], barLabelAlign);
+                        },
                         offset: CHART_CONFIG.bar.datalabels.offset,
-                        color: () => gdsStyles.onBarLabel,
+                        color: function (ctx) {
+                            return getBarLabelColor(ctx.dataset.data[ctx.dataIndex], gdsStyles, barLabelAlign);
+                        },
                         font: {
                             ...fonts,
                             weight: CHART_CONFIG.bar.datalabels.fontWeight
