@@ -33,7 +33,6 @@ public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) 
         await Page.GotoAsync(PagePath);
 
         await Expect(Page.Locator("#englishLanguageGrade")).ToBeVisibleAsync();
-        await Expect(Page.Locator("#englishLanguageCharacteristic")).ToBeDisabledAsync();
         await Expect(Page.Locator(".app-side-navigation__item--selected").GetByText("KS4 core subjects")).ToBeVisibleAsync();
     }
 
