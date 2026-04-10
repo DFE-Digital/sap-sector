@@ -35,7 +35,7 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("You've accepted analytics cookies.");
+        content.Should().Contain("You've accepted additional cookies.");
         content.Should().Contain("id=\"cookies-banner\"");
     }
 
@@ -49,7 +49,7 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("You've rejected analytics cookies.");
+        content.Should().Contain("You've rejected additional cookies.");
         content.Should().Contain("id=\"cookies-banner\"");
     }
 }
