@@ -1,11 +1,25 @@
 using System.Globalization;
 using SAPSec.Core.Model;
 using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
 namespace SAPSec.Web.ViewModels;
 
 public class SimilarSchoolsComparisonViewModel
 {
+    public record CoreSubjectSection(
+        decimal? ThisSchoolThreeYearAverage,
+        decimal? SimilarSchoolThreeYearAverage,
+        decimal? EnglandThreeYearAverage,
+        Ks4HeadlineMeasureSeries? ThisSchoolYearByYear,
+        Ks4HeadlineMeasureSeries? SimilarSchoolYearByYear,
+        Ks4HeadlineMeasureSeries? EnglandYearByYear)
+    {
+        public string ThisSchoolDisplay => DisplayPercent(ThisSchoolThreeYearAverage);
+        public string SimilarSchoolDisplay => DisplayPercent(SimilarSchoolThreeYearAverage);
+        public string EnglandDisplay => DisplayPercent(EnglandThreeYearAverage);
+    }
+
     public required string Urn { get; set; }
     public required string SimilarSchoolUrn { get; set; }
     public required string Name { get; set; }
@@ -66,6 +80,13 @@ public class SimilarSchoolsComparisonViewModel
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolDestinationsYearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolDestinationsYearByYear { get; set; }
     public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandDestinationsYearByYear { get; set; }
+    public CoreSubjectSection? EnglishLanguage { get; set; }
+    public CoreSubjectSection? EnglishLiterature { get; set; }
+    public CoreSubjectSection? Biology { get; set; }
+    public CoreSubjectSection? Chemistry { get; set; }
+    public CoreSubjectSection? Physics { get; set; }
+    public CoreSubjectSection? Maths { get; set; }
+    public CoreSubjectSection? CombinedScienceDoubleAward { get; set; }
 
     public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
     public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
