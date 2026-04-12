@@ -1,4 +1,6 @@
-﻿using GovUk.Frontend.AspNetCore;
+﻿using Dfe.Analytics;
+using Dfe.Analytics.AspNetCore;
+using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
@@ -126,6 +128,13 @@ public class Program
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 
+        builder.Services.AddDfeAnalytics(options =>
+        {
+            options.ProjectId = builder.Configuration["DfeAnalytics:ProjectId"];
+            options.DatasetId = builder.Configuration["DfeAnalytics:DatasetId"];
+           // options.Environment = builder.Environment.EnvironmentName;
+        }).AddAspNetCoreIntegration();
+
         var app = builder.Build();
 
         var isDevelopment = app.Environment.IsDevelopment();
@@ -200,6 +209,8 @@ public class Program
         app.UseAuthorization();
 
         app.MapHealthChecks("/healthcheck");
+
+        app.UseDfeAnalytics();
 
         app.MapControllers();
         app.MapRazorPages();
