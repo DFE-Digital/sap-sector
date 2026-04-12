@@ -214,6 +214,8 @@ jobs:
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
           db-seed: false
           smoke-test: false
+          gcp-wip: ${{ vars.GCP_WIP }}
+          gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
       
       # ---------------------------
       # REVIEW APP DATABASE DEPLOYMENT (PR)
@@ -472,6 +474,8 @@ jobs:
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
           smoke-test: false
+          gcp-wip: ${{ vars.GCP_WIP }}
+          gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
 
   manual_deploy:
     name: Manual deploy
@@ -506,6 +510,8 @@ jobs:
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
           smoke-test: false
+          gcp-wip: ${{ vars.GCP_WIP }}
+          gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
 
       - name: Checkout (needed for workspace consistency)
         if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
