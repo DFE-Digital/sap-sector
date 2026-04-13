@@ -72,7 +72,7 @@
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
 <p class="govuk-body">
-    Compare this school's KS4 core subject GCSE results with:
+    Compare this school's GCSEs in core subjects with:
 </p>
 
 <ul class="govuk-list govuk-list--bullet">
@@ -106,12 +106,6 @@
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
-            </select>
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="englishLanguageCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="englishLanguageCharacteristic" name="englishLanguageCharacteristic" disabled>
-                <option selected>All pupils</option>
             </select>
         </div>
     </div>
@@ -173,9 +167,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
@@ -206,12 +200,6 @@
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
-            </select>
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="englishLiteratureCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="englishLiteratureCharacteristic" name="englishLiteratureCharacteristic" disabled>
-                <option selected>All pupils</option>
             </select>
         </div>
     </div>
@@ -273,9 +261,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
@@ -306,12 +294,6 @@
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
-            </select>
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="mathsCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="mathsCharacteristic" name="mathsCharacteristic" disabled>
-                <option selected>All pupils</option>
             </select>
         </div>
     </div>
@@ -373,9 +355,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
@@ -406,12 +388,6 @@
                 <option value="4" selected>Grade 4-4 and above</option>
                 <option value="5">Grade 5-5 and above</option>
                 <option value="7">Grade 7-7 and above</option>
-            </select>
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="combinedScienceCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="combinedScienceCharacteristic" name="combinedScienceCharacteristic" disabled>
-                <option selected>All pupils</option>
             </select>
         </div>
     </div>
@@ -473,9 +449,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
@@ -506,12 +482,6 @@
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
-            </select>
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="biologyCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="biologyCharacteristic" name="biologyCharacteristic" disabled>
-                <option selected>All pupils</option>
             </select>
         </div>
     </div>
@@ -573,9 +543,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
@@ -606,12 +576,6 @@
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
-            </select>
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="chemistryCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="chemistryCharacteristic" name="chemistryCharacteristic" disabled>
-                <option selected>All pupils</option>
             </select>
         </div>
     </div>
@@ -673,9 +637,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
@@ -706,12 +670,6 @@
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
-            </select>
-        </div>
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="physicsCharacteristic">Pupil characteristic</label>
-            <select class="govuk-select" id="physicsCharacteristic" name="physicsCharacteristic" disabled>
-                <option selected>All pupils</option>
             </select>
         </div>
     </div>
@@ -773,9 +731,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }

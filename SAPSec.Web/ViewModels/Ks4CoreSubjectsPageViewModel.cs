@@ -18,10 +18,10 @@ public class Ks4CoreSubjectsPageViewModel
         Ks4HeadlineMeasureSeries LocalAuthorityYearByYear,
         Ks4HeadlineMeasureSeries EnglandYearByYear)
     {
-        public string SchoolDisplay => DisplayPercent(SchoolThreeYearAverage);
-        public string SimilarSchoolsDisplay => DisplayPercent(SimilarSchoolsThreeYearAverage);
-        public string LocalAuthorityDisplay => DisplayPercent(LocalAuthorityThreeYearAverage);
-        public string EnglandDisplay => DisplayPercent(EnglandThreeYearAverage);
+        public string SchoolDisplay => DisplayWholePercent(SchoolThreeYearAverage);
+        public string SimilarSchoolsDisplay => DisplayWholePercent(SimilarSchoolsThreeYearAverage);
+        public string LocalAuthorityDisplay => DisplayWholePercent(LocalAuthorityThreeYearAverage);
+        public string EnglandDisplay => DisplayWholePercent(EnglandThreeYearAverage);
     }
 
     public required SchoolDetails SchoolDetails { get; set; }
@@ -41,4 +41,9 @@ public class Ks4CoreSubjectsPageViewModel
 
     public static string DisplayPercent(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) + "%" : "No available data";
+
+    public static string DisplayWholePercent(decimal? value) =>
+        value.HasValue
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
+            : "No available data";
 }
