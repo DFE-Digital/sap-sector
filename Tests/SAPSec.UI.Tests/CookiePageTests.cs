@@ -24,6 +24,6 @@ public class CookiePageTests(WebApplicationSetupFixture fixture) : BasePageTest(
 
         var banner = Page.Locator("#accepted-cookies-banner");
         await Expect(banner).ToBeVisibleAsync();
-        (await banner.TextContentAsync()).Should().Contain("You've accepted analytics cookies.");
+        (await banner.TextContentAsync()).Should().Contain("You've accepted additional cookies.");
     }
 }

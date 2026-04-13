@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.StaticFiles;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
+using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using SAPSec.Web.Setup;
@@ -41,6 +42,7 @@ public class Program
             });
 
         builder.Services.AddRazorPages();
+        builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
 
         builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
         {
