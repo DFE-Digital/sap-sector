@@ -30,6 +30,8 @@ public class HomeControllerTests(WebApplicationSetupFixture fixture)
         content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/accessibility\">Accessibility</a>");
         content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/terms-of-use\">Terms of use</a>");
         content.Should().Contain("https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers");
+        content.Should().Contain($"href=\"mailto:{LayoutConstants.SupportEmail}\"");
+        content.Should().Contain($">{LayoutConstants.SupportEmail}</a>");
     }
 
     [Fact]

@@ -115,7 +115,8 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
             { "Cookies", "/cookies" },
             { "Accessibility", "/accessibility" },
             { "Terms of use", "/terms-of-use" },
-            { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" }
+            { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" },
+            { LayoutConstants.SupportEmail, $"mailto:{LayoutConstants.SupportEmail}" }
         };
 
         foreach (var (linkText, expectedHref) in footerLinks)
