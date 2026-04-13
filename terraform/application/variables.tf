@@ -61,7 +61,7 @@ variable "azure_maintenance_window" {
     start_hour   = number
     start_minute = number
   })
-  default = null
+  default     = null
   description = "Maintenance window for PostgreSQL. Day 0 = Sunday, 1 = Monday, etc."
 }
 variable "docker_image" {
@@ -112,4 +112,8 @@ locals {
 variable "enable_logit" { default = true }
 
 
+variable "enable_dfe_analytics_federated_auth" {
+  description = "Create the resources in Google cloud for federated authentication and enable in application"
+  default     = false
+}
 
