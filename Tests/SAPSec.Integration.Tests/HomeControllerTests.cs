@@ -52,4 +52,5 @@ public class HomeControllerTests(WebApplicationSetupFixture fixture)
         content.Should().Contain("© Crown copyright");
         content.Should().Contain("Open Government Licence v3.0");
     }
+
 }
