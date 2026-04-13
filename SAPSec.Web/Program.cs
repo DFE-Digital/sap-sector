@@ -1,4 +1,6 @@
-﻿using GovUk.Frontend.AspNetCore;
+﻿using Dfe.Analytics;
+using Dfe.Analytics.AspNetCore;
+using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
@@ -116,6 +118,8 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
+        builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration();
+
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
@@ -202,6 +206,8 @@ public class Program
         app.UseAuthorization();
 
         app.MapHealthChecks("/healthcheck");
+
+        app.UseDfeAnalytics();
 
         app.MapControllers();
         app.MapRazorPages();
