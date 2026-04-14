@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -13,8 +14,10 @@ namespace SAPSec.Web.Controllers;
 [Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
 public class SimilarSchoolsComparisonController : Controller
 {
+    private static readonly GetFilteredSchoolKs4CoreSubject FilterSchoolKs4CoreSubject = new();
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
+    private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
@@ -24,6 +27,7 @@ public class SimilarSchoolsComparisonController : Controller
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetAttendanceMeasures getAttendanceMeasures,
+        GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
         GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         GetCharacteristicsComparison getCharacteristicsComparison,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
@@ -33,6 +37,7 @@ public class SimilarSchoolsComparisonController : Controller
         _getSimilarSchoolDetails =
             getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
         _getAttendanceMeasures = getAttendanceMeasures ?? throw new ArgumentNullException(nameof(getAttendanceMeasures));
+        _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects ?? throw new ArgumentNullException(nameof(getSchoolKs4CoreSubjects));
         _getKs4HeadlineMeasures = getKs4HeadlineMeasures ?? throw new ArgumentNullException(nameof(getKs4HeadlineMeasures));
         _getCharacteristicsComparison = getCharacteristicsComparison ??
                                         throw new ArgumentNullException(nameof(getCharacteristicsComparison));
@@ -325,6 +330,85 @@ public class SimilarSchoolsComparisonController : Controller
         SetComparisonSchoolViewData(modelResult.Model!);
         return View(modelResult.Model);
     }
+
+    [HttpGet]
+    [Route("Ks4CoreSubjectsData")]
+    public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string similarSchoolUrn, string subject = "english-language", string grade = "4")
+    {
+        if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
+        {
+            return BadRequest(new { error = "Missing route parameters." });
+        }
+
+        var thisSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
+        var selectedSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(similarSchoolUrn));
+        var thisSchoolFilteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(thisSchoolKs4, subject, grade));
+        var selectedSchoolFilteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(selectedSchoolKs4, subject, grade));
+        var thisSchoolSubject = thisSchoolFilteredSubject.Selection;
+        var selectedSchoolSubject = selectedSchoolFilteredSubject.Selection;
+
+        return Json(new
+        {
+            subject = thisSchoolFilteredSubject.Subject.ToSubjectValue(),
+            grade = thisSchoolFilteredSubject.Grade.ToFilterValue(),
+            bar = new decimal?[]
+            {
+                RoundWholePercentValue(thisSchoolSubject.ThreeYearAverage.SchoolValue),
+                RoundWholePercentValue(selectedSchoolSubject.ThreeYearAverage.SchoolValue),
+                RoundWholePercentValue(thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue)
+            },
+            line = new
+            {
+                thisSchool = new decimal?[]
+                {
+                    thisSchoolSubject.YearByYear.School.Previous2,
+                    thisSchoolSubject.YearByYear.School.Previous,
+                    thisSchoolSubject.YearByYear.School.Current
+                },
+                similarSchool = new decimal?[]
+                {
+                    selectedSchoolSubject.YearByYear.School.Previous2,
+                    selectedSchoolSubject.YearByYear.School.Previous,
+                    selectedSchoolSubject.YearByYear.School.Current
+                },
+                england = new decimal?[]
+                {
+                    (thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous2,
+                    (thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous,
+                    (thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Current
+                }
+            },
+            table = new
+            {
+                thisSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.ThreeYearAverage.SchoolValue)
+                },
+                similarSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.ThreeYearAverage.SchoolValue)
+                },
+                england = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue)
+                }
+            }
+        });
+    }
+
+    private static decimal? RoundWholePercentValue(decimal? value) =>
+        value.HasValue
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero)
+            : null;
 
     [HttpGet]
     [Route("attendance")]
