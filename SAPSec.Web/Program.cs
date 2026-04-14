@@ -2,6 +2,7 @@
 using Dfe.Analytics.AspNetCore;
 using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -17,6 +18,7 @@ using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
+using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -118,7 +120,11 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration();
+        builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
+        {    
+            options.RequestFilter = ctx =>
+                ctx.Request.Path != "/healthcheck";
+        });
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
@@ -205,7 +211,7 @@ public class Program
 
         app.UseAuthorization();
 
-        //app.MapHealthChecks("/healthcheck");
+        app.MapHealthChecks("/healthcheck");
 
         app.UseDfeAnalytics();
 
