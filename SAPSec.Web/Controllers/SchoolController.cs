@@ -17,6 +17,7 @@ namespace SAPSec.Web.Controllers;
 [Route("school/{urn}")]
 public class SchoolController : Controller
 {
+    private static readonly GetFilteredSchoolKs4CoreSubject FilterSchoolKs4CoreSubject = new();
     private readonly ISchoolDetailsService _schoolDetailsService;
     private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
@@ -321,14 +322,13 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string subject = "english-language", string grade = "4")
     {
         var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
-        var gradeFilter = SchoolKs4CoreSubjectSelection.ParseGradeFilter(grade);
-        var subjectFilter = SchoolKs4CoreSubjectSelection.ParseSubject(subject);
-        var selectedSubject = SchoolKs4CoreSubjectSelection.From(response, subjectFilter, gradeFilter);
+        var filteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(response, subject, grade));
+        var selectedSubject = filteredSubject.Selection;
 
         return Json(new
         {
-            subject = SchoolKs4CoreSubjectSelection.ToSubjectValue(subjectFilter),
-            grade = SchoolKs4CoreSubjectSelection.ToFilterValue(gradeFilter),
+            subject = filteredSubject.Subject.ToSubjectValue(),
+            grade = filteredSubject.Grade.ToFilterValue(),
             bar = new decimal?[]
             {
                 selectedSubject.ThreeYearAverage.SchoolValue,

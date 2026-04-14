@@ -5,6 +5,7 @@ using Moq;
 using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
@@ -41,6 +42,11 @@ public class SimilarSchoolsComparisonControllerTests
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object,
             _schoolDetailsServiceMock.Object);
+        var ks4CoreSubjectsUseCase = new GetSchoolKs4CoreSubjects(
+            _ks4PerformanceRepositoryMock.Object,
+            _schoolDetailsServiceMock.Object,
+            _establishmentRepositoryMock.Object,
+            _repoMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
             _attendanceRepositoryMock.Object,
             _establishmentRepositoryMock.Object);
@@ -68,6 +74,7 @@ public class SimilarSchoolsComparisonControllerTests
         _sut = new SimilarSchoolsComparisonController(
             getSimilarSchoolDetails,
             attendanceUseCase,
+            ks4CoreSubjectsUseCase,
             ks4UseCase,
             getCharacteristicsComparison,
             characteristicsFormatter,

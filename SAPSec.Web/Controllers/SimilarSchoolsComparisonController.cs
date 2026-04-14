@@ -14,6 +14,7 @@ namespace SAPSec.Web.Controllers;
 [Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
 public class SimilarSchoolsComparisonController : Controller
 {
+    private static readonly GetFilteredSchoolKs4CoreSubject FilterSchoolKs4CoreSubject = new();
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
@@ -353,15 +354,15 @@ public class SimilarSchoolsComparisonController : Controller
 
         var thisSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
         var selectedSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(similarSchoolUrn));
-        var gradeFilter = SchoolKs4CoreSubjectSelection.ParseGradeFilter(grade);
-        var subjectFilter = SchoolKs4CoreSubjectSelection.ParseSubject(subject);
-        var thisSchoolSubject = SchoolKs4CoreSubjectSelection.From(thisSchoolKs4, subjectFilter, gradeFilter);
-        var selectedSchoolSubject = SchoolKs4CoreSubjectSelection.From(selectedSchoolKs4, subjectFilter, gradeFilter);
+        var thisSchoolFilteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(thisSchoolKs4, subject, grade));
+        var selectedSchoolFilteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(selectedSchoolKs4, subject, grade));
+        var thisSchoolSubject = thisSchoolFilteredSubject.Selection;
+        var selectedSchoolSubject = selectedSchoolFilteredSubject.Selection;
 
         return Json(new
         {
-            subject = SchoolKs4CoreSubjectSelection.ToSubjectValue(subjectFilter),
-            grade = SchoolKs4CoreSubjectSelection.ToFilterValue(gradeFilter),
+            subject = thisSchoolFilteredSubject.Subject.ToSubjectValue(),
+            grade = thisSchoolFilteredSubject.Grade.ToFilterValue(),
             bar = new decimal?[]
             {
                 RoundWholePercentValue(thisSchoolSubject.ThreeYearAverage.SchoolValue),

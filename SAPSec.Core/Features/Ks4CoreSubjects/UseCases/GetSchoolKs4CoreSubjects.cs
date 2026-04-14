@@ -451,46 +451,6 @@ public record SchoolKs4CoreSubjectSelection(
     IReadOnlyList<Ks4TopPerformer> TopPerformers,
     SchoolKs4ComparisonYearByYear YearByYear)
 {
-    public static SchoolKs4CoreSubjectGradeFilter ParseGradeFilter(string? grade) =>
-        grade switch
-        {
-            "5" => SchoolKs4CoreSubjectGradeFilter.Grade5,
-            "7" => SchoolKs4CoreSubjectGradeFilter.Grade7,
-            _ => SchoolKs4CoreSubjectGradeFilter.Grade4
-        };
-
-    public static string ToFilterValue(SchoolKs4CoreSubjectGradeFilter filter) =>
-        filter switch
-        {
-            SchoolKs4CoreSubjectGradeFilter.Grade5 => "5",
-            SchoolKs4CoreSubjectGradeFilter.Grade7 => "7",
-            _ => "4"
-        };
-
-    public static SchoolKs4CoreSubject ParseSubject(string? subject) =>
-        subject?.ToLowerInvariant() switch
-        {
-            "english-literature" => SchoolKs4CoreSubject.EnglishLiterature,
-            "biology" => SchoolKs4CoreSubject.Biology,
-            "chemistry" => SchoolKs4CoreSubject.Chemistry,
-            "physics" => SchoolKs4CoreSubject.Physics,
-            "maths" => SchoolKs4CoreSubject.Maths,
-            "combined-science-double-award" => SchoolKs4CoreSubject.CombinedScienceDoubleAward,
-            _ => SchoolKs4CoreSubject.EnglishLanguage
-        };
-
-    public static string ToSubjectValue(SchoolKs4CoreSubject subject) =>
-        subject switch
-        {
-            SchoolKs4CoreSubject.EnglishLiterature => "english-literature",
-            SchoolKs4CoreSubject.Biology => "biology",
-            SchoolKs4CoreSubject.Chemistry => "chemistry",
-            SchoolKs4CoreSubject.Physics => "physics",
-            SchoolKs4CoreSubject.Maths => "maths",
-            SchoolKs4CoreSubject.CombinedScienceDoubleAward => "combined-science-double-award",
-            _ => "english-language"
-        };
-
     public static SchoolKs4CoreSubjectSelection From(
         GetSchoolKs4CoreSubjectsResponse response,
         SchoolKs4CoreSubject subject,
