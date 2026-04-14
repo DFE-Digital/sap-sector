@@ -80,11 +80,14 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-        builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
+        if (builder.Environment.EnvironmentName is not "IntegrationTests")
         {
-            options.RequestFilter = ctx =>
-                ctx.Request.Path != "/healthcheck";
-        });
+            builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
+            {
+                options.RequestFilter = ctx =>
+                    ctx.Request.Path != "/healthcheck";
+            });
+        }
 
         builder.Services.AddDistributedMemoryCache();
 
