@@ -217,7 +217,12 @@ public class Program
 
         app.MapHealthChecks("/healthcheck");
 
-        if (!isDevelopment || !isIntegrationTests)
+        //if (!isDevelopment || !isIntegrationTests)
+        //{
+        //    app.UseDfeAnalytics();
+        //}
+
+        if (!builder.Environment.IsEnvironment("Development") || !builder.Environment.IsEnvironment("IntegrationTests"))
         {
             app.UseDfeAnalytics();
         }
