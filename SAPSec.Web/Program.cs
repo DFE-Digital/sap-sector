@@ -213,7 +213,10 @@ public class Program
 
         app.MapHealthChecks("/healthcheck");
 
-        app.UseDfeAnalytics();
+        if (!isDevelopment)
+        {
+            app.UseDfeAnalytics();
+        }
 
         app.MapControllers();
         app.MapRazorPages();
