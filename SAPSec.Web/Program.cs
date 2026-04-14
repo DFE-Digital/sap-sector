@@ -144,6 +144,8 @@ public class Program
 
         var isDevelopment = app.Environment.IsDevelopment();
 
+        var isIntegrationTests = app.Environment.EnvironmentName == "IntegrationTests";
+
         // Set up error handling
         // Note: The order of these lines is important!
         // 1. Status code pages (used by later exception handlers)
@@ -215,7 +217,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck");
 
-        if (!isDevelopment)
+        if (!isDevelopment || !isIntegrationTests)
         {
             app.UseDfeAnalytics();
         }
