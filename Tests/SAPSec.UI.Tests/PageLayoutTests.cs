@@ -115,8 +115,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
             { "Cookies", "/cookies" },
             { "Accessibility", "/accessibility" },
             { "Terms of use", "/terms-of-use" },
-            { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" },
-            { "Support and feedback", $"mailto:{LayoutConstants.SupportEmail}" }
+            { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" }
         };
 
         foreach (var (linkText, expectedHref) in footerLinks)
@@ -125,6 +124,13 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
             (await link.IsVisibleAsync()).Should().BeTrue();
             (await link.GetAttributeAsync("href")).Should().Be(expectedHref);
         }
+
+        var supportText = Page.Locator("footer.govuk-footer").GetByText("Report a problem with this site to:");
+        (await supportText.IsVisibleAsync()).Should().BeTrue();
+
+        var supportEmailLink = Page.Locator($"a.govuk-footer__link[href='mailto:{LayoutConstants.SupportEmail}']");
+        (await supportEmailLink.IsVisibleAsync()).Should().BeTrue();
+        (await supportEmailLink.TextContentAsync()).Should().Be(LayoutConstants.SupportEmail);
     }
 
     [Fact]

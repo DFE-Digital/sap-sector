@@ -152,6 +152,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <div class="govuk-footer__meta">
                 <div class="govuk-footer__meta-item govuk-footer__meta-item--grow">
                     <h2 class="govuk-visually-hidden">Support links</h2>
+                    <p class="govuk-body govuk-!-display-none-print">
+                        Report a problem with this site to:
+                        <a class="govuk-footer__link" href="mailto:@LayoutConstants.SupportEmail">@LayoutConstants.SupportEmail</a>
+                    </p>
                     <ul class="govuk-footer__inline-list govuk-!-display-none-print">
                         <li class="govuk-footer__inline-list-item">
                             <a class="govuk-footer__link" href="@Url.Action("Cookies", "StaticContent")">Cookies</a>
@@ -167,9 +171,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                                href="https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers">
                                 Privacy
                             </a>
-                        </li>
-                        <li class="govuk-footer__inline-list-item">
-                            <a class="govuk-footer__link" href="mailto:@LayoutConstants.SupportEmail">Support and feedback</a>
                         </li>
                     </ul>
                     <svg aria-hidden="true"
