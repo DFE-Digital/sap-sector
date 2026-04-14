@@ -15,9 +15,9 @@ public class SimilarSchoolsComparisonViewModel
         Ks4HeadlineMeasureSeries? SimilarSchoolYearByYear,
         Ks4HeadlineMeasureSeries? EnglandYearByYear)
     {
-        public string ThisSchoolDisplay => DisplayPercent(ThisSchoolThreeYearAverage);
-        public string SimilarSchoolDisplay => DisplayPercent(SimilarSchoolThreeYearAverage);
-        public string EnglandDisplay => DisplayPercent(EnglandThreeYearAverage);
+        public string ThisSchoolDisplay => DisplayWholePercent(ThisSchoolThreeYearAverage);
+        public string SimilarSchoolDisplay => DisplayWholePercent(SimilarSchoolThreeYearAverage);
+        public string EnglandDisplay => DisplayWholePercent(EnglandThreeYearAverage);
     }
 
     public required string Urn { get; set; }

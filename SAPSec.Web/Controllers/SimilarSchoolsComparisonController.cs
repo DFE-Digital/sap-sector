@@ -364,9 +364,9 @@ public class SimilarSchoolsComparisonController : Controller
             grade = SchoolKs4CoreSubjectSelection.ToFilterValue(gradeFilter),
             bar = new decimal?[]
             {
-                thisSchoolSubject.ThreeYearAverage.SchoolValue,
-                selectedSchoolSubject.ThreeYearAverage.SchoolValue,
-                thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue
+                RoundWholePercentValue(thisSchoolSubject.ThreeYearAverage.SchoolValue),
+                RoundWholePercentValue(selectedSchoolSubject.ThreeYearAverage.SchoolValue),
+                RoundWholePercentValue(thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue)
             },
             line = new
             {
@@ -393,28 +393,33 @@ public class SimilarSchoolsComparisonController : Controller
             {
                 thisSchool = new[]
                 {
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSubject.YearByYear.School.Previous2),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSubject.YearByYear.School.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSubject.YearByYear.School.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSubject.ThreeYearAverage.SchoolValue)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.ThreeYearAverage.SchoolValue)
                 },
                 similarSchool = new[]
                 {
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSubject.YearByYear.School.Previous2),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSubject.YearByYear.School.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSubject.YearByYear.School.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(selectedSchoolSubject.ThreeYearAverage.SchoolValue)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.ThreeYearAverage.SchoolValue)
                 },
                 england = new[]
                 {
-                    SimilarSchoolsComparisonViewModel.DisplayPercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous2),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayPercent(thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Current),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue)
                 }
             }
         });
     }
+
+    private static decimal? RoundWholePercentValue(decimal? value) =>
+        value.HasValue
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero)
+            : null;
 
     [HttpGet]
     [Route("attendance")]

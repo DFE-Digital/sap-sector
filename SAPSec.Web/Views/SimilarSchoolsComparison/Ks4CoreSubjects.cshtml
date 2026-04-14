@@ -6,6 +6,9 @@
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
     var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
     bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
+    decimal? RoundWholePercent(decimal? value) => value.HasValue
+        ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero)
+        : null;
 
     var sections = new[]
     {
@@ -101,9 +104,9 @@
         },
         data = new decimal?[]
         {
-            coreSubjectSection.ThisSchoolThreeYearAverage,
-            coreSubjectSection.SimilarSchoolThreeYearAverage,
-            coreSubjectSection.EnglandThreeYearAverage
+            RoundWholePercent(coreSubjectSection.ThisSchoolThreeYearAverage),
+            RoundWholePercent(coreSubjectSection.SimilarSchoolThreeYearAverage),
+            RoundWholePercent(coreSubjectSection.EnglandThreeYearAverage)
         }
     };
     var yearByYearData = new
@@ -173,9 +176,9 @@
                         data-cell-attribute="data-view-cell"
                         data-cell-prefixes='{"thisSchool":"@($"{item.CellPrefix}-this")","similarSchool":"@($"{item.CellPrefix}-similar")","england":"@($"{item.CellPrefix}-england")"}'
                         data-series-keys='["thisSchool","similarSchool","england"]'>
-                    <option value="4" selected>Grade 4 and above</option>
-                    <option value="5">Grade 5 and above</option>
-                    <option value="7">Grade 7 and above</option>
+                    <option value="4" selected>@(item.Key == "combined-science-double-award" ? "4-4 and above" : "Grade 4 and above")</option>
+                    <option value="5">@(item.Key == "combined-science-double-award" ? "5-5 and above" : "Grade 5 and above")</option>
+                    <option value="7">@(item.Key == "combined-science-double-award" ? "7-7 and above" : "Grade 7 and above")</option>
                 </select>
             </div>
         </div>
@@ -250,23 +253,23 @@
                     <tbody class="govuk-table__body">
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@Model.Name</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.ThisSchoolYearByYear?.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.ThisSchoolYearByYear?.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.ThisSchoolYearByYear?.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-avg")">@coreSubjectSection.ThisSchoolDisplay</td>
                         </tr>
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.SimilarSchoolYearByYear?.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-avg")">@coreSubjectSection.SimilarSchoolDisplay</td>
                         </tr>
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">Schools in England average</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.EnglandYearByYear?.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.EnglandYearByYear?.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayPercent(coreSubjectSection.EnglandYearByYear?.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-avg")">@coreSubjectSection.EnglandDisplay</td>
                         </tr>
                     </tbody>
