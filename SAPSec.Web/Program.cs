@@ -80,6 +80,11 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
+        builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
+        {
+            options.RequestFilter = ctx =>
+                ctx.Request.Path != "/healthcheck";
+        });
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -119,12 +124,6 @@ public class Program
         });
 
         builder.Services.AddHealthChecks();
-
-        builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
-        {    
-            options.RequestFilter = ctx =>
-                ctx.Request.Path != "/healthcheck";
-        });
 
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
