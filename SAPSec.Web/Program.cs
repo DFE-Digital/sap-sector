@@ -80,7 +80,7 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-        if (builder.Environment.EnvironmentName is not ("IntegrationTests" or "Development"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -215,7 +215,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck");
 
-        if (builder.Environment.EnvironmentName is not ("IntegrationTests" or "Development"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             app.UseDfeAnalytics();
         }
