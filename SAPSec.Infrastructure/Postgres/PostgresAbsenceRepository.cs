@@ -1,24 +1,20 @@
 using Dapper;
-using Microsoft.Extensions.Logging;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.Postgres;
 
-public class PostgresKs4PerformanceRepository(
-    ILogger<PostgresKs4PerformanceRepository> logger,
-    NpgsqlDataSourceFactory factory) : IKs4PerformanceRepository
+public class PostgresAbsenceRepository(NpgsqlDataSourceFactory factory) : IAbsenceRepository
 {
-    private readonly ILogger<PostgresKs4PerformanceRepository> _logger = logger;
     private readonly NpgsqlDataSourceFactory _factory = factory;
 
-    public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
+    public async Task<AbsenceData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
         return results.FirstOrDefault(x => string.Equals(x.URN, urn, StringComparison.Ordinal));
     }
 
-    public async Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)
+    public async Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)
     {
         var requestedUrns = urns
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
@@ -27,7 +23,7 @@ public class PostgresKs4PerformanceRepository(
 
         if (requestedUrns.Length == 0)
         {
-            return Array.Empty<Ks4PerformanceData>();
+            return Array.Empty<AbsenceData>();
         }
 
         using var conn = await _factory.Create().OpenConnectionAsync();
@@ -38,11 +34,11 @@ public class PostgresKs4PerformanceRepository(
             WHERE "URN" = ANY(@urns);
         
             SELECT *
-            FROM public.v_establishment_performance
+            FROM public.v_establishment_absence
             WHERE "Id" = ANY(@urns);
         
             SELECT *
-            FROM public.v_la_performance
+            FROM public.v_la_absence
             WHERE "Id" IN (
                 SELECT DISTINCT "LAId" 
                 FROM public.v_establishment 
@@ -50,7 +46,7 @@ public class PostgresKs4PerformanceRepository(
             );
             
             SELECT *
-            FROM public.v_england_performance
+            FROM public.v_england_absence
             WHERE "Id" = 'National';
         """;
 
@@ -59,15 +55,15 @@ public class PostgresKs4PerformanceRepository(
         var laIds = (await results.ReadAsync<(string, string)>())
             .ToDictionary(x => x.Item1, x => x.Item2, StringComparer.Ordinal);
 
-        var establishmentPerformance = (await results.ReadAsync<EstablishmentPerformance>())
+        var establishmentAbsence = (await results.ReadAsync<EstablishmentAbsence>())
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var localAuthorityPerformance = (await results.ReadAsync<LAPerformance>())
+        var localAuthorityAbsence = (await results.ReadAsync<LAAbsence>())
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandPerformance = await results.ReadSingleOrDefaultAsync<EnglandPerformance>();
+        var englandAbsence = await results.ReadSingleOrDefaultAsync<EnglandAbsence>();
 
-        var output = new List<Ks4PerformanceData>(requestedUrns.Length);
+        var output = new List<AbsenceData>(requestedUrns.Length);
 
         foreach (var urn in requestedUrns)
         {
@@ -76,14 +72,14 @@ public class PostgresKs4PerformanceRepository(
                 continue;
             }
 
-            establishmentPerformance.TryGetValue(urn, out var schoolPerformance);
-            localAuthorityPerformance.TryGetValue(laId, out var laPerformance);
+            establishmentAbsence.TryGetValue(urn, out var school);
+            localAuthorityAbsence.TryGetValue(laId, out var la);
 
-            output.Add(new Ks4PerformanceData(
+            output.Add(new AbsenceData(
                 urn,
-                schoolPerformance,
-                laPerformance,
-                englandPerformance));
+                school,
+                la,
+                englandAbsence));
         }
 
         return output;

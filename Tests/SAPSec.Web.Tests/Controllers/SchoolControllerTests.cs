@@ -176,8 +176,9 @@ public class SchoolControllerTests
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         _absenceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn, "373"))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(new AbsenceData(
+                urn,
                 new EstablishmentAbsence(),
                 new LAAbsence(),
                 new EnglandAbsence()));
@@ -199,8 +200,9 @@ public class SchoolControllerTests
             .Setup(x => x.GetEstablishmentAsync(urn))
             .ReturnsAsync(new Establishment { URN = urn, LAId = "373" });
         _absenceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn, "373"))
+            .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(new AbsenceData(
+                urn,
                 new EstablishmentAbsence
                 {
                     Abs_Tot_Est_Current_Pct = "5.1",

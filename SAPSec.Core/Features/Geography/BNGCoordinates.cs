@@ -20,8 +20,9 @@ public record BNGCoordinates(int Easting, int Northing)
 
     public double DistanceMiles(BNGCoordinates other)
     {
-        var (e, n) = (Easting - other.Easting, Northing - other.Northing);
+        var e = (Easting - other.Easting) / 1000.0 * KilometersToMiles;
+        var n = (Northing - other.Northing) / 1000.0 * KilometersToMiles;
 
-        return Math.Sqrt(e * e + n * n) / 1000.0 * KilometersToMiles;
+        return Math.Sqrt(e * e + n * n);
     }
 }

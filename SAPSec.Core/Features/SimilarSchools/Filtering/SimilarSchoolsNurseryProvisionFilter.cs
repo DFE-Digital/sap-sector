@@ -30,7 +30,7 @@ public class SimilarSchoolsNurseryProvisionFilter(SimilarSchool currentSchool) :
         items.GroupBy(i => new { i.NurseryProvisionName })
             .Where(f => !string.IsNullOrWhiteSpace(f.Key.NurseryProvisionName))
             .Select(g => new FilterOption(
-                g.Key.NurseryProvisionName,
+                   g.Key.NurseryProvisionName,
                 g.Key.NurseryProvisionName,
                 g.Count(),
                 values.Contains(g.Key.NurseryProvisionName, StringComparer.OrdinalIgnoreCase)));

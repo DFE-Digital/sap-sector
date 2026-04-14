@@ -15,34 +15,34 @@ public class GetAttendanceMeasures(
             throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
 
-        var data = await repository.GetByUrnAsync(request.Urn, establishment.LAId);
+        var data = await repository.GetByUrnAsync(request.Urn);
 
         var overallSchoolSeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Tot_Est_Current_Pct),
-            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Tot_Est_Previous_Pct),
-            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Tot_Est_Previous2_Pct));
+            ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Tot_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Tot_Est_Previous2_Pct));
         var persistentSchoolSeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Persistent_Est_Current_Pct),
-            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous_Pct),
-            ParseNullableDecimal(data?.EstablishmentAttendance?.Abs_Persistent_Est_Previous2_Pct));
+            ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct),
+            ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct),
+            ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct));
 
         var overallLocalAuthoritySeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Current_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Previous_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Tot_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous2_Pct));
         var persistentLocalAuthoritySeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Current_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Previous_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAttendance?.Abs_Persistent_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous2_Pct));
 
         var overallEnglandSeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Tot_Eng_Current_Pct),
-            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Tot_Eng_Previous_Pct),
-            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Tot_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Eng_Previous2_Pct));
         var persistentEnglandSeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Persistent_Eng_Current_Pct),
-            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Persistent_Eng_Previous_Pct),
-            ParseNullableDecimal(data?.EnglandAttendance?.Abs_Persistent_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Eng_Previous2_Pct));
 
         return new(
             new AttendanceMeasureAverage(

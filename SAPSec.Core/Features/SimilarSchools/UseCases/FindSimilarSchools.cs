@@ -1,3 +1,4 @@
+using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
@@ -14,10 +15,10 @@ namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 public class FindSimilarSchools(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
-    IKs4PerformanceRepository performanceRepository)
+    IKs4PerformanceRepository performanceRepository,
+    IAbsenceRepository absenceRepository)
 {
     private static readonly Regex UrnRegex = new Regex(@"^\d{6}$", RegexOptions.Compiled);
-    public const int ItemsPerPage = 10;
 
     public async Task<FindSimilarSchoolsResponse> Execute(FindSimilarSchoolsRequest request)
     {
@@ -30,9 +31,17 @@ public class FindSimilarSchools(
 
         var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
+
         var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-        var performances = await performanceRepository.GetByUrnsAsync(urns);
-        var schools = establishments.GroupJoin(performances, e => e.URN, p => p.Urn, SimilarSchool.FromData).ToList();
+        var performance = await performanceRepository.GetByUrnsAsync(urns);
+        var absence = await absenceRepository.GetByUrnsAsync(urns);
+
+        var schools =
+            from e in establishments
+            join p in performance on e.URN equals p.URN into perf
+            join a in absence on e.URN equals a.URN into abs
+            select SimilarSchool.FromData(e, perf.FirstOrDefault()?.EstablishmentPerformance, abs.FirstOrDefault()?.EstablishmentAbsence);
+
         var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
         if (currentSchool is null)
         {
@@ -57,11 +66,14 @@ public class FindSimilarSchools(
             .ToList()
             .AsReadOnly();
 
+        var page = int.TryParse(request.Page, out int parsed) ? parsed : 1;
+        var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
+
         return new(
             currentSchool.Name,
             sorting.GetPossibleOptions(request.SortBy).ToList().AsReadOnly(),
             filters.AsAvailableFilters(similarSchools),
-            new PagedCollection<SimilarSchoolResult>(allResults, request.Page, ItemsPerPage),
+            resultsPage,
             allResults
         );
     }
@@ -71,7 +83,8 @@ public record FindSimilarSchoolsRequest(
     string CurrentSchoolUrn,
     IDictionary<string, IEnumerable<string>> FilterBy,
     string SortBy,
-    int Page);
+    string Page,
+    int ResultsPerPage = 10);
 
 public record FindSimilarSchoolsResponse(
     string SchoolName,

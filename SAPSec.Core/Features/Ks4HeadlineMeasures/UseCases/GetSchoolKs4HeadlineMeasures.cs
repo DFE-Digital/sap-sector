@@ -23,7 +23,7 @@ public class GetSchoolKs4HeadlineMeasures(
         var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.Urn))
             .Select(s => s.NeighbourURN);
         var similarSchoolPerformanceData = ((await performanceRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
-            .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
+            .ToDictionary(x => x.URN, x => x, StringComparer.Ordinal);
         var similarSchoolDestinationsData = ((await destinationsRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))

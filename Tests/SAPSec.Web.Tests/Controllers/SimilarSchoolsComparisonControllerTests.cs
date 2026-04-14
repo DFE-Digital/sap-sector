@@ -26,7 +26,7 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
-    private readonly Mock<IAbsenceRepository> _attendanceRepositoryMock = new();
+    private readonly Mock<IAbsenceRepository> _absenceRepositoryMock = new();
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
@@ -38,13 +38,14 @@ public class SimilarSchoolsComparisonControllerTests
             _establishmentRepositoryMock.Object,
             _repoMock.Object,
             _schoolDetailsServiceMock.Object,
-            _ks4PerformanceRepositoryMock.Object);
+            _ks4PerformanceRepositoryMock.Object,
+            _absenceRepositoryMock.Object);
         var ks4UseCase = new GetKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object,
             _schoolDetailsServiceMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
-            _attendanceRepositoryMock.Object,
+            _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
@@ -205,9 +206,10 @@ public class SimilarSchoolsComparisonControllerTests
             .Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
             .ReturnsAsync(new Establishment { URN = "145327", LAId = "373" });
 
-        _attendanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(It.IsAny<string>(), It.IsAny<string?>()))
+        _absenceRepositoryMock
+            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
             .ReturnsAsync(new AbsenceData(
+                "145327",
                 new EstablishmentAbsence
                 {
                     Abs_Tot_Est_Current_Pct = "5.0",
@@ -392,7 +394,9 @@ public class SimilarSchoolsComparisonControllerTests
             EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.Available(64m),
             EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(65m),
             MathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(66m),
-            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(67m)
+            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(67m),
+            OverallAbsenceRate = DataWithAvailability.Available(0m),
+            PersistentAbsenceRate = DataWithAvailability.Available(0m)
         };
     }
 

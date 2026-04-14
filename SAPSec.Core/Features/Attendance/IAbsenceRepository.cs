@@ -4,10 +4,12 @@ namespace SAPSec.Core.Features.Attendance;
 
 public interface IAbsenceRepository
 {
-    Task<AbsenceData?> GetByUrnAsync(string urn, string? laId);
+    Task<AbsenceData?> GetByUrnAsync(string urn);
+    Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns);
 }
 
 public record AbsenceData(
-    EstablishmentAbsence? EstablishmentAttendance,
-    LAAbsence? LocalAuthorityAttendance,
-    EnglandAbsence? EnglandAttendance);
+    string URN,
+    EstablishmentAbsence? EstablishmentAbsence,
+    LAAbsence? LocalAuthorityAbsence,
+    EnglandAbsence? EnglandAbsence);

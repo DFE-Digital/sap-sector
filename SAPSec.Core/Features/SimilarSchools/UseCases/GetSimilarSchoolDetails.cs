@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Geography;
+﻿using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
@@ -10,7 +11,8 @@ public class GetSimilarSchoolDetails(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
     ISchoolDetailsService schoolDetailsService,
-    IKs4PerformanceRepository performanceRepository)
+    IKs4PerformanceRepository performanceRepository,
+    IAbsenceRepository absenceRepository)
 {
     public async Task<GetSimilarSchoolDetailsResponse> Execute(GetSimilarSchoolDetailsRequest request)
     {
@@ -18,8 +20,15 @@ public class GetSimilarSchoolDetails(
         var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
         var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-        var performances = await performanceRepository.GetByUrnsAsync(urns);
-        var schools = establishments.GroupJoin(performances, e => e.URN, p => p.Urn, SimilarSchool.FromData).ToList();
+        var performance = await performanceRepository.GetByUrnsAsync(urns);
+        var absence = await absenceRepository.GetByUrnsAsync(urns);
+
+        var schools =
+            from e in establishments
+            join p in performance on e.URN equals p.URN into perf
+            join a in absence on e.URN equals a.URN into abs
+            select SimilarSchool.FromData(e, perf.FirstOrDefault()?.EstablishmentPerformance, abs.FirstOrDefault()?.EstablishmentAbsence);
+
         var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
         var similarSchool = schools.FirstOrDefault(s => s.URN == request.SimilarSchoolUrn);
 

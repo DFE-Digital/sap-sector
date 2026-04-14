@@ -13,15 +13,15 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
         ["reg"] = new SimilarSchoolsRegionFilter(currentSchool),
         ["ur"] = new SimilarSchoolsUrbanRuralFilter(currentSchool),
         ["poe"] = new SimilarSchoolsPhaseOfEducationFilter(currentSchool),
-        ["sc"] = new SimilarSchoolsSchoolCapacityInUseFilter(currentSchool),
+        ["sciu"] = new SimilarSchoolsSchoolCapacityInUseFilter(currentSchool),
         ["np"] = new SimilarSchoolsNurseryProvisionFilter(currentSchool),
         ["sf"] = new SimilarSchoolsSixthFormFilter(currentSchool),
         ["ap"] = new SimilarSchoolsAdmissionsPolicyFilter(currentSchool),
         // TODO: Governance structure
         ["sp"] = new SimilarSchoolsTypeOfSpecialistProvisionFilter(currentSchool),
         ["goe"] = new SimilarSchoolsGenderOfEntryFilter(currentSchool),
-        // TODO: Overall absence rate
-        // TODO: Persistent absence rate
+        ["oar"] = new SimilarSchoolsOverallAbsenceRateFilter(currentSchool),
+        ["par"] = new SimilarSchoolsPersistentAbsenceRateFilter(currentSchool)
     };
 
     public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
@@ -59,18 +59,27 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
             if (filter is ISimilarSchoolsMultiValueFilter mvf)
             {
                 var values = _filterValues.ContainsKey(key) ? _filterValues[key] : [];
-                availableFilters.Add(mvf.AsAvailableFilter(key, items, values));
+                var availableFilter = mvf.AsAvailableFilter(key, items, values);
+                if (availableFilter.Options.Count > 1)
+                {
+                    availableFilters.Add(availableFilter);
+                }
             }
             else if (filter is ISimilarSchoolsSingleValueFilter svf)
             {
                 var value = (_filterValues.ContainsKey(key) ? _filterValues[key] : []).LastOrDefault();
-                availableFilters.Add(svf.AsAvailableFilter(key, items, value));
+                var availableFilter = svf.AsAvailableFilter(key, items, value);
+                if (availableFilter.Options.Count > 1)
+                {
+                    availableFilters.Add(availableFilter);
+                }
             }
             else if (filter is ISimilarSchoolsNumericRangeFilter rf)
             {
                 var from = (_filterValues.ContainsKey(key + "_f") ? _filterValues[key + "_f"] : []).LastOrDefault();
                 var to = (_filterValues.ContainsKey(key + "_t") ? _filterValues[key + "_t"] : []).LastOrDefault();
-                availableFilters.Add(rf.AsAvailableFilter(key, items, from, to));
+                var availableFilter = rf.AsAvailableFilter(key, items, from, to);
+                availableFilters.Add(availableFilter);
             }
         }
 

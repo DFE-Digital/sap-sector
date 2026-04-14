@@ -37,8 +37,9 @@ public class GetAttendanceMeasuresTests
             .ReturnsAsync(new Establishment { URN = "123456", LAId = "373" });
 
         repositoryMock
-            .Setup(x => x.GetByUrnAsync("123456", "373"))
+            .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new AbsenceData(
+                "123456",
                 new EstablishmentAbsence
                 {
                     Abs_Tot_Est_Current_Pct = "5.0",
@@ -93,7 +94,7 @@ public class GetAttendanceMeasuresTests
             .ReturnsAsync(new Establishment { URN = "123456" });
 
         repositoryMock
-            .Setup(x => x.GetByUrnAsync("123456", "373"))
+            .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync((AbsenceData?)null);
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object);
@@ -121,8 +122,9 @@ public class GetAttendanceMeasuresTests
             .ReturnsAsync(new Establishment { URN = "123456", LAId = "373" });
 
         repositoryMock
-            .Setup(x => x.GetByUrnAsync("123456", "373"))
+            .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new AbsenceData(
+                "123456",
                 new EstablishmentAbsence
                 {
                     Abs_Tot_Est_Current_Pct = "5.0",

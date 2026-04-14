@@ -1,5 +1,4 @@
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 
@@ -35,11 +34,12 @@ public record SimilarSchool
     public required DataWithAvailability<decimal> EnglishMathsGcseGrade5AndAbovePercentage { get; set; }
     public required DataWithAvailability<decimal> MathsGcseGrade5AndAbovePercentage { get; set; }
     public required DataWithAvailability<decimal> PhysicsGcseGrade5AndAbovePercentage { get; set; }
+    public required DataWithAvailability<decimal> OverallAbsenceRate { get; set; }
+    public required DataWithAvailability<decimal> PersistentAbsenceRate { get; set; }
 
-    public static SimilarSchool FromData(Establishment currentEstab, IEnumerable<Ks4PerformanceData> currentSchoolPerformances)
+
+    public static SimilarSchool FromData(Establishment currentEstab, EstablishmentPerformance? performance, EstablishmentAbsence? absence)
     {
-        var currentSchoolPerformance = currentSchoolPerformances.FirstOrDefault()?.EstablishmentPerformance;
-
         return new SimilarSchool
         {
             URN = currentEstab.URN,
@@ -67,15 +67,17 @@ public record SimilarSchool
             TrustSchoolFlag = new(currentEstab.TrustSchoolFlagId, currentEstab.TrustSchoolFlagName),
             OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
             ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
-            Attainment8Score = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Attainment8_Tot_Est_Current_Num),
-            BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Bio59_Sum_Est_Current_Pct),
-            ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Chem59_Sum_Est_Current_Pct),
-            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.CombSci59_Sum_Est_Current_Pct),
-            EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngLang59_Sum_Est_Current_Pct),
-            EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngLit59_Sum_Est_Current_Pct),
-            EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.EngMaths59_Tot_Est_Current_Pct),
-            MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Maths59_Sum_Est_Current_Pct),
-            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(currentSchoolPerformance?.Physics59_Sum_Est_Current_Pct),
+            Attainment8Score = DataWithAvailability.FromDecimalString(performance?.Attainment8_Tot_Est_Current_Num),
+            BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Bio59_Sum_Est_Current_Pct),
+            ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Chem59_Sum_Est_Current_Pct),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.CombSci59_Sum_Est_Current_Pct),
+            EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngLang59_Sum_Est_Current_Pct),
+            EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngLit59_Sum_Est_Current_Pct),
+            EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngMaths59_Tot_Est_Current_Pct),
+            MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Maths59_Sum_Est_Current_Pct),
+            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Physics59_Sum_Est_Current_Pct),
+            OverallAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Tot_Est_Current_Pct),
+            PersistentAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Persistent_Est_Current_Pct)
         };
     }
 
