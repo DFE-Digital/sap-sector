@@ -80,7 +80,7 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-        if (builder.Environment.EnvironmentName is not "Development" or "IntegrationTests")
+        if (!builder.Environment.IsEnvironment("Development") || !builder.Environment.IsEnvironment("IntegrationTests"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
