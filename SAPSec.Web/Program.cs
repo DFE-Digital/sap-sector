@@ -80,7 +80,7 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-        if (!builder.Environment.IsEnvironment("Development") || !builder.Environment.IsEnvironment("IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not "Development" || builder.Environment.EnvironmentName is not "IntegrationTests")
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -222,7 +222,7 @@ public class Program
         //    app.UseDfeAnalytics();
         //}
 
-        if (!builder.Environment.IsEnvironment("Development") || !builder.Environment.IsEnvironment("IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not "Development" || builder.Environment.EnvironmentName is not "IntegrationTests")
         {
             app.UseDfeAnalytics();
         }
