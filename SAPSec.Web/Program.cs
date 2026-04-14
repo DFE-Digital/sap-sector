@@ -80,7 +80,7 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-        if (!builder.Environment.IsEnvironment("Development") && !builder.Environment.IsEnvironment("IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not ("IntegrationTests" or "Development"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -143,8 +143,6 @@ public class Program
         var app = builder.Build();
 
         var isDevelopment = app.Environment.IsDevelopment();
-
-        var isIntegrationTests = app.Environment.EnvironmentName == "IntegrationTests";
 
         // Set up error handling
         // Note: The order of these lines is important!
@@ -217,12 +215,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck");
 
-        //if (!isDevelopment || !isIntegrationTests)
-        //{
-        //    app.UseDfeAnalytics();
-        //}
-
-        if (!builder.Environment.IsEnvironment("Development") && !builder.Environment.IsEnvironment("IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not ("IntegrationTests" or "Development"))
         {
             app.UseDfeAnalytics();
         }
