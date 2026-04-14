@@ -205,7 +205,7 @@ public class Program
 
         app.UseAuthorization();
 
-        app.MapHealthChecks("/healthcheck");
+        //app.MapHealthChecks("/healthcheck");
 
         app.UseDfeAnalytics();
 
