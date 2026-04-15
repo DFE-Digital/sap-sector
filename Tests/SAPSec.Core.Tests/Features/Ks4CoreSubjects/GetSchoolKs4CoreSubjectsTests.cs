@@ -99,6 +99,52 @@ public class GetSchoolKs4CoreSubjectsTests
     }
 
     [Fact]
+    public async Task Execute_WhenSimilarSchoolUrnsContainDuplicates_BuildsUniqueTopPerformers()
+    {
+        var context = new TestContext();
+        context.SetupCurrentSchoolData(establishment: data =>
+        {
+            data.EngLang49_Sum_Est_Current_Pct = "52";
+            data.EngLang49_Sum_Est_Previous_Pct = "51";
+            data.EngLang49_Sum_Est_Previous2_Pct = "50";
+        });
+
+        context.SetupSimilarSchools(
+            [
+                CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+                {
+                    data.EngLang49_Sum_Est_Current_Pct = "62";
+                    data.EngLang49_Sum_Est_Previous_Pct = "61";
+                    data.EngLang49_Sum_Est_Previous2_Pct = "60";
+                }),
+                CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+                {
+                    data.EngLang49_Sum_Est_Current_Pct = "62";
+                    data.EngLang49_Sum_Est_Previous_Pct = "61";
+                    data.EngLang49_Sum_Est_Previous2_Pct = "60";
+                }),
+                CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+                {
+                    data.EngLang49_Sum_Est_Current_Pct = "58";
+                    data.EngLang49_Sum_Est_Previous_Pct = "57";
+                    data.EngLang49_Sum_Est_Previous2_Pct = "56";
+                }),
+                CreateSimilarSchoolMeasures("400", "Gamma school", establishment: data =>
+                {
+                    data.EngLang49_Sum_Est_Current_Pct = "48";
+                    data.EngLang49_Sum_Est_Previous_Pct = "47";
+                    data.EngLang49_Sum_Est_Previous2_Pct = "46";
+                })
+            ]);
+
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+
+        result.SimilarSchoolsCount.Should().Be(3);
+        subject.TopPerformers.Select(x => x.Urn).Should().Equal("200", "300", "400");
+    }
+
+    [Fact]
     public async Task Execute_EnglishLiteratureGrade4_BuildsYearByYearSeries()
     {
         var context = new TestContext();
@@ -477,19 +523,29 @@ public class GetSchoolKs4CoreSubjectsTests
                 .ReturnsAsync(_currentSchoolData);
         }
 
-        public void SetupSimilarSchools(params SimilarSchoolMeasuresInput[] similarSchools)
+        public void SetupSimilarSchools(params SimilarSchoolMeasuresInput[] similarSchools) =>
+            SetupSimilarSchools((IEnumerable<SimilarSchoolMeasuresInput>)similarSchools);
+
+        public void SetupSimilarSchools(IEnumerable<SimilarSchoolMeasuresInput> similarSchools)
         {
+            var similarSchoolsArray = similarSchools.ToArray();
+
             _similarSchoolsRepositoryMock
                 .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
-                .ReturnsAsync(similarSchools.Select(x => x.Urn).ToArray());
+                .ReturnsAsync(similarSchoolsArray.Select(x => x.Urn).ToArray());
 
             _repositoryMock
                 .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
-                .ReturnsAsync(similarSchools.Select(x => x.Data).ToArray());
+                .ReturnsAsync(similarSchoolsArray
+                    .GroupBy(x => x.Urn, StringComparer.Ordinal)
+                    .Select(x => x.First().Data)
+                    .ToArray());
 
             _establishmentRepositoryMock
                 .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
-                .ReturnsAsync(similarSchools
+                .ReturnsAsync(similarSchoolsArray
+                    .GroupBy(x => x.Urn, StringComparer.Ordinal)
+                    .Select(x => x.First())
                     .Select(x => new Establishment { URN = x.Urn, EstablishmentName = x.Name })
                     .ToArray());
         }

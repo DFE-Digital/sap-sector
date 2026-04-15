@@ -1,6 +1,8 @@
 using FluentAssertions;
 using Moq;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;

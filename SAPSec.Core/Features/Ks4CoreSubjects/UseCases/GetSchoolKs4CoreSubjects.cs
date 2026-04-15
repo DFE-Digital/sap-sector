@@ -17,7 +17,10 @@ public class GetSchoolKs4CoreSubjects(
     {
         var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
         var schoolData = await repository.GetByUrnAsync(request.Urn);
-        var similarSchoolUrns = await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn);
+        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn))
+            .Where(urn => !string.IsNullOrWhiteSpace(urn))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
         var similarSchoolData = ((await repository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
