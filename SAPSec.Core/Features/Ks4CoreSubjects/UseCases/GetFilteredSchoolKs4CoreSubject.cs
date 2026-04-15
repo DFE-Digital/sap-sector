@@ -1,14 +1,15 @@
 namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 
-public class GetFilteredSchoolKs4CoreSubject
+public class GetFilteredSchoolKs4CoreSubject(GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects)
 {
-    public GetFilteredSchoolKs4CoreSubjectResponse Execute(GetFilteredSchoolKs4CoreSubjectRequest request)
+    public async Task<GetFilteredSchoolKs4CoreSubjectResponse> Execute(GetFilteredSchoolKs4CoreSubjectRequest request)
     {
         var gradeFilter = ParseGradeFilter(request.Grade);
         var subjectFilter = ParseSubject(request.Subject);
+        var response = await getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(request.Urn));
 
         return new(
-            SchoolKs4CoreSubjectSelection.From(request.Response, subjectFilter, gradeFilter),
+            SchoolKs4CoreSubjectSelection.From(response, subjectFilter, gradeFilter),
             subjectFilter,
             gradeFilter);
     }
@@ -36,7 +37,7 @@ public class GetFilteredSchoolKs4CoreSubject
 }
 
 public record GetFilteredSchoolKs4CoreSubjectRequest(
-    GetSchoolKs4CoreSubjectsResponse Response,
+    string Urn,
     string? Subject,
     string? Grade);
 

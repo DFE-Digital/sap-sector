@@ -57,11 +57,14 @@ public class SchoolControllerTests
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
+        var getFilteredSchoolKs4CoreSubject = new GetFilteredSchoolKs4CoreSubject(
+            getSchoolKs4CoreSubjects);
 
         _sut = new SchoolController(
             _schoolDetailsServiceMock.Object,
             getSchoolKs4HeadlineMeasures,
             getSchoolKs4CoreSubjects,
+            getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,
             _loggerMock.Object);
     }
