@@ -48,7 +48,9 @@ public class SimilarSchoolsComparisonControllerTests
             _establishmentRepositoryMock.Object,
             _repoMock.Object);
         var filteredKs4CoreSubjectsUseCase = new GetFilteredSchoolKs4CoreSubject(
-            ks4CoreSubjectsUseCase);
+            _ks4PerformanceRepositoryMock.Object,
+            _establishmentRepositoryMock.Object,
+            _repoMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
             _attendanceRepositoryMock.Object,
             _establishmentRepositoryMock.Object);

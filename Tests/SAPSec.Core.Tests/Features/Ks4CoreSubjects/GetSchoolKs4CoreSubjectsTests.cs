@@ -38,20 +38,20 @@ public class GetSchoolKs4CoreSubjectsTests
             });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.EngLang49_Sum_Est_Current_Pct = "62";
                 data.EngLang49_Sum_Est_Previous_Pct = "61";
                 data.EngLang49_Sum_Est_Previous2_Pct = "60";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.EngLang49_Sum_Est_Current_Pct = "58";
                 data.EngLang49_Sum_Est_Previous_Pct = "57";
                 data.EngLang49_Sum_Est_Previous2_Pct = "56";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         result.SimilarSchoolsCount.Should().Be(2);
@@ -70,26 +70,26 @@ public class GetSchoolKs4CoreSubjectsTests
         });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.EngLang49_Sum_Est_Current_Pct = "62";
                 data.EngLang49_Sum_Est_Previous_Pct = "61";
                 data.EngLang49_Sum_Est_Previous2_Pct = "60";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.EngLang49_Sum_Est_Current_Pct = "58";
                 data.EngLang49_Sum_Est_Previous_Pct = "57";
                 data.EngLang49_Sum_Est_Previous2_Pct = "56";
             }),
-            CreateSimilarSchoolMeasures("400", "Gamma school", establishment: data =>
+            CreateSimilarSchoolMeasures("200003", "Gamma school", establishment: data =>
             {
                 data.EngLang49_Sum_Est_Current_Pct = "48";
                 data.EngLang49_Sum_Est_Previous_Pct = "47";
                 data.EngLang49_Sum_Est_Previous2_Pct = "46";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         subject.TopPerformers.Select(x => (x.Rank, x.Name, x.Value)).Should().ContainInOrder(
@@ -111,25 +111,25 @@ public class GetSchoolKs4CoreSubjectsTests
 
         context.SetupSimilarSchools(
             [
-                CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+                CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
                 {
                     data.EngLang49_Sum_Est_Current_Pct = "62";
                     data.EngLang49_Sum_Est_Previous_Pct = "61";
                     data.EngLang49_Sum_Est_Previous2_Pct = "60";
                 }),
-                CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+                CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
                 {
                     data.EngLang49_Sum_Est_Current_Pct = "62";
                     data.EngLang49_Sum_Est_Previous_Pct = "61";
                     data.EngLang49_Sum_Est_Previous2_Pct = "60";
                 }),
-                CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+                CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
                 {
                     data.EngLang49_Sum_Est_Current_Pct = "58";
                     data.EngLang49_Sum_Est_Previous_Pct = "57";
                     data.EngLang49_Sum_Est_Previous2_Pct = "56";
                 }),
-                CreateSimilarSchoolMeasures("400", "Gamma school", establishment: data =>
+                CreateSimilarSchoolMeasures("200003", "Gamma school", establishment: data =>
                 {
                     data.EngLang49_Sum_Est_Current_Pct = "48";
                     data.EngLang49_Sum_Est_Previous_Pct = "47";
@@ -137,11 +137,11 @@ public class GetSchoolKs4CoreSubjectsTests
                 })
             ]);
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         result.SimilarSchoolsCount.Should().Be(3);
-        subject.TopPerformers.Select(x => x.Urn).Should().Equal("200", "300", "400");
+        subject.TopPerformers.Select(x => x.Urn).Should().Equal("200001", "200002", "200003");
     }
 
     [Fact]
@@ -169,20 +169,20 @@ public class GetSchoolKs4CoreSubjectsTests
             });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.EngLit49_Sum_Est_Current_Pct = "64";
                 data.EngLit49_Sum_Est_Previous_Pct = "63";
                 data.EngLit49_Sum_Est_Previous2_Pct = "62";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.EngLit49_Sum_Est_Current_Pct = "60";
                 data.EngLit49_Sum_Est_Previous_Pct = "59";
                 data.EngLit49_Sum_Est_Previous2_Pct = "58";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLiterature, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         subject.YearByYear.Should().BeEquivalentTo(new SchoolKs4ComparisonYearByYear(
@@ -217,20 +217,20 @@ public class GetSchoolKs4CoreSubjectsTests
             });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.CombSci49_Sum_Est_Current_Pct = "66";
                 data.CombSci49_Sum_Est_Previous_Pct = "65";
                 data.CombSci49_Sum_Est_Previous2_Pct = "64";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.CombSci49_Sum_Est_Current_Pct = "62";
                 data.CombSci49_Sum_Est_Previous_Pct = "61";
                 data.CombSci49_Sum_Est_Previous2_Pct = "60";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(47m, 63m, 56m, 57m));
@@ -261,20 +261,20 @@ public class GetSchoolKs4CoreSubjectsTests
             });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.Bio59_Sum_Est_Current_Pct = "75";
                 data.Bio59_Sum_Est_Previous_Pct = "74";
                 data.Bio59_Sum_Est_Previous2_Pct = "73";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.Bio59_Sum_Est_Current_Pct = "69";
                 data.Bio59_Sum_Est_Previous_Pct = "68";
                 data.Bio59_Sum_Est_Previous2_Pct = "67";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Biology, SchoolKs4CoreSubjectGradeFilter.Grade5);
 
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(44m, 71m, 54m, 64m));
@@ -305,20 +305,20 @@ public class GetSchoolKs4CoreSubjectsTests
             });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.Chem59_Sum_Est_Current_Pct = "66";
                 data.Chem59_Sum_Est_Previous_Pct = "65";
                 data.Chem59_Sum_Est_Previous2_Pct = "64";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.Chem59_Sum_Est_Current_Pct = "62";
                 data.Chem59_Sum_Est_Previous_Pct = "61";
                 data.Chem59_Sum_Est_Previous2_Pct = "60";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Chemistry, SchoolKs4CoreSubjectGradeFilter.Grade5);
 
         subject.YearByYear.Should().BeEquivalentTo(new SchoolKs4ComparisonYearByYear(
@@ -340,26 +340,26 @@ public class GetSchoolKs4CoreSubjectsTests
         });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.Physics79_Sum_Est_Current_Pct = "86";
                 data.Physics79_Sum_Est_Previous_Pct = "85";
                 data.Physics79_Sum_Est_Previous2_Pct = "84";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.Physics79_Sum_Est_Current_Pct = "80";
                 data.Physics79_Sum_Est_Previous_Pct = "79";
                 data.Physics79_Sum_Est_Previous2_Pct = "78";
             }),
-            CreateSimilarSchoolMeasures("400", "Gamma school", establishment: data =>
+            CreateSimilarSchoolMeasures("200003", "Gamma school", establishment: data =>
             {
                 data.Physics79_Sum_Est_Current_Pct = "74";
                 data.Physics79_Sum_Est_Previous_Pct = "73";
                 data.Physics79_Sum_Est_Previous2_Pct = "72";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Physics, SchoolKs4CoreSubjectGradeFilter.Grade7);
 
         subject.TopPerformers.Select(x => (x.Rank, x.Name, x.Value)).Should().ContainInOrder(
@@ -393,20 +393,20 @@ public class GetSchoolKs4CoreSubjectsTests
             });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.Maths79_Sum_Est_Current_Pct = "89";
                 data.Maths79_Sum_Est_Previous_Pct = "88";
                 data.Maths79_Sum_Est_Previous2_Pct = "87";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.Maths79_Sum_Est_Current_Pct = "83";
                 data.Maths79_Sum_Est_Previous_Pct = "82";
                 data.Maths79_Sum_Est_Previous2_Pct = "81";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade7);
 
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(76m, 85m, 86m, 96m));
@@ -437,20 +437,20 @@ public class GetSchoolKs4CoreSubjectsTests
             });
 
         context.SetupSimilarSchools(
-            CreateSimilarSchoolMeasures("200", "Alpha school", establishment: data =>
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
             {
                 data.CombSci79_Sum_Est_Current_Pct = "88";
                 data.CombSci79_Sum_Est_Previous_Pct = "87";
                 data.CombSci79_Sum_Est_Previous2_Pct = "86";
             }),
-            CreateSimilarSchoolMeasures("300", "Beta school", establishment: data =>
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
             {
                 data.CombSci79_Sum_Est_Current_Pct = "84";
                 data.CombSci79_Sum_Est_Previous_Pct = "83";
                 data.CombSci79_Sum_Est_Previous2_Pct = "82";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100"));
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade7);
 
         subject.YearByYear.Should().BeEquivalentTo(new SchoolKs4ComparisonYearByYear(
@@ -496,13 +496,13 @@ public class GetSchoolKs4CoreSubjectsTests
         private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
         private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
         private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
-        private Ks4PerformanceData _currentSchoolData = CreateMeasures("100");
+        private Ks4PerformanceData _currentSchoolData = CreateMeasures("100001");
 
         public TestContext()
         {
             _schoolDetailsServiceMock
-                .Setup(x => x.GetByUrnAsync("100"))
-                .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
+                .Setup(x => x.GetByUrnAsync("100001"))
+                .ReturnsAsync(CreateSchoolDetails("100001", "Current school"));
         }
 
         public GetSchoolKs4CoreSubjects Sut => new(
@@ -516,10 +516,10 @@ public class GetSchoolKs4CoreSubjectsTests
             Action<LAPerformance>? localAuthority = null,
             Action<EnglandPerformance>? england = null)
         {
-            _currentSchoolData = CreateMeasures("100", establishment, localAuthority, england);
+            _currentSchoolData = CreateMeasures("100001", establishment, localAuthority, england);
 
             _repositoryMock
-                .Setup(x => x.GetByUrnAsync("100"))
+                .Setup(x => x.GetByUrnAsync("100001"))
                 .ReturnsAsync(_currentSchoolData);
         }
 
@@ -531,7 +531,7 @@ public class GetSchoolKs4CoreSubjectsTests
             var similarSchoolsArray = similarSchools.ToArray();
 
             _similarSchoolsRepositoryMock
-                .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
+                .Setup(x => x.GetSimilarSchoolUrnsAsync("100001"))
                 .ReturnsAsync(similarSchoolsArray.Select(x => x.Urn).ToArray());
 
             _repositoryMock

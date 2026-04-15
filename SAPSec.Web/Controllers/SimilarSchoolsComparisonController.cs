@@ -342,8 +342,18 @@ public class SimilarSchoolsComparisonController : Controller
             return BadRequest(new { error = "Missing route parameters." });
         }
 
-        var thisSchoolFilteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(urn, subject, grade));
-        var selectedSchoolFilteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(similarSchoolUrn, subject, grade));
+        GetFilteredSchoolKs4CoreSubjectResponse thisSchoolFilteredSubject;
+        GetFilteredSchoolKs4CoreSubjectResponse selectedSchoolFilteredSubject;
+        try
+        {
+            thisSchoolFilteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(urn, subject, grade));
+            selectedSchoolFilteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(similarSchoolUrn, subject, grade));
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return BadRequest(new { error = "Invalid KS4 core subjects filter." });
+        }
+
         var thisSchoolSubject = thisSchoolFilteredSubject.Selection;
         var selectedSchoolSubject = selectedSchoolFilteredSubject.Selection;
 

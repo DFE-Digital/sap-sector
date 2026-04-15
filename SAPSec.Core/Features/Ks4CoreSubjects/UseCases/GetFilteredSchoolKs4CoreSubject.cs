@@ -1,39 +1,42 @@
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Interfaces.Repositories;
+
 namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 
-public class GetFilteredSchoolKs4CoreSubject(GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects)
+public class GetFilteredSchoolKs4CoreSubject(
+    IKs4PerformanceRepository repository,
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
 {
     public async Task<GetFilteredSchoolKs4CoreSubjectResponse> Execute(GetFilteredSchoolKs4CoreSubjectRequest request)
     {
-        var gradeFilter = ParseGradeFilter(request.Grade);
-        var subjectFilter = ParseSubject(request.Subject);
-        var response = await getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(request.Urn));
+        var gradeFilter = SchoolKs4CoreSubjectExtensions.ParseFilter(request.Grade);
+        var subjectFilter = SchoolKs4CoreSubjectExtensions.ParseSubject(request.Subject);
+        var schoolData = await repository.GetByUrnAsync(request.Urn);
+        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn))
+            .Where(urn => !string.IsNullOrWhiteSpace(urn))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var similarSchoolData = ((await repository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
+            .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
+        var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
+                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
+            .Where(x => !string.IsNullOrWhiteSpace(x.URN))
+            .ToDictionary(x => x.URN, StringComparer.Ordinal);
+        var similarSchools = similarSchoolUrns
+            .Where(similarSchoolDetails.ContainsKey)
+            .Select(urn => new SimilarSchoolMeasure(
+                urn,
+                similarSchoolDetails[urn].EstablishmentName,
+                similarSchoolData.GetValueOrDefault(urn)))
+            .ToArray();
 
         return new(
-            SchoolKs4CoreSubjectSelection.From(response, subjectFilter, gradeFilter),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, subjectFilter, gradeFilter),
             subjectFilter,
             gradeFilter);
     }
-
-    private static SchoolKs4CoreSubjectGradeFilter ParseGradeFilter(string? grade) =>
-        grade switch
-        {
-            "5" => SchoolKs4CoreSubjectGradeFilter.Grade5,
-            "7" => SchoolKs4CoreSubjectGradeFilter.Grade7,
-            _ => SchoolKs4CoreSubjectGradeFilter.Grade4
-        };
-
-    private static SchoolKs4CoreSubject ParseSubject(string? subject) =>
-        subject?.ToLowerInvariant() switch
-        {
-            "english-literature" => SchoolKs4CoreSubject.EnglishLiterature,
-            "biology" => SchoolKs4CoreSubject.Biology,
-            "chemistry" => SchoolKs4CoreSubject.Chemistry,
-            "physics" => SchoolKs4CoreSubject.Physics,
-            "maths" => SchoolKs4CoreSubject.Maths,
-            "combined-science-double-award" => SchoolKs4CoreSubject.CombinedScienceDoubleAward,
-            _ => SchoolKs4CoreSubject.EnglishLanguage
-        };
-
 }
 
 public record GetFilteredSchoolKs4CoreSubjectRequest(

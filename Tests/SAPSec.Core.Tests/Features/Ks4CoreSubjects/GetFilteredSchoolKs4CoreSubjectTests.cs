@@ -4,7 +4,6 @@ using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 
@@ -13,21 +12,25 @@ namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;
 public class GetFilteredSchoolKs4CoreSubjectTests
 {
     [Fact]
-    public async Task Execute_NormalizesUnknownValuesToEnglishLanguageGrade4()
+    public async Task Execute_WithUnsupportedSubject_ThrowsArgumentOutOfRangeException()
     {
         var context = new TestContext();
-        context.SetupCurrentSchoolData(establishment: data =>
-        {
-            data.EngLang49_Sum_Est_Current_Pct = "52";
-            data.EngLang49_Sum_Est_Previous_Pct = "51";
-            data.EngLang49_Sum_Est_Previous2_Pct = "50";
-        });
 
-        var result = await context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100", "unknown-subject", "99"));
+        var act = () => context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100", "unknown-subject", "4"));
 
-        result.Subject.Should().Be(SchoolKs4CoreSubject.EnglishLanguage);
-        result.Grade.Should().Be(SchoolKs4CoreSubjectGradeFilter.Grade4);
-        result.Selection.ThreeYearAverage.SchoolValue.Should().Be(51m);
+        await act.Should().ThrowAsync<ArgumentOutOfRangeException>()
+            .WithParameterName("subject");
+    }
+
+    [Fact]
+    public async Task Execute_WithUnsupportedGrade_ThrowsArgumentOutOfRangeException()
+    {
+        var context = new TestContext();
+
+        var act = () => context.Sut.Execute(new GetFilteredSchoolKs4CoreSubjectRequest("100", "english-language", "99"));
+
+        await act.Should().ThrowAsync<ArgumentOutOfRangeException>()
+            .WithParameterName("grade");
     }
 
     [Fact]
@@ -53,15 +56,11 @@ public class GetFilteredSchoolKs4CoreSubjectTests
     private sealed class TestContext
     {
         private readonly Mock<IKs4PerformanceRepository> _repositoryMock = new();
-        private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
         private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
         private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
 
         public TestContext()
         {
-            _schoolDetailsServiceMock
-                .Setup(x => x.GetByUrnAsync("100"))
-                .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
             _similarSchoolsRepositoryMock
                 .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
                 .ReturnsAsync(Array.Empty<string>());
@@ -73,11 +72,10 @@ public class GetFilteredSchoolKs4CoreSubjectTests
                 .ReturnsAsync(Array.Empty<Establishment>());
         }
 
-        public GetFilteredSchoolKs4CoreSubject Sut => new(new GetSchoolKs4CoreSubjects(
+        public GetFilteredSchoolKs4CoreSubject Sut => new(
             _repositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object));
+            _similarSchoolsRepositoryMock.Object);
 
         public void SetupCurrentSchoolData(Action<EstablishmentPerformance>? establishment = null)
         {
@@ -89,36 +87,4 @@ public class GetFilteredSchoolKs4CoreSubjectTests
                 .ReturnsAsync(new Ks4PerformanceData("100", establishmentPerformance, new LAPerformance(), new EnglandPerformance()));
         }
     }
-
-    private static SchoolDetails CreateSchoolDetails(string urn, string name) =>
-        new()
-        {
-            Urn = urn,
-            Name = name,
-            DfENumber = DataWithAvailability.Available("001/1234"),
-            Ukprn = DataWithAvailability.Available("10000000"),
-            Address = DataWithAvailability.Available("Test Address"),
-            LocalAuthorityName = DataWithAvailability.Available("Test LA"),
-            LocalAuthorityCode = DataWithAvailability.Available("001"),
-            Region = DataWithAvailability.Available("Test Region"),
-            UrbanRuralDescription = DataWithAvailability.Available("Urban"),
-            AgeRangeLow = DataWithAvailability.Available(11),
-            AgeRangeHigh = DataWithAvailability.Available(16),
-            GenderOfEntry = DataWithAvailability.Available("Mixed"),
-            PhaseOfEducation = DataWithAvailability.Available("Secondary"),
-            SchoolType = DataWithAvailability.Available("Academy"),
-            AdmissionsPolicy = DataWithAvailability.Available("Not selective"),
-            ReligiousCharacter = DataWithAvailability.Available("None"),
-            GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
-            AcademyTrustName = DataWithAvailability.Available("Test Trust"),
-            AcademyTrustId = DataWithAvailability.Available("5000"),
-            HasNurseryProvision = DataWithAvailability.Available(false),
-            HasSixthForm = DataWithAvailability.Available(false),
-            HasSenUnit = DataWithAvailability.Available(false),
-            HasResourcedProvision = DataWithAvailability.Available(false),
-            HeadteacherName = DataWithAvailability.Available("Head Teacher"),
-            Website = DataWithAvailability.Available("https://example.test"),
-            Telephone = DataWithAvailability.Available("0123456789"),
-            Email = DataWithAvailability.NotAvailable<string>()
-        };
 }

@@ -323,7 +323,16 @@ public class SchoolController : Controller
     [Route("ks4-core-subjects/data")]
     public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string subject = "english-language", string grade = "4")
     {
-        var filteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(urn, subject, grade));
+        GetFilteredSchoolKs4CoreSubjectResponse filteredSubject;
+        try
+        {
+            filteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(urn, subject, grade));
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return BadRequest(new { error = "Invalid KS4 core subjects filter." });
+        }
+
         var selectedSubject = filteredSubject.Selection;
 
         return Json(new
