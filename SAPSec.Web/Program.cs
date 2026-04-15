@@ -86,7 +86,7 @@ public class Program
             {
                 options.RequestFilter = ctx =>
                     ctx.Request.Path != "/healthcheck";
-                options.UserIdClaimType = ClaimTypes.NameIdentifier;
+                options.UserIdClaimType = ClaimTypes.Email;
             });
         //}
 
