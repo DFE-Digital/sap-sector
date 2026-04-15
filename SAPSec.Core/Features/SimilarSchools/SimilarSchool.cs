@@ -1,5 +1,6 @@
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Features.SimilarSchools;
 
@@ -33,4 +34,51 @@ public record SimilarSchool
     public required DataWithAvailability<decimal> EnglishMathsGcseGrade5AndAbovePercentage { get; set; }
     public required DataWithAvailability<decimal> MathsGcseGrade5AndAbovePercentage { get; set; }
     public required DataWithAvailability<decimal> PhysicsGcseGrade5AndAbovePercentage { get; set; }
+    public required DataWithAvailability<decimal> OverallAbsenceRate { get; set; }
+    public required DataWithAvailability<decimal> PersistentAbsenceRate { get; set; }
+
+
+    public static SimilarSchool FromData(Establishment currentEstab, EstablishmentPerformance? performance, EstablishmentAbsence? absence)
+    {
+        return new SimilarSchool
+        {
+            URN = currentEstab.URN,
+            Name = currentEstab.EstablishmentName,
+            Address = new Address
+            {
+                Street = currentEstab.Street,
+                Locality = currentEstab.Locality,
+                Address3 = currentEstab.Address3,
+                Town = currentEstab.Town,
+                Postcode = currentEstab.Postcode
+            },
+            TotalCapacity = currentEstab.TotalCapacity,
+            TotalPupils = currentEstab.TotalPupils,
+            NurseryProvisionName = currentEstab.NurseryProvisionName,
+            Coordinates = BNGCoordinates.TryParse(currentEstab.Easting, currentEstab.Northing, out var coords) ? coords : null,
+            LocalAuthority = new(currentEstab.LAId, currentEstab.LAName),
+            UrbanRural = new(currentEstab.UrbanRuralId, currentEstab.UrbanRuralName),
+            Region = new(currentEstab.RegionId, currentEstab.RegionName),
+            AdmissionsPolicy = new(currentEstab.AdmissionsPolicyId, currentEstab.AdmissionsPolicyName),
+            PhaseOfEducation = new(currentEstab.PhaseOfEducationId, currentEstab.PhaseOfEducationName),
+            Gender = new(currentEstab.GenderId, currentEstab.GenderName),
+            TypeOfEstablishment = new(currentEstab.TypeOfEstablishmentId, currentEstab.TypeOfEstablishmentName),
+            EstablishmentTypeGroup = new(currentEstab.EstablishmentTypeGroupId, currentEstab.EstablishmentTypeGroupName),
+            TrustSchoolFlag = new(currentEstab.TrustSchoolFlagId, currentEstab.TrustSchoolFlagName),
+            OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
+            ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
+            Attainment8Score = DataWithAvailability.FromDecimalString(performance?.Attainment8_Tot_Est_Current_Num),
+            BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Bio59_Sum_Est_Current_Pct),
+            ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Chem59_Sum_Est_Current_Pct),
+            CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.CombSci59_Sum_Est_Current_Pct),
+            EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngLang59_Sum_Est_Current_Pct),
+            EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngLit59_Sum_Est_Current_Pct),
+            EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngMaths59_Tot_Est_Current_Pct),
+            MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Maths59_Sum_Est_Current_Pct),
+            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Physics59_Sum_Est_Current_Pct),
+            OverallAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Tot_Est_Current_Pct),
+            PersistentAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Persistent_Est_Current_Pct)
+        };
+    }
+
 }

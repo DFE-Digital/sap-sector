@@ -38,3 +38,61 @@ public class SimilarSchoolsSchoolCapacityInUseFilter(SimilarSchool currentSchool
             ? (school.TotalPupils / school.TotalCapacity) * 100.0M
             : null;
 }
+
+public class SimilarSchoolsOverallAbsenceRateFilter(SimilarSchool currentSchool) : ISimilarSchoolsNumericRangeFilter
+{
+    public string Name => "Overall absence rate";
+    public FilterType Type => FilterType.NumericRange;
+
+    public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, string? from, string? to)
+    {
+        var minValue = !string.IsNullOrWhiteSpace(from) && decimal.TryParse(from, out decimal f) ? DataWithAvailability.Available(f) : DataWithAvailability.NotAvailable<decimal>();
+        var maxValue = DataWithAvailability.Available(!string.IsNullOrWhiteSpace(to) && decimal.TryParse(to, out decimal t) ? t : decimal.MaxValue);
+
+        return items
+            .Where(i => minValue <= i.PersistentAbsenceRate && i.PersistentAbsenceRate <= maxValue);
+    }
+
+    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, string? from, string? to) => new(
+        key,
+        Name,
+        Type,
+        [],
+        CalculateCapacityInUse(currentSchool) is decimal c
+            ? DataWithAvailability.Available($"{c}%")
+            : DataWithAvailability.NotAvailable<string>());
+
+    private decimal? CalculateCapacityInUse(SimilarSchool school) =>
+        school.TotalPupils is not null && school.TotalCapacity is not null
+            ? (school.TotalPupils / school.TotalCapacity) * 100.0M
+            : null;
+}
+
+public class SimilarSchoolsPersistentAbsenceRateFilter(SimilarSchool currentSchool) : ISimilarSchoolsNumericRangeFilter
+{
+    public string Name => "Persistent absence rate";
+    public FilterType Type => FilterType.NumericRange;
+
+    public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, string? from, string? to)
+    {
+        var minValue = !string.IsNullOrWhiteSpace(from) && decimal.TryParse(from, out decimal f) ? DataWithAvailability.Available(f) : DataWithAvailability.NotAvailable<decimal>();
+        var maxValue = DataWithAvailability.Available(!string.IsNullOrWhiteSpace(to) && decimal.TryParse(to, out decimal t) ? t : decimal.MaxValue);
+
+        return items
+            .Where(i => minValue <= i.OverallAbsenceRate && i.OverallAbsenceRate <= maxValue);
+    }
+
+    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, string? from, string? to) => new(
+        key,
+        Name,
+        Type,
+        [],
+        CalculateCapacityInUse(currentSchool) is decimal c
+            ? DataWithAvailability.Available($"{c}%")
+            : DataWithAvailability.NotAvailable<string>());
+
+    private decimal? CalculateCapacityInUse(SimilarSchool school) =>
+        school.TotalPupils is not null && school.TotalCapacity is not null
+            ? (school.TotalPupils / school.TotalCapacity) * 100.0M
+            : null;
+}

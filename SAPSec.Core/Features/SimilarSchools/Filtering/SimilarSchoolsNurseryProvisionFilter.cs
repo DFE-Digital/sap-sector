@@ -16,7 +16,7 @@ public class SimilarSchoolsNurseryProvisionFilter(SimilarSchool currentSchool) :
             return items;
         }
 
-        return items.Where(i => values.Contains(i.NurseryProvisionName));
+        return items.Where(i => values.Contains(i.NurseryProvisionName, StringComparer.OrdinalIgnoreCase));
     }
 
     public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
@@ -30,8 +30,8 @@ public class SimilarSchoolsNurseryProvisionFilter(SimilarSchool currentSchool) :
         items.GroupBy(i => new { i.NurseryProvisionName })
             .Where(f => !string.IsNullOrWhiteSpace(f.Key.NurseryProvisionName))
             .Select(g => new FilterOption(
-                g.Key.NurseryProvisionName,
+                   g.Key.NurseryProvisionName,
                 g.Key.NurseryProvisionName,
                 g.Count(),
-                values.Contains(g.Key.NurseryProvisionName)));
+                values.Contains(g.Key.NurseryProvisionName, StringComparer.OrdinalIgnoreCase)));
 }

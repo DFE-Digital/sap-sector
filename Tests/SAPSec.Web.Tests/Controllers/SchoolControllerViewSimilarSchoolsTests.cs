@@ -3,9 +3,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
@@ -17,6 +20,9 @@ public class SimilarSchoolsControllerTests
 {
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepoMock;
+    private readonly Mock<IEstablishmentRepository> _establishmentRepo;
+    private readonly Mock<IKs4PerformanceRepository> _performanceRepo;
+    private readonly Mock<IAbsenceRepository> _absenceRepo;
     private readonly Mock<ILogger<SimilarSchoolsController>> _loggerMock;
     private readonly SimilarSchoolsController _sut;
 
@@ -24,8 +30,17 @@ public class SimilarSchoolsControllerTests
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
         _similarSchoolsRepoMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        _establishmentRepo = new Mock<IEstablishmentRepository>();
+        _performanceRepo = new Mock<IKs4PerformanceRepository>();
+        _absenceRepo = new Mock<IAbsenceRepository>();
         _loggerMock = new Mock<ILogger<SimilarSchoolsController>>();
-        _sut = new SimilarSchoolsController(_schoolDetailsServiceMock.Object, new FindSimilarSchools(_similarSchoolsRepoMock.Object), _loggerMock.Object);
+        _sut = new SimilarSchoolsController(_schoolDetailsServiceMock.Object,
+            new FindSimilarSchools(
+                _establishmentRepo.Object,
+                _similarSchoolsRepoMock.Object,
+                _performanceRepo.Object,
+                _absenceRepo.Object),
+            _loggerMock.Object);
         _sut.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()
@@ -200,9 +215,9 @@ public class SimilarSchoolsControllerTests
             similarSchools.Add(CreateSimilarSchool(urn, $"Similar {i + 1}", urbanId, urbanName));
         }
 
-        _similarSchoolsRepoMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
-            .ReturnsAsync((currentSchool, similarSchools));
+        //_similarSchoolsRepoMock
+        //    .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+        //    .ReturnsAsync((currentSchool, similarSchools));
     }
 
     private static SimilarSchool CreateSimilarSchool(string urn, string name, string urbanId, string urbanName)
@@ -242,7 +257,9 @@ public class SimilarSchoolsControllerTests
             EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             MathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
-            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m)
+            PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
+            OverallAbsenceRate = DataWithAvailability.Available(0m),
+            PersistentAbsenceRate = DataWithAvailability.Available(0m)
         };
     }
 }
