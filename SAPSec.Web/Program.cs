@@ -18,7 +18,6 @@ using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
-using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
