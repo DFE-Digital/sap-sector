@@ -80,14 +80,14 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
-        {
+       // if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        //{
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
                 options.RequestFilter = ctx =>
                     ctx.Request.Path != "/healthcheck";
             });
-        }
+        //}
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -215,10 +215,10 @@ public class Program
 
         app.MapHealthChecks("/healthcheck");
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
-        {
+        //if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        //{
             app.UseDfeAnalytics();
-        }
+        //}
 
         app.MapControllers();
         app.MapRazorPages();
