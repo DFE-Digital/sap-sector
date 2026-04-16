@@ -1,0 +1,53 @@
+using FluentAssertions;
+using Microsoft.Playwright;
+using SAPSec.UI.Tests.Infrastructure;
+using Xunit;
+
+namespace SAPSec.UI.Tests;
+
+[Collection("UITestsCollection")]
+public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
+{
+    private const string PagePath = "/school/105574/ks4-core-subjects";
+
+    [Fact]
+    public async Task Ks4CoreSubjects_LoadsEnglishLanguagePage()
+    {
+        var response = await Page.GotoAsync(PagePath);
+
+        response.Should().NotBeNull();
+        response!.Status.Should().Be(200);
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "KS4 core subject GCSE results" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "English language" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "English literature" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Biology" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Chemistry" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Physics" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Mathematics" })).ToBeVisibleAsync();
+        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Combined science (double award)" })).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjects_ShowsGradeFilterAndActiveNavigation()
+    {
+        await Page.GotoAsync(PagePath);
+
+        await Expect(Page.Locator("#englishLanguageGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#englishLiteratureGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#biologyGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#chemistryGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#physicsGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#mathsGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#combinedScienceGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator(".app-side-navigation__item--selected").GetByText("KS4 core subjects")).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjects_ThreeYearBarChartsUseWholePercentLabels()
+    {
+        await Page.GotoAsync(PagePath);
+
+        var charts = Page.Locator("canvas.js-chart--school-ks4-bar[data-label-decimals='0']");
+        await Expect(charts).ToHaveCountAsync(7);
+    }
+}
