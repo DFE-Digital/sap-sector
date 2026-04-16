@@ -3,7 +3,11 @@ namespace SAPSec.Web.Configuration;
 public class AnalyticsSettings
 {
     public string? GoogleTagManagerId { get; set; }
+    public Dictionary<string, string>? GoogleTagManagerIds { get; set; }
     public string? GoogleTagManagerAuth { get; set; }
+    public Dictionary<string, string>? GoogleTagManagerAuths { get; set; }
     public string? GoogleTagManagerPreview { get; set; }
+    public Dictionary<string, string>? GoogleTagManagerPreviews { get; set; }
     public string? ClarityId { get; set; }
+    public Dictionary<string, string>? ClarityIds { get; set; }
 }
