@@ -37,10 +37,25 @@ public class Program
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            });
+        });
 
         builder.Services.AddRazorPages();
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
+        builder.Services.PostConfigure<AnalyticsSettings>(options =>
+        {
+            var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
+            var analyticsEnvironment = IsProductionEnvironment(environmentName) ? "production" : "test";
+
+            if (options.GoogleMeasurementIds?.TryGetValue(analyticsEnvironment, out var googleMeasurementId) == true)
+            {
+                options.GoogleMeasurementId = googleMeasurementId;
+            }
+
+            if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
+            {
+                options.ClarityId = clarityId;
+            }
+        });
 
         builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
         {
@@ -211,5 +226,17 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
         app.Run();
+    }
+
+    private static bool IsProductionEnvironment(string? environmentName)
+    {
+        if (string.IsNullOrWhiteSpace(environmentName))
+        {
+            return false;
+        }
+
+        return environmentName.Equals("production", StringComparison.OrdinalIgnoreCase)
+               || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
+               || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
 }
