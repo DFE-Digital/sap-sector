@@ -5,6 +5,7 @@ using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;
 
@@ -34,7 +35,8 @@ public class SchoolSearchController(
                 return View(searchQueryViewModel);
             }
 
-            if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
+            var schoolNumber = SchoolNumberFrom(searchQueryViewModel);
+            if (string.IsNullOrWhiteSpace(schoolNumber))
             {
                 var routeValues = BuildSearchRouteValues(
                     searchQueryViewModel.Query,
@@ -43,7 +45,7 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
+            var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
@@ -72,6 +74,15 @@ public class SchoolSearchController(
         using (logger.BeginScope(new { query, secondaryOnly = applySecondaryOnly, similarSchoolsOnly = applySimilarSchoolsOnly, page }))
         {
             if (page < 1) page = 1;
+
+            if (IsSchoolNumberCandidate(query))
+            {
+                var school = await _searchService.SearchByNumberAsync(query!.Trim());
+                if (!string.IsNullOrWhiteSpace(school?.URN))
+                {
+                    return RedirectToAction("Index", "School", new { urn = school.URN });
+                }
+            }
 
             var results = await _searchService.SearchAsync(query ?? string.Empty);
 
@@ -211,7 +222,8 @@ public class SchoolSearchController(
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
+            var schoolNumber = SchoolNumberFrom(searchQueryViewModel);
+            if (string.IsNullOrWhiteSpace(schoolNumber))
             {
                 var routeValues = BuildSearchRouteValues(
                     searchQueryViewModel.Query,
@@ -220,7 +232,7 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
+            var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
@@ -268,6 +280,17 @@ public class SchoolSearchController(
 
         return routeValues;
     }
+
+    private static string? SchoolNumberFrom(SchoolSearchQueryViewModel searchQueryViewModel) =>
+        !string.IsNullOrWhiteSpace(searchQueryViewModel.Urn)
+            ? searchQueryViewModel.Urn.Trim()
+            : IsSchoolNumberCandidate(searchQueryViewModel.Query)
+                ? searchQueryViewModel.Query.Trim()
+                : null;
+
+    private static bool IsSchoolNumberCandidate(string? value) =>
+        !string.IsNullOrWhiteSpace(value) &&
+        Regex.IsMatch(value.Trim(), @"^(\d+|\d+[\\/]\d+)$");
 
     private async Task<bool> HasSimilarSchoolsAsync(string urn)
     {

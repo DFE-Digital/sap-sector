@@ -72,18 +72,16 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
 
         using var conn = await _factory.Create().OpenConnectionAsync();
 
-        int? ukprn = int.TryParse(number, out var k) ? k : null;
-
-        //Missing Field "DfENumberSearchable" in database
         const string sql = """
             SELECT *
             FROM public.v_establishment
             WHERE "URN" = @number
-                OR (@ukprn IS NOT NULL AND "UKPRN" = @ukprn)
+                OR "UKPRN" = @number
+                OR CONCAT("LAId", "EstablishmentNumber") = @number
             LIMIT 1;
         """;
 
-        var result = await conn.QuerySingleOrDefaultAsync<Establishment>(sql, new { number, ukprn });
+        var result = await conn.QuerySingleOrDefaultAsync<Establishment>(sql, new { number });
 
         return result;
     }
