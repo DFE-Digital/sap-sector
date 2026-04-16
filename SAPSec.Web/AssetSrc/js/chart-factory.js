@@ -150,7 +150,24 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisSuffix, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function getBarLabelAlignment(value, barLabelAlign) {
+        if (barLabelAlign) {
+            return barLabelAlign;
+        }
+
+        return value < CHART_CONFIG.bar.datalabels.alignThreshold
+            ? CHART_CONFIG.bar.datalabels.smallValueAlign
+            : CHART_CONFIG.bar.datalabels.defaultAlign;
+    }
+
+    function getBarLabelColor(value, gdsStyles, barLabelAlign) {
+        const align = getBarLabelAlignment(value, barLabelAlign);
+        return align === CHART_CONFIG.bar.datalabels.defaultAlign
+            ? gdsStyles.onBarLabel
+            : gdsStyles.text;
+    }
+
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -161,6 +178,8 @@
             family: gdsStyles.fontFamily,
             size: gdsStyles.fontSize
         };
+
+        const stepSize = axisStep;
 
         const legendOptions = {
             display: showLegend,
@@ -186,6 +205,7 @@
                 scales: {
                     y: {
                         beginAtZero: true,
+                        max: axisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         grid: {
                             display: true,
@@ -201,6 +221,7 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -255,6 +276,7 @@
                 scales: {
                     x: {
                         beginAtZero: true,
+                        max: axisMax ?? undefined,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -269,6 +291,7 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -297,11 +320,13 @@
                     },
                     datalabels: {
                         anchor: CHART_CONFIG.bar.datalabels.anchor,
-                        align: barLabelAlign || (ctx => ctx.dataset.data[ctx.dataIndex] < CHART_CONFIG.bar.datalabels.alignThreshold
-                            ? CHART_CONFIG.bar.datalabels.smallValueAlign
-                            : CHART_CONFIG.bar.datalabels.defaultAlign),
+                        align: function (ctx) {
+                            return getBarLabelAlignment(ctx.dataset.data[ctx.dataIndex], barLabelAlign);
+                        },
                         offset: CHART_CONFIG.bar.datalabels.offset,
-                        color: () => gdsStyles.onBarLabel,
+                        color: function (ctx) {
+                            return getBarLabelColor(ctx.dataset.data[ctx.dataIndex], gdsStyles, barLabelAlign);
+                        },
                         font: {
                             ...fonts,
                             weight: CHART_CONFIG.bar.datalabels.fontWeight
@@ -437,6 +462,12 @@
             const showLegend = canvas.dataset.showLegend === "true";
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
+            const axisStep = canvas.dataset.axisStep
+                ? parseInt(canvas.dataset.axisStep, 10)
+                : CHART_CONFIG.defaults.axisStep;
+            const axisMax = canvas.dataset.axisMax
+                ? parseFloat(canvas.dataset.axisMax)
+                : null;
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
@@ -475,7 +506,9 @@
                 options: buildChartOptions(
                     type,
                     gdsStyles,
+                    axisStep,
                     axisSuffix,
+                    axisMax,
                     showLegend,
                     showDataLabels,
                     showXGrid,
