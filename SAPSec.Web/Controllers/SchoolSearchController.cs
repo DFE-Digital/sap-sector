@@ -54,8 +54,10 @@ public class SchoolSearchController(
                 });
             }
 
-            ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
-            return View(searchQueryViewModel);
+            return RedirectToAction("Search", BuildSearchRouteValues(
+                searchQueryViewModel.Query,
+                searchQueryViewModel.SecondaryOnly,
+                searchQueryViewModel.SimilarSchoolsOnly));
         }
     }
 

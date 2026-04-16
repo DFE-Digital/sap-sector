@@ -188,6 +188,26 @@ public class SchoolSearchControllerTests
         redirectResult.RouteValues!["urn"].Should().Be("123456");
     }
 
+    [Fact]
+    public async Task Index_Post_WithUnmatchedNumericQuery_RedirectsToSearch()
+    {
+        var viewModel = new SchoolSearchQueryViewModel
+        {
+            Query = "123456"
+        };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query))
+            .ReturnsAsync((Establishment?)null);
+
+        var result = await _controller.Index(viewModel);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.ActionName.Should().Be("Search");
+        redirectResult.ControllerName.Should().BeNull();
+        redirectResult.RouteValues!["query"].Should().Be("123456");
+    }
+
     #endregion
 
     #region Search GET Tests
