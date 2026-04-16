@@ -117,3 +117,7 @@ variable "enable_dfe_analytics_federated_auth" {
   default     = false
 }
 
+variable "gcp_table_deletion_protection" {
+  description = "Prevents deletion of the event table. Default: true"
+  default     = true
+}
