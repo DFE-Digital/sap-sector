@@ -37,7 +37,7 @@ public class Program
             {
                 options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-        });
+            });
 
         builder.Services.AddRazorPages();
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
@@ -46,9 +46,19 @@ public class Program
             var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
             var analyticsEnvironment = IsProductionEnvironment(environmentName) ? "production" : "test";
 
-            if (options.GoogleMeasurementIds?.TryGetValue(analyticsEnvironment, out var googleMeasurementId) == true)
+            if (options.GoogleTagManagerIds?.TryGetValue(analyticsEnvironment, out var googleTagManagerId) == true)
             {
-                options.GoogleMeasurementId = googleMeasurementId;
+                options.GoogleTagManagerId = googleTagManagerId;
+            }
+
+            if (options.GoogleTagManagerAuths?.TryGetValue(analyticsEnvironment, out var googleTagManagerAuth) == true)
+            {
+                options.GoogleTagManagerAuth = googleTagManagerAuth;
+            }
+
+            if (options.GoogleTagManagerPreviews?.TryGetValue(analyticsEnvironment, out var googleTagManagerPreview) == true)
+            {
+                options.GoogleTagManagerPreview = googleTagManagerPreview;
             }
 
             if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
