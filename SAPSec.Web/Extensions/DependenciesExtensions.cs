@@ -41,6 +41,7 @@ public static class DependenciesExtensions
         services.AddSingleton<GetKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4CoreSubjects>();
+        services.AddSingleton<GetFilteredSchoolKs4CoreSubject>();
         services.AddSingleton<GetAttendanceMeasures>();
         services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<GetSimilarSchoolDetails>();

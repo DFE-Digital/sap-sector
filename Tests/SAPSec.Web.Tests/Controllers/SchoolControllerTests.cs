@@ -57,11 +57,16 @@ public class SchoolControllerTests
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
+        var getFilteredSchoolKs4CoreSubject = new GetFilteredSchoolKs4CoreSubject(
+            _ks4PerformanceRepositoryMock.Object,
+            _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object);
 
         _sut = new SchoolController(
             _schoolDetailsServiceMock.Object,
             getSchoolKs4HeadlineMeasures,
             getSchoolKs4CoreSubjects,
+            getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,
             _loggerMock.Object);
     }
@@ -233,6 +238,14 @@ public class SchoolControllerTests
 
         var json = result.Should().BeOfType<JsonResult>().Subject;
         json.Value.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsData_InvalidFilter_ReturnsBadRequest()
+    {
+        var result = await _sut.Ks4CoreSubjectsData("123456", "unknown-subject", "4");
+
+        result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     #endregion

@@ -17,10 +17,10 @@ namespace SAPSec.Web.Controllers;
 [Route("school/{urn}")]
 public class SchoolController : Controller
 {
-    private static readonly GetFilteredSchoolKs4CoreSubject FilterSchoolKs4CoreSubject = new();
     private readonly ISchoolDetailsService _schoolDetailsService;
     private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
+    private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly ILogger<SchoolController> _logger;
 
@@ -28,12 +28,14 @@ public class SchoolController : Controller
         ISchoolDetailsService schoolDetailsService,
         GetSchoolKs4HeadlineMeasures getSchoolKs4HeadlineMeasures,
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
+        GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetAttendanceMeasures getAttendanceMeasures,
         ILogger<SchoolController> logger)
     {
         _schoolDetailsService = schoolDetailsService;
         _getSchoolKs4HeadlineMeasures = getSchoolKs4HeadlineMeasures;
         _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects;
+        _getFilteredSchoolKs4CoreSubject = getFilteredSchoolKs4CoreSubject;
         _getAttendanceMeasures = getAttendanceMeasures;
         _logger = logger;
     }
@@ -321,8 +323,16 @@ public class SchoolController : Controller
     [Route("ks4-core-subjects/data")]
     public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string subject = "english-language", string grade = "4")
     {
-        var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
-        var filteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(response, subject, grade));
+        GetFilteredSchoolKs4CoreSubjectResponse filteredSubject;
+        try
+        {
+            filteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(urn, subject, grade));
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return BadRequest(new { error = "Invalid KS4 core subjects filter." });
+        }
+
         var selectedSubject = filteredSubject.Selection;
 
         return Json(new

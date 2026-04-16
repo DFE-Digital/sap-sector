@@ -14,10 +14,10 @@ namespace SAPSec.Web.Controllers;
 [Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
 public class SimilarSchoolsComparisonController : Controller
 {
-    private static readonly GetFilteredSchoolKs4CoreSubject FilterSchoolKs4CoreSubject = new();
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
+    private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
@@ -28,6 +28,7 @@ public class SimilarSchoolsComparisonController : Controller
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetAttendanceMeasures getAttendanceMeasures,
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
+        GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         GetCharacteristicsComparison getCharacteristicsComparison,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
@@ -38,6 +39,7 @@ public class SimilarSchoolsComparisonController : Controller
             getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
         _getAttendanceMeasures = getAttendanceMeasures ?? throw new ArgumentNullException(nameof(getAttendanceMeasures));
         _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects ?? throw new ArgumentNullException(nameof(getSchoolKs4CoreSubjects));
+        _getFilteredSchoolKs4CoreSubject = getFilteredSchoolKs4CoreSubject ?? throw new ArgumentNullException(nameof(getFilteredSchoolKs4CoreSubject));
         _getKs4HeadlineMeasures = getKs4HeadlineMeasures ?? throw new ArgumentNullException(nameof(getKs4HeadlineMeasures));
         _getCharacteristicsComparison = getCharacteristicsComparison ??
                                         throw new ArgumentNullException(nameof(getCharacteristicsComparison));
@@ -352,10 +354,18 @@ public class SimilarSchoolsComparisonController : Controller
             return BadRequest(new { error = "Missing route parameters." });
         }
 
-        var thisSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
-        var selectedSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(similarSchoolUrn));
-        var thisSchoolFilteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(thisSchoolKs4, subject, grade));
-        var selectedSchoolFilteredSubject = FilterSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(selectedSchoolKs4, subject, grade));
+        GetFilteredSchoolKs4CoreSubjectResponse thisSchoolFilteredSubject;
+        GetFilteredSchoolKs4CoreSubjectResponse selectedSchoolFilteredSubject;
+        try
+        {
+            thisSchoolFilteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(urn, subject, grade));
+            selectedSchoolFilteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(similarSchoolUrn, subject, grade));
+        }
+        catch (ArgumentOutOfRangeException)
+        {
+            return BadRequest(new { error = "Invalid KS4 core subjects filter." });
+        }
+
         var thisSchoolSubject = thisSchoolFilteredSubject.Selection;
         var selectedSchoolSubject = selectedSchoolFilteredSubject.Selection;
 

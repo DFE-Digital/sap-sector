@@ -33,6 +33,12 @@ public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) 
         await Page.GotoAsync(PagePath);
 
         await Expect(Page.Locator("#englishLanguageGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#englishLiteratureGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#biologyGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#chemistryGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#physicsGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#mathsGrade")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#combinedScienceGrade")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-side-navigation__item--selected").GetByText("KS4 core subjects")).ToBeVisibleAsync();
     }
 
