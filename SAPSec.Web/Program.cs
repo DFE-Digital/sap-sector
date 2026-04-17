@@ -41,6 +41,31 @@ public class Program
 
         builder.Services.AddRazorPages();
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
+        builder.Services.PostConfigure<AnalyticsSettings>(options =>
+        {
+            var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
+            var analyticsEnvironment = IsProductionEnvironment(environmentName) ? "production" : "test";
+
+            if (options.GoogleTagManagerIds?.TryGetValue(analyticsEnvironment, out var googleTagManagerId) == true)
+            {
+                options.GoogleTagManagerId = googleTagManagerId;
+            }
+
+            if (options.GoogleTagManagerAuths?.TryGetValue(analyticsEnvironment, out var googleTagManagerAuth) == true)
+            {
+                options.GoogleTagManagerAuth = googleTagManagerAuth;
+            }
+
+            if (options.GoogleTagManagerPreviews?.TryGetValue(analyticsEnvironment, out var googleTagManagerPreview) == true)
+            {
+                options.GoogleTagManagerPreview = googleTagManagerPreview;
+            }
+
+            if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
+            {
+                options.ClarityId = clarityId;
+            }
+        });
 
         builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
         {
@@ -211,5 +236,17 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
         app.Run();
+    }
+
+    private static bool IsProductionEnvironment(string? environmentName)
+    {
+        if (string.IsNullOrWhiteSpace(environmentName))
+        {
+            return false;
+        }
+
+        return environmentName.Equals("production", StringComparison.OrdinalIgnoreCase)
+               || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
+               || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
 }

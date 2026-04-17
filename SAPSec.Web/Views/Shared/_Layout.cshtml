@@ -9,6 +9,8 @@
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var analytics = AnalyticsOptions.Value;
     var analyticsCookiesAccepted = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
+    var hasGoogleTagManagerId = !string.IsNullOrWhiteSpace(analytics.GoogleTagManagerId);
+    var hasClarityId = !string.IsNullOrWhiteSpace(analytics.ClarityId);
     var gtmScriptUrl = $"https://www.googletagmanager.com/gtm.js?id={analytics.GoogleTagManagerId}&gtm_auth={analytics.GoogleTagManagerAuth}&gtm_preview={analytics.GoogleTagManagerPreview}&gtm_cookies_win=x";
     var gtmNoscriptUrl = $"https://www.googletagmanager.com/ns.html?id={analytics.GoogleTagManagerId}&gtm_auth={analytics.GoogleTagManagerAuth}&gtm_preview={analytics.GoogleTagManagerPreview}&gtm_cookies_win=x";
 }
@@ -38,8 +40,9 @@
     <link rel="stylesheet" href="/css/accessible-autocomplete.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/main.css" asp-append-version="true" />
-    @if (analyticsCookiesAccepted)
+    @if (analyticsCookiesAccepted && hasGoogleTagManagerId)
     {
+    <script add-nonce="true">window.dataLayer = window.dataLayer || [];</script>
     <!-- Google Tag Manager -->
     <script add-nonce="true">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
@@ -47,6 +50,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 '@gtmScriptUrl';f.parentNode.insertBefore(j,f);
 })(window,document,'script','dataLayer','@analytics.GoogleTagManagerId');</script>
     <!-- End Google Tag Manager -->
+    }
+    @if (analyticsCookiesAccepted && hasClarityId)
+    {
     <script type="text/javascript" add-nonce="true">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -63,7 +69,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
-    @if (analyticsCookiesAccepted)
+    @if (analyticsCookiesAccepted && hasGoogleTagManagerId)
     {
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="@gtmNoscriptUrl" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
