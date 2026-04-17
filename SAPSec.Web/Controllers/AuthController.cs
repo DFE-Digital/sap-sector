@@ -45,6 +45,7 @@ public class AuthController(
     }
 
     [HttpGet(Routes.SignIn)]
+    [AllowAnonymous]
     public IActionResult SignIn(string? returnUrl = null)
     {
         if (IsUserAuthenticated())
@@ -113,12 +114,14 @@ public class AuthController(
     }
 
     [HttpGet(Routes.AccessDenied)]
+    [AllowAnonymous]
     public IActionResult AccessDenied()
     {
         return View();
     }
 
     [HttpGet(Routes.SignedOut)]
+    [AllowAnonymous]
     public IActionResult SignedOut()
     {
         return View();

@@ -25,16 +25,16 @@ public class GetCharacteristicsComparison(
             CurrentSchoolUrn = request.CurrentSchoolUrn,
             SimilarSchoolUrn = request.SimilarSchoolUrn,
             Ks2AverageScore = Build(
-                current.Ks2AverageScore,
-                similar.Ks2AverageScore,
+                RoundWholeNumber(current.Ks2AverageScore),
+                RoundWholeNumber(similar.Ks2AverageScore),
                 standardDeviations.Ks2AverageScore),
             PupilPremiumEligibilityPercentage = Build(
-                current.PupilPremiumEligibilityPercentage,
-                similar.PupilPremiumEligibilityPercentage,
+                RoundToOneDecimalPlace(current.PupilPremiumEligibilityPercentage),
+                RoundToOneDecimalPlace(similar.PupilPremiumEligibilityPercentage),
                 standardDeviations.PupilPremiumEligibilityPercentage),
             PupilsWithEalPercentage = Build(
-                current.PupilsWithEalPercentage,
-                similar.PupilsWithEalPercentage,
+                RoundToOneDecimalPlace(current.PupilsWithEalPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithEalPercentage),
                 standardDeviations.PupilsWithEalPercentage),
             Polar4Quintile = Build(
                 RoundInt(current.Polar4Quintile),
@@ -45,20 +45,20 @@ public class GetCharacteristicsComparison(
                 RoundInt(similar.PupilCount),
                 standardDeviations.PupilCount),
             PupilStabilityRate = Build(
-                current.PupilStabilityRate,
-                similar.PupilStabilityRate,
+                RoundToOneDecimalPlace(current.PupilStabilityRate),
+                RoundToOneDecimalPlace(similar.PupilStabilityRate),
                 standardDeviations.PupilStabilityRate),
             AverageIdaciScore = Build(
-                current.AverageIdaciScore,
-                similar.AverageIdaciScore,
+                RoundToThreeDecimalPlaces(current.AverageIdaciScore),
+                RoundToThreeDecimalPlaces(similar.AverageIdaciScore),
                 standardDeviations.AverageIdaciScore),
             PupilsWithSenSupportPercentage = Build(
-                current.PupilsWithSenSupportPercentage,
-                similar.PupilsWithSenSupportPercentage,
+                RoundToOneDecimalPlace(current.PupilsWithSenSupportPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithSenSupportPercentage),
                 standardDeviations.PupilsWithSenSupportPercentage),
             PupilsWithEhcPlanPercentage = Build(
-                current.PupilsWithEhcPlanPercentage,
-                similar.PupilsWithEhcPlanPercentage,
+                RoundToOneDecimalPlace(current.PupilsWithEhcPlanPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithEhcPlanPercentage),
                 standardDeviations.PupilsWithEhcPlanPercentage)
         };
     }
@@ -116,6 +116,15 @@ public class GetCharacteristicsComparison(
 
     private static int RoundInt(decimal value) =>
         Convert.ToInt32(Math.Round(value, MidpointRounding.AwayFromZero));
+
+    private static decimal RoundWholeNumber(decimal value) =>
+        decimal.Round(value, 0, MidpointRounding.AwayFromZero);
+
+    private static decimal RoundToOneDecimalPlace(decimal value) =>
+        decimal.Round(value, 1, MidpointRounding.AwayFromZero);
+
+    private static decimal RoundToThreeDecimalPlaces(decimal value) =>
+        decimal.Round(value, 3, MidpointRounding.AwayFromZero);
 
     private static decimal PopulationStandardDeviation(IEnumerable<decimal> values)
     {

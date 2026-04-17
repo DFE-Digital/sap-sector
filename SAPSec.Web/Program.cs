@@ -2,7 +2,7 @@
 using Dfe.Analytics.AspNetCore;
 using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -103,6 +103,13 @@ public class Program
         {
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
+
+        builder.Services.AddAuthorization(options =>
+        {
+            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
 
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
@@ -237,7 +244,7 @@ public class Program
 
         app.UseAuthorization();
 
-        app.MapHealthChecks("/healthcheck");
+        app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {

@@ -44,6 +44,75 @@ public class GetCharacteristicsComparisonTests
     }
 
     [Fact]
+    public async Task Execute_UsesRoundedKs2Average_WhenDisplayedValuesMatch()
+    {
+        var currentUrn = "100";
+        var similarUrn = "200";
+
+        var current = BuildValues(currentUrn, ks2Avg: 113.5m);
+        var similar = BuildValues(similarUrn, ks2Avg: 114.4m);
+
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[] { current, similar });
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 1m));
+
+        var sut = CreateSut();
+
+        var result = await sut.Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn));
+
+        Assert.Equal(114m, result.Ks2AverageScore.CurrentSchoolValue);
+        Assert.Equal(114m, result.Ks2AverageScore.SimilarSchoolValue);
+        Assert.Equal(SchoolSimilarity.Similar, result.Ks2AverageScore.Similarity);
+    }
+
+    [Fact]
+    public async Task Execute_UsesRoundedPercentage_WhenDisplayedValuesMatch()
+    {
+        var currentUrn = "100";
+        var similarUrn = "200";
+
+        var current = BuildValues(currentUrn, ks2Avg: 100m, eal: 19.44m);
+        var similar = BuildValues(similarUrn, ks2Avg: 100m, eal: 19.36m);
+
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[] { current, similar });
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 1m));
+
+        var sut = CreateSut();
+
+        var result = await sut.Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn));
+
+        Assert.Equal(19.4m, result.PupilsWithEalPercentage.CurrentSchoolValue);
+        Assert.Equal(19.4m, result.PupilsWithEalPercentage.SimilarSchoolValue);
+        Assert.Equal(SchoolSimilarity.Similar, result.PupilsWithEalPercentage.Similarity);
+    }
+
+    [Fact]
+    public async Task Execute_UsesRoundedIdaci_WhenDisplayedValuesMatch()
+    {
+        var currentUrn = "100";
+        var similarUrn = "200";
+
+        var current = BuildValues(currentUrn, ks2Avg: 100m, idaci: 0.1305m);
+        var similar = BuildValues(similarUrn, ks2Avg: 100m, idaci: 0.1314m);
+
+        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[] { current, similar });
+        _repo.Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .ReturnsAsync(BuildStandardDeviations(ks2AvgSd: 1m));
+
+        var sut = CreateSut();
+
+        var result = await sut.Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn));
+
+        Assert.Equal(0.131m, result.AverageIdaciScore.CurrentSchoolValue);
+        Assert.Equal(0.131m, result.AverageIdaciScore.SimilarSchoolValue);
+        Assert.Equal(SchoolSimilarity.Similar, result.AverageIdaciScore.Similarity);
+    }
+
+    [Fact]
     public async Task Execute_ReturnsNotSimilar_WhenSdIsZero()
     {
         var currentUrn = "100";
