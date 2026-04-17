@@ -59,7 +59,6 @@
             },
             datalabels: {
                 anchor: 'end',
-                alignThreshold: 10,
                 smallValueAlign: 'end',
                 defaultAlign: 'start',
                 offset: 10,
@@ -150,18 +149,49 @@
         };
     }
 
-    function getBarLabelAlignment(value, barLabelAlign) {
+    function getBarLabelText(value, axisSuffix) {
+        if (value === null || value === undefined || Number.isNaN(value)) {
+            return '';
+        }
+
+        return `${value}${axisSuffix}`;
+    }
+
+    function canBarFitLabel(ctx, axisSuffix) {
+        const value = ctx.dataset.data[ctx.dataIndex];
+        if (value === null || value === undefined || Number.isNaN(value)) {
+            return false;
+        }
+
+        const xScale = ctx.chart?.scales?.x;
+        const canvasContext = ctx.chart?.ctx;
+        if (!xScale || !canvasContext) {
+            return true;
+        }
+
+        const barLength = Math.abs(xScale.getPixelForValue(value) - xScale.getPixelForValue(0));
+        const font = Chart.helpers.toFont(ctx.chart.options?.plugins?.datalabels?.font);
+
+        canvasContext.save();
+        canvasContext.font = font.string;
+        const labelWidth = canvasContext.measureText(getBarLabelText(value, axisSuffix)).width;
+        canvasContext.restore();
+
+        return barLength >= labelWidth + (CHART_CONFIG.bar.datalabels.offset * 2);
+    }
+
+    function getBarLabelAlignment(ctx, axisSuffix, barLabelAlign) {
         if (barLabelAlign) {
             return barLabelAlign;
         }
 
-        return value < CHART_CONFIG.bar.datalabels.alignThreshold
-            ? CHART_CONFIG.bar.datalabels.smallValueAlign
-            : CHART_CONFIG.bar.datalabels.defaultAlign;
+        return canBarFitLabel(ctx, axisSuffix)
+            ? CHART_CONFIG.bar.datalabels.defaultAlign
+            : CHART_CONFIG.bar.datalabels.smallValueAlign;
     }
 
-    function getBarLabelColor(value, gdsStyles, barLabelAlign) {
-        const align = getBarLabelAlignment(value, barLabelAlign);
+    function getBarLabelColor(ctx, gdsStyles, axisSuffix, barLabelAlign) {
+        const align = getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
         return align === CHART_CONFIG.bar.datalabels.defaultAlign
             ? gdsStyles.onBarLabel
             : gdsStyles.text;
@@ -321,11 +351,11 @@
                     datalabels: {
                         anchor: CHART_CONFIG.bar.datalabels.anchor,
                         align: function (ctx) {
-                            return getBarLabelAlignment(ctx.dataset.data[ctx.dataIndex], barLabelAlign);
+                            return getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
                         },
                         offset: CHART_CONFIG.bar.datalabels.offset,
                         color: function (ctx) {
-                            return getBarLabelColor(ctx.dataset.data[ctx.dataIndex], gdsStyles, barLabelAlign);
+                            return getBarLabelColor(ctx, gdsStyles, axisSuffix, barLabelAlign);
                         },
                         font: {
                             ...fonts,
