@@ -1,1 +1,0 @@
-\copy (select json_array(select row_to_json(r) from(select * from v_la_performance) r)) to 'C:\Users\nikki\Source\Repos\sap-sector\SAPSec.Infrastructure\Data\Files\Generated\LAPerformance.json' with(format text);
