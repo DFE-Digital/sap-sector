@@ -329,8 +329,20 @@ public class SimilarSchoolsComparisonController : Controller
         if (modelResult.Result != null)
             return modelResult.Result;
 
-        SetComparisonSchoolViewData(modelResult.Model!);
-        return View(modelResult.Model);
+        var thisSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
+        var selectedSchoolKs4 = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(similarSchoolUrn));
+
+        var model = modelResult.Model!;
+        model.EnglishLanguage = BuildComparisonCoreSubjectSection(thisSchoolKs4, selectedSchoolKs4, SchoolKs4CoreSubject.EnglishLanguage);
+        model.EnglishLiterature = BuildComparisonCoreSubjectSection(thisSchoolKs4, selectedSchoolKs4, SchoolKs4CoreSubject.EnglishLiterature);
+        model.Biology = BuildComparisonCoreSubjectSection(thisSchoolKs4, selectedSchoolKs4, SchoolKs4CoreSubject.Biology);
+        model.Chemistry = BuildComparisonCoreSubjectSection(thisSchoolKs4, selectedSchoolKs4, SchoolKs4CoreSubject.Chemistry);
+        model.Physics = BuildComparisonCoreSubjectSection(thisSchoolKs4, selectedSchoolKs4, SchoolKs4CoreSubject.Physics);
+        model.Maths = BuildComparisonCoreSubjectSection(thisSchoolKs4, selectedSchoolKs4, SchoolKs4CoreSubject.Maths);
+        model.CombinedScienceDoubleAward = BuildComparisonCoreSubjectSection(thisSchoolKs4, selectedSchoolKs4, SchoolKs4CoreSubject.CombinedScienceDoubleAward);
+
+        SetComparisonSchoolViewData(model);
+        return View(model);
     }
 
     [HttpGet]
@@ -659,6 +671,29 @@ public class SimilarSchoolsComparisonController : Controller
             "employment" => "employment",
             _ => "all"
         };
+
+    private static SimilarSchoolsComparisonViewModel.CoreSubjectSection BuildComparisonCoreSubjectSection(
+        GetSchoolKs4CoreSubjectsResponse thisSchoolResponse,
+        GetSchoolKs4CoreSubjectsResponse selectedSchoolResponse,
+        SchoolKs4CoreSubject subject)
+    {
+        var thisSchoolSelection = SchoolKs4CoreSubjectSelection.From(
+            thisSchoolResponse,
+            subject,
+            SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var selectedSchoolSelection = SchoolKs4CoreSubjectSelection.From(
+            selectedSchoolResponse,
+            subject,
+            SchoolKs4CoreSubjectGradeFilter.Grade4);
+
+        return new SimilarSchoolsComparisonViewModel.CoreSubjectSection(
+            thisSchoolSelection.ThreeYearAverage.SchoolValue,
+            selectedSchoolSelection.ThreeYearAverage.SchoolValue,
+            thisSchoolSelection.ThreeYearAverage.EnglandValue ?? selectedSchoolSelection.ThreeYearAverage.EnglandValue,
+            thisSchoolSelection.YearByYear.School,
+            selectedSchoolSelection.YearByYear.School,
+            thisSchoolSelection.YearByYear.England ?? selectedSchoolSelection.YearByYear.England);
+    }
 
     private static Ks4HeadlineMeasureAverage? SelectDestinationsAverage(GetKs4HeadlineMeasuresResponse? response, string destination) =>
         destination switch

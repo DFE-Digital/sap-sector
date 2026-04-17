@@ -1,5 +1,288 @@
+@using System.Text.Json
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
-  
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
+    var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
+    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
+    decimal? RoundWholePercent(decimal? value) => value.HasValue
+        ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero)
+        : null;
+
+    var sections = new[]
+    {
+        new
+        {
+            Key = "english-language",
+            Title = "English language",
+            GradeId = "englishLanguageGrade",
+            ChartId = "english-language-comparison-chart",
+            LineChartId = "english-language-comparison-yearbyyear-chart",
+            CellPrefix = "english-language",
+            Section = Model.EnglishLanguage!
+        },
+        new
+        {
+            Key = "english-literature",
+            Title = "English literature",
+            GradeId = "englishLiteratureGrade",
+            ChartId = "english-literature-comparison-chart",
+            LineChartId = "english-literature-comparison-yearbyyear-chart",
+            CellPrefix = "english-literature",
+            Section = Model.EnglishLiterature!
+        },
+        new
+        {
+            Key = "maths",
+            Title = "Mathematics",
+            GradeId = "mathsGrade",
+            ChartId = "maths-comparison-chart",
+            LineChartId = "maths-comparison-yearbyyear-chart",
+            CellPrefix = "maths",
+            Section = Model.Maths!
+        },
+        new
+        {
+            Key = "combined-science-double-award",
+            Title = "Combined science (double award)",
+            GradeId = "combinedScienceGrade",
+            ChartId = "combined-science-comparison-chart",
+            LineChartId = "combined-science-comparison-yearbyyear-chart",
+            CellPrefix = "combined-science",
+            Section = Model.CombinedScienceDoubleAward!
+        },
+        new
+        {
+            Key = "biology",
+            Title = "Biology",
+            GradeId = "biologyGrade",
+            ChartId = "biology-comparison-chart",
+            LineChartId = "biology-comparison-yearbyyear-chart",
+            CellPrefix = "biology",
+            Section = Model.Biology!
+        },
+        new
+        {
+            Key = "chemistry",
+            Title = "Chemistry",
+            GradeId = "chemistryGrade",
+            ChartId = "chemistry-comparison-chart",
+            LineChartId = "chemistry-comparison-yearbyyear-chart",
+            CellPrefix = "chemistry",
+            Section = Model.Chemistry!
+        },
+        new
+        {
+            Key = "physics",
+            Title = "Physics",
+            GradeId = "physicsGrade",
+            ChartId = "physics-comparison-chart",
+            LineChartId = "physics-comparison-yearbyyear-chart",
+            CellPrefix = "physics",
+            Section = Model.Physics!
+        }
+    };
+}
+
+<h1 class="govuk-heading-l">KS4 core subject GCSE results</h1>
+
+<p class="govuk-body">
+    How @Model.Name compares with @Model.SimilarSchoolName based on KS4 core subject GCSE results.
+</p>
+
+@foreach (var item in sections)
+{
+    var coreSubjectSection = item.Section;
+    var chartData = new
+    {
+        labels = new[]
+        {
+            Model.Name,
+            Model.SimilarSchoolName,
+            "Schools in England average"
+        },
+        data = new decimal?[]
+        {
+            RoundWholePercent(coreSubjectSection.ThisSchoolThreeYearAverage),
+            RoundWholePercent(coreSubjectSection.SimilarSchoolThreeYearAverage),
+            RoundWholePercent(coreSubjectSection.EnglandThreeYearAverage)
+        }
+    };
+    var yearByYearData = new
+    {
+        labels = ks4YearLabels,
+        datasets = new object[]
+        {
+            new
+            {
+                label = Model.Name,
+                borderWidth = 2,
+                pointRadius = 4,
+                pointHoverRadius = 5,
+                tension = 0,
+                data = new decimal?[]
+                {
+                    coreSubjectSection.ThisSchoolYearByYear?.Previous2,
+                    coreSubjectSection.ThisSchoolYearByYear?.Previous,
+                    coreSubjectSection.ThisSchoolYearByYear?.Current
+                }
+            },
+            new
+            {
+                label = Model.SimilarSchoolName,
+                borderWidth = 2,
+                pointRadius = 4,
+                pointHoverRadius = 5,
+                tension = 0,
+                data = new decimal?[]
+                {
+                    coreSubjectSection.SimilarSchoolYearByYear?.Previous2,
+                    coreSubjectSection.SimilarSchoolYearByYear?.Previous,
+                    coreSubjectSection.SimilarSchoolYearByYear?.Current
+                }
+            },
+            new
+            {
+                label = "Schools in England average",
+                borderWidth = 2,
+                pointRadius = 4,
+                pointHoverRadius = 5,
+                tension = 0,
+                data = new decimal?[]
+                {
+                    coreSubjectSection.EnglandYearByYear?.Previous2,
+                    coreSubjectSection.EnglandYearByYear?.Previous,
+                    coreSubjectSection.EnglandYearByYear?.Current
+                }
+            }
+        }
+    };
+
+    <section aria-labelledby="@($"{item.Key}-heading")" class="app-ks4-attainment @(item.Key == "english-language" ? "" : "govuk-!-margin-top-7")">
+        <h2 class="govuk-heading-m" id="@($"{item.Key}-heading")">@item.Title</h2>
+
+        <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="@item.GradeId">Grade</label>
+                <select class="govuk-select"
+                        id="@item.GradeId"
+                        name="@item.GradeId"
+                        data-view-switcher="true"
+                        data-endpoint="@Url.Action("Ks4CoreSubjectsData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn, subject = item.Key })"
+                        data-query-key="grade"
+                        data-bar-chart-id="@item.ChartId"
+                        data-line-chart-id="@item.LineChartId"
+                        data-cell-attribute="data-view-cell"
+                        data-cell-prefixes='{"thisSchool":"@($"{item.CellPrefix}-this")","similarSchool":"@($"{item.CellPrefix}-similar")","england":"@($"{item.CellPrefix}-england")"}'
+                        data-series-keys='["thisSchool","similarSchool","england"]'>
+                    <option value="4" selected>@(item.Key == "combined-science-double-award" ? "Grade 4-4 and above" : "Grade 4 and above")</option>
+                    <option value="5">@(item.Key == "combined-science-double-award" ? "Grade 5-5 and above" : "Grade 5 and above")</option>
+                    <option value="7">@(item.Key == "combined-science-double-award" ? "Grade 7-7 and above" : "Grade 7 and above")</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+            <ul class="govuk-tabs__list">
+                <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                    <a class="govuk-tabs__tab" href="#@($"{item.Key}-three-year-average")">3-year average</a>
+                </li>
+                <li class="govuk-tabs__list-item">
+                    <a class="govuk-tabs__tab" href="#@($"{item.Key}-year-by-year")">Year by year</a>
+                </li>
+                <li class="govuk-tabs__list-item">
+                    <a class="govuk-tabs__tab" href="#@($"{item.Key}-table-view")">Table</a>
+                </li>
+            </ul>
+
+            <div class="govuk-tabs__panel" id="@($"{item.Key}-three-year-average")">
+                <div class="app-ks4-chart-container">
+                    @if (HasAnyData(chartData.data))
+                    {
+                        <canvas id="@item.ChartId"
+                                class="js-chart"
+                                data-type="bar"
+                                data-show-no-data-labels="true"
+                                data-axis-step="25"
+                                data-axis-max="100"
+                                data-axis-suffix="%"
+                                data-label-decimals="0"
+                                data-bar-thickness="50"
+                                data-category-percentage="0.7"
+                                data-bar-percentage="1"
+                                data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                                data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                        </canvas>
+                    }
+                    else
+                    {
+                        <p class="govuk-body">No available data</p>
+                    }
+                </div>
+            </div>
+
+            <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="@($"{item.Key}-year-by-year")">
+                <div class="app-ks4-chart-container">
+                    <canvas id="@item.LineChartId"
+                            class="js-chart"
+                            data-type="line"
+                            data-axis-step="25"
+                            data-axis-max="100"
+                            data-axis-suffix="%"
+                            data-show-legend="true"
+                            data-show-datalabels="false"
+                            data-show-x-grid="true"
+                            data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
+                            data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                    </canvas>
+                </div>
+            </div>
+
+            <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="@($"{item.Key}-table-view")">
+                <table class="govuk-table">
+                    <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">School(s)</th>
+                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
+                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                        </tr>
+                    </thead>
+                    <tbody class="govuk-table__body">
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">@Model.Name</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-avg")">@coreSubjectSection.ThisSchoolDisplay</td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-avg")">@coreSubjectSection.SimilarSchoolDisplay</td>
+                        </tr>
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">Schools in England average</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-avg")">@coreSubjectSection.EnglandDisplay</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+}
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
