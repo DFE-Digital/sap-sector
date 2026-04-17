@@ -68,12 +68,6 @@ public class Program
             }
         });
 
-            if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
-            {
-                options.ClarityId = clarityId;
-            }
-        });
-
         builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
         {
             options.TagClasses = "govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile";
