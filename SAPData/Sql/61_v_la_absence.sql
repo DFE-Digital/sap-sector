@@ -1,0 +1,1 @@
+\copy (select json_array(select row_to_json(r) from(select * from v_la_absence) r)) to 'C:\Users\nikki\Source\Repos\sap-sector\SAPSec.Infrastructure\Data\Files\Generated\LAAbsence.json' with(format text);

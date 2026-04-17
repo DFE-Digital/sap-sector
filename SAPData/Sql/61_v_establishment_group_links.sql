@@ -1,0 +1,1 @@
+\copy (select json_array(select row_to_json(r) from(select * from v_establishment_group_links) r)) to 'C:\Users\nikki\Source\Repos\sap-sector\SAPSec.Infrastructure\Data\Files\Generated\EstablishmentGroupLinks.json' with(format text);
