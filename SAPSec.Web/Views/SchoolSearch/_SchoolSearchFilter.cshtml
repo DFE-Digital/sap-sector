@@ -137,10 +137,9 @@
             const applyButton = document.getElementById('apply-filters-btn');
 
             filterForm.onsubmit = function(e) {
-                const activeElement = document.activeElement;
-                const isApplyButton = activeElement &&
-                    activeElement.type === 'submit' &&
-                    activeElement.textContent.includes('Apply');
+                const submitEvent = e;
+                const submitter = submitEvent.submitter;
+                const isApplyButton = submitter === applyButton;
 
                 if (!isApplyButton) {
                     e.preventDefault();
