@@ -25,7 +25,7 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
         context.Items[CspHelper.ScriptNonceKey] = nonce;
 
         context.Response.Headers.Append("Expect-CT", "max-age=86400, enforce");
-        context.Response.Headers.Append("Referrer-Policy", "same-origin");
+        context.Response.Headers.Append("Referrer-Policy", "strict-origin-when-cross-origin");
         context.Response.Headers.Append("Arr-Disable-Session-Affinity", "true");
         context.Response.Headers.Append("X-Content-Type-Options", "nosniff");
         context.Response.Headers.Append("X-Frame-Options", "DENY");
