@@ -16,4 +16,6 @@ module "dfe_analytics" {
   gcp_key           = "school-standards-key"
   gcp_taxonomy_id   = "9218536955874377223"
   gcp_policy_tag_id = "1991951892101805780"
+
+  gcp_table_deletion_protection = var.gcp_table_deletion_protection
 }
