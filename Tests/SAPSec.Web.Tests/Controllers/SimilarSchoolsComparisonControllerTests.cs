@@ -182,7 +182,7 @@ public class SimilarSchoolsComparisonControllerTests
     }
 
     [Fact]
-    public async Task Similarity_WithGroupCalculationQuery_UsesGroupStandardDeviation()
+    public async Task Similarity_WithGroupCalculationQuery_UsesRoundedDisplayedKs2Value()
     {
         var urn = "145327";
         var similarUrn = "142075";
@@ -205,7 +205,7 @@ public class SimilarSchoolsComparisonControllerTests
         var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
 
         model.CharacteristicsRows.Should().NotBeNull();
-        model.CharacteristicsRows[0].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
+        model.CharacteristicsRows[0].Similarity.Should().Be(SchoolSimilarity.Similar);
     }
 
     [Fact]
