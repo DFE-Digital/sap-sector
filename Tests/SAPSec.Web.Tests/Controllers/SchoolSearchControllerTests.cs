@@ -169,19 +169,43 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
-    public async Task Index_Post_WithNumericResults_RedirectsToSchoolDetails()
+    public async Task Index_Post_WithNumericQuery_RedirectsToSchoolDetails()
     {
         var viewModel = new SchoolSearchQueryViewModel
         {
-            Query = "123/123"
+            Query = "123456"
         };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query))
+            .ReturnsAsync(FakeEstablishment1);
 
         var result = await _controller.Index(viewModel);
 
         result.Should().BeOfType<RedirectToActionResult>();
 
         var redirectResult = result as RedirectToActionResult;
-        redirectResult!.RouteValues!["query"].Should().Be("123/123");
+        redirectResult!.ActionName.Should().Be("Index");
+        redirectResult.ControllerName.Should().Be("School");
+        redirectResult.RouteValues!["urn"].Should().Be("123456");
+    }
+
+    [Fact]
+    public async Task Index_Post_WithUnmatchedNumericQuery_RedirectsToSearch()
+    {
+        var viewModel = new SchoolSearchQueryViewModel
+        {
+            Query = "123456"
+        };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query))
+            .ReturnsAsync((Establishment?)null);
+
+        var result = await _controller.Index(viewModel);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.ActionName.Should().Be("Search");
+        redirectResult.ControllerName.Should().BeNull();
+        redirectResult.RouteValues!["query"].Should().Be("123456");
     }
 
     #endregion
@@ -216,6 +240,24 @@ public class SchoolSearchControllerTests
         model.Results[0].URN.Should().Be("123456");
         model.Results[1].SchoolName.Should().Be("Fake Establishment Two");
         model.Results[1].URN.Should().Be("789456");
+    }
+
+    [Fact]
+    public async Task Search_Get_WithNumericQuery_RedirectsToSchoolDetails()
+    {
+        const string query = "10000001";
+        var establishment = new Establishment { URN = "123456", UKPRN = query, EstablishmentName = "School by UKPRN" };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(query))
+            .ReturnsAsync(establishment);
+
+        var result = await _controller.Search(query, null, 1);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.ActionName.Should().Be("Index");
+        redirectResult.ControllerName.Should().Be("School");
+        redirectResult.RouteValues!["urn"].Should().Be("123456");
     }
 
     [Fact]
@@ -563,6 +605,27 @@ public class SchoolSearchControllerTests
         var redirectResult = result as RedirectToActionResult;
         redirectResult!.ActionName.Should().Be("Search");
         redirectResult.RouteValues.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task Search_Post_WithNumericQueryAndNoUrn_RedirectsToSchoolController()
+    {
+        var viewModel = new SchoolSearchQueryViewModel
+        {
+            Query = "123456",
+            Urn = null
+        };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query))
+            .ReturnsAsync(FakeEstablishment1);
+
+        var result = await _controller.Search(viewModel);
+
+        result.Should().BeOfType<RedirectToActionResult>();
+
+        var redirectResult = result as RedirectToActionResult;
+        redirectResult!.ActionName.Should().Be("Index");
+        redirectResult.ControllerName.Should().Be("School");
+        redirectResult.RouteValues!["urn"].Should().Be("123456");
     }
 
     [Fact]

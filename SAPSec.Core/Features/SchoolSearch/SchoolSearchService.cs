@@ -74,13 +74,14 @@ public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablis
 
     public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
     {
-        var isNumber = Regex.IsMatch(schoolNumber, @"^\d+$");
-        var isDfENumber = Regex.IsMatch(schoolNumber, @"^\d+\\|/\d+$");
+        var trimmedSchoolNumber = schoolNumber.Trim();
+        var isNumber = Regex.IsMatch(trimmedSchoolNumber, @"^\d+$");
+        var isDfENumber = Regex.IsMatch(trimmedSchoolNumber, @"^\d+[\\/]\d+$");
 
         return isNumber
-            ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(schoolNumber))
+            ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber))
             : isDfENumber
-                ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(schoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty)))
+                ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty)))
                 : null;
     }
 }

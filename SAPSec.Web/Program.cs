@@ -1,5 +1,6 @@
 ﻿using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
@@ -67,6 +68,12 @@ public class Program
             }
         });
 
+            if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
+            {
+                options.ClarityId = clarityId;
+            }
+        });
+
         builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
         {
             options.TagClasses = "govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile";
@@ -101,6 +108,12 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
+        builder.Services.AddAuthorization(options =>
+        {
+            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -226,7 +239,7 @@ public class Program
 
         app.UseAuthorization();
 
-        app.MapHealthChecks("/healthcheck");
+        app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
         app.MapControllers();
         app.MapRazorPages();

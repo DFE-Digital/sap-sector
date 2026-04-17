@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
@@ -8,6 +9,7 @@ using SAPSec.Web.ViewModels;
 namespace SAPSec.Web.Controllers;
 
 [Route("school/{urn}")]
+[Authorize]
 public class SimilarSchoolsController : Controller
 {
     private readonly ISchoolDetailsService _schoolDetailsService;
