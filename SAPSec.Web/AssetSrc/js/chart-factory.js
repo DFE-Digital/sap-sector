@@ -167,6 +167,20 @@
             : gdsStyles.text;
     }
 
+    function buildExplicitTicks(axisMin, axisMax, stepSize) {
+        if (axisMin === null || axisMax === null || !stepSize) {
+            return undefined;
+        }
+
+        return function (axis) {
+            const ticks = [];
+            for (let value = axisMin; value <= axisMax; value += stepSize) {
+                ticks.push({ value });
+            }
+            axis.ticks = ticks;
+        };
+    }
+
     function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
@@ -180,6 +194,10 @@
         };
 
         const stepSize = axisStep;
+        const axisTickCount = axisMin !== null && axisMax !== null && stepSize
+            ? Math.floor((axisMax - axisMin) / stepSize) + 1
+            : undefined;
+        const explicitTicks = buildExplicitTicks(axisMin, axisMax, stepSize);
 
         const legendOptions = {
             display: showLegend,
@@ -208,6 +226,7 @@
                         min: axisMin ?? undefined,
                         max: axisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
+                        afterBuildTicks: explicitTicks,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -224,6 +243,7 @@
                             font: fonts,
                             autoSkip: axisAutoSkip,
                             stepSize: stepSize,
+                            count: axisTickCount,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -280,6 +300,7 @@
                         beginAtZero: true,
                         min: axisMin ?? undefined,
                         max: axisMax ?? undefined,
+                        afterBuildTicks: explicitTicks,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -296,6 +317,7 @@
                             font: fonts,
                             autoSkip: axisAutoSkip,
                             stepSize: stepSize,
+                            count: axisTickCount,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },

@@ -58,5 +58,11 @@ public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetu
             (await chart.GetAttributeAsync("data-axis-auto-skip")).Should().Be("false");
             (await chart.GetAttributeAsync("data-axis-suffix")).Should().Be("%");
         }
+
+        var englishLanguageTickLabels = await Page
+            .Locator("#english-language-comparison-yearbyyear-chart")
+            .EvaluateAsync<string[]>("canvas => window.Chart.getChart(canvas).scales.y.ticks.map(tick => tick.label)");
+
+        englishLanguageTickLabels.Should().Equal("0%", "25%", "50%", "75%", "100%");
     }
 }
