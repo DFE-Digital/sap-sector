@@ -55,6 +55,7 @@ public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetu
             (await chart.GetAttributeAsync("data-axis-min")).Should().Be("0");
             (await chart.GetAttributeAsync("data-axis-step")).Should().Be("25");
             (await chart.GetAttributeAsync("data-axis-max")).Should().Be("100");
+            (await chart.GetAttributeAsync("data-axis-auto-skip")).Should().Be("false");
             (await chart.GetAttributeAsync("data-axis-suffix")).Should().Be("%");
         }
     }

@@ -167,7 +167,7 @@
             : gdsStyles.text;
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -222,6 +222,7 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            autoSkip: axisAutoSkip,
                             stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
@@ -293,6 +294,7 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            autoSkip: axisAutoSkip,
                             stepSize: stepSize,
                             callback: (value) => `${value}${axisSuffix}`
                         }
@@ -473,6 +475,9 @@
             const axisMax = canvas.dataset.axisMax
                 ? parseFloat(canvas.dataset.axisMax)
                 : null;
+            const axisAutoSkip = canvas.dataset.axisAutoSkip !== undefined
+                ? canvas.dataset.axisAutoSkip !== "false"
+                : undefined;
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
@@ -515,6 +520,7 @@
                     axisSuffix,
                     axisMin,
                     axisMax,
+                    axisAutoSkip,
                     showLegend,
                     showDataLabels,
                     showXGrid,
