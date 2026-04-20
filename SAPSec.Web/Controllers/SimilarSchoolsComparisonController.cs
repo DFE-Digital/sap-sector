@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
@@ -12,6 +13,7 @@ using System.Globalization;
 namespace SAPSec.Web.Controllers;
 
 [Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
+[Authorize]
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;

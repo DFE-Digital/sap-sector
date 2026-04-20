@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
@@ -15,6 +16,7 @@ namespace SAPSec.Web.Controllers;
 /// Single Responsibility: HTTP handling and view selection only.
 /// </summary>
 [Route("school/{urn}")]
+[Authorize]
 public class SchoolController : Controller
 {
     private readonly ISchoolDetailsService _schoolDetailsService;

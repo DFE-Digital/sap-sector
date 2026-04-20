@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SAPSec.Core.Configuration;
@@ -7,6 +8,7 @@ using SmartBreadcrumbs.Attributes;
 
 namespace SAPSec.Web.Controllers;
 
+[AllowAnonymous]
 public class HomeController(IOptions<DfeSignInSettings> configuration, IWebHostEnvironment environment) : Controller
 {
     [DefaultBreadcrumb(PageTitles.ServiceHome)]
