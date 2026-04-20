@@ -167,7 +167,7 @@
             : gdsStyles.text;
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -205,6 +205,7 @@
                 scales: {
                     y: {
                         beginAtZero: true,
+                        min: axisMin ?? undefined,
                         max: axisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         grid: {
@@ -276,6 +277,7 @@
                 scales: {
                     x: {
                         beginAtZero: true,
+                        min: axisMin ?? undefined,
                         max: axisMax ?? undefined,
                         grid: {
                             display: true,
@@ -465,6 +467,9 @@
             const axisStep = canvas.dataset.axisStep
                 ? parseInt(canvas.dataset.axisStep, 10)
                 : CHART_CONFIG.defaults.axisStep;
+            const axisMin = canvas.dataset.axisMin
+                ? parseFloat(canvas.dataset.axisMin)
+                : null;
             const axisMax = canvas.dataset.axisMax
                 ? parseFloat(canvas.dataset.axisMax)
                 : null;
@@ -508,6 +513,7 @@
                     gdsStyles,
                     axisStep,
                     axisSuffix,
+                    axisMin,
                     axisMax,
                     showLegend,
                     showDataLabels,

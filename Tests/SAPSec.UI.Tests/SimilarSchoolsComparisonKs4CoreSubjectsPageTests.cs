@@ -39,4 +39,23 @@ public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetu
         chartColours.Should().Contain("#ca357c");
         chartColours.Should().Contain("#2a1950");
     }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsComparison_YearByYearChartsUsePercentAxisInQuarters()
+    {
+        await Page.GotoAsync(Path);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var lineCharts = Page.Locator("canvas[id$='-comparison-yearbyyear-chart'][data-type='line']");
+        await Expect(lineCharts).ToHaveCountAsync(7);
+
+        for (var index = 0; index < await lineCharts.CountAsync(); index++)
+        {
+            var chart = lineCharts.Nth(index);
+            (await chart.GetAttributeAsync("data-axis-min")).Should().Be("0");
+            (await chart.GetAttributeAsync("data-axis-step")).Should().Be("25");
+            (await chart.GetAttributeAsync("data-axis-max")).Should().Be("100");
+            (await chart.GetAttributeAsync("data-axis-suffix")).Should().Be("%");
+        }
+    }
 }
