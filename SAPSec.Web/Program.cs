@@ -1,4 +1,6 @@
-﻿using GovUk.Frontend.AspNetCore;
+﻿using Dfe.Analytics;
+using Dfe.Analytics.AspNetCore;
+using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -108,6 +110,15 @@ public class Program
                 .RequireAuthenticatedUser()
                 .Build();
         });
+
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        {
+            builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
+            {
+                options.RequestFilter = ctx =>
+                    ctx.Request.Path != "/healthcheck";
+            });
+        }
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -234,6 +245,11 @@ public class Program
         app.UseAuthorization();
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
+
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        {
+           app.UseDfeAnalytics();
+        }
 
         app.MapControllers();
         app.MapRazorPages();
