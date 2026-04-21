@@ -312,6 +312,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Sixth form field should be visible");
     }
+
     [Fact]
     public async Task SchoolDetails_DisplaysSENUnitField()
     {
