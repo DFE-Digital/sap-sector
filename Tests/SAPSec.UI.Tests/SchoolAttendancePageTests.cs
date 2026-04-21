@@ -36,6 +36,7 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await Expect(Page.Locator("main")).ToContainTextAsync("national averages");
         await Expect(Page.Locator("main")).ToContainTextAsync("Monitor your school attendance service");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-show-no-data-labels", "true");
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-year-by-year']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']")).ToBeVisibleAsync();
         await Expect(Page.Locator("#attendanceAbsenceType")).ToHaveValueAsync("overall");
