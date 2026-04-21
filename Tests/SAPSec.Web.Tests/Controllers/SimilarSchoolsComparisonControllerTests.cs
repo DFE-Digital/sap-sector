@@ -96,10 +96,10 @@ public class SimilarSchoolsComparisonControllerTests
         var urn = "145327";
         var similarUrn = "142075";
 
-        var currentSchool = CreateSimilarSchool(urn, "Main School",
+        var currentSchool = CreateSchool(urn, "Main School",
             new BNGCoordinates(Easting: 430000, Northing: 380000));
 
-        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School",
+        var similarSchool = CreateSchool(similarUrn, "Similar School",
             new BNGCoordinates(Easting: 431000, Northing: 381000));
 
         //var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
@@ -129,10 +129,10 @@ public class SimilarSchoolsComparisonControllerTests
         var urn = "145327";
         var similarUrn = "142075";
 
-        var currentSchool = CreateSimilarSchool(urn, "Main School",
+        var currentSchool = CreateSchool(urn, "Main School",
             new BNGCoordinates(Easting: 430000, Northing: 380000));
 
-        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School",
+        var similarSchool = CreateSchool(similarUrn, "Similar School",
             new BNGCoordinates(Easting: 431000, Northing: 381000));
 
         //var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
@@ -158,10 +158,10 @@ public class SimilarSchoolsComparisonControllerTests
         var urn = "145327";
         var similarUrn = "142075";
 
-        var currentSchool = CreateSimilarSchool(urn, "Main School",
+        var currentSchool = CreateSchool(urn, "Main School",
             new BNGCoordinates(Easting: 430000, Northing: 380000));
 
-        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School",
+        var similarSchool = CreateSchool(similarUrn, "Similar School",
             new BNGCoordinates(Easting: 431000, Northing: 381000));
 
         //var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
@@ -196,10 +196,10 @@ public class SimilarSchoolsComparisonControllerTests
         var urn = "145327";
         var similarUrn = "142075";
 
-        var currentSchool = CreateSimilarSchool(urn, "Main School",
+        var currentSchool = CreateSchool(urn, "Main School",
             new BNGCoordinates(Easting: 430000, Northing: 380000));
 
-        var similarSchool = CreateSimilarSchool(similarUrn, "Similar School Group",
+        var similarSchool = CreateSchool(similarUrn, "Similar School Group",
             new BNGCoordinates(Easting: 431000, Northing: 381000));
 
         //var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
@@ -408,7 +408,7 @@ public class SimilarSchoolsComparisonControllerTests
             .ReturnsAsync(new List<Ks4PerformanceData>());
     }
 
-    private static Establishment CreateSimilarSchool(string urn, string name, BNGCoordinates coordinates)
+    private static Establishment CreateSchool(string urn, string name, BNGCoordinates coordinates)
     {
         return new Establishment
         {
@@ -446,51 +446,6 @@ public class SimilarSchoolsComparisonControllerTests
             TrustSchoolFlagName = "No",
             Easting = coordinates.Easting,
             Northing = coordinates.Northing,
-            //Attainment8Score = DataWithAvailability.Available(50m),
-            //BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
-            //ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.Available(61m),
-            //CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.Available(62m),
-            //EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.Available(63m),
-            //EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.Available(64m),
-            //EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(65m),
-            //MathsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(66m),
-            //PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.Available(67m),
-            //OverallAbsenceRate = DataWithAvailability.Available(0m),
-            //PersistentAbsenceRate = DataWithAvailability.Available(0m)
         };
     }
-
-    //private static SchoolDetails CreateSchoolDetails(string urn, string name)
-    //{
-    //    return new SchoolDetails
-    //    {
-    //        Urn = urn,
-    //        Name = name,
-    //        DfENumber = DataWithAvailability.Available("373/1234"),
-    //        Ukprn = DataWithAvailability.Available("10012345"),
-    //        Address = DataWithAvailability.Available("123 Test Street, Sheffield, S1 1AA"),
-    //        LocalAuthorityName = DataWithAvailability.Available("Sheffield"),
-    //        LocalAuthorityCode = DataWithAvailability.Available("373"),
-    //        Region = DataWithAvailability.Available("Yorkshire"),
-    //        UrbanRuralDescription = DataWithAvailability.Available("Urban"),
-    //        AgeRangeLow = DataWithAvailability.Available(11),
-    //        AgeRangeHigh = DataWithAvailability.Available(18),
-    //        GenderOfEntry = DataWithAvailability.Available("Mixed"),
-    //        PhaseOfEducation = DataWithAvailability.Available("Secondary"),
-    //        SchoolType = DataWithAvailability.Available("Academy converter"),
-    //        AdmissionsPolicy = DataWithAvailability.Available("Non-selective"),
-    //        ReligiousCharacter = DataWithAvailability.Available("None"),
-    //        GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
-    //        AcademyTrustName = DataWithAvailability.Available("Test Trust"),
-    //        AcademyTrustId = DataWithAvailability.Available("5001"),
-    //        HasNurseryProvision = DataWithAvailability.Available(false),
-    //        HasSixthForm = DataWithAvailability.Available(true),
-    //        HasSenUnit = DataWithAvailability.Available(false),
-    //        HasResourcedProvision = DataWithAvailability.Available(false),
-    //        HeadteacherName = DataWithAvailability.Available("Mr John Smith"),
-    //        Website = DataWithAvailability.Available("https://www.testacademy.org.uk"),
-    //        Telephone = DataWithAvailability.Available("0114 123 4567"),
-    //        Email = DataWithAvailability.NotAvailable<string>()
-    //    };
-    //}
 }
