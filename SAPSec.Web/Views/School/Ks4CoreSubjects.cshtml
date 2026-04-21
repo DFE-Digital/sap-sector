@@ -66,7 +66,6 @@
     string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
     string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
 }
-
 <div class="app-ks4-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
@@ -137,7 +136,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-language-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="english-language-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -151,7 +150,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="english-language">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -231,7 +239,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-literature-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="english-literature-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -245,7 +253,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="english-literature">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -325,7 +342,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="maths-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="maths-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -339,7 +356,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="maths">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -419,7 +445,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="combined-science-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="combined-science-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -433,7 +459,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="combined-science">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -513,7 +548,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="biology-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="biology-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -527,7 +562,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="biology">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -607,7 +651,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="chemistry-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="chemistry-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -621,7 +665,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="chemistry">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -701,7 +754,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="physics-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="physics-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -715,7 +768,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="physics">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -765,4 +827,3 @@
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
-

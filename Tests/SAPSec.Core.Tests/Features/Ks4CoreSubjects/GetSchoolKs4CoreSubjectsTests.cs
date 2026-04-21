@@ -95,7 +95,8 @@ public class GetSchoolKs4CoreSubjectsTests
         subject.TopPerformers.Select(x => (x.Rank, x.Name, x.Value)).Should().ContainInOrder(
             (1, "Alpha school", 61m as decimal?),
             (2, "Beta school", 57m as decimal?),
-            (3, "Gamma school", 47m as decimal?));
+            (3, "Current school", 51m as decimal?));
+        subject.TopPerformers[2].IsCurrentSchool.Should().BeTrue();
     }
 
     [Fact]
@@ -141,7 +142,7 @@ public class GetSchoolKs4CoreSubjectsTests
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         result.SimilarSchoolsCount.Should().Be(3);
-        subject.TopPerformers.Select(x => x.Urn).Should().Equal("200001", "200002", "200003");
+        subject.TopPerformers.Select(x => x.Urn).Should().Equal("200001", "200002", "100001");
     }
 
     [Fact]

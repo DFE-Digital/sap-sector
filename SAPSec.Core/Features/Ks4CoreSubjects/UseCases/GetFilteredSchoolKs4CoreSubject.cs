@@ -1,11 +1,13 @@
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Interfaces.Services;
 
 namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 
 public class GetFilteredSchoolKs4CoreSubject(
     IKs4PerformanceRepository repository,
+    ISchoolDetailsService schoolDetailsService,
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
 {
@@ -13,6 +15,7 @@ public class GetFilteredSchoolKs4CoreSubject(
     {
         var gradeFilter = SchoolKs4CoreSubjectExtensions.ParseFilter(request.Grade);
         var subjectFilter = SchoolKs4CoreSubjectExtensions.ParseSubject(request.Subject);
+        var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
         var schoolData = await repository.GetByUrnAsync(request.Urn);
         var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn))
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
@@ -33,7 +36,7 @@ public class GetFilteredSchoolKs4CoreSubject(
             .ToArray();
 
         return new(
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, subjectFilter, gradeFilter),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, subjectFilter, gradeFilter),
             subjectFilter,
             gradeFilter);
     }

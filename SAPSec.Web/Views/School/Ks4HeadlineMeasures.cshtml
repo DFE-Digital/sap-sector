@@ -34,7 +34,6 @@
     string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
     string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
 }
-
 <div class="app-ks4-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
@@ -109,7 +108,7 @@
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -123,7 +122,16 @@
                     {
                         <tr class="govuk-table__row">
                             <td class="govuk-table__cell">@row.Rank</td>
-                            <th scope="row" class="govuk-table__header"><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header">
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric">@row.DisplayValue</td>
                         </tr>
                     }
@@ -205,7 +213,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="eng-maths-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -219,7 +227,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="eng-maths">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }
@@ -312,7 +329,7 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <p class="govuk-body">These are the top performing schools for this measure.</p>
             <table class="govuk-table" id="destinations-top-performers-table">
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
@@ -326,7 +343,16 @@
                     {
                         <tr class="govuk-table__row" data-top-performer-row="destinations">
                             <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name><a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a></th>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
                         </tr>
                     }

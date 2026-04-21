@@ -49,6 +49,8 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
                     x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num))),
             BuildTopPerformers(
+                schoolResponse.SchoolDetails,
+                schoolResponse.Attainment8ThreeYearAverage.SchoolValue,
                 similarSchools,
                 x => MeasureValue(
                     x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
@@ -67,6 +69,8 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
+                schoolResponse.SchoolDetails,
+                schoolResponse.EngMaths49ThreeYearAverage.SchoolValue,
                 similarSchools,
                 x => MeasureValue(
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
@@ -85,6 +89,8 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
+                schoolResponse.SchoolDetails,
+                schoolResponse.EngMaths59ThreeYearAverage.SchoolValue,
                 similarSchools,
                 x => MeasureValue(
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
@@ -103,6 +109,8 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
                     x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
+                schoolResponse.SchoolDetails,
+                schoolResponse.DestinationsThreeYearAverage.SchoolValue,
                 similarSchools,
                 x => MeasureValue(
                     x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
@@ -121,6 +129,8 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
                     x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
+                schoolResponse.SchoolDetails,
+                schoolResponse.DestinationsEducationThreeYearAverage.SchoolValue,
                 similarSchools,
                 x => MeasureValue(
                     x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
@@ -139,6 +149,8 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
                     x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
+                schoolResponse.SchoolDetails,
+                schoolResponse.DestinationsEmploymentThreeYearAverage.SchoolValue,
                 similarSchools,
                 x => MeasureValue(
                     x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
@@ -329,22 +341,38 @@ public class GetSchoolKs4HeadlineMeasures(
     }
 
     private static IReadOnlyList<Ks4TopPerformer> BuildTopPerformers(
+        SchoolDetails currentSchool,
+        decimal? currentSchoolValue,
         IEnumerable<SimilarSchoolMeasure> similarSchoolResponses,
-        Func<SimilarSchoolMeasure, decimal?> selector) =>
-        similarSchoolResponses
-            .Select(response => new
-            {
+        Func<SimilarSchoolMeasure, decimal?> selector)
+    {
+        var currentSchoolCandidate = new TopPerformerCandidate(
+            currentSchool.Urn,
+            currentSchool.Name,
+            currentSchoolValue,
+            IsCurrentSchool: true);
+
+        return similarSchoolResponses
+            .Select(response => new TopPerformerCandidate(
                 response.Urn,
                 response.Name,
-                Value = selector(response)
-            })
+                selector(response),
+                IsCurrentSchool: false))
+            .Append(currentSchoolCandidate)
             .Where(x => x.Value.HasValue)
             .OrderByDescending(x => x.Value)
             .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
             .Take(3)
-            .Select((x, index) => new Ks4TopPerformer(index + 1, x.Urn, x.Name, x.Value))
+            .Select((x, index) => new Ks4TopPerformer(index + 1, x.Urn, x.Name, x.Value, x.IsCurrentSchool))
             .ToList()
             .AsReadOnly();
+    }
+
+    private sealed record TopPerformerCandidate(
+        string Urn,
+        string Name,
+        decimal? Value,
+        bool IsCurrentSchool);
 }
 
 public record GetSchoolKs4HeadlineMeasuresRequest(string Urn);
@@ -359,7 +387,8 @@ public record Ks4TopPerformer(
     int Rank,
     string Urn,
     string Name,
-    decimal? Value);
+    decimal? Value,
+    bool IsCurrentSchool = false);
 
 public record SchoolKs4ComparisonYearByYear(
     Ks4HeadlineMeasureSeries School,

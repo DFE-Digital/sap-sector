@@ -6,7 +6,7 @@ namespace SAPSec.Web.ViewModels;
 
 public class Ks4HeadlineMeasuresPageViewModel
 {
-    public record TopPerformerRow(int Rank, string Urn, string Name, decimal? Value, string DisplayValue);
+    public record TopPerformerRow(int Rank, string Urn, string Name, decimal? Value, string DisplayValue, bool IsCurrentSchool);
 
     public required SchoolDetails SchoolDetails { get; set; }
     public required int SimilarSchoolsCount { get; set; }

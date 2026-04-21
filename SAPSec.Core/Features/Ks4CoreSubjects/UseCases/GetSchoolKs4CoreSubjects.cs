@@ -41,6 +41,7 @@ public class GetSchoolKs4CoreSubjects(
             similarSchools.Length,
             BuildGradeSelections(
                 schoolData,
+                schoolDetails,
                 similarSchools,
                 new SubjectFieldSelectors(
                     x => x?.EstablishmentPerformance?.EngLang49_Sum_Est_Current_Pct,
@@ -114,6 +115,7 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.EnglandPerformance?.CombSci49_Tot_Eng_Previous2_Pct)),
             BuildGradeSelections(
                 schoolData,
+                schoolDetails,
                 similarSchools,
                 new SubjectFieldSelectors(
                     x => x?.EstablishmentPerformance?.EngLang59_Sum_Est_Current_Pct,
@@ -187,6 +189,7 @@ public class GetSchoolKs4CoreSubjects(
                     x => x?.EnglandPerformance?.CombSci59_Tot_Eng_Previous2_Pct)),
             BuildGradeSelections(
                 schoolData,
+                schoolDetails,
                 similarSchools,
                 new SubjectFieldSelectors(
                     x => x?.EstablishmentPerformance?.EngLang79_Sum_Est_Current_Pct,
@@ -262,6 +265,7 @@ public class GetSchoolKs4CoreSubjects(
 
     private static SchoolKs4CoreSubjectsGradeSelections BuildGradeSelections(
         Ks4PerformanceData? schoolData,
+        SchoolDetails schoolDetails,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors englishLanguageSelectors,
         SubjectFieldSelectors englishLiteratureSelectors,
@@ -271,13 +275,13 @@ public class GetSchoolKs4CoreSubjects(
         SubjectFieldSelectors mathsSelectors,
         SubjectFieldSelectors combinedScienceSelectors) =>
         new(
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, englishLanguageSelectors),
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, englishLiteratureSelectors),
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, biologySelectors),
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, chemistrySelectors),
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, physicsSelectors),
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, mathsSelectors),
-            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, similarSchools, combinedScienceSelectors));
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, englishLanguageSelectors),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, englishLiteratureSelectors),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, biologySelectors),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, chemistrySelectors),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, physicsSelectors),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, mathsSelectors),
+            SchoolKs4CoreSubjectSelectionBuilder.BuildSelection(schoolData, schoolDetails, similarSchools, combinedScienceSelectors));
 }
 
 public record GetSchoolKs4CoreSubjectsRequest(string Urn);
