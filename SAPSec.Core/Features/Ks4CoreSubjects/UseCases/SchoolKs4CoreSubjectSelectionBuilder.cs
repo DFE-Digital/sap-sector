@@ -8,13 +8,15 @@ internal static class SchoolKs4CoreSubjectSelectionBuilder
 {
     public static SchoolKs4CoreSubjectSelection BuildSelection(
         Ks4PerformanceData? schoolData,
+        SchoolDetails schoolDetails,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SchoolKs4CoreSubject subject,
         SchoolKs4CoreSubjectGradeFilter grade) =>
-        BuildSelection(schoolData, similarSchools, GetSelectors(subject, grade));
+        BuildSelection(schoolData, schoolDetails, similarSchools, GetSelectors(subject, grade));
 
     public static SchoolKs4CoreSubjectSelection BuildSelection(
         Ks4PerformanceData? schoolData,
+        SchoolDetails schoolDetails,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors selectors)
     {
@@ -49,6 +51,8 @@ internal static class SchoolKs4CoreSubjectSelectionBuilder
                 schoolAverage.LocalAuthorityValue,
                 schoolAverage.EnglandValue),
             BuildTopPerformers(
+                schoolDetails,
+                schoolAverage.SchoolValue,
                 similarSchools,
                 x => MeasureValue(
                     selectors.SchoolCurrent(x.Data),
@@ -363,20 +367,36 @@ internal static class SchoolKs4CoreSubjectSelectionBuilder
     }
 
     private static IReadOnlyList<Ks4TopPerformer> BuildTopPerformers(
+        SchoolDetails currentSchool,
+        decimal? currentSchoolValue,
         IEnumerable<SimilarSchoolMeasure> similarSchoolResponses,
-        Func<SimilarSchoolMeasure, decimal?> selector) =>
-        similarSchoolResponses
-            .Select(response => new
-            {
+        Func<SimilarSchoolMeasure, decimal?> selector)
+    {
+        var currentSchoolCandidate = new TopPerformerCandidate(
+            currentSchool.Urn,
+            currentSchool.Name,
+            currentSchoolValue,
+            IsCurrentSchool: true);
+
+        return similarSchoolResponses
+            .Select(response => new TopPerformerCandidate(
                 response.Urn,
                 response.Name,
-                Value = selector(response)
-            })
+                selector(response),
+                IsCurrentSchool: false))
+            .Append(currentSchoolCandidate)
             .Where(x => x.Value.HasValue)
             .OrderByDescending(x => x.Value)
             .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
             .Take(3)
-            .Select((x, index) => new Ks4TopPerformer(index + 1, x.Urn, x.Name, x.Value))
+            .Select((x, index) => new Ks4TopPerformer(index + 1, x.Urn, x.Name, x.Value, x.IsCurrentSchool))
             .ToList()
             .AsReadOnly();
+    }
+
+    private sealed record TopPerformerCandidate(
+        string Urn,
+        string Name,
+        decimal? Value,
+        bool IsCurrentSchool);
 }

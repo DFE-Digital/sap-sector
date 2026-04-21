@@ -35,11 +35,15 @@
             name.scope = "row";
             name.className = "govuk-table__header";
 
-            var link = document.createElement("a");
-            link.className = "govuk-link";
-            link.href = buildTopPerformerHref(baseUrl, row.urn);
-            link.textContent = row.name;
-            name.appendChild(link);
+            if (row.isCurrentSchool) {
+                name.textContent = row.name;
+            } else {
+                var link = document.createElement("a");
+                link.className = "govuk-link";
+                link.href = buildTopPerformerHref(baseUrl, row.urn);
+                link.textContent = row.name;
+                name.appendChild(link);
+            }
 
             var value = document.createElement("td");
             value.className = "govuk-table__cell govuk-table__cell--numeric";

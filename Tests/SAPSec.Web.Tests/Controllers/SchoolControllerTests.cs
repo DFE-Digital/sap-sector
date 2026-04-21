@@ -59,6 +59,7 @@ public class SchoolControllerTests
             _similarSchoolsRepositoryMock.Object);
         var getFilteredSchoolKs4CoreSubject = new GetFilteredSchoolKs4CoreSubject(
             _ks4PerformanceRepositoryMock.Object,
+            _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
 
