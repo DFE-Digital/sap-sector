@@ -87,8 +87,7 @@ public class SimilarSchoolsComparisonControllerTests
             ks4UseCase,
             getCharacteristicsComparison,
             characteristicsFormatter,
-            _loggerMock.Object,
-            _repoMock.Object);
+            _loggerMock.Object);
     }
 
     [Fact]
