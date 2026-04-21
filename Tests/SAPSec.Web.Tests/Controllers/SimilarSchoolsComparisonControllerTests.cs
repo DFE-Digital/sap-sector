@@ -33,8 +33,9 @@ public class SimilarSchoolsComparisonControllerTests
 
     public SimilarSchoolsComparisonControllerTests()
     {
-        var logger = new Mock<ILogger<SchoolDetailsService>>();
-        var schoolDetailsService = new SchoolDetailsService(_establishmentRepositoryMock.Object, logger.Object);
+        var schoolDetailsService = new SchoolDetailsService(
+            _establishmentRepositoryMock.Object,
+            new Mock<ILogger<SchoolDetailsService>>().Object);
         var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
             _establishmentRepositoryMock.Object,
             _repoMock.Object,
@@ -52,7 +53,7 @@ public class SimilarSchoolsComparisonControllerTests
             _repoMock.Object);
         var filteredKs4CoreSubjectsUseCase = new GetFilteredSchoolKs4CoreSubject(
             _ks4PerformanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
+            schoolDetailsService,
             _establishmentRepositoryMock.Object,
             _repoMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
