@@ -197,7 +197,21 @@
             : gdsStyles.text;
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMax, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function buildExplicitTicks(axisMin, axisMax, stepSize) {
+        if (axisMin === null || axisMax === null || !stepSize) {
+            return undefined;
+        }
+
+        return function (axis) {
+            const ticks = [];
+            for (let value = axisMin; value <= axisMax; value += stepSize) {
+                ticks.push({ value });
+            }
+            axis.ticks = ticks;
+        };
+    }
+
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -210,6 +224,10 @@
         };
 
         const stepSize = axisStep;
+        const axisTickCount = axisMin !== null && axisMax !== null && stepSize
+            ? Math.floor((axisMax - axisMin) / stepSize) + 1
+            : undefined;
+        const explicitTicks = buildExplicitTicks(axisMin, axisMax, stepSize);
 
         const legendOptions = {
             display: showLegend,
@@ -235,8 +253,10 @@
                 scales: {
                     y: {
                         beginAtZero: true,
+                        min: axisMin ?? undefined,
                         max: axisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
+                        afterBuildTicks: explicitTicks,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -251,7 +271,9 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            autoSkip: axisAutoSkip,
                             stepSize: stepSize,
+                            count: axisTickCount,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -306,7 +328,9 @@
                 scales: {
                     x: {
                         beginAtZero: true,
+                        min: axisMin ?? undefined,
                         max: axisMax ?? undefined,
+                        afterBuildTicks: explicitTicks,
                         grid: {
                             display: true,
                             drawBorder: false,
@@ -321,7 +345,9 @@
                         ticks: {
                             color: gdsStyles.text,
                             font: fonts,
+                            autoSkip: axisAutoSkip,
                             stepSize: stepSize,
+                            count: axisTickCount,
                             callback: (value) => `${value}${axisSuffix}`
                         }
                     },
@@ -495,9 +521,15 @@
             const axisStep = canvas.dataset.axisStep
                 ? parseInt(canvas.dataset.axisStep, 10)
                 : CHART_CONFIG.defaults.axisStep;
+            const axisMin = canvas.dataset.axisMin
+                ? parseFloat(canvas.dataset.axisMin)
+                : null;
             const axisMax = canvas.dataset.axisMax
                 ? parseFloat(canvas.dataset.axisMax)
                 : null;
+            const axisAutoSkip = canvas.dataset.axisAutoSkip !== undefined
+                ? canvas.dataset.axisAutoSkip !== "false"
+                : undefined;
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
@@ -538,7 +570,9 @@
                     gdsStyles,
                     axisStep,
                     axisSuffix,
+                    axisMin,
                     axisMax,
+                    axisAutoSkip,
                     showLegend,
                     showDataLabels,
                     showXGrid,
