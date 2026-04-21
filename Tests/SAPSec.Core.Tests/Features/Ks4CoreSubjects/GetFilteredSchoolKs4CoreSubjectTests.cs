@@ -87,8 +87,8 @@ public class GetFilteredSchoolKs4CoreSubjectTests
             establishment?.Invoke(establishmentPerformance);
 
             _repositoryMock
-                .Setup(x => x.GetByUrnAsync("100"))
-                .ReturnsAsync(new Ks4PerformanceData("100", establishmentPerformance, new LAPerformance(), new EnglandPerformance()));
+                .Setup(x => x.GetByUrnAsync("100001"))
+                .ReturnsAsync(new Ks4PerformanceData("100001", establishmentPerformance, new LAPerformance(), new EnglandPerformance()));
         }
     }
 
