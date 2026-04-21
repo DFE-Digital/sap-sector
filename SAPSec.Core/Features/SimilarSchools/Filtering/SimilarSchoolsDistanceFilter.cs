@@ -72,7 +72,7 @@ public class SimilarSchoolsDistanceFilter(
             count = items.Count();
             if (count > 0)
             {
-                yield return new FilterOption("All", "All schools", count, value is null || value.ToLowerInvariant() == "all");
+                yield return new FilterOption("All", "All schools", count, value?.ToLowerInvariant() == "all");
             }
         }
     }

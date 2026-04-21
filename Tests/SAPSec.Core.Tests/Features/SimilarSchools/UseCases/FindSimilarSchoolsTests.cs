@@ -490,7 +490,7 @@ public class FindSimilarSchoolsTests
                 Options = new[]
                 {
                     new { Key = "100", Name = "Up to 100 miles", Selected = false, Count = 2 },
-                    new { Key = "All", Name = "All schools", Selected = true, Count = 2 }
+                    new { Key = "All", Name = "All schools", Selected = false, Count = 2 }
                 }
             }),
             // Numeric range filters are always included
