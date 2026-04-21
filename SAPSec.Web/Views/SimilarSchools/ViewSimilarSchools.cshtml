@@ -19,7 +19,17 @@
             @foreach (var error in Model.ValidationErrors)
             {
                 <li>
-                    <a href="#@(error.Key)">@error.Message</a>
+                    @{
+                        // If there is an error with both fields in a numeric range filter,
+                        // we still need to link to one of the fields, so we choose the From
+                        // field.
+                        // Note: This will only work as long as numeric range filters are
+                        // the only filters with validation errors
+                        var key = !error.Key.EndsWith("_f") && !error.Key.EndsWith("_t")
+                            ? error.Key + "_f"
+                            : error.Key;
+                    }
+                    <a href="#@(key)">@error.Message</a>
                 </li>
             }
           </ul>

@@ -55,9 +55,9 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             .AsReadOnly();
     }
 
-    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
+    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
     {
         var list = await _standardDeviations.ReadAllAsync();
-        return list.First();
+        return list.FirstOrDefault();
     }
 }
