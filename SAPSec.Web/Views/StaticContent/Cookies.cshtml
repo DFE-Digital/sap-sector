@@ -1,7 +1,11 @@
 @using SAPSec.Web.Constants
+@using System.Text.Json
 @{
     ViewData[ViewDataKeys.Title] = PageTitles.Cookies;
+    var returnUrl = ViewData["CookieReturnUrl"] as string ?? Url.Content("~/");
 }
+
+<a href="@returnUrl" class="govuk-back-link">Back</a>
 
 <h1 class="govuk-heading-xl">Cookies</h1>
 
@@ -211,6 +215,7 @@
     <script add-nonce="true">
         (function () {
             var cookieName = "@LayoutConstants.CookieSettingsName";
+            var returnUrl = @Html.Raw(JsonSerializer.Serialize(returnUrl));
             var saveForm = document.getElementById("cookie-settings-form");
             var radios = document.getElementsByName("analytics-cookies");
 
@@ -253,6 +258,11 @@
                 expireCookie("SM");
             }
 
+            function addQueryParameter(url, name, value) {
+                var separator = url.indexOf("?") === -1 ? "?" : "&";
+                return url + separator + encodeURIComponent(name) + "=" + encodeURIComponent(value);
+            }
+
             function setSelectedValue(value) {
                 for (var i = 0; i < radios.length; i++) {
                     radios[i].checked = radios[i].value === value;
@@ -285,7 +295,7 @@
                 }
 
                 var bannerState = analyticsEnabled ? "accepted" : "rejected";
-                window.location.assign(window.location.pathname + "?cookie-banner=" + bannerState);
+                window.location.assign(addQueryParameter(returnUrl, "cookie-banner", bannerState));
             });
         })();
     </script>

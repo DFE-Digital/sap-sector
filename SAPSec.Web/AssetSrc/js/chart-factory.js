@@ -47,7 +47,10 @@
             },
             labels: {
                 yTickPadding: 10,
-                noDataOffset: 12
+                noDataOffset: 12,
+                baseContainerHeight: 260,
+                rowHeight: 70,
+                lineHeight: 18
             },
             dataset: {
                 borderWidth: 1,
@@ -507,6 +510,26 @@
         }
     }
 
+    function resizeBarChartContainer(canvas, chartData) {
+        const container = canvas.parentElement;
+        const labels = Array.isArray(chartData.labels) ? chartData.labels : [];
+        if (!container || labels.length === 0) {
+            return;
+        }
+
+        const maxWrappedLines = Math.max(...labels.map(label =>
+            wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars).length
+        ));
+        const rowHeight = CHART_CONFIG.bar.labels.rowHeight
+            + Math.max(0, maxWrappedLines - 2) * CHART_CONFIG.bar.labels.lineHeight;
+        const height = Math.max(
+            CHART_CONFIG.bar.labels.baseContainerHeight,
+            labels.length * rowHeight
+        );
+
+        container.style.height = `${height}px`;
+    }
+
     function initCharts() {
         document.querySelectorAll('.js-chart').forEach(canvas => {
             if (charts[canvas.id]) {
@@ -521,6 +544,9 @@
 
             const chartData = JSON.parse(canvas.dataset.chart);
             const type = canvas.dataset.type;
+            if (type === 'bar') {
+                resizeBarChartContainer(canvas, chartData);
+            }
             const showLegend = canvas.dataset.showLegend === "true";
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
