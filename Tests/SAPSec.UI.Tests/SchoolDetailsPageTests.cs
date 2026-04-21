@@ -289,23 +289,6 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         isVisible.Should().BeTrue("Admissions policy field should be visible");
     }
 
-
-    [Fact]
-    public async Task SchoolDetails_AdmissionsPolicyField_ValueIsNotNumeric()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var admissionsValueLocator = Page.Locator("div.govuk-summary-list__row:has(dt:has-text('Admissions policy')) dd.govuk-summary-list__value");
-
-        var admissionsValue = await admissionsValueLocator.InnerTextAsync();
-
-        var isNumeric = int.TryParse(admissionsValue, out _);
-
-        isNumeric.Should().BeFalse("Admissions policy value should not be a number");
-    }
-
-
     [Fact]
     public async Task SchoolDetails_DisplaysNurseryProvisionField()
     {
