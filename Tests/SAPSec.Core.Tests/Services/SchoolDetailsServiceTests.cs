@@ -48,7 +48,7 @@ public class SchoolDetailsServiceTests
     }
 
     [Fact]
-    public async Task GetByUrn_ValidUrn_AdmissionsPolicy_ShouldNotBeNumber()
+    public async Task GetByUrn_ValidUrn_AdmissionsPolicy_ShouldNotBeANumber()
     {
         // Arrange
         var establishment = CreateTestAcademy();
