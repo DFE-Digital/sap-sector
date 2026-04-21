@@ -31,7 +31,6 @@ public class SimilarSchoolsDistanceFilter(
                 "25" => i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 25,
                 "50" => i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 50,
                 "100" => i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 100,
-                "over100" => i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) > 100,
                 _ => true
             });
     }
@@ -70,10 +69,10 @@ public class SimilarSchoolsDistanceFilter(
                 yield return new FilterOption("100", "Up to 100 miles", count, value == "100");
             }
 
-            count = items.Count(i => i.Coordinates is not null && i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) > 100);
+            count = items.Count();
             if (count > 0)
             {
-                yield return new FilterOption("Over100", "More than 100 miles", count, value == "Over100");
+                yield return new FilterOption("All", "All schools", count, value is null || value.ToLowerInvariant() == "all");
             }
         }
     }

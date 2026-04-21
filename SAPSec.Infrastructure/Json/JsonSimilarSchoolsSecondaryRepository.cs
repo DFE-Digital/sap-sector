@@ -7,27 +7,20 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
 {
     private readonly IJsonFile<SimilarSchoolsSecondaryGroupsEntry> _similarSchoolsGroups;
     private readonly IJsonFile<SimilarSchoolsSecondaryValuesEntry> _similarSchoolsValues;
-    private readonly IJsonFile<Establishment> _establishments;
     private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> _standardDeviations;
 
     public JsonSimilarSchoolsSecondaryRepository(
         IJsonFile<SimilarSchoolsSecondaryGroupsEntry> similarSchoolsGroupsRepository,
         IJsonFile<SimilarSchoolsSecondaryValuesEntry> similarSchoolsValuesRepository,
-        IJsonFile<Establishment> establishmentRepository,
-        IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
         IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> standardDeviationsRepository)
     {
         _similarSchoolsGroups = similarSchoolsGroupsRepository;
         _similarSchoolsValues = similarSchoolsValuesRepository;
-        _establishments = establishmentRepository;
         _standardDeviations = standardDeviationsRepository;
     }
 
     public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)
     {
-        var allEstabs = await _establishments.ReadAllAsync();
-        var currentEstab = allEstabs.Single(e => e.URN == urn);
-
         var rows = await _similarSchoolsGroups.ReadAllAsync();
         var groupRows = rows.Where(r => r.URN == urn).ToList();
         return groupRows.AsReadOnly();

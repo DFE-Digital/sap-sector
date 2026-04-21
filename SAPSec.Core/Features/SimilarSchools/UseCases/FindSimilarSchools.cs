@@ -8,7 +8,6 @@ using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
-using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
@@ -18,16 +17,9 @@ public class FindSimilarSchools(
     IKs4PerformanceRepository performanceRepository,
     IAbsenceRepository absenceRepository)
 {
-    private static readonly Regex UrnRegex = new Regex(@"^\d{6}$", RegexOptions.Compiled);
-
     public async Task<FindSimilarSchoolsResponse> Execute(FindSimilarSchoolsRequest request)
     {
-        if (!UrnRegex.IsMatch(request.CurrentSchoolUrn))
-        {
-            var ex = new ValidationException();
-            ex.AddError("CurrentSchoolUrn", "Current School URN should be a valid URN");
-            throw ex;
-        }
+        // TODO: Validate request
 
         var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);

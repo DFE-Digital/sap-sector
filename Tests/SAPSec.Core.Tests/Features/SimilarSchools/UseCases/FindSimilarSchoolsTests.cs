@@ -20,18 +20,6 @@ public class FindSimilarSchoolsTests
             _absenceRepo);
     }
 
-    [Theory]
-    [InlineData("XXX")]
-    [InlineData("12345")]
-    [InlineData("1234567")]
-    public async Task WhenCurrentSchoolUrnIsInvalid_ThrowsValidationException(string invalidUrn)
-    {
-        var act = async () => await _sut.Execute(Request(invalidUrn));
-
-        var x = await act.Should().ThrowAsync<ValidationException>()
-            .Where(ex => ex.Errors.Any(e => e.Key == "CurrentSchoolUrn"));
-    }
-
     [Fact]
     public async Task WhenCurrentSchoolUrnDoesNotExist_ThrowsNotFoundException()
     {
@@ -235,7 +223,7 @@ public class FindSimilarSchoolsTests
     [InlineData("dist", new[] { "25" }, new[] { "100002", "100003", "100004", "100005", "100006" })]
     [InlineData("dist", new[] { "50" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008" })]
     [InlineData("dist", new[] { "100" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008", "100009", "100010" })]
-    [InlineData("dist", new[] { "over100" }, new[] { "100011" })]
+    [InlineData("dist", new[] { "all" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008", "100009", "100010", "100011" })]
     // Filter key is case insensitive
     [InlineData("DIST", new[] { "5" }, new[] { "100002" })]
     // Invalid filter values are ignored
@@ -392,7 +380,7 @@ public class FindSimilarSchoolsTests
                     new { Key = "25", Name = "Up to 25 miles", Selected = false, Count = 5 },
                     new { Key = "50", Name = "Up to 50 miles", Selected = false, Count = 7 },
                     new { Key = "100", Name = "Up to 100 miles", Selected = false, Count = 9 },
-                    new { Key = "Over100", Name = "More than 100 miles", Selected = false, Count = 1 },
+                    new { Key = "All", Name = "All schools", Selected = false, Count = 10 },
                 },
 
             }),
@@ -448,7 +436,7 @@ public class FindSimilarSchoolsTests
                     new { Key = "25", Name = "Up to 25 miles", Selected = false, Count = 2 },
                     new { Key = "50", Name = "Up to 50 miles", Selected = false, Count = 2 },
                     new { Key = "100", Name = "Up to 100 miles", Selected = false, Count = 2 },
-                    new { Key = "Over100", Name = "More than 100 miles", Selected = false, Count = 1 },
+                    new { Key = "All", Name = "All schools", Selected = false, Count = 3 },
                 },
                 CurrentSchoolValue = (DataWithAvailability<string>?)null
             }),
@@ -484,8 +472,8 @@ public class FindSimilarSchoolsTests
     {
         _establishmentRepo.SetupEstablishments(
             new() { URN = "100001", Easting = 100000, Northing = 100000 },
-            new() { URN = "100002", Easting = 100000, Northing = 180000 },
-            new() { URN = "100003", Easting = 180000, Northing = 100000 }
+            new() { URN = "100002", Easting = 100000, Northing = 260000 },
+            new() { URN = "100003", Easting = 260000, Northing = 100000 }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -501,8 +489,8 @@ public class FindSimilarSchoolsTests
                 Name = "Distance",
                 Options = new[]
                 {
-                    new { Key = "50", Name = "Up to 50 miles", Selected = false, Count = 2 },
-                    new { Key = "100", Name = "Up to 100 miles", Selected = false, Count = 2 }
+                    new { Key = "100", Name = "Up to 100 miles", Selected = false, Count = 2 },
+                    new { Key = "All", Name = "All schools", Selected = true, Count = 2 }
                 }
             }),
             // Numeric range filters are always included
@@ -565,7 +553,8 @@ public class FindSimilarSchoolsTests
                 Options = new[]
                 {
                     new { Key = "50", Name = "Up to 50 miles", Selected = false, Count = 1 },
-                    new { Key = "100", Name = "Up to 100 miles", Selected = true, Count = 1 }
+                    new { Key = "100", Name = "Up to 100 miles", Selected = true, Count = 1 },
+                    new { Key = "All", Name = "All schools", Selected = false, Count = 4 }
                 }
             }),
             // Numeric range filters are always included
