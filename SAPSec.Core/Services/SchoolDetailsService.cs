@@ -69,7 +69,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             GenderOfEntry = DataMapper.MapString(establishment.GenderName),
             PhaseOfEducation = DataMapper.MapString(establishment.PhaseOfEducationName),
             SchoolType = DataMapper.MapString(establishment.TypeOfEstablishmentName),
-            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionsPolicyId),
+            AdmissionsPolicy = DataMapper.MapString(establishment.AdmissionsPolicyName),
             ReligiousCharacter = DataMapper.MapString(establishment.ReligiousCharacterName),
 
             // Governance - business rule
