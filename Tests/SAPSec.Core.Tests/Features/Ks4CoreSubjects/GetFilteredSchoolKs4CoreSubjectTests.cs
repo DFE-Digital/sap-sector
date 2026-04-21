@@ -4,6 +4,7 @@ using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 
@@ -56,6 +57,7 @@ public class GetFilteredSchoolKs4CoreSubjectTests
     private sealed class TestContext
     {
         private readonly Mock<IKs4PerformanceRepository> _repositoryMock = new();
+        private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
         private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
         private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
 
@@ -64,6 +66,9 @@ public class GetFilteredSchoolKs4CoreSubjectTests
             _similarSchoolsRepositoryMock
                 .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
                 .ReturnsAsync(Array.Empty<string>());
+            _schoolDetailsServiceMock
+                .Setup(x => x.GetByUrnAsync("100"))
+                .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
             _repositoryMock
                 .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(Array.Empty<Ks4PerformanceData>());
@@ -74,6 +79,7 @@ public class GetFilteredSchoolKs4CoreSubjectTests
 
         public GetFilteredSchoolKs4CoreSubject Sut => new(
             _repositoryMock.Object,
+            _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
 
@@ -87,4 +93,36 @@ public class GetFilteredSchoolKs4CoreSubjectTests
                 .ReturnsAsync(new Ks4PerformanceData("100", establishmentPerformance, new LAPerformance(), new EnglandPerformance()));
         }
     }
+
+    private static SchoolDetails CreateSchoolDetails(string urn, string name) =>
+        new()
+        {
+            Urn = urn,
+            Name = name,
+            DfENumber = DataWithAvailability.Available("001/1234"),
+            Ukprn = DataWithAvailability.Available("10000000"),
+            Address = DataWithAvailability.Available("Test Address"),
+            LocalAuthorityName = DataWithAvailability.Available("Test LA"),
+            LocalAuthorityCode = DataWithAvailability.Available("001"),
+            Region = DataWithAvailability.Available("Test Region"),
+            UrbanRuralDescription = DataWithAvailability.Available("Urban"),
+            AgeRangeLow = DataWithAvailability.Available(11),
+            AgeRangeHigh = DataWithAvailability.Available(16),
+            GenderOfEntry = DataWithAvailability.Available("Mixed"),
+            PhaseOfEducation = DataWithAvailability.Available("Secondary"),
+            SchoolType = DataWithAvailability.Available("Academy"),
+            AdmissionsPolicy = DataWithAvailability.Available("Not selective"),
+            ReligiousCharacter = DataWithAvailability.Available("None"),
+            GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
+            AcademyTrustName = DataWithAvailability.Available("Test Trust"),
+            AcademyTrustId = DataWithAvailability.Available("5000"),
+            HasNurseryProvision = DataWithAvailability.Available(false),
+            HasSixthForm = DataWithAvailability.Available(false),
+            HasSenUnit = DataWithAvailability.Available(false),
+            HasResourcedProvision = DataWithAvailability.Available(false),
+            HeadteacherName = DataWithAvailability.Available("Head Teacher"),
+            Website = DataWithAvailability.Available("https://example.test"),
+            Telephone = DataWithAvailability.Available("0123456789"),
+            Email = DataWithAvailability.NotAvailable<string>()
+        };
 }

@@ -267,8 +267,9 @@ public class GetSchoolKs4HeadlineMeasuresTests
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
 
         result.SimilarSchoolsCount.Should().Be(1);
-        result.Attainment8TopPerformers.Should().ContainSingle();
-        result.Attainment8TopPerformers[0].Name.Should().Be("Alpha school");
+        result.Attainment8TopPerformers.Select(x => (x.Rank, x.Name, x.IsCurrentSchool)).Should().ContainInOrder(
+            (1, "Current school", true),
+            (2, "Alpha school", false));
     }
 
     [Fact]
@@ -342,7 +343,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
     }
 
     [Fact]
-    public async Task Execute_WhenAllSimilarSchoolSourceDataIsUnavailable_ReturnsNullComparisonValuesAndNoTopPerformers()
+    public async Task Execute_WhenAllSimilarSchoolSourceDataIsUnavailable_ReturnsNullComparisonValuesAndCurrentSchoolTopPerformers()
     {
         var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
         var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
@@ -405,9 +406,9 @@ public class GetSchoolKs4HeadlineMeasuresTests
         result.EngMaths49YearByYear.SimilarSchools.Should().Be(new Ks4HeadlineMeasureSeries(null, null, null));
         result.DestinationsThreeYearAverage.SimilarSchoolsValue.Should().BeNull();
         result.DestinationsYearByYear.SimilarSchools.Should().Be(new Ks4HeadlineMeasureSeries(null, null, null));
-        result.Attainment8TopPerformers.Should().BeEmpty();
-        result.EngMaths49TopPerformers.Should().BeEmpty();
-        result.DestinationsTopPerformers.Should().BeEmpty();
+        result.Attainment8TopPerformers.Should().ContainSingle(x => x.Name == "Current school" && x.IsCurrentSchool);
+        result.EngMaths49TopPerformers.Should().ContainSingle(x => x.Name == "Current school" && x.IsCurrentSchool);
+        result.DestinationsTopPerformers.Should().ContainSingle(x => x.Name == "Current school" && x.IsCurrentSchool);
     }
 
     private static SchoolDetails CreateSchoolDetails(string urn, string name) =>

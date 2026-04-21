@@ -257,6 +257,12 @@
             ? Math.floor((axisMax - axisMin) / stepSize) + 1
             : undefined;
         const explicitTicks = buildExplicitTicks(axisMin, axisMax, stepSize);
+        const lineScaleHeadroom = type === 'line' && axisMax !== null && stepSize
+            ? stepSize * 0.2
+            : 0;
+        const lineScaleMax = axisMax !== null
+            ? axisMax + lineScaleHeadroom
+            : null;
 
         const legendOptions = {
             display: showLegend,
@@ -283,7 +289,7 @@
                     y: {
                         beginAtZero: true,
                         min: axisMin ?? undefined,
-                        max: axisMax ?? undefined,
+                        max: lineScaleMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         afterBuildTicks: explicitTicks,
                         grid: {

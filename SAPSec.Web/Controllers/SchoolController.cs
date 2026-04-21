@@ -238,6 +238,7 @@ public class SchoolController : Controller
                     x.Rank,
                     x.Urn,
                     x.Name,
+                    x.IsCurrentSchool,
                     DisplayValue = Ks4HeadlineMeasuresPageViewModel.DisplayPercent(x.Value)
                 })
         });
@@ -306,6 +307,7 @@ public class SchoolController : Controller
                     x.Rank,
                     x.Urn,
                     x.Name,
+                    x.IsCurrentSchool,
                     DisplayValue = Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(x.Value)
                 })
         });
@@ -392,6 +394,7 @@ public class SchoolController : Controller
                     x.Rank,
                     x.Urn,
                     x.Name,
+                    x.IsCurrentSchool,
                     DisplayValue = Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value)
                 })
         });
@@ -449,7 +452,7 @@ public class SchoolController : Controller
         IReadOnlyList<SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4TopPerformer> topPerformers,
         Func<decimal?, string> formatter) =>
         topPerformers
-            .Select(x => new TopPerformerRow(x.Rank, x.Urn, x.Name, x.Value, formatter(x.Value)))
+            .Select(x => new TopPerformerRow(x.Rank, x.Urn, x.Name, x.Value, formatter(x.Value), x.IsCurrentSchool))
             .ToList()
             .AsReadOnly();
 
@@ -512,7 +515,8 @@ public class SchoolController : Controller
                     x.Urn,
                     x.Name,
                     x.Value,
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value)))
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value),
+                    x.IsCurrentSchool))
                 .ToList()
                 .AsReadOnly(),
             selection.YearByYear.School,
