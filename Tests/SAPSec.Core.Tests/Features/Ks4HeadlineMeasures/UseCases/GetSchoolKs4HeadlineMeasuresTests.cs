@@ -301,8 +301,12 @@ public class GetSchoolKs4HeadlineMeasuresTests
             .ReturnsAsync(CreateDestinations("100001", "90", "91", "92"));
 
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolUrnsAsync("100001"))
-            .ReturnsAsync(["200003", "200001", "200002"]);
+            .Setup(x => x.GetSimilarSchoolsGroupAsync("100001"))
+            .ReturnsAsync([
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = "200003" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = "200001" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = "200002" }
+            ]);
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
