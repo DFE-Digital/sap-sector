@@ -9,7 +9,7 @@ public interface IKs4PerformanceRepository
 }
 
 public record Ks4PerformanceData(
-    string Urn,
+    string URN,
     EstablishmentPerformance? EstablishmentPerformance,
     LAPerformance? LocalAuthorityPerformance,
     EnglandPerformance? EnglandPerformance);

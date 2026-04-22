@@ -7,7 +7,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 
-namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures;
+namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
 
 public class GetSchoolKs4HeadlineMeasuresTests
 {
@@ -160,8 +160,12 @@ public class GetSchoolKs4HeadlineMeasuresTests
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
-            .ReturnsAsync(["200", "300", "400"]);
+            .Setup(x => x.GetSimilarSchoolsGroupAsync("100"))
+            .ReturnsAsync([
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "400" }
+            ]);
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200", "300", "400" }))))
@@ -231,8 +235,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
-            .ReturnsAsync(["200", "300"]);
+            .Setup(x => x.GetSimilarSchoolsGroupAsync("100"))
+            .ReturnsAsync([
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" }
+            ]);
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
@@ -294,8 +301,12 @@ public class GetSchoolKs4HeadlineMeasuresTests
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
-            .ReturnsAsync(["200", "300", "400"]);
+            .Setup(x => x.GetSimilarSchoolsGroupAsync("100"))
+            .ReturnsAsync([
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "400" }
+            ]);
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
@@ -364,8 +375,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolUrnsAsync("100"))
-            .ReturnsAsync(["200", "300"]);
+            .Setup(x => x.GetSimilarSchoolsGroupAsync("100"))
+            .ReturnsAsync([
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" }
+            ]);
 
         performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))

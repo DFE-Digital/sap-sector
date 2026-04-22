@@ -6,11 +6,43 @@
 }
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 <link rel="stylesheet" href="~/css/MarkerCluster.css"/>
+
+@if (Model.ValidationErrors.Any())
+{
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+      <div role="alert">
+        <h2 class="govuk-error-summary__title">
+          There is a problem
+        </h2>
+        <div class="govuk-error-summary__body">
+          <ul class="govuk-list govuk-error-summary__list">
+            @foreach (var error in Model.ValidationErrors)
+            {
+                <li>
+                    @{
+                        // If there is an error with both fields in a numeric range filter,
+                        // we still need to link to one of the fields, so we choose the From
+                        // field.
+                        // Note: This will only work as long as numeric range filters are
+                        // the only filters with validation errors
+                        var key = !error.Key.EndsWith("_f") && !error.Key.EndsWith("_t")
+                            ? error.Key + "_f"
+                            : error.Key;
+                    }
+                    <a href="#@(key)">@error.Message</a>
+                </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+}
+
 <span class="govuk-caption-xl">@Model.EstablishmentName</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
 <p class="govuk-body">
-    We've identified <strong>@Model.TotalResults</strong> similar @Model.PhaseOfEducation.ToLower() phase schools.
+    We've identified <strong>50</strong> similar secondary phase schools.
     Select a school to compare further and connect with for support. You can also refine the results by applying filters.
 </p>
 <p class="govuk-body">
@@ -23,7 +55,7 @@
     <partial name="SimilarSchoolsFilter.cshtml" model="Model" />
 
     @* ── Right column: Sort + Results + Pagination ── *@
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-two-thirds app-filter__results-column">
         
         @if (Model.TotalResults > 0)
         {
@@ -78,7 +110,7 @@
         var sortSelect = document.getElementById('sort-by');
         if (sortSelect) {
             sortSelect.addEventListener('change', function () {
-                var form = document.getElementById('similar-schools-filter-form');
+                var form = document.getElementById('app-filter-panel');
                 if (form) form.submit();
             });
         }

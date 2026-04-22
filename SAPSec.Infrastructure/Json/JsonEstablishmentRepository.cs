@@ -9,12 +9,12 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
     private readonly IJsonFile<Establishment> _establishmentJsonFile;
     private readonly IJsonFile<EstablishmentEmail> _establishmentEmailJsonFile;
 
-    private ILogger<Establishment> _logger;
+    private ILogger<JsonEstablishmentRepository> _logger;
 
     public JsonEstablishmentRepository(
         IJsonFile<Establishment> establishmentJsonFile,
         IJsonFile<EstablishmentEmail> establishmentEmailJsonFile,
-        ILogger<Establishment> logger)
+        ILogger<JsonEstablishmentRepository> logger)
     {
         _establishmentJsonFile = establishmentJsonFile;
         _establishmentEmailJsonFile = establishmentEmailJsonFile;
@@ -47,7 +47,7 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
     {
         var allEstablishments = await _establishmentJsonFile.ReadAllAsync();
 
-        return allEstablishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || $"{x.LAId}{x.EstablishmentNumber}" == number);
+        return allEstablishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.LAESTAB == number);
     }
 
     public async Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
@@ -56,5 +56,4 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
 
         return establishmentEmails.FirstOrDefault(x => x.URN == urn);
     }
-
 }

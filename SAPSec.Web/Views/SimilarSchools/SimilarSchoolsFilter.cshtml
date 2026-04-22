@@ -7,22 +7,22 @@
     var panelVisibleClass = hasActiveFilters ? "app-filter-panel--visible" : "";
 }
 
-<div class="govuk-grid-column-one-third app-filter-column app-similar-schools-filter-column">
+<div class="govuk-grid-column-one-third app-filter__column">
     <button type="button" class="govuk-button govuk-button--secondary app-filter-toggle"
             data-module="app-filter-toggle"
             aria-expanded="@isExpanded"
-            aria-controls="similar-schools-filter-form">
+            aria-controls="app-filter-panel">
         <span class="app-filter-toggle__show">Show filters</span>
         <span class="app-filter-toggle__hide">Hide filters</span>
     </button>
 
     <form method="get"
           action="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })"
-          id="similar-schools-filter-form"
-          class="app-filter-panel app-filter-panel--similar @panelVisibleClass">
+          id="app-filter-panel"
+          class="app-filter-panel @panelVisibleClass">
 
-        <div class="moj-filter">
-            <div class="moj-filter__header app-filter-header-divider">
+        <div class="moj-filter app-filter">
+            <div class="moj-filter__header app-filter__header">
                 <div class="moj-filter__header-title">
                     <h2 class="govuk-heading-m">Filters</h2>
                 </div>
@@ -33,18 +33,18 @@
                 @* ── Selected filter tags + Clear filters ── *@
                 @if (hasActiveFilters)
                 {
-                    <div class="moj-filter__selected app-filter-selected-divider">
-                        <div class="moj-filter__selected-heading">
+                    <div class="moj-filter__selected app-filter__selected">
+                        <div class="moj-filter__selected-heading app-filter__selected-heading">
                             <div class="moj-filter__heading-title">
                                 <h2 class="govuk-heading-s">Selected filters</h2>
                             </div>
                         </div>
 
-                        <ul class="moj-filter-tags">
+                        <ul class="moj-filter-tags app-filter__tags">
                             @foreach (var tag in Model.SelectedFilterTags)
                             {
                                 <li>
-                                    <a class="moj-filter__tag" href="@tag.RemoveUrl">
+                                    <a class="moj-filter__tag app-filter__tag" href="@tag.RemoveUrl">
                                         <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
                                     </a>
                                 </li>
@@ -60,15 +60,15 @@
                     </div>
                 }
 
-                <div class="moj-filter__options">
-                    <button type="submit" class="govuk-button" data-module="govuk-button" id="apply-filters-btn">
+                <div class="moj-filter__options app-filter__options">
+                    <button type="submit" class="govuk-button app-filter__apply-button" data-module="govuk-button">
                         <span class="app-button-spinner" aria-hidden="true"></span>
                         <span class="app-button-text">Apply filters</span>
                     </button>
 
                     @foreach (var group in Model.FilterGroups)
                     {
-                        <fieldset class="govuk-fieldset">
+                        <fieldset class="govuk-fieldset app-filter__fieldset">
                             <legend class="govuk-fieldset__legend govuk-fieldset__legend--s">@group.Heading</legend>
                             @for (var i = 0; i < group.Filters.Count; i++)
                             {
@@ -80,6 +80,11 @@
                             }
                         </fieldset>
                     }
+
+                    <button type="submit" class="govuk-button app-filter__apply-button" data-module="govuk-button">
+                        <span class="app-button-spinner" aria-hidden="true"></span>
+                        <span class="app-button-text">Apply filters</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -95,22 +100,22 @@
         }
 
         function initFilterProtection() {
-            var filterForm = document.getElementById('similar-schools-filter-form');
+            var filterForm = document.getElementById('app-filter-panel');
             if (!filterForm) return;
 
-            var applyButton = document.getElementById('apply-filters-btn');
+            const applyButtons = document.getElementsByClassName('app-filter__apply-button');
 
             filterForm.onsubmit = function (e) {
-                var submitEvent = e;
-                var submitter = submitEvent.submitter;
-                var isApplyButton = submitter === applyButton;
+                const submitEvent = e;
+                const submitter = submitEvent.submitter;
+                const isApplyButton = [...applyButtons].indexOf(submitter) > -1;
 
                 if (!isApplyButton) {
                     e.preventDefault();
                     return false;
                 }
 
-                if (applyButton) {
+                for(var applyButton of applyButtons) {
                     applyButton.classList.add('govuk-button--loading');
                     applyButton.disabled = true;
                 }
@@ -141,7 +146,7 @@
         });
 
         var filterToggle = document.querySelector('[data-module="app-filter-toggle"]');
-        var filterPanel = document.getElementById('similar-schools-filter-form');
+        var filterPanel = document.getElementById('app-filter-panel');
         if (filterToggle && filterPanel) {
             filterToggle.addEventListener('click', function (e) {
                 e.preventDefault();

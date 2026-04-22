@@ -4,43 +4,47 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filterValues, SimilarSchool currentSchool)
 {
-    private Dictionary<string, ISimilarSchoolsFilter> _filters = new()
+    private Dictionary<string, ISimilarSchoolsFilter> _filters = new ISimilarSchoolsFilter[]
     {
-        ["dist"] = new SimilarSchoolsDistanceFilter(currentSchool),
-        ["reg"] = new SimilarSchoolsRegionFilter(currentSchool),
-        ["ur"] = new SimilarSchoolsUrbanRuralFilter(currentSchool),
-        ["poe"] = new SimilarSchoolsPhaseOfEducationFilter(currentSchool),
-        ["sc"] = new SimilarSchoolsSchoolCapacityInUseFilter(currentSchool),
-        ["np"] = new SimilarSchoolsNurseryProvisionFilter(currentSchool),
-        ["sf"] = new SimilarSchoolsSixthFormFilter(currentSchool),
-        ["ap"] = new SimilarSchoolsAdmissionsPolicyFilter(currentSchool),
+        new SimilarSchoolsDistanceFilter("dist", "Distance", filterValues, currentSchool),
+        new SimilarSchoolsReferenceDataFilter("reg", "Region", filterValues, currentSchool, s => s.Region),
+        new SimilarSchoolsReferenceDataFilter("ur", "Urban or rural", filterValues, currentSchool, s => s.UrbanRural),
+        new SimilarSchoolsReferenceDataFilter("poe", "Phase of education", filterValues, currentSchool, s => s.PhaseOfEducation),
+        new SimilarSchoolsSchoolCapacityInUseFilter("sciu", "School capacity in use", filterValues, currentSchool),
+        new SimilarSchoolsNurseryProvisionFilter("np", "Nursery provision", filterValues, currentSchool),
+        new SimilarSchoolsReferenceDataFilter("sf", "Sixth form", filterValues, currentSchool, s => s.OfficialSixthForm),
+        new SimilarSchoolsReferenceDataFilter("ap", "Admissions policy", filterValues, currentSchool, s => s.AdmissionsPolicy),
         // TODO: Governance structure
-        ["sp"] = new SimilarSchoolsTypeOfSpecialistProvisionFilter(currentSchool),
-        ["goe"] = new SimilarSchoolsGenderOfEntryFilter(currentSchool),
-        // TODO: Overall absence rate
-        // TODO: Persistent absence rate
-    };
+        new SimilarSchoolsTypeOfSpecialistProvisionFilter("sp", "Type of specialist provision", filterValues, currentSchool),
+        new SimilarSchoolsReferenceDataFilter("goe", "Gender of entry", filterValues, currentSchool, s => s.Gender),
+        new SimilarSchoolsOverallAbsenceRateFilter("oar", "Overall absence rate", filterValues, currentSchool),
+        new SimilarSchoolsPersistentAbsenceRateFilter("par", "Persistent absence rate", filterValues, currentSchool)
+    }.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
+
+    public IReadOnlyCollection<ValidationError> Validate()
+    {
+        var errors = new List<ValidationError>();
+
+        foreach (var filter in _filters.Values.OfType<SimilarSchoolsNumericRangeFilter>())
+        {
+            if (filter.IsApplied)
+            {
+                errors.AddRange(filter.Validate());
+            }
+        }
+
+        return errors;
+    }
 
     public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
     {
         var filteredItems = items;
-        foreach (var (key, filter) in _filters)
+
+        foreach (var filter in _filters.Values)
         {
-            if (filter is ISimilarSchoolsMultiValueFilter mvf)
+            if (filter.IsApplied)
             {
-                var values = filterValues.ContainsKey(key) ? filterValues[key] : [];
-                filteredItems = mvf.Filter(filteredItems, values);
-            }
-            else if (filter is ISimilarSchoolsSingleValueFilter svf)
-            {
-                var value = (filterValues.ContainsKey(key) ? filterValues[key] : []).LastOrDefault();
-                filteredItems = svf.Filter(filteredItems, value);
-            }
-            else if (filter is ISimilarSchoolsNumericRangeFilter rf)
-            {
-                var from = (filterValues.ContainsKey(key + "_f") ? filterValues[key + "_f"] : []).LastOrDefault();
-                var to = (filterValues.ContainsKey(key + "_t") ? filterValues[key + "_t"] : []).LastOrDefault();
-                filteredItems = rf.Filter(filteredItems, from, to);
+                filteredItems = filter.Filter(filteredItems);
             }
         }
 
@@ -53,21 +57,10 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
 
         foreach (var (key, filter) in _filters)
         {
-            if (filter is ISimilarSchoolsMultiValueFilter mvf)
+            var availableFilter = filter.AsAvailableFilter(items);
+            if (availableFilter is not null)
             {
-                var values = filterValues.ContainsKey(key) ? filterValues[key] : [];
-                availableFilters.Add(mvf.AsAvailableFilter(key, items, values));
-            }
-            else if (filter is ISimilarSchoolsSingleValueFilter svf)
-            {
-                var value = (filterValues.ContainsKey(key) ? filterValues[key] : []).LastOrDefault();
-                availableFilters.Add(svf.AsAvailableFilter(key, items, value));
-            }
-            else if (filter is ISimilarSchoolsNumericRangeFilter rf)
-            {
-                var from = (filterValues.ContainsKey(key + "_f") ? filterValues[key + "_f"] : []).LastOrDefault();
-                var to = (filterValues.ContainsKey(key + "_t") ? filterValues[key + "_t"] : []).LastOrDefault();
-                availableFilters.Add(rf.AsAvailableFilter(key, items, from, to));
+                availableFilters.Add(availableFilter);
             }
         }
 
