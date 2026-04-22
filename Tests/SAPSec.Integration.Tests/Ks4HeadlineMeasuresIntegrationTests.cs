@@ -38,6 +38,19 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasures_BarChartsUseExpectedDecimalPlaces()
+    {
+        var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+        content.Should().Contain("id=\"ks4-attainment8-school-chart\"");
+        content.Should().Contain("data-label-decimals=\"0\"");
+        content.Should().Contain("id=\"eng-maths-school-chart\" class=\"js-chart js-chart--school-ks4-bar\" data-type=\"bar\" data-show-no-data-labels=\"true\" data-axis-step=\"25\" data-axis-max=\"100\" data-axis-suffix=\"%\" data-label-decimals=\"0\"");
+        content.Should().Contain("id=\"destinations-school-chart\" class=\"js-chart js-chart--school-ks4-bar\" data-type=\"bar\" data-show-no-data-labels=\"true\" data-axis-step=\"25\" data-axis-max=\"100\" data-axis-suffix=\"%\" data-label-decimals=\"0\"");
+    }
+
+    [Fact]
     public async Task Ks4HeadlineMeasures_WithNonExistentUrn_ReturnsNotFound()
     {
         var response = await fixture.Client.GetAsync("/school/999999/ks4-headline-measures");

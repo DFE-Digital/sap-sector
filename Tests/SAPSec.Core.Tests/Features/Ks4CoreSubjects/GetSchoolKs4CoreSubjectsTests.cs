@@ -100,6 +100,46 @@ public class GetSchoolKs4CoreSubjectsTests
     }
 
     [Fact]
+    public async Task Execute_EnglishLanguageGrade4_WhenTopPerformersHaveSameValue_OrdersBySchoolName()
+    {
+        var context = new TestContext();
+        context.SetupCurrentSchoolData(establishment: data =>
+        {
+            data.EngLang49_Sum_Est_Current_Pct = "52";
+            data.EngLang49_Sum_Est_Previous_Pct = "51";
+            data.EngLang49_Sum_Est_Previous2_Pct = "50";
+        });
+
+        context.SetupSimilarSchools(
+            CreateSimilarSchoolMeasures("200003", "Charlie school", establishment: data =>
+            {
+                data.EngLang49_Sum_Est_Current_Pct = "62";
+                data.EngLang49_Sum_Est_Previous_Pct = "61";
+                data.EngLang49_Sum_Est_Previous2_Pct = "60";
+            }),
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
+            {
+                data.EngLang49_Sum_Est_Current_Pct = "62";
+                data.EngLang49_Sum_Est_Previous_Pct = "61";
+                data.EngLang49_Sum_Est_Previous2_Pct = "60";
+            }),
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
+            {
+                data.EngLang49_Sum_Est_Current_Pct = "62";
+                data.EngLang49_Sum_Est_Previous_Pct = "61";
+                data.EngLang49_Sum_Est_Previous2_Pct = "60";
+            }));
+
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
+        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+
+        subject.TopPerformers.Select(x => x.Name).Should().Equal(
+            "Alpha school",
+            "Beta school",
+            "Charlie school");
+    }
+
+    [Fact]
     public async Task Execute_WhenSimilarSchoolUrnsContainDuplicates_BuildsUniqueTopPerformers()
     {
         var context = new TestContext();
@@ -235,6 +275,46 @@ public class GetSchoolKs4CoreSubjectsTests
         var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade4);
 
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(47m, 63m, 56m, 57m));
+    }
+
+    [Fact]
+    public async Task Execute_CombinedScienceGrade4_WhenDisplayedTopPerformerValuesTie_OrdersBySchoolName()
+    {
+        var context = new TestContext();
+        context.SetupCurrentSchoolData(establishment: data =>
+        {
+            data.CombSci49_Sum_Est_Current_Pct = "48";
+            data.CombSci49_Sum_Est_Previous_Pct = "47";
+            data.CombSci49_Sum_Est_Previous2_Pct = "46";
+        });
+
+        context.SetupSimilarSchools(
+            CreateSimilarSchoolMeasures("200003", "Charlie school", establishment: data =>
+            {
+                data.CombSci49_Sum_Est_Current_Pct = "88.4";
+                data.CombSci49_Sum_Est_Previous_Pct = "88.4";
+                data.CombSci49_Sum_Est_Previous2_Pct = "88.4";
+            }),
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
+            {
+                data.CombSci49_Sum_Est_Current_Pct = "88.2";
+                data.CombSci49_Sum_Est_Previous_Pct = "88.2";
+                data.CombSci49_Sum_Est_Previous2_Pct = "88.2";
+            }),
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
+            {
+                data.CombSci49_Sum_Est_Current_Pct = "88.3";
+                data.CombSci49_Sum_Est_Previous_Pct = "88.3";
+                data.CombSci49_Sum_Est_Previous2_Pct = "88.3";
+            }));
+
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
+        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade4);
+
+        subject.TopPerformers.Select(x => x.Name).Should().Equal(
+            "Alpha school",
+            "Beta school",
+            "Charlie school");
     }
 
     [Fact]

@@ -9,15 +9,20 @@ namespace SAPSec.UI.Tests;
 public class CookiePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     [Fact]
-    public async Task CookiesPage_SaveAcceptedCookies_ShowsTopBannerAndScrollsToTop()
+    public async Task CookiesPage_SaveAcceptedCookies_RedirectsToPreviousPageAndShowsTopBanner()
     {
-        await Page.GotoAsync("/cookies");
+        await Page.GotoAsync("/accessibility");
+        await Page.Locator(".govuk-footer__link[href='/cookies']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+
+        var backLink = Page.GetByRole(AriaRole.Link, new() { Name = "Back", Exact = true });
+        await Expect(backLink).ToBeVisibleAsync();
+        (await backLink.GetAttributeAsync("href")).Should().Be("/accessibility");
 
         await Page.GetByLabel("Yes, use additional cookies").CheckAsync();
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save changes" }).ClickAsync();
 
-        await Page.WaitForURLAsync("**/cookies?cookie-banner=accepted");
+        await Page.WaitForURLAsync("**/accessibility?cookie-banner=accepted");
 
         var scrollY = await Page.EvaluateAsync<int>("window.scrollY");
         scrollY.Should().BeLessThan(50);
