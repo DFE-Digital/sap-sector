@@ -78,7 +78,8 @@ public class HomeControllerTests(WebApplicationSetupFixture fixture)
         content.Should().Contain("GTM-M3BPJWJD");
         content.Should().Contain("googletagmanager.com/ns.html?id=GTM-M3BPJWJD");
         content.Should().Contain("clarity.ms/tag/");
-        content.Should().NotContain("gtm_auth=");
-        content.Should().NotContain("gtm_preview=");
+        content.Should().Contain("gtm_auth=");
+        content.Should().Contain("gtm_preview=");
+        content.Should().Contain("gtm_cookies_win=x");
     }
 }

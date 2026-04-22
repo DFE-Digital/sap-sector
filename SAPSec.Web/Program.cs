@@ -54,6 +54,11 @@ public class Program
                 options.GoogleTagManagerId = googleTagManagerId;
             }
 
+            if (options.GoogleTagManagerAdditionals?.TryGetValue(analyticsEnvironment, out var googleTagManagerAdditional) == true)
+            {
+                options.GoogleTagManagerAdditional = googleTagManagerAdditional;
+            }
+
             if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
             {
                 options.ClarityId = clarityId;
