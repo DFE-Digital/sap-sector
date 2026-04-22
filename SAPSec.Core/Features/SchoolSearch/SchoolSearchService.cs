@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;
 
@@ -10,6 +11,7 @@ public class SchoolSearchService(
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
+    private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
     {
@@ -79,6 +81,11 @@ public class SchoolSearchService(
             .Trim()
             .Replace("/", string.Empty)
             .Replace("\\", string.Empty);
+
+        if (!Numeric.IsMatch(trimmedSchoolNumber))
+        {
+            return null;
+        }
 
         return await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
     }
