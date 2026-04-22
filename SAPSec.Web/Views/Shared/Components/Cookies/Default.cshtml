@@ -60,20 +60,12 @@
     }
 
     function acceptOrRejectClick(enabled) {
-        if (window.setAppInsightsCookieEnabled !== undefined) {
-            window.setAppInsightsCookieEnabled(enabled);
-        }
-
         document.cookie = `@Model.CookieName=${enabled ? "enabled" : "disabled"}; path=/; max-age=${60 * 60 * 24 * 365}; secure`;
         document.getElementById("unselected-cookies-banner").setAttribute("hidden", "hidden");
         if (enabled) {
             showBannerMessage("accepted-cookies-banner");
         } else {
             showBannerMessage("rejected-cookies-banner");
-            if (enabled === false) {
-                document.cookie = "ai_session=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-                document.cookie = "ai_user=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-            }
         }
     }
 

@@ -8,11 +8,10 @@
 @{
     var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
     var analytics = AnalyticsOptions.Value;
-    var analyticsCookiesAccepted = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
-    var hasGoogleTagManagerId = !string.IsNullOrWhiteSpace(analytics.GoogleTagManagerId);
-    var hasClarityId = !string.IsNullOrWhiteSpace(analytics.ClarityId);
-    var gtmScriptUrl = $"https://www.googletagmanager.com/gtm.js?id={analytics.GoogleTagManagerId}&gtm_auth={analytics.GoogleTagManagerAuth}&gtm_preview={analytics.GoogleTagManagerPreview}&gtm_cookies_win=x";
-    var gtmNoscriptUrl = $"https://www.googletagmanager.com/ns.html?id={analytics.GoogleTagManagerId}&gtm_auth={analytics.GoogleTagManagerAuth}&gtm_preview={analytics.GoogleTagManagerPreview}&gtm_cookies_win=x";
+    var gtmId = analytics.GoogleTagManagerId;
+    var gtmAdditional = analytics.GoogleTagManagerAdditional;
+    var clarityId = analytics.ClarityId;
+    var loadAnalytics = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
@@ -40,39 +39,35 @@
     <link rel="stylesheet" href="/css/accessible-autocomplete.min.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/dfefrontend.css" asp-append-version="true" />
     <link rel="stylesheet" href="/css/main.css" asp-append-version="true" />
-    @if (analyticsCookiesAccepted && hasGoogleTagManagerId)
+    @if (loadAnalytics && !string.IsNullOrWhiteSpace(gtmId))
     {
-    <script add-nonce="true">window.dataLayer = window.dataLayer || [];</script>
     <!-- Google Tag Manager -->
     <script add-nonce="true">(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'@gtmScriptUrl';f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','@analytics.GoogleTagManagerId');</script>
+'https://www.googletagmanager.com/gtm.js?id='+i+dl+'@Html.Raw(gtmAdditional)';var n=d.querySelector('[nonce]');
+n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','@gtmId');</script>
     <!-- End Google Tag Manager -->
     }
-    @if (analyticsCookiesAccepted && hasClarityId)
+    @if (loadAnalytics && !string.IsNullOrWhiteSpace(clarityId))
     {
     <script type="text/javascript" add-nonce="true">
         (function(c,l,a,r,i,t,y){
             c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
             t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
             y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "@analytics.ClarityId");
-        window.clarity('consentv2', {
-            ad_Storage: "denied",
-            analytics_Storage: "granted"
-        });
+        })(window, document, "clarity", "script", "@clarityId");
     </script>
     }
     @* @await Component.InvokeAsync("Analytics") *@
     
 </head>
 <body class="govuk-template__body govuk-frontend-supported app-body-class">
-    @if (analyticsCookiesAccepted && hasGoogleTagManagerId)
+    @if (loadAnalytics && !string.IsNullOrWhiteSpace(gtmId))
     {
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="@gtmNoscriptUrl" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=@gtmId@Html.Raw(gtmAdditional)" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     }
     <script add-nonce="true">
