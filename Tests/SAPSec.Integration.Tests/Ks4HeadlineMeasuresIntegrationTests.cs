@@ -45,7 +45,8 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
 
         response.EnsureSuccessStatusCode();
         content.Should().Contain("id=\"ks4-attainment8-school-chart\"");
-        content.Should().Contain("id=\"eng-maths-school-chart\" class=\"js-chart js-chart--school-ks4-bar\" data-type=\"bar\" data-show-no-data-labels=\"true\" data-axis-step=\"25\" data-axis-max=\"100\" data-axis-suffix=\"%\" data-label-decimals=\"1\"");
+        content.Should().Contain("data-label-decimals=\"0\"");
+        content.Should().Contain("id=\"eng-maths-school-chart\" class=\"js-chart js-chart--school-ks4-bar\" data-type=\"bar\" data-show-no-data-labels=\"true\" data-axis-step=\"25\" data-axis-max=\"100\" data-axis-suffix=\"%\" data-label-decimals=\"0\"");
         content.Should().Contain("id=\"destinations-school-chart\" class=\"js-chart js-chart--school-ks4-bar\" data-type=\"bar\" data-show-no-data-labels=\"true\" data-axis-step=\"25\" data-axis-max=\"100\" data-axis-suffix=\"%\" data-label-decimals=\"0\"");
     }
 

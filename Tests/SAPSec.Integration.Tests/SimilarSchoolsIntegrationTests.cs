@@ -90,7 +90,7 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         content.Should().Contain("id=\"ks4-attainment8-comparison-chart\"");
         content.Should().Contain("id=\"eng-maths-comparison-chart\"");
         content.Should().Contain("id=\"destinations-comparison-chart\"");
-        content.Should().Contain("data-label-decimals=\"1\"");
         content.Should().Contain("data-label-decimals=\"0\"");
+        content.Should().NotContain("data-label-decimals=\"1\"");
     }
 }

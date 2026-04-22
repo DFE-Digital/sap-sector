@@ -77,7 +77,7 @@
                             data-show-no-data-labels="true"
                             data-axis-step="30"
                             data-axis-max="90"
-                            data-label-decimals="1"
+                            data-label-decimals="0"
                             data-bar-thickness="50"
                             data-category-percentage="0.6"
                             data-bar-percentage="1"
@@ -200,7 +200,7 @@
                 }
                 @if (HasAnyData(engMathsBarData))
                 {
-                    <canvas id="eng-maths-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="1" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))'></canvas>
+                    <canvas id="eng-maths-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))'></canvas>
                 }
                 else
                 {
