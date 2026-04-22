@@ -1,37 +1,43 @@
 ﻿using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsNurseryProvisionFilter(SimilarSchool currentSchool) : ISimilarSchoolsMultiValueFilter
+public class SimilarSchoolsNurseryProvisionFilter(string key,
+    string name,
+    IDictionary<string, IEnumerable<string>> filterValues,
+    SimilarSchool currentSchool)
+    : SimilarSchoolsMultiValueFilter(
+        key,
+        name,
+        filterValues,
+        currentSchool)
 {
-    public string Name => "Nursery provision";
-    public FilterType Type => FilterType.MultipleValue;
+    protected override DataWithAvailability<string>? CurrentSchoolValue
+        => DataWithAvailability.FromStringWithoutCodes(CurrentSchool.NurseryProvisionName);
 
-    public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
     {
         if (!values.Any())
         {
             return items;
         }
 
-        return items.Where(i => values.Contains(i.NurseryProvisionName));
+        return items.Where(i => values.Contains(i.NurseryProvisionName, StringComparer.OrdinalIgnoreCase));
     }
 
-    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
-        key,
-        Name,
-        Type,
-        GetPossibleOptions(items, values).ToList().AsReadOnly(),
-        DataWithAvailability.FromStringWithoutCodes(currentSchool.NurseryProvisionName));
-
-    private IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
-        items.GroupBy(i => new { i.NurseryProvisionName })
-            .Where(f => !string.IsNullOrWhiteSpace(f.Key.NurseryProvisionName))
+    protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
+        items.GroupBy(i => i.NurseryProvisionName)
+            .Where(f => !string.IsNullOrWhiteSpace(f.Key))
             .Select(g => new FilterOption(
-                g.Key.NurseryProvisionName,
-                g.Key.NurseryProvisionName,
+                g.Key,
+                g.Key,
                 g.Count(),
-                values.Contains(g.Key.NurseryProvisionName)));
+                values.Contains(g.Key, StringComparer.OrdinalIgnoreCase)))
+            .OrderBy(fo => fo.Key switch
+            {
+                "Has Nursery Classes" => 0,
+                "No Nursery Classes" => 1,
+                _ => 3
+            });
 }

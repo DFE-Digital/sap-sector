@@ -10,7 +10,7 @@
     @* Sort dropdown *@
     <div class="govuk-form-group app-similar-schools-sort">
         <label class="govuk-label app-similar-schools-sort__label" for="sort-by">Sort by</label>
-        <select class="govuk-select app-similar-schools-sort__select" id="sort-by" name="sortBy" form="similar-schools-filter-form">
+        <select class="govuk-select app-similar-schools-sort__select" id="sort-by" name="sortBy" form="app-filter-panel">
             @foreach (var option in Model.SortOptions)
             {
                 <option value="@option.Key" selected="@(option.Selected ? "selected" : null)">@option.Name</option>

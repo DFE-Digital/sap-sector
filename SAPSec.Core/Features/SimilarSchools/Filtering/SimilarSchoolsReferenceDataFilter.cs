@@ -1,39 +1,35 @@
 ﻿using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public abstract class SimilarSchoolsReferenceDataFilter(
+public class SimilarSchoolsReferenceDataFilter(
+    string key,
+    string name,
+    IDictionary<string, IEnumerable<string>> filterValues,
     SimilarSchool currentSchool,
-    Func<SimilarSchool, ReferenceData> field) : ISimilarSchoolsMultiValueFilter
+    Func<SimilarSchool, ReferenceData> field) : SimilarSchoolsMultiValueFilter(key, name, filterValues, currentSchool)
 {
-    public abstract string Name { get; }
-    public FilterType Type => FilterType.MultipleValue;
+    protected override DataWithAvailability<string> CurrentSchoolValue
+        => DataWithAvailability.FromStringWithCodes(field(CurrentSchool).Id, field(CurrentSchool).Name);
 
-    public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
     {
         if (!values.Any())
         {
             return items;
         }
 
-        return items.Where(i => values.Contains(field(i).Id));
+        return items.Where(i => values.Contains(field(i).Id, StringComparer.OrdinalIgnoreCase));
     }
 
-    public SimilarSchoolsAvailableFilter AsAvailableFilter(string key, IEnumerable<SimilarSchool> items, IEnumerable<string?> values) => new(
-        key,
-        Name,
-        Type,
-        GetPossibleOptions(items, values).ToList().AsReadOnly(),
-        DataWithAvailability.FromStringWithCodes(field(currentSchool).Id, field(currentSchool).Name));
-
-    private IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
+    protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
         items.GroupBy(field)
             .Where(f => !string.IsNullOrWhiteSpace(f.Key.Id) && f.Key.Id != "9")
             .Select(g => new FilterOption(
                 g.Key.Id,
                 g.Key.Name,
                 g.Count(),
-                values.Contains(g.Key.Id)));
+                values.Contains(g.Key.Id, StringComparer.OrdinalIgnoreCase)))
+            .OrderBy(fo => fo.Name);
 }

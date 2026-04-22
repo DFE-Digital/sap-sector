@@ -18,7 +18,7 @@ public static class PostgresDependenciesExtensions
         services.AddSingleton<ISimilarSchoolsSecondaryRepository, PostgresSimilarSchoolsSecondaryRepository>();
         services.AddSingleton<IKs4PerformanceRepository, PostgresKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, PostgresKs4DestinationsRepository>();
-        services.AddSingleton<IAttendanceRepository, PostgresAttendanceRepository>();
+        services.AddSingleton<IAbsenceRepository, PostgresAbsenceRepository>();
 
         return services;
     }

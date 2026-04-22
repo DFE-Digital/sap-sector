@@ -13,7 +13,7 @@ public class JsonKs4PerformanceRepository(
     public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal));
+        return results.FirstOrDefault(x => string.Equals(x.URN, urn, StringComparison.Ordinal));
     }
 
     public async Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)

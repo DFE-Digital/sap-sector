@@ -1,23 +1,42 @@
-﻿using SAPSec.Core.Features.Geography;
+﻿using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class GetSimilarSchoolDetails(
-    ISimilarSchoolsSecondaryRepository repository,
-    ISchoolDetailsService schoolDetailsService)
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    ISchoolDetailsService schoolDetailsService,
+    IKs4PerformanceRepository performanceRepository,
+    IAbsenceRepository absenceRepository)
 {
     public async Task<GetSimilarSchoolDetailsResponse> Execute(GetSimilarSchoolDetailsRequest request)
     {
         // TODO: Validate SimilarSchoolUrn actually belongs in similar schools group for current school
-        var (currentSchool, similarSchools) = await repository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
+        var performance = await performanceRepository.GetByUrnsAsync(urns);
+        var absence = await absenceRepository.GetByUrnsAsync(urns);
+
+        var schools =
+            from e in establishments
+            join p in performance on e.URN equals p.URN into perf
+            join a in absence on e.URN equals a.URN into abs
+            select SimilarSchool.FromData(e, perf.FirstOrDefault()?.EstablishmentPerformance, abs.FirstOrDefault()?.EstablishmentAbsence);
+
+        var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
+        var similarSchool = schools.FirstOrDefault(s => s.URN == request.SimilarSchoolUrn);
+
         if (currentSchool is null)
         {
             throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
         }
 
-        var similarSchool = similarSchools.SingleOrDefault(s => s.URN == request.SimilarSchoolUrn);
         if (similarSchool is null)
         {
             throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");

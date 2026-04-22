@@ -9,14 +9,14 @@ public class EstablishmentRepositoryTests
 {
     private readonly Mock<IJsonFile<Establishment>> _mockEstablishmentJsonFile;
     private readonly Mock<IJsonFile<EstablishmentEmail>> _mockEstablishmentEmailJsonFile;
-    private readonly Mock<ILogger<Establishment>> _mockLogger;
+    private readonly Mock<ILogger<JsonEstablishmentRepository>> _mockLogger;
     private readonly JsonEstablishmentRepository _sut;
 
     public EstablishmentRepositoryTests()
     {
         _mockEstablishmentJsonFile = new Mock<IJsonFile<Establishment>>();
         _mockEstablishmentEmailJsonFile = new Mock<IJsonFile<EstablishmentEmail>>();
-        _mockLogger = new Mock<ILogger<Establishment>>();
+        _mockLogger = new Mock<ILogger<JsonEstablishmentRepository>>();
         _sut = new JsonEstablishmentRepository(_mockEstablishmentJsonFile.Object, _mockEstablishmentEmailJsonFile.Object, _mockLogger.Object);
     }
 

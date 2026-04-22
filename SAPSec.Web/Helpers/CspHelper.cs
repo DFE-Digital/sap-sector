@@ -22,7 +22,7 @@ public static class CspHelper
             "default-src 'self';",
             "frame-ancestors 'none';",
             "form-action 'self' https://test-oidc.signin.education.gov.uk https://pp-oidc.signin.education.gov.uk https://oidc.signin.education.gov.uk;",
-            "connect-src 'self' *.google-analytics.com *.analytics.google.com https://www.compare-school-performance.service.gov.uk https://api.postcodes.io https://*.doubleclick.net https://*.clarity.ms https://c.bing.com https://*.applicationinsights.azure.com/ https://*.visualstudio.com/;",
+            "connect-src 'self' *.google-analytics.com *.analytics.google.com https://www.compare-school-performance.service.gov.uk https://api.postcodes.io https://*.doubleclick.net https://*.clarity.ms https://c.bing.com https://*.applicationinsights.azure.com/ https://*.visualstudio.com/ wss://localhost:*;",
             "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/ https://*.tile.openstreetmap.org;",
             "style-src 'self' 'unsafe-inline';",
             "font-src 'self' data:;",

@@ -5,7 +5,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 
-namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures;
+namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
 
 public class GetKs4HeadlineMeasuresTests
 {

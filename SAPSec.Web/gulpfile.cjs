@@ -28,6 +28,10 @@ const buildSass = () =>
         .pipe(sourcemaps.write("./"))
         .pipe(gulp.dest("wwwroot/css"));
 
+const watchSass = () =>
+    gulp
+        .watch(["AssetSrc/scss/*.scss"], buildSass);
+
 const copyStaticAssets = () =>
     gulp
         .src(["node_modules/govuk-frontend/dist/govuk/assets/**/*"], {
@@ -175,5 +179,11 @@ gulp.task("build-fe", () => {
     return async.series([
         (next) => buildSass().on("end", next),
         (next) => copyStaticAssets().on("end", next)
+    ]);
+});
+
+gulp.task("watch-fe", () => {
+    return async.series([
+        (next) => watchSass().on("end", next)
     ]);
 });

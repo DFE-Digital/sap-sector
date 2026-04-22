@@ -1,7 +1,7 @@
-using System.Globalization;
-using SAPSec.Core.Model;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Model;
+using System.Globalization;
 
 namespace SAPSec.Web.ViewModels;
 
