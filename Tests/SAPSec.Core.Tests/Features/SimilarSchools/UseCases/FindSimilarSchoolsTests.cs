@@ -1308,6 +1308,7 @@ public class FindSimilarSchoolsTests
     [InlineData("sciu_f", new[] { "50" }, "sciu_t", new[] { "51" }, new string[0])]
     [InlineData("sciu_f", new[] { "50" }, "", new string[0], new string[0])]
     [InlineData("", new string[0], "sciu_t", new[] { "51" }, new string[0])]
+    [InlineData("sciu_f", new[] { ".5" }, "sciu_t", new[] { ".6" }, new string[0])]
     [InlineData("sciu_f", new[] { "XXX" }, "", new string[0], new[] { "sciu_f:Enter a numeric value" })]
     [InlineData("sciu_f", new[] { "10..0" }, "", new string[0], new[] { "sciu_f:Enter a numeric value" })]
     [InlineData("sciu_f", new[] { "..10..0" }, "", new string[0], new[] { "sciu_f:Enter a numeric value" })]
@@ -1365,34 +1366,37 @@ public class FindSimilarSchoolsTests
     }
 
     [Theory]
-    [InlineData("sciu_f", new[] { "50" }, "sciu_t", new[] { "51" }, new[] { "100005", "100006", "100007", "100008", "100009" })]
-    [InlineData("sciu_f", new[] { "50" }, "", new string[0], new[] { "100005", "100006", "100007", "100008", "100009", "100010", "100011", "100012" })]
-    [InlineData("", new string[0], "sciu_t", new[] { "51" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008", "100009" })]
+    [InlineData("sciu_f", new[] { "50" }, "sciu_t", new[] { "51" }, new[] { "100006", "100007", "100008", "100009", "100010" })]
+    [InlineData("sciu_f", new[] { "50" }, "", new string[0], new[] { "100006", "100007", "100008", "100009", "100010", "100011", "100012", "100013" })]
+    [InlineData("", new string[0], "sciu_t", new[] { "51" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008", "100009", "100010" })]
     // Filter key is case insensitive
-    [InlineData("SCIU_F", new[] { "50" }, "sciu_T", new[] { "51" }, new[] { "100005", "100006", "100007", "100008", "100009" })]
+    [InlineData("SCIU_F", new[] { "50" }, "sciu_T", new[] { "51" }, new[] { "100006", "100007", "100008", "100009", "100010" })]
     // Duplicate filter values are ignored (uses last given value)
-    [InlineData("sciu_f", new[] { "0", "50" }, "sciu_t", new[] { "100", "51" }, new[] { "100005", "100006", "100007", "100008", "100009" })]
+    [InlineData("sciu_f", new[] { "0", "50" }, "sciu_t", new[] { "100", "51" }, new[] { "100006", "100007", "100008", "100009", "100010" })]
     // Empty filter values returns all results
-    [InlineData("", new string[0], "", new string[0], new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008", "100009", "100010", "100011", "100012" })]
+    [InlineData("", new string[0], "", new string[0], new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008", "100009", "100010", "100011", "100012", "100013" })]
+    // Otherwise valid decimals starting with a decimal point are parsed correctly
+    [InlineData("sciu_f", new[] { ".4" }, "sciu_t", new[] { ".6" }, new[] { "100002" })]
     public async Task FilterBy_SchoolCapacityInUse(string fromFilterKey, string[] fromFilterValues, string toFilterKey, string[] toFilterValues, string[] expectedUrns)
     {
         _establishmentRepo.SetupEstablishments(
             new() { URN = "100001" },
             // Less than 50%
-            new() { URN = "100002", TotalCapacity = 50, TotalPupils = 24 },
-            new() { URN = "100003", TotalCapacity = 100, TotalPupils = 49 },
-            new() { URN = "100004", TotalCapacity = 200, TotalPupils = 99 },
+            new() { URN = "100002", TotalCapacity = 200, TotalPupils = 1 },
+            new() { URN = "100003", TotalCapacity = 50, TotalPupils = 24 },
+            new() { URN = "100004", TotalCapacity = 100, TotalPupils = 49 },
+            new() { URN = "100005", TotalCapacity = 200, TotalPupils = 99 },
             // 50%
-            new() { URN = "100005", TotalCapacity = 50, TotalPupils = 25 },
-            new() { URN = "100006", TotalCapacity = 100, TotalPupils = 50 },
-            new() { URN = "100007", TotalCapacity = 200, TotalPupils = 100 },
+            new() { URN = "100006", TotalCapacity = 50, TotalPupils = 25 },
+            new() { URN = "100007", TotalCapacity = 100, TotalPupils = 50 },
+            new() { URN = "100008", TotalCapacity = 200, TotalPupils = 100 },
             // 51%
-            new() { URN = "100008", TotalCapacity = 100, TotalPupils = 51 },
-            new() { URN = "100009", TotalCapacity = 200, TotalPupils = 102 },
+            new() { URN = "100009", TotalCapacity = 100, TotalPupils = 51 },
+            new() { URN = "100010", TotalCapacity = 200, TotalPupils = 102 },
             // More than 51%
-            new() { URN = "100010", TotalCapacity = 50, TotalPupils = 26 },
-            new() { URN = "100011", TotalCapacity = 100, TotalPupils = 52 },
-            new() { URN = "100012", TotalCapacity = 200, TotalPupils = 103 }
+            new() { URN = "100011", TotalCapacity = 50, TotalPupils = 26 },
+            new() { URN = "100012", TotalCapacity = 100, TotalPupils = 52 },
+            new() { URN = "100013", TotalCapacity = 200, TotalPupils = 103 }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -1405,7 +1409,8 @@ public class FindSimilarSchoolsTests
             new() { URN = "100001", NeighbourURN = "100009" },
             new() { URN = "100001", NeighbourURN = "100010" },
             new() { URN = "100001", NeighbourURN = "100011" },
-            new() { URN = "100001", NeighbourURN = "100012" }
+            new() { URN = "100001", NeighbourURN = "100012" },
+            new() { URN = "100001", NeighbourURN = "100013" }
         );
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
@@ -2780,6 +2785,7 @@ public class FindSimilarSchoolsTests
     [InlineData("oar_f", new[] { "50" }, "oar_t", new[] { "51" }, new string[0])]
     [InlineData("oar_f", new[] { "50" }, "", new string[0], new string[0])]
     [InlineData("", new string[0], "oar_t", new[] { "51" }, new string[0])]
+    [InlineData("oar_f", new[] { ".5" }, "oar_t", new[] { ".6" }, new string[0])]
     [InlineData("oar_f", new[] { "XXX" }, "", new string[0], new[] { "oar_f:Enter a numeric value" })]
     [InlineData("oar_f", new[] { "10..0" }, "", new string[0], new[] { "oar_f:Enter a numeric value" })]
     [InlineData("oar_f", new[] { "..10..0" }, "", new string[0], new[] { "oar_f:Enter a numeric value" })]
@@ -2832,15 +2838,17 @@ public class FindSimilarSchoolsTests
     }
 
     [Theory]
-    [InlineData("oar_f", new[] { "50" }, "oar_t", new[] { "51" }, new[] { "100003", "100004", "100005" })]
-    [InlineData("oar_f", new[] { "50" }, "", new string[0], new[] { "100003", "100004", "100005", "100006", "100007" })]
-    [InlineData("", new string[0], "oar_t", new[] { "51" }, new[] { "100002", "100003", "100004", "100005" })]
+    [InlineData("oar_f", new[] { "50" }, "oar_t", new[] { "51" }, new[] { "100004", "100005", "100006" })]
+    [InlineData("oar_f", new[] { "50" }, "", new string[0], new[] { "100004", "100005", "100006", "100007", "100008" })]
+    [InlineData("", new string[0], "oar_t", new[] { "51" }, new[] { "100002", "100003", "100004", "100005", "100006" })]
     // Filter key is case insensitive
-    [InlineData("OAR_F", new[] { "50" }, "oar_T", new[] { "51" }, new[] { "100003", "100004", "100005" })]
+    [InlineData("OAR_F", new[] { "50" }, "oar_T", new[] { "51" }, new[] { "100004", "100005", "100006" })]
     // Duplicate filter values are ignored (uses last given value)
-    [InlineData("oar_f", new[] { "0", "50" }, "oar_t", new[] { "100", "51" }, new[] { "100003", "100004", "100005" })]
+    [InlineData("oar_f", new[] { "0", "50" }, "oar_t", new[] { "100", "51" }, new[] { "100004", "100005", "100006" })]
     // Empty filter values returns all results
-    [InlineData("", new string[0], "", new string[0], new[] { "100002", "100003", "100004", "100005", "100006", "100007" })]
+    [InlineData("", new string[0], "", new string[0], new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008" })]
+    // Otherwise valid decimals starting with a decimal point are parsed correctly
+    [InlineData("oar_f", new[] { ".4" }, "oar_t", new[] { ".6" }, new[] { "100002" })]
     public async Task FilterBy_OverallAbsenceRate(string fromFilterKey, string[] fromFilterValues, string toFilterKey, string[] toFilterValues, string[] expectedUrns)
     {
         _establishmentRepo.SetupEstablishments(
@@ -2850,15 +2858,17 @@ public class FindSimilarSchoolsTests
             new() { URN = "100004" },
             new() { URN = "100005" },
             new() { URN = "100006" },
-            new() { URN = "100007" }
+            new() { URN = "100007" },
+            new() { URN = "100008" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "50.00" },
-            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "50.01" },
-            new() { Id = "100005", Abs_Tot_Est_Current_Pct = "51.00" },
-            new() { Id = "100006", Abs_Tot_Est_Current_Pct = "51.01" },
-            new() { Id = "100007", Abs_Tot_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "0.5" },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "49.99" },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "50.00" },
+            new() { Id = "100005", Abs_Tot_Est_Current_Pct = "50.01" },
+            new() { Id = "100006", Abs_Tot_Est_Current_Pct = "51.00" },
+            new() { Id = "100007", Abs_Tot_Est_Current_Pct = "51.01" },
+            new() { Id = "100008", Abs_Tot_Est_Current_Pct = "52" }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -2866,7 +2876,8 @@ public class FindSimilarSchoolsTests
             new() { URN = "100001", NeighbourURN = "100004" },
             new() { URN = "100001", NeighbourURN = "100005" },
             new() { URN = "100001", NeighbourURN = "100006" },
-            new() { URN = "100001", NeighbourURN = "100007" }
+            new() { URN = "100001", NeighbourURN = "100007" },
+            new() { URN = "100001", NeighbourURN = "100008" }
         );
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
@@ -3068,6 +3079,7 @@ public class FindSimilarSchoolsTests
     [InlineData("par_f", new[] { "50" }, "par_t", new[] { "51" }, new string[0])]
     [InlineData("par_f", new[] { "50" }, "", new string[0], new string[0])]
     [InlineData("", new string[0], "par_t", new[] { "51" }, new string[0])]
+    [InlineData("oar_f", new[] { ".5" }, "oar_t", new[] { ".6" }, new string[0])]
     [InlineData("par_f", new[] { "XXX" }, "", new string[0], new[] { "par_f:Enter a numeric value" })]
     [InlineData("par_f", new[] { "10..0" }, "", new string[0], new[] { "par_f:Enter a numeric value" })]
     [InlineData("par_f", new[] { "..10..0" }, "", new string[0], new[] { "par_f:Enter a numeric value" })]
@@ -3120,15 +3132,17 @@ public class FindSimilarSchoolsTests
     }
 
     [Theory]
-    [InlineData("par_f", new[] { "50" }, "par_t", new[] { "51" }, new[] { "100003", "100004", "100005" })]
-    [InlineData("par_f", new[] { "50" }, "", new string[0], new[] { "100003", "100004", "100005", "100006", "100007" })]
-    [InlineData("", new string[0], "par_t", new[] { "51" }, new[] { "100002", "100003", "100004", "100005" })]
+    [InlineData("par_f", new[] { "50" }, "par_t", new[] { "51" }, new[] { "100004", "100005", "100006" })]
+    [InlineData("par_f", new[] { "50" }, "", new string[0], new[] { "100004", "100005", "100006", "100007", "100008" })]
+    [InlineData("", new string[0], "par_t", new[] { "51" }, new[] { "100002", "100003", "100004", "100005", "100006" })]
     // Filter key is case insensitive
-    [InlineData("PAR_F", new[] { "50" }, "par_T", new[] { "51" }, new[] { "100003", "100004", "100005" })]
+    [InlineData("PAR_F", new[] { "50" }, "par_T", new[] { "51" }, new[] { "100004", "100005", "100006" })]
     // Duplicate filter values are ignored (uses last given value)
-    [InlineData("par_f", new[] { "0", "50" }, "par_t", new[] { "100", "51" }, new[] { "100003", "100004", "100005" })]
+    [InlineData("par_f", new[] { "0", "50" }, "par_t", new[] { "100", "51" }, new[] { "100004", "100005", "100006" })]
     // Empty filter values returns all results
-    [InlineData("", new string[0], "", new string[0], new[] { "100002", "100003", "100004", "100005", "100006", "100007" })]
+    [InlineData("", new string[0], "", new string[0], new[] { "100002", "100003", "100004", "100005", "100006", "100007", "100008" })]
+    // Otherwise valid decimals starting with a decimal point are parsed correctly
+    [InlineData("par_f", new[] { ".4" }, "par_t", new[] { ".6" }, new[] { "100002" })]
     public async Task FilterBy_PersistentAbsenceRate(string fromFilterKey, string[] fromFilterValues, string toFilterKey, string[] toFilterValues, string[] expectedUrns)
     {
         _establishmentRepo.SetupEstablishments(
@@ -3138,15 +3152,17 @@ public class FindSimilarSchoolsTests
             new() { URN = "100004" },
             new() { URN = "100005" },
             new() { URN = "100006" },
-            new() { URN = "100007" }
+            new() { URN = "100007" },
+            new() { URN = "100008" }
         );
         _absenceRepo.SetupEstablishmentAbsence(
-            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
-            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "50.00" },
-            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "50.01" },
-            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = "51.00" },
-            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = "51.01" },
-            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = "52" }
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "0.5" },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "49.99" },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "50.00" },
+            new() { Id = "100005", Abs_Persistent_Est_Current_Pct = "50.01" },
+            new() { Id = "100006", Abs_Persistent_Est_Current_Pct = "51.00" },
+            new() { Id = "100007", Abs_Persistent_Est_Current_Pct = "51.01" },
+            new() { Id = "100008", Abs_Persistent_Est_Current_Pct = "52" }
         );
         _similarSchoolsRepo.SetupGroups(
             new() { URN = "100001", NeighbourURN = "100002" },
@@ -3154,7 +3170,8 @@ public class FindSimilarSchoolsTests
             new() { URN = "100001", NeighbourURN = "100004" },
             new() { URN = "100001", NeighbourURN = "100005" },
             new() { URN = "100001", NeighbourURN = "100006" },
-            new() { URN = "100001", NeighbourURN = "100007" }
+            new() { URN = "100001", NeighbourURN = "100007" },
+            new() { URN = "100001", NeighbourURN = "100008" }
         );
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
