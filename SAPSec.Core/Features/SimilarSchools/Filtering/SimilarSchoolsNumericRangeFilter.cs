@@ -14,7 +14,7 @@ public abstract class SimilarSchoolsNumericRangeFilter(
     const int MaxValue = 999;
     static readonly Regex NumericValueRegex = new Regex(@"^-?\d+(\.\d+)?$", RegexOptions.Compiled);
 
-    public override bool IsApplied => FilterValues.ContainsKey(Key + "_f") || FilterValues.ContainsKey(Key + "_t");
+    public override bool IsApplied => HasFilterValues(Key + "_f") || HasFilterValues(Key + "_t");
 
     public IEnumerable<ValidationError> Validate()
     {

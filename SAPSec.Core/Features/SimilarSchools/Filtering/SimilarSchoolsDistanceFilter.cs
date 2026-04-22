@@ -23,7 +23,7 @@ public class SimilarSchoolsDistanceFilter(
             return items;
         }
 
-        return items.Where(i => i.Coordinates is not null &&
+        var filtered = items.Where(i => i.Coordinates is not null &&
             value.ToLowerInvariant() switch
             {
                 "5" => i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 5,
@@ -32,7 +32,10 @@ public class SimilarSchoolsDistanceFilter(
                 "50" => i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 50,
                 "100" => i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 100,
                 _ => true
-            });
+            }).ToList();
+
+        var missing = items.Except(filtered).ToList();
+        return filtered;
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, string? value)

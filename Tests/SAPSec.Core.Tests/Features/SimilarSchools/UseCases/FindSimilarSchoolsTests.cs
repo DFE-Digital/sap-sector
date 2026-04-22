@@ -1448,6 +1448,35 @@ public class FindSimilarSchoolsTests
     }
 
     [Fact]
+    public async Task FilterBy_SchoolCapacityInUse_DoesNotApplyFilterIfBothFromAndToFieldsAreEmpty()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002", TotalCapacity = 100, TotalPupils = 50 },
+            new() { URN = "100003", TotalCapacity = 100, TotalPupils = null },
+            new() { URN = "100004", TotalCapacity = null, TotalPupils = 50 },
+            new() { URN = "100005", TotalCapacity = null, TotalPupils = null },
+            new() { URN = "100006" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            ["sciu_f"] = [""],
+            ["sciu_t"] = [""]
+        }));
+
+        response.AllResults.Select(r => r.SimilarSchool.URN)
+            .Should().BeEquivalentTo("100002", "100003", "100004", "100005", "100006");
+    }
+
+    [Fact]
     public async Task FilterBy_SchoolCapacityInUse_FilterOptions()
     {
         _establishmentRepo.SetupEstablishments(
@@ -2884,6 +2913,39 @@ public class FindSimilarSchoolsTests
     }
 
     [Fact]
+    public async Task FilterBy_OverallAbsenceRate_DoesNotApplyFilterIfBothFromAndToFieldsAreEmpty()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" }
+        );
+        _absenceRepo.SetupEstablishmentAbsence(
+            new() { Id = "100002", Abs_Tot_Est_Current_Pct = "49.99" },
+            new() { Id = "100003", Abs_Tot_Est_Current_Pct = "" },
+            new() { Id = "100004", Abs_Tot_Est_Current_Pct = "XXX" },
+            new() { Id = "100005" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            ["sciu_f"] = [""],
+            ["sciu_t"] = [""]
+        }));
+
+        response.AllResults.Select(r => r.SimilarSchool.URN)
+            .Should().BeEquivalentTo("100002", "100003", "100004", "100005");
+    }
+
+    [Fact]
     public async Task FilterBy_OverallAbsenceRate_FilterOptions()
     {
         _establishmentRepo.SetupEstablishments(
@@ -3136,6 +3198,39 @@ public class FindSimilarSchoolsTests
 
         response.AllResults.Select(r => r.SimilarSchool.URN)
             .Should().BeEquivalentTo(["100002"]);
+    }
+
+    [Fact]
+    public async Task FilterBy_PersistentAbsenceRate_DoesNotApplyFilterIfBothFromAndToFieldsAreEmpty()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002" },
+            new() { URN = "100003" },
+            new() { URN = "100004" },
+            new() { URN = "100005" }
+        );
+        _absenceRepo.SetupEstablishmentAbsence(
+            new() { Id = "100002", Abs_Persistent_Est_Current_Pct = "49.99" },
+            new() { Id = "100003", Abs_Persistent_Est_Current_Pct = "" },
+            new() { Id = "100004", Abs_Persistent_Est_Current_Pct = "XXX" },
+            new() { Id = "100005" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            ["sciu_f"] = [""],
+            ["sciu_t"] = [""]
+        }));
+
+        response.AllResults.Select(r => r.SimilarSchool.URN)
+            .Should().BeEquivalentTo("100002", "100003", "100004", "100005");
     }
 
     [Fact]

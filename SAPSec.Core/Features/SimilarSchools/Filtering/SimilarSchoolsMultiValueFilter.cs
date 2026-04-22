@@ -10,7 +10,7 @@ public abstract class SimilarSchoolsMultiValueFilter(
     SimilarSchool currentSchool)
     : SimilarSchoolsFilter(key, name, filterValues, currentSchool)
 {
-    public override bool IsApplied => FilterValues.ContainsKey(Key);
+    public override bool IsApplied => HasFilterValues(Key);
 
     public override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
     {

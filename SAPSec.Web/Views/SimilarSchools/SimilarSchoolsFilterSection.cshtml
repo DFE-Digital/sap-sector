@@ -16,7 +16,7 @@
             (!string.IsNullOrWhiteSpace(r.From.Value) || !string.IsNullOrWhiteSpace(r.To.Value), r.ValidationErrors.Any()),
         _ => (false, false)
     };
-    var isExpanded = hasSelection || hasErrors;
+    var isExpanded = hasSelection || hasErrors ? "true" : "false";
     var isLastInGroup = ViewData["IsLastInGroup"] as bool? ?? false;
     var sectionClasses = isLastInGroup ? "app-filter-section" : "app-filter-section app-filter-section--divider";
 }

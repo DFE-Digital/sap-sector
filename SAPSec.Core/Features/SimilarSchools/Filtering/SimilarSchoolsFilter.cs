@@ -15,6 +15,8 @@ public abstract class SimilarSchoolsFilter(
     protected IDictionary<string, IEnumerable<string>> FilterValues => _filterValues;
     protected SimilarSchool CurrentSchool => currentSchool;
     protected abstract DataWithAvailability<string>? CurrentSchoolValue { get; }
+    protected bool HasFilterValues(string key)
+        => FilterValues.ContainsKey(key) && FilterValues[key].Any(v => !string.IsNullOrWhiteSpace(v));
 
     public string Key => key;
     public string Name => name;
