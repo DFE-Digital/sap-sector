@@ -1,7 +1,7 @@
-using System.Globalization;
-using SAPSec.Core.Model;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Model;
+using System.Globalization;
 
 namespace SAPSec.Web.ViewModels;
 
@@ -118,7 +118,7 @@ public class SimilarSchoolsComparisonViewModel
         return Math.Round((clamped / Attainment8MaxScore) * 100m, 1, MidpointRounding.AwayFromZero);
     }
 
-    private static string DisplayValue(decimal? value) =>
+    public static string DisplayValue(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) : "No available data";
 
     public static string DisplayPercent(decimal? value) =>

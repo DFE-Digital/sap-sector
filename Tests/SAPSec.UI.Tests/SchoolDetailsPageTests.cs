@@ -270,7 +270,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
     {
         await Page.GotoAsync(SchoolDetailsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
+        
         var trustKey = Page.Locator(".govuk-summary-list__key:has-text('Academy trust')");
         var isVisible = await trustKey.IsVisibleAsync();
 
@@ -288,7 +288,6 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Admissions policy field should be visible");
     }
-
 
     [Fact]
     public async Task SchoolDetails_DisplaysNurseryProvisionField()
@@ -313,6 +312,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Sixth form field should be visible");
     }
+
     [Fact]
     public async Task SchoolDetails_DisplaysSENUnitField()
     {

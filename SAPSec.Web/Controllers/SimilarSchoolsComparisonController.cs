@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
@@ -23,7 +22,6 @@ public class SimilarSchoolsComparisonController : Controller
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
-    private readonly ISimilarSchoolsSecondaryRepository _similarSchoolsSecondaryRepository;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
 
     public SimilarSchoolsComparisonController(
@@ -34,8 +32,7 @@ public class SimilarSchoolsComparisonController : Controller
         GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         GetCharacteristicsComparison getCharacteristicsComparison,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
-        ILogger<SimilarSchoolsComparisonController> logger,
-        ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository)
+        ILogger<SimilarSchoolsComparisonController> logger)
     {
         _getSimilarSchoolDetails =
             getSimilarSchoolDetails ?? throw new ArgumentNullException(nameof(getSimilarSchoolDetails));
@@ -48,8 +45,6 @@ public class SimilarSchoolsComparisonController : Controller
         _characteristicsFormatter = characteristicsFormatter ??
                                     throw new ArgumentNullException(nameof(characteristicsFormatter));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _similarSchoolsSecondaryRepository = similarSchoolsSecondaryRepository
-            ?? throw new ArgumentNullException(nameof(similarSchoolsSecondaryRepository));
     }
 
     [HttpGet]
@@ -74,16 +69,6 @@ public class SimilarSchoolsComparisonController : Controller
 
         SetComparisonSchoolViewData(modelResult.Model!);
         return View("Similarity", modelResult.Model);
-    }
-
-    [HttpGet]
-    [Route("Throw")]
-    public async Task<IActionResult> Throw(
-        string urn,
-        string similarSchoolUrn,
-        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
-    {
-        throw new InvalidOperationException("STU");
     }
 
     [HttpGet]
@@ -617,10 +602,10 @@ public class SimilarSchoolsComparisonController : Controller
 
         var model = baseResult.Model!;
 
-        model.CurrentSchoolLatitude = response.CurrentSchoolCoordinates.Latitude;
-        model.CurrentSchoolLongitude = response.CurrentSchoolCoordinates.Longitude;
-        model.SimilarSchoolLatitude = response.SimilarSchoolCoordinates.Latitude;
-        model.SimilarSchoolLongitude = response.SimilarSchoolCoordinates.Longitude;
+        model.CurrentSchoolLatitude = response.CurrentSchoolCoordinates?.Latitude;
+        model.CurrentSchoolLongitude = response.CurrentSchoolCoordinates?.Longitude;
+        model.SimilarSchoolLatitude = response.SimilarSchoolCoordinates?.Latitude;
+        model.SimilarSchoolLongitude = response.SimilarSchoolCoordinates?.Longitude;
         model.Distance = response.DistanceMiles;
         model.SimilarSchoolDetails = response.SimilarSchoolDetails;
 

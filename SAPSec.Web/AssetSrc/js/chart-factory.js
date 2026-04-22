@@ -5,7 +5,8 @@
             axisSuffix: '%',
             maxDevicePixelRatio: 2,
             resizeDebounceMs: 100,
-            labelWrapChars: 15
+            labelWrapChars: 15,
+            mobileBreakpoint: '(max-width: 40.0625em)'
         },
         legend: {
             position: 'bottom',
@@ -64,6 +65,7 @@
                 anchor: 'end',
                 smallValueAlign: 'end',
                 defaultAlign: 'start',
+                mobileInsideThresholdRatio: 0.4,
                 offset: 10,
                 fontWeight: 'bold'
             },
@@ -183,9 +185,36 @@
         return barLength >= labelWidth + (CHART_CONFIG.bar.datalabels.offset * 2);
     }
 
+    function isMobileViewport() {
+        return window.matchMedia(CHART_CONFIG.defaults.mobileBreakpoint).matches;
+    }
+
+    function isLargeEnoughForInsideLabel(value, ctx) {
+        if (value === null || value === undefined || Number.isNaN(value)) {
+            return false;
+        }
+
+        const xScale = ctx.chart?.scales?.x;
+        const axisMin = xScale?.min ?? 0;
+        const axisMax = xScale?.max ?? 0;
+        const axisRange = axisMax - axisMin;
+
+        if (axisRange <= 0) {
+            return true;
+        }
+
+        return ((value - axisMin) / axisRange) >= CHART_CONFIG.bar.datalabels.mobileInsideThresholdRatio;
+    }
+
     function getBarLabelAlignment(ctx, axisSuffix, barLabelAlign) {
         if (barLabelAlign) {
             return barLabelAlign;
+        }
+
+        if (isMobileViewport()) {
+            return isLargeEnoughForInsideLabel(ctx.dataset.data[ctx.dataIndex], ctx)
+                ? CHART_CONFIG.bar.datalabels.defaultAlign
+                : CHART_CONFIG.bar.datalabels.smallValueAlign;
         }
 
         return canBarFitLabel(ctx, axisSuffix)

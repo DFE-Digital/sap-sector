@@ -17,12 +17,13 @@ public class GetFilteredSchoolKs4CoreSubject(
         var subjectFilter = SchoolKs4CoreSubjectExtensions.ParseSubject(request.Subject);
         var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
         var schoolData = await repository.GetByUrnAsync(request.Urn);
-        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolUrnsAsync(request.Urn))
+        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.Urn))
+            .Select(g => g.NeighbourURN)
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
         var similarSchoolData = ((await repository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
-            .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
+            .ToDictionary(x => x.URN, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
                 ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))

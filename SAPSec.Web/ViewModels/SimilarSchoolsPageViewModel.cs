@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core;
 
 namespace SAPSec.Web.ViewModels;
 
@@ -24,6 +24,7 @@ public class SimilarSchoolsPageViewModel
     public int CurrentPage { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     public int TotalResults { get; set; }
+    public IReadOnlyCollection<ValidationError> ValidationErrors { get; set; } = [];
 
     public int TotalPages => (int)Math.Ceiling((double)TotalResults / PageSize);
     public int ShowingFrom => TotalResults == 0 ? 0 : ((CurrentPage - 1) * PageSize) + 1;

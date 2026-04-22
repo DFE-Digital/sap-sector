@@ -97,6 +97,24 @@ public class SchoolDetailsServiceTests
         await action.Should().ThrowAsync<NotFoundException>();
     }
 
+    [Fact]
+    public async Task GetByUrn_AdmissionsPolicy_ShouldNotBeANumber()
+    {
+        // Arrange
+        var establishment = CreateTestAcademy();
+
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync("123456"))
+            .ReturnsAsync(establishment);
+
+        // Act
+        var result = await _sut.GetByUrnAsync("123456");
+        var isNumeric = int.TryParse(result.AdmissionsPolicy.Value, out _);
+
+        // Assert
+        isNumeric.Should().BeFalse("Admissions policy value should not be a number");
+    }
+
     #endregion
 
     #region Governance Rule Integration Tests

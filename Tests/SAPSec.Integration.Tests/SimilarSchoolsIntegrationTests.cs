@@ -34,7 +34,7 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("similar-schools-filter-form");
+        content.Should().Contain("app-filter-panel");
     }
 
     [Fact]

@@ -1,13 +1,13 @@
-using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Services;
 
 namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;
 
@@ -574,21 +574,20 @@ public class GetSchoolKs4CoreSubjectsTests
     private sealed class TestContext
     {
         private readonly Mock<IKs4PerformanceRepository> _repositoryMock = new();
-        private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
         private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
         private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
         private Ks4PerformanceData _currentSchoolData = CreateMeasures("100001");
 
         public TestContext()
         {
-            _schoolDetailsServiceMock
-                .Setup(x => x.GetByUrnAsync("100001"))
-                .ReturnsAsync(CreateSchoolDetails("100001", "Current school"));
+            _establishmentRepositoryMock
+                .Setup(x => x.GetEstablishmentAsync("100001"))
+                .ReturnsAsync(CreateSchool("100001", "Current school"));
         }
 
         public GetSchoolKs4CoreSubjects Sut => new(
             _repositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
+            new SchoolDetailsService(_establishmentRepositoryMock.Object, new Mock<ILogger<SchoolDetailsService>>().Object),
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
 
@@ -612,8 +611,8 @@ public class GetSchoolKs4CoreSubjectsTests
             var similarSchoolsArray = similarSchools.ToArray();
 
             _similarSchoolsRepositoryMock
-                .Setup(x => x.GetSimilarSchoolUrnsAsync("100001"))
-                .ReturnsAsync(similarSchoolsArray.Select(x => x.Urn).ToArray());
+                .Setup(x => x.GetSimilarSchoolsGroupAsync("100001"))
+                .ReturnsAsync(similarSchoolsArray.Select(x => new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = x.Urn }).ToArray());
 
             _repositoryMock
                 .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
@@ -632,35 +631,44 @@ public class GetSchoolKs4CoreSubjectsTests
         }
     }
 
-    private static SchoolDetails CreateSchoolDetails(string urn, string name) =>
-        new()
+    private static Establishment CreateSchool(string urn, string name, BNGCoordinates? coordinates = null)
+    {
+        return new Establishment
         {
-            Urn = urn,
-            Name = name,
-            DfENumber = DataWithAvailability.Available("001/1234"),
-            Ukprn = DataWithAvailability.Available("10000000"),
-            Address = DataWithAvailability.Available("Test Address"),
-            LocalAuthorityName = DataWithAvailability.Available("Test LA"),
-            LocalAuthorityCode = DataWithAvailability.Available("001"),
-            Region = DataWithAvailability.Available("Test Region"),
-            UrbanRuralDescription = DataWithAvailability.Available("Urban"),
-            AgeRangeLow = DataWithAvailability.Available(11),
-            AgeRangeHigh = DataWithAvailability.Available(16),
-            GenderOfEntry = DataWithAvailability.Available("Mixed"),
-            PhaseOfEducation = DataWithAvailability.Available("Secondary"),
-            SchoolType = DataWithAvailability.Available("Academy"),
-            AdmissionsPolicy = DataWithAvailability.Available("Not selective"),
-            ReligiousCharacter = DataWithAvailability.Available("None"),
-            GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
-            AcademyTrustName = DataWithAvailability.Available("Test Trust"),
-            AcademyTrustId = DataWithAvailability.Available("5000"),
-            HasNurseryProvision = DataWithAvailability.Available(false),
-            HasSixthForm = DataWithAvailability.Available(false),
-            HasSenUnit = DataWithAvailability.Available(false),
-            HasResourcedProvision = DataWithAvailability.Available(false),
-            HeadteacherName = DataWithAvailability.Available("Head Teacher"),
-            Website = DataWithAvailability.Available("https://example.test"),
-            Telephone = DataWithAvailability.Available("0123456789"),
-            Email = DataWithAvailability.NotAvailable<string>()
+            URN = urn,
+            EstablishmentName = name,
+            Street = "123 Test Street",
+            Town = "Sheffield",
+            Postcode = "S1 1AA",
+            Locality = "",
+            Address3 = "",
+            TotalCapacity = 1200,
+            TotalPupils = 1000,
+            NurseryProvisionName = "No",
+            LAId = "373",
+            LAName = "Sheffield",
+            RegionId = "R",
+            RegionName = "Yorkshire and the Humber",
+            UrbanRuralId = "A1",
+            UrbanRuralName = "Urban",
+            PhaseOfEducationId = "P",
+            PhaseOfEducationName = "Secondary",
+            OfficialSixthFormId = "1",
+            OfficialSixthFormName = "Has sixth form",
+            AdmissionsPolicyId = "1",
+            AdmissionsPolicyName = "Comprehensive",
+            GenderId = "M",
+            GenderName = "Mixed",
+            ResourcedProvisionId = "0",
+            ResourcedProvisionName = "No",
+            TypeOfEstablishmentId = "27",
+            TypeOfEstablishmentName = "Academy",
+            EstablishmentTypeGroupId = "10",
+            EstablishmentTypeGroupName = "Academies",
+            TrustSchoolFlagId = "0",
+            TrustSchoolFlagName = "No",
+            Easting = coordinates?.Easting,
+            Northing = coordinates?.Northing,
         };
+    }
 }
