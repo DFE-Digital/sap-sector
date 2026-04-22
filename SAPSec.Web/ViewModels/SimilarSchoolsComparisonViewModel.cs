@@ -118,7 +118,7 @@ public class SimilarSchoolsComparisonViewModel
         return Math.Round((clamped / Attainment8MaxScore) * 100m, 1, MidpointRounding.AwayFromZero);
     }
 
-    private static string DisplayValue(decimal? value) =>
+    public static string DisplayValue(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) : "No available data";
 
     public static string DisplayPercent(decimal? value) =>

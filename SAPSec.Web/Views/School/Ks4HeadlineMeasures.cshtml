@@ -150,9 +150,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Item1</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">@row.Item2.Previous2</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">@row.Item2.Previous</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">@row.Item2.Current</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric">@row.Item3</td>
                         </tr>
                     }
