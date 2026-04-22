@@ -47,6 +47,37 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
     }
 
     [Fact]
+    public async Task GetCookies_DoesNotListRetiredApplicationInsightsCookies()
+    {
+        var response = await fixture.Client.GetAsync("/cookies");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().NotContain("ai_session");
+        content.Should().NotContain("ai_user");
+    }
+
+    [Fact]
+    public async Task GetCookies_ListsOnlySupportedAdditionalCookies()
+    {
+        var response = await fixture.Client.GetAsync("/cookies");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("_ga");
+        content.Should().Contain("_ga_&lt;id&gt;");
+        content.Should().Contain("_gid");
+        content.Should().Contain("_dc_gtm_&lt;id&gt;");
+        content.Should().Contain("_clck");
+        content.Should().Contain("_clsk");
+        content.Should().NotContain("CLID");
+        content.Should().NotContain("ANONCHK");
+        content.Should().NotContain("MR");
+        content.Should().NotContain("MUID");
+        content.Should().NotContain("SM");
+    }
+
+    [Fact]
     public async Task GetCookies_WithAcceptedBannerQuery_RendersAcceptedCookieBanner()
     {
         var request = new HttpRequestMessage(HttpMethod.Get, "/cookies?cookie-banner=accepted");

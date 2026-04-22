@@ -54,4 +54,31 @@ public class HomeControllerTests(WebApplicationSetupFixture fixture)
         content.Should().Contain("Open Government Licence v3.0");
     }
 
+    [Fact]
+    public async Task HomePage_WithoutAnalyticsConsent_DoesNotRenderAnalyticsTags()
+    {
+        var response = await fixture.Client.GetAsync("/");
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().NotContain("googletagmanager.com/gtm.js");
+        content.Should().NotContain("googletagmanager.com/ns.html");
+        content.Should().NotContain("clarity.ms/tag/");
+    }
+
+    [Fact]
+    public async Task HomePage_WithAnalyticsConsent_RendersAnalyticsTags()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "/");
+        request.Headers.Add("Cookie", "cookie_policy=enabled");
+
+        var response = await fixture.Client.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("googletagmanager.com/gtm.js?id='+i+dl+'");
+        content.Should().Contain("GTM-M3BPJWJD");
+        content.Should().Contain("googletagmanager.com/ns.html?id=GTM-M3BPJWJD");
+        content.Should().Contain("clarity.ms/tag/");
+        content.Should().NotContain("gtm_auth=");
+        content.Should().NotContain("gtm_preview=");
+    }
 }
