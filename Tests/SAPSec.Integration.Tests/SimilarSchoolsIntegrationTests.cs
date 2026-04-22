@@ -79,4 +79,18 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         content.Should().Contain("Progress 8");
         content.Should().Contain("Attainment 8");
     }
+
+    [Fact]
+    public async Task ComparisonKs4HeadlineMeasures_BarChartsUseExpectedDecimalPlaces()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Ks4HeadlineMeasures");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("id=\"ks4-attainment8-comparison-chart\"");
+        content.Should().Contain("id=\"eng-maths-comparison-chart\"");
+        content.Should().Contain("id=\"destinations-comparison-chart\"");
+        content.Should().Contain("data-label-decimals=\"1\"");
+        content.Should().Contain("data-label-decimals=\"0\"");
+    }
 }
