@@ -76,4 +76,18 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
         return result;
     }
+
+    public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
+    {
+        const string sql = """
+            SELECT
+                DISTINCT "URN" 
+            FROM v_similar_schools_secondary_values;
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+        var result = await conn.QueryAsync<string>(sql);
+
+        return result.ToList();
+    }
 }

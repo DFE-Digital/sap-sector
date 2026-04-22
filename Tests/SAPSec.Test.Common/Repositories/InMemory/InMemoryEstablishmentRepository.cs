@@ -1,7 +1,7 @@
 ﻿using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
 
-namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
+namespace SAPSec.Test.Common.Repositories.InMemory;
 
 public class InMemoryEstablishmentRepository : IEstablishmentRepository
 {
