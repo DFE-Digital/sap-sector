@@ -96,8 +96,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("/find-a-school/search");
         Page.Url.Should().Contain("query=Test");
-        Page.Url.Should().Contain("secondaryOnly", "search now preserves hidden secondary-only filter");
-        Page.Url.Should().Contain("similarSchoolsOnly", "search now preserves hidden similar-schools-only filter");
     }
 
     [Fact]

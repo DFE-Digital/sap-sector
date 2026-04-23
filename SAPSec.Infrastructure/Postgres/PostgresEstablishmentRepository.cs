@@ -77,7 +77,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
             FROM public.v_establishment
             WHERE "URN" = @number
                 OR "UKPRN" = @number
-                OR CONCAT("LAId", "EstablishmentNumber") = @number
+                OR "LAESTAB" = @number
             LIMIT 1;
         """;
 

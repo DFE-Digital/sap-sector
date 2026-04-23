@@ -8,9 +8,7 @@
 @await Html.PartialAsync("_SchoolSearchQuery", new SchoolSearchQueryViewModel
 {
     Query = Model.Query,
-    HasNoResults = !string.IsNullOrWhiteSpace(Model.Query) && Model.Results.Length == 0,
-    SecondaryOnly = Model.SecondaryOnly,
-    SimilarSchoolsOnly = Model.SimilarSchoolsOnly
+    HasNoResults = !string.IsNullOrWhiteSpace(Model.Query) && Model.Results.Length == 0
 })
 @{
     var hasResults = Model.Results.Length > 0;
@@ -21,13 +19,11 @@
     @if (hasResults)
     {
         @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
-        {
-            Query = Model.Query,
-            LocalAuthorities = Model.LocalAuthorities,
-            SelectedLocalAuthorities = Model.SelectedLocalAuthorities,
-            SecondaryOnly = Model.SecondaryOnly,
-            SimilarSchoolsOnly = Model.SimilarSchoolsOnly
-        })
+   {
+       Query = Model.Query,
+       LocalAuthorities = Model.LocalAuthorities,
+       SelectedLocalAuthorities = Model.SelectedLocalAuthorities
+   })
     }
 
     <div class="govuk-grid-column-two-thirds app-filter__results-column">

@@ -53,4 +53,10 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
         var list = await _standardDeviations.ReadAllAsync();
         return list.FirstOrDefault();
     }
+
+    public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
+    {
+        var rows = await _similarSchoolsValues.ReadAllAsync();
+        return rows.Select(r => r.URN).ToList();
+    }
 }

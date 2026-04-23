@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
@@ -7,13 +8,14 @@ namespace SAPSec.Infrastructure.LuceneSearch;
 public class StartupIndexBuilder(
     ILogger<StartupIndexBuilder> logger,
     LuceneIndexWriter writer,
-    IEstablishmentRepository establishmentRepository)
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    int retryIntervalMilliseconds = 10000)
     : BackgroundService
 {
-    private const int RetryIntervalSeconds = 10;
     private long _indexBuiltSuccessfully = 0;
 
-    private bool IndexBuiltSuccessfully
+    public bool IndexBuiltSuccessfully
     {
         get => Interlocked.Read(ref _indexBuiltSuccessfully) == 1;
         set => Interlocked.Exchange(ref _indexBuiltSuccessfully, Convert.ToInt64(value));
@@ -25,7 +27,7 @@ public class StartupIndexBuilder(
         {
             await TryBuildIndex(cancellationToken);
 
-            using PeriodicTimer timer = new(TimeSpan.FromSeconds(RetryIntervalSeconds));
+            using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(retryIntervalMilliseconds));
 
             while (!IndexBuiltSuccessfully
                 && await timer.WaitForNextTickAsync(cancellationToken))
@@ -47,7 +49,8 @@ public class StartupIndexBuilder(
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var schools = await establishmentRepository.GetAllEstablishmentsAsync();
+            var similarSchoolUrns = await similarSchoolsRepository.GetAllUrnsInSimilarSchoolsDataSet();
+            var schools = await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns);
 
             if (!schools.Any())
             {

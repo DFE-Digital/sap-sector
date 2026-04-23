@@ -5,14 +5,17 @@ using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;
 
-public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablishmentRepository _establishmentRepository) : ISchoolSearchService
+public class SchoolSearchService(
+    ISchoolSearchIndexReader _indexReader,
+    IEstablishmentRepository _establishmentRepository) : ISchoolSearchService
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
+    private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
     {
-        var searchResults = await indexReader.SearchAsync(query, MaxResults);
+        var searchResults = await _indexReader.SearchAsync(query, MaxResults);
 
         var results = new List<SchoolSearchResult>();
 
@@ -40,12 +43,12 @@ public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablis
             results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
         }
 
-        return results;
+        return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
     {
-        var searchResults = await indexReader.SearchAsync(queryPart, MaxSuggestions);
+        var searchResults = await _indexReader.SearchAsync(queryPart, MaxSuggestions);
 
         var results = new List<SchoolSearchResult>();
 
@@ -69,19 +72,21 @@ public class SchoolSearchService(ISchoolSearchIndexReader indexReader, IEstablis
             results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, null));
         }
 
-        return results;
+        return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 
     public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
     {
-        var trimmedSchoolNumber = schoolNumber.Trim();
-        var isNumber = Regex.IsMatch(trimmedSchoolNumber, @"^\d+$");
-        var isDfENumber = Regex.IsMatch(trimmedSchoolNumber, @"^\d+[\\/]\d+$");
+        var trimmedSchoolNumber = schoolNumber
+            .Trim()
+            .Replace("/", string.Empty)
+            .Replace("\\", string.Empty);
 
-        return isNumber
-            ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber))
-            : isDfENumber
-                ? (await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber.Replace("/", string.Empty).Replace("\\", string.Empty)))
-                : null;
+        if (!Numeric.IsMatch(trimmedSchoolNumber))
+        {
+            return null;
+        }
+
+        return await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
     }
 }
