@@ -1,5 +1,21 @@
 (function () {
     const datasetColorKeys = ['school', 'similarSchools', 'localAuthority', 'england'];
+    const ks4CoreSubjectYearByYearChartIds = new Set([
+        'english-language-school-yearbyyear-chart',
+        'english-literature-school-yearbyyear-chart',
+        'maths-school-yearbyyear-chart',
+        'combined-science-school-yearbyyear-chart',
+        'biology-school-yearbyyear-chart',
+        'chemistry-school-yearbyyear-chart',
+        'physics-school-yearbyyear-chart',
+        'english-language-comparison-yearbyyear-chart',
+        'english-literature-comparison-yearbyyear-chart',
+        'maths-comparison-yearbyyear-chart',
+        'combined-science-comparison-yearbyyear-chart',
+        'biology-comparison-yearbyyear-chart',
+        'chemistry-comparison-yearbyyear-chart',
+        'physics-comparison-yearbyyear-chart'
+    ]);
     const CHART_CONFIG = {
         defaults: {
             axisSuffix: '%',
@@ -553,6 +569,10 @@
         container.style.height = `${height}px`;
     }
 
+    function isKs4CoreSubjectYearByYearChart(canvas) {
+        return ks4CoreSubjectYearByYearChartIds.has(canvas.id);
+    }
+
     function initCharts() {
         document.querySelectorAll('.js-chart').forEach(canvas => {
             if (charts[canvas.id]) {
@@ -573,18 +593,19 @@
             const showLegend = canvas.dataset.showLegend === "true";
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
+            const forceKs4CoreSubjectTicks = isKs4CoreSubjectYearByYearChart(canvas);
             const axisStep = canvas.dataset.axisStep
                 ? parseInt(canvas.dataset.axisStep, 10)
                 : CHART_CONFIG.defaults.axisStep;
             const axisMin = canvas.dataset.axisMin
                 ? parseFloat(canvas.dataset.axisMin)
-                : null;
+                : forceKs4CoreSubjectTicks ? 0 : null;
             const axisMax = canvas.dataset.axisMax
                 ? parseFloat(canvas.dataset.axisMax)
                 : null;
             const axisAutoSkip = canvas.dataset.axisAutoSkip !== undefined
                 ? canvas.dataset.axisAutoSkip !== "false"
-                : undefined;
+                : forceKs4CoreSubjectTicks ? false : undefined;
             const axisSuffix = canvas.dataset.axisSuffix !== undefined
                 ? canvas.dataset.axisSuffix
                 : CHART_CONFIG.defaults.axisSuffix;
