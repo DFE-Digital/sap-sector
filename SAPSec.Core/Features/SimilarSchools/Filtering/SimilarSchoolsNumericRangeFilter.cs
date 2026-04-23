@@ -12,7 +12,7 @@ public abstract class SimilarSchoolsNumericRangeFilter(
 {
     const int MinValue = 0;
     const int MaxValue = 999;
-    static readonly Regex NumericValueRegex = new Regex(@"^-?\d+(\.\d+)?$", RegexOptions.Compiled);
+    static readonly Regex NumericValueRegex = new Regex(@"^-?\.?\d+(\.\d+)?$", RegexOptions.Compiled);
 
     public override bool IsApplied => HasFilterValues(Key + "_f") || HasFilterValues(Key + "_t");
 
