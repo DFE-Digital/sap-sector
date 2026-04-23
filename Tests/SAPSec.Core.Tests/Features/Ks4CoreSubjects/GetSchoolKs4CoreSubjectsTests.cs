@@ -186,6 +186,44 @@ public class GetSchoolKs4CoreSubjectsTests
     }
 
     [Fact]
+    public async Task Execute_WhenCurrentSchoolAppearsInSimilarSchools_DoesNotDuplicateCurrentSchoolTopPerformer()
+    {
+        var context = new TestContext();
+        context.SetupCurrentSchoolData(establishment: data =>
+        {
+            data.EngLang49_Sum_Est_Current_Pct = "82";
+            data.EngLang49_Sum_Est_Previous_Pct = "81";
+            data.EngLang49_Sum_Est_Previous2_Pct = "80";
+        });
+
+        context.SetupSimilarSchools(
+            CreateSimilarSchoolMeasures("100001", "Current school", establishment: data =>
+            {
+                data.EngLang49_Sum_Est_Current_Pct = "82";
+                data.EngLang49_Sum_Est_Previous_Pct = "81";
+                data.EngLang49_Sum_Est_Previous2_Pct = "80";
+            }),
+            CreateSimilarSchoolMeasures("200001", "Alpha school", establishment: data =>
+            {
+                data.EngLang49_Sum_Est_Current_Pct = "72";
+                data.EngLang49_Sum_Est_Previous_Pct = "71";
+                data.EngLang49_Sum_Est_Previous2_Pct = "70";
+            }),
+            CreateSimilarSchoolMeasures("200002", "Beta school", establishment: data =>
+            {
+                data.EngLang49_Sum_Est_Current_Pct = "62";
+                data.EngLang49_Sum_Est_Previous_Pct = "61";
+                data.EngLang49_Sum_Est_Previous2_Pct = "60";
+            }));
+
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
+        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+
+        subject.TopPerformers.Should().ContainSingle(x => x.Urn == "100001" && x.IsCurrentSchool);
+        subject.TopPerformers.Select(x => x.Urn).Should().Equal("100001", "200001", "200002");
+    }
+
+    [Fact]
     public async Task Execute_EnglishLiteratureGrade4_BuildsYearByYearSeries()
     {
         var context = new TestContext();

@@ -239,7 +239,7 @@ public class SchoolController : Controller
                     x.Urn,
                     x.Name,
                     x.IsCurrentSchool,
-                    DisplayValue = Ks4HeadlineMeasuresPageViewModel.DisplayPercent(x.Value)
+                    DisplayValue = Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(x.Value)
                 })
         });
     }
@@ -422,7 +422,7 @@ public class SchoolController : Controller
             SimilarSchoolsAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.LocalAuthorityValue,
             EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue,
-            Attainment8TopPerformers = MapTopPerformers(response.Attainment8TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayValue),
+            Attainment8TopPerformers = MapTopPerformers(response.Attainment8TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholeValue),
             SchoolAttainment8YearByYear = response.Attainment8YearByYear.School,
             SimilarSchoolsAttainment8YearByYear = response.Attainment8YearByYear.SimilarSchools,
             LocalAuthorityAttainment8YearByYear = response.Attainment8YearByYear.LocalAuthority,
@@ -431,7 +431,7 @@ public class SchoolController : Controller
             SimilarSchoolsEngMathsThreeYearAverage = defaultEngMaths.ThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityEngMathsThreeYearAverage = defaultEngMaths.ThreeYearAverage.LocalAuthorityValue,
             EnglandEngMathsThreeYearAverage = defaultEngMaths.ThreeYearAverage.EnglandValue,
-            EngMathsTopPerformers = MapTopPerformers(defaultEngMaths.TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayPercent),
+            EngMathsTopPerformers = MapTopPerformers(defaultEngMaths.TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent),
             SchoolEngMathsYearByYear = defaultEngMaths.YearByYear.School,
             SimilarSchoolsEngMathsYearByYear = defaultEngMaths.YearByYear.SimilarSchools,
             LocalAuthorityEngMathsYearByYear = defaultEngMaths.YearByYear.LocalAuthority,

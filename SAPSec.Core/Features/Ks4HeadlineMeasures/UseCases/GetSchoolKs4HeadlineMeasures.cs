@@ -361,13 +361,18 @@ public class GetSchoolKs4HeadlineMeasures(
                 IsCurrentSchool: false))
             .Append(currentSchoolCandidate)
             .Where(x => x.Value.HasValue)
-            .OrderByDescending(x => x.Value)
+            .GroupBy(x => x.Urn, StringComparer.Ordinal)
+            .Select(x => x.OrderByDescending(candidate => candidate.IsCurrentSchool).First())
+            .OrderByDescending(x => TopPerformerSortValue(x.Value))
             .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
             .Take(3)
             .Select((x, index) => new Ks4TopPerformer(index + 1, x.Urn, x.Name, x.Value, x.IsCurrentSchool))
             .ToList()
             .AsReadOnly();
     }
+
+    private static decimal TopPerformerSortValue(decimal? value) =>
+        Math.Round(value!.Value, 0, MidpointRounding.AwayFromZero);
 
     private sealed record TopPerformerCandidate(
         string Urn,
