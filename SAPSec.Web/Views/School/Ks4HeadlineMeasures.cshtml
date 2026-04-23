@@ -151,9 +151,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Item1</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholeValue(row.Item2.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholeValue(row.Item2.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholeValue(row.Item2.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric">@row.Item3</td>
                         </tr>
                     }
@@ -253,9 +253,9 @@
                     {
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayPercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayPercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayPercent(row.Series.Current)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Current)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }

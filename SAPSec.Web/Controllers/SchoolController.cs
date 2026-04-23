@@ -205,31 +205,31 @@ public class SchoolController : Controller
             {
                 thisSchool = new[]
                 {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.School.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.School.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.School.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.ThreeYearAverage.SchoolValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Previous2),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Previous),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Current),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.SchoolValue)
                 },
                 similarSchools = new[]
                 {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.SimilarSchools.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.SimilarSchools.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.SimilarSchools.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.ThreeYearAverage.SimilarSchoolsValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Previous2),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Previous),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Current),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.SimilarSchoolsValue)
                 },
                 localAuthority = new[]
                 {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.LocalAuthority.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.LocalAuthority.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.LocalAuthority.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.ThreeYearAverage.LocalAuthorityValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Previous2),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Previous),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Current),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.LocalAuthorityValue)
                 },
                 england = new[]
                 {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.England.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.England.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.YearByYear.England.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayPercent(selectedEngMaths.ThreeYearAverage.EnglandValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Previous2),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Previous),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Current),
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.EnglandValue)
                 }
             },
             topPerformers = selectedEngMaths.TopPerformers
