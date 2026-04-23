@@ -386,6 +386,8 @@ internal static class SchoolKs4CoreSubjectSelectionBuilder
                 IsCurrentSchool: false))
             .Append(currentSchoolCandidate)
             .Where(x => x.Value.HasValue)
+            .GroupBy(x => x.Urn, StringComparer.Ordinal)
+            .Select(x => x.OrderByDescending(candidate => candidate.IsCurrentSchool).First())
             .OrderByDescending(x => TopPerformerSortValue(x.Value))
             .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
             .Take(3)

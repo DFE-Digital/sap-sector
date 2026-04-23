@@ -88,15 +88,15 @@ public class SimilarSchoolsComparisonViewModel
     public CoreSubjectSection? Maths { get; set; }
     public CoreSubjectSection? CombinedScienceDoubleAward { get; set; }
 
-    public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
-    public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
-    public string EnglandAttainment8Display => DisplayValue(EnglandAttainment8ThreeYearAverage);
-    public string ThisSchoolEngMaths49Display => DisplayPercent(ThisSchoolEngMaths49ThreeYearAverage);
-    public string SelectedSchoolEngMaths49Display => DisplayPercent(SelectedSchoolEngMaths49ThreeYearAverage);
-    public string EnglandEngMaths49Display => DisplayPercent(EnglandEngMaths49ThreeYearAverage);
-    public string ThisSchoolEngMaths59Display => DisplayPercent(ThisSchoolEngMaths59ThreeYearAverage);
-    public string SelectedSchoolEngMaths59Display => DisplayPercent(SelectedSchoolEngMaths59ThreeYearAverage);
-    public string EnglandEngMaths59Display => DisplayPercent(EnglandEngMaths59ThreeYearAverage);
+    public string ThisSchoolAttainment8Display => DisplayWholeValue(ThisSchoolAttainment8ThreeYearAverage);
+    public string SelectedSchoolAttainment8Display => DisplayWholeValue(SelectedSchoolAttainment8ThreeYearAverage);
+    public string EnglandAttainment8Display => DisplayWholeValue(EnglandAttainment8ThreeYearAverage);
+    public string ThisSchoolEngMaths49Display => DisplayWholePercent(ThisSchoolEngMaths49ThreeYearAverage);
+    public string SelectedSchoolEngMaths49Display => DisplayWholePercent(SelectedSchoolEngMaths49ThreeYearAverage);
+    public string EnglandEngMaths49Display => DisplayWholePercent(EnglandEngMaths49ThreeYearAverage);
+    public string ThisSchoolEngMaths59Display => DisplayWholePercent(ThisSchoolEngMaths59ThreeYearAverage);
+    public string SelectedSchoolEngMaths59Display => DisplayWholePercent(SelectedSchoolEngMaths59ThreeYearAverage);
+    public string EnglandEngMaths59Display => DisplayWholePercent(EnglandEngMaths59ThreeYearAverage);
     public string ThisSchoolDestinationsDisplay => DisplayWholePercent(ThisSchoolDestinationsThreeYearAverage);
     public string SelectedSchoolDestinationsDisplay => DisplayWholePercent(SelectedSchoolDestinationsThreeYearAverage);
     public string EnglandDestinationsDisplay => DisplayWholePercent(EnglandDestinationsThreeYearAverage);
@@ -120,6 +120,11 @@ public class SimilarSchoolsComparisonViewModel
 
     public static string DisplayValue(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) : "No available data";
+
+    public static string DisplayWholeValue(decimal? value) =>
+        value.HasValue
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture)
+            : "No available data";
 
     public static string DisplayPercent(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) + "%" : "No available data";

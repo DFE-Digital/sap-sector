@@ -41,15 +41,15 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityDestinationsYearByYear { get; set; }
     public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries EnglandDestinationsYearByYear { get; set; }
 
-    public string SchoolAttainment8Display => DisplayValue(SchoolAttainment8ThreeYearAverage);
-    public string SimilarSchoolsAttainment8Display => DisplayValue(SimilarSchoolsAttainment8ThreeYearAverage);
-    public string LocalAuthorityAttainment8Display => DisplayValue(LocalAuthorityAttainment8ThreeYearAverage);
-    public string EnglandAttainment8Display => DisplayValue(EnglandAttainment8ThreeYearAverage);
+    public string SchoolAttainment8Display => DisplayWholeValue(SchoolAttainment8ThreeYearAverage);
+    public string SimilarSchoolsAttainment8Display => DisplayWholeValue(SimilarSchoolsAttainment8ThreeYearAverage);
+    public string LocalAuthorityAttainment8Display => DisplayWholeValue(LocalAuthorityAttainment8ThreeYearAverage);
+    public string EnglandAttainment8Display => DisplayWholeValue(EnglandAttainment8ThreeYearAverage);
 
-    public string SchoolEngMathsDisplay => DisplayPercent(SchoolEngMathsThreeYearAverage);
-    public string SimilarSchoolsEngMathsDisplay => DisplayPercent(SimilarSchoolsEngMathsThreeYearAverage);
-    public string LocalAuthorityEngMathsDisplay => DisplayPercent(LocalAuthorityEngMathsThreeYearAverage);
-    public string EnglandEngMathsDisplay => DisplayPercent(EnglandEngMathsThreeYearAverage);
+    public string SchoolEngMathsDisplay => DisplayWholePercent(SchoolEngMathsThreeYearAverage);
+    public string SimilarSchoolsEngMathsDisplay => DisplayWholePercent(SimilarSchoolsEngMathsThreeYearAverage);
+    public string LocalAuthorityEngMathsDisplay => DisplayWholePercent(LocalAuthorityEngMathsThreeYearAverage);
+    public string EnglandEngMathsDisplay => DisplayWholePercent(EnglandEngMathsThreeYearAverage);
 
     public string SchoolDestinationsDisplay => DisplayWholePercent(SchoolDestinationsThreeYearAverage);
     public string SimilarSchoolsDestinationsDisplay => DisplayWholePercent(SimilarSchoolsDestinationsThreeYearAverage);
@@ -63,6 +63,11 @@ public class Ks4HeadlineMeasuresPageViewModel
 
     public static string DisplayValue(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) : "No available data";
+
+    public static string DisplayWholeValue(decimal? value) =>
+        value.HasValue
+            ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture)
+            : "No available data";
 
     public static string DisplayPercent(decimal? value) =>
         value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) + "%" : "No available data";
