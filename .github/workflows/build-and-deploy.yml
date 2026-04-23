@@ -149,7 +149,7 @@ jobs:
           retention-days: 5
 
       - name: Publish Test Results
-        uses: dorny/test-reporter@v2
+        uses: dorny/test-reporter@df6247429542221bc30d46a036ee47af1102c451 # Pinned at v2.7.0
         if: always()
         with:
           reporter: 'dotnet-trx'
@@ -162,7 +162,7 @@ jobs:
           dotnet coverage merge --reports $(find Tests -name "coverage.cobertura.xml") -f cobertura -o coverage-results/coverage.xml
 
       - name: Generate Coverage Report
-        uses: clearlyip/code-coverage-report-action@v6
+        uses: clearlyip/code-coverage-report-action@9e2cd22e39153feba8b4477e4fefcc0b5e2727ba # Pinned at v6.0.1
         id: code_coverage_report_action
         if: ${{ github.actor != 'dependabot[bot]'}}
         with:
@@ -171,7 +171,7 @@ jobs:
           only_list_changed_files: true
 
       - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405 # Pinned at v2.9.4
         if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
         with:
           recreate: true
@@ -216,7 +216,7 @@ jobs:
           smoke-test: false
           gcp-wip: ${{ vars.GCP_WIP }}
           gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
-      
+
       # ---------------------------
       # REVIEW APP DATABASE DEPLOYMENT (PR)
       # ---------------------------
