@@ -43,14 +43,16 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
     }
 
     [Fact]
-    public async Task Attendance_SidebarShowsAttendanceAsActiveNonNavigableItem()
+    public async Task Attendance_SidebarShowsAttendanceAsActiveNavigableItem()
     {
         await NavigateToAttendanceAsync();
 
         var activeItem = Page.Locator(".app-side-navigation__item--selected");
         await Expect(activeItem).ToContainTextAsync("Attendance");
-        (await activeItem.Locator("a").CountAsync()).Should().Be(0);
-        await Expect(activeItem.Locator("span[aria-current='page']")).ToBeVisibleAsync();
+        var activeLink = activeItem.Locator("a.app-side-navigation__link--selected");
+        await Expect(activeLink).ToBeVisibleAsync();
+        await Expect(activeLink).ToHaveAttributeAsync("href", "/school/145327/attendance");
+        await Expect(activeLink).ToHaveAttributeAsync("aria-current", "page");
     }
 
     [Fact]
