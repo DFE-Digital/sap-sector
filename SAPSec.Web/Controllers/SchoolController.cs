@@ -1,3 +1,4 @@
+using Dfe.Analytics.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
@@ -52,14 +53,14 @@ public class SchoolController : Controller
         return View(school);
     }
 
+
     [HttpGet]
-    [Route("school-details")]
-    public async Task<IActionResult> SchoolDetails(string urn)
+    [Route("tracking")]
+    public async Task<IActionResult> Tracking(string target)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
-        return View(school);
+        HttpContext.GetWebRequestEvent()?.AddData("External link click", target);
+
+        return Redirect(target);
     }
 
     [HttpGet]
