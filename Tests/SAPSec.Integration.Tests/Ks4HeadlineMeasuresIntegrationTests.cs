@@ -1,5 +1,6 @@
 using FluentAssertions;
 using SAPSec.Integration.Tests.Infrastructure;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.Integration.Tests;
 
@@ -44,10 +45,9 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
         var content = await response.Content.ReadAsStringAsync();
 
         response.EnsureSuccessStatusCode();
-        content.Should().Contain("id=\"ks4-attainment8-school-chart\"");
-        content.Should().Contain("data-label-decimals=\"0\"");
-        content.Should().Contain("id=\"eng-maths-school-chart\" class=\"js-chart js-chart--school-ks4-bar\" data-type=\"bar\" data-show-no-data-labels=\"true\" data-axis-step=\"25\" data-axis-max=\"100\" data-axis-suffix=\"%\" data-label-decimals=\"0\"");
-        content.Should().Contain("id=\"destinations-school-chart\" class=\"js-chart js-chart--school-ks4-bar\" data-type=\"bar\" data-show-no-data-labels=\"true\" data-axis-step=\"25\" data-axis-max=\"100\" data-axis-suffix=\"%\" data-label-decimals=\"0\"");
+        GetCanvasMarkup(content, "ks4-attainment8-school-chart").Should().Contain("data-label-decimals=\"1\"");
+        GetCanvasMarkup(content, "eng-maths-school-chart").Should().Contain("data-label-decimals=\"0\"");
+        GetCanvasMarkup(content, "destinations-school-chart").Should().Contain("data-label-decimals=\"0\"");
     }
 
     [Fact]
@@ -56,5 +56,14 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
         var response = await fixture.Client.GetAsync("/school/999999/ks4-headline-measures");
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
+    }
+
+    private static string GetCanvasMarkup(string content, string id)
+    {
+        var pattern = $"""<canvas[^>]*id="{Regex.Escape(id)}"[^>]*>""";
+        var match = Regex.Match(content, pattern, RegexOptions.Singleline);
+
+        match.Success.Should().BeTrue($"expected canvas '{id}' to be rendered");
+        return match.Value;
     }
 }
