@@ -88,9 +88,9 @@ public class SimilarSchoolsComparisonViewModel
     public CoreSubjectSection? Maths { get; set; }
     public CoreSubjectSection? CombinedScienceDoubleAward { get; set; }
 
-    public string ThisSchoolAttainment8Display => DisplayWholeValue(ThisSchoolAttainment8ThreeYearAverage);
-    public string SelectedSchoolAttainment8Display => DisplayWholeValue(SelectedSchoolAttainment8ThreeYearAverage);
-    public string EnglandAttainment8Display => DisplayWholeValue(EnglandAttainment8ThreeYearAverage);
+    public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
+    public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
+    public string EnglandAttainment8Display => DisplayValue(EnglandAttainment8ThreeYearAverage);
     public string ThisSchoolEngMaths49Display => DisplayWholePercent(ThisSchoolEngMaths49ThreeYearAverage);
     public string SelectedSchoolEngMaths49Display => DisplayWholePercent(SelectedSchoolEngMaths49ThreeYearAverage);
     public string EnglandEngMaths49Display => DisplayWholePercent(EnglandEngMaths49ThreeYearAverage);
