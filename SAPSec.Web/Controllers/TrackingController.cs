@@ -9,8 +9,8 @@ namespace SAPSec.Web.Controllers;
 public class TrackingController() : Controller
 {
     [HttpGet]
-    [Route("tracked-linked-click")]
-    public IActionResult TrackedLinkClick(string? externalLink)
+    [Route("tracked-link-clicked")]
+    public IActionResult TrackedLinkClicked(string? externalLink)
     {
         if (externalLink is not null)
         {
