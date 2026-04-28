@@ -53,16 +53,6 @@ public class SchoolController : Controller
         return View(school);
     }
 
-
-    [HttpGet]
-    [Route("tracking")]
-    public async Task<IActionResult> Tracking(string target)
-    {
-        HttpContext.GetWebRequestEvent()?.AddData("External link click", target);
-
-        return Redirect(target);
-    }
-
     [HttpGet]
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
