@@ -54,6 +54,16 @@ public class SchoolController : Controller
     }
 
     [HttpGet]
+    [Route("school-details")]
+    public async Task<IActionResult> SchoolDetails(string urn)
+    {
+        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(school);
+        return View(school);
+    }
+
+    [HttpGet]
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
