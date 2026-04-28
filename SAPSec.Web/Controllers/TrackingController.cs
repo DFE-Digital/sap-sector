@@ -9,8 +9,8 @@ namespace SAPSec.Web.Controllers;
 public class TrackingController() : Controller
 {
     [HttpGet]
-    [Route("log-to-big-query")]
-    public IActionResult LogToBigQuery(string? externalLink)
+    [Route("tracked-linked-click")]
+    public IActionResult TrackedLinkClick(string? externalLink)
     {
         if (externalLink is not null)
         {
