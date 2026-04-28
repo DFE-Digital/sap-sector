@@ -46,23 +46,23 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
 
         // Check favicon.ico
         var faviconIco = await Page.Locator("link[rel='icon'][sizes='48x48']").GetAttributeAsync("href");
-        faviconIco.Should().Be("/assets/images/favicon.ico");
+        faviconIco.Should().Be("/assets/rebrand/images/favicon.ico");
 
         // Check favicon.svg
         var href = await Page.Locator("link[rel='icon'][href$='.svg']").GetAttributeAsync("href");
         var type = await Page.Locator("link[rel='icon'][href$='.svg']").GetAttributeAsync("type");
-        href.Should().Be("/assets/images/favicon.svg");
+        href.Should().Be("/assets/rebrand/images/favicon.svg");
         type.Should().Be("image/svg+xml");
 
         // Check mask-icon
         var maskIconHref = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("href");
         var maskIconColor = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("color");
-        maskIconHref.Should().Be("/assets/images/govuk-icon-mask.svg");
+        maskIconHref.Should().Be("/assets/rebrand/images/govuk-icon-mask.svg");
         maskIconColor.Should().Be("#0b0c0c");
 
         // Check apple-touch-icon
         var appleIcon = await Page.Locator("link[rel='apple-touch-icon']").GetAttributeAsync("href");
-        appleIcon.Should().Be("/assets/images/govuk-icon-180.png");
+        appleIcon.Should().Be("/assets/rebrand/images/govuk-icon-180.png");
 
         // Check manifest
         var manifest = await Page.Locator("link[rel='manifest']").GetAttributeAsync("href");
@@ -137,6 +137,9 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
     public async Task Layout_HasCrownCopyrightAndOpenGovernmentLicence()
     {
         await Page.GotoAsync(HomePagePath);
+
+        var footerCrown = Page.Locator("svg.govuk-footer__crown");
+        (await footerCrown.IsVisibleAsync()).Should().BeTrue();
 
         // Crown copyright link
         var crownLink = Page.Locator("a.govuk-footer__copyright-logo");

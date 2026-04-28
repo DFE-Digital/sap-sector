@@ -5,6 +5,16 @@
     var returnUrl = ViewData["CookieReturnUrl"] as string ?? Url.Content("~/");
 }
 
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
+
 <a href="@returnUrl" class="govuk-back-link">Back</a>
 
 <h1 class="govuk-heading-xl">Cookies</h1>

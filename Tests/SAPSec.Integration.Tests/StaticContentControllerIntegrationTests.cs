@@ -11,18 +11,23 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
     public async Task GetAccessibility_ReturnsSuccess()
     {
         var response = await fixture.Client.GetAsync("/accessibility");
+        var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+        content.Should().Contain($"{SAPSec.Web.Constants.PageTitles.AccessibilityStatement} - {SAPSec.Web.Constants.LayoutConstants.ServiceName} - GOV.UK");
+        content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
     }
 
     [Fact]
     public async Task GetTermsOfUse_ReturnsSuccess()
     {
         var response = await fixture.Client.GetAsync("/terms-of-use");
+        var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+        content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
     }
 
     [Fact]
@@ -32,6 +37,7 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
         content.Should().Contain("<a href=\"/accessibility\" class=\"govuk-back-link\">Back</a>");
     }
 

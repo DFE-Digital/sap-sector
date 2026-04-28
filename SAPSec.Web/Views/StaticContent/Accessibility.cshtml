@@ -1,6 +1,16 @@
 ﻿@using SAPSec.Web.Constants
 @{
-    ViewData[ViewDataKeys.Title] = PageTitles.PrivacyPolicy;
+    ViewData[ViewDataKeys.Title] = PageTitles.AccessibilityStatement;
+}
+
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+            </li>
+        </ol>
+    </nav>
 }
 
 <h1 class="govuk-heading-xl">Accessibility statement</h1>
