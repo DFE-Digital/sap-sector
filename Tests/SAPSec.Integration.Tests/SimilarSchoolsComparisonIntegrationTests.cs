@@ -29,6 +29,16 @@ public class SimilarSchoolsComparisonIntegrationTests(WebApplicationSetupFixture
     }
 
     [Fact]
+    public async Task GetSchoolDetails_HomeBreadcrumb_LinksToSchoolSearch()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("href=\"/find-a-school\">Home</a>");
+    }
+
+    [Fact]
     public async Task GetSchoolDetails_ReturnsSuccess()
     {
         var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");

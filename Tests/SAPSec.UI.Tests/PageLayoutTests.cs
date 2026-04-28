@@ -46,23 +46,23 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
 
         // Check favicon.ico
         var faviconIco = await Page.Locator("link[rel='icon'][sizes='48x48']").GetAttributeAsync("href");
-        faviconIco.Should().Be("/assets/images/favicon.ico");
+        faviconIco.Should().Be("/assets/rebrand/images/favicon.ico");
 
         // Check favicon.svg
         var href = await Page.Locator("link[rel='icon'][href$='.svg']").GetAttributeAsync("href");
         var type = await Page.Locator("link[rel='icon'][href$='.svg']").GetAttributeAsync("type");
-        href.Should().Be("/assets/images/favicon.svg");
+        href.Should().Be("/assets/rebrand/images/favicon.svg");
         type.Should().Be("image/svg+xml");
 
         // Check mask-icon
         var maskIconHref = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("href");
         var maskIconColor = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("color");
-        maskIconHref.Should().Be("/assets/images/govuk-icon-mask.svg");
+        maskIconHref.Should().Be("/assets/rebrand/images/govuk-icon-mask.svg");
         maskIconColor.Should().Be("#0b0c0c");
 
         // Check apple-touch-icon
         var appleIcon = await Page.Locator("link[rel='apple-touch-icon']").GetAttributeAsync("href");
-        appleIcon.Should().Be("/assets/images/govuk-icon-180.png");
+        appleIcon.Should().Be("/assets/rebrand/images/govuk-icon-180.png");
 
         // Check manifest
         var manifest = await Page.Locator("link[rel='manifest']").GetAttributeAsync("href");
@@ -142,6 +142,8 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var crownLink = Page.Locator("a.govuk-footer__copyright-logo");
         (await crownLink.IsVisibleAsync()).Should().BeTrue();
         (await crownLink.GetAttributeAsync("href")).Should().Be("https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/");
+        (await crownLink.Locator("img.app-footer__copyright-crest").IsVisibleAsync()).Should().BeTrue();
+        (await crownLink.Locator("img.app-footer__copyright-crest").GetAttributeAsync("src")).Should().Be("/assets/rebrand/images/govuk-crest.svg");
 
         // Open Government Licence link
         var oglLink = Page.Locator("a.govuk-footer__link[href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/']");

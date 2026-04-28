@@ -59,6 +59,18 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
+    public async Task GetSimilarSchools_NoResults_HidesMapToggleAndShowsNoResultsMessage()
+    {
+        var response = await fixture.Client.GetAsync("/school/105574/view-similar-schools?ur=doesnotexist");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("There are no schools that match your search.");
+        content.Should().NotContain("toggleViewLink");
+        content.Should().NotContain("View on map");
+    }
+
+    [Fact]
     public async Task GetSimilarSchools_RouteRedirectsToViewSimilarSchools()
     {
         var response = await fixture.NonRedirectingClient.GetAsync("/school/105574/similar-schools");

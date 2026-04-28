@@ -2,6 +2,7 @@ namespace SAPSec.Web.Constants;
 
 public static class PageTitles
 {
+    public const string AccessibilityStatement = "Accessibility statement";
     public const string TermsOfUse = "Terms of use";
     public const string Cookies = "Cookies";
     public const string PrivacyPolicy = "Privacy Policy";
