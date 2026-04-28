@@ -142,8 +142,6 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var crownLink = Page.Locator("a.govuk-footer__copyright-logo");
         (await crownLink.IsVisibleAsync()).Should().BeTrue();
         (await crownLink.GetAttributeAsync("href")).Should().Be("https://www.nationalarchives.gov.uk/information-management/re-using-public-sector-information/uk-government-licensing-framework/crown-copyright/");
-        (await crownLink.Locator("img.app-footer__copyright-crest").IsVisibleAsync()).Should().BeTrue();
-        (await crownLink.Locator("img.app-footer__copyright-crest").GetAttributeAsync("src")).Should().Be("/assets/rebrand/images/govuk-crest.svg");
 
         // Open Government Licence link
         var oglLink = Page.Locator("a.govuk-footer__link[href='https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/']");

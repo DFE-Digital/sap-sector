@@ -777,23 +777,6 @@
   text-decoration: none;
 }
 
-.app-footer__copyright-logo {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: govuk-spacing(1);
-}
-
-.app-footer__copyright-logo::before {
-  display: none;
-}
-
-.app-footer__copyright-crest {
-  display: block;
-  width: 36px;
-  height: auto;
-}
-
 $app-ks4-color-school: #d53880;
 $app-ks4-color-authority: #1d70b8;
 $app-ks4-color-england: #003078;

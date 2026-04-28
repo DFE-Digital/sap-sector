@@ -486,11 +486,9 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         // Act
         var crownCopyrightLink = Page.Locator(".govuk-footer__copyright-logo");
         var isVisible = await crownCopyrightLink.IsVisibleAsync();
-        var crownImage = crownCopyrightLink.Locator("img.app-footer__copyright-crest");
 
         // Assert
         isVisible.Should().BeTrue("Crown copyright link should be visible");
-        (await crownImage.IsVisibleAsync()).Should().BeTrue("Crown image should be visible in footer");
     }
 
     #endregion
