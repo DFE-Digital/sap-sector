@@ -138,6 +138,9 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
     {
         await Page.GotoAsync(HomePagePath);
 
+        var footerCrown = Page.Locator("svg.govuk-footer__crown");
+        (await footerCrown.IsVisibleAsync()).Should().BeTrue();
+
         // Crown copyright link
         var crownLink = Page.Locator("a.govuk-footer__copyright-logo");
         (await crownLink.IsVisibleAsync()).Should().BeTrue();
