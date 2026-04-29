@@ -243,7 +243,7 @@ public class Program
 
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
-           app.UseDfeAnalytics();
+            app.UseDfeAnalytics();
         }
 
         app.MapControllers();
