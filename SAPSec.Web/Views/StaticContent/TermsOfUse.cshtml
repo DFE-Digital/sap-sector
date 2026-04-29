@@ -3,6 +3,16 @@
   ViewData[ViewDataKeys.Title] = PageTitles.TermsOfUse;
 }
 
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
+
 <h1 class="govuk-heading-xl">Terms and conditions</h1>
 
 <h2 class="govuk-heading-l">Using the service</h2>

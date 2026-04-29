@@ -422,7 +422,7 @@ public class SchoolController : Controller
             SimilarSchoolsAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SimilarSchoolsValue,
             LocalAuthorityAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.LocalAuthorityValue,
             EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue,
-            Attainment8TopPerformers = MapTopPerformers(response.Attainment8TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholeValue),
+            Attainment8TopPerformers = MapTopPerformers(response.Attainment8TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayValue),
             SchoolAttainment8YearByYear = response.Attainment8YearByYear.School,
             SimilarSchoolsAttainment8YearByYear = response.Attainment8YearByYear.SimilarSchools,
             LocalAuthorityAttainment8YearByYear = response.Attainment8YearByYear.LocalAuthority,

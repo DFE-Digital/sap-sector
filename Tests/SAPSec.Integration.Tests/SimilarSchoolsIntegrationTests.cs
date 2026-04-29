@@ -1,6 +1,7 @@
 using FluentAssertions;
 using SAPSec.Integration.Tests.Infrastructure;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.Integration.Tests;
 
@@ -58,6 +59,18 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
+    public async Task GetSimilarSchools_NoResults_HidesMapToggleAndShowsNoResultsMessage()
+    {
+        var response = await fixture.Client.GetAsync("/school/105574/view-similar-schools?ur=doesnotexist");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("There are no schools that match your search.");
+        content.Should().NotContain("toggleViewLink");
+        content.Should().NotContain("View on map");
+    }
+
+    [Fact]
     public async Task GetSimilarSchools_RouteRedirectsToViewSimilarSchools()
     {
         var response = await fixture.NonRedirectingClient.GetAsync("/school/105574/similar-schools");
@@ -87,10 +100,17 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("id=\"ks4-attainment8-comparison-chart\"");
-        content.Should().Contain("id=\"eng-maths-comparison-chart\"");
-        content.Should().Contain("id=\"destinations-comparison-chart\"");
-        content.Should().Contain("data-label-decimals=\"0\"");
-        content.Should().NotContain("data-label-decimals=\"1\"");
+        GetCanvasMarkup(content, "ks4-attainment8-comparison-chart").Should().Contain("data-label-decimals=\"1\"");
+        GetCanvasMarkup(content, "eng-maths-comparison-chart").Should().Contain("data-label-decimals=\"0\"");
+        GetCanvasMarkup(content, "destinations-comparison-chart").Should().Contain("data-label-decimals=\"0\"");
+    }
+
+    private static string GetCanvasMarkup(string content, string id)
+    {
+        var pattern = $"""<canvas[^>]*id="{Regex.Escape(id)}"[^>]*>""";
+        var match = Regex.Match(content, pattern, RegexOptions.Singleline);
+
+        match.Success.Should().BeTrue($"expected canvas '{id}' to be rendered");
+        return match.Value;
     }
 }

@@ -32,8 +32,8 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await NavigateToAttendanceAsync();
 
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Attendance measures" })).ToBeVisibleAsync();
-        await Expect(Page.Locator("main")).ToContainTextAsync("local averages");
-        await Expect(Page.Locator("main")).ToContainTextAsync("national averages");
+        await Expect(Page.Locator("main")).ToContainTextAsync("the local authority average");
+        await Expect(Page.Locator("main")).ToContainTextAsync("the national average");
         await Expect(Page.Locator("main")).ToContainTextAsync("Monitor your school attendance service");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToBeVisibleAsync();
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-show-no-data-labels", "true");
