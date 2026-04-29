@@ -9,6 +9,17 @@ namespace SAPSec.UI.Tests;
 public class CookiePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     [Fact]
+    public async Task CookiesPage_HasHomeBreadcrumb()
+    {
+        await Page.GotoAsync("/cookies");
+
+        var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
+
+        await Expect(breadcrumb).ToBeVisibleAsync();
+        (await breadcrumb.GetAttributeAsync("href")).Should().Be("/find-a-school");
+    }
+
+    [Fact]
     public async Task CookiesPage_SaveAcceptedCookies_RedirectsToPreviousPageAndShowsTopBanner()
     {
         await Page.GotoAsync("/accessibility");

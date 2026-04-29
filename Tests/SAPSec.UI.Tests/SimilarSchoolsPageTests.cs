@@ -9,7 +9,7 @@ namespace SAPSec.UI.Tests;
 public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private const string SimilarSchoolsPath = "/school/108088/view-similar-schools";
-    private const string NoResultsSimilarSchoolsPath = "/school/116482/view-similar-schools";
+    private const string NoResultsSimilarSchoolsPath = "/school/108088/view-similar-schools?ur=doesnotexist";
 
     [Fact]
     public async Task SimilarSchoolsPage_LoadsSuccessfully()
@@ -150,5 +150,17 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
         (await toggleLink.CountAsync()).Should().Be(0);
         (await toggleWrap.CountAsync()).Should().Be(0);
         (await mapView.CountAsync()).Should().Be(0);
+    }
+
+    [Fact]
+    public async Task SimilarSchoolsPage_NoResults_ShowsExpectedMessage()
+    {
+        await Page.GotoAsync(NoResultsSimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var message = Page.Locator("p.govuk-body").Filter(new() { HasText = "There are no schools that match your search." });
+
+        (await message.CountAsync()).Should().Be(1);
+        (await message.First.IsVisibleAsync()).Should().BeTrue();
     }
 }
