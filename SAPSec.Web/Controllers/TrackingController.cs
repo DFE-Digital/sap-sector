@@ -8,17 +8,17 @@ namespace SAPSec.Web.Controllers;
 [Route("tracking")]
 public class TrackingController() : Controller
 {
-    [HttpGet]
-    [Route("tracked-link-clicked")]
-    public IActionResult TrackedLinkClicked(string? externalLink)
-    {
-        if (externalLink is not null)
-        {
-            HttpContext.GetWebRequestEvent()?.AddData("External link click", externalLink);
+    //[HttpGet]
+    //[Route("tracked-link-clicked")]
+    //public IActionResult TrackedLinkClicked(string? externalLink)
+    //{
+    //    if (externalLink is not null)
+    //    {
+    //        HttpContext.GetWebRequestEvent()?.AddData("External link click", externalLink);
 
-            return Redirect(externalLink);
-        }
+    //        return Redirect(externalLink);
+    //    }
 
-        return NoContent();
-    }
+    //    return NoContent();
+    //}
 }
