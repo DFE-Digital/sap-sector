@@ -32,6 +32,16 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     }
 
     [Fact]
+    public async Task GetSchoolOverview_HomeBreadcrumb_LinksToSchoolSearch()
+    {
+        var response = await fixture.Client.GetAsync(SchoolOverviewPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("href=\"/find-a-school\">Home</a>");
+    }
+
+    [Fact]
     public async Task GetSchoolDetails_ReturnsSuccess()
     {
         var response = await fixture.Client.GetAsync(SchoolDetailsPath);

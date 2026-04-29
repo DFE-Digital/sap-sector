@@ -3,6 +3,7 @@
 @{
     Layout = "~/Views/School/_Layout.cshtml";
     ViewData["Title"] = "View similar schools";
+    var hasVisibleResults = Model.Schools.Any();
 }
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 <link rel="stylesheet" href="~/css/MarkerCluster.css"/>
@@ -57,7 +58,7 @@
     @* ── Right column: Sort + Results + Pagination ── *@
     <div class="govuk-grid-column-two-thirds app-filter__results-column">
         
-        @if (Model.TotalResults > 0)
+        @if (hasVisibleResults)
         {
             <div id="toggleWrap" class="results-toggle-wrap">
                 <a href="#" id="toggleViewLink"
@@ -95,7 +96,7 @@
             }
         </div>
         
-        @if (Model.TotalResults > 0)
+        @if (hasVisibleResults)
         {
             <div id="mapView" class="govuk-!-display-none">
                 <partial name="SimilarSchoolsMap.cshtml" model="Model" />
