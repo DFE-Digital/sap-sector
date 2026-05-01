@@ -105,6 +105,16 @@ public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
         GetCanvasMarkup(content, "destinations-comparison-chart").Should().Contain("data-label-decimals=\"0\"");
     }
 
+    [Fact]
+    public async Task ComparisonKs4HeadlineMeasures_Attainment8YearByYear_DisablesAxisAutoSkip()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Ks4HeadlineMeasures");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        GetCanvasMarkup(content, "ks4-attainment8-comparison-yearbyyear-chart").Should().Contain("data-axis-auto-skip=\"false\"");
+    }
+
     private static string GetCanvasMarkup(string content, string id)
     {
         var pattern = $"""<canvas[^>]*id="{Regex.Escape(id)}"[^>]*>""";
