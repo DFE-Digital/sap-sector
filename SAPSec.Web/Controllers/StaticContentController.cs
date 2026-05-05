@@ -15,8 +15,9 @@ public class StaticContentController : Controller
         return View();
     }
 
-    [Route("terms-of-use")]
-    public IActionResult TermsOfUse()
+    [HttpGet]
+    [Route("terms-and-conditions")]
+    public IActionResult TermsAndConditions()
     {
         return View();
     }

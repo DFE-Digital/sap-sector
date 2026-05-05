@@ -22,14 +22,23 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
     }
 
     [Fact]
-    public async Task GetTermsOfUse_ReturnsSuccess()
+    public async Task GetTermsAndConditions_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/terms-of-use");
+        var response = await fixture.Client.GetAsync("/terms-and-conditions");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+        content.Should().Contain($"{SAPSec.Web.Constants.PageTitles.TermsAndConditions} - {SAPSec.Web.Constants.LayoutConstants.ServiceName} - GOV.UK");
         content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
+    }
+
+    [Fact]
+    public async Task GetTermsOfUse_ReturnsNotFound()
+    {
+        var response = await fixture.Client.GetAsync("/terms-of-use");
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
