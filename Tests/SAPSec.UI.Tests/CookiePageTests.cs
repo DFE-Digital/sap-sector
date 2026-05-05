@@ -26,10 +26,6 @@ public class CookiePageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         await Page.Locator(".govuk-footer__link[href='/cookies']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
 
-        var backLink = Page.GetByRole(AriaRole.Link, new() { Name = "Back", Exact = true });
-        await Expect(backLink).ToBeVisibleAsync();
-        (await backLink.GetAttributeAsync("href")).Should().Be("/accessibility");
-
         await Page.GetByLabel("Yes, use additional cookies").CheckAsync();
         await Page.GetByRole(AriaRole.Button, new() { Name = "Save changes" }).ClickAsync();
 
@@ -41,5 +37,15 @@ public class CookiePageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var banner = Page.Locator("#accepted-cookies-banner");
         await Expect(banner).ToBeVisibleAsync();
         (await banner.TextContentAsync()).Should().Contain("You've accepted additional cookies.");
+    }
+
+    [Fact]
+    public async Task CookiesPage_DoesNotRenderBackLink()
+    {
+        await Page.GotoAsync("/cookies?returnUrl=%2Faccessibility");
+
+        var backLink = Page.GetByRole(AriaRole.Link, new() { Name = "Back", Exact = true });
+
+        await Expect(backLink).ToHaveCountAsync(0);
     }
 }
