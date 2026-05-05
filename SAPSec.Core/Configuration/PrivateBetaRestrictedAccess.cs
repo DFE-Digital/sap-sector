@@ -2,5 +2,5 @@
 
 public class PrivateBetaRestrictedAccess
 {
-    public string[] UrnWhitelist { get; set; } = [];
+    public string UrnWhitelist { get; set; } = "";
 }
