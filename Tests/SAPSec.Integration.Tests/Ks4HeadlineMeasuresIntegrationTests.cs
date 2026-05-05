@@ -51,6 +51,16 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasures_Attainment8YearByYear_DisablesAxisAutoSkip()
+    {
+        var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+        GetCanvasMarkup(content, "ks4-attainment8-school-yearbyyear-chart").Should().Contain("data-axis-auto-skip=\"false\"");
+    }
+
+    [Fact]
     public async Task Ks4HeadlineMeasures_WithNonExistentUrn_ReturnsNotFound()
     {
         var response = await fixture.Client.GetAsync("/school/999999/ks4-headline-measures");
