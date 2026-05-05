@@ -40,9 +40,9 @@ public class SchoolHomeController(
             return Redirect(Routes.SchoolSearch);
         }
 
-        if (!_privateBeta.UrnWhitelist.Contains(org.Urn))
+        if (!_privateBeta.UrnWhitelist.Split(",").Contains(org.Urn))
         {
-            _logger.LogWarning($"User Organisation {org.Name} (URN: {org.Urn}) was not part of the private beta whitelist: [{string.Join(", ", _privateBeta.UrnWhitelist)}]");
+            _logger.LogWarning($"User Organisation {org.Name} (URN: {org.Urn}) was not part of the private beta whitelist: [{_privateBeta.UrnWhitelist}]");
             return AccessDenied();
         }
 
