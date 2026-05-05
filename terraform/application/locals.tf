@@ -5,12 +5,12 @@ locals {
 
   dsi_config = {
     test = {
-      api_uri          = "https://pp-api.signin.education.gov.uk"
-      authority        = "https://pp-oidc.signin.education.gov.uk"
-      issuer           = "https://pp-oidc.signin.education.gov.uk"
-      metadata_address = "https://pp-oidc.signin.education.gov.uk/.well-known/openid-configuration"
+      api_uri          = "https://test-api.signin.education.gov.uk"
+      authority        = "https://test-oidc.signin.education.gov.uk"
+      issuer           = "https://test-oidc.signin.education.gov.uk"
+      metadata_address = "https://test-oidc.signin.education.gov.uk/.well-known/openid-configuration"
       require_https    = "true"
-      audience         = "schoolsAccountabilityandPerformance"
+      audience         = "SAP"
     }
     production = {
       api_uri          = "https://api.signin.education.gov.uk"
