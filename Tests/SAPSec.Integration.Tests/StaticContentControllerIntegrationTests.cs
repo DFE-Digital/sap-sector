@@ -17,6 +17,8 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
         content.Should().Contain($"{SAPSec.Web.Constants.PageTitles.AccessibilityStatement} - {SAPSec.Web.Constants.LayoutConstants.ServiceName} - GOV.UK");
         content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
+        content.Should().Contain("<a href=\"https://mcmw.abilitynet.org.uk/\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">AbilityNet</a>");
+        content.Should().Contain("<a class=\"govuk-link\" rel=\"noopener noreferrer\" href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">contact the Equality Advisory and Support Service");
     }
 
     [Fact]
