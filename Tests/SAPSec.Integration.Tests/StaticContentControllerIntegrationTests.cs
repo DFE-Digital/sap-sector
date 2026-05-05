@@ -31,25 +31,25 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
     }
 
     [Fact]
-    public async Task GetCookies_WithLocalReturnUrl_RendersBackLink()
+    public async Task GetCookies_WithLocalReturnUrl_DoesNotRenderBackLink()
     {
         var response = await fixture.Client.GetAsync("/cookies?returnUrl=%2Faccessibility");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
-        content.Should().Contain("<a href=\"/accessibility\" class=\"govuk-back-link\">Back</a>");
+        content.Should().NotContain("class=\"govuk-back-link\"");
     }
 
     [Fact]
-    public async Task GetCookies_WithExternalReturnUrl_DoesNotRenderExternalBackLink()
+    public async Task GetCookies_WithExternalReturnUrl_DoesNotRenderBackLink()
     {
         var response = await fixture.Client.GetAsync("/cookies?returnUrl=https%3A%2F%2Fexample.com%2F");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().NotContain("https://example.com/");
-        content.Should().Contain("<a href=\"/\" class=\"govuk-back-link\">Back</a>");
+        content.Should().NotContain("class=\"govuk-back-link\"");
     }
 
     [Fact]
