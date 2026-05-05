@@ -243,7 +243,7 @@ public class Program
 
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
         {
-           app.UseDfeAnalytics();
+            app.UseDfeAnalytics();
         }
 
         app.MapGet("/tracking", (string targetUrl, HttpContext context) =>

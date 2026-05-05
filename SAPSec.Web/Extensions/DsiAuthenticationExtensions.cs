@@ -44,6 +44,7 @@ public static class DsiAuthenticationExtensions
         var dsiConfig = GetAndValidateConfiguration(configuration);
 
         services.Configure<DsiConfiguration>(configuration.GetSection("DsiConfiguration"));
+        services.Configure<PrivateBetaRestrictedAccess>(configuration.GetSection("PrivateBetaRestrictedAccess"));
 
         services
             .AddAuthentication(ConfigureAuthenticationDefaults)

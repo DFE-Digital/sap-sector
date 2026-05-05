@@ -31,25 +31,25 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
     }
 
     [Fact]
-    public async Task GetCookies_WithLocalReturnUrl_RendersBackLink()
+    public async Task GetCookies_WithLocalReturnUrl_DoesNotRenderBackLink()
     {
         var response = await fixture.Client.GetAsync("/cookies?returnUrl=%2Faccessibility");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
-        content.Should().Contain("<a href=\"/accessibility\" class=\"govuk-back-link\">Back</a>");
+        content.Should().NotContain("class=\"govuk-back-link\"");
     }
 
     [Fact]
-    public async Task GetCookies_WithExternalReturnUrl_DoesNotRenderExternalBackLink()
+    public async Task GetCookies_WithExternalReturnUrl_DoesNotRenderBackLink()
     {
         var response = await fixture.Client.GetAsync("/cookies?returnUrl=https%3A%2F%2Fexample.com%2F");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().NotContain("https://example.com/");
-        content.Should().Contain("<a href=\"/\" class=\"govuk-back-link\">Back</a>");
+        content.Should().NotContain("class=\"govuk-back-link\"");
     }
 
     [Fact]
@@ -68,19 +68,22 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
     {
         var response = await fixture.Client.GetAsync("/cookies");
         var content = await response.Content.ReadAsStringAsync();
+        var googleAnalyticsTable = ExtractTable(content, "Google Analytics cookies");
+        var clarityTable = ExtractTable(content, "Microsoft Clarity cookies");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("_ga");
-        content.Should().Contain("_ga_&lt;id&gt;");
-        content.Should().Contain("_gid");
-        content.Should().Contain("_dc_gtm_&lt;id&gt;");
-        content.Should().Contain("_clck");
-        content.Should().Contain("_clsk");
-        content.Should().NotContain("CLID");
-        content.Should().NotContain("ANONCHK");
-        content.Should().NotContain("MR");
-        content.Should().NotContain("MUID");
-        content.Should().NotContain("SM");
+        googleAnalyticsTable.Should().Contain("_ga");
+        googleAnalyticsTable.Should().Contain("_ga_&lt;id&gt;");
+        googleAnalyticsTable.Should().NotContain("_gid");
+        googleAnalyticsTable.Should().NotContain("_dc_gtm_&lt;id&gt;");
+
+        clarityTable.Should().Contain("_clck");
+        clarityTable.Should().Contain("_clsk");
+        clarityTable.Should().NotContain("CLID");
+        clarityTable.Should().NotContain("ANONCHK");
+        clarityTable.Should().NotContain("MR");
+        clarityTable.Should().NotContain("MUID");
+        clarityTable.Should().NotContain("SM");
     }
 
     [Fact]
@@ -109,5 +112,17 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("You've rejected additional cookies.");
         content.Should().Contain("id=\"cookies-banner\"");
+    }
+
+    private static string ExtractTable(string content, string caption)
+    {
+        var captionMarkup = $"<caption class=\"govuk-table__caption govuk-visually-hidden\">{caption}</caption>";
+        var tableStart = content.IndexOf(captionMarkup, StringComparison.Ordinal);
+        tableStart.Should().BeGreaterThanOrEqualTo(0);
+
+        var tableEnd = content.IndexOf("</table>", tableStart, StringComparison.Ordinal);
+        tableEnd.Should().BeGreaterThan(tableStart);
+
+        return content.Substring(tableStart, tableEnd - tableStart);
     }
 }
