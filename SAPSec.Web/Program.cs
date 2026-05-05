@@ -246,6 +246,13 @@ public class Program
            app.UseDfeAnalytics();
         }
 
+        app.MapGet("/tracking", (string targetUrl, HttpContext context) =>
+        {
+            context.GetWebRequestEvent()?.AddData("External link click", targetUrl);
+
+            return Results.Redirect(targetUrl);
+        });
+
         app.MapControllers();
         app.MapRazorPages();
 
