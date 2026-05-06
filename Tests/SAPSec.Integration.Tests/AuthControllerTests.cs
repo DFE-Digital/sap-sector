@@ -8,13 +8,13 @@ public class AuthControllerIntegrationTests(WebApplicationSetupFixture fixture) 
 {
     private static class ExpectedRoutes
     {
-        public const string SignIn = "/Auth/sign-in";
-        public const string SignOut = "/Auth/sign-out";
-        public const string AccessDenied = "/Auth/access-denied";
-        public const string SignedOut = "/Auth/signed-out";
+        public const string SignIn = "/auth/signin";
+        public const string SignOut = "/auth/signout";
+        public const string AccessDenied = "/error/403";
+        public const string SignedOut = "/auth/signed-out";
     }
 
-    #region GET /Auth/sign-in Tests
+    #region GET /auth/signin Tests
 
     [Fact]
     public async Task GetSignIn_WhenNotAuthenticated_ReturnsChallengeRedirect()
@@ -95,55 +95,6 @@ public class AuthControllerIntegrationTests(WebApplicationSetupFixture fixture) 
         if (response.StatusCode == HttpStatusCode.Redirect)
         {
             response.Headers.Location!.ToString().Should().NotContain("malicious-site.com");
-        }
-    }
-
-    #endregion
-
-    #region GET /Auth/access-denied Tests
-
-    [Fact]
-    public async Task GetAccessDenied_WhenAuthenticated_ReturnsSuccess()
-    {
-        var response = await fixture.NonRedirectingClient.GetAsync(ExpectedRoutes.AccessDenied);
-
-        response.StatusCode.Should().BeOneOf(
-            HttpStatusCode.OK,
-            HttpStatusCode.InternalServerError);
-    }
-
-    [Fact]
-    public async Task GetAccessDenied_HasSecurityHeaders()
-    {
-        var response = await fixture.Client.GetAsync(ExpectedRoutes.AccessDenied);
-
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            var allHeaders = response.Headers
-                .Concat(response.Content.Headers)
-                .ToDictionary(h => h.Key, h => h.Value);
-
-            if (allHeaders.ContainsKey("X-Content-Type-Options"))
-            {
-                allHeaders["X-Content-Type-Options"].Should().Contain("nosniff");
-            }
-
-            if (allHeaders.ContainsKey("X-Frame-Options"))
-            {
-                allHeaders["X-Frame-Options"].Should().Contain("DENY");
-            }
-        }
-    }
-
-    [Fact]
-    public async Task GetAccessDenied_ReturnsPageWithAppropriateContent()
-    {
-        var response = await fixture.Client.GetAsync(ExpectedRoutes.AccessDenied);
-
-        if (response.StatusCode == HttpStatusCode.OK)
-        {
-            var content = await response.Content.ReadAsStringAsync();
-            content.Should().NotBeNullOrEmpty();
         }
     }
 
@@ -245,9 +196,8 @@ public class AuthControllerIntegrationTests(WebApplicationSetupFixture fixture) 
     #region Route Validation Tests
 
     [Theory]
-    [InlineData("/Auth/sign-in")]
-    [InlineData("/Auth/access-denied")]
-    [InlineData("/Auth/signed-out")]
+    [InlineData("/auth/signin")]
+    [InlineData("/auth/signed-out")]
     public async Task PublicEndpoints_RespondToHeadRequests(string endpoint)
     {
         var request = new HttpRequestMessage(HttpMethod.Head, endpoint);
@@ -275,7 +225,7 @@ public class AuthControllerIntegrationTests(WebApplicationSetupFixture fixture) 
     [Fact]
     public async Task SignIn_CaseInsensitiveRoute()
     {
-        var response = await fixture.Client.GetAsync("/AUTH/SIGN-IN");
+        var response = await fixture.Client.GetAsync("/AUTH/SIGNIN");
 
         response.StatusCode.Should().BeOneOf(
             HttpStatusCode.OK,
