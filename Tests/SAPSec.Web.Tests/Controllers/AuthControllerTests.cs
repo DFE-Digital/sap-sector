@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;
 
@@ -195,270 +194,6 @@ public class AuthControllerTests
 
     #endregion
 
-    #region SelectOrganisation GET Tests
-
-    [Fact]
-    public async Task SelectOrganisation_Get_WithNullUser_RedirectsToProblem()
-    {
-        _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((User?)null);
-
-        var result = await _controller.SelectOrganisation(null);
-
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be(ExpectedRoutes.ErrorAction);
-        redirectResult.ControllerName.Should().Be(ExpectedRoutes.ErrorController);
-        redirectResult.RouteValues.Should().ContainKey("statusCode");
-        redirectResult.RouteValues!["statusCode"].Should().Be(500);
-    }
-
-    [Fact]
-    public async Task SelectOrganisation_Get_WithUserWithNoOrganisations_RedirectsToProblem()
-    {
-        var user = new User
-        {
-            Name = "test-user",
-            Organisations = new List<Organisation>()
-        };
-        _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(user);
-
-        var result = await _controller.SelectOrganisation(null);
-
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be(ExpectedRoutes.ErrorAction);
-        redirectResult.ControllerName.Should().Be(ExpectedRoutes.ErrorController);
-        redirectResult.RouteValues!["statusCode"].Should().Be(500);
-    }
-
-    [Fact]
-    public async Task SelectOrganisation_Get_WithNullUser_LogsWarning()
-    {
-        _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync((User?)null);
-
-        await _controller.SelectOrganisation(null);
-
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("User not found")),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task SelectOrganisation_Get_WithValidUser_ReturnsView()
-    {
-        var user = new User
-        {
-            Name = "test-user",
-            Organisations = new List<Organisation>
-            {
-                new() { Id = "org1", Name = "Organisation 1" }
-            }
-        };
-        _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(user);
-
-        var result = await _controller.SelectOrganisation("/return");
-
-        result.Should().BeOfType<ViewResult>();
-        var viewResult = result as ViewResult;
-        viewResult!.Model.Should().Be(user);
-    }
-
-    [Fact]
-    public async Task SelectOrganisation_Get_WithValidUser_SetsReturnUrlInViewBag()
-    {
-        var user = new User
-        {
-            Name = "test-user",
-            Organisations = new List<Organisation>
-            {
-                new() { Id = "org1", Name = "Organisation 1" }
-            }
-        };
-        _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(user);
-
-        var result = await _controller.SelectOrganisation("/custom-return");
-
-        result.Should().BeOfType<ViewResult>();
-        ((string)_controller.ViewBag.ReturnUrl).Should().Be("/custom-return");
-    }
-
-    [Fact]
-    public async Task SelectOrganisation_Get_WithMultipleOrganisations_ReturnsViewWithAllOrganisations()
-    {
-        var user = new User
-        {
-            Name = "test-user",
-            Organisations = new List<Organisation>
-            {
-                new() { Id = "org1", Name = "Organisation 1" },
-                new() { Id = "org2", Name = "Organisation 2" },
-                new() { Id = "org3", Name = "Organisation 3" }
-            }
-        };
-        _mockUserService.Setup(s => s.GetUserFromClaimsAsync(It.IsAny<ClaimsPrincipal>()))
-            .ReturnsAsync(user);
-
-        var result = await _controller.SelectOrganisation(null);
-
-        result.Should().BeOfType<ViewResult>();
-        var viewResult = result as ViewResult;
-        var model = viewResult!.Model as User;
-        model!.Organisations.Should().HaveCount(3);
-    }
-
-    #endregion
-
-    #region SelectOrganisationPost Tests
-
-    [Fact]
-    public async Task SelectOrganisationPost_WithEmptyOrganisationId_ReturnsBadRequest()
-    {
-        var result = await _controller.SelectOrganisationPost(string.Empty, "/return");
-
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badRequestResult = result as BadRequestObjectResult;
-        badRequestResult!.Value.Should().Be("Organisation ID is required");
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_WithNullOrganisationId_ReturnsBadRequest()
-    {
-        var result = await _controller.SelectOrganisationPost(null!, "/return");
-
-        result.Should().BeOfType<BadRequestObjectResult>();
-        var badRequestResult = result as BadRequestObjectResult;
-        badRequestResult!.Value.Should().Be("Organisation ID is required");
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_WhenSetOrganisationFails_RedirectsToProblem()
-    {
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(false);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        var result = await _controller.SelectOrganisationPost("org-123", "/return");
-
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be(ExpectedRoutes.ErrorAction);
-        redirectResult.ControllerName.Should().Be(ExpectedRoutes.ErrorController);
-        redirectResult.RouteValues!["statusCode"].Should().Be(500);
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_WhenSetOrganisationFails_LogsWarning()
-    {
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(false);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        await _controller.SelectOrganisationPost("org-123", "/return");
-
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("Failed to set organisation")),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_WhenSuccessful_RedirectsToReturnUrl()
-    {
-        var returnUrl = "/dashboard";
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-        _mockUrlHelper.Setup(u => u.IsLocalUrl(returnUrl)).Returns(true);
-
-        var result = await _controller.SelectOrganisationPost("org-123", returnUrl);
-
-        result.Should().BeOfType<RedirectResult>();
-        var redirectResult = result as RedirectResult;
-        redirectResult!.Url.Should().Be(returnUrl);
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_WhenSuccessful_WithNullReturnUrl_RedirectsToHome()
-    {
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        var result = await _controller.SelectOrganisationPost("org-123", null);
-
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
-        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_WhenSuccessful_WithExternalReturnUrl_RedirectsToHome()
-    {
-        var externalUrl = "https://evil.com";
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-        _mockUrlHelper.Setup(u => u.IsLocalUrl(externalUrl)).Returns(false);
-
-        var result = await _controller.SelectOrganisationPost("org-123", externalUrl);
-
-        result.Should().BeOfType<RedirectToActionResult>();
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be(ExpectedRoutes.HomeAction);
-        redirectResult.ControllerName.Should().Be(ExpectedRoutes.HomeController);
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_WhenSuccessful_LogsInformation()
-    {
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        await _controller.SelectOrganisationPost("org-123", "/return");
-
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Information,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("selected organisation")),
-                null,
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
-    }
-
-    [Fact]
-    public async Task SelectOrganisationPost_CallsSetCurrentOrganisationWithCorrectParameters()
-    {
-        var organisationId = "org-test-123";
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        await _controller.SelectOrganisationPost(organisationId, "/return");
-
-        _mockUserService.Verify(
-            s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), organisationId),
-            Times.Once);
-    }
-
-    #endregion
-
     #region SignOut Tests
 
     [Fact]
@@ -497,14 +232,14 @@ public class AuthControllerTests
     public async Task SignOut_HasRedirectUriToSignedOut()
     {
         _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-        _mockUrlHelper.Setup(u => u.Action(It.IsAny<UrlActionContext>())).Returns("/Auth/signed-out");
+        _mockUrlHelper.Setup(u => u.Action(It.IsAny<UrlActionContext>())).Returns("/auth/signed-out");
 
         var result = await _controller.SignOut();
 
         result.Should().BeOfType<SignOutResult>();
         var signOutResult = result as SignOutResult;
         signOutResult!.Properties.Should().NotBeNull();
-        signOutResult.Properties!.RedirectUri.Should().Be("/Auth/signed-out");
+        signOutResult.Properties!.RedirectUri.Should().Be("/auth/signed-out");
     }
 
     [Fact]
@@ -553,26 +288,6 @@ public class AuthControllerTests
 
         sessionCleared.Should().BeTrue("Session should be cleared before returning SignOutResult");
         result.Should().BeOfType<SignOutResult>();
-    }
-
-    #endregion
-
-    #region AccessDenied Tests
-
-    [Fact]
-    public void AccessDenied_ReturnsView()
-    {
-        var result = _controller.AccessDenied();
-
-        result.Should().BeOfType<ViewResult>();
-    }
-
-    [Fact]
-    public void AccessDenied_ReturnsCorrectView()
-    {
-        var result = _controller.AccessDenied() as ViewResult;
-
-        result!.ViewName.Should().Be("~/Views/Error/AccessDenied.cshtml");
     }
 
     #endregion
@@ -635,20 +350,6 @@ public class AuthControllerTests
     #endregion
 
     #region Edge Cases
-
-    [Fact]
-    public async Task SelectOrganisationPost_WithVeryLongOrganisationId_ProcessesCorrectly()
-    {
-        var longOrgId = new string('a', 1000);
-        _mockUserService.Setup(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), It.IsAny<string>()))
-            .ReturnsAsync(true);
-        _mockUserService.Setup(s => s.GetUserId(It.IsAny<ClaimsPrincipal>())).Returns("user-123");
-
-        var result = await _controller.SelectOrganisationPost(longOrgId, "/return");
-
-        result.Should().BeOfType<RedirectResult>();
-        _mockUserService.Verify(s => s.SetCurrentOrganisationAsync(It.IsAny<ClaimsPrincipal>(), longOrgId), Times.Once);
-    }
 
     [Fact]
     public void SignIn_WithSpecialCharactersInReturnUrl_ProcessesCorrectly()

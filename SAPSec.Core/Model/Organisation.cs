@@ -116,4 +116,9 @@ public class Organisation
     public string? IsOnApar { get; set; }
 
     public List<Service> Services { get; set; } = new();
+
+    public bool IsEstablishment => string.Equals(
+        Category?.Name,
+        "Establishment",
+        StringComparison.OrdinalIgnoreCase);
 }

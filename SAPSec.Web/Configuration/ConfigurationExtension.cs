@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Web.Extensions;
+﻿namespace SAPSec.Web.Configuration;
 
 public static class ConfigurationExtensions
 {

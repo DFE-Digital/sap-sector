@@ -1,28 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using SAPSec.Core.Configuration;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Core.Services;
+using SAPSec.Web.Authorization;
+using SAPSec.Web.Constants;
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Web.Extensions;
+namespace SAPSec.Web.Authentication;
 
 [ExcludeFromCodeCoverage]
 public static class DsiAuthenticationExtensions
 {
-    private static class Routes
-    {
-        public const string SignIn = "/Auth/sign-in";
-        public const string AccessDenied = "/Auth/access-denied";
-        public const string Home = "/";
-        public const string SchoolSearch = "/find-a-school";
-        public const string Error = "/error";
-    }
-
     private static class CookieSettings
     {
         public const string Name = "SAPSec.Auth";
@@ -44,7 +37,6 @@ public static class DsiAuthenticationExtensions
         var dsiConfig = GetAndValidateConfiguration(configuration);
 
         services.Configure<DsiConfiguration>(configuration.GetSection("DsiConfiguration"));
-        services.Configure<PrivateBetaRestrictedAccess>(configuration.GetSection("PrivateBetaRestrictedAccess"));
 
         services
             .AddAuthentication(ConfigureAuthenticationDefaults)
@@ -54,6 +46,17 @@ public static class DsiAuthenticationExtensions
 
         RegisterServices(services);
 
+        services.AddAuthorization(o =>
+        {
+            const string PolicyName = "DsiAuthorizationPolicy";
+            o.AddPolicy(PolicyName, policy => policy.AddRequirements(new DsiAuthorizationRequirement()));
+            var policy = o.GetPolicy(PolicyName);
+            if (policy is not null)
+            {
+                o.DefaultPolicy = policy;
+            }
+        });
+        services.AddScoped<IAuthorizationHandler, DsiAuthorizationHandler>();
         return services;
     }
 
@@ -86,6 +89,22 @@ public static class DsiAuthenticationExtensions
         options.SlidingExpiration = true;
         options.LoginPath = Routes.SignIn;
         options.AccessDeniedPath = Routes.AccessDenied;
+
+        // Override login redirect for unauthenticated requests
+        options.Events.OnRedirectToLogin = context =>
+        {
+            // Set status code to 401 Unauthorized
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            return Task.CompletedTask;
+        };
+
+        // Override access-denied redirect for unauthorized requests
+        options.Events.OnRedirectToAccessDenied = context =>
+        {
+            // Set status code to 403 Forbidden
+            context.Response.StatusCode = StatusCodes.Status403Forbidden;
+            return Task.CompletedTask;
+        };
     }
 
     private static void ConfigureOpenIdConnectOptions(OpenIdConnectOptions options, DsiConfiguration config)
@@ -139,175 +158,14 @@ public static class DsiAuthenticationExtensions
     {
         return new OpenIdConnectEvents
         {
-            OnRedirectToIdentityProvider = context => HandleRedirectToIdentityProvider(context, config),
-            OnMessageReceived = HandleMessageReceived,
-            OnAuthorizationCodeReceived = HandleAuthorizationCodeReceived,
-            OnTokenValidated = HandleTokenValidated,
-            OnRemoteFailure = HandleRemoteFailure,
-            OnAuthenticationFailed = HandleAuthenticationFailed,
-            OnSignedOutCallbackRedirect = HandleSignedOutCallbackRedirect
+            OnRedirectToIdentityProvider = context => DsiAuthenticationHandler.HandleRedirectToIdentityProvider(context, config),
+            OnMessageReceived = DsiAuthenticationHandler.HandleMessageReceived,
+            OnAuthorizationCodeReceived = DsiAuthenticationHandler.HandleAuthorizationCodeReceived,
+            OnTokenValidated = DsiAuthenticationHandler.HandleTokenValidated,
+            OnRemoteFailure = DsiAuthenticationHandler.HandleRemoteFailure,
+            OnAuthenticationFailed = DsiAuthenticationHandler.HandleAuthenticationFailed,
+            OnSignedOutCallbackRedirect = DsiAuthenticationHandler.HandleSignedOutCallbackRedirect
         };
-    }
-
-    private static Task HandleRedirectToIdentityProvider(
-        RedirectContext context,
-        DsiConfiguration config)
-    {
-        if (IsNonLocalhost(context))
-        {
-            SetProductionRedirectUri(context, config);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private static bool IsNonLocalhost(RedirectContext context)
-    {
-        return !context.HttpContext.Request.Host.Host.Contains("localhost");
-    }
-
-    private static void SetProductionRedirectUri(RedirectContext context, DsiConfiguration config)
-    {
-        var host = context.HttpContext.Request.Host.ToUriComponent();
-        context.ProtocolMessage.RedirectUri = $"https://{host}{config.CallbackPath}";
-    }
-
-    private static Task HandleMessageReceived(MessageReceivedContext context)
-    {
-        if (IsSpuriousAuthCallbackRequest(context))
-        {
-            LogSpuriousRequest(context);
-            RedirectToHomeAndHandle(context);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private static bool IsSpuriousAuthCallbackRequest(MessageReceivedContext context)
-    {
-        var options = context.Options;
-        return context.Request.Path == options.CallbackPath &&
-               context.Request.Method == "GET" &&
-               !context.Request.Query.ContainsKey("code");
-    }
-
-    private static void LogSpuriousRequest(MessageReceivedContext context)
-    {
-        var logger = GetLogger(context.HttpContext);
-        logger.LogWarning(
-            "Spurious authentication callback request detected at {Path}",
-            context.Request.Path);
-    }
-
-    private static void RedirectToHomeAndHandle(MessageReceivedContext context)
-    {
-        context.Response.Redirect(Routes.Home);
-        context.HandleResponse();
-    }
-
-    private static Task HandleAuthorizationCodeReceived(AuthorizationCodeReceivedContext context)
-    {
-        return Task.CompletedTask;
-    }
-
-    private static async Task HandleTokenValidated(TokenValidatedContext context)
-    {
-        var logger = GetLogger(context.HttpContext);
-
-        try
-        {
-            await ProcessValidatedToken(context);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Error processing validated token for user");
-            context.Fail(ex);
-        }
-    }
-
-    private static async Task ProcessValidatedToken(TokenValidatedContext context)
-    {
-        var userService = context.HttpContext.RequestServices
-            .GetRequiredService<IUserService>();
-
-        var user = await userService.GetUserFromClaimsAsync(context.Principal!);
-
-        if (user == null)
-        {
-            return;
-        }
-
-        await SetOrganisationBasedOnCount(context, userService, user);
-    }
-
-    private static async Task SetOrganisationBasedOnCount(
-        TokenValidatedContext context,
-        IUserService userService,
-        User user)
-    {
-        if (user.Organisations.Count == 1)
-        {
-            await userService.SetCurrentOrganisationAsync(
-                context.Principal!,
-                user.Organisations[0].Id);
-        }
-        else if (user.Organisations.Count > 1)
-        {
-            context.Properties!.RedirectUri = Routes.SchoolSearch;
-        }
-    }
-
-    private static Task HandleRemoteFailure(RemoteFailureContext context)
-    {
-        var logger = GetLogger(context.HttpContext);
-
-        logger.LogError(
-            context.Failure,
-            "DSI remote authentication failure: {Message}",
-            context.Failure?.Message);
-
-        RedirectToErrorAndHandle(context);
-
-        return Task.CompletedTask;
-    }
-
-    private static Task HandleAuthenticationFailed(AuthenticationFailedContext context)
-    {
-        var logger = GetLogger(context.HttpContext);
-
-        logger.LogError(
-            context.Exception,
-            "DSI authentication failed: {Message}",
-            context.Exception.Message);
-
-        RedirectToErrorAndHandle(context);
-
-        return Task.CompletedTask;
-    }
-
-    private static void RedirectToErrorAndHandle(RemoteFailureContext context)
-    {
-        context.Response.Redirect(Routes.Error);
-        context.HandleResponse();
-    }
-
-    private static void RedirectToErrorAndHandle(AuthenticationFailedContext context)
-    {
-        context.Response.Redirect(Routes.Error);
-        context.HandleResponse();
-    }
-
-    private static Task HandleSignedOutCallbackRedirect(RemoteSignOutContext context)
-    {
-        context.Response.Redirect(Routes.Home);
-        context.HandleResponse();
-
-        return Task.CompletedTask;
-    }
-
-    private static ILogger<Program> GetLogger(HttpContext httpContext)
-    {
-        return httpContext.RequestServices.GetRequiredService<ILogger<Program>>();
     }
 
     private static void RegisterServices(IServiceCollection services)
