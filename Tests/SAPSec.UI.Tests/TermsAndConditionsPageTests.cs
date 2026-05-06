@@ -6,34 +6,34 @@ using Xunit;
 namespace SAPSec.UI.Tests;
 
 [Collection("UITestsCollection")]
-public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
+public class TermsAndConditionsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string TermsOfUsePath = "/terms-of-use";
+    private const string TermsAndConditionsPath = "/terms-and-conditions";
 
     #region View Rendering Tests
 
     [Fact]
-    public async Task TermsOfUsePage_LoadsSuccessfully()
+    public async Task TermsAndConditionsPage_LoadsSuccessfully()
     {
-        var response = await Page.GotoAsync(TermsOfUsePath);
+        var response = await Page.GotoAsync(TermsAndConditionsPath);
 
         response.Should().NotBeNull();
-        response.Status.Should().Be(200, "Terms of Use page should return HTTP 200");
+        response.Status.Should().Be(200, "Terms and conditions page should return HTTP 200");
     }
 
     [Fact]
-    public async Task TermsOfUsePage_HasCorrectTitle()
+    public async Task TermsAndConditionsPage_HasCorrectTitle()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         var pageTitle = await Page.TitleAsync();
-        pageTitle.Should().Contain(PageTitles.TermsOfUse);
+        pageTitle.Should().Contain(PageTitles.TermsAndConditions);
     }
 
     [Fact]
-    public async Task TermsOfUsePage_DisplaysMainHeading()
+    public async Task TermsAndConditionsPage_DisplaysMainHeading()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         var heading = Page.Locator("h1.govuk-heading-xl");
         var headingText = await heading.TextContentAsync();
@@ -43,9 +43,9 @@ public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageT
     }
 
     [Fact]
-    public async Task TermsOfUsePage_HasHomeBreadcrumb()
+    public async Task TermsAndConditionsPage_HasHomeBreadcrumb()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
 
@@ -54,9 +54,9 @@ public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageT
     }
 
     [Fact]
-    public async Task TermsOfUsePage_ContainsAllRequiredSectionHeadings()
+    public async Task TermsAndConditionsPage_ContainsAllRequiredSectionHeadings()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         var expectedHeadings = new[] {
             "Using the service",
@@ -74,9 +74,9 @@ public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageT
     }
 
     [Fact]
-    public async Task TermsOfUsePage_ContainsServiceNameReference()
+    public async Task TermsAndConditionsPage_ContainsServiceNameReference()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         // Verify "Get school improvement insights" is used consistently (as in CSHTML)
         var serviceReference = Page.Locator("text=/Get school improvement insights/");
@@ -86,9 +86,9 @@ public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageT
     }
 
     [Fact]
-    public async Task TermsOfUsePage_ContainsCorrectLegalLanguage()
+    public async Task TermsAndConditionsPage_ContainsCorrectLegalLanguage()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         var paragraphs = Page.Locator("p.govuk-body");
 
@@ -118,9 +118,9 @@ public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageT
     }
 
     [Fact]
-    public async Task TermsOfUsePage_LastUpdatedDateIsRenderedCorrectly()
+    public async Task TermsAndConditionsPage_LastUpdatedDateIsRenderedCorrectly()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         var lastUpdatedText = await Page.Locator("text=This version was last updated on 01/12/2025").TextContentAsync();
 
@@ -132,9 +132,9 @@ public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageT
     #region Accessibility Tests
 
     [Fact]
-    public async Task TermsOfUsePage_HasProperSemanticStructure()
+    public async Task TermsAndConditionsPage_HasProperSemanticStructure()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         var h1Count = await Page.Locator("h1").CountAsync();
         h1Count.Should().Be(1);
@@ -154,9 +154,9 @@ public class TermsOfUsePageTests(WebApplicationSetupFixture fixture) : BasePageT
     #region Service Name Validation
 
     [Fact]
-    public async Task TermsOfUsePage_ServiceNameMatchesGlobalConstant()
+    public async Task TermsAndConditionsPage_ServiceNameMatchesGlobalConstant()
     {
-        await Page.GotoAsync(TermsOfUsePath);
+        await Page.GotoAsync(TermsAndConditionsPath);
 
         // Verify the service name used in CSHTML matches the constant
         var serviceReference = Page.Locator("text=/Get school improvement insights/");

@@ -114,7 +114,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
         {
             { "Cookies", "/cookies" },
             { "Accessibility", "/accessibility" },
-            { "Terms of use", "/terms-of-use" },
+            { "Terms and conditions", "/terms-and-conditions" },
             { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" }
         };
 
