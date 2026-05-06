@@ -276,6 +276,18 @@ public sealed class GenerateViews
                     continue;
                 }
 
+                var missingTableMappings = GetMissingTableMappings(viewRows, tableMap);
+                if (missingTableMappings.Count > 0)
+                {
+                    var reason =
+                        "Missing table mappings for: " +
+                        string.Join(", ", missingTableMappings.OrderBy(x => x, StringComparer.OrdinalIgnoreCase));
+                    Console.WriteLine($"Skipping {view.ViewName}. {reason}");
+                    sql = BuildSkippedSql(view.ViewName, reason);
+                    WriteSql("04", view.ViewName, sql);
+                    continue;
+                }
+
                 sql = GenerateMaterializedView(view.ViewName, view.EstablishmentIdentifier, viewRows, tableMap);
                 WriteSql("04", view.ViewName, sql);
             }
@@ -850,6 +862,18 @@ public sealed class GenerateViews
             return true;
 
         return false;
+    }
+
+    private static List<string> GetMissingTableMappings(
+        IEnumerable<DataMapRow> rows,
+        Dictionary<string, string> tableMap)
+    {
+        return rows
+            .Select(r => (r.FileName ?? "").Trim().TrimStart('\uFEFF'))
+            .Where(k => !string.IsNullOrWhiteSpace(k))
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Where(k => !TryResolveRawTable(tableMap, k, out _))
+            .ToList();
     }
 
     private static string BuildAggregatedExpression(IEnumerable<DataMapRow> rows)
