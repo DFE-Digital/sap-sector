@@ -25,15 +25,12 @@ permissions:
 
 jobs:
   ingest:
-    if: ${{ github.event_name == 'schedule' || matrix.target_env == inputs.environment }}
     name: Ingest Raw Data & Build Warehouse (${{ matrix.target_env }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        target_env:
-        - test
-        - production
+        target_env: ${{ fromJson(github.event_name == 'schedule' && '["test","production"]' || format('["{0}"]', inputs.environment || 'test')) }}
     environment: ${{ matrix.target_env }}
 
     env:
