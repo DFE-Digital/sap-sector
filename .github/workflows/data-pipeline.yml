@@ -25,9 +25,16 @@ permissions:
 
 jobs:
   ingest:
-    name: Ingest Raw Data & Build Warehouse
+    if: ${{ github.event_name == 'schedule' || matrix.target_env == inputs.environment }}
+    name: Ingest Raw Data & Build Warehouse (${{ matrix.target_env }})
     runs-on: ubuntu-latest
-    environment: ${{ case(inputs.environment == '', 'test', inputs.environment) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        target_env:
+        - test
+        - production
+    environment: ${{ matrix.target_env }}
 
     env:
       # Blob (currently from GitHub secrets)
@@ -48,7 +55,7 @@ jobs:
       SERVICE_NAME: get-school-improvement-insights
       SERVICE_SHORT: sapsec
       TF_VARS_PATH: terraform/application/config
-      DEPLOY_ENV: ${{ inputs.environment || 'test' }}
+      DEPLOY_ENV: ${{ matrix.target_env }}
       
     steps:
       # ==============================
@@ -73,6 +80,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+      - name: Install Terraform
+        uses: hashicorp/setup-terraform@v3
 
       - name: Install Azure CLI
         run: |
@@ -595,6 +604,53 @@ jobs:
           dotnet run --configuration Release --project SAPData/SAPData.csproj
           echo "Generated SQL scripts."
 
+      - name: Set deployment variables
+        shell: bash
+        run: |
+          set -euo pipefail
+          source global_config/${DEPLOY_ENV}.sh
+          tf_vars_file=${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json
+          echo "CLUSTER=$(jq -r '.cluster' ${tf_vars_file})" >> $GITHUB_ENV
+          echo "NAMESPACE=$(jq -r '.namespace' ${tf_vars_file})" >> $GITHUB_ENV
+          echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
+          echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
+          echo "TFSTATE_STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}${CONFIG_SHORT}tfsa" >> $GITHUB_ENV
+          echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
+          TODAY=$(date +"%F")
+          BACKUP_FILE=${SERVICE_SHORT}_${CONFIG_SHORT}_post_data_pipeline_${TODAY}
+          echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
+          echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
+          echo "AZURE_SUBSCRIPTION=${AZURE_SUBSCRIPTION}" >> $GITHUB_ENV
+          echo "AZURE_RESOURCE_PREFIX=${AZURE_RESOURCE_PREFIX}" >> $GITHUB_ENV
+          echo "CONFIG=${CONFIG}" >> $GITHUB_ENV
+          echo "CONFIG_SHORT=${CONFIG_SHORT}" >> $GITHUB_ENV
+          echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
+          echo "TERRAFORM_MODULES_TAG=${TERRAFORM_MODULES_TAG}" >> $GITHUB_ENV
+
+      - name: Enable maintenance page for production
+        if: ${{ env.DEPLOY_ENV == 'production' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tf_vars_file="${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json"
+          override_file="${RUNNER_TEMP}/${DEPLOY_ENV}.maintenance-on.tfvars.json"
+          current_image="$(kubectl -n "${NAMESPACE}" get deployment "${SERVICE_NAME}-${DEPLOY_ENV}" -o jsonpath='{.spec.template.spec.containers[0].image}')"
+          jq '. + {"send_traffic_to_maintenance_page": true}' "${tf_vars_file}" > "${override_file}"
+          rm -rf terraform/application/vendor/modules/aks
+          git -c advice.detachedHead=false clone --depth=1 --single-branch --branch "${TERRAFORM_MODULES_TAG}" https://github.com/DFE-Digital/terraform-modules.git terraform/application/vendor/modules/aks
+          export TF_VAR_environment="${ENVIRONMENT}"
+          export TF_VAR_azure_resource_prefix="${AZURE_RESOURCE_PREFIX}"
+          export TF_VAR_config="${CONFIG}"
+          export TF_VAR_config_short="${CONFIG_SHORT}"
+          export TF_VAR_service_name="${SERVICE_NAME}"
+          export TF_VAR_service_short="${SERVICE_SHORT}"
+          export TF_VAR_docker_image="${current_image}"
+          terraform -chdir=terraform/application init -upgrade -reconfigure \
+            -backend-config="resource_group_name=${RESOURCE_GROUP_NAME}" \
+            -backend-config="storage_account_name=${TFSTATE_STORAGE_ACCOUNT_NAME}" \
+            -backend-config="key=${ENVIRONMENT}_kubernetes.tfstate"
+          terraform -chdir=terraform/application apply -auto-approve -var-file "${override_file}"
+
       # ==============================
       # 9. Run ETL via konduit (private DB) WITH RETRY on transient disconnects
       # ==============================
@@ -642,10 +698,35 @@ jobs:
             exit 2
           fi
 
+      - name: Disable maintenance page for production
+        if: ${{ always() && env.DEPLOY_ENV == 'production' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tf_vars_file="${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json"
+          override_file="${RUNNER_TEMP}/${DEPLOY_ENV}.maintenance-off.tfvars.json"
+          current_image="$(kubectl -n "${NAMESPACE}" get deployment "${SERVICE_NAME}-${DEPLOY_ENV}" -o jsonpath='{.spec.template.spec.containers[0].image}')"
+          jq '. + {"send_traffic_to_maintenance_page": false}' "${tf_vars_file}" > "${override_file}"
+          rm -rf terraform/application/vendor/modules/aks
+          git -c advice.detachedHead=false clone --depth=1 --single-branch --branch "${TERRAFORM_MODULES_TAG}" https://github.com/DFE-Digital/terraform-modules.git terraform/application/vendor/modules/aks
+          export TF_VAR_environment="${ENVIRONMENT}"
+          export TF_VAR_azure_resource_prefix="${AZURE_RESOURCE_PREFIX}"
+          export TF_VAR_config="${CONFIG}"
+          export TF_VAR_config_short="${CONFIG_SHORT}"
+          export TF_VAR_service_name="${SERVICE_NAME}"
+          export TF_VAR_service_short="${SERVICE_SHORT}"
+          export TF_VAR_docker_image="${current_image}"
+          terraform -chdir=terraform/application init -upgrade -reconfigure \
+            -backend-config="resource_group_name=${RESOURCE_GROUP_NAME}" \
+            -backend-config="storage_account_name=${TFSTATE_STORAGE_ACCOUNT_NAME}" \
+            -backend-config="key=${ENVIRONMENT}_kubernetes.tfstate"
+          terraform -chdir=terraform/application apply -auto-approve -var-file "${override_file}"
+
       # ==============================
       # 10. Create & upload DB backup (used to restore db in review app env)
       # ==============================
       - name: Create + upload review seed DB backup
+        if: ${{ env.DEPLOY_ENV == 'test' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -684,27 +765,13 @@ jobs:
       # ==============================
       # 11. Backup target DB (if pipeline was run normally)
       # ==============================
-      - name: Set environment variables
-        run: |
-          source global_config/${DEPLOY_ENV}.sh
-          tf_vars_file=${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json
-          echo "CLUSTER=$(jq -r '.cluster' ${tf_vars_file})" >> $GITHUB_ENV
-          echo "NAMESPACE=$(jq -r '.namespace' ${tf_vars_file})" >> $GITHUB_ENV
-          echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
-          echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
-          echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
-          TODAY=$(date +"%F")
-          BACKUP_FILE=${SERVICE_SHORT}_${CONFIG_SHORT}_post_data_pipeline_${TODAY}
-          echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
-          echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
-
       - name: Backup ${{ env.DEPLOY_ENV }} postgres (if pipeline was run normally)
-        if: ${{ inputs.environment == 'test' && inputs.review-app-number == '' }}
+        if: ${{ env.DEPLOY_ENV == 'test' && inputs.review-app-number == '' }}
         uses: DFE-Digital/github-actions/backup-postgres@master
         with:
           storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
           resource-group: ${{ env.RESOURCE_GROUP_NAME }}
-          app-name: ${{ env.SERVICE_NAME }}-${{ inputs.environment }}
+          app-name: ${{ env.SERVICE_NAME }}-${{ env.DEPLOY_ENV }}
           namespace: ${{ env.NAMESPACE }}
           cluster: ${{ env.CLUSTER }}
           azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -718,12 +785,12 @@ jobs:
       # 12. Restore DB backup (if pipeline was run to to create a backup for a review app)
       # ==============================
       - name: Restore ${{ env.DEPLOY_ENV }} postgres (if pipeline was run to to create a backup for a review app)
-        if: ${{ inputs.environment == 'test' && inputs.review-app-number != '' }}
+        if: ${{ env.DEPLOY_ENV == 'test' && inputs.review-app-number != '' }}
         uses: DFE-Digital/github-actions/restore-postgres-backup@master
         with:
           storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
           resource-group: ${{ env.RESOURCE_GROUP_NAME }}
-          app-name: ${{ env.SERVICE_NAME }}-${{ inputs.environment }}
+          app-name: ${{ env.SERVICE_NAME }}-${{ env.DEPLOY_ENV }}
           namespace: ${{ env.NAMESPACE }}
           cluster: ${{ env.CLUSTER }}
           azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
