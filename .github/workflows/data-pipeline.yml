@@ -72,15 +72,12 @@ jobs:
           sudo apt-get install -y \
             postgresql-client \
             powershell \
-            unzip
+            unzip \
+            jq
       - name: Install .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
-      - name: Install Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.14.5
 
       - name: Install Azure CLI
         run: |
@@ -613,42 +610,123 @@ jobs:
           echo "NAMESPACE=$(jq -r '.namespace' ${tf_vars_file})" >> $GITHUB_ENV
           echo "RESOURCE_GROUP_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-rg" >> $GITHUB_ENV
           echo "STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}dbbkp${CONFIG_SHORT}sa" >> $GITHUB_ENV
-          echo "TFSTATE_STORAGE_ACCOUNT_NAME=${AZURE_RESOURCE_PREFIX}${SERVICE_SHORT}${CONFIG_SHORT}tfsa" >> $GITHUB_ENV
           echo "DB_SERVER=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-pg" >> $GITHUB_ENV
           TODAY=$(date +"%F")
           BACKUP_FILE=${SERVICE_SHORT}_${CONFIG_SHORT}_post_data_pipeline_${TODAY}
           echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
           echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
-          echo "AZURE_SUBSCRIPTION=${AZURE_SUBSCRIPTION}" >> $GITHUB_ENV
-          echo "AZURE_RESOURCE_PREFIX=${AZURE_RESOURCE_PREFIX}" >> $GITHUB_ENV
-          echo "CONFIG=${CONFIG}" >> $GITHUB_ENV
-          echo "CONFIG_SHORT=${CONFIG_SHORT}" >> $GITHUB_ENV
-          echo "ENVIRONMENT=${ENVIRONMENT}" >> $GITHUB_ENV
-          echo "TERRAFORM_MODULES_TAG=${TERRAFORM_MODULES_TAG}" >> $GITHUB_ENV
 
-      - name: Enable maintenance page for production
-        if: ${{ env.DEPLOY_ENV == 'production' }}
+      - name: Enable maintenance page
+        if: ${{ github.event_name == 'workflow_dispatch' || env.DEPLOY_ENV == 'production' }}
         shell: bash
         run: |
           set -euo pipefail
-          tf_vars_file="${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json"
-          override_file="${RUNNER_TEMP}/${DEPLOY_ENV}.maintenance-on.tfvars.json"
-          current_image="$(kubectl -n "${NAMESPACE}" get deployment "${SERVICE_NAME}-${DEPLOY_ENV}" -o jsonpath='{.spec.template.spec.containers[0].image}')"
-          jq '. + {"send_traffic_to_maintenance_page": true}' "${tf_vars_file}" > "${override_file}"
-          rm -rf terraform/application/vendor/modules/aks
-          git -c advice.detachedHead=false clone --depth=1 --single-branch --branch "${TERRAFORM_MODULES_TAG}" https://github.com/DFE-Digital/terraform-modules.git terraform/application/vendor/modules/aks
-          export TF_VAR_environment="${ENVIRONMENT}"
-          export TF_VAR_azure_resource_prefix="${AZURE_RESOURCE_PREFIX}"
-          export TF_VAR_config="${CONFIG}"
-          export TF_VAR_config_short="${CONFIG_SHORT}"
-          export TF_VAR_service_name="${SERVICE_NAME}"
-          export TF_VAR_service_short="${SERVICE_SHORT}"
-          export TF_VAR_docker_image="${current_image}"
-          terraform -chdir=terraform/application init -upgrade -reconfigure \
-            -backend-config="resource_group_name=${RESOURCE_GROUP_NAME}" \
-            -backend-config="storage_account_name=${TFSTATE_STORAGE_ACCOUNT_NAME}" \
-            -backend-config="key=${ENVIRONMENT}_kubernetes.tfstate"
-          terraform -chdir=terraform/application apply -auto-approve -var-file "${override_file}"
+          primary_service="${SERVICE_NAME}-${DEPLOY_ENV}"
+          maintenance_dir="${RUNNER_TEMP}/maintenance"
+          backup_file="${maintenance_dir}/${DEPLOY_ENV}-ingresses.json"
+          mkdir -p "${maintenance_dir}"
+
+          maintenance_service="$(
+            kubectl -n "${NAMESPACE}" get svc -o json |
+              jq -r --arg exact "${SERVICE_NAME}-${DEPLOY_ENV}-maintenance" --arg generic "${SERVICE_NAME}-maintenance" '
+                ([.items[].metadata.name] | unique) as $names
+                | if ($names | index($exact)) then $exact
+                  elif ($names | index($generic)) then $generic
+                  else ($names[] | select(test("maintenance")))
+                  end
+              ' | head -n 1
+          )"
+
+          if [ -z "${maintenance_service}" ] || [ "${maintenance_service}" = "null" ]; then
+            echo "No maintenance service found in namespace ${NAMESPACE}."
+            kubectl -n "${NAMESPACE}" get svc
+            exit 1
+          fi
+
+          maintenance_port_name="$(kubectl -n "${NAMESPACE}" get svc "${maintenance_service}" -o jsonpath='{.spec.ports[0].name}')"
+          maintenance_port_number="$(kubectl -n "${NAMESPACE}" get svc "${maintenance_service}" -o jsonpath='{.spec.ports[0].port}')"
+
+          ingress_json="$(kubectl -n "${NAMESPACE}" get ingress -o json)"
+          matching_ingresses="$(
+            printf '%s' "${ingress_json}" |
+              jq -r --arg svc "${primary_service}" '
+                .items[]
+                | select(
+                    ((.spec.defaultBackend.service.name // "") == $svc)
+                    or any(.spec.rules[]?.http.paths[]?.backend.service.name; . == $svc)
+                  )
+                | .metadata.name
+              '
+          )"
+
+          if [ -z "${matching_ingresses}" ]; then
+            echo "No ingress found routing to service ${primary_service} in namespace ${NAMESPACE}."
+            kubectl -n "${NAMESPACE}" get ingress -o wide
+            exit 1
+          fi
+
+          printf '%s' "${ingress_json}" |
+            jq --arg svc "${primary_service}" '
+              {
+                apiVersion: "v1",
+                kind: "List",
+                items: [
+                  .items[]
+                  | select(
+                      ((.spec.defaultBackend.service.name // "") == $svc)
+                      or any(.spec.rules[]?.http.paths[]?.backend.service.name; . == $svc)
+                    )
+                  | {
+                      apiVersion,
+                      kind,
+                      metadata: {
+                        name: .metadata.name,
+                        namespace: .metadata.namespace,
+                        labels: .metadata.labels,
+                        annotations: .metadata.annotations
+                      },
+                      spec
+                    }
+                ]
+              }
+            ' > "${backup_file}"
+
+          while IFS= read -r ingress_name; do
+            current_file="${maintenance_dir}/${ingress_name}.json"
+            kubectl -n "${NAMESPACE}" get ingress "${ingress_name}" -o json > "${current_file}"
+            jq \
+              --arg svc "${primary_service}" \
+              --arg maint "${maintenance_service}" \
+              --arg portName "${maintenance_port_name}" \
+              --arg portNumber "${maintenance_port_number}" '
+                def maintPort:
+                  if ($portName | length) > 0
+                  then {name: $portName}
+                  else {number: ($portNumber | tonumber)}
+                  end;
+                .spec.defaultBackend |=
+                  (if .service.name == $svc then {service: {name: $maint, port: maintPort}} else . end)
+                | .spec.rules |= ((. // []) | map(
+                    .http.paths |= (((. // [])) | map(
+                      if .backend.service.name == $svc
+                      then .backend.service = {name: $maint, port: maintPort}
+                      else .
+                      end
+                    ))
+                  ))
+                | {
+                    apiVersion,
+                    kind,
+                    metadata: {
+                      name: .metadata.name,
+                      namespace: .metadata.namespace,
+                      labels: .metadata.labels,
+                      annotations: .metadata.annotations
+                    },
+                    spec
+                  }
+              ' "${current_file}" | kubectl apply -f -
+          done <<< "${matching_ingresses}"
 
       # ==============================
       # 9. Run ETL via konduit (private DB) WITH RETRY on transient disconnects
@@ -697,29 +775,20 @@ jobs:
             exit 2
           fi
 
-      - name: Disable maintenance page for production
-        if: ${{ always() && env.DEPLOY_ENV == 'production' }}
+      - name: Disable maintenance page
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' || env.DEPLOY_ENV == 'production') }}
         shell: bash
         run: |
           set -euo pipefail
-          tf_vars_file="${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json"
-          override_file="${RUNNER_TEMP}/${DEPLOY_ENV}.maintenance-off.tfvars.json"
-          current_image="$(kubectl -n "${NAMESPACE}" get deployment "${SERVICE_NAME}-${DEPLOY_ENV}" -o jsonpath='{.spec.template.spec.containers[0].image}')"
-          jq '. + {"send_traffic_to_maintenance_page": false}' "${tf_vars_file}" > "${override_file}"
-          rm -rf terraform/application/vendor/modules/aks
-          git -c advice.detachedHead=false clone --depth=1 --single-branch --branch "${TERRAFORM_MODULES_TAG}" https://github.com/DFE-Digital/terraform-modules.git terraform/application/vendor/modules/aks
-          export TF_VAR_environment="${ENVIRONMENT}"
-          export TF_VAR_azure_resource_prefix="${AZURE_RESOURCE_PREFIX}"
-          export TF_VAR_config="${CONFIG}"
-          export TF_VAR_config_short="${CONFIG_SHORT}"
-          export TF_VAR_service_name="${SERVICE_NAME}"
-          export TF_VAR_service_short="${SERVICE_SHORT}"
-          export TF_VAR_docker_image="${current_image}"
-          terraform -chdir=terraform/application init -upgrade -reconfigure \
-            -backend-config="resource_group_name=${RESOURCE_GROUP_NAME}" \
-            -backend-config="storage_account_name=${TFSTATE_STORAGE_ACCOUNT_NAME}" \
-            -backend-config="key=${ENVIRONMENT}_kubernetes.tfstate"
-          terraform -chdir=terraform/application apply -auto-approve -var-file "${override_file}"
+          backup_file="${RUNNER_TEMP}/maintenance/${DEPLOY_ENV}-ingresses.json"
+          if [ ! -f "${backup_file}" ]; then
+            echo "No ingress backup found for ${DEPLOY_ENV}; skipping maintenance restore."
+            exit 0
+          fi
+
+          jq -c '.items[]' "${backup_file}" | while IFS= read -r ingress_spec; do
+            printf '%s\n' "${ingress_spec}" | kubectl apply -f -
+          done
 
       # ==============================
       # 10. Create & upload DB backup (used to restore db in review app env)
