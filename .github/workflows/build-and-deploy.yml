@@ -44,8 +44,10 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' }}
     env:
       DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector
+      MAINTENANCE_DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector-maintenance
     outputs:
       docker-image-tag: ${{ steps.build-image.outputs.tag }}
+      maintenance-image-tag: ${{ steps.build-image.outputs.tag }}
     permissions:
       packages: write
       pull-requests: write
@@ -65,6 +67,15 @@ jobs:
           max-cache: true
           reuse-cache: true
           snyk-token: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Build and push maintenance image
+        env:
+          IMAGE_TAG: ${{ steps.build-image.outputs.tag }}
+        run: |
+          set -euo pipefail
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+          docker build -t "${MAINTENANCE_DOCKER_REPOSITORY}:${IMAGE_TAG}" maintenance_page
+          docker push "${MAINTENANCE_DOCKER_REPOSITORY}:${IMAGE_TAG}"
 
   test:
     name: Run Unit & Integration Tests with Coverage
@@ -454,12 +465,20 @@ jobs:
     permissions:
       id-token: write
       pull-requests: write
+      contents: read
     strategy:
       max-parallel: 1
       matrix:
         environment: [test, production]
+    env:
+      AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+      AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+      MAINTENANCE_DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector-maintenance
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Deploy app to ${{ matrix.environment }}
         id: deploy_app
         uses: DFE-Digital/github-actions/deploy-to-aks@master
@@ -477,6 +496,51 @@ jobs:
           gcp-wip: ${{ vars.GCP_WIP }}
           gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
 
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubectl (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="v1.29.8"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client=true
+
+      - name: Install kubelogin (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBELOGIN_VERSION="v0.1.6"
+          curl -fsSLo kubelogin.zip "https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip"
+          unzip -q kubelogin.zip
+          sudo install -m 0755 bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
+          kubelogin --version
+
+      - name: Configure AKS credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
+          kubelogin convert-kubeconfig -l azurecli
+
+      - name: Deploy maintenance service to ${{ matrix.environment }}
+        env:
+          MAINTENANCE_IMAGE_TAG: ${{ needs.build.outputs.maintenance-image-tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          namespace="$(jq -r '.namespace' "terraform/application/config/${{ matrix.environment }}.tfvars.json")"
+          maintenance_image="${MAINTENANCE_DOCKER_REPOSITORY}:${MAINTENANCE_IMAGE_TAG}"
+          kubectl -n "${namespace}" apply -f maintenance_page/manifests/
+          kubectl -n "${namespace}" set image deployment/get-school-improvement-insights-maintenance maintenance-page="${maintenance_image}"
+          kubectl -n "${namespace}" rollout status deployment/get-school-improvement-insights-maintenance --timeout=180s
+
   manual_deploy:
     name: Manual deploy
     concurrency:
@@ -490,11 +554,16 @@ jobs:
     permissions:
       id-token: write
       pull-requests: write
+      contents: read
     env:
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
       AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+      MAINTENANCE_DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector-maintenance
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Deploy app to ${{ inputs.environment }}
         id: deploy_manual
         uses: DFE-Digital/github-actions/deploy-to-aks@master
@@ -512,6 +581,56 @@ jobs:
           smoke-test: false
           gcp-wip: ${{ vars.GCP_WIP }}
           gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Azure login (OIDC)
+        if: ${{ inputs.environment != 'review' }}
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubectl (pinned)
+        if: ${{ inputs.environment != 'review' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="v1.29.8"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client=true
+
+      - name: Install kubelogin (pinned)
+        if: ${{ inputs.environment != 'review' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBELOGIN_VERSION="v0.1.6"
+          curl -fsSLo kubelogin.zip "https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip"
+          unzip -q kubelogin.zip
+          sudo install -m 0755 bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
+          kubelogin --version
+
+      - name: Configure AKS credentials
+        if: ${{ inputs.environment != 'review' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
+          kubelogin convert-kubeconfig -l azurecli
+
+      - name: Deploy maintenance service to ${{ inputs.environment }}
+        if: ${{ inputs.environment != 'review' }}
+        env:
+          MAINTENANCE_IMAGE_TAG: ${{ inputs.docker-image-tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          namespace="$(jq -r '.namespace' "terraform/application/config/${{ inputs.environment }}.tfvars.json")"
+          maintenance_image="${MAINTENANCE_DOCKER_REPOSITORY}:${MAINTENANCE_IMAGE_TAG}"
+          kubectl -n "${namespace}" apply -f maintenance_page/manifests/
+          kubectl -n "${namespace}" set image deployment/get-school-improvement-insights-maintenance maintenance-page="${maintenance_image}"
+          kubectl -n "${namespace}" rollout status deployment/get-school-improvement-insights-maintenance --timeout=180s
 
       - name: Checkout (needed for workspace consistency)
         if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
