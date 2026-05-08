@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Service temporarily unavailable</title>
+  <style>
+    :root {
+      --bg: #f8f5ef;
+      --ink: #1f1f1f;
+      --muted: #5c5751;
+      --panel: #fffdf8;
+      --border: #d8d1c4;
+      --accent: #0b57d0;
+      --shadow: rgba(31, 31, 31, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Georgia, "Times New Roman", serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(11, 87, 208, 0.08), transparent 28rem),
+        linear-gradient(180deg, #fbfaf7 0%, var(--bg) 100%);
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+    }
+
+    main {
+      width: min(100%, 46rem);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 1.25rem;
+      box-shadow: 0 1.25rem 3rem var(--shadow);
+      overflow: hidden;
+    }
+
+    .banner {
+      padding: 0.9rem 1.25rem;
+      background: #16213a;
+      color: #f7f4ee;
+      font: 600 0.92rem/1.2 Arial, sans-serif;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .content {
+      padding: 2.5rem 2rem 2.75rem;
+    }
+
+    h1 {
+      margin: 0 0 1rem;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      line-height: 0.98;
+      max-width: 12ch;
+    }
+
+    p {
+      margin: 0 0 1rem;
+      font: 400 1.1rem/1.65 Arial, sans-serif;
+      color: var(--muted);
+    }
+
+    .note {
+      margin-top: 1.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.98rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="banner">Get school improvement insights</div>
+    <div class="content">
+      <h1>We’re carrying out planned maintenance.</h1>
+      <p>The service is temporarily unavailable while data updates are being applied.</p>
+      <p>Please try again shortly.</p>
+      <p class="note">If you still see this page after the maintenance window, try refreshing your browser.</p>
+    </div>
+  </main>
+</body>
+</html>
