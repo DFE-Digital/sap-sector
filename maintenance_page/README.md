@@ -11,7 +11,7 @@ Expected service name:
 Build and push example:
 
 ```bash
-docker build -t ghcr.io/dfe-digital/sap-sector-maintenance:latest maintenance_page
+docker build -f maintenance_page/Dockerfile -t ghcr.io/dfe-digital/sap-sector-maintenance:latest .
 docker push ghcr.io/dfe-digital/sap-sector-maintenance:latest
 ```
 
