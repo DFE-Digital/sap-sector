@@ -568,11 +568,11 @@ public class AuthControllerTests
     }
 
     [Fact]
-    public void AccessDenied_ReturnsDefaultView()
+    public void AccessDenied_ReturnsCorrectView()
     {
         var result = _controller.AccessDenied() as ViewResult;
 
-        result!.ViewName.Should().BeNull();
+        result!.ViewName.Should().Be("~/Views/Error/AccessDenied.cshtml");
     }
 
     #endregion
