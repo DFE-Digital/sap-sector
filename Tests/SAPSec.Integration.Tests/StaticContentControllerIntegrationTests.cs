@@ -53,6 +53,19 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
     }
 
     [Fact]
+    public async Task GetCookies_WithLocalReturnUrl_RendersSuccessBannerReturnLink()
+    {
+        var response = await fixture.Client.GetAsync("/cookies?returnUrl=%2Faccessibility");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("id=\"cookie-settings-success-banner\"");
+        content.Should().Contain("govuk-notification-banner govuk-notification-banner--success");
+        content.Should().Contain("You've set your cookie preferences.");
+        content.Should().Contain("<a class=\"govuk-notification-banner__link\" href=\"/accessibility\">Go back to the page you were looking at</a>.");
+    }
+
+    [Fact]
     public async Task GetCookies_WithExternalReturnUrl_DoesNotRenderBackLink()
     {
         var response = await fixture.Client.GetAsync("/cookies?returnUrl=https%3A%2F%2Fexample.com%2F");
