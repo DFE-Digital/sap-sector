@@ -1,7 +1,9 @@
 @using System.Text.Json
+@using SAPSec.Web.Constants
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = "Attendance";
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
     var initialBarData = new
     {
