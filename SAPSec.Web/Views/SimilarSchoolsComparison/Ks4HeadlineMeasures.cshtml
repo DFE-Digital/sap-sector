@@ -1,7 +1,9 @@
 @using System.Text.Json
+@using SAPSec.Web.Constants
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = "KS4 headline performance measures";
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
     var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
@@ -396,7 +398,7 @@
                 This data shows the number of pupils who either stayed in education, started an apprenticeship, or entered employment for at least two terms after completing key stage 4.
             </p>
             <p class="govuk-body-s govuk-!-margin-bottom-2">
-                The most recent data covers pupils who finished year 11 in 2023. The three-year average is the average of pupils completed year 11 in 2021,2022 and 2023.
+                The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021,2022 and 2023.
             </p>
         </div>
     </details>

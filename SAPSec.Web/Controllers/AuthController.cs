@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 
@@ -117,7 +118,7 @@ public class AuthController(
     [AllowAnonymous]
     public IActionResult AccessDenied()
     {
-        return View();
+        return View("~/Views/Error/AccessDenied.cshtml");
     }
 
     [HttpGet(Routes.SignedOut)]
