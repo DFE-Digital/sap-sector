@@ -141,5 +141,4 @@ public class UserService(
     {
         return principal?.IsInRole(role) == true;
     }
-
 }

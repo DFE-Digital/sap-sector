@@ -30,7 +30,6 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
         builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
         builder.Services.AddGovUkFrontend(options =>
@@ -167,6 +166,7 @@ public class Program
         builder.Services.AddDependencies();
 
         // Add custom error handler for NotFoundExceptions
+        builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 
         var app = builder.Build();
