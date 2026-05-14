@@ -15,29 +15,28 @@ public class DsiAuthorizationHandler(
             return;
         }
 
-        void Fail(string message)
-        {
-            logger.LogWarning(message);
-            context.Fail(new AuthorizationFailureReason(this, message));
-        }
-
         var user = await userService.GetUserFromClaimsAsync(context.User);
         if (user is null)
         {
-            Fail("User claim was null.");
+            var userName = context.User.Identity?.Name ?? "(unknown)";
+            logger.LogWarning("User claim was null for user {UserName}.", userName);
+            context.Fail(new AuthorizationFailureReason(this, $"User claim was null for user {userName}."));
             return;
         }
+
+        var userId = user.Sub;
 
         var org = await userService.GetCurrentOrganisationAsync(context.User);
         if (org is null)
         {
-            Fail("User Organisation claim was null.");
+            logger.LogWarning("User Organisation claim was null for user {UserId}.", userId);
+            context.Fail(new AuthorizationFailureReason(this, $"User Organisation claim was null for user {userId}."));
             return;
         }
 
         if (!org.IsEstablishment || org.Urn is null)
         {
-            logger.LogInformation("User Organisation is not an Establishment or has a null Urn.");
+            logger.LogInformation("User Organisation is not an Establishment or has a null Urn for user {UserId}.", userId);
         }
 
         context.Succeed(requirement);

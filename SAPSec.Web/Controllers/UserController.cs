@@ -21,18 +21,21 @@ public class UserController(
         var user = await _userService.GetUserFromClaimsAsync(User);
         if (user is null)
         {
-            throw new InvalidOperationException("User claim was null.");
+            var userName = User.Identity?.Name ?? "(unknown)";
+            throw new InvalidOperationException($"Unable to create user object from claims for user {userName}.");
         }
+
+        var userId = user.Sub;
 
         var org = await _userService.GetCurrentOrganisationAsync(User);
         if (org is null)
         {
-            throw new InvalidOperationException("User Organisation claim was null.");
+            throw new InvalidOperationException($"Current organisation is null for user {userId}.");
         }
 
         if (!org.IsEstablishment || org.Urn is null)
         {
-            _logger.LogInformation("User Organisation is not an Establishment or has a null Urn, redirecting to school search.");
+            _logger.LogInformation("User Organisation is not an Establishment or has a null Urn, redirecting to school search for user {UserId}.", userId);
             return Redirect(Routes.FindASchool);
         }
 
