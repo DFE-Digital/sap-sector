@@ -159,7 +159,7 @@ public class DsiApiService : IDsiClient
             var payload = new Dictionary<string, object>
             {
                 ["iss"] = _config.ClientId,
-                ["aud"] = _config.Audience,
+                ["aud"] = _config.APIAudience,
                 ["exp"] = expires.ToUnixTimeSeconds()
             };
 
