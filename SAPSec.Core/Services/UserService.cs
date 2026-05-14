@@ -36,7 +36,7 @@ public class UserService(
             var organisationClaim = principal.FindFirst("organisation")?.Value;
             var organisations = organisationClaim.DeserializeToList<Organisation>();
 
-            if (!organisations.Any() && !string.IsNullOrEmpty(userId))
+            if (organisations.Any() && !string.IsNullOrEmpty(userId))
             {
                 try
                 {
