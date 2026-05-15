@@ -36,7 +36,12 @@ public class DsiAuthorizationHandler(
 
         if (!org.IsEstablishment || org.Urn is null)
         {
-            logger.LogInformation("User Organisation is not an Establishment or has a null Urn for user {UserId}.", userId);
+            logger.LogInformation(
+                "User Organisation is not an Establishment or has a null Urn for user {UserId}. OrganisationId: {OrganisationId}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}.",
+                userId,
+                org.Id,
+                org.Category?.Name,
+                org.Urn);
         }
 
         context.Succeed(requirement);
