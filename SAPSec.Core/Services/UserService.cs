@@ -33,8 +33,19 @@ public class UserService(
             var familyName = principal.FindFirst(ClaimTypes.Surname)?.Value ?? string.Empty;
             var name = principal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
 
+            var hasOrganisationClaim = principal.HasClaim(c => c.Type == "organisation");
             var organisationClaim = principal.FindFirst("organisation")?.Value;
-            var organisations = organisationClaim.DeserializeToList<Organisation>();
+            _logger.LogInformation(
+                "Organisation claim raw value for user {UserId}: {OrganisationClaim}",
+                userId,
+                organisationClaim);
+            var organisations = organisationClaim.DeserializeToList<Organisation>(logger: _logger);
+
+            _logger.LogInformation(
+                "Resolved organisations from claims for user {UserId}. HasOrganisationClaim: {HasOrganisationClaim}. ParsedOrganisationCount: {OrganisationCount}",
+                userId,
+                hasOrganisationClaim,
+                organisations.Count);
 
             if (!organisations.Any() && !string.IsNullOrEmpty(userId))
             {
@@ -45,6 +56,14 @@ public class UserService(
                     if (userInfo != null && userInfo.Organisations != null)
                     {
                         organisations = userInfo.Organisations;
+                        _logger.LogInformation(
+                            "Resolved organisations from DSI API for user {UserId}. ApiOrganisationCount: {OrganisationCount}",
+                            userId,
+                            organisations.Count);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("DSI API returned no organisations for user {UserId}", userId);
                     }
                 }
                 catch (Exception ex)
@@ -75,6 +94,11 @@ public class UserService(
         var user = await GetUserFromClaimsAsync(principal);
         if (user == null || !user.Organisations.Any())
         {
+            _logger.LogWarning(
+                "Unable to resolve current organisation for user {UserId}. UserResolved: {UserResolved}. OrganisationCount: {OrganisationCount}",
+                GetUserId(principal),
+                user != null,
+                user?.Organisations.Count ?? 0);
             return null;
         }
 
@@ -88,16 +112,41 @@ public class UserService(
             }
         }
 
+        _logger.LogInformation(
+            "Resolving current organisation for user {UserId}. SessionOrganisationIdPresent: {HasSessionOrganisationId}. OrganisationCount: {OrganisationCount}",
+            GetUserId(principal),
+            !string.IsNullOrEmpty(selectedOrgId),
+            user.Organisations.Count);
+
         if (!string.IsNullOrEmpty(selectedOrgId))
         {
             var selectedOrg = user.Organisations.FirstOrDefault(o => o.Id == selectedOrgId);
             if (selectedOrg != null)
             {
+                _logger.LogInformation(
+                    "Resolved current organisation from session for user {UserId}. OrganisationId: {OrganisationId}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}",
+                    GetUserId(principal),
+                    selectedOrg.Id,
+                    selectedOrg.Category?.Name,
+                    selectedOrg.Urn);
                 return selectedOrg;
             }
+
+            _logger.LogWarning(
+                "Session organisation id {OrganisationId} was not found in resolved organisations for user {UserId}",
+                selectedOrgId,
+                GetUserId(principal));
         }
 
-        return user.Organisations.First();
+        var fallbackOrganisation = user.Organisations.First();
+        _logger.LogInformation(
+            "Falling back to first organisation for user {UserId}. OrganisationId: {OrganisationId}. Category: {OrganisationCategory}. Urn: {OrganisationUrn}",
+            GetUserId(principal),
+            fallbackOrganisation.Id,
+            fallbackOrganisation.Category?.Name,
+            fallbackOrganisation.Urn);
+
+        return fallbackOrganisation;
     }
 
     public Task<bool> SetCurrentOrganisationAsync(ClaimsPrincipal principal, string organisationId)
