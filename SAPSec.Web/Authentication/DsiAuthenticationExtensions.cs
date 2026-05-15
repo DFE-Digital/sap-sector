@@ -50,11 +50,6 @@ public static class DsiAuthenticationExtensions
         {
             const string PolicyName = "DsiAuthorizationPolicy";
             o.AddPolicy(PolicyName, policy => policy.AddRequirements(new DsiAuthorizationRequirement()));
-            var policy = o.GetPolicy(PolicyName);
-            if (policy is not null)
-            {
-                o.DefaultPolicy = policy;
-            }
         });
         services.AddScoped<IAuthorizationHandler, DsiAuthorizationHandler>();
         return services;
