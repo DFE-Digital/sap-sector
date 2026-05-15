@@ -96,7 +96,6 @@ public class GetAttendanceMeasuresTests
                         Abs_Persistent_Est_Previous2_Pct = "18.8"
                     },
                     null,
-                    null,
                     null),
                 new AbsenceData(
                     "200002",
@@ -109,7 +108,6 @@ public class GetAttendanceMeasuresTests
                         Abs_Persistent_Est_Previous_Pct = "17.4",
                         Abs_Persistent_Est_Previous2_Pct = "17.8"
                     },
-                    null,
                     null,
                     null)
             ]);
