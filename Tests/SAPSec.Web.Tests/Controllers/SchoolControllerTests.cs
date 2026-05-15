@@ -13,6 +13,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Web.Controllers;
+using System.Text.Json;
 
 namespace SAPSec.Web.Tests.Controllers;
 
@@ -45,7 +46,8 @@ public class SchoolControllerTests
 
         var getAttendanceMeasures = new GetAttendanceMeasures(
             _absenceRepositoryMock.Object,
-            _establishmentRepositoryMock.Object);
+            _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object);
         var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object,
@@ -272,6 +274,9 @@ public class SchoolControllerTests
                 new EstablishmentAbsence(),
                 new LAAbsence(),
                 new EnglandAbsence()));
+        _similarSchoolsRepositoryMock
+            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         var result = await _sut.Attendance(urn);
 
@@ -320,11 +325,55 @@ public class SchoolControllerTests
                     Abs_Persistent_Eng_Previous_Pct = "14.9",
                     Abs_Persistent_Eng_Previous2_Pct = "14.7"
                 }));
+        _similarSchoolsRepositoryMock
+            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .ReturnsAsync(
+            [
+                new SimilarSchoolsSecondaryGroupsEntry { URN = urn, NeighbourURN = "200001" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = urn, NeighbourURN = "200002" }
+            ]);
+        _absenceRepositoryMock
+            .Setup(x => x.GetByUrnsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200001", "200002" }))))
+            .ReturnsAsync(
+            [
+                new AbsenceData(
+                    "200001",
+                    new EstablishmentAbsence
+                    {
+                        Abs_Tot_Est_Current_Pct = "5.5",
+                        Abs_Tot_Est_Previous_Pct = "5.4",
+                        Abs_Tot_Est_Previous2_Pct = "5.3",
+                        Abs_Persistent_Est_Current_Pct = "16.5",
+                        Abs_Persistent_Est_Previous_Pct = "16.3",
+                        Abs_Persistent_Est_Previous2_Pct = "16.1"
+                    },
+                    null,
+                    null),
+                new AbsenceData(
+                    "200002",
+                    new EstablishmentAbsence
+                    {
+                        Abs_Tot_Est_Current_Pct = "5.3",
+                        Abs_Tot_Est_Previous_Pct = "5.2",
+                        Abs_Tot_Est_Previous2_Pct = "5.1",
+                        Abs_Persistent_Est_Current_Pct = "16.1",
+                        Abs_Persistent_Est_Previous_Pct = "15.9",
+                        Abs_Persistent_Est_Previous2_Pct = "15.7"
+                    },
+                    null,
+                    null)
+            ]);
 
         var result = await _sut.AttendanceData(urn, "overall");
 
         var json = result.Should().BeOfType<JsonResult>().Subject;
-        json.Value.Should().NotBeNull();
+        var payload = JsonSerializer.Serialize(json.Value);
+        using var document = JsonDocument.Parse(payload);
+        var root = document.RootElement;
+
+        root.GetProperty("bar").GetArrayLength().Should().Be(4);
+        root.GetProperty("line").GetProperty("similarSchools").GetArrayLength().Should().Be(3);
+        root.GetProperty("table").GetProperty("similarSchools").GetArrayLength().Should().Be(4);
     }
 
     #endregion

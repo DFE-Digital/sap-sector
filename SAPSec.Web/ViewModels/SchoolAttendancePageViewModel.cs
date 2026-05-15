@@ -11,16 +11,19 @@ public class SchoolAttendancePageViewModel
     public required GetAttendanceMeasuresResponse AttendanceMeasures { get; init; }
 
     public string SchoolName => SchoolDetails.Name;
+    public string SimilarSchoolsLabel => "Similar schools average";
     public string LocalAuthorityName => SchoolDetails.LocalAuthorityName.Display();
     public string LocalAuthorityLabel => "Local authority schools average";
     public string EnglandLabel => "Schools in England average";
     public string[] AcademicYears => Ks4YearLabelConfig.YearByYear;
 
     public decimal? SelectedSchoolOverallAbsenceThreeYearAverage => AttendanceMeasures.OverallAbsenceThreeYearAverage.SchoolValue;
+    public decimal? SimilarSchoolsOverallAbsenceThreeYearAverage => AttendanceMeasures.OverallAbsenceThreeYearAverage.SimilarSchoolsValue;
     public decimal? LocalAuthorityOverallAbsenceThreeYearAverage => AttendanceMeasures.OverallAbsenceThreeYearAverage.LocalAuthorityValue;
     public decimal? EnglandOverallAbsenceThreeYearAverage => AttendanceMeasures.OverallAbsenceThreeYearAverage.EnglandValue;
 
     public decimal? SelectedSchoolPersistentAbsenceThreeYearAverage => AttendanceMeasures.PersistentAbsenceThreeYearAverage.SchoolValue;
+    public decimal? SimilarSchoolsPersistentAbsenceThreeYearAverage => AttendanceMeasures.PersistentAbsenceThreeYearAverage.SimilarSchoolsValue;
     public decimal? LocalAuthorityPersistentAbsenceThreeYearAverage => AttendanceMeasures.PersistentAbsenceThreeYearAverage.LocalAuthorityValue;
     public decimal? EnglandPersistentAbsenceThreeYearAverage => AttendanceMeasures.PersistentAbsenceThreeYearAverage.EnglandValue;
 
