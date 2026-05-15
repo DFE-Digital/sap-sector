@@ -89,7 +89,8 @@ public class Organisation
     public string? PimsStatusName { get; set; }
 
     [JsonPropertyName("pimsStatus")]
-    public string? PimsStatus { get; set; }
+    [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    public int? PimsStatus { get; set; }
 
     [JsonPropertyName("GIASStatusName")]
     public string? GiasStatusName { get; set; }
