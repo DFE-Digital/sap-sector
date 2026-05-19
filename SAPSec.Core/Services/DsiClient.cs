@@ -69,7 +69,8 @@ public class DsiApiService : IDsiClient
                 return null;
             }
 
-            var organisations = await response.Content.ReadFromJsonAsync<List<Organisation>>();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var organisations = DeserializeOrganisations(responseBody);
 
             return new UserInfo
             {
@@ -178,6 +179,31 @@ public class DsiApiService : IDsiClient
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating bearer token for DSI API");
+            throw;
+        }
+    }
+
+    private List<Organisation>? DeserializeOrganisations(string responseBody)
+    {
+        if (string.IsNullOrWhiteSpace(responseBody))
+        {
+            return new List<Organisation>();
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+
+            return document.RootElement.ValueKind switch
+            {
+                JsonValueKind.Array => JsonSerializer.Deserialize<List<Organisation>>(responseBody),
+                JsonValueKind.Object => JsonSerializer.Deserialize<UserOrganisationsResponse>(responseBody)?.Organisations,
+                _ => new List<Organisation>()
+            };
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize organisations response from DSI API");
             throw;
         }
     }
