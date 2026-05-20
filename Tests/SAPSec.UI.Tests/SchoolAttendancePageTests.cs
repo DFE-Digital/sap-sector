@@ -32,9 +32,11 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await NavigateToAttendanceAsync();
 
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Attendance measures" })).ToBeVisibleAsync();
-        await Expect(Page.Locator("main")).ToContainTextAsync("similar schools average");
+        await Expect(Page.Locator("main")).ToContainTextAsync("50 similar secondary phase schools (including all-throughs)");
         await Expect(Page.Locator("main")).ToContainTextAsync("the local authority average");
         await Expect(Page.Locator("main")).ToContainTextAsync("the national average");
+        await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "how DfE defines what a similar school is" }))
+            .ToHaveAttributeAsync("href", "/school/145327/what-is-a-similar-school");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToBeVisibleAsync();
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-show-no-data-labels", "true");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-colors", "[\"#D53780\",\"#2a1950\",\"#2a1950\",\"#2a1950\"]");
