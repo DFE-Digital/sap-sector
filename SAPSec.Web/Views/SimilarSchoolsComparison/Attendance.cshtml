@@ -3,7 +3,7 @@
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
-    ViewData[ViewDataKeys.Title] = "Attendance";
+    ViewData[ViewDataKeys.Title] = $"Attendance compared to {Model.SimilarSchoolName}";
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
     var initialBarData = new
     {
