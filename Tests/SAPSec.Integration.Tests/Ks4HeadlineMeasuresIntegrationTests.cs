@@ -30,6 +30,17 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasures_DestinationsDetails_UsesNumericThreeYearAverageWording()
+    {
+        var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("Information about staying in education or entering employment data");
+        content.Should().Contain("The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021,2022 and 2023.");
+        content.Should().NotContain("The most recent data covers pupils who finished year 11 in 2023. The three-year average is the average of pupils completed year 11 in 2021,2022 and 2023.");
+    }
+
+    [Fact]
     public async Task Ks4HeadlineMeasures_TopPerformersContainLinksToSimilarSchoolComparison()
     {
         var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
@@ -48,6 +59,16 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
         GetCanvasMarkup(content, "ks4-attainment8-school-chart").Should().Contain("data-label-decimals=\"1\"");
         GetCanvasMarkup(content, "eng-maths-school-chart").Should().Contain("data-label-decimals=\"0\"");
         GetCanvasMarkup(content, "destinations-school-chart").Should().Contain("data-label-decimals=\"0\"");
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasures_Attainment8YearByYear_DisablesAxisAutoSkip()
+    {
+        var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+        GetCanvasMarkup(content, "ks4-attainment8-school-yearbyyear-chart").Should().Contain("data-axis-auto-skip=\"false\"");
     }
 
     [Fact]

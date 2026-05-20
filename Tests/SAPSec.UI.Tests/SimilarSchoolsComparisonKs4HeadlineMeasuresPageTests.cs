@@ -40,4 +40,24 @@ public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplication
         barChartColours.Should().Contain("#ca357c");
         barChartColours.Should().Contain("#2a1950");
     }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasuresComparison_Attainment8YearByYear_ShowsExpectedYAxisTicks()
+    {
+        await Page.GotoAsync(Path);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await Page.Locator(".govuk-tabs__tab[href='#year-by-year']").ClickAsync();
+        var lineChart = Page.Locator("#ks4-attainment8-comparison-yearbyyear-chart");
+        await Expect(lineChart).ToBeVisibleAsync();
+
+        var tickLabels = await lineChart.EvaluateAsync<string[]>(@"
+            el => {
+                const chart = window.Chart && window.Chart.getChart(el);
+                return chart?.scales?.y?.ticks?.map(tick => tick.label) ?? [];
+            }
+        ");
+
+        tickLabels.Should().Equal("0", "30", "60", "90");
+    }
 }

@@ -89,7 +89,8 @@ public class Organisation
     public string? PimsStatusName { get; set; }
 
     [JsonPropertyName("pimsStatus")]
-    public string? PimsStatus { get; set; }
+    [JsonNumberHandling(JsonNumberHandling.AllowReadingFromString)]
+    public int? PimsStatus { get; set; }
 
     [JsonPropertyName("GIASStatusName")]
     public string? GiasStatusName { get; set; }
@@ -116,4 +117,9 @@ public class Organisation
     public string? IsOnApar { get; set; }
 
     public List<Service> Services { get; set; } = new();
+
+    public bool IsEstablishment => string.Equals(
+        Category?.Name,
+        "Establishment",
+        StringComparison.OrdinalIgnoreCase);
 }

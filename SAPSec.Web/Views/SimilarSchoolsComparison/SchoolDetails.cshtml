@@ -1,11 +1,13 @@
 @using System.Globalization
 @using System.Text.Encodings.Web
 @using System.Text.Json
+@using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
 @model SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = "School details";
 
     var inv = CultureInfo.InvariantCulture;
 

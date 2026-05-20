@@ -20,10 +20,10 @@ public class StaticContentControllerTests
     }
 
     [Fact]
-    public void TermsOfUse_Get_ReturnsViewResult()
+    public void TermsAndConditions_Get_ReturnsViewResult()
     {
         // Act
-        var result = _controller.TermsOfUse();
+        var result = _controller.TermsAndConditions();
 
         // Assert
         result.Should().NotBeNull();

@@ -9,6 +9,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
 {
     private const string SchoolOverviewPath = "/school/105574";
     private const string SchoolDetailsPath = "/school/105574/school-details";
+    private const string WhatIsASimilarSchoolPath = "/school/105574/what-is-a-similar-school";
 
     [Fact]
     public async Task GetSchoolOverview_ReturnsSuccess()
@@ -61,5 +62,16 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         content.Should().Contain("Location");
         content.Should().Contain("Contact details");
         content.Should().Contain("Further information");
+    }
+
+    [Fact]
+    public async Task GetWhatIsASimilarSchool_UsesGovUkLinkStylingForReferenceLinks()
+    {
+        var response = await fixture.Client.GetAsync(WhatIsASimilarSchoolPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("href='https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release' class=\"govuk-link\"");
+        content.Should().Contain("href='https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/' class=\"govuk-link\"");
     }
 }

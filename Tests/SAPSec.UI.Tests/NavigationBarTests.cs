@@ -124,7 +124,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         await Page.GotoAsync(_fixture.BaseUrl);
 
         // Act
-        var signOutLink = Page.Locator("a[href*='Auth/SignOutCallback']");
+        var signOutLink = Page.Locator("a[href*='auth/signout']");
 
         // Assert - Check if element exists (may not be visible if not authenticated)
         var count = await signOutLink.CountAsync();
