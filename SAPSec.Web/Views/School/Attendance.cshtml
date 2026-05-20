@@ -31,7 +31,7 @@
             new { label = Model.EnglandLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
         }
     };
-    var chartColors = new[] { "#D53780", "#2a1950", "#2a1950", "#003078" };
+    var chartColors = new[] { "#D53780", "#2a1950", "#2a1950", "#2a1950" };
     var lineChartColors = new[] { "#D53780", "#2a1950", "#5694CA", "#28A197" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
 }
