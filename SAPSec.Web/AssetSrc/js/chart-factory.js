@@ -1,4 +1,4 @@
-(function () {
+(function (window) {
     const datasetColorKeys = ['school', 'similarSchools', 'localAuthority', 'england'];
     const ks4CoreSubjectYearByYearChartIds = new Set([
         'english-language-school-yearbyyear-chart',
@@ -573,8 +573,8 @@
         return ks4CoreSubjectYearByYearChartIds.has(canvas.id);
     }
 
-    function initCharts() {
-        document.querySelectorAll('.js-chart').forEach(canvas => {
+    function initCharts(element) {
+        element.querySelectorAll('.js-chart').forEach(canvas => {
             if (charts[canvas.id]) {
                 charts[canvas.id].destroy();
             }
@@ -762,6 +762,11 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', initCharts);
+    window.MeasureCharts = {
+        init(element) {
+            initCharts(element);
+        }
+    };
+    document.addEventListener('DOMContentLoaded', () => initCharts(document));
     adjustChartResize();
-})();
+})(window);

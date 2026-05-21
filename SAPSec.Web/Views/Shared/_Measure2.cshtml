@@ -1,0 +1,25 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels
+
+@model Measure2ViewModel
+
+<div id="@Model.HtmlPrefix">
+    <tabbed-view html-prefix="@Model.HtmlPrefix">
+        <tab-content id="three-year-average" name="3-year average">
+            <partial name="_MeasureThreeYearAverageChart" model="@Model" />
+        </tab-content>
+
+        <tab-content id="year-by-year" name="Year by year">
+            <partial name="_MeasureYearByYearChart" model="@Model" />
+        </tab-content>
+
+        <tab-content id="table-view" name="Table">
+            <partial name="_MeasureTable" model="@Model" />
+        </tab-content>
+
+        <tab-content id="top-performers" name="Top performers">
+            <partial name="_MeasureTopPerformers" model="@Model" />
+        </tab-content>
+    </tabbed-view>
+</div>

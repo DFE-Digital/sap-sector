@@ -170,5 +170,3 @@ public record GetKs4HeadlineMeasuresResponse(
     Ks4HeadlineMeasureYearByYear DestinationsEducationYearByYear,
     Ks4HeadlineMeasureAverage DestinationsEmploymentThreeYearAverage,
     Ks4HeadlineMeasureYearByYear DestinationsEmploymentYearByYear);
-
-

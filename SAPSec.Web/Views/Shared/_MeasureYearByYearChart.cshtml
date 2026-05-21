@@ -1,0 +1,25 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels
+
+@model Measure2ViewModel
+
+@{
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+}
+
+<div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+    <canvas id="@Model.HtmlPrefix-school-yearbyyear-chart"
+            class="js-chart js-chart--school-ks4-line"
+            data-type="line"
+            data-axis-min="0"
+            data-axis-step="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 25 : 30)"
+            data-axis-max="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 100 : 90)"
+            data-axis-auto-skip="false"
+            data-axis-suffix="@(Model.NumberDisplayType == NumberDisplayType.Percentage? "%" : "")"
+            data-show-x-grid="true"
+            data-show-legend="true"
+            data-show-datalabels="false"
+            data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Subject.SchoolYearByYear.Previous2, Model.Subject.SchoolYearByYear.Previous, Model.Subject.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Subject.SimilarSchoolsYearByYear.Previous2, Model.Subject.SimilarSchoolsYearByYear.Previous, Model.Subject.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Subject.LocalAuthorityYearByYear.Previous2, Model.Subject.LocalAuthorityYearByYear.Previous, Model.Subject.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Subject.EnglandYearByYear.Previous2, Model.Subject.EnglandYearByYear.Previous, Model.Subject.EnglandYearByYear.Current } } } }))'>
+    </canvas>
+</div>

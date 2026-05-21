@@ -1,0 +1,41 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels
+
+@model Measure2ViewModel
+
+@{
+    var rows = new[]
+    {
+        (Key: "this", Label: Model.SchoolLabel, Series: Model.Subject.SchoolYearByYear, Display: Model.Subject.SchoolDisplay),
+        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.Subject.SimilarSchoolsYearByYear, Display: Model.Subject.SimilarSchoolsDisplay),
+        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.Subject.LocalAuthorityYearByYear, Display: Model.Subject.LocalAuthorityDisplay),
+        (Key: "england", Label: Model.EnglandLabel, Series: Model.Subject.EnglandYearByYear, Display: Model.Subject.EnglandDisplay)
+    };
+
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+}
+
+<table class="govuk-table">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">School(s)</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @foreach (var row in rows)
+        {
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">@row.Label</th>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-prev2")">@Model.DisplayNumber(row.Series.Previous2)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-prev")">@Model.DisplayNumber(row.Series.Previous)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-current")">@Model.DisplayNumber(row.Series.Current)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-avg")">@row.Display</td>
+            </tr>
+        }
+    </tbody>
+</table>

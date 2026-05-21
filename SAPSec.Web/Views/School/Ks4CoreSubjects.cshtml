@@ -25,18 +25,38 @@
     Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
 
-<partial name="_Measure" model=@(new MeasureViewModel { 
-    Key = "english-language",
-    HtmlPrefix = "english-language-2",
-    Title = "English language",
-    SchoolDetails = Model.SchoolDetails,
-    Subject = Model.EnglishLanguage,
-    GradeOptions = [
-        new("4", "Grade 4 and above"),
-        new("5", "Grade 5 and above"),
-        new("7", "Grade 7 and above")
-    ]
-})/>
+<section aria-labelledby="english-language-2-heading" class="app-ks4-attainment govuk-!-margin-top-9">
+    <h2 class="govuk-heading-m" id="english-language-2-heading">English language</h2>
+    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="english-language-2-grade">Grade</label>
+            <select class="govuk-select"
+                    id="english-language-2-grade"
+                    name="english-language-2-grade"
+                    data-view-switcher="true"
+                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "english-language" })"
+                    data-query-key="grade"
+                    data-bar-chart-id="english-language-2-school-chart"
+                    data-line-chart-id="english-language-2-school-yearbyyear-chart"
+                    data-cell-attribute="data-english-language-2-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
+                    data-top-performers-table-id="english-language-2-top-performers-table"
+                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    <option value="4" selected>Grade 4 and above</option>
+                    <option value="5">Grade 5 and above</option>
+                    <option value="7">Grade 7 and above</option>
+            </select>
+        </div>
+    </div>
+
+    <partial name="_Measure2" model=@(new Measure2ViewModel {
+        NumberDisplayType = NumberDisplayType.Percentage,
+        HtmlPrefix = "english-language-2",
+        SchoolDetails = Model.SchoolDetails,
+        Subject = Model.EnglishLanguage
+    })/>
+</section>
 
 <partial name="_Measure" model=@(new MeasureViewModel { 
     Key = "english-literature",

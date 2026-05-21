@@ -1,0 +1,34 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels
+
+@model Measure2ViewModel
+
+@{
+    var barData = new decimal?[] { Model.Subject.SchoolThreeYearAverage, Model.Subject.SimilarSchoolsThreeYearAverage, Model.Subject.LocalAuthorityThreeYearAverage, Model.Subject.EnglandThreeYearAverage };
+    var labels = new[] { Model.SchoolLabel, Model.SimilarSchoolsLabel, Model.LocalAuthorityLabel, Model.EnglandLabel };
+    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
+}
+
+<div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+    @if (HasAnyData(barData))
+    {
+        <canvas id="@Model.HtmlPrefix-school-chart"
+                class="js-chart js-chart--school-ks4-bar"
+                data-type="bar"
+                data-show-no-data-labels="true"
+                data-axis-step="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 25 : 30)"
+                data-axis-max="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 100 : 90)"
+                data-label-decimals="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 0 : 1)"
+                data-bar-thickness="50"
+                data-category-percentage="0.6"
+                data-bar-percentage="1"
+                data-axis-suffix="@(Model.NumberDisplayType == NumberDisplayType.Percentage? "%" : "")"
+                data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = barData }))'>
+        </canvas>
+    }
+    else
+    {
+        <p class="govuk-body">No available data</p>
+    }
+</div>

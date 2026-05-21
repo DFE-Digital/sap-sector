@@ -123,19 +123,25 @@
         tabContainer.dataset.mobileTabsBound = "true";
     }
 
-    function init() {
-        document.querySelectorAll(".app-ks4-tabs").forEach(initTabContainer);
+    function init(element) {
+        element.querySelectorAll(".app-ks4-tabs").forEach(initTabContainer);
     }
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
+        document.addEventListener("DOMContentLoaded", () => init(document));
     } else {
-        init();
+        init(document);
     }
 
     // GOV.UK tabs may re-apply classes after module init; enforce mobile state again.
-    window.addEventListener("load", init);
-    window.setTimeout(init, 100);
-    window.addEventListener("resize", init);
-    window.matchMedia(MOBILE_MEDIA_QUERY).addEventListener("change", init);
+    window.addEventListener("load", () => init(document));
+    window.setTimeout(() => init(document), 100);
+    window.addEventListener("resize", () => init(document));
+    window.matchMedia(MOBILE_MEDIA_QUERY).addEventListener("change", () => init(document));
+
+    window.MeasureTabs = {
+        init(element) {
+            init(element);
+        }
+    };
 })();
