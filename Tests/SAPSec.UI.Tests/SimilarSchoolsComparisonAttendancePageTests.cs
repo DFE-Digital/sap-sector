@@ -21,6 +21,7 @@ public class SimilarSchoolsComparisonAttendancePageTests(WebApplicationSetupFixt
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Attendance measures" })).ToBeVisibleAsync();
+        await Expect(Page.Locator("label[for='attendanceAbsenceType']")).ToHaveClassAsync(new Regex("govuk-label--s"));
 
         var absenceType = Page.Locator("#attendanceAbsenceType");
         await Expect(absenceType).ToHaveValueAsync("overall");
