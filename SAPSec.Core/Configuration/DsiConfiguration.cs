@@ -8,6 +8,7 @@ public class DsiConfiguration
     public string ApiUri { get; set; } = string.Empty;
     public string Issuer { get; set; } = string.Empty;
     public string Audience { get; set; } = string.Empty;
+    public string APIAudience { get; set; } = "signin.education.gov.uk";
     public string CallbackPath { get; set; } = "/signin-oidc";
     public string SignedOutCallbackPath { get; set; } = "/signout-callback-oidc";
     public string MetadataAddress { get; set; } = string.Empty;

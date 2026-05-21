@@ -7,7 +7,7 @@
 @model SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
-    ViewData[ViewDataKeys.Title] = "School details";
+    ViewData[ViewDataKeys.Title] = $"School details compared to {Model.SimilarSchoolName}";
 
     var inv = CultureInfo.InvariantCulture;
 

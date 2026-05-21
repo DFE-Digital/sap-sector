@@ -617,7 +617,7 @@ jobs:
           echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
 
       - name: Enable maintenance page
-        if: ${{ github.event_name == 'workflow_dispatch' || env.DEPLOY_ENV == 'production' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -776,7 +776,7 @@ jobs:
           fi
 
       - name: Disable maintenance page
-        if: ${{ always() && (github.event_name == 'workflow_dispatch' || env.DEPLOY_ENV == 'production') }}
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
         shell: bash
         run: |
           set -euo pipefail

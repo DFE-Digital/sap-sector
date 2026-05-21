@@ -1,14 +1,14 @@
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SAPSec.Core.Configuration;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace SAPSec.Core.Services;
 
@@ -59,15 +59,18 @@ public class DsiApiService : IDsiClient
             if (!response.IsSuccessStatusCode)
             {
                 var body = await response.Content.ReadAsStringAsync();
+
                 _logger.LogWarning(
                     "Failed to get user {UserId} from DSI API. Status: {StatusCode}. Body: {Body}",
                     userId,
                     response.StatusCode,
                     body);
+
                 return null;
             }
 
-            var organisations = await response.Content.ReadFromJsonAsync<List<Organisation>>();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var organisations = DeserializeOrganisations(responseBody);
 
             return new UserInfo
             {
@@ -157,7 +160,7 @@ public class DsiApiService : IDsiClient
             var payload = new Dictionary<string, object>
             {
                 ["iss"] = _config.ClientId,
-                ["aud"] = _config.Audience,
+                ["aud"] = _config.APIAudience,
                 ["exp"] = expires.ToUnixTimeSeconds()
             };
 
@@ -176,6 +179,31 @@ public class DsiApiService : IDsiClient
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating bearer token for DSI API");
+            throw;
+        }
+    }
+
+    private List<Organisation>? DeserializeOrganisations(string responseBody)
+    {
+        if (string.IsNullOrWhiteSpace(responseBody))
+        {
+            return new List<Organisation>();
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+
+            return document.RootElement.ValueKind switch
+            {
+                JsonValueKind.Array => JsonSerializer.Deserialize<List<Organisation>>(responseBody),
+                JsonValueKind.Object => JsonSerializer.Deserialize<UserOrganisationsResponse>(responseBody)?.Organisations,
+                _ => new List<Organisation>()
+            };
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize organisations response from DSI API");
             throw;
         }
     }

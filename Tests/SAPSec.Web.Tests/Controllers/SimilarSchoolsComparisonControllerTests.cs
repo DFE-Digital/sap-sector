@@ -58,7 +58,8 @@ public class SimilarSchoolsComparisonControllerTests
             _repoMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
             _absenceRepositoryMock.Object,
-            _establishmentRepositoryMock.Object);
+            _establishmentRepositoryMock.Object,
+            _repoMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
             _repoMock.Object);
@@ -77,6 +78,9 @@ public class SimilarSchoolsComparisonControllerTests
                 PercentageStatementOrEHP = 1.678816m,
                 KS2AVG = 2.527329m
             });
+        _repoMock
+            .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         var characteristicsFormatter = new CharacteristicsComparisonFormatter();
 

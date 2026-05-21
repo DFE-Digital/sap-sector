@@ -32,13 +32,17 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await NavigateToAttendanceAsync();
 
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "Attendance measures" })).ToBeVisibleAsync();
+        await Expect(Page.Locator("main")).ToContainTextAsync("50 similar secondary phase schools (including all-throughs)");
         await Expect(Page.Locator("main")).ToContainTextAsync("the local authority average");
         await Expect(Page.Locator("main")).ToContainTextAsync("the national average");
-        await Expect(Page.Locator("main")).ToContainTextAsync("Monitor your school attendance service");
+        await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "how DfE defines what a similar school is" }))
+            .ToHaveAttributeAsync("href", "/school/145327/what-is-a-similar-school");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToBeVisibleAsync();
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-show-no-data-labels", "true");
+        await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-colors", "[\"#D53780\",\"#2a1950\",\"#2a1950\",\"#2a1950\"]");
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-year-by-year']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']")).ToBeVisibleAsync();
+        await Expect(Page.Locator("label[for='attendanceAbsenceType']")).ToHaveClassAsync(new Regex("govuk-label--s"));
         await Expect(Page.Locator("#attendanceAbsenceType")).ToHaveValueAsync("overall");
     }
 
@@ -53,17 +57,6 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await Expect(activeLink).ToBeVisibleAsync();
         await Expect(activeLink).ToHaveAttributeAsync("href", "/school/145327/attendance");
         await Expect(activeLink).ToHaveAttributeAsync("aria-current", "page");
-    }
-
-    [Fact]
-    public async Task Attendance_ExternalLinksOpenInNewTab()
-    {
-        await NavigateToAttendanceAsync();
-
-        await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "View your education data (VYED)" }))
-            .ToHaveAttributeAsync("target", "_blank");
-        await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "you can follow this guidance" }))
-            .ToHaveAttributeAsync("target", "_blank");
     }
 
     [Fact]
@@ -126,5 +119,6 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         var tableTab = Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']");
         await tableTab.ClickAsync();
         await Expect(Page.Locator("#attendance-table .govuk-table")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#attendance-table .govuk-table")).ToContainTextAsync("Similar schools average");
     }
 }
