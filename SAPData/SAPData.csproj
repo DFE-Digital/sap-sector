@@ -264,6 +264,9 @@
     <None Update="raw_sources.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="preserved_raw_tables.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Sql\00_cleanup.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

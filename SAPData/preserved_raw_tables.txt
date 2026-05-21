@@ -1,0 +1,6 @@
+# One logical dataset key per line to preserve across pipeline rebuilds.
+# Lines starting with # are ignored.
+#
+# Example:
+# gias_all_establishment_current
+# ees_ks4_performance_metadata_current_v1.0
