@@ -1,7 +1,9 @@
 @using System.Text.Json
+@using SAPSec.Web.Constants
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = $"KS4 headline performance measures compared to {Model.SimilarSchoolName}";
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
     var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
@@ -69,7 +71,7 @@
                             data-show-no-data-labels="true"
                             data-axis-step="30"
                             data-axis-max="90"
-                            data-label-decimals="0"
+                            data-label-decimals="1"
                             data-bar-thickness="50"
                             data-category-percentage="0.7"
                             data-bar-percentage="1"
@@ -143,8 +145,10 @@
                 <canvas id="ks4-attainment8-comparison-yearbyyear-chart"
                         class="js-chart"
                         data-type="line"
+                        data-axis-min="0"
                         data-axis-step="30"
                         data-axis-max="90"
+                        data-axis-auto-skip="false"
                         data-axis-suffix=""
                         data-show-x-grid="true"
                         data-show-legend="true"
@@ -169,23 +173,23 @@
                 <tbody class="govuk-table__body">
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.Name</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.ThisSchoolAttainment8YearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.ThisSchoolAttainment8YearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.ThisSchoolAttainment8YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.ThisSchoolAttainment8YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.ThisSchoolAttainment8YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.ThisSchoolAttainment8YearByYear?.Current)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.SelectedSchoolAttainment8YearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.SelectedSchoolAttainment8YearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.SelectedSchoolAttainment8YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.SelectedSchoolAttainment8YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.SelectedSchoolAttainment8YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.SelectedSchoolAttainment8YearByYear?.Current)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Schools in England average</th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.EnglandAttainment8YearByYear?.Previous2)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.EnglandAttainment8YearByYear?.Previous)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholeValue(Model.EnglandAttainment8YearByYear?.Current)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.EnglandAttainment8YearByYear?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.EnglandAttainment8YearByYear?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.EnglandAttainment8YearByYear?.Current)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8Display</td>
                     </tr>
                 </tbody>
@@ -394,7 +398,7 @@
                 This data shows the number of pupils who either stayed in education, started an apprenticeship, or entered employment for at least two terms after completing key stage 4.
             </p>
             <p class="govuk-body-s govuk-!-margin-bottom-2">
-                The most recent data covers pupils who finished year 11 in 2023. The three-year average is the average of pupils completed year 11 in 2021,2022 and 2023.
+                The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021,2022 and 2023.
             </p>
         </div>
     </details>

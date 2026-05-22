@@ -1,11 +1,38 @@
 @using SAPSec.Web.Constants
-@using System.Text.Json
 @{
     ViewData[ViewDataKeys.Title] = PageTitles.Cookies;
     var returnUrl = ViewData["CookieReturnUrl"] as string ?? Url.Content("~/");
 }
 
-<a href="@returnUrl" class="govuk-back-link">Back</a>
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
+
+<div class="govuk-notification-banner govuk-notification-banner--success"
+     role="alert"
+     aria-labelledby="cookie-settings-success-title"
+     data-module="govuk-notification-banner"
+     id="cookie-settings-success-banner"
+     hidden
+     tabindex="-1">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="cookie-settings-success-title">
+            Success
+        </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">
+            You've set your cookie preferences.
+            <a class="govuk-notification-banner__link" href="@returnUrl">Go back to the page you were looking at</a>.
+        </p>
+    </div>
+</div>
 
 <h1 class="govuk-heading-xl">Cookies</h1>
 
@@ -65,16 +92,6 @@
             <td class="govuk-table__cell"><code>_ga_&lt;id&gt;</code></td>
             <td class="govuk-table__cell">Used to persist session state.</td>
             <td class="govuk-table__cell">2 years</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell"><code>_gid</code></td>
-            <td class="govuk-table__cell">Used to identify the user within a session.</td>
-            <td class="govuk-table__cell">24 hours</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell"><code>_dc_gtm_&lt;id&gt;</code></td>
-            <td class="govuk-table__cell">Used to help control the rate at which page view requests are made.</td>
-            <td class="govuk-table__cell">1 minute</td>
         </tr>
     </tbody>
 </table>
@@ -195,9 +212,9 @@
     <script add-nonce="true">
         (function () {
             var cookieName = "@LayoutConstants.CookieSettingsName";
-            var returnUrl = @Html.Raw(JsonSerializer.Serialize(returnUrl));
             var saveForm = document.getElementById("cookie-settings-form");
             var radios = document.getElementsByName("analytics-cookies");
+            var successBanner = document.getElementById("cookie-settings-success-banner");
 
             function getCookie(name) {
                 var cookies = document.cookie ? document.cookie.split("; ") : [];
@@ -240,15 +257,23 @@
                 }
             }
 
-            function addQueryParameter(url, name, value) {
-                var separator = url.indexOf("?") === -1 ? "?" : "&";
-                return url + separator + encodeURIComponent(name) + "=" + encodeURIComponent(value);
-            }
-
             function setSelectedValue(value) {
                 for (var i = 0; i < radios.length; i++) {
                     radios[i].checked = radios[i].value === value;
                 }
+            }
+
+            function hideCookiesBanner() {
+                var cookiesBanner = document.getElementById("cookies-banner");
+                if (cookiesBanner) {
+                    cookiesBanner.setAttribute("hidden", "hidden");
+                }
+            }
+
+            function showSuccessBanner() {
+                successBanner.removeAttribute("hidden");
+                successBanner.scrollIntoView();
+                successBanner.focus();
             }
 
             var currentValue = getCookie(cookieName);
@@ -272,8 +297,8 @@
                     clearAdditionalCookies();
                 }
 
-                var bannerState = analyticsEnabled ? "accepted" : "rejected";
-                window.location.assign(addQueryParameter(returnUrl, "cookie-banner", bannerState));
+                hideCookiesBanner();
+                showSuccessBanner();
             });
         })();
     </script>

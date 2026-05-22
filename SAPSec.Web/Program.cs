@@ -14,6 +14,7 @@ using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using SAPSec.Web.Setup;
+using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -29,6 +30,7 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
         builder.Services.AddGovUkFrontend(options =>
         {
@@ -164,6 +166,7 @@ public class Program
         builder.Services.AddDependencies();
 
         // Add custom error handler for NotFoundExceptions
+        builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 
         var app = builder.Build();
@@ -243,7 +246,7 @@ public class Program
 
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
-           app.UseDfeAnalytics();
+            app.UseDfeAnalytics();
         }
 
         app.MapControllers();

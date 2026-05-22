@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: get-school-improvement-insights-maintenance
+  labels:
+    app: get-school-improvement-insights-maintenance
+spec:
+  selector:
+    app: get-school-improvement-insights-maintenance
+  ports:
+  - name: http
+    port: 80
+    targetPort: http

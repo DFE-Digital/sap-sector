@@ -1,14 +1,14 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Security.Claims;
-using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using SAPSec.Core.Configuration;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace SAPSec.Core.Services;
 
@@ -44,7 +44,6 @@ public class DsiApiService : IDsiClient
                 throw;
             }
         }
-
     }
 
     public async Task<UserInfo?> GetUserAsync(string userId)
@@ -55,18 +54,29 @@ public class DsiApiService : IDsiClient
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await _httpClient.GetAsync($"/users/{userId}");
+            var response = await _httpClient.GetAsync($"/users/{userId}/organisations");
 
             if (!response.IsSuccessStatusCode)
             {
+                var body = await response.Content.ReadAsStringAsync();
+
                 _logger.LogWarning(
-                    "Failed to get user {UserId} from DSI API. Status: {StatusCode}",
+                    "Failed to get user {UserId} from DSI API. Status: {StatusCode}. Body: {Body}",
                     userId,
-                    response.StatusCode);
+                    response.StatusCode,
+                    body);
+
                 return null;
             }
 
-            return await response.Content.ReadFromJsonAsync<UserInfo>();
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var organisations = DeserializeOrganisations(responseBody);
+
+            return new UserInfo
+            {
+                Sub = userId,
+                Organisations = organisations ?? new List<Organisation>()
+            };
         }
         catch (Exception ex)
         {
@@ -87,10 +97,12 @@ public class DsiApiService : IDsiClient
 
             if (!response.IsSuccessStatusCode)
             {
+                var body = await response.Content.ReadAsStringAsync();
                 _logger.LogWarning(
-                    "Failed to get user by email {Email} from DSI API. Status: {StatusCode}",
+                    "Failed to get user by email {Email} from DSI API. Status: {StatusCode}. Body: {Body}",
                     email,
-                    response.StatusCode);
+                    response.StatusCode,
+                    body);
                 return null;
             }
 
@@ -115,10 +127,12 @@ public class DsiApiService : IDsiClient
 
             if (!response.IsSuccessStatusCode)
             {
+                var body = await response.Content.ReadAsStringAsync();
                 _logger.LogWarning(
-                    "Failed to get organisation {OrganisationId} from DSI API. Status: {StatusCode}",
+                    "Failed to get organisation {OrganisationId} from DSI API. Status: {StatusCode}. Body: {Body}",
                     organisationId,
-                    response.StatusCode);
+                    response.StatusCode,
+                    body);
                 return null;
             }
 
@@ -135,28 +149,61 @@ public class DsiApiService : IDsiClient
     {
         try
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_config.ApiSecret);
+            var expires = DateTimeOffset.UtcNow.AddMinutes(_config.TokenExpiryMinutes);
 
-            var tokenDescriptor = new SecurityTokenDescriptor
+            var header = new Dictionary<string, object>
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                        new Claim("iss", _config.ClientId),
-                        new Claim("aud", _config.Audience)
-                    }),
-                Expires = DateTime.UtcNow.AddMinutes(_config.TokenExpiryMinutes),
-                SigningCredentials = new SigningCredentials(
-                    new SymmetricSecurityKey(key),
-                    SecurityAlgorithms.HmacSha256Signature)
+                ["alg"] = "HS256",
+                ["typ"] = "JWT"
             };
 
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return Task.FromResult(tokenHandler.WriteToken(token));
+            var payload = new Dictionary<string, object>
+            {
+                ["iss"] = _config.ClientId,
+                ["aud"] = _config.APIAudience,
+                ["exp"] = expires.ToUnixTimeSeconds()
+            };
+
+            var encodedHeader = Base64UrlEncoder.Encode(
+                Encoding.UTF8.GetBytes(JsonSerializer.Serialize(header)));
+            var encodedPayload = Base64UrlEncoder.Encode(
+                Encoding.UTF8.GetBytes(JsonSerializer.Serialize(payload)));
+            var unsignedToken = $"{encodedHeader}.{encodedPayload}";
+
+            using var hmac = new HMACSHA256(Encoding.ASCII.GetBytes(_config.ApiSecret));
+            var signature = Base64UrlEncoder.Encode(
+                hmac.ComputeHash(Encoding.ASCII.GetBytes(unsignedToken)));
+
+            return Task.FromResult($"{unsignedToken}.{signature}");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error generating bearer token for DSI API");
+            throw;
+        }
+    }
+
+    private List<Organisation>? DeserializeOrganisations(string responseBody)
+    {
+        if (string.IsNullOrWhiteSpace(responseBody))
+        {
+            return new List<Organisation>();
+        }
+
+        try
+        {
+            using var document = JsonDocument.Parse(responseBody);
+
+            return document.RootElement.ValueKind switch
+            {
+                JsonValueKind.Array => JsonSerializer.Deserialize<List<Organisation>>(responseBody),
+                JsonValueKind.Object => JsonSerializer.Deserialize<UserOrganisationsResponse>(responseBody)?.Organisations,
+                _ => new List<Organisation>()
+            };
+        }
+        catch (JsonException ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize organisations response from DSI API");
             throw;
         }
     }

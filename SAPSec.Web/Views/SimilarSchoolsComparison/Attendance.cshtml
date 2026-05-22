@@ -1,7 +1,9 @@
 @using System.Text.Json
+@using SAPSec.Web.Constants
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = $"Attendance compared to {Model.SimilarSchoolName}";
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
     var initialBarData = new
     {
@@ -18,7 +20,7 @@
             new { label = "Schools in England average", data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
         }
     };
-    var chartColors = new[] { "#d53880", "#003078", "#003078" };
+    var chartColors = new[] { "#d53880", "#2a1950", "#2a1950" };
     var lineChartColors = new[] { "#D53780", "#003078", "#28A197" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "SimilarSchoolsComparison",
         new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn });
@@ -34,7 +36,7 @@
 
     <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
         <div class="govuk-form-group">
-            <label class="govuk-label" for="attendanceAbsenceType">Type of absence</label>
+            <label class="govuk-label govuk-label--s" for="attendanceAbsenceType">Type of absence</label>
             <select class="govuk-select"
                     id="attendanceAbsenceType"
                     name="attendanceAbsenceType"

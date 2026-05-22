@@ -27,7 +27,7 @@ public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(AccessibilityPath);
 
         var pageTitle = await Page.TitleAsync();
-        pageTitle.Should().Contain(PageTitles.PrivacyPolicy);
+        pageTitle.Should().Be($"{PageTitles.AccessibilityStatement} - {LayoutConstants.ServiceName} - GOV.UK");
     }
 
     [Fact]
@@ -40,6 +40,17 @@ public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         heading.Should().NotBeNull();
         headingText.Should().Contain("Accessibility statement");
+    }
+
+    [Fact]
+    public async Task AccessibilityPage_HasHomeBreadcrumb()
+    {
+        await Page.GotoAsync(AccessibilityPath);
+
+        var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
+
+        (await breadcrumb.CountAsync()).Should().Be(1);
+        (await breadcrumb.First.GetAttributeAsync("href")).Should().Be("/find-a-school");
     }
 
     [Fact]

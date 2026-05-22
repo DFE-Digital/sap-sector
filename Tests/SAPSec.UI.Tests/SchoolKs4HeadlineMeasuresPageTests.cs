@@ -58,6 +58,25 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasures_Attainment8YearByYear_ShowsExpectedYAxisTicks()
+    {
+        await NavigateAsync();
+
+        await Page.Locator(".govuk-tabs__tab[href='#year-by-year']").ClickAsync();
+        var lineChart = Page.Locator("#ks4-attainment8-school-yearbyyear-chart");
+        await Expect(lineChart).ToBeVisibleAsync();
+
+        var tickLabels = await lineChart.EvaluateAsync<string[]>(@"
+            el => {
+                const chart = window.Chart && window.Chart.getChart(el);
+                return chart?.scales?.y?.ticks?.map(tick => tick.label) ?? [];
+            }
+        ");
+
+        tickLabels.Should().Equal("0", "30", "60", "90");
+    }
+
+    [Fact]
     public async Task Ks4HeadlineMeasures_UsesExpectedColoursForAllSchoolCharts()
     {
         await NavigateAsync();

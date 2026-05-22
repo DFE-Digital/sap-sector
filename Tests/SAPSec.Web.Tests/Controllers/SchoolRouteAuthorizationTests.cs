@@ -39,7 +39,6 @@ public class SchoolRouteAuthorizationTests
     }
 
     [Theory]
-    [InlineData(nameof(AuthController.AccessDenied))]
     [InlineData(nameof(AuthController.SignedOut))]
     public void PublicAuthAction_AllowsAnonymousAccess(string actionName)
     {

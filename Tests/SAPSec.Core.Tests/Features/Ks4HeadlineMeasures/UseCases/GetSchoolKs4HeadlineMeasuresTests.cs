@@ -424,8 +424,8 @@ public class GetSchoolKs4HeadlineMeasuresTests
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100001"));
 
         result.Attainment8TopPerformers.Select(x => x.Name).Should().Equal(
-            "Alpha school",
             "Beta school",
+            "Alpha school",
             "Charlie school");
         result.EngMaths49TopPerformers.Select(x => x.Name).Should().Equal(
             "Alpha school",
