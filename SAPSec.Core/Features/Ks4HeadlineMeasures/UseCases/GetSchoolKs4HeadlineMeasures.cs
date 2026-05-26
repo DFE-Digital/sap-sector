@@ -3,6 +3,7 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
@@ -16,8 +17,12 @@ public class GetSchoolKs4HeadlineMeasures(
     public async Task<GetSchoolKs4HeadlineMeasuresResponse> Execute(GetSchoolKs4HeadlineMeasuresRequest request)
     {
         var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
-        var schoolResponse = BuildSchoolResponse(
-            schoolDetails,
+        var performance = await performanceRepository.GetByUrnAsync(request.Urn);
+        var dest = await destinationsRepository.GetByUrnAsync(request.Urn);
+
+        var schoolData = new SchoolData(
+            request.Urn,
+            schoolDetails.Name,
             await performanceRepository.GetByUrnAsync(request.Urn),
             await destinationsRepository.GetByUrnAsync(request.Urn));
 
@@ -28,184 +33,83 @@ public class GetSchoolKs4HeadlineMeasures(
         var similarSchoolDestinationsData = ((await destinationsRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
+                ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
 
         var similarSchools = similarSchoolUrns
             .Where(similarSchoolDetails.ContainsKey)
-            .Select(urn => new SimilarSchoolMeasure(
+            .Select(urn => new SchoolData(
                 urn,
                 similarSchoolDetails[urn].EstablishmentName,
                 similarSchoolPerformanceData.GetValueOrDefault(urn),
                 similarSchoolDestinationsData.GetValueOrDefault(urn)))
             .ToArray();
 
-        var attainment8 = new Measure(
-            "attainment8",
-            BuildComparisonAverage(
-                schoolResponse.Attainment8ThreeYearAverage,
-                similarSchools.Select(x => MeasureValue(
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num))),
-            BuildTopPerformers(
-                schoolResponse.SchoolDetails,
-                schoolResponse.Attainment8ThreeYearAverage.SchoolValue,
-                similarSchools,
-                x => MeasureValue(
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num),
-                displayDecimalPlaces: 1),
-            BuildComparisonYearByYear(
-                schoolResponse.Attainment8YearByYear,
-                similarSchools.Select(x => SeriesFrom(
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num)))
-            );
-
         var filterBy = request.FilterBy ?? new Dictionary<string, string>();
+
+        var attainment8 = Measure.Build(
+            "attainment8",
+            MeasureDataType.Number,
+            [],
+            schoolData,
+            similarSchools,
+            new(
+                x => x?.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
+                x => x?.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
+                x => x?.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num,
+                x => x?.PerformanceData?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num,
+                x => x?.PerformanceData?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num,
+                x => x?.PerformanceData?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num,
+                x => x?.PerformanceData?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num,
+                x => x?.PerformanceData?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num,
+                x => x?.PerformanceData?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
+
         var engMathsGrade = filterBy.ContainsKey("eng-maths:grade") ? filterBy["eng-maths:grade"] : "4";
-        var destinationType = filterBy.ContainsKey("destinations:destination") ? filterBy["destinations:destination"] : "all";
 
-        var engMaths = engMathsGrade switch
-        {
-            "5" => new Measure(
-                "eng-maths",
-                BuildComparisonAverage(
-                    schoolResponse.EngMaths59ThreeYearAverage,
-                    similarSchools.Select(x => MeasureValue(
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct))),
-                BuildTopPerformers(
-                    schoolResponse.SchoolDetails,
-                    schoolResponse.EngMaths59ThreeYearAverage.SchoolValue,
-                    similarSchools,
-                    x => MeasureValue(
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct),
-                    displayDecimalPlaces: 0),
-                BuildComparisonYearByYear(
-                    schoolResponse.EngMaths59YearByYear,
-                    similarSchools.Select(x => SeriesFrom(
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct)))),
-            _ => new Measure(
-                "eng-maths",
-                BuildComparisonAverage(
-                    schoolResponse.EngMaths49ThreeYearAverage,
-                    similarSchools.Select(x => MeasureValue(
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct))),
-                BuildTopPerformers(
-                    schoolResponse.SchoolDetails,
-                    schoolResponse.EngMaths49ThreeYearAverage.SchoolValue,
-                    similarSchools,
-                    x => MeasureValue(
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct),
-                    displayDecimalPlaces: 0),
-                BuildComparisonYearByYear(
-                    schoolResponse.EngMaths49YearByYear,
-                    similarSchools.Select(x => SeriesFrom(
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
-                        x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct))))
-        };
-
-        var destinations = destinationType switch
-        {
-            "education" => new Measure(
-                "destinations",
-                BuildComparisonAverage(
-                    schoolResponse.DestinationsEducationThreeYearAverage,
-                    similarSchools.Select(x => MeasureValue(
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct))),
-                BuildTopPerformers(
-                    schoolResponse.SchoolDetails,
-                    schoolResponse.DestinationsEducationThreeYearAverage.SchoolValue,
-                    similarSchools,
-                    x => MeasureValue(
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct),
-                    displayDecimalPlaces: 0),
-                BuildComparisonYearByYear(
-                    schoolResponse.DestinationsEducationYearByYear,
-                    similarSchools.Select(x => SeriesFrom(
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct)))),
-            "employment" => new Measure(
-                "destinations",
-                BuildComparisonAverage(
-                    schoolResponse.DestinationsEmploymentThreeYearAverage,
-                    similarSchools.Select(x => MeasureValue(
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct))),
-                BuildTopPerformers(
-                    schoolResponse.SchoolDetails,
-                    schoolResponse.DestinationsEmploymentThreeYearAverage.SchoolValue,
-                    similarSchools,
-                    x => MeasureValue(
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct),
-                    displayDecimalPlaces: 0),
-                BuildComparisonYearByYear(
-                    schoolResponse.DestinationsEmploymentYearByYear,
-                    similarSchools.Select(x => SeriesFrom(
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct)))),
-            _ => new Measure(
-                "destinations",
-                BuildComparisonAverage(
-                    schoolResponse.DestinationsThreeYearAverage,
-                    similarSchools.Select(x => MeasureValue(
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct))),
-                BuildTopPerformers(
-                    schoolResponse.SchoolDetails,
-                    schoolResponse.DestinationsThreeYearAverage.SchoolValue,
-                    similarSchools,
-                    x => MeasureValue(
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct),
-                    displayDecimalPlaces: 0),
-                BuildComparisonYearByYear(
-                    schoolResponse.DestinationsYearByYear,
-                    similarSchools.Select(x => SeriesFrom(
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
-                        x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct))))
-        };
-
-
-        return new(
-            schoolResponse.SchoolDetails,
-            similarSchools.Length,
+        var engMaths = Measure.Build(
+            "eng-maths",
+            MeasureDataType.Percentage,
             [
-                new Ks4HeadlineMeasuresAvailableFilter(
+                new MeasureAvailableFilter(
                     "eng-maths:grade",
                     "Grade", [
                         new FilterOption("4", "Grade 4 and above", 0, engMathsGrade == "4"),
                         new FilterOption("5", "Grade 5 and above", 0, engMathsGrade == "5")
                     ]),
+            ],
+            schoolData,
+            similarSchools,
+            engMathsGrade switch
+            {
+                "5" => new(
+                    x => x?.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
+                    x => x?.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
+                    x => x?.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct,
+                    x => x?.PerformanceData?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct,
+                    x => x?.PerformanceData?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct,
+                    x => x?.PerformanceData?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct,
+                    x => x?.PerformanceData?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct,
+                    x => x?.PerformanceData?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct,
+                    x => x?.PerformanceData?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct),
+                _ => new(
+                    x => x?.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
+                    x => x?.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
+                    x => x?.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct,
+                    x => x?.PerformanceData?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct,
+                    x => x?.PerformanceData?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct,
+                    x => x?.PerformanceData?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct,
+                    x => x?.PerformanceData?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct,
+                    x => x?.PerformanceData?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct,
+                    x => x?.PerformanceData?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct)
+            });
 
-                new Ks4HeadlineMeasuresAvailableFilter(
+        var destinationType = filterBy.ContainsKey("destinations:destination") ? filterBy["destinations:destination"] : "all";
+        var destinations = Measure.Build(
+            "destinations",
+            MeasureDataType.Percentage,
+            [
+                new MeasureAvailableFilter(
                     "destinations:destination",
                     "Destination", [
                         new FilterOption("all", "All destinations", 0, destinationType == "all"),
@@ -213,277 +117,58 @@ public class GetSchoolKs4HeadlineMeasures(
                         new FilterOption("employment", "Employment and apprenticeships", 0, engMathsGrade == "employment")
                     ])
             ],
-            [attainment8, engMaths, destinations]);
-    }
-
-    private static GetKs4HeadlineMeasuresResponse BuildSchoolResponse(
-        SchoolDetails schoolDetails,
-        Ks4PerformanceData? performance,
-        Ks4DestinationsData? destinations) =>
-        new(
-            schoolDetails,
-            Ks4HeadlineMeasuresCalculator.BuildAverage(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num)),
-            Ks4HeadlineMeasuresCalculator.BuildYearByYear(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Current_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.Attainment8_Tot_LA_Previous2_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.Attainment8_Tot_Eng_Current_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.Attainment8_Tot_Eng_Previous_Num),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num)),
-            Ks4HeadlineMeasuresCalculator.BuildAverage(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildYearByYear(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths49_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths49_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths49_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildAverage(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildYearByYear(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.LocalAuthorityPerformance?.EngMaths59_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths59_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(performance?.EnglandPerformance?.EngMaths59_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildAverage(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.AllDest_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.AllDest_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.AllDest_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.AllDest_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildYearByYear(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.AllDest_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.AllDest_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.AllDest_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.AllDest_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildAverage(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Education_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Education_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Education_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Education_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Education_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Education_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildYearByYear(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Education_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Education_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Education_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Education_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Education_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Education_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildAverage(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Employment_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Employment_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Employment_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Employment_Tot_Eng_Previous2_Pct)),
-            Ks4HeadlineMeasuresCalculator.BuildYearByYear(
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Employment_Tot_LA_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous2_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Employment_Tot_Eng_Current_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Employment_Tot_Eng_Previous_Pct),
-                Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(destinations?.EnglandDestinations?.Employment_Tot_Eng_Previous2_Pct)));
-
-    private static SchoolKs4ComparisonAverage BuildComparisonAverage(
-        Ks4HeadlineMeasureAverage current,
-        IEnumerable<decimal?> similarSchoolValues) =>
-        new(
-            current.SchoolValue,
-            Average(similarSchoolValues),
-            current.LocalAuthorityValue,
-            current.EnglandValue);
-
-    private static SchoolKs4ComparisonYearByYear BuildComparisonYearByYear(
-        Ks4HeadlineMeasureYearByYear current,
-        IEnumerable<Ks4HeadlineMeasureSeries> similarSchoolSeries)
-    {
-        var similarSeries = similarSchoolSeries.ToArray();
+            schoolData,
+            similarSchools,
+            destinationType switch
+            {
+                "education" => new(
+                    x => x?.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
+                    x => x?.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
+                    x => x?.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.Education_Tot_LA_Current_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.Education_Tot_LA_Previous_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.Education_Tot_LA_Previous2_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.Education_Tot_Eng_Current_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.Education_Tot_Eng_Previous_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.Education_Tot_Eng_Previous2_Pct),
+                "employment" => new(
+                    x => x?.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
+                    x => x?.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
+                    x => x?.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.Employment_Tot_LA_Current_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.Employment_Tot_LA_Previous2_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.Employment_Tot_Eng_Current_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.Employment_Tot_Eng_Previous_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.Employment_Tot_Eng_Previous2_Pct),
+                _ => new(
+                    x => x?.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
+                    x => x?.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
+                    x => x?.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.AllDest_Tot_LA_Current_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous_Pct,
+                    x => x?.DestinationsData?.LocalAuthorityDestinations?.AllDest_Tot_LA_Previous2_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.AllDest_Tot_Eng_Current_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.AllDest_Tot_Eng_Previous_Pct,
+                    x => x?.DestinationsData?.EnglandDestinations?.AllDest_Tot_Eng_Previous2_Pct)
+            });
 
         return new(
-            current.School,
-            new Ks4HeadlineMeasureSeries(
-                Average(similarSeries.Select(x => x.Current)),
-                Average(similarSeries.Select(x => x.Previous)),
-                Average(similarSeries.Select(x => x.Previous2))),
-            current.LocalAuthority,
-            current.England);
+            schoolDetails,
+            similarSchools.Length,
+            attainment8,
+            engMaths,
+            destinations);
     }
-
-    private static decimal? MeasureValue(string? current, string? previous, string? previous2) =>
-        Ks4HeadlineMeasuresCalculator.Average(
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(current),
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous),
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous2));
-
-    private static Ks4HeadlineMeasureSeries SeriesFrom(string? current, string? previous, string? previous2) =>
-        new(
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(current),
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous),
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous2));
-
-    private static decimal? Average(IEnumerable<decimal?> values)
-    {
-        var availableValues = values
-            .Where(v => v.HasValue)
-            .Select(v => v!.Value)
-            .ToList();
-
-        return availableValues.Count == 0
-            ? null
-            : Math.Round(availableValues.Average(), 1, MidpointRounding.AwayFromZero);
-    }
-
-    private static IReadOnlyList<Ks4TopPerformer> BuildTopPerformers(
-        SchoolDetails currentSchool,
-        decimal? currentSchoolValue,
-        IEnumerable<SimilarSchoolMeasure> similarSchoolResponses,
-        Func<SimilarSchoolMeasure, decimal?> selector,
-        int displayDecimalPlaces)
-    {
-        var currentSchoolCandidate = new TopPerformerCandidate(
-            currentSchool.Urn,
-            currentSchool.Name,
-            currentSchoolValue,
-            IsCurrentSchool: true);
-
-        return similarSchoolResponses
-            .Select(response => new TopPerformerCandidate(
-                response.Urn,
-                response.Name,
-                selector(response),
-                IsCurrentSchool: false))
-            .Append(currentSchoolCandidate)
-            .Where(x => x.Value.HasValue)
-            .GroupBy(x => x.Urn, StringComparer.Ordinal)
-            .Select(x => x.OrderByDescending(candidate => candidate.IsCurrentSchool).First())
-            .OrderByDescending(x => TopPerformerSortValue(x.Value, displayDecimalPlaces))
-            .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
-            .Take(3)
-            .Select((x, index) => new Ks4TopPerformer(index + 1, x.Urn, x.Name, x.Value, x.IsCurrentSchool))
-            .ToList()
-            .AsReadOnly();
-    }
-
-    private static decimal TopPerformerSortValue(decimal? value, int decimalPlaces) =>
-        Math.Round(value!.Value, decimalPlaces, MidpointRounding.AwayFromZero);
-
-    private sealed record TopPerformerCandidate(
-        string Urn,
-        string Name,
-        decimal? Value,
-        bool IsCurrentSchool);
 }
 
 public record GetSchoolKs4HeadlineMeasuresRequest(
     string Urn,
     IDictionary<string, string>? FilterBy = null);
 
-public record SchoolKs4ComparisonAverage(
-    decimal? SchoolValue,
-    decimal? SimilarSchoolsValue,
-    decimal? LocalAuthorityValue,
-    decimal? EnglandValue);
-
-public record Ks4TopPerformer(
-    int Rank,
-    string Urn,
-    string Name,
-    decimal? Value,
-    bool IsCurrentSchool = false);
-
-public record SchoolKs4ComparisonYearByYear(
-    Ks4HeadlineMeasureSeries School,
-    Ks4HeadlineMeasureSeries SimilarSchools,
-    Ks4HeadlineMeasureSeries LocalAuthority,
-    Ks4HeadlineMeasureSeries England);
-
-public enum SchoolKs4DestinationFilter
-{
-    All,
-    Education,
-    Employment
-}
-
-public enum SchoolKs4GradeFilter
-{
-    Grade4,
-    Grade5
-}
-
-public record Measure(
-    string Key,
-    SchoolKs4ComparisonAverage ThreeYearAverage,
-    IReadOnlyList<Ks4TopPerformer> TopPerformers,
-    SchoolKs4ComparisonYearByYear YearByYear);
-
-public record Ks4HeadlineMeasuresAvailableFilter(
-    string Key,
-    string Name,
-    IReadOnlyCollection<FilterOption> Options);
-
 public record GetSchoolKs4HeadlineMeasuresResponse(
     SchoolDetails SchoolDetails,
     int SimilarSchoolsCount,
-    IReadOnlyCollection<Ks4HeadlineMeasuresAvailableFilter> FilterOptions,
-    IReadOnlyList<Measure> Measures);
-
-internal sealed record SimilarSchoolMeasure(string Urn, string Name, Ks4PerformanceData? PerformanceData, Ks4DestinationsData? DestinationsData);
+    Measure Attainment8,
+    Measure EnglishAndMaths,
+    Measure Destinations);

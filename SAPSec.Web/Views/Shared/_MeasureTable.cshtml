@@ -2,15 +2,15 @@
 @using System.Text.Json
 @using SAPSec.Web.ViewModels
 
-@model Measure2ViewModel
+@model MeasureViewModel
 
 @{
     var rows = new[]
     {
-        (Key: "this", Label: Model.SchoolLabel, Series: Model.Subject.SchoolYearByYear, Display: Model.Subject.SchoolDisplay),
-        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.Subject.SimilarSchoolsYearByYear, Display: Model.Subject.SimilarSchoolsDisplay),
-        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.Subject.LocalAuthorityYearByYear, Display: Model.Subject.LocalAuthorityDisplay),
-        (Key: "england", Label: Model.EnglandLabel, Series: Model.Subject.EnglandYearByYear, Display: Model.Subject.EnglandDisplay)
+        (Key: "this", Label: Model.SchoolName, Series: Model.SchoolYearByYear, Display: Model.SchoolDisplay),
+        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.SimilarSchoolsYearByYear, Display: Model.SimilarSchoolsDisplay),
+        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.LocalAuthorityYearByYear, Display: Model.LocalAuthorityDisplay),
+        (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandYearByYear, Display: Model.EnglandDisplay)
     };
 
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;

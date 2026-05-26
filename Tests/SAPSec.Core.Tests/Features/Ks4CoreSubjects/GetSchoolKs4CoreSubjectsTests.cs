@@ -52,7 +52,7 @@ public class GetSchoolKs4CoreSubjectsTests
             }));
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.EnglishLanguage;
 
         result.SimilarSchoolsCount.Should().Be(2);
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(51m, 59m, 60m, 61m));
@@ -90,7 +90,7 @@ public class GetSchoolKs4CoreSubjectsTests
             }));
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.EnglishLanguage;
 
         subject.TopPerformers.Select(x => (x.Rank, x.Name, x.Value)).Should().ContainInOrder(
             (1, "Alpha school", 61m as decimal?),
@@ -131,7 +131,7 @@ public class GetSchoolKs4CoreSubjectsTests
             }));
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.EnglishLanguage;
 
         subject.TopPerformers.Select(x => x.Name).Should().Equal(
             "Alpha school",
@@ -179,7 +179,7 @@ public class GetSchoolKs4CoreSubjectsTests
             ]);
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.EnglishLanguage;
 
         result.SimilarSchoolsCount.Should().Be(3);
         subject.TopPerformers.Select(x => x.Urn).Should().Equal("200001", "200002", "100001");
@@ -217,7 +217,7 @@ public class GetSchoolKs4CoreSubjectsTests
             }));
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLanguage, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.EnglishLanguage;
 
         subject.TopPerformers.Should().ContainSingle(x => x.Urn == "100001" && x.IsCurrentSchool);
         subject.TopPerformers.Select(x => x.Urn).Should().Equal("100001", "200001", "200002");
@@ -262,7 +262,7 @@ public class GetSchoolKs4CoreSubjectsTests
             }));
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.EnglishLiterature, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.EnglishLanguage;
 
         subject.YearByYear.Should().BeEquivalentTo(new SchoolKs4ComparisonYearByYear(
             new Ks4HeadlineMeasureSeries(54m, 53m, 52m),
@@ -310,7 +310,7 @@ public class GetSchoolKs4CoreSubjectsTests
             }));
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.CombinedScienceDoubleAward;
 
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(47m, 63m, 56m, 57m));
     }
@@ -347,7 +347,7 @@ public class GetSchoolKs4CoreSubjectsTests
             }));
 
         var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade4);
+        var subject = result.CombinedScienceDoubleAward;
 
         subject.TopPerformers.Select(x => x.Name).Should().Equal(
             "Alpha school",
@@ -393,8 +393,8 @@ public class GetSchoolKs4CoreSubjectsTests
                 data.Bio59_Sum_Est_Previous2_Pct = "67";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Biology, SchoolKs4CoreSubjectGradeFilter.Grade5);
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001", new Dictionary<string, string> { ["bio:grade"] = "5" }));
+        var subject = result.Biology;
 
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(44m, 71m, 54m, 64m));
     }
@@ -437,8 +437,8 @@ public class GetSchoolKs4CoreSubjectsTests
                 data.Chem59_Sum_Est_Previous2_Pct = "60";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Chemistry, SchoolKs4CoreSubjectGradeFilter.Grade5);
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001", new Dictionary<string, string> { ["chem:grade"] = "5" }));
+        var subject = result.Chemistry;
 
         subject.YearByYear.Should().BeEquivalentTo(new SchoolKs4ComparisonYearByYear(
             new Ks4HeadlineMeasureSeries(46m, 45m, 44m),
@@ -478,8 +478,8 @@ public class GetSchoolKs4CoreSubjectsTests
                 data.Physics79_Sum_Est_Previous2_Pct = "72";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Physics, SchoolKs4CoreSubjectGradeFilter.Grade7);
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001", new Dictionary<string, string> { ["phys:grade"] = "7" }));
+        var subject = result.Physics;
 
         subject.TopPerformers.Select(x => (x.Rank, x.Name, x.Value)).Should().ContainInOrder(
             (1, "Alpha school", 85m as decimal?),
@@ -525,8 +525,8 @@ public class GetSchoolKs4CoreSubjectsTests
                 data.Maths79_Sum_Est_Previous2_Pct = "81";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.Maths, SchoolKs4CoreSubjectGradeFilter.Grade7);
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001", new Dictionary<string, string> { ["maths:grade"] = "7" }));
+        var subject = result.Mathematics;
 
         subject.ThreeYearAverage.Should().BeEquivalentTo(new SchoolKs4ComparisonAverage(76m, 85m, 86m, 96m));
     }
@@ -569,8 +569,8 @@ public class GetSchoolKs4CoreSubjectsTests
                 data.CombSci79_Sum_Est_Previous2_Pct = "82";
             }));
 
-        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001"));
-        var subject = SchoolKs4CoreSubjectSelection.From(result, SchoolKs4CoreSubject.CombinedScienceDoubleAward, SchoolKs4CoreSubjectGradeFilter.Grade7);
+        var result = await context.Sut.Execute(new GetSchoolKs4CoreSubjectsRequest("100001", new Dictionary<string, string> { ["comb-sci:grade"] = "7" }));
+        var subject = result.CombinedScienceDoubleAward;
 
         subject.YearByYear.Should().BeEquivalentTo(new SchoolKs4ComparisonYearByYear(
             new Ks4HeadlineMeasureSeries(78m, 77m, 76m),

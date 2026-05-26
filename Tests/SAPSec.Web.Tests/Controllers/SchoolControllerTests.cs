@@ -59,17 +59,17 @@ public class SchoolControllerTests
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
-        var getFilteredSchoolKs4CoreSubject = new GetFilteredSchoolKs4CoreSubject(
-            _ks4PerformanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
+        //var getFilteredSchoolKs4CoreSubject = new GetFilteredSchoolKs4CoreSubject(
+        //    _ks4PerformanceRepositoryMock.Object,
+        //    _schoolDetailsServiceMock.Object,
+        //    _establishmentRepositoryMock.Object,
+        //    _similarSchoolsRepositoryMock.Object);
 
         _sut = new SchoolController(
             _schoolDetailsServiceMock.Object,
             getSchoolKs4HeadlineMeasures,
             getSchoolKs4CoreSubjects,
-            getFilteredSchoolKs4CoreSubject,
+            //getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,
             _loggerMock.Object);
     }
@@ -201,55 +201,55 @@ public class SchoolControllerTests
         viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel>();
     }
 
-    [Fact]
-    public async Task Ks4CoreSubjectsData_ValidUrn_ReturnsPayload()
-    {
-        var urn = "123456";
-        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
+    //[Fact]
+    //public async Task Ks4CoreSubjectsData_ValidUrn_ReturnsPayload()
+    //{
+    //    var urn = "123456";
+    //    var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(schoolDetails);
-        _similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
-            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
+    //    _schoolDetailsServiceMock
+    //        .Setup(x => x.GetByUrnAsync(urn))
+    //        .ReturnsAsync(schoolDetails);
+    //    _similarSchoolsRepositoryMock
+    //        .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+    //        .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
-        _ks4PerformanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4PerformanceData(
-                urn,
-                new EstablishmentPerformance
-                {
-                    EngLang49_Sum_Est_Current_Pct = "52",
-                    EngLang49_Sum_Est_Previous_Pct = "51",
-                    EngLang49_Sum_Est_Previous2_Pct = "50"
-                },
-                new LAPerformance
-                {
-                    EngLang49_Tot_LA_Current_Pct = "60",
-                    EngLang49_Tot_LA_Previous_Pct = "59",
-                    EngLang49_Tot_LA_Previous2_Pct = "58"
-                },
-                new EnglandPerformance
-                {
-                    EngLang49_Tot_Eng_Current_Pct = "61",
-                    EngLang49_Tot_Eng_Previous_Pct = "60",
-                    EngLang49_Tot_Eng_Previous2_Pct = "59"
-                }));
+    //    _ks4PerformanceRepositoryMock
+    //        .Setup(x => x.GetByUrnAsync(urn))
+    //        .ReturnsAsync(new Ks4PerformanceData(
+    //            urn,
+    //            new EstablishmentPerformance
+    //            {
+    //                EngLang49_Sum_Est_Current_Pct = "52",
+    //                EngLang49_Sum_Est_Previous_Pct = "51",
+    //                EngLang49_Sum_Est_Previous2_Pct = "50"
+    //            },
+    //            new LAPerformance
+    //            {
+    //                EngLang49_Tot_LA_Current_Pct = "60",
+    //                EngLang49_Tot_LA_Previous_Pct = "59",
+    //                EngLang49_Tot_LA_Previous2_Pct = "58"
+    //            },
+    //            new EnglandPerformance
+    //            {
+    //                EngLang49_Tot_Eng_Current_Pct = "61",
+    //                EngLang49_Tot_Eng_Previous_Pct = "60",
+    //                EngLang49_Tot_Eng_Previous2_Pct = "59"
+    //            }));
 
-        var result = await _sut.Ks4CoreSubjectsData(urn, "english-language", "4");
+    //    var result = await _sut.Ks4CoreSubjectsData(urn, "english-language", "4");
 
-        var json = result.Should().BeOfType<JsonResult>().Subject;
-        json.Value.Should().NotBeNull();
-    }
+    //    var json = result.Should().BeOfType<JsonResult>().Subject;
+    //    json.Value.Should().NotBeNull();
+    //}
 
-    [Fact]
-    public async Task Ks4CoreSubjectsData_InvalidFilter_ReturnsBadRequest()
-    {
-        var result = await _sut.Ks4CoreSubjectsData("123456", "unknown-subject", "4");
+    //[Fact]
+    //public async Task Ks4CoreSubjectsData_InvalidFilter_ReturnsBadRequest()
+    //{
+    //    var result = await _sut.Ks4CoreSubjectsData("123456", "unknown-subject", "4");
 
-        result.Should().BeOfType<BadRequestObjectResult>();
-    }
+    //    result.Should().BeOfType<BadRequestObjectResult>();
+    //}
 
     #endregion
 

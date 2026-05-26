@@ -27,37 +27,14 @@
 
     <partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
 
-    <tabbed-view html-prefix="stu-tabs">
-        <tab-content id="three-year-average" name="Three year average">
-            <p>Three year average</p>
-        </tab-content>
-
-        <tab-content id="year-by-year" name="Year by year">
-            <p>Year by year</p>
-        </tab-content>
-
-        <tab-content id="top-performers" name="Top performers">
-            <p>Top performers</p>
-        </tab-content>
-
-        <tab-content id="table-view" name="Table view">
-            <p>Table view</p>
-        </tab-content>
-    </tabbed-view>
-
     <section aria-labelledby="attainment8-2-heading" class="app-ks4-attainment">
         <h2 class="govuk-heading-m" id="attainment8-2-heading">Attainment 8</h2>
         <partial name="~/Views/Shared/_Ks4Attainment8Intro.cshtml" />
 
-        <partial name="_Measure2" model=@(new Measure2ViewModel { 
-            NumberDisplayType = NumberDisplayType.Number,
-            HtmlPrefix = "attainment8",
-            SchoolDetails = Model.SchoolDetails,
-            Subject = Model.Attainment8,
-        })/>
+        <partial name="_Measure" model=@Model.Attainment8 />
     </section>
 
-    <section aria-labelledby="eng-maths-2-heading" class="app-ks4-attainment">
+    <section aria-labelledby="eng-maths-2-heading" class="app-ks4-attainment govuk-!-margin-top-9">
         <h2 class="govuk-heading-m" id="eng-maths-2-heading">Grade achieved in English and maths GCSEs</h2>
 
         <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
@@ -76,15 +53,10 @@
             </div>
         </div>
 
-        <partial name="_Measure2" model=@(new Measure2ViewModel { 
-            NumberDisplayType = NumberDisplayType.Percentage,
-            HtmlPrefix = "eng-maths",
-            SchoolDetails = Model.SchoolDetails,
-            Subject = Model.EngMaths,
-        })/>
+        <partial name="_Measure" model=@Model.EnglishAndMaths />
     </section>
 
-    <section aria-labelledby="destinations-2-heading" class="app-ks4-attainment">
+    <section aria-labelledby="destinations-2-heading" class="app-ks4-attainment govuk-!-margin-top-9">
         <h2 class="govuk-heading-m" id="destinations-heading">Staying in education or entering employment</h2>
 
         <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
@@ -118,12 +90,7 @@
             </div>
         </div>
 
-        <partial name="_Measure2" model=@(new Measure2ViewModel { 
-            NumberDisplayType = NumberDisplayType.Percentage,
-            HtmlPrefix = "destinations",
-            SchoolDetails = Model.SchoolDetails,
-            Subject = Model.Destinations,
-        })/>
+        <partial name="_Measure" model=@Model.Destinations />
     </section>
 </div>
 

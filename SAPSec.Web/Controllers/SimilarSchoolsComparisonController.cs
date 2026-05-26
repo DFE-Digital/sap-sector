@@ -17,7 +17,7 @@ public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
-    private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
+    private readonly GetSchoolKs4CoreSubjects2 _getSchoolKs4CoreSubjects;
     private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
@@ -27,7 +27,7 @@ public class SimilarSchoolsComparisonController : Controller
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetAttendanceMeasures getAttendanceMeasures,
-        GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
+        GetSchoolKs4CoreSubjects2 getSchoolKs4CoreSubjects,
         GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetKs4HeadlineMeasures getKs4HeadlineMeasures,
         GetCharacteristicsComparison getCharacteristicsComparison,
@@ -660,8 +660,8 @@ public class SimilarSchoolsComparisonController : Controller
         };
 
     private static SimilarSchoolsComparisonViewModel.CoreSubjectSection BuildComparisonCoreSubjectSection(
-        GetSchoolKs4CoreSubjectsResponse thisSchoolResponse,
-        GetSchoolKs4CoreSubjectsResponse selectedSchoolResponse,
+        GetSchoolKs4CoreSubjectsResponse2 thisSchoolResponse,
+        GetSchoolKs4CoreSubjectsResponse2 selectedSchoolResponse,
         SchoolKs4CoreSubject subject)
     {
         var thisSchoolSelection = SchoolKs4CoreSubjectSelection.From(

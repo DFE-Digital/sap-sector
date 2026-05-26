@@ -1,12 +1,13 @@
 ﻿@using SAPSec.Web.Constants
 @using System.Text.Json
 @using SAPSec.Web.ViewModels
+@using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases
 
-@model Measure2ViewModel
+@model MeasureViewModel
 
 @{
-    var barData = new decimal?[] { Model.Subject.SchoolThreeYearAverage, Model.Subject.SimilarSchoolsThreeYearAverage, Model.Subject.LocalAuthorityThreeYearAverage, Model.Subject.EnglandThreeYearAverage };
-    var labels = new[] { Model.SchoolLabel, Model.SimilarSchoolsLabel, Model.LocalAuthorityLabel, Model.EnglandLabel };
+    var barData = new decimal?[] { Model.SchoolThreeYearAverage, Model.SimilarSchoolsThreeYearAverage, Model.LocalAuthorityThreeYearAverage, Model.EnglandThreeYearAverage };
+    var labels = new[] { Model.SchoolName, Model.SimilarSchoolsLabel, Model.LocalAuthorityLabel, Model.EnglandLabel };
     bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
 }
 
@@ -17,13 +18,13 @@
                 class="js-chart js-chart--school-ks4-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
-                data-axis-step="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 25 : 30)"
-                data-axis-max="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 100 : 90)"
-                data-label-decimals="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 0 : 1)"
+                data-axis-step="@(Model.DataType == MeasureDataType.Percentage? 25 : 30)"
+                data-axis-max="@(Model.DataType == MeasureDataType.Percentage? 100 : 90)"
+                data-label-decimals="@(Model.DataType == MeasureDataType.Percentage? 0 : 1)"
                 data-bar-thickness="50"
                 data-category-percentage="0.6"
                 data-bar-percentage="1"
-                data-axis-suffix="@(Model.NumberDisplayType == NumberDisplayType.Percentage? "%" : "")"
+                data-axis-suffix="@(Model.DataType == MeasureDataType.Percentage? "%" : "")"
                 data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = barData }))'>
         </canvas>
     }

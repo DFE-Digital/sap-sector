@@ -1,123 +1,25 @@
 ﻿@using SAPSec.Web.Constants
 @using System.Text.Json
+@using SAPSec.Web.ViewModels
 
-@model SAPSec.Web.ViewModels.MeasureViewModel
+@model MeasureViewModel
 
-@{
-    var rows = new[]
-    {
-        (Key: "this", Label: Model.SchoolLabel, Series: Model.Subject.SchoolYearByYear, Display: Model.Subject.SchoolDisplay),
-        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.Subject.SimilarSchoolsYearByYear, Display: Model.Subject.SimilarSchoolsDisplay),
-        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.Subject.LocalAuthorityYearByYear, Display: Model.Subject.LocalAuthorityDisplay),
-        (Key: "england", Label: Model.EnglandLabel, Series: Model.Subject.EnglandYearByYear, Display: Model.Subject.EnglandDisplay)
-    };
+<div id="@Model.HtmlPrefix">
+    <tabbed-view html-prefix="@Model.HtmlPrefix">
+        <tab-content id="three-year-average" name="3-year average">
+            <partial name="_MeasureThreeYearAverageChart" model="@Model" />
+        </tab-content>
 
-    var barData = new decimal?[] { Model.Subject.SchoolThreeYearAverage, Model.Subject.SimilarSchoolsThreeYearAverage, Model.Subject.LocalAuthorityThreeYearAverage, Model.Subject.EnglandThreeYearAverage };
-    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
-    var labels = new[] { Model.SchoolLabel, Model.SimilarSchoolsLabel, Model.LocalAuthorityLabel, Model.EnglandLabel };
-    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
-}
+        <tab-content id="year-by-year" name="Year by year">
+            <partial name="_MeasureYearByYearChart" model="@Model" />
+        </tab-content>
 
-<section aria-labelledby="@Model.HtmlPrefix-heading" class="app-ks4-attainment govuk-!-margin-top-9">
-    <h2 class="govuk-heading-m" id="@Model.HtmlPrefix-heading">@Model.Title</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-!-font-weight-bold" for="@Model.HtmlPrefix-grade">Grade</label>
-            <select class="govuk-select"
-                    id="@Model.HtmlPrefix-grade"
-                    name="@Model.HtmlPrefix-grade"
-                    data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = Model.Key })"
-                    data-query-key="grade"
-                    data-bar-chart-id="@Model.HtmlPrefix-school-chart"
-                    data-line-chart-id="@Model.HtmlPrefix-school-yearbyyear-chart"
-                    data-cell-attribute="data-@Model.HtmlPrefix-cell"
-                    data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
-                    data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
-                    data-top-performers-table-id="@Model.HtmlPrefix-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
-                @foreach (var (option, i) in Model.GradeOptions.Select((o, i) => (o, i)))
-                {
-                    <option value="@option.Key" selected=@(i == 0)>@option.Name</option>
-                }
-            </select>
-        </div>
-    </div>
+        <tab-content id="table-view" name="Table">
+            <partial name="_MeasureTable" model="@Model" />
+        </tab-content>
 
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
-        <ul class="govuk-tabs__list">
-            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#@Model.HtmlPrefix-three-year-average">3-year average</a></li>
-            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#@Model.HtmlPrefix-year-by-year">Year by year</a></li>
-            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#@Model.HtmlPrefix-table-view">Table</a></li>
-            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#@Model.HtmlPrefix-top-performers">Top performers</a></li>
-        </ul>
-        <div class="govuk-tabs__panel" id="@Model.HtmlPrefix-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                @{
-                }
-                @if (HasAnyData(barData))
-                {
-                    <canvas id="@Model.HtmlPrefix-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = barData }))'></canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
-            </div>
-        </div>
-        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="@Model.HtmlPrefix-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="@Model.HtmlPrefix-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Subject.SchoolYearByYear.Previous2, Model.Subject.SchoolYearByYear.Previous, Model.Subject.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Subject.SimilarSchoolsYearByYear.Previous2, Model.Subject.SimilarSchoolsYearByYear.Previous, Model.Subject.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Subject.LocalAuthorityYearByYear.Previous2, Model.Subject.LocalAuthorityYearByYear.Previous, Model.Subject.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Subject.EnglandYearByYear.Previous2, Model.Subject.EnglandYearByYear.Previous, Model.Subject.EnglandYearByYear.Current } } } }))'></canvas>
-            </div>
-        </div>
-        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="@Model.HtmlPrefix-top-performers">
-            <p class="govuk-body">These are the top performing schools for this measure.</p>
-            <table class="govuk-table" id="@Model.HtmlPrefix-top-performers-table">
-                <thead class="govuk-table__head">
-                    <tr class="govuk-table__row">
-                        <th scope="col" class="govuk-table__header">Rank</th>
-                        <th scope="col" class="govuk-table__header">School</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
-                    </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                    @foreach (var row in Model.Subject.TopPerformers)
-                    {
-                        <tr class="govuk-table__row" data-top-performer-row="@Model.HtmlPrefix">
-                            <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
-                            <th scope="row" class="govuk-table__header" data-top-performer-name>
-                                @if (row.IsCurrentSchool)
-                                {
-                                    @row.Name
-                                }
-                                else
-                                {
-                                    <a href="@Routes.SimilarSchoolComparison(Model.SchoolDetails.Urn, row.Urn)" class="govuk-link">@row.Name</a>
-                                }
-                            </th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@Routes.SimilarSchools(Model.SchoolDetails.Urn)" class="govuk-link">See all similar schools</a></p>
-        </div>
-        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="@Model.HtmlPrefix-table-view">
-            <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th></tr></thead>
-                <tbody class="govuk-table__body">
-                    @foreach (var row in rows)
-                    {
-                        <tr class="govuk-table__row">
-                            <th scope="row" class="govuk-table__header">@row.Label</th>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-avg")">@row.Display</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </div>
-</section>
+        <tab-content id="top-performers" name="Top performers">
+            <partial name="_MeasureTopPerformers" model="@Model" />
+        </tab-content>
+    </tabbed-view>
+</div>

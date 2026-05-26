@@ -46,7 +46,7 @@ public class SimilarSchoolsComparisonControllerTests
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object,
             schoolDetailsService);
-        var ks4CoreSubjectsUseCase = new GetSchoolKs4CoreSubjects(
+        var ks4CoreSubjectsUseCase = new GetSchoolKs4CoreSubjects2(
             _ks4PerformanceRepositoryMock.Object,
             schoolDetailsService,
             _establishmentRepositoryMock.Object,

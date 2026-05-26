@@ -36,9 +36,9 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required SchoolDetails SchoolDetails { get; set; }
     public required int SimilarSchoolsCount { get; set; }
 
-    public required SubjectSection Attainment8 { get; set; }
-    public required SubjectSection EngMaths { get; set; }
-    public required SubjectSection Destinations { get; set; }
+    public required MeasureViewModel Attainment8 { get; set; }
+    public required MeasureViewModel EnglishAndMaths { get; set; }
+    public required MeasureViewModel Destinations { get; set; }
 
     public string SchoolLabel => SchoolDetails.Name;
     public string SimilarSchoolsLabel => $"Similar schools average";

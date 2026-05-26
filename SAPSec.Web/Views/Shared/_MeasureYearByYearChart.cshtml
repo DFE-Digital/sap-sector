@@ -1,8 +1,9 @@
 ﻿@using SAPSec.Web.Constants
 @using System.Text.Json
 @using SAPSec.Web.ViewModels
+@using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases
 
-@model Measure2ViewModel
+@model MeasureViewModel
 
 @{
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
@@ -13,13 +14,49 @@
             class="js-chart js-chart--school-ks4-line"
             data-type="line"
             data-axis-min="0"
-            data-axis-step="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 25 : 30)"
-            data-axis-max="@(Model.NumberDisplayType == NumberDisplayType.Percentage? 100 : 90)"
+            data-axis-step="@(Model.DataType == MeasureDataType.Percentage? 25 : 30)"
+            data-axis-max="@(Model.DataType == MeasureDataType.Percentage? 100 : 90)"
             data-axis-auto-skip="false"
-            data-axis-suffix="@(Model.NumberDisplayType == NumberDisplayType.Percentage? "%" : "")"
+            data-axis-suffix="@(Model.DataType == MeasureDataType.Percentage? "%" : "")"
             data-show-x-grid="true"
             data-show-legend="true"
             data-show-datalabels="false"
-            data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Subject.SchoolYearByYear.Previous2, Model.Subject.SchoolYearByYear.Previous, Model.Subject.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Subject.SimilarSchoolsYearByYear.Previous2, Model.Subject.SimilarSchoolsYearByYear.Previous, Model.Subject.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Subject.LocalAuthorityYearByYear.Previous2, Model.Subject.LocalAuthorityYearByYear.Previous, Model.Subject.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Subject.EnglandYearByYear.Previous2, Model.Subject.EnglandYearByYear.Previous, Model.Subject.EnglandYearByYear.Current } } } }))'>
+            data-chart='@Html.Raw(JsonSerializer.Serialize(
+                new { 
+                    labels = ks4YearLabels, 
+                    datasets = new object[] { 
+                        new { 
+                            label = Model.SchoolName, 
+                            data = new decimal?[] { 
+                                Model.SchoolYearByYear.Previous2, 
+                                Model.SchoolYearByYear.Previous, 
+                                Model.SchoolYearByYear.Current 
+                            } 
+                        }, 
+                        new { 
+                            label = Model.SimilarSchoolsLabel, 
+                            data = new decimal?[] { 
+                                Model.SimilarSchoolsYearByYear.Previous2, 
+                                Model.SimilarSchoolsYearByYear.Previous, 
+                                Model.SimilarSchoolsYearByYear.Current 
+                            } 
+                        }, 
+                        new { 
+                            label = Model.LocalAuthorityLabel, 
+                            data = new decimal?[] { 
+                                Model.LocalAuthorityYearByYear.Previous2, 
+                                Model.LocalAuthorityYearByYear.Previous, 
+                                Model.LocalAuthorityYearByYear.Current 
+                            } 
+                        }, new { 
+                            label = Model.EnglandLabel, 
+                            data = new decimal?[] { 
+                                Model.EnglandYearByYear.Previous2, 
+                                Model.EnglandYearByYear.Previous, 
+                                Model.EnglandYearByYear.Current 
+                            } 
+                        } 
+                    } 
+                }))'>
     </canvas>
 </div>
