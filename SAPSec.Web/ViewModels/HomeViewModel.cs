@@ -3,4 +3,5 @@ namespace SAPSec.Web.ViewModels;
 public class HomeViewModel
 {
     public string? StartNowUri { get; set; }
+    public bool HomePagePilotContentEnabled { get; set; }
 }

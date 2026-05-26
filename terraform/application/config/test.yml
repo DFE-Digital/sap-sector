@@ -1,2 +1,3 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Test"
+FeatureManagement__HomePagePilotContent: "false"
