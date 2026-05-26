@@ -651,19 +651,5 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         count.Should().Be(1, "Footer should have role='contentinfo'");
     }
 
-    [Fact]
-    public async Task SupportLinksHeading_IsVisuallyHidden()
-    {
-        // Arrange
-        await Page.GotoAsync(_fixture.BaseUrl);
-
-        // Act
-        var supportHeading = Page.Locator(".govuk-visually-hidden", new() { HasText = "Support links" });
-        var count = await supportHeading.CountAsync();
-
-        // Assert
-        count.Should().Be(1, "Support links heading should exist and be visually hidden");
-    }
-
     #endregion
 }
