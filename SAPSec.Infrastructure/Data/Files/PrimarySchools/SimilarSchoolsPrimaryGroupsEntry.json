@@ -1,1 +1,3002 @@
-﻿[{"URN":"100747","NeighbourURN":"146327","Dist":"0.419806107","Rank":"1"},{"URN":"100747","NeighbourURN":"100749","Dist":"0.433289585","Rank":"2"},{"URN":"100747","NeighbourURN":"135264","Dist":"0.445947431","Rank":"3"},{"URN":"100747","NeighbourURN":"140935","Dist":"0.451896567","Rank":"4"},{"URN":"100747","NeighbourURN":"143101","Dist":"0.473938046","Rank":"5"},{"URN":"100747","NeighbourURN":"139016","Dist":"0.512846489","Rank":"6"},{"URN":"100747","NeighbourURN":"145106","Dist":"0.556021262","Rank":"7"},{"URN":"100747","NeighbourURN":"103080","Dist":"0.561567852","Rank":"8"},{"URN":"100747","NeighbourURN":"101193","Dist":"0.567276113","Rank":"9"},{"URN":"100747","NeighbourURN":"135296","Dist":"0.572849429","Rank":"10"},{"URN":"100747","NeighbourURN":"136413","Dist":"0.574686544","Rank":"11"},{"URN":"100747","NeighbourURN":"144142","Dist":"0.599569698","Rank":"12"},{"URN":"100747","NeighbourURN":"140204","Dist":"0.609304526","Rank":"13"},{"URN":"100747","NeighbourURN":"101230","Dist":"0.636561682","Rank":"14"},{"URN":"100747","NeighbourURN":"145140","Dist":"0.636809271","Rank":"15"},{"URN":"100747","NeighbourURN":"100590","Dist":"0.638227241","Rank":"16"},{"URN":"100747","NeighbourURN":"137010","Dist":"0.644378313","Rank":"17"},{"URN":"100747","NeighbourURN":"137487","Dist":"0.647560418","Rank":"18"},{"URN":"100747","NeighbourURN":"109567","Dist":"0.650528249","Rank":"19"},{"URN":"100747","NeighbourURN":"145063","Dist":"0.655131797","Rank":"20"},{"URN":"100747","NeighbourURN":"138073","Dist":"0.657929863","Rank":"21"},{"URN":"100747","NeighbourURN":"101206","Dist":"0.663295217","Rank":"22"},{"URN":"100747","NeighbourURN":"136952","Dist":"0.668061622","Rank":"23"},{"URN":"100747","NeighbourURN":"141165","Dist":"0.66936072","Rank":"24"},{"URN":"100747","NeighbourURN":"100171","Dist":"0.670801272","Rank":"25"},{"URN":"100747","NeighbourURN":"100602","Dist":"0.673014809","Rank":"26"},{"URN":"100747","NeighbourURN":"101222","Dist":"0.680354393","Rank":"27"},{"URN":"100747","NeighbourURN":"138690","Dist":"0.684880066","Rank":"28"},{"URN":"100747","NeighbourURN":"143090","Dist":"0.686663352","Rank":"29"},{"URN":"100747","NeighbourURN":"135600","Dist":"0.700667721","Rank":"30"},{"URN":"100747","NeighbourURN":"105403","Dist":"0.703410574","Rank":"31"},{"URN":"100747","NeighbourURN":"131752","Dist":"0.710650248","Rank":"32"},{"URN":"100747","NeighbourURN":"139796","Dist":"0.718774867","Rank":"33"},{"URN":"100747","NeighbourURN":"132089","Dist":"0.718975219","Rank":"34"},{"URN":"100747","NeighbourURN":"133996","Dist":"0.720540604","Rank":"35"},{"URN":"100747","NeighbourURN":"137770","Dist":"0.724700405","Rank":"36"},{"URN":"100747","NeighbourURN":"101993","Dist":"0.729658639","Rank":"37"},{"URN":"100747","NeighbourURN":"131246","Dist":"0.730653385","Rank":"38"},{"URN":"100747","NeighbourURN":"140962","Dist":"0.736799254","Rank":"39"},{"URN":"100747","NeighbourURN":"103081","Dist":"0.74161551","Rank":"40"},{"URN":"100747","NeighbourURN":"143592","Dist":"0.745489976","Rank":"41"},{"URN":"100747","NeighbourURN":"101898","Dist":"0.748570512","Rank":"42"},{"URN":"100747","NeighbourURN":"131184","Dist":"0.749007769","Rank":"43"},{"URN":"100747","NeighbourURN":"101226","Dist":"0.749228248","Rank":"44"},{"URN":"100747","NeighbourURN":"139815","Dist":"0.751052315","Rank":"45"},{"URN":"100747","NeighbourURN":"140326","Dist":"0.755446218","Rank":"46"},{"URN":"100747","NeighbourURN":"100891","Dist":"0.756454427","Rank":"47"},{"URN":"100747","NeighbourURN":"143384","Dist":"0.756750918","Rank":"48"},{"URN":"100747","NeighbourURN":"136013","Dist":"0.759029548","Rank":"49"},{"URN":"100747","NeighbourURN":"134314","Dist":"0.761010939","Rank":"50"},{"URN":"101243","NeighbourURN":"101230","Dist":"0.478232111","Rank":"1"},{"URN":"101243","NeighbourURN":"140962","Dist":"0.496156809","Rank":"2"},{"URN":"101243","NeighbourURN":"101226","Dist":"0.568230571","Rank":"3"},{"URN":"101243","NeighbourURN":"131184","Dist":"0.573822239","Rank":"4"},{"URN":"101243","NeighbourURN":"138266","Dist":"0.573823049","Rank":"5"},{"URN":"101243","NeighbourURN":"145140","Dist":"0.577084436","Rank":"6"},{"URN":"101243","NeighbourURN":"112951","Dist":"0.610177781","Rank":"7"},{"URN":"101243","NeighbourURN":"145106","Dist":"0.625122466","Rank":"8"},{"URN":"101243","NeighbourURN":"103080","Dist":"0.626789282","Rank":"9"},{"URN":"101243","NeighbourURN":"101206","Dist":"0.644149171","Rank":"10"},{"URN":"101243","NeighbourURN":"109502","Dist":"0.660647841","Rank":"11"},{"URN":"101243","NeighbourURN":"115313","Dist":"0.669774635","Rank":"12"},{"URN":"101243","NeighbourURN":"102322","Dist":"0.674321876","Rank":"13"},{"URN":"101243","NeighbourURN":"135264","Dist":"0.68967014","Rank":"14"},{"URN":"101243","NeighbourURN":"101222","Dist":"0.692320467","Rank":"15"},{"URN":"101243","NeighbourURN":"102408","Dist":"0.704252655","Rank":"16"},{"URN":"101243","NeighbourURN":"101494","Dist":"0.717894785","Rank":"17"},{"URN":"101243","NeighbourURN":"138888","Dist":"0.728597705","Rank":"18"},{"URN":"101243","NeighbourURN":"101224","Dist":"0.732369662","Rank":"19"},{"URN":"101243","NeighbourURN":"143219","Dist":"0.734318171","Rank":"20"},{"URN":"101243","NeighbourURN":"141671","Dist":"0.74307272","Rank":"21"},{"URN":"101243","NeighbourURN":"116342","Dist":"0.743145737","Rank":"22"},{"URN":"101243","NeighbourURN":"130357","Dist":"0.746793624","Rank":"23"},{"URN":"101243","NeighbourURN":"137010","Dist":"0.761858332","Rank":"24"},{"URN":"101243","NeighbourURN":"103845","Dist":"0.7721302","Rank":"25"},{"URN":"101243","NeighbourURN":"103937","Dist":"0.772266363","Rank":"26"},{"URN":"101243","NeighbourURN":"143128","Dist":"0.775562698","Rank":"27"},{"URN":"101243","NeighbourURN":"102373","Dist":"0.775951825","Rank":"28"},{"URN":"101243","NeighbourURN":"139380","Dist":"0.778878012","Rank":"29"},{"URN":"101243","NeighbourURN":"130925","Dist":"0.782263074","Rank":"30"},{"URN":"101243","NeighbourURN":"100747","Dist":"0.789164982","Rank":"31"},{"URN":"101243","NeighbourURN":"136599","Dist":"0.792192373","Rank":"32"},{"URN":"101243","NeighbourURN":"112770","Dist":"0.793332511","Rank":"33"},{"URN":"101243","NeighbourURN":"143198","Dist":"0.794297639","Rank":"34"},{"URN":"101243","NeighbourURN":"135887","Dist":"0.797455523","Rank":"35"},{"URN":"101243","NeighbourURN":"146900","Dist":"0.803127803","Rank":"36"},{"URN":"101243","NeighbourURN":"131839","Dist":"0.812994045","Rank":"37"},{"URN":"101243","NeighbourURN":"146327","Dist":"0.815029797","Rank":"38"},{"URN":"101243","NeighbourURN":"130340","Dist":"0.819289313","Rank":"39"},{"URN":"101243","NeighbourURN":"143218","Dist":"0.821178912","Rank":"40"},{"URN":"101243","NeighbourURN":"139378","Dist":"0.829213859","Rank":"41"},{"URN":"101243","NeighbourURN":"138073","Dist":"0.830525938","Rank":"42"},{"URN":"101243","NeighbourURN":"144142","Dist":"0.833238576","Rank":"43"},{"URN":"101243","NeighbourURN":"141038","Dist":"0.837153775","Rank":"44"},{"URN":"101243","NeighbourURN":"133446","Dist":"0.837225305","Rank":"45"},{"URN":"101243","NeighbourURN":"147376","Dist":"0.837445391","Rank":"46"},{"URN":"101243","NeighbourURN":"138033","Dist":"0.838068185","Rank":"47"},{"URN":"101243","NeighbourURN":"114704","Dist":"0.842827849","Rank":"48"},{"URN":"101243","NeighbourURN":"138983","Dist":"0.843238861","Rank":"49"},{"URN":"101243","NeighbourURN":"141889","Dist":"0.845011363","Rank":"50"},{"URN":"103080","NeighbourURN":"143198","Dist":"0.365146904","Rank":"1"},{"URN":"103080","NeighbourURN":"145106","Dist":"0.491077371","Rank":"2"},{"URN":"103080","NeighbourURN":"139016","Dist":"0.514092867","Rank":"3"},{"URN":"103080","NeighbourURN":"112951","Dist":"0.540184805","Rank":"4"},{"URN":"103080","NeighbourURN":"138266","Dist":"0.551487481","Rank":"5"},{"URN":"103080","NeighbourURN":"100747","Dist":"0.561567852","Rank":"6"},{"URN":"103080","NeighbourURN":"135264","Dist":"0.568505334","Rank":"7"},{"URN":"103080","NeighbourURN":"143079","Dist":"0.578911642","Rank":"8"},{"URN":"103080","NeighbourURN":"146900","Dist":"0.611175102","Rank":"9"},{"URN":"103080","NeighbourURN":"146327","Dist":"0.612725321","Rank":"10"},{"URN":"103080","NeighbourURN":"109552","Dist":"0.623137542","Rank":"11"},{"URN":"103080","NeighbourURN":"101243","Dist":"0.626789282","Rank":"12"},{"URN":"103080","NeighbourURN":"101222","Dist":"0.632296345","Rank":"13"},{"URN":"103080","NeighbourURN":"144142","Dist":"0.634897733","Rank":"14"},{"URN":"103080","NeighbourURN":"101898","Dist":"0.640488278","Rank":"15"},{"URN":"103080","NeighbourURN":"101226","Dist":"0.666485682","Rank":"16"},{"URN":"103080","NeighbourURN":"146862","Dist":"0.677850459","Rank":"17"},{"URN":"103080","NeighbourURN":"140935","Dist":"0.682824403","Rank":"18"},{"URN":"103080","NeighbourURN":"101230","Dist":"0.685575317","Rank":"19"},{"URN":"103080","NeighbourURN":"135958","Dist":"0.692625981","Rank":"20"},{"URN":"103080","NeighbourURN":"132089","Dist":"0.694457306","Rank":"21"},{"URN":"103080","NeighbourURN":"143090","Dist":"0.7092474","Rank":"22"},{"URN":"103080","NeighbourURN":"140962","Dist":"0.709515407","Rank":"23"},{"URN":"103080","NeighbourURN":"109502","Dist":"0.713060032","Rank":"24"},{"URN":"103080","NeighbourURN":"101993","Dist":"0.716179065","Rank":"25"},{"URN":"103080","NeighbourURN":"131089","Dist":"0.717464603","Rank":"26"},{"URN":"103080","NeighbourURN":"131184","Dist":"0.717818301","Rank":"27"},{"URN":"103080","NeighbourURN":"142699","Dist":"0.71812431","Rank":"28"},{"URN":"103080","NeighbourURN":"100171","Dist":"0.719781489","Rank":"29"},{"URN":"103080","NeighbourURN":"101988","Dist":"0.72312819","Rank":"30"},{"URN":"103080","NeighbourURN":"145140","Dist":"0.728411118","Rank":"31"},{"URN":"103080","NeighbourURN":"143869","Dist":"0.7348648","Rank":"32"},{"URN":"103080","NeighbourURN":"100917","Dist":"0.74004805","Rank":"33"},{"URN":"103080","NeighbourURN":"145364","Dist":"0.746645745","Rank":"34"},{"URN":"103080","NeighbourURN":"140391","Dist":"0.746943968","Rank":"35"},{"URN":"103080","NeighbourURN":"138364","Dist":"0.75656345","Rank":"36"},{"URN":"103080","NeighbourURN":"139782","Dist":"0.758022575","Rank":"37"},{"URN":"103080","NeighbourURN":"101206","Dist":"0.761247536","Rank":"38"},{"URN":"103080","NeighbourURN":"140434","Dist":"0.763281622","Rank":"39"},{"URN":"103080","NeighbourURN":"134701","Dist":"0.765589066","Rank":"40"},{"URN":"103080","NeighbourURN":"143592","Dist":"0.773172998","Rank":"41"},{"URN":"103080","NeighbourURN":"138690","Dist":"0.778657506","Rank":"42"},{"URN":"103080","NeighbourURN":"130380","Dist":"0.779440059","Rank":"43"},{"URN":"103080","NeighbourURN":"135296","Dist":"0.781590079","Rank":"44"},{"URN":"103080","NeighbourURN":"101232","Dist":"0.783502206","Rank":"45"},{"URN":"103080","NeighbourURN":"100891","Dist":"0.784848175","Rank":"46"},{"URN":"103080","NeighbourURN":"101524","Dist":"0.786482787","Rank":"47"},{"URN":"103080","NeighbourURN":"109567","Dist":"0.792952219","Rank":"48"},{"URN":"103080","NeighbourURN":"102041","Dist":"0.796527752","Rank":"49"},{"URN":"103080","NeighbourURN":"131775","Dist":"0.79655007","Rank":"50"},{"URN":"107562","NeighbourURN":"137770","Dist":"0.328247998","Rank":"1"},{"URN":"107562","NeighbourURN":"138475","Dist":"0.381001037","Rank":"2"},{"URN":"107562","NeighbourURN":"139796","Dist":"0.481527468","Rank":"3"},{"URN":"107562","NeighbourURN":"139686","Dist":"0.491505009","Rank":"4"},{"URN":"107562","NeighbourURN":"137656","Dist":"0.492276553","Rank":"5"},{"URN":"107562","NeighbourURN":"135877","Dist":"0.492827644","Rank":"6"},{"URN":"107562","NeighbourURN":"142869","Dist":"0.554079321","Rank":"7"},{"URN":"107562","NeighbourURN":"141165","Dist":"0.566072637","Rank":"8"},{"URN":"107562","NeighbourURN":"137753","Dist":"0.595032721","Rank":"9"},{"URN":"107562","NeighbourURN":"138582","Dist":"0.646967873","Rank":"10"},{"URN":"107562","NeighbourURN":"145063","Dist":"0.647924017","Rank":"11"},{"URN":"107562","NeighbourURN":"108059","Dist":"0.657546388","Rank":"12"},{"URN":"107562","NeighbourURN":"136013","Dist":"0.685380337","Rank":"13"},{"URN":"107562","NeighbourURN":"144954","Dist":"0.701074309","Rank":"14"},{"URN":"107562","NeighbourURN":"145916","Dist":"0.72566347","Rank":"15"},{"URN":"107562","NeighbourURN":"135050","Dist":"0.728098723","Rank":"16"},{"URN":"107562","NeighbourURN":"138764","Dist":"0.742705458","Rank":"17"},{"URN":"107562","NeighbourURN":"136713","Dist":"0.746374512","Rank":"18"},{"URN":"107562","NeighbourURN":"103696","Dist":"0.764618516","Rank":"19"},{"URN":"107562","NeighbourURN":"139658","Dist":"0.766542991","Rank":"20"},{"URN":"107562","NeighbourURN":"101193","Dist":"0.780001771","Rank":"21"},{"URN":"107562","NeighbourURN":"137947","Dist":"0.782973224","Rank":"22"},{"URN":"107562","NeighbourURN":"135966","Dist":"0.786526721","Rank":"23"},{"URN":"107562","NeighbourURN":"114403","Dist":"0.791008903","Rank":"24"},{"URN":"107562","NeighbourURN":"143101","Dist":"0.802944685","Rank":"25"},{"URN":"107562","NeighbourURN":"103791","Dist":"0.806226381","Rank":"26"},{"URN":"107562","NeighbourURN":"139171","Dist":"0.811879428","Rank":"27"},{"URN":"107562","NeighbourURN":"144938","Dist":"0.815675223","Rank":"28"},{"URN":"107562","NeighbourURN":"104995","Dist":"0.817430437","Rank":"29"},{"URN":"107562","NeighbourURN":"136348","Dist":"0.826165229","Rank":"30"},{"URN":"107562","NeighbourURN":"137487","Dist":"0.834771733","Rank":"31"},{"URN":"107562","NeighbourURN":"134314","Dist":"0.843987051","Rank":"32"},{"URN":"107562","NeighbourURN":"118919","Dist":"0.847262797","Rank":"33"},{"URN":"107562","NeighbourURN":"100749","Dist":"0.848791875","Rank":"34"},{"URN":"107562","NeighbourURN":"100747","Dist":"0.853546116","Rank":"35"},{"URN":"107562","NeighbourURN":"138073","Dist":"0.85603567","Rank":"36"},{"URN":"107562","NeighbourURN":"141105","Dist":"0.856225466","Rank":"37"},{"URN":"107562","NeighbourURN":"136413","Dist":"0.858119186","Rank":"38"},{"URN":"107562","NeighbourURN":"140294","Dist":"0.861278778","Rank":"39"},{"URN":"107562","NeighbourURN":"114755","Dist":"0.867951474","Rank":"40"},{"URN":"107562","NeighbourURN":"114435","Dist":"0.868159157","Rank":"41"},{"URN":"107562","NeighbourURN":"103070","Dist":"0.869052722","Rank":"42"},{"URN":"107562","NeighbourURN":"114393","Dist":"0.874953874","Rank":"43"},{"URN":"107562","NeighbourURN":"137599","Dist":"0.87573866","Rank":"44"},{"URN":"107562","NeighbourURN":"142453","Dist":"0.876064288","Rank":"45"},{"URN":"107562","NeighbourURN":"137271","Dist":"0.879761567","Rank":"46"},{"URN":"107562","NeighbourURN":"138844","Dist":"0.884265706","Rank":"47"},{"URN":"107562","NeighbourURN":"134774","Dist":"0.884682473","Rank":"48"},{"URN":"107562","NeighbourURN":"109595","Dist":"0.884783719","Rank":"49"},{"URN":"107562","NeighbourURN":"116959","Dist":"0.885229842","Rank":"50"},{"URN":"112951","NeighbourURN":"138266","Dist":"0.538187827","Rank":"1"},{"URN":"112951","NeighbourURN":"103080","Dist":"0.540184805","Rank":"2"},{"URN":"112951","NeighbourURN":"142219","Dist":"0.542038754","Rank":"3"},{"URN":"112951","NeighbourURN":"143198","Dist":"0.587331699","Rank":"4"},{"URN":"112951","NeighbourURN":"135958","Dist":"0.607940868","Rank":"5"},{"URN":"112951","NeighbourURN":"101243","Dist":"0.610177781","Rank":"6"},{"URN":"112951","NeighbourURN":"141752","Dist":"0.640222821","Rank":"7"},{"URN":"112951","NeighbourURN":"145140","Dist":"0.647871625","Rank":"8"},{"URN":"112951","NeighbourURN":"109502","Dist":"0.690862611","Rank":"9"},{"URN":"112951","NeighbourURN":"131184","Dist":"0.702063175","Rank":"10"},{"URN":"112951","NeighbourURN":"101222","Dist":"0.714459004","Rank":"11"},{"URN":"112951","NeighbourURN":"140394","Dist":"0.722834083","Rank":"12"},{"URN":"112951","NeighbourURN":"140962","Dist":"0.723174049","Rank":"13"},{"URN":"112951","NeighbourURN":"100171","Dist":"0.751306245","Rank":"14"},{"URN":"112951","NeighbourURN":"146900","Dist":"0.755671177","Rank":"15"},{"URN":"112951","NeighbourURN":"101226","Dist":"0.757871914","Rank":"16"},{"URN":"112951","NeighbourURN":"139856","Dist":"0.765651478","Rank":"17"},{"URN":"112951","NeighbourURN":"101230","Dist":"0.769902746","Rank":"18"},{"URN":"112951","NeighbourURN":"145106","Dist":"0.771747728","Rank":"19"},{"URN":"112951","NeighbourURN":"140935","Dist":"0.776612102","Rank":"20"},{"URN":"112951","NeighbourURN":"103217","Dist":"0.777711581","Rank":"21"},{"URN":"112951","NeighbourURN":"105404","Dist":"0.782814257","Rank":"22"},{"URN":"112951","NeighbourURN":"146327","Dist":"0.793978252","Rank":"23"},{"URN":"112951","NeighbourURN":"135264","Dist":"0.817805659","Rank":"24"},{"URN":"112951","NeighbourURN":"138888","Dist":"0.818090936","Rank":"25"},{"URN":"112951","NeighbourURN":"138785","Dist":"0.818426465","Rank":"26"},{"URN":"112951","NeighbourURN":"143079","Dist":"0.831624398","Rank":"27"},{"URN":"112951","NeighbourURN":"145760","Dist":"0.835941154","Rank":"28"},{"URN":"112951","NeighbourURN":"131511","Dist":"0.839377481","Rank":"29"},{"URN":"112951","NeighbourURN":"115313","Dist":"0.840423944","Rank":"30"},{"URN":"112951","NeighbourURN":"103695","Dist":"0.844089366","Rank":"31"},{"URN":"112951","NeighbourURN":"100747","Dist":"0.844097066","Rank":"32"},{"URN":"112951","NeighbourURN":"135296","Dist":"0.85442519","Rank":"33"},{"URN":"112951","NeighbourURN":"138799","Dist":"0.855524364","Rank":"34"},{"URN":"112951","NeighbourURN":"139888","Dist":"0.858239339","Rank":"35"},{"URN":"112951","NeighbourURN":"100920","Dist":"0.863451981","Rank":"36"},{"URN":"112951","NeighbourURN":"101988","Dist":"0.86598804","Rank":"37"},{"URN":"112951","NeighbourURN":"146862","Dist":"0.876406127","Rank":"38"},{"URN":"112951","NeighbourURN":"101224","Dist":"0.877903237","Rank":"39"},{"URN":"112951","NeighbourURN":"139378","Dist":"0.882229464","Rank":"40"},{"URN":"112951","NeighbourURN":"135584","Dist":"0.882434179","Rank":"41"},{"URN":"112951","NeighbourURN":"143219","Dist":"0.883253023","Rank":"42"},{"URN":"112951","NeighbourURN":"101494","Dist":"0.887615577","Rank":"43"},{"URN":"112951","NeighbourURN":"140234","Dist":"0.896122488","Rank":"44"},{"URN":"112951","NeighbourURN":"132074","Dist":"0.900918209","Rank":"45"},{"URN":"112951","NeighbourURN":"103937","Dist":"0.901439133","Rank":"46"},{"URN":"112951","NeighbourURN":"130380","Dist":"0.909010122","Rank":"47"},{"URN":"112951","NeighbourURN":"131841","Dist":"0.909033128","Rank":"48"},{"URN":"112951","NeighbourURN":"130925","Dist":"0.913502678","Rank":"49"},{"URN":"112951","NeighbourURN":"143573","Dist":"0.913690784","Rank":"50"},{"URN":"116407","NeighbourURN":"140294","Dist":"0.140923338","Rank":"1"},{"URN":"116407","NeighbourURN":"136891","Dist":"0.345592074","Rank":"2"},{"URN":"116407","NeighbourURN":"135507","Dist":"0.404675474","Rank":"3"},{"URN":"116407","NeighbourURN":"138582","Dist":"0.45586345","Rank":"4"},{"URN":"116407","NeighbourURN":"139658","Dist":"0.565991851","Rank":"5"},{"URN":"116407","NeighbourURN":"137753","Dist":"0.595469106","Rank":"6"},{"URN":"116407","NeighbourURN":"142869","Dist":"0.661029503","Rank":"7"},{"URN":"116407","NeighbourURN":"139686","Dist":"0.6743763","Rank":"8"},{"URN":"116407","NeighbourURN":"145916","Dist":"0.712699413","Rank":"9"},{"URN":"116407","NeighbourURN":"136398","Dist":"0.727923707","Rank":"10"},{"URN":"116407","NeighbourURN":"137089","Dist":"0.741654345","Rank":"11"},{"URN":"116407","NeighbourURN":"142223","Dist":"0.745523544","Rank":"12"},{"URN":"116407","NeighbourURN":"138475","Dist":"0.795606173","Rank":"13"},{"URN":"116407","NeighbourURN":"136713","Dist":"0.812733608","Rank":"14"},{"URN":"116407","NeighbourURN":"139796","Dist":"0.81812282","Rank":"15"},{"URN":"116407","NeighbourURN":"101897","Dist":"0.832130901","Rank":"16"},{"URN":"116407","NeighbourURN":"135877","Dist":"0.835803724","Rank":"17"},{"URN":"116407","NeighbourURN":"140314","Dist":"0.858579034","Rank":"18"},{"URN":"116407","NeighbourURN":"137770","Dist":"0.864356304","Rank":"19"},{"URN":"116407","NeighbourURN":"141165","Dist":"0.905005449","Rank":"20"},{"URN":"116407","NeighbourURN":"136888","Dist":"0.9275648","Rank":"21"},{"URN":"116407","NeighbourURN":"139720","Dist":"0.93056915","Rank":"22"},{"URN":"116407","NeighbourURN":"138226","Dist":"0.93070642","Rank":"23"},{"URN":"116407","NeighbourURN":"107562","Dist":"0.935178629","Rank":"24"},{"URN":"116407","NeighbourURN":"136915","Dist":"0.945059165","Rank":"25"},{"URN":"116407","NeighbourURN":"137349","Dist":"0.958976455","Rank":"26"},{"URN":"116407","NeighbourURN":"138518","Dist":"0.966591249","Rank":"27"},{"URN":"116407","NeighbourURN":"109116","Dist":"0.979562345","Rank":"28"},{"URN":"116407","NeighbourURN":"125279","Dist":"0.989464237","Rank":"29"},{"URN":"116407","NeighbourURN":"136413","Dist":"0.998397204","Rank":"30"},{"URN":"116407","NeighbourURN":"137093","Dist":"1.001961644","Rank":"31"},{"URN":"116407","NeighbourURN":"108636","Dist":"1.002062423","Rank":"32"},{"URN":"116407","NeighbourURN":"136338","Dist":"1.017938538","Rank":"33"},{"URN":"116407","NeighbourURN":"138214","Dist":"1.020434183","Rank":"34"},{"URN":"116407","NeighbourURN":"104995","Dist":"1.023267079","Rank":"35"},{"URN":"116407","NeighbourURN":"102121","Dist":"1.029426912","Rank":"36"},{"URN":"116407","NeighbourURN":"137683","Dist":"1.029512368","Rank":"37"},{"URN":"116407","NeighbourURN":"104926","Dist":"1.033034219","Rank":"38"},{"URN":"116407","NeighbourURN":"125066","Dist":"1.037957062","Rank":"39"},{"URN":"116407","NeighbourURN":"100590","Dist":"1.045182578","Rank":"40"},{"URN":"116407","NeighbourURN":"140260","Dist":"1.04824662","Rank":"41"},{"URN":"116407","NeighbourURN":"142974","Dist":"1.049058356","Rank":"42"},{"URN":"116407","NeighbourURN":"143101","Dist":"1.054809255","Rank":"43"},{"URN":"116407","NeighbourURN":"137947","Dist":"1.057798994","Rank":"44"},{"URN":"116407","NeighbourURN":"136454","Dist":"1.067158019","Rank":"45"},{"URN":"116407","NeighbourURN":"140704","Dist":"1.074685185","Rank":"46"},{"URN":"116407","NeighbourURN":"138536","Dist":"1.077411769","Rank":"47"},{"URN":"116407","NeighbourURN":"125008","Dist":"1.07801673","Rank":"48"},{"URN":"116407","NeighbourURN":"135600","Dist":"1.079418969","Rank":"49"},{"URN":"116407","NeighbourURN":"102128","Dist":"1.084188177","Rank":"50"},{"URN":"125279","NeighbourURN":"138689","Dist":"0.413611187","Rank":"1"},{"URN":"125279","NeighbourURN":"137563","Dist":"0.427743004","Rank":"2"},{"URN":"125279","NeighbourURN":"138226","Dist":"0.467603626","Rank":"3"},{"URN":"125279","NeighbourURN":"137939","Dist":"0.551348323","Rank":"4"},{"URN":"125279","NeighbourURN":"140314","Dist":"0.561339265","Rank":"5"},{"URN":"125279","NeighbourURN":"101897","Dist":"0.565131386","Rank":"6"},{"URN":"125279","NeighbourURN":"102121","Dist":"0.612658442","Rank":"7"},{"URN":"125279","NeighbourURN":"114382","Dist":"0.63728858","Rank":"8"},{"URN":"125279","NeighbourURN":"102648","Dist":"0.642048028","Rank":"9"},{"URN":"125279","NeighbourURN":"102380","Dist":"0.643801945","Rank":"10"},{"URN":"125279","NeighbourURN":"114446","Dist":"0.650737108","Rank":"11"},{"URN":"125279","NeighbourURN":"141500","Dist":"0.651008014","Rank":"12"},{"URN":"125279","NeighbourURN":"145207","Dist":"0.659926098","Rank":"13"},{"URN":"125279","NeighbourURN":"102914","Dist":"0.6662487","Rank":"14"},{"URN":"125279","NeighbourURN":"104079","Dist":"0.674814245","Rank":"15"},{"URN":"125279","NeighbourURN":"132246","Dist":"0.678107153","Rank":"16"},{"URN":"125279","NeighbourURN":"102903","Dist":"0.68614898","Rank":"17"},{"URN":"125279","NeighbourURN":"101904","Dist":"0.690404309","Rank":"18"},{"URN":"125279","NeighbourURN":"138764","Dist":"0.693549633","Rank":"19"},{"URN":"125279","NeighbourURN":"132261","Dist":"0.695006825","Rank":"20"},{"URN":"125279","NeighbourURN":"110750","Dist":"0.695468646","Rank":"21"},{"URN":"125279","NeighbourURN":"109435","Dist":"0.696426819","Rank":"22"},{"URN":"125279","NeighbourURN":"118551","Dist":"0.699177523","Rank":"23"},{"URN":"125279","NeighbourURN":"102885","Dist":"0.702420232","Rank":"24"},{"URN":"125279","NeighbourURN":"135271","Dist":"0.703969107","Rank":"25"},{"URN":"125279","NeighbourURN":"137850","Dist":"0.704011864","Rank":"26"},{"URN":"125279","NeighbourURN":"142220","Dist":"0.70492542","Rank":"27"},{"URN":"125279","NeighbourURN":"136445","Dist":"0.708698301","Rank":"28"},{"URN":"125279","NeighbourURN":"120918","Dist":"0.709108024","Rank":"29"},{"URN":"125279","NeighbourURN":"111385","Dist":"0.716922443","Rank":"30"},{"URN":"125279","NeighbourURN":"109146","Dist":"0.71930355","Rank":"31"},{"URN":"125279","NeighbourURN":"102580","Dist":"0.719416859","Rank":"32"},{"URN":"125279","NeighbourURN":"145977","Dist":"0.720317933","Rank":"33"},{"URN":"125279","NeighbourURN":"102823","Dist":"0.722643497","Rank":"34"},{"URN":"125279","NeighbourURN":"106073","Dist":"0.724578072","Rank":"35"},{"URN":"125279","NeighbourURN":"141514","Dist":"0.728403191","Rank":"36"},{"URN":"125279","NeighbourURN":"102906","Dist":"0.730094254","Rank":"37"},{"URN":"125279","NeighbourURN":"145796","Dist":"0.730866722","Rank":"38"},{"URN":"125279","NeighbourURN":"131577","Dist":"0.732335468","Rank":"39"},{"URN":"125279","NeighbourURN":"104084","Dist":"0.734724132","Rank":"40"},{"URN":"125279","NeighbourURN":"145388","Dist":"0.735280061","Rank":"41"},{"URN":"125279","NeighbourURN":"102369","Dist":"0.73552659","Rank":"42"},{"URN":"125279","NeighbourURN":"102902","Dist":"0.735937574","Rank":"43"},{"URN":"125279","NeighbourURN":"125058","Dist":"0.740848997","Rank":"44"},{"URN":"125279","NeighbourURN":"102917","Dist":"0.744197672","Rank":"45"},{"URN":"125279","NeighbourURN":"142173","Dist":"0.745092282","Rank":"46"},{"URN":"125279","NeighbourURN":"142298","Dist":"0.747522832","Rank":"47"},{"URN":"125279","NeighbourURN":"140704","Dist":"0.748374726","Rank":"48"},{"URN":"125279","NeighbourURN":"136853","Dist":"0.751311809","Rank":"49"},{"URN":"125279","NeighbourURN":"102905","Dist":"0.755791024","Rank":"50"},{"URN":"131752","NeighbourURN":"135843","Dist":"0.480099439","Rank":"1"},{"URN":"131752","NeighbourURN":"135264","Dist":"0.523194087","Rank":"2"},{"URN":"131752","NeighbourURN":"146327","Dist":"0.55361141","Rank":"3"},{"URN":"131752","NeighbourURN":"139016","Dist":"0.631826444","Rank":"4"},{"URN":"131752","NeighbourURN":"145775","Dist":"0.689768258","Rank":"5"},{"URN":"131752","NeighbourURN":"101898","Dist":"0.704318665","Rank":"6"},{"URN":"131752","NeighbourURN":"100747","Dist":"0.710650248","Rank":"7"},{"URN":"131752","NeighbourURN":"131246","Dist":"0.720805614","Rank":"8"},{"URN":"131752","NeighbourURN":"100564","Dist":"0.721558801","Rank":"9"},{"URN":"131752","NeighbourURN":"100749","Dist":"0.734897975","Rank":"10"},{"URN":"131752","NeighbourURN":"140935","Dist":"0.736925294","Rank":"11"},{"URN":"131752","NeighbourURN":"143079","Dist":"0.741577713","Rank":"12"},{"URN":"131752","NeighbourURN":"101733","Dist":"0.772397075","Rank":"13"},{"URN":"131752","NeighbourURN":"100425","Dist":"0.784626288","Rank":"14"},{"URN":"131752","NeighbourURN":"135584","Dist":"0.785190725","Rank":"15"},{"URN":"131752","NeighbourURN":"143090","Dist":"0.788803672","Rank":"16"},{"URN":"131752","NeighbourURN":"136952","Dist":"0.790180432","Rank":"17"},{"URN":"131752","NeighbourURN":"103077","Dist":"0.818877978","Rank":"18"},{"URN":"131752","NeighbourURN":"103080","Dist":"0.819345199","Rank":"19"},{"URN":"131752","NeighbourURN":"145439","Dist":"0.82194173","Rank":"20"},{"URN":"131752","NeighbourURN":"102139","Dist":"0.822541971","Rank":"21"},{"URN":"131752","NeighbourURN":"134314","Dist":"0.82511426","Rank":"22"},{"URN":"131752","NeighbourURN":"101993","Dist":"0.825436954","Rank":"23"},{"URN":"131752","NeighbourURN":"100916","Dist":"0.832223341","Rank":"24"},{"URN":"131752","NeighbourURN":"145106","Dist":"0.832510928","Rank":"25"},{"URN":"131752","NeighbourURN":"115607","Dist":"0.833991045","Rank":"26"},{"URN":"131752","NeighbourURN":"145280","Dist":"0.835078675","Rank":"27"},{"URN":"131752","NeighbourURN":"100560","Dist":"0.836598596","Rank":"28"},{"URN":"131752","NeighbourURN":"131773","Dist":"0.837178954","Rank":"29"},{"URN":"131752","NeighbourURN":"100248","Dist":"0.843567388","Rank":"30"},{"URN":"131752","NeighbourURN":"138196","Dist":"0.846313229","Rank":"31"},{"URN":"131752","NeighbourURN":"145087","Dist":"0.853495301","Rank":"32"},{"URN":"131752","NeighbourURN":"100234","Dist":"0.860799827","Rank":"33"},{"URN":"131752","NeighbourURN":"101057","Dist":"0.86334874","Rank":"34"},{"URN":"131752","NeighbourURN":"137441","Dist":"0.865134105","Rank":"35"},{"URN":"131752","NeighbourURN":"140096","Dist":"0.868849808","Rank":"36"},{"URN":"131752","NeighbourURN":"130380","Dist":"0.870229005","Rank":"37"},{"URN":"131752","NeighbourURN":"103324","Dist":"0.871332458","Rank":"38"},{"URN":"131752","NeighbourURN":"100566","Dist":"0.874329263","Rank":"39"},{"URN":"131752","NeighbourURN":"131843","Dist":"0.874844517","Rank":"40"},{"URN":"131752","NeighbourURN":"139699","Dist":"0.875213602","Rank":"41"},{"URN":"131752","NeighbourURN":"100023","Dist":"0.87630236","Rank":"42"},{"URN":"131752","NeighbourURN":"143594","Dist":"0.878739984","Rank":"43"},{"URN":"131752","NeighbourURN":"100701","Dist":"0.879810934","Rank":"44"},{"URN":"131752","NeighbourURN":"138218","Dist":"0.880633904","Rank":"45"},{"URN":"131752","NeighbourURN":"146862","Dist":"0.885099255","Rank":"46"},{"URN":"131752","NeighbourURN":"100171","Dist":"0.887597944","Rank":"47"},{"URN":"131752","NeighbourURN":"139519","Dist":"0.887819919","Rank":"48"},{"URN":"131752","NeighbourURN":"102904","Dist":"0.887824345","Rank":"49"},{"URN":"131752","NeighbourURN":"101314","Dist":"0.894218845","Rank":"50"},{"URN":"134369","NeighbourURN":"134798","Dist":"0.437351113","Rank":"1"},{"URN":"134369","NeighbourURN":"103119","Dist":"0.466460868","Rank":"2"},{"URN":"134369","NeighbourURN":"141071","Dist":"0.471378796","Rank":"3"},{"URN":"134369","NeighbourURN":"132089","Dist":"0.613348773","Rank":"4"},{"URN":"134369","NeighbourURN":"139703","Dist":"0.642979697","Rank":"5"},{"URN":"134369","NeighbourURN":"138690","Dist":"0.669099692","Rank":"6"},{"URN":"134369","NeighbourURN":"100171","Dist":"0.686632283","Rank":"7"},{"URN":"134369","NeighbourURN":"139016","Dist":"0.696204547","Rank":"8"},{"URN":"134369","NeighbourURN":"100590","Dist":"0.725878958","Rank":"9"},{"URN":"134369","NeighbourURN":"135968","Dist":"0.73160993","Rank":"10"},{"URN":"134369","NeighbourURN":"139319","Dist":"0.736970554","Rank":"11"},{"URN":"134369","NeighbourURN":"135600","Dist":"0.75158105","Rank":"12"},{"URN":"134369","NeighbourURN":"135242","Dist":"0.751759582","Rank":"13"},{"URN":"134369","NeighbourURN":"138196","Dist":"0.75716894","Rank":"14"},{"URN":"134369","NeighbourURN":"139815","Dist":"0.763337062","Rank":"15"},{"URN":"134369","NeighbourURN":"103080","Dist":"0.801574549","Rank":"16"},{"URN":"134369","NeighbourURN":"101244","Dist":"0.809055621","Rank":"17"},{"URN":"134369","NeighbourURN":"140373","Dist":"0.817797471","Rank":"18"},{"URN":"134369","NeighbourURN":"135958","Dist":"0.820240661","Rank":"19"},{"URN":"134369","NeighbourURN":"135296","Dist":"0.837560274","Rank":"20"},{"URN":"134369","NeighbourURN":"140935","Dist":"0.868059439","Rank":"21"},{"URN":"134369","NeighbourURN":"138518","Dist":"0.888599157","Rank":"22"},{"URN":"134369","NeighbourURN":"131775","Dist":"0.889255712","Rank":"23"},{"URN":"134369","NeighbourURN":"145106","Dist":"0.893118142","Rank":"24"},{"URN":"134369","NeighbourURN":"143197","Dist":"0.901463685","Rank":"25"},{"URN":"134369","NeighbourURN":"143198","Dist":"0.904182365","Rank":"26"},{"URN":"134369","NeighbourURN":"100747","Dist":"0.911301187","Rank":"27"},{"URN":"134369","NeighbourURN":"142219","Dist":"0.942416297","Rank":"28"},{"URN":"134369","NeighbourURN":"101898","Dist":"0.970497488","Rank":"29"},{"URN":"134369","NeighbourURN":"141752","Dist":"0.980488378","Rank":"30"},{"URN":"134369","NeighbourURN":"131752","Dist":"0.994865067","Rank":"31"},{"URN":"134369","NeighbourURN":"145140","Dist":"1.001445795","Rank":"32"},{"URN":"134369","NeighbourURN":"135264","Dist":"1.015232033","Rank":"33"},{"URN":"134369","NeighbourURN":"112951","Dist":"1.024318455","Rank":"34"},{"URN":"134369","NeighbourURN":"143101","Dist":"1.025250234","Rank":"35"},{"URN":"134369","NeighbourURN":"143379","Dist":"1.032771122","Rank":"36"},{"URN":"134369","NeighbourURN":"146327","Dist":"1.038285932","Rank":"37"},{"URN":"134369","NeighbourURN":"137093","Dist":"1.047645893","Rank":"38"},{"URN":"134369","NeighbourURN":"103077","Dist":"1.052543185","Rank":"39"},{"URN":"134369","NeighbourURN":"130995","Dist":"1.059948184","Rank":"40"},{"URN":"134369","NeighbourURN":"130381","Dist":"1.067356633","Rank":"41"},{"URN":"134369","NeighbourURN":"101988","Dist":"1.068616817","Rank":"42"},{"URN":"134369","NeighbourURN":"146900","Dist":"1.069985637","Rank":"43"},{"URN":"134369","NeighbourURN":"140326","Dist":"1.073401696","Rank":"44"},{"URN":"134369","NeighbourURN":"145362","Dist":"1.078209355","Rank":"45"},{"URN":"134369","NeighbourURN":"144142","Dist":"1.092481907","Rank":"46"},{"URN":"134369","NeighbourURN":"138621","Dist":"1.101112439","Rank":"47"},{"URN":"134369","NeighbourURN":"102711","Dist":"1.108567197","Rank":"48"},{"URN":"134369","NeighbourURN":"101993","Dist":"1.110451991","Rank":"49"},{"URN":"134369","NeighbourURN":"140962","Dist":"1.113633525","Rank":"50"},{"URN":"135264","NeighbourURN":"146327","Dist":"0.422789393","Rank":"1"},{"URN":"135264","NeighbourURN":"100747","Dist":"0.445947431","Rank":"2"},{"URN":"135264","NeighbourURN":"100749","Dist":"0.478064354","Rank":"3"},{"URN":"135264","NeighbourURN":"135843","Dist":"0.496439075","Rank":"4"},{"URN":"135264","NeighbourURN":"115607","Dist":"0.521508596","Rank":"5"},{"URN":"135264","NeighbourURN":"131752","Dist":"0.523194087","Rank":"6"},{"URN":"135264","NeighbourURN":"143079","Dist":"0.531891239","Rank":"7"},{"URN":"135264","NeighbourURN":"101226","Dist":"0.545044383","Rank":"8"},{"URN":"135264","NeighbourURN":"145106","Dist":"0.546845006","Rank":"9"},{"URN":"135264","NeighbourURN":"131184","Dist":"0.562575461","Rank":"10"},{"URN":"135264","NeighbourURN":"103080","Dist":"0.568505334","Rank":"11"},{"URN":"135264","NeighbourURN":"140262","Dist":"0.57062978","Rank":"12"},{"URN":"135264","NeighbourURN":"140962","Dist":"0.574721837","Rank":"13"},{"URN":"135264","NeighbourURN":"121319","Dist":"0.587149418","Rank":"14"},{"URN":"135264","NeighbourURN":"138073","Dist":"0.596326482","Rank":"15"},{"URN":"135264","NeighbourURN":"143090","Dist":"0.599211592","Rank":"16"},{"URN":"135264","NeighbourURN":"147528","Dist":"0.609262576","Rank":"17"},{"URN":"135264","NeighbourURN":"138218","Dist":"0.612718205","Rank":"18"},{"URN":"135264","NeighbourURN":"145775","Dist":"0.613445067","Rank":"19"},{"URN":"135264","NeighbourURN":"143592","Dist":"0.61811849","Rank":"20"},{"URN":"135264","NeighbourURN":"142774","Dist":"0.626138782","Rank":"21"},{"URN":"135264","NeighbourURN":"100916","Dist":"0.632328609","Rank":"22"},{"URN":"135264","NeighbourURN":"131246","Dist":"0.634892333","Rank":"23"},{"URN":"135264","NeighbourURN":"145140","Dist":"0.635777462","Rank":"24"},{"URN":"135264","NeighbourURN":"139519","Dist":"0.638453318","Rank":"25"},{"URN":"135264","NeighbourURN":"137010","Dist":"0.639219349","Rank":"26"},{"URN":"135264","NeighbourURN":"139016","Dist":"0.642629113","Rank":"27"},{"URN":"135264","NeighbourURN":"140935","Dist":"0.645203214","Rank":"28"},{"URN":"135264","NeighbourURN":"115313","Dist":"0.647379507","Rank":"29"},{"URN":"135264","NeighbourURN":"140434","Dist":"0.647404203","Rank":"30"},{"URN":"135264","NeighbourURN":"101206","Dist":"0.647638782","Rank":"31"},{"URN":"135264","NeighbourURN":"101230","Dist":"0.648124137","Rank":"32"},{"URN":"135264","NeighbourURN":"145087","Dist":"0.653923709","Rank":"33"},{"URN":"135264","NeighbourURN":"144142","Dist":"0.655292132","Rank":"34"},{"URN":"135264","NeighbourURN":"136431","Dist":"0.662706724","Rank":"35"},{"URN":"135264","NeighbourURN":"105403","Dist":"0.663757394","Rank":"36"},{"URN":"135264","NeighbourURN":"102373","Dist":"0.667201791","Rank":"37"},{"URN":"135264","NeighbourURN":"140204","Dist":"0.667495227","Rank":"38"},{"URN":"135264","NeighbourURN":"138266","Dist":"0.66985277","Rank":"39"},{"URN":"135264","NeighbourURN":"139523","Dist":"0.670765427","Rank":"40"},{"URN":"135264","NeighbourURN":"136952","Dist":"0.671730272","Rank":"41"},{"URN":"135264","NeighbourURN":"102904","Dist":"0.673120152","Rank":"42"},{"URN":"135264","NeighbourURN":"135215","Dist":"0.673504054","Rank":"43"},{"URN":"135264","NeighbourURN":"143178","Dist":"0.677255896","Rank":"44"},{"URN":"135264","NeighbourURN":"133996","Dist":"0.678862967","Rank":"45"},{"URN":"135264","NeighbourURN":"138888","Dist":"0.68079914","Rank":"46"},{"URN":"135264","NeighbourURN":"103974","Dist":"0.681395593","Rank":"47"},{"URN":"135264","NeighbourURN":"145985","Dist":"0.683151432","Rank":"48"},{"URN":"135264","NeighbourURN":"133712","Dist":"0.687575099","Rank":"49"},{"URN":"135264","NeighbourURN":"109502","Dist":"0.688822377","Rank":"50"},{"URN":"135367","NeighbourURN":"136197","Dist":"0.396231882","Rank":"1"},{"URN":"135367","NeighbourURN":"135364","Dist":"0.530126215","Rank":"2"},{"URN":"135367","NeighbourURN":"139856","Dist":"0.579288422","Rank":"3"},{"URN":"135367","NeighbourURN":"145173","Dist":"0.678068366","Rank":"4"},{"URN":"135367","NeighbourURN":"142219","Dist":"0.710922855","Rank":"5"},{"URN":"135367","NeighbourURN":"145140","Dist":"0.722746114","Rank":"6"},{"URN":"135367","NeighbourURN":"139888","Dist":"0.769606726","Rank":"7"},{"URN":"135367","NeighbourURN":"135866","Dist":"0.784493099","Rank":"8"},{"URN":"135367","NeighbourURN":"116463","Dist":"0.806029681","Rank":"9"},{"URN":"135367","NeighbourURN":"138375","Dist":"0.82116369","Rank":"10"},{"URN":"135367","NeighbourURN":"137274","Dist":"0.823553561","Rank":"11"},{"URN":"135367","NeighbourURN":"116234","Dist":"0.861945546","Rank":"12"},{"URN":"135367","NeighbourURN":"144617","Dist":"0.88394098","Rank":"13"},{"URN":"135367","NeighbourURN":"135879","Dist":"0.898819373","Rank":"14"},{"URN":"135367","NeighbourURN":"135881","Dist":"0.899435944","Rank":"15"},{"URN":"135367","NeighbourURN":"140394","Dist":"0.923996079","Rank":"16"},{"URN":"135367","NeighbourURN":"144606","Dist":"0.937311918","Rank":"17"},{"URN":"135367","NeighbourURN":"137119","Dist":"0.938618415","Rank":"18"},{"URN":"135367","NeighbourURN":"139815","Dist":"0.945800299","Rank":"19"},{"URN":"135367","NeighbourURN":"108059","Dist":"0.947543704","Rank":"20"},{"URN":"135367","NeighbourURN":"100171","Dist":"0.949377958","Rank":"21"},{"URN":"135367","NeighbourURN":"135423","Dist":"0.959511133","Rank":"22"},{"URN":"135367","NeighbourURN":"135966","Dist":"0.96266012","Rank":"23"},{"URN":"135367","NeighbourURN":"112951","Dist":"0.966616671","Rank":"24"},{"URN":"135367","NeighbourURN":"135968","Dist":"0.969128205","Rank":"25"},{"URN":"135367","NeighbourURN":"137306","Dist":"0.971255995","Rank":"26"},{"URN":"135367","NeighbourURN":"135597","Dist":"0.977178819","Rank":"27"},{"URN":"135367","NeighbourURN":"118919","Dist":"0.977587041","Rank":"28"},{"URN":"135367","NeighbourURN":"136013","Dist":"1.012443948","Rank":"29"},{"URN":"135367","NeighbourURN":"146327","Dist":"1.013705583","Rank":"30"},{"URN":"135367","NeighbourURN":"133446","Dist":"1.022130739","Rank":"31"},{"URN":"135367","NeighbourURN":"143197","Dist":"1.026920656","Rank":"32"},{"URN":"135367","NeighbourURN":"135296","Dist":"1.038600749","Rank":"33"},{"URN":"135367","NeighbourURN":"140012","Dist":"1.05166327","Rank":"34"},{"URN":"135367","NeighbourURN":"140373","Dist":"1.060556719","Rank":"35"},{"URN":"135367","NeighbourURN":"135619","Dist":"1.063797649","Rank":"36"},{"URN":"135367","NeighbourURN":"141300","Dist":"1.066104065","Rank":"37"},{"URN":"135367","NeighbourURN":"143379","Dist":"1.074998088","Rank":"38"},{"URN":"135367","NeighbourURN":"139703","Dist":"1.090116259","Rank":"39"},{"URN":"135367","NeighbourURN":"135263","Dist":"1.098999732","Rank":"40"},{"URN":"135367","NeighbourURN":"140935","Dist":"1.101282974","Rank":"41"},{"URN":"135367","NeighbourURN":"141752","Dist":"1.101495963","Rank":"42"},{"URN":"135367","NeighbourURN":"101243","Dist":"1.104195131","Rank":"43"},{"URN":"135367","NeighbourURN":"100747","Dist":"1.105313737","Rank":"44"},{"URN":"135367","NeighbourURN":"135563","Dist":"1.111272804","Rank":"45"},{"URN":"135367","NeighbourURN":"135584","Dist":"1.115918156","Rank":"46"},{"URN":"135367","NeighbourURN":"140204","Dist":"1.117073652","Rank":"47"},{"URN":"135367","NeighbourURN":"144694","Dist":"1.121347466","Rank":"48"},{"URN":"135367","NeighbourURN":"131184","Dist":"1.148686311","Rank":"49"},{"URN":"135367","NeighbourURN":"138073","Dist":"1.150687328","Rank":"50"},{"URN":"135423","NeighbourURN":"139856","Dist":"0.694923979","Rank":"1"},{"URN":"135423","NeighbourURN":"135597","Dist":"0.794219625","Rank":"2"},{"URN":"135423","NeighbourURN":"137274","Dist":"0.863583914","Rank":"3"},{"URN":"135423","NeighbourURN":"139049","Dist":"0.881147241","Rank":"4"},{"URN":"135423","NeighbourURN":"135584","Dist":"0.902091196","Rank":"5"},{"URN":"135423","NeighbourURN":"145314","Dist":"0.946251069","Rank":"6"},{"URN":"135423","NeighbourURN":"135367","Dist":"0.959511133","Rank":"7"},{"URN":"135423","NeighbourURN":"140394","Dist":"0.959549054","Rank":"8"},{"URN":"135423","NeighbourURN":"139888","Dist":"0.961787592","Rank":"9"},{"URN":"135423","NeighbourURN":"141883","Dist":"0.969690026","Rank":"10"},{"URN":"135423","NeighbourURN":"145173","Dist":"0.977623607","Rank":"11"},{"URN":"135423","NeighbourURN":"143437","Dist":"0.983310939","Rank":"12"},{"URN":"135423","NeighbourURN":"144617","Dist":"0.996393189","Rank":"13"},{"URN":"135423","NeighbourURN":"137578","Dist":"1.019621181","Rank":"14"},{"URN":"135423","NeighbourURN":"135563","Dist":"1.03644874","Rank":"15"},{"URN":"135423","NeighbourURN":"144194","Dist":"1.076979675","Rank":"16"},{"URN":"135423","NeighbourURN":"104294","Dist":"1.094116632","Rank":"17"},{"URN":"135423","NeighbourURN":"142219","Dist":"1.112365628","Rank":"18"},{"URN":"135423","NeighbourURN":"139133","Dist":"1.113241212","Rank":"19"},{"URN":"135423","NeighbourURN":"142542","Dist":"1.114227035","Rank":"20"},{"URN":"135423","NeighbourURN":"112951","Dist":"1.114934305","Rank":"21"},{"URN":"135423","NeighbourURN":"135364","Dist":"1.11786289","Rank":"22"},{"URN":"135423","NeighbourURN":"145477","Dist":"1.122281887","Rank":"23"},{"URN":"135423","NeighbourURN":"140012","Dist":"1.130665689","Rank":"24"},{"URN":"135423","NeighbourURN":"141396","Dist":"1.132512126","Rank":"25"},{"URN":"135423","NeighbourURN":"136197","Dist":"1.142153319","Rank":"26"},{"URN":"135423","NeighbourURN":"139404","Dist":"1.168452188","Rank":"27"},{"URN":"135423","NeighbourURN":"143087","Dist":"1.173227155","Rank":"28"},{"URN":"135423","NeighbourURN":"130259","Dist":"1.176222544","Rank":"29"},{"URN":"135423","NeighbourURN":"142437","Dist":"1.177942244","Rank":"30"},{"URN":"135423","NeighbourURN":"143620","Dist":"1.185610968","Rank":"31"},{"URN":"135423","NeighbourURN":"135958","Dist":"1.186230785","Rank":"32"},{"URN":"135423","NeighbourURN":"131021","Dist":"1.193334721","Rank":"33"},{"URN":"135423","NeighbourURN":"139675","Dist":"1.193912185","Rank":"34"},{"URN":"135423","NeighbourURN":"138551","Dist":"1.195316084","Rank":"35"},{"URN":"135423","NeighbourURN":"138104","Dist":"1.199042919","Rank":"36"},{"URN":"135423","NeighbourURN":"138375","Dist":"1.21561693","Rank":"37"},{"URN":"135423","NeighbourURN":"144482","Dist":"1.220917122","Rank":"38"},{"URN":"135423","NeighbourURN":"146079","Dist":"1.23900503","Rank":"39"},{"URN":"135423","NeighbourURN":"139003","Dist":"1.239626701","Rank":"40"},{"URN":"135423","NeighbourURN":"140709","Dist":"1.244355834","Rank":"41"},{"URN":"135423","NeighbourURN":"132241","Dist":"1.259221103","Rank":"42"},{"URN":"135423","NeighbourURN":"138575","Dist":"1.265115751","Rank":"43"},{"URN":"135423","NeighbourURN":"103217","Dist":"1.269136276","Rank":"44"},{"URN":"135423","NeighbourURN":"141752","Dist":"1.269224127","Rank":"45"},{"URN":"135423","NeighbourURN":"100171","Dist":"1.274024703","Rank":"46"},{"URN":"135423","NeighbourURN":"145623","Dist":"1.278314429","Rank":"47"},{"URN":"135423","NeighbourURN":"145140","Dist":"1.280183321","Rank":"48"},{"URN":"135423","NeighbourURN":"141318","Dist":"1.288027843","Rank":"49"},{"URN":"135423","NeighbourURN":"138653","Dist":"1.30086556","Rank":"50"},{"URN":"135507","NeighbourURN":"138582","Dist":"0.384163712","Rank":"1"},{"URN":"135507","NeighbourURN":"116407","Dist":"0.404675474","Rank":"2"},{"URN":"135507","NeighbourURN":"140294","Dist":"0.412514542","Rank":"3"},{"URN":"135507","NeighbourURN":"138518","Dist":"0.603757283","Rank":"4"},{"URN":"135507","NeighbourURN":"136891","Dist":"0.613331101","Rank":"5"},{"URN":"135507","NeighbourURN":"139686","Dist":"0.617976451","Rank":"6"},{"URN":"135507","NeighbourURN":"137753","Dist":"0.64234909","Rank":"7"},{"URN":"135507","NeighbourURN":"142223","Dist":"0.673588191","Rank":"8"},{"URN":"135507","NeighbourURN":"139658","Dist":"0.686524679","Rank":"9"},{"URN":"135507","NeighbourURN":"135600","Dist":"0.705835929","Rank":"10"},{"URN":"135507","NeighbourURN":"100590","Dist":"0.715266633","Rank":"11"},{"URN":"135507","NeighbourURN":"138475","Dist":"0.723592594","Rank":"12"},{"URN":"135507","NeighbourURN":"136398","Dist":"0.723751117","Rank":"13"},{"URN":"135507","NeighbourURN":"137093","Dist":"0.723971476","Rank":"14"},{"URN":"135507","NeighbourURN":"142869","Dist":"0.724399902","Rank":"15"},{"URN":"135507","NeighbourURN":"139720","Dist":"0.739279104","Rank":"16"},{"URN":"135507","NeighbourURN":"139796","Dist":"0.752822767","Rank":"17"},{"URN":"135507","NeighbourURN":"143101","Dist":"0.781145308","Rank":"18"},{"URN":"135507","NeighbourURN":"136413","Dist":"0.786688085","Rank":"19"},{"URN":"135507","NeighbourURN":"145916","Dist":"0.797414384","Rank":"20"},{"URN":"135507","NeighbourURN":"141165","Dist":"0.800446516","Rank":"21"},{"URN":"135507","NeighbourURN":"137089","Dist":"0.807246797","Rank":"22"},{"URN":"135507","NeighbourURN":"136329","Dist":"0.813044772","Rank":"23"},{"URN":"135507","NeighbourURN":"135877","Dist":"0.818282224","Rank":"24"},{"URN":"135507","NeighbourURN":"137770","Dist":"0.819255117","Rank":"25"},{"URN":"135507","NeighbourURN":"140314","Dist":"0.819256478","Rank":"26"},{"URN":"135507","NeighbourURN":"101897","Dist":"0.847562832","Rank":"27"},{"URN":"135507","NeighbourURN":"134314","Dist":"0.880160708","Rank":"28"},{"URN":"135507","NeighbourURN":"100602","Dist":"0.901256046","Rank":"29"},{"URN":"135507","NeighbourURN":"107562","Dist":"0.908499812","Rank":"30"},{"URN":"135507","NeighbourURN":"101193","Dist":"0.910174403","Rank":"31"},{"URN":"135507","NeighbourURN":"136713","Dist":"0.920319087","Rank":"32"},{"URN":"135507","NeighbourURN":"138226","Dist":"0.942061078","Rank":"33"},{"URN":"135507","NeighbourURN":"137349","Dist":"0.951313264","Rank":"34"},{"URN":"135507","NeighbourURN":"141300","Dist":"0.976389405","Rank":"35"},{"URN":"135507","NeighbourURN":"136454","Dist":"0.991007554","Rank":"36"},{"URN":"135507","NeighbourURN":"138013","Dist":"0.99137641","Rank":"37"},{"URN":"135507","NeighbourURN":"102856","Dist":"0.993243289","Rank":"38"},{"URN":"135507","NeighbourURN":"102121","Dist":"0.997224328","Rank":"39"},{"URN":"135507","NeighbourURN":"139319","Dist":"0.998864301","Rank":"40"},{"URN":"135507","NeighbourURN":"145063","Dist":"0.999313619","Rank":"41"},{"URN":"135507","NeighbourURN":"118919","Dist":"1.000051791","Rank":"42"},{"URN":"135507","NeighbourURN":"138214","Dist":"1.001926795","Rank":"43"},{"URN":"135507","NeighbourURN":"104995","Dist":"1.002007271","Rank":"44"},{"URN":"135507","NeighbourURN":"137306","Dist":"1.002454357","Rank":"45"},{"URN":"135507","NeighbourURN":"136445","Dist":"1.0031231","Rank":"46"},{"URN":"135507","NeighbourURN":"109116","Dist":"1.004169071","Rank":"47"},{"URN":"135507","NeighbourURN":"138690","Dist":"1.005557455","Rank":"48"},{"URN":"135507","NeighbourURN":"140260","Dist":"1.011166324","Rank":"49"},{"URN":"135507","NeighbourURN":"100747","Dist":"1.011589576","Rank":"50"},{"URN":"135563","NeighbourURN":"145314","Dist":"0.333735874","Rank":"1"},{"URN":"135563","NeighbourURN":"144617","Dist":"0.544300888","Rank":"2"},{"URN":"135563","NeighbourURN":"139049","Dist":"0.598336425","Rank":"3"},{"URN":"135563","NeighbourURN":"138104","Dist":"0.634112693","Rank":"4"},{"URN":"135563","NeighbourURN":"138575","Dist":"0.650051924","Rank":"5"},{"URN":"135563","NeighbourURN":"133270","Dist":"0.655034538","Rank":"6"},{"URN":"135563","NeighbourURN":"141883","Dist":"0.659863154","Rank":"7"},{"URN":"135563","NeighbourURN":"106833","Dist":"0.671221502","Rank":"8"},{"URN":"135563","NeighbourURN":"145173","Dist":"0.675591697","Rank":"9"},{"URN":"135563","NeighbourURN":"131021","Dist":"0.692824579","Rank":"10"},{"URN":"135563","NeighbourURN":"145119","Dist":"0.699473826","Rank":"11"},{"URN":"135563","NeighbourURN":"138375","Dist":"0.69966618","Rank":"12"},{"URN":"135563","NeighbourURN":"133758","Dist":"0.708548917","Rank":"13"},{"URN":"135563","NeighbourURN":"135214","Dist":"0.721331356","Rank":"14"},{"URN":"135563","NeighbourURN":"140872","Dist":"0.73563153","Rank":"15"},{"URN":"135563","NeighbourURN":"144482","Dist":"0.73990881","Rank":"16"},{"URN":"135563","NeighbourURN":"143785","Dist":"0.743459119","Rank":"17"},{"URN":"135563","NeighbourURN":"145506","Dist":"0.743717391","Rank":"18"},{"URN":"135563","NeighbourURN":"145477","Dist":"0.744471413","Rank":"19"},{"URN":"135563","NeighbourURN":"105432","Dist":"0.753158058","Rank":"20"},{"URN":"135563","NeighbourURN":"138989","Dist":"0.756331042","Rank":"21"},{"URN":"135563","NeighbourURN":"139133","Dist":"0.762510462","Rank":"22"},{"URN":"135563","NeighbourURN":"136512","Dist":"0.763476338","Rank":"23"},{"URN":"135563","NeighbourURN":"140041","Dist":"0.773447636","Rank":"24"},{"URN":"135563","NeighbourURN":"119138","Dist":"0.7852333","Rank":"25"},{"URN":"135563","NeighbourURN":"138369","Dist":"0.792987272","Rank":"26"},{"URN":"135563","NeighbourURN":"131818","Dist":"0.79438833","Rank":"27"},{"URN":"135563","NeighbourURN":"138300","Dist":"0.796680523","Rank":"28"},{"URN":"135563","NeighbourURN":"143821","Dist":"0.801635465","Rank":"29"},{"URN":"135563","NeighbourURN":"137417","Dist":"0.802790221","Rank":"30"},{"URN":"135563","NeighbourURN":"107262","Dist":"0.80839432","Rank":"31"},{"URN":"135563","NeighbourURN":"140709","Dist":"0.810158221","Rank":"32"},{"URN":"135563","NeighbourURN":"132196","Dist":"0.81093042","Rank":"33"},{"URN":"135563","NeighbourURN":"140573","Dist":"0.811114395","Rank":"34"},{"URN":"135563","NeighbourURN":"131082","Dist":"0.815974021","Rank":"35"},{"URN":"135563","NeighbourURN":"139125","Dist":"0.819148672","Rank":"36"},{"URN":"135563","NeighbourURN":"124221","Dist":"0.8242495","Rank":"37"},{"URN":"135563","NeighbourURN":"142542","Dist":"0.826018464","Rank":"38"},{"URN":"135563","NeighbourURN":"111218","Dist":"0.826173569","Rank":"39"},{"URN":"135563","NeighbourURN":"104294","Dist":"0.828663873","Rank":"40"},{"URN":"135563","NeighbourURN":"133333","Dist":"0.829469667","Rank":"41"},{"URN":"135563","NeighbourURN":"144194","Dist":"0.830324309","Rank":"42"},{"URN":"135563","NeighbourURN":"105449","Dist":"0.831005428","Rank":"43"},{"URN":"135563","NeighbourURN":"139856","Dist":"0.831685234","Rank":"44"},{"URN":"135563","NeighbourURN":"143452","Dist":"0.832251575","Rank":"45"},{"URN":"135563","NeighbourURN":"122994","Dist":"0.832927017","Rank":"46"},{"URN":"135563","NeighbourURN":"114834","Dist":"0.834547813","Rank":"47"},{"URN":"135563","NeighbourURN":"144351","Dist":"0.843598006","Rank":"48"},{"URN":"135563","NeighbourURN":"136293","Dist":"0.843730831","Rank":"49"},{"URN":"135563","NeighbourURN":"105405","Dist":"0.846090074","Rank":"50"},{"URN":"135584","NeighbourURN":"146327","Dist":"0.683923018","Rank":"1"},{"URN":"135584","NeighbourURN":"135958","Dist":"0.761480108","Rank":"2"},{"URN":"135584","NeighbourURN":"131752","Dist":"0.785190725","Rank":"3"},{"URN":"135584","NeighbourURN":"100171","Dist":"0.804355665","Rank":"4"},{"URN":"135584","NeighbourURN":"100234","Dist":"0.853179403","Rank":"5"},{"URN":"135584","NeighbourURN":"112951","Dist":"0.882434179","Rank":"6"},{"URN":"135584","NeighbourURN":"135423","Dist":"0.902091196","Rank":"7"},{"URN":"135584","NeighbourURN":"143079","Dist":"0.909245633","Rank":"8"},{"URN":"135584","NeighbourURN":"135264","Dist":"0.915724407","Rank":"9"},{"URN":"135584","NeighbourURN":"139856","Dist":"0.926727513","Rank":"10"},{"URN":"135584","NeighbourURN":"139888","Dist":"0.935934045","Rank":"11"},{"URN":"135584","NeighbourURN":"103080","Dist":"0.960951257","Rank":"12"},{"URN":"135584","NeighbourURN":"142219","Dist":"0.976586117","Rank":"13"},{"URN":"135584","NeighbourURN":"145439","Dist":"0.981228582","Rank":"14"},{"URN":"135584","NeighbourURN":"140935","Dist":"0.982630338","Rank":"15"},{"URN":"135584","NeighbourURN":"100920","Dist":"0.987142548","Rank":"16"},{"URN":"135584","NeighbourURN":"135242","Dist":"0.98912785","Rank":"17"},{"URN":"135584","NeighbourURN":"145140","Dist":"0.994286307","Rank":"18"},{"URN":"135584","NeighbourURN":"139675","Dist":"0.994553161","Rank":"19"},{"URN":"135584","NeighbourURN":"131970","Dist":"1.013900795","Rank":"20"},{"URN":"135584","NeighbourURN":"103217","Dist":"1.017548257","Rank":"21"},{"URN":"135584","NeighbourURN":"135968","Dist":"1.019141047","Rank":"22"},{"URN":"135584","NeighbourURN":"100747","Dist":"1.022112819","Rank":"23"},{"URN":"135584","NeighbourURN":"141318","Dist":"1.028649254","Rank":"24"},{"URN":"135584","NeighbourURN":"146722","Dist":"1.032843764","Rank":"25"},{"URN":"135584","NeighbourURN":"135296","Dist":"1.037475664","Rank":"26"},{"URN":"135584","NeighbourURN":"135597","Dist":"1.038350475","Rank":"27"},{"URN":"135584","NeighbourURN":"145173","Dist":"1.039026994","Rank":"28"},{"URN":"135584","NeighbourURN":"103392","Dist":"1.040287517","Rank":"29"},{"URN":"135584","NeighbourURN":"131842","Dist":"1.04454607","Rank":"30"},{"URN":"135584","NeighbourURN":"144617","Dist":"1.049790121","Rank":"31"},{"URN":"135584","NeighbourURN":"131184","Dist":"1.051355852","Rank":"32"},{"URN":"135584","NeighbourURN":"143090","Dist":"1.055654268","Rank":"33"},{"URN":"135584","NeighbourURN":"143198","Dist":"1.055818622","Rank":"34"},{"URN":"135584","NeighbourURN":"143379","Dist":"1.057000606","Rank":"35"},{"URN":"135584","NeighbourURN":"145775","Dist":"1.060268474","Rank":"36"},{"URN":"135584","NeighbourURN":"143437","Dist":"1.073384729","Rank":"37"},{"URN":"135584","NeighbourURN":"139016","Dist":"1.074846674","Rank":"38"},{"URN":"135584","NeighbourURN":"146117","Dist":"1.078998988","Rank":"39"},{"URN":"135584","NeighbourURN":"103460","Dist":"1.081149029","Rank":"40"},{"URN":"135584","NeighbourURN":"138888","Dist":"1.085389281","Rank":"41"},{"URN":"135584","NeighbourURN":"140394","Dist":"1.086563661","Rank":"42"},{"URN":"135584","NeighbourURN":"100829","Dist":"1.087190663","Rank":"43"},{"URN":"135584","NeighbourURN":"102124","Dist":"1.089311696","Rank":"44"},{"URN":"135584","NeighbourURN":"139815","Dist":"1.089744303","Rank":"45"},{"URN":"135584","NeighbourURN":"139049","Dist":"1.089758662","Rank":"46"},{"URN":"135584","NeighbourURN":"100898","Dist":"1.090445277","Rank":"47"},{"URN":"135584","NeighbourURN":"142230","Dist":"1.090561068","Rank":"48"},{"URN":"135584","NeighbourURN":"134798","Dist":"1.090750497","Rank":"49"},{"URN":"135584","NeighbourURN":"145314","Dist":"1.091462503","Rank":"50"},{"URN":"135597","NeighbourURN":"145477","Dist":"0.576445937","Rank":"1"},{"URN":"135597","NeighbourURN":"139049","Dist":"0.585903278","Rank":"2"},{"URN":"135597","NeighbourURN":"144617","Dist":"0.597997729","Rank":"3"},{"URN":"135597","NeighbourURN":"137274","Dist":"0.628929418","Rank":"4"},{"URN":"135597","NeighbourURN":"141883","Dist":"0.711242423","Rank":"5"},{"URN":"135597","NeighbourURN":"145173","Dist":"0.721903313","Rank":"6"},{"URN":"135597","NeighbourURN":"104294","Dist":"0.737191256","Rank":"7"},{"URN":"135597","NeighbourURN":"145314","Dist":"0.757012567","Rank":"8"},{"URN":"135597","NeighbourURN":"139133","Dist":"0.759623342","Rank":"9"},{"URN":"135597","NeighbourURN":"139675","Dist":"0.76750673","Rank":"10"},{"URN":"135597","NeighbourURN":"142542","Dist":"0.772179596","Rank":"11"},{"URN":"135597","NeighbourURN":"131021","Dist":"0.782968713","Rank":"12"},{"URN":"135597","NeighbourURN":"135423","Dist":"0.794219625","Rank":"13"},{"URN":"135597","NeighbourURN":"142437","Dist":"0.794768466","Rank":"14"},{"URN":"135597","NeighbourURN":"143437","Dist":"0.802386856","Rank":"15"},{"URN":"135597","NeighbourURN":"138551","Dist":"0.807605495","Rank":"16"},{"URN":"135597","NeighbourURN":"130259","Dist":"0.816969035","Rank":"17"},{"URN":"135597","NeighbourURN":"137578","Dist":"0.850201711","Rank":"18"},{"URN":"135597","NeighbourURN":"139856","Dist":"0.856456205","Rank":"19"},{"URN":"135597","NeighbourURN":"144482","Dist":"0.868702976","Rank":"20"},{"URN":"135597","NeighbourURN":"142307","Dist":"0.872332507","Rank":"21"},{"URN":"135597","NeighbourURN":"139508","Dist":"0.879543881","Rank":"22"},{"URN":"135597","NeighbourURN":"138104","Dist":"0.883272956","Rank":"23"},{"URN":"135597","NeighbourURN":"138575","Dist":"0.893342099","Rank":"24"},{"URN":"135597","NeighbourURN":"140012","Dist":"0.898490124","Rank":"25"},{"URN":"135597","NeighbourURN":"144194","Dist":"0.898989423","Rank":"26"},{"URN":"135597","NeighbourURN":"135563","Dist":"0.90871725","Rank":"27"},{"URN":"135597","NeighbourURN":"143620","Dist":"0.911470552","Rank":"28"},{"URN":"135597","NeighbourURN":"140709","Dist":"0.923481564","Rank":"29"},{"URN":"135597","NeighbourURN":"141396","Dist":"0.926530315","Rank":"30"},{"URN":"135597","NeighbourURN":"138653","Dist":"0.932350911","Rank":"31"},{"URN":"135597","NeighbourURN":"104070","Dist":"0.938701942","Rank":"32"},{"URN":"135597","NeighbourURN":"143087","Dist":"0.961047083","Rank":"33"},{"URN":"135597","NeighbourURN":"143322","Dist":"0.961845218","Rank":"34"},{"URN":"135597","NeighbourURN":"138300","Dist":"0.961932349","Rank":"35"},{"URN":"135597","NeighbourURN":"124221","Dist":"0.96297542","Rank":"36"},{"URN":"135597","NeighbourURN":"141318","Dist":"0.976915675","Rank":"37"},{"URN":"135597","NeighbourURN":"135367","Dist":"0.977178819","Rank":"38"},{"URN":"135597","NeighbourURN":"139228","Dist":"0.977268526","Rank":"39"},{"URN":"135597","NeighbourURN":"146079","Dist":"0.983533576","Rank":"40"},{"URN":"135597","NeighbourURN":"132241","Dist":"0.983586883","Rank":"41"},{"URN":"135597","NeighbourURN":"138048","Dist":"0.986189759","Rank":"42"},{"URN":"135597","NeighbourURN":"143030","Dist":"0.989625279","Rank":"43"},{"URN":"135597","NeighbourURN":"139263","Dist":"0.989716169","Rank":"44"},{"URN":"135597","NeighbourURN":"111632","Dist":"0.99119444","Rank":"45"},{"URN":"135597","NeighbourURN":"144136","Dist":"0.992341608","Rank":"46"},{"URN":"135597","NeighbourURN":"140041","Dist":"0.99422996","Rank":"47"},{"URN":"135597","NeighbourURN":"135139","Dist":"0.995111305","Rank":"48"},{"URN":"135597","NeighbourURN":"141339","Dist":"0.997611103","Rank":"49"},{"URN":"135597","NeighbourURN":"138591","Dist":"0.997731406","Rank":"50"},{"URN":"135619","NeighbourURN":"137306","Dist":"0.459153776","Rank":"1"},{"URN":"135619","NeighbourURN":"137119","Dist":"0.469504522","Rank":"2"},{"URN":"135619","NeighbourURN":"135966","Dist":"0.556104353","Rank":"3"},{"URN":"135619","NeighbourURN":"138214","Dist":"0.562842016","Rank":"4"},{"URN":"135619","NeighbourURN":"135879","Dist":"0.579806439","Rank":"5"},{"URN":"135619","NeighbourURN":"137349","Dist":"0.639141309","Rank":"6"},{"URN":"135619","NeighbourURN":"116463","Dist":"0.668096556","Rank":"7"},{"URN":"135619","NeighbourURN":"118919","Dist":"0.669745215","Rank":"8"},{"URN":"135619","NeighbourURN":"141300","Dist":"0.764460193","Rank":"9"},{"URN":"135619","NeighbourURN":"135866","Dist":"0.860079377","Rank":"10"},{"URN":"135619","NeighbourURN":"136197","Dist":"0.957140477","Rank":"11"},{"URN":"135619","NeighbourURN":"116234","Dist":"0.962354","Rank":"12"},{"URN":"135619","NeighbourURN":"141683","Dist":"0.974532343","Rank":"13"},{"URN":"135619","NeighbourURN":"135263","Dist":"0.985390655","Rank":"14"},{"URN":"135619","NeighbourURN":"139686","Dist":"0.987848251","Rank":"15"},{"URN":"135619","NeighbourURN":"137089","Dist":"1.024351401","Rank":"16"},{"URN":"135619","NeighbourURN":"135367","Dist":"1.063797649","Rank":"17"},{"URN":"135619","NeighbourURN":"108059","Dist":"1.069053171","Rank":"18"},{"URN":"135619","NeighbourURN":"136454","Dist":"1.07697817","Rank":"19"},{"URN":"135619","NeighbourURN":"144606","Dist":"1.0777715","Rank":"20"},{"URN":"135619","NeighbourURN":"108076","Dist":"1.094988067","Rank":"21"},{"URN":"135619","NeighbourURN":"137947","Dist":"1.096479485","Rank":"22"},{"URN":"135619","NeighbourURN":"138475","Dist":"1.097701588","Rank":"23"},{"URN":"135619","NeighbourURN":"136013","Dist":"1.097788462","Rank":"24"},{"URN":"135619","NeighbourURN":"139658","Dist":"1.122410676","Rank":"25"},{"URN":"135619","NeighbourURN":"135881","Dist":"1.149695283","Rank":"26"},{"URN":"135619","NeighbourURN":"137106","Dist":"1.164577797","Rank":"27"},{"URN":"135619","NeighbourURN":"137108","Dist":"1.169481789","Rank":"28"},{"URN":"135619","NeighbourURN":"137770","Dist":"1.171753264","Rank":"29"},{"URN":"135619","NeighbourURN":"107562","Dist":"1.18183709","Rank":"30"},{"URN":"135619","NeighbourURN":"141165","Dist":"1.190721705","Rank":"31"},{"URN":"135619","NeighbourURN":"138375","Dist":"1.212759117","Rank":"32"},{"URN":"135619","NeighbourURN":"139796","Dist":"1.218132021","Rank":"33"},{"URN":"135619","NeighbourURN":"142869","Dist":"1.218842688","Rank":"34"},{"URN":"135619","NeighbourURN":"137753","Dist":"1.226019943","Rank":"35"},{"URN":"135619","NeighbourURN":"135364","Dist":"1.22944165","Rank":"36"},{"URN":"135619","NeighbourURN":"135877","Dist":"1.230275616","Rank":"37"},{"URN":"135619","NeighbourURN":"145140","Dist":"1.238644803","Rank":"38"},{"URN":"135619","NeighbourURN":"143101","Dist":"1.244618118","Rank":"39"},{"URN":"135619","NeighbourURN":"137487","Dist":"1.245862739","Rank":"40"},{"URN":"135619","NeighbourURN":"140204","Dist":"1.275881402","Rank":"41"},{"URN":"135619","NeighbourURN":"138073","Dist":"1.295255362","Rank":"42"},{"URN":"135619","NeighbourURN":"143338","Dist":"1.307886876","Rank":"43"},{"URN":"135619","NeighbourURN":"136398","Dist":"1.318720082","Rank":"44"},{"URN":"135619","NeighbourURN":"139668","Dist":"1.331056655","Rank":"45"},{"URN":"135619","NeighbourURN":"136413","Dist":"1.332931715","Rank":"46"},{"URN":"135619","NeighbourURN":"143197","Dist":"1.344899746","Rank":"47"},{"URN":"135619","NeighbourURN":"139815","Dist":"1.349015456","Rank":"48"},{"URN":"135619","NeighbourURN":"145173","Dist":"1.356620918","Rank":"49"},{"URN":"135619","NeighbourURN":"135507","Dist":"1.364339688","Rank":"50"},{"URN":"135866","NeighbourURN":"143197","Dist":"0.574349501","Rank":"1"},{"URN":"135866","NeighbourURN":"135966","Dist":"0.585026594","Rank":"2"},{"URN":"135866","NeighbourURN":"137306","Dist":"0.623803561","Rank":"3"},{"URN":"135866","NeighbourURN":"135296","Dist":"0.721109126","Rank":"4"},{"URN":"135866","NeighbourURN":"135881","Dist":"0.743160309","Rank":"5"},{"URN":"135866","NeighbourURN":"135263","Dist":"0.743429445","Rank":"6"},{"URN":"135866","NeighbourURN":"118919","Dist":"0.773701827","Rank":"7"},{"URN":"135866","NeighbourURN":"139888","Dist":"0.775081226","Rank":"8"},{"URN":"135866","NeighbourURN":"135367","Dist":"0.784493099","Rank":"9"},{"URN":"135866","NeighbourURN":"108059","Dist":"0.78625938","Rank":"10"},{"URN":"135866","NeighbourURN":"135879","Dist":"0.800762228","Rank":"11"},{"URN":"135866","NeighbourURN":"139815","Dist":"0.805074701","Rank":"12"},{"URN":"135866","NeighbourURN":"100171","Dist":"0.808441852","Rank":"13"},{"URN":"135866","NeighbourURN":"141300","Dist":"0.82493624","Rank":"14"},{"URN":"135866","NeighbourURN":"136197","Dist":"0.832703296","Rank":"15"},{"URN":"135866","NeighbourURN":"143101","Dist":"0.832867706","Rank":"16"},{"URN":"135866","NeighbourURN":"138214","Dist":"0.835144206","Rank":"17"},{"URN":"135866","NeighbourURN":"116463","Dist":"0.836798606","Rank":"18"},{"URN":"135866","NeighbourURN":"137119","Dist":"0.840330247","Rank":"19"},{"URN":"135866","NeighbourURN":"141683","Dist":"0.853882354","Rank":"20"},{"URN":"135866","NeighbourURN":"140326","Dist":"0.859254642","Rank":"21"},{"URN":"135866","NeighbourURN":"135619","Dist":"0.860079377","Rank":"22"},{"URN":"135866","NeighbourURN":"142219","Dist":"0.885208491","Rank":"23"},{"URN":"135866","NeighbourURN":"140373","Dist":"0.885628876","Rank":"24"},{"URN":"135866","NeighbourURN":"137349","Dist":"0.902641279","Rank":"25"},{"URN":"135866","NeighbourURN":"139703","Dist":"0.905067209","Rank":"26"},{"URN":"135866","NeighbourURN":"137093","Dist":"0.912944942","Rank":"27"},{"URN":"135866","NeighbourURN":"145140","Dist":"0.930724397","Rank":"28"},{"URN":"135866","NeighbourURN":"100747","Dist":"0.942373761","Rank":"29"},{"URN":"135866","NeighbourURN":"135968","Dist":"0.949349102","Rank":"30"},{"URN":"135866","NeighbourURN":"138518","Dist":"0.950819351","Rank":"31"},{"URN":"135866","NeighbourURN":"140935","Dist":"0.952249887","Rank":"32"},{"URN":"135866","NeighbourURN":"139686","Dist":"0.952943479","Rank":"33"},{"URN":"135866","NeighbourURN":"134314","Dist":"0.953069812","Rank":"34"},{"URN":"135866","NeighbourURN":"136329","Dist":"0.978826573","Rank":"35"},{"URN":"135866","NeighbourURN":"139856","Dist":"0.997464391","Rank":"36"},{"URN":"135866","NeighbourURN":"143379","Dist":"0.997522113","Rank":"37"},{"URN":"135866","NeighbourURN":"138475","Dist":"1.015514189","Rank":"38"},{"URN":"135866","NeighbourURN":"116234","Dist":"1.032836812","Rank":"39"},{"URN":"135866","NeighbourURN":"135600","Dist":"1.038408306","Rank":"40"},{"URN":"135866","NeighbourURN":"101244","Dist":"1.044015355","Rank":"41"},{"URN":"135866","NeighbourURN":"140204","Dist":"1.048695732","Rank":"42"},{"URN":"135866","NeighbourURN":"137487","Dist":"1.050351376","Rank":"43"},{"URN":"135866","NeighbourURN":"146327","Dist":"1.057957317","Rank":"44"},{"URN":"135866","NeighbourURN":"135364","Dist":"1.071784039","Rank":"45"},{"URN":"135866","NeighbourURN":"107562","Dist":"1.074616403","Rank":"46"},{"URN":"135866","NeighbourURN":"141752","Dist":"1.078904916","Rank":"47"},{"URN":"135866","NeighbourURN":"132089","Dist":"1.081540168","Rank":"48"},{"URN":"135866","NeighbourURN":"138375","Dist":"1.082236781","Rank":"49"},{"URN":"135866","NeighbourURN":"136013","Dist":"1.089937423","Rank":"50"},{"URN":"135958","NeighbourURN":"100171","Dist":"0.55957927","Rank":"1"},{"URN":"135958","NeighbourURN":"112951","Dist":"0.607940868","Rank":"2"},{"URN":"135958","NeighbourURN":"141752","Dist":"0.630651042","Rank":"3"},{"URN":"135958","NeighbourURN":"143198","Dist":"0.656614783","Rank":"4"},{"URN":"135958","NeighbourURN":"142219","Dist":"0.658877916","Rank":"5"},{"URN":"135958","NeighbourURN":"135242","Dist":"0.681615564","Rank":"6"},{"URN":"135958","NeighbourURN":"103080","Dist":"0.692625981","Rank":"7"},{"URN":"135958","NeighbourURN":"135584","Dist":"0.761480108","Rank":"8"},{"URN":"135958","NeighbourURN":"135296","Dist":"0.814110128","Rank":"9"},{"URN":"135958","NeighbourURN":"139888","Dist":"0.815068784","Rank":"10"},{"URN":"135958","NeighbourURN":"134369","Dist":"0.820240661","Rank":"11"},{"URN":"135958","NeighbourURN":"134798","Dist":"0.827286159","Rank":"12"},{"URN":"135958","NeighbourURN":"139703","Dist":"0.876823361","Rank":"13"},{"URN":"135958","NeighbourURN":"140935","Dist":"0.886768483","Rank":"14"},{"URN":"135958","NeighbourURN":"143197","Dist":"0.893131071","Rank":"15"},{"URN":"135958","NeighbourURN":"146327","Dist":"0.919263721","Rank":"16"},{"URN":"135958","NeighbourURN":"132089","Dist":"0.921450043","Rank":"17"},{"URN":"135958","NeighbourURN":"139016","Dist":"0.93182161","Rank":"18"},{"URN":"135958","NeighbourURN":"145140","Dist":"0.940132601","Rank":"19"},{"URN":"135958","NeighbourURN":"135968","Dist":"0.95588809","Rank":"20"},{"URN":"135958","NeighbourURN":"139815","Dist":"0.957198901","Rank":"21"},{"URN":"135958","NeighbourURN":"143379","Dist":"0.959690354","Rank":"22"},{"URN":"135958","NeighbourURN":"146900","Dist":"0.963119769","Rank":"23"},{"URN":"135958","NeighbourURN":"138266","Dist":"0.963269222","Rank":"24"},{"URN":"135958","NeighbourURN":"103119","Dist":"0.971354137","Rank":"25"},{"URN":"135958","NeighbourURN":"143079","Dist":"0.979259231","Rank":"26"},{"URN":"135958","NeighbourURN":"140373","Dist":"0.980834037","Rank":"27"},{"URN":"135958","NeighbourURN":"100920","Dist":"0.984648632","Rank":"28"},{"URN":"135958","NeighbourURN":"131970","Dist":"0.98479126","Rank":"29"},{"URN":"135958","NeighbourURN":"100747","Dist":"0.987122951","Rank":"30"},{"URN":"135958","NeighbourURN":"135264","Dist":"1.007675502","Rank":"31"},{"URN":"135958","NeighbourURN":"140326","Dist":"1.010616279","Rank":"32"},{"URN":"135958","NeighbourURN":"103217","Dist":"1.021603272","Rank":"33"},{"URN":"135958","NeighbourURN":"101898","Dist":"1.022867731","Rank":"34"},{"URN":"135958","NeighbourURN":"131752","Dist":"1.030645864","Rank":"35"},{"URN":"135958","NeighbourURN":"131089","Dist":"1.030714672","Rank":"36"},{"URN":"135958","NeighbourURN":"145106","Dist":"1.032314041","Rank":"37"},{"URN":"135958","NeighbourURN":"134840","Dist":"1.032532626","Rank":"38"},{"URN":"135958","NeighbourURN":"143090","Dist":"1.034268398","Rank":"39"},{"URN":"135958","NeighbourURN":"139856","Dist":"1.040160266","Rank":"40"},{"URN":"135958","NeighbourURN":"141071","Dist":"1.047223573","Rank":"41"},{"URN":"135958","NeighbourURN":"138799","Dist":"1.061786871","Rank":"42"},{"URN":"135958","NeighbourURN":"105422","Dist":"1.070303189","Rank":"43"},{"URN":"135958","NeighbourURN":"101988","Dist":"1.074789907","Rank":"44"},{"URN":"135958","NeighbourURN":"131775","Dist":"1.076163498","Rank":"45"},{"URN":"135958","NeighbourURN":"101222","Dist":"1.080005572","Rank":"46"},{"URN":"135958","NeighbourURN":"103392","Dist":"1.083489303","Rank":"47"},{"URN":"135958","NeighbourURN":"145439","Dist":"1.085669897","Rank":"48"},{"URN":"135958","NeighbourURN":"100917","Dist":"1.090531485","Rank":"49"},{"URN":"135958","NeighbourURN":"105404","Dist":"1.093566887","Rank":"50"},{"URN":"135966","NeighbourURN":"137306","Dist":"0.337716762","Rank":"1"},{"URN":"135966","NeighbourURN":"138214","Dist":"0.396652305","Rank":"2"},{"URN":"135966","NeighbourURN":"135879","Dist":"0.501818812","Rank":"3"},{"URN":"135966","NeighbourURN":"141300","Dist":"0.52568254","Rank":"4"},{"URN":"135966","NeighbourURN":"137119","Dist":"0.528770179","Rank":"5"},{"URN":"135966","NeighbourURN":"135619","Dist":"0.556104353","Rank":"6"},{"URN":"135966","NeighbourURN":"135866","Dist":"0.585026594","Rank":"7"},{"URN":"135966","NeighbourURN":"137349","Dist":"0.607264046","Rank":"8"},{"URN":"135966","NeighbourURN":"118919","Dist":"0.611935776","Rank":"9"},{"URN":"135966","NeighbourURN":"139686","Dist":"0.625732668","Rank":"10"},{"URN":"135966","NeighbourURN":"116463","Dist":"0.639638127","Rank":"11"},{"URN":"135966","NeighbourURN":"108059","Dist":"0.652525982","Rank":"12"},{"URN":"135966","NeighbourURN":"138475","Dist":"0.735722139","Rank":"13"},{"URN":"135966","NeighbourURN":"107562","Dist":"0.786526721","Rank":"14"},{"URN":"135966","NeighbourURN":"137770","Dist":"0.798911727","Rank":"15"},{"URN":"135966","NeighbourURN":"136197","Dist":"0.799551841","Rank":"16"},{"URN":"135966","NeighbourURN":"116234","Dist":"0.805097249","Rank":"17"},{"URN":"135966","NeighbourURN":"141165","Dist":"0.814090815","Rank":"18"},{"URN":"135966","NeighbourURN":"143101","Dist":"0.825916447","Rank":"19"},{"URN":"135966","NeighbourURN":"136013","Dist":"0.834115851","Rank":"20"},{"URN":"135966","NeighbourURN":"139796","Dist":"0.864079333","Rank":"21"},{"URN":"135966","NeighbourURN":"139658","Dist":"0.885084143","Rank":"22"},{"URN":"135966","NeighbourURN":"141683","Dist":"0.898372421","Rank":"23"},{"URN":"135966","NeighbourURN":"142869","Dist":"0.901967313","Rank":"24"},{"URN":"135966","NeighbourURN":"135877","Dist":"0.910814425","Rank":"25"},{"URN":"135966","NeighbourURN":"137089","Dist":"0.91735777","Rank":"26"},{"URN":"135966","NeighbourURN":"145140","Dist":"0.928598318","Rank":"27"},{"URN":"135966","NeighbourURN":"137947","Dist":"0.941743801","Rank":"28"},{"URN":"135966","NeighbourURN":"135263","Dist":"0.943663925","Rank":"29"},{"URN":"135966","NeighbourURN":"137093","Dist":"0.943735248","Rank":"30"},{"URN":"135966","NeighbourURN":"135367","Dist":"0.96266012","Rank":"31"},{"URN":"135966","NeighbourURN":"100747","Dist":"0.964337906","Rank":"32"},{"URN":"135966","NeighbourURN":"101193","Dist":"0.966117099","Rank":"33"},{"URN":"135966","NeighbourURN":"143197","Dist":"0.967579789","Rank":"34"},{"URN":"135966","NeighbourURN":"137753","Dist":"0.969206511","Rank":"35"},{"URN":"135966","NeighbourURN":"138582","Dist":"0.97732837","Rank":"36"},{"URN":"135966","NeighbourURN":"135881","Dist":"0.977769092","Rank":"37"},{"URN":"135966","NeighbourURN":"138073","Dist":"0.983693978","Rank":"38"},{"URN":"135966","NeighbourURN":"138375","Dist":"0.989707139","Rank":"39"},{"URN":"135966","NeighbourURN":"137487","Dist":"1.006010585","Rank":"40"},{"URN":"135966","NeighbourURN":"144606","Dist":"1.012895823","Rank":"41"},{"URN":"135966","NeighbourURN":"136454","Dist":"1.01356813","Rank":"42"},{"URN":"135966","NeighbourURN":"100171","Dist":"1.025638547","Rank":"43"},{"URN":"135966","NeighbourURN":"108076","Dist":"1.031437342","Rank":"44"},{"URN":"135966","NeighbourURN":"135296","Dist":"1.031538351","Rank":"45"},{"URN":"135966","NeighbourURN":"136413","Dist":"1.033651308","Rank":"46"},{"URN":"135966","NeighbourURN":"134314","Dist":"1.034877843","Rank":"47"},{"URN":"135966","NeighbourURN":"138518","Dist":"1.036145659","Rank":"48"},{"URN":"135966","NeighbourURN":"139815","Dist":"1.036516265","Rank":"49"},{"URN":"135966","NeighbourURN":"140204","Dist":"1.039836294","Rank":"50"},{"URN":"135968","NeighbourURN":"139815","Dist":"0.442518627","Rank":"1"},{"URN":"135968","NeighbourURN":"140373","Dist":"0.494523311","Rank":"2"},{"URN":"135968","NeighbourURN":"139703","Dist":"0.499282052","Rank":"3"},{"URN":"135968","NeighbourURN":"100171","Dist":"0.52185512","Rank":"4"},{"URN":"135968","NeighbourURN":"134798","Dist":"0.620871617","Rank":"5"},{"URN":"135968","NeighbourURN":"145140","Dist":"0.651186238","Rank":"6"},{"URN":"135968","NeighbourURN":"142219","Dist":"0.718812273","Rank":"7"},{"URN":"135968","NeighbourURN":"134369","Dist":"0.73160993","Rank":"8"},{"URN":"135968","NeighbourURN":"143197","Dist":"0.736002389","Rank":"9"},{"URN":"135968","NeighbourURN":"135881","Dist":"0.749969194","Rank":"10"},{"URN":"135968","NeighbourURN":"135296","Dist":"0.787085363","Rank":"11"},{"URN":"135968","NeighbourURN":"139888","Dist":"0.792612719","Rank":"12"},{"URN":"135968","NeighbourURN":"135600","Dist":"0.803457312","Rank":"13"},{"URN":"135968","NeighbourURN":"143379","Dist":"0.816903009","Rank":"14"},{"URN":"135968","NeighbourURN":"140935","Dist":"0.824254561","Rank":"15"},{"URN":"135968","NeighbourURN":"146327","Dist":"0.830757141","Rank":"16"},{"URN":"135968","NeighbourURN":"100747","Dist":"0.831000829","Rank":"17"},{"URN":"135968","NeighbourURN":"132089","Dist":"0.838502774","Rank":"18"},{"URN":"135968","NeighbourURN":"101244","Dist":"0.876964858","Rank":"19"},{"URN":"135968","NeighbourURN":"138518","Dist":"0.924152634","Rank":"20"},{"URN":"135968","NeighbourURN":"137093","Dist":"0.927334899","Rank":"21"},{"URN":"135968","NeighbourURN":"103119","Dist":"0.933914757","Rank":"22"},{"URN":"135968","NeighbourURN":"135264","Dist":"0.94171331","Rank":"23"},{"URN":"135968","NeighbourURN":"135866","Dist":"0.949349102","Rank":"24"},{"URN":"135968","NeighbourURN":"100590","Dist":"0.9531248","Rank":"25"},{"URN":"135968","NeighbourURN":"135958","Dist":"0.95588809","Rank":"26"},{"URN":"135968","NeighbourURN":"139016","Dist":"0.96306343","Rank":"27"},{"URN":"135968","NeighbourURN":"135367","Dist":"0.969128205","Rank":"28"},{"URN":"135968","NeighbourURN":"131752","Dist":"0.97834281","Rank":"29"},{"URN":"135968","NeighbourURN":"103080","Dist":"0.984410356","Rank":"30"},{"URN":"135968","NeighbourURN":"134314","Dist":"0.985590988","Rank":"31"},{"URN":"135968","NeighbourURN":"112951","Dist":"0.987451879","Rank":"32"},{"URN":"135968","NeighbourURN":"135364","Dist":"0.988711975","Rank":"33"},{"URN":"135968","NeighbourURN":"141300","Dist":"0.990775307","Rank":"34"},{"URN":"135968","NeighbourURN":"135263","Dist":"0.992788707","Rank":"35"},{"URN":"135968","NeighbourURN":"138196","Dist":"1.008459017","Rank":"36"},{"URN":"135968","NeighbourURN":"141752","Dist":"1.012970726","Rank":"37"},{"URN":"135968","NeighbourURN":"135584","Dist":"1.019141047","Rank":"38"},{"URN":"135968","NeighbourURN":"136197","Dist":"1.02476136","Rank":"39"},{"URN":"135968","NeighbourURN":"143101","Dist":"1.03136773","Rank":"40"},{"URN":"135968","NeighbourURN":"139319","Dist":"1.04002758","Rank":"41"},{"URN":"135968","NeighbourURN":"140962","Dist":"1.04644067","Rank":"42"},{"URN":"135968","NeighbourURN":"101243","Dist":"1.048758254","Rank":"43"},{"URN":"135968","NeighbourURN":"138690","Dist":"1.06111862","Rank":"44"},{"URN":"135968","NeighbourURN":"137306","Dist":"1.062051028","Rank":"45"},{"URN":"135968","NeighbourURN":"135966","Dist":"1.06867879","Rank":"46"},{"URN":"135968","NeighbourURN":"145106","Dist":"1.070158448","Rank":"47"},{"URN":"135968","NeighbourURN":"141071","Dist":"1.097593592","Rank":"48"},{"URN":"135968","NeighbourURN":"101230","Dist":"1.109649638","Rank":"49"},{"URN":"135968","NeighbourURN":"100749","Dist":"1.11480349","Rank":"50"},{"URN":"136454","NeighbourURN":"108076","Dist":"0.229314219","Rank":"1"},{"URN":"136454","NeighbourURN":"137089","Dist":"0.463559812","Rank":"2"},{"URN":"136454","NeighbourURN":"137349","Dist":"0.809180869","Rank":"3"},{"URN":"136454","NeighbourURN":"138214","Dist":"0.825422048","Rank":"4"},{"URN":"136454","NeighbourURN":"141683","Dist":"0.848070038","Rank":"5"},{"URN":"136454","NeighbourURN":"135263","Dist":"0.863871632","Rank":"6"},{"URN":"136454","NeighbourURN":"137306","Dist":"0.913999618","Rank":"7"},{"URN":"136454","NeighbourURN":"102856","Dist":"0.928978905","Rank":"8"},{"URN":"136454","NeighbourURN":"136891","Dist":"0.978038748","Rank":"9"},{"URN":"136454","NeighbourURN":"101244","Dist":"0.989671494","Rank":"10"},{"URN":"136454","NeighbourURN":"135507","Dist":"0.991007554","Rank":"11"},{"URN":"136454","NeighbourURN":"135966","Dist":"1.01356813","Rank":"12"},{"URN":"136454","NeighbourURN":"141300","Dist":"1.064523428","Rank":"13"},{"URN":"136454","NeighbourURN":"138518","Dist":"1.066427351","Rank":"14"},{"URN":"136454","NeighbourURN":"116407","Dist":"1.067158019","Rank":"15"},{"URN":"136454","NeighbourURN":"139686","Dist":"1.067475577","Rank":"16"},{"URN":"136454","NeighbourURN":"135619","Dist":"1.07697817","Rank":"17"},{"URN":"136454","NeighbourURN":"140294","Dist":"1.106488736","Rank":"18"},{"URN":"136454","NeighbourURN":"139658","Dist":"1.131781983","Rank":"19"},{"URN":"136454","NeighbourURN":"137093","Dist":"1.137347593","Rank":"20"},{"URN":"136454","NeighbourURN":"139319","Dist":"1.148953473","Rank":"21"},{"URN":"136454","NeighbourURN":"135866","Dist":"1.160176783","Rank":"22"},{"URN":"136454","NeighbourURN":"138582","Dist":"1.168520537","Rank":"23"},{"URN":"136454","NeighbourURN":"136329","Dist":"1.175999584","Rank":"24"},{"URN":"136454","NeighbourURN":"118919","Dist":"1.178574137","Rank":"25"},{"URN":"136454","NeighbourURN":"135600","Dist":"1.195539342","Rank":"26"},{"URN":"136454","NeighbourURN":"135881","Dist":"1.199265439","Rank":"27"},{"URN":"136454","NeighbourURN":"135879","Dist":"1.282057148","Rank":"28"},{"URN":"136454","NeighbourURN":"100590","Dist":"1.286217696","Rank":"29"},{"URN":"136454","NeighbourURN":"143101","Dist":"1.288831167","Rank":"30"},{"URN":"136454","NeighbourURN":"139703","Dist":"1.296230062","Rank":"31"},{"URN":"136454","NeighbourURN":"140373","Dist":"1.297411946","Rank":"32"},{"URN":"136454","NeighbourURN":"143197","Dist":"1.297987011","Rank":"33"},{"URN":"136454","NeighbourURN":"138475","Dist":"1.304708295","Rank":"34"},{"URN":"136454","NeighbourURN":"137753","Dist":"1.308643716","Rank":"35"},{"URN":"136454","NeighbourURN":"142869","Dist":"1.313187551","Rank":"36"},{"URN":"136454","NeighbourURN":"139815","Dist":"1.337755396","Rank":"37"},{"URN":"136454","NeighbourURN":"137119","Dist":"1.359020816","Rank":"38"},{"URN":"136454","NeighbourURN":"136398","Dist":"1.379863264","Rank":"39"},{"URN":"136454","NeighbourURN":"141165","Dist":"1.39535125","Rank":"40"},{"URN":"136454","NeighbourURN":"135968","Dist":"1.401537782","Rank":"41"},{"URN":"136454","NeighbourURN":"132089","Dist":"1.411947032","Rank":"42"},{"URN":"136454","NeighbourURN":"137770","Dist":"1.413996775","Rank":"43"},{"URN":"136454","NeighbourURN":"139796","Dist":"1.417330606","Rank":"44"},{"URN":"136454","NeighbourURN":"134314","Dist":"1.429013256","Rank":"45"},{"URN":"136454","NeighbourURN":"136413","Dist":"1.442178191","Rank":"46"},{"URN":"136454","NeighbourURN":"135296","Dist":"1.456687431","Rank":"47"},{"URN":"136454","NeighbourURN":"103119","Dist":"1.458286794","Rank":"48"},{"URN":"136454","NeighbourURN":"107562","Dist":"1.466513169","Rank":"49"},{"URN":"136454","NeighbourURN":"135877","Dist":"1.470962403","Rank":"50"},{"URN":"136891","NeighbourURN":"116407","Dist":"0.345592074","Rank":"1"},{"URN":"136891","NeighbourURN":"140294","Dist":"0.382673023","Rank":"2"},{"URN":"136891","NeighbourURN":"138582","Dist":"0.610241943","Rank":"3"},{"URN":"136891","NeighbourURN":"135507","Dist":"0.613331101","Rank":"4"},{"URN":"136891","NeighbourURN":"137089","Dist":"0.640151633","Rank":"5"},{"URN":"136891","NeighbourURN":"139658","Dist":"0.684861341","Rank":"6"},{"URN":"136891","NeighbourURN":"139686","Dist":"0.743217381","Rank":"7"},{"URN":"136891","NeighbourURN":"142869","Dist":"0.746967149","Rank":"8"},{"URN":"136891","NeighbourURN":"137753","Dist":"0.76293608","Rank":"9"},{"URN":"136891","NeighbourURN":"137349","Dist":"0.904369921","Rank":"10"},{"URN":"136891","NeighbourURN":"138475","Dist":"0.928469159","Rank":"11"},{"URN":"136891","NeighbourURN":"145916","Dist":"0.9312039","Rank":"12"},{"URN":"136891","NeighbourURN":"138214","Dist":"0.955742989","Rank":"13"},{"URN":"136891","NeighbourURN":"142223","Dist":"0.966833894","Rank":"14"},{"URN":"136891","NeighbourURN":"136398","Dist":"0.970416469","Rank":"15"},{"URN":"136891","NeighbourURN":"136454","Dist":"0.978038748","Rank":"16"},{"URN":"136891","NeighbourURN":"139796","Dist":"0.998259268","Rank":"17"},{"URN":"136891","NeighbourURN":"137770","Dist":"1.013448687","Rank":"18"},{"URN":"136891","NeighbourURN":"135877","Dist":"1.015026971","Rank":"19"},{"URN":"136891","NeighbourURN":"136713","Dist":"1.018351395","Rank":"20"},{"URN":"136891","NeighbourURN":"107562","Dist":"1.019667845","Rank":"21"},{"URN":"136891","NeighbourURN":"108076","Dist":"1.053900806","Rank":"22"},{"URN":"136891","NeighbourURN":"141165","Dist":"1.076452657","Rank":"23"},{"URN":"136891","NeighbourURN":"138518","Dist":"1.080565532","Rank":"24"},{"URN":"136891","NeighbourURN":"137093","Dist":"1.090288228","Rank":"25"},{"URN":"136891","NeighbourURN":"136888","Dist":"1.107878026","Rank":"26"},{"URN":"136891","NeighbourURN":"101897","Dist":"1.112469095","Rank":"27"},{"URN":"136891","NeighbourURN":"140314","Dist":"1.119130988","Rank":"28"},{"URN":"136891","NeighbourURN":"139720","Dist":"1.138538637","Rank":"29"},{"URN":"136891","NeighbourURN":"137306","Dist":"1.162489627","Rank":"30"},{"URN":"136891","NeighbourURN":"135966","Dist":"1.170638797","Rank":"31"},{"URN":"136891","NeighbourURN":"102856","Dist":"1.17573089","Rank":"32"},{"URN":"136891","NeighbourURN":"136915","Dist":"1.181507168","Rank":"33"},{"URN":"136891","NeighbourURN":"136329","Dist":"1.186371497","Rank":"34"},{"URN":"136891","NeighbourURN":"143101","Dist":"1.19382652","Rank":"35"},{"URN":"136891","NeighbourURN":"109116","Dist":"1.205580397","Rank":"36"},{"URN":"136891","NeighbourURN":"100590","Dist":"1.206165861","Rank":"37"},{"URN":"136891","NeighbourURN":"125279","Dist":"1.209568768","Rank":"38"},{"URN":"136891","NeighbourURN":"138226","Dist":"1.212631099","Rank":"39"},{"URN":"136891","NeighbourURN":"108636","Dist":"1.213157876","Rank":"40"},{"URN":"136891","NeighbourURN":"137656","Dist":"1.218573251","Rank":"41"},{"URN":"136891","NeighbourURN":"141300","Dist":"1.226492788","Rank":"42"},{"URN":"136891","NeighbourURN":"137947","Dist":"1.241507681","Rank":"43"},{"URN":"136891","NeighbourURN":"102121","Dist":"1.242440706","Rank":"44"},{"URN":"136891","NeighbourURN":"104995","Dist":"1.242536862","Rank":"45"},{"URN":"136891","NeighbourURN":"136413","Dist":"1.244576939","Rank":"46"},{"URN":"136891","NeighbourURN":"135600","Dist":"1.247903288","Rank":"47"},{"URN":"136891","NeighbourURN":"136338","Dist":"1.254631972","Rank":"48"},{"URN":"136891","NeighbourURN":"101193","Dist":"1.262767827","Rank":"49"},{"URN":"136891","NeighbourURN":"140260","Dist":"1.26353965","Rank":"50"},{"URN":"137093","NeighbourURN":"138518","Dist":"0.427223418","Rank":"1"},{"URN":"137093","NeighbourURN":"134314","Dist":"0.501686165","Rank":"2"},{"URN":"137093","NeighbourURN":"135600","Dist":"0.583740291","Rank":"3"},{"URN":"137093","NeighbourURN":"100590","Dist":"0.642727868","Rank":"4"},{"URN":"137093","NeighbourURN":"101244","Dist":"0.697911433","Rank":"5"},{"URN":"137093","NeighbourURN":"143197","Dist":"0.702314929","Rank":"6"},{"URN":"137093","NeighbourURN":"143101","Dist":"0.711822257","Rank":"7"},{"URN":"137093","NeighbourURN":"135507","Dist":"0.723971476","Rank":"8"},{"URN":"137093","NeighbourURN":"138582","Dist":"0.734250096","Rank":"9"},{"URN":"137093","NeighbourURN":"135296","Dist":"0.738491908","Rank":"10"},{"URN":"137093","NeighbourURN":"139686","Dist":"0.77303435","Rank":"11"},{"URN":"137093","NeighbourURN":"139815","Dist":"0.780956576","Rank":"12"},{"URN":"137093","NeighbourURN":"134798","Dist":"0.788989642","Rank":"13"},{"URN":"137093","NeighbourURN":"100747","Dist":"0.8008086","Rank":"14"},{"URN":"137093","NeighbourURN":"139319","Dist":"0.835231268","Rank":"15"},{"URN":"137093","NeighbourURN":"100171","Dist":"0.849874427","Rank":"16"},{"URN":"137093","NeighbourURN":"139016","Dist":"0.865210965","Rank":"17"},{"URN":"137093","NeighbourURN":"138475","Dist":"0.883742148","Rank":"18"},{"URN":"137093","NeighbourURN":"140373","Dist":"0.897764184","Rank":"19"},{"URN":"137093","NeighbourURN":"107562","Dist":"0.897958284","Rank":"20"},{"URN":"137093","NeighbourURN":"136413","Dist":"0.903499787","Rank":"21"},{"URN":"137093","NeighbourURN":"137770","Dist":"0.903582045","Rank":"22"},{"URN":"137093","NeighbourURN":"103119","Dist":"0.906539594","Rank":"23"},{"URN":"137093","NeighbourURN":"135866","Dist":"0.912944942","Rank":"24"},{"URN":"137093","NeighbourURN":"146327","Dist":"0.919850638","Rank":"25"},{"URN":"137093","NeighbourURN":"140935","Dist":"0.927305643","Rank":"26"},{"URN":"137093","NeighbourURN":"135968","Dist":"0.927334899","Rank":"27"},{"URN":"137093","NeighbourURN":"137306","Dist":"0.93414906","Rank":"28"},{"URN":"137093","NeighbourURN":"139703","Dist":"0.936692289","Rank":"29"},{"URN":"137093","NeighbourURN":"135966","Dist":"0.943735248","Rank":"30"},{"URN":"137093","NeighbourURN":"141165","Dist":"0.958851481","Rank":"31"},{"URN":"137093","NeighbourURN":"140326","Dist":"0.964051572","Rank":"32"},{"URN":"137093","NeighbourURN":"140294","Dist":"0.966364957","Rank":"33"},{"URN":"137093","NeighbourURN":"138690","Dist":"0.967377995","Rank":"34"},{"URN":"137093","NeighbourURN":"118919","Dist":"0.978395329","Rank":"35"},{"URN":"137093","NeighbourURN":"139796","Dist":"0.984908866","Rank":"36"},{"URN":"137093","NeighbourURN":"143379","Dist":"0.996430349","Rank":"37"},{"URN":"137093","NeighbourURN":"116407","Dist":"1.001961644","Rank":"38"},{"URN":"137093","NeighbourURN":"101193","Dist":"1.002693828","Rank":"39"},{"URN":"137093","NeighbourURN":"132089","Dist":"1.005227324","Rank":"40"},{"URN":"137093","NeighbourURN":"136329","Dist":"1.006247853","Rank":"41"},{"URN":"137093","NeighbourURN":"102856","Dist":"1.017911538","Rank":"42"},{"URN":"137093","NeighbourURN":"100602","Dist":"1.021418621","Rank":"43"},{"URN":"137093","NeighbourURN":"137753","Dist":"1.032224752","Rank":"44"},{"URN":"137093","NeighbourURN":"141300","Dist":"1.035255258","Rank":"45"},{"URN":"137093","NeighbourURN":"100749","Dist":"1.035703276","Rank":"46"},{"URN":"137093","NeighbourURN":"108059","Dist":"1.04477605","Rank":"47"},{"URN":"137093","NeighbourURN":"134369","Dist":"1.047645893","Rank":"48"},{"URN":"137093","NeighbourURN":"135877","Dist":"1.062280923","Rank":"49"},{"URN":"137093","NeighbourURN":"142869","Dist":"1.078290297","Rank":"50"},{"URN":"137274","NeighbourURN":"135597","Dist":"0.628929418","Rank":"1"},{"URN":"137274","NeighbourURN":"135367","Dist":"0.823553561","Rank":"2"},{"URN":"137274","NeighbourURN":"145173","Dist":"0.856549394","Rank":"3"},{"URN":"137274","NeighbourURN":"135423","Dist":"0.863583914","Rank":"4"},{"URN":"137274","NeighbourURN":"139856","Dist":"0.893063398","Rank":"5"},{"URN":"137274","NeighbourURN":"144617","Dist":"0.941828237","Rank":"6"},{"URN":"137274","NeighbourURN":"135364","Dist":"0.958617089","Rank":"7"},{"URN":"137274","NeighbourURN":"140394","Dist":"1.028679634","Rank":"8"},{"URN":"137274","NeighbourURN":"104294","Dist":"1.038119994","Rank":"9"},{"URN":"137274","NeighbourURN":"139888","Dist":"1.05701394","Rank":"10"},{"URN":"137274","NeighbourURN":"145477","Dist":"1.060765058","Rank":"11"},{"URN":"137274","NeighbourURN":"142542","Dist":"1.067693496","Rank":"12"},{"URN":"137274","NeighbourURN":"138551","Dist":"1.077045098","Rank":"13"},{"URN":"137274","NeighbourURN":"140012","Dist":"1.08308871","Rank":"14"},{"URN":"137274","NeighbourURN":"111632","Dist":"1.085304662","Rank":"15"},{"URN":"137274","NeighbourURN":"143437","Dist":"1.100915774","Rank":"16"},{"URN":"137274","NeighbourURN":"139049","Dist":"1.102029212","Rank":"17"},{"URN":"137274","NeighbourURN":"136197","Dist":"1.104956927","Rank":"18"},{"URN":"137274","NeighbourURN":"144136","Dist":"1.121417015","Rank":"19"},{"URN":"137274","NeighbourURN":"130259","Dist":"1.134362147","Rank":"20"},{"URN":"137274","NeighbourURN":"143152","Dist":"1.136406143","Rank":"21"},{"URN":"137274","NeighbourURN":"135584","Dist":"1.144410562","Rank":"22"},{"URN":"137274","NeighbourURN":"139133","Dist":"1.14485259","Rank":"23"},{"URN":"137274","NeighbourURN":"104070","Dist":"1.158339557","Rank":"24"},{"URN":"137274","NeighbourURN":"145140","Dist":"1.164915411","Rank":"25"},{"URN":"137274","NeighbourURN":"141883","Dist":"1.176367778","Rank":"26"},{"URN":"137274","NeighbourURN":"143087","Dist":"1.176813987","Rank":"27"},{"URN":"137274","NeighbourURN":"142307","Dist":"1.177418181","Rank":"28"},{"URN":"137274","NeighbourURN":"143322","Dist":"1.181421385","Rank":"29"},{"URN":"137274","NeighbourURN":"137480","Dist":"1.181662565","Rank":"30"},{"URN":"137274","NeighbourURN":"144273","Dist":"1.185896716","Rank":"31"},{"URN":"137274","NeighbourURN":"141396","Dist":"1.186698933","Rank":"32"},{"URN":"137274","NeighbourURN":"139508","Dist":"1.188224603","Rank":"33"},{"URN":"137274","NeighbourURN":"131021","Dist":"1.197931296","Rank":"34"},{"URN":"137274","NeighbourURN":"139003","Dist":"1.218880913","Rank":"35"},{"URN":"137274","NeighbourURN":"140709","Dist":"1.222123868","Rank":"36"},{"URN":"137274","NeighbourURN":"141318","Dist":"1.224688512","Rank":"37"},{"URN":"137274","NeighbourURN":"138048","Dist":"1.23071717","Rank":"38"},{"URN":"137274","NeighbourURN":"142219","Dist":"1.230901973","Rank":"39"},{"URN":"137274","NeighbourURN":"145314","Dist":"1.237972708","Rank":"40"},{"URN":"137274","NeighbourURN":"142437","Dist":"1.248395429","Rank":"41"},{"URN":"137274","NeighbourURN":"137141","Dist":"1.254765054","Rank":"42"},{"URN":"137274","NeighbourURN":"139675","Dist":"1.255544786","Rank":"43"},{"URN":"137274","NeighbourURN":"141760","Dist":"1.25645168","Rank":"44"},{"URN":"137274","NeighbourURN":"143620","Dist":"1.257224918","Rank":"45"},{"URN":"137274","NeighbourURN":"145068","Dist":"1.26740508","Rank":"46"},{"URN":"137274","NeighbourURN":"145357","Dist":"1.267908191","Rank":"47"},{"URN":"137274","NeighbourURN":"145305","Dist":"1.272027099","Rank":"48"},{"URN":"137274","NeighbourURN":"145288","Dist":"1.272921757","Rank":"49"},{"URN":"137274","NeighbourURN":"135796","Dist":"1.274869186","Rank":"50"},{"URN":"137306","NeighbourURN":"135966","Dist":"0.337716762","Rank":"1"},{"URN":"137306","NeighbourURN":"118919","Dist":"0.394835573","Rank":"2"},{"URN":"137306","NeighbourURN":"135619","Dist":"0.459153776","Rank":"3"},{"URN":"137306","NeighbourURN":"138214","Dist":"0.495218711","Rank":"4"},{"URN":"137306","NeighbourURN":"137119","Dist":"0.555640368","Rank":"5"},{"URN":"137306","NeighbourURN":"137349","Dist":"0.583816904","Rank":"6"},{"URN":"137306","NeighbourURN":"141300","Dist":"0.591684602","Rank":"7"},{"URN":"137306","NeighbourURN":"135866","Dist":"0.623803561","Rank":"8"},{"URN":"137306","NeighbourURN":"116463","Dist":"0.658147156","Rank":"9"},{"URN":"137306","NeighbourURN":"135879","Dist":"0.660565208","Rank":"10"},{"URN":"137306","NeighbourURN":"139686","Dist":"0.68943103","Rank":"11"},{"URN":"137306","NeighbourURN":"138475","Dist":"0.781647439","Rank":"12"},{"URN":"137306","NeighbourURN":"137770","Dist":"0.856739765","Rank":"13"},{"URN":"137306","NeighbourURN":"135263","Dist":"0.857214904","Rank":"14"},{"URN":"137306","NeighbourURN":"137089","Dist":"0.870031282","Rank":"15"},{"URN":"137306","NeighbourURN":"108059","Dist":"0.871830952","Rank":"16"},{"URN":"137306","NeighbourURN":"107562","Dist":"0.885490318","Rank":"17"},{"URN":"137306","NeighbourURN":"136013","Dist":"0.89240855","Rank":"18"},{"URN":"137306","NeighbourURN":"136197","Dist":"0.900233975","Rank":"19"},{"URN":"137306","NeighbourURN":"141683","Dist":"0.904767725","Rank":"20"},{"URN":"137306","NeighbourURN":"141165","Dist":"0.909866985","Rank":"21"},{"URN":"137306","NeighbourURN":"136454","Dist":"0.913999618","Rank":"22"},{"URN":"137306","NeighbourURN":"143101","Dist":"0.921818306","Rank":"23"},{"URN":"137306","NeighbourURN":"139658","Dist":"0.924429937","Rank":"24"},{"URN":"137306","NeighbourURN":"116234","Dist":"0.930095423","Rank":"25"},{"URN":"137306","NeighbourURN":"137093","Dist":"0.93414906","Rank":"26"},{"URN":"137306","NeighbourURN":"108076","Dist":"0.939036163","Rank":"27"},{"URN":"137306","NeighbourURN":"139796","Dist":"0.939543164","Rank":"28"},{"URN":"137306","NeighbourURN":"135367","Dist":"0.971255995","Rank":"29"},{"URN":"137306","NeighbourURN":"137947","Dist":"0.974021936","Rank":"30"},{"URN":"137306","NeighbourURN":"137753","Dist":"0.975683063","Rank":"31"},{"URN":"137306","NeighbourURN":"135877","Dist":"0.977500565","Rank":"32"},{"URN":"137306","NeighbourURN":"135881","Dist":"0.996922176","Rank":"33"},{"URN":"137306","NeighbourURN":"142869","Dist":"0.999076339","Rank":"34"},{"URN":"137306","NeighbourURN":"139815","Dist":"1.002129067","Rank":"35"},{"URN":"137306","NeighbourURN":"143197","Dist":"1.002270326","Rank":"36"},{"URN":"137306","NeighbourURN":"135507","Dist":"1.002454357","Rank":"37"},{"URN":"137306","NeighbourURN":"138582","Dist":"1.008174961","Rank":"38"},{"URN":"137306","NeighbourURN":"144606","Dist":"1.019294424","Rank":"39"},{"URN":"137306","NeighbourURN":"145140","Dist":"1.019633179","Rank":"40"},{"URN":"137306","NeighbourURN":"136413","Dist":"1.02783739","Rank":"41"},{"URN":"137306","NeighbourURN":"100747","Dist":"1.029109395","Rank":"42"},{"URN":"137306","NeighbourURN":"134314","Dist":"1.02999003","Rank":"43"},{"URN":"137306","NeighbourURN":"138518","Dist":"1.033645587","Rank":"44"},{"URN":"137306","NeighbourURN":"137487","Dist":"1.039056026","Rank":"45"},{"URN":"137306","NeighbourURN":"135968","Dist":"1.062051028","Rank":"46"},{"URN":"137306","NeighbourURN":"140204","Dist":"1.069608338","Rank":"47"},{"URN":"137306","NeighbourURN":"135296","Dist":"1.076874928","Rank":"48"},{"URN":"137306","NeighbourURN":"140294","Dist":"1.085678275","Rank":"49"},{"URN":"137306","NeighbourURN":"135600","Dist":"1.103926403","Rank":"50"},{"URN":"137349","NeighbourURN":"138214","Dist":"0.349660578","Rank":"1"},{"URN":"137349","NeighbourURN":"137306","Dist":"0.583816904","Rank":"2"},{"URN":"137349","NeighbourURN":"135966","Dist":"0.607264046","Rank":"3"},{"URN":"137349","NeighbourURN":"139686","Dist":"0.624013337","Rank":"4"},{"URN":"137349","NeighbourURN":"137089","Dist":"0.634131822","Rank":"5"},{"URN":"137349","NeighbourURN":"135619","Dist":"0.639141309","Rank":"6"},{"URN":"137349","NeighbourURN":"137119","Dist":"0.739283263","Rank":"7"},{"URN":"137349","NeighbourURN":"141300","Dist":"0.771309986","Rank":"8"},{"URN":"137349","NeighbourURN":"118919","Dist":"0.77948226","Rank":"9"},{"URN":"137349","NeighbourURN":"135879","Dist":"0.781787225","Rank":"10"},{"URN":"137349","NeighbourURN":"139658","Dist":"0.801012244","Rank":"11"},{"URN":"137349","NeighbourURN":"136454","Dist":"0.809180869","Rank":"12"},{"URN":"137349","NeighbourURN":"137753","Dist":"0.822344895","Rank":"13"},{"URN":"137349","NeighbourURN":"142869","Dist":"0.824714302","Rank":"14"},{"URN":"137349","NeighbourURN":"108076","Dist":"0.829086451","Rank":"15"},{"URN":"137349","NeighbourURN":"135866","Dist":"0.902641279","Rank":"16"},{"URN":"137349","NeighbourURN":"136891","Dist":"0.904369921","Rank":"17"},{"URN":"137349","NeighbourURN":"138475","Dist":"0.909833079","Rank":"18"},{"URN":"137349","NeighbourURN":"135507","Dist":"0.951313264","Rank":"19"},{"URN":"137349","NeighbourURN":"140294","Dist":"0.956378163","Rank":"20"},{"URN":"137349","NeighbourURN":"116407","Dist":"0.958976455","Rank":"21"},{"URN":"137349","NeighbourURN":"116463","Dist":"0.966816657","Rank":"22"},{"URN":"137349","NeighbourURN":"107562","Dist":"0.970941166","Rank":"23"},{"URN":"137349","NeighbourURN":"143101","Dist":"0.996013553","Rank":"24"},{"URN":"137349","NeighbourURN":"137947","Dist":"0.997653845","Rank":"25"},{"URN":"137349","NeighbourURN":"138582","Dist":"1.001127167","Rank":"26"},{"URN":"137349","NeighbourURN":"139796","Dist":"1.002924931","Rank":"27"},{"URN":"137349","NeighbourURN":"136329","Dist":"1.004218305","Rank":"28"},{"URN":"137349","NeighbourURN":"137770","Dist":"1.007664951","Rank":"29"},{"URN":"137349","NeighbourURN":"135877","Dist":"1.029679549","Rank":"30"},{"URN":"137349","NeighbourURN":"136398","Dist":"1.033478349","Rank":"31"},{"URN":"137349","NeighbourURN":"141165","Dist":"1.037151215","Rank":"32"},{"URN":"137349","NeighbourURN":"141683","Dist":"1.051418638","Rank":"33"},{"URN":"137349","NeighbourURN":"108059","Dist":"1.058917989","Rank":"34"},{"URN":"137349","NeighbourURN":"145916","Dist":"1.061451306","Rank":"35"},{"URN":"137349","NeighbourURN":"135263","Dist":"1.099210067","Rank":"36"},{"URN":"137349","NeighbourURN":"136413","Dist":"1.123342906","Rank":"37"},{"URN":"137349","NeighbourURN":"137093","Dist":"1.129547008","Rank":"38"},{"URN":"137349","NeighbourURN":"138518","Dist":"1.145666007","Rank":"39"},{"URN":"137349","NeighbourURN":"116234","Dist":"1.159570831","Rank":"40"},{"URN":"137349","NeighbourURN":"101193","Dist":"1.166998478","Rank":"41"},{"URN":"137349","NeighbourURN":"136013","Dist":"1.178051697","Rank":"42"},{"URN":"137349","NeighbourURN":"102856","Dist":"1.209660925","Rank":"43"},{"URN":"137349","NeighbourURN":"137108","Dist":"1.237906647","Rank":"44"},{"URN":"137349","NeighbourURN":"143197","Dist":"1.251984451","Rank":"45"},{"URN":"137349","NeighbourURN":"137487","Dist":"1.253324883","Rank":"46"},{"URN":"137349","NeighbourURN":"139668","Dist":"1.259494233","Rank":"47"},{"URN":"137349","NeighbourURN":"140938","Dist":"1.276368943","Rank":"48"},{"URN":"137349","NeighbourURN":"138013","Dist":"1.28827262","Rank":"49"},{"URN":"137349","NeighbourURN":"100590","Dist":"1.29096611","Rank":"50"},{"URN":"137487","NeighbourURN":"140204","Dist":"0.212382784","Rank":"1"},{"URN":"137487","NeighbourURN":"133996","Dist":"0.32810241","Rank":"2"},{"URN":"137487","NeighbourURN":"143338","Dist":"0.383834958","Rank":"3"},{"URN":"137487","NeighbourURN":"141858","Dist":"0.438625825","Rank":"4"},{"URN":"137487","NeighbourURN":"142453","Dist":"0.448303449","Rank":"5"},{"URN":"137487","NeighbourURN":"142349","Dist":"0.454055866","Rank":"6"},{"URN":"137487","NeighbourURN":"138073","Dist":"0.458910568","Rank":"7"},{"URN":"137487","NeighbourURN":"138693","Dist":"0.461623276","Rank":"8"},{"URN":"137487","NeighbourURN":"145063","Dist":"0.466894439","Rank":"9"},{"URN":"137487","NeighbourURN":"100749","Dist":"0.468231658","Rank":"10"},{"URN":"137487","NeighbourURN":"107233","Dist":"0.483753859","Rank":"11"},{"URN":"137487","NeighbourURN":"119184","Dist":"0.499206846","Rank":"12"},{"URN":"137487","NeighbourURN":"103821","Dist":"0.518958876","Rank":"13"},{"URN":"137487","NeighbourURN":"142156","Dist":"0.520732301","Rank":"14"},{"URN":"137487","NeighbourURN":"137010","Dist":"0.529128502","Rank":"15"},{"URN":"137487","NeighbourURN":"141797","Dist":"0.541101973","Rank":"16"},{"URN":"137487","NeighbourURN":"141866","Dist":"0.545898231","Rank":"17"},{"URN":"137487","NeighbourURN":"136653","Dist":"0.546253641","Rank":"18"},{"URN":"137487","NeighbourURN":"102299","Dist":"0.549250147","Rank":"19"},{"URN":"137487","NeighbourURN":"123999","Dist":"0.554382604","Rank":"20"},{"URN":"137487","NeighbourURN":"142964","Dist":"0.558412206","Rank":"21"},{"URN":"137487","NeighbourURN":"144606","Dist":"0.559205807","Rank":"22"},{"URN":"137487","NeighbourURN":"101206","Dist":"0.570195635","Rank":"23"},{"URN":"137487","NeighbourURN":"103791","Dist":"0.573309534","Rank":"24"},{"URN":"137487","NeighbourURN":"143218","Dist":"0.575070556","Rank":"25"},{"URN":"137487","NeighbourURN":"135050","Dist":"0.575157371","Rank":"26"},{"URN":"137487","NeighbourURN":"140071","Dist":"0.57674395","Rank":"27"},{"URN":"137487","NeighbourURN":"121931","Dist":"0.577525784","Rank":"28"},{"URN":"137487","NeighbourURN":"137611","Dist":"0.580035177","Rank":"29"},{"URN":"137487","NeighbourURN":"140917","Dist":"0.581322189","Rank":"30"},{"URN":"137487","NeighbourURN":"104775","Dist":"0.591437725","Rank":"31"},{"URN":"137487","NeighbourURN":"138181","Dist":"0.594648367","Rank":"32"},{"URN":"137487","NeighbourURN":"108475","Dist":"0.594902281","Rank":"33"},{"URN":"137487","NeighbourURN":"113216","Dist":"0.596845356","Rank":"34"},{"URN":"137487","NeighbourURN":"105910","Dist":"0.598596094","Rank":"35"},{"URN":"137487","NeighbourURN":"107087","Dist":"0.600978857","Rank":"36"},{"URN":"137487","NeighbourURN":"138153","Dist":"0.60184671","Rank":"37"},{"URN":"137487","NeighbourURN":"142361","Dist":"0.603401289","Rank":"38"},{"URN":"137487","NeighbourURN":"121321","Dist":"0.606485566","Rank":"39"},{"URN":"137487","NeighbourURN":"123527","Dist":"0.608453285","Rank":"40"},{"URN":"137487","NeighbourURN":"143383","Dist":"0.609657935","Rank":"41"},{"URN":"137487","NeighbourURN":"141021","Dist":"0.609802819","Rank":"42"},{"URN":"137487","NeighbourURN":"121319","Dist":"0.610210455","Rank":"43"},{"URN":"137487","NeighbourURN":"137106","Dist":"0.611178123","Rank":"44"},{"URN":"137487","NeighbourURN":"140932","Dist":"0.611588605","Rank":"45"},{"URN":"137487","NeighbourURN":"102269","Dist":"0.612249693","Rank":"46"},{"URN":"137487","NeighbourURN":"121456","Dist":"0.614721064","Rank":"47"},{"URN":"137487","NeighbourURN":"103696","Dist":"0.617232166","Rank":"48"},{"URN":"137487","NeighbourURN":"138003","Dist":"0.618380701","Rank":"49"},{"URN":"137487","NeighbourURN":"140089","Dist":"0.624225587","Rank":"50"},{"URN":"137578","NeighbourURN":"132241","Dist":"0.500222837","Rank":"1"},{"URN":"137578","NeighbourURN":"144270","Dist":"0.536179056","Rank":"2"},{"URN":"137578","NeighbourURN":"108458","Dist":"0.581927523","Rank":"3"},{"URN":"137578","NeighbourURN":"143620","Dist":"0.609124156","Rank":"4"},{"URN":"137578","NeighbourURN":"138237","Dist":"0.609543486","Rank":"5"},{"URN":"137578","NeighbourURN":"142437","Dist":"0.623199818","Rank":"6"},{"URN":"137578","NeighbourURN":"141627","Dist":"0.632180466","Rank":"7"},{"URN":"137578","NeighbourURN":"139336","Dist":"0.640728711","Rank":"8"},{"URN":"137578","NeighbourURN":"144194","Dist":"0.643904332","Rank":"9"},{"URN":"137578","NeighbourURN":"138577","Dist":"0.664532915","Rank":"10"},{"URN":"137578","NeighbourURN":"105045","Dist":"0.680933946","Rank":"11"},{"URN":"137578","NeighbourURN":"138591","Dist":"0.702596507","Rank":"12"},{"URN":"137578","NeighbourURN":"141883","Dist":"0.705788347","Rank":"13"},{"URN":"137578","NeighbourURN":"141339","Dist":"0.715061173","Rank":"14"},{"URN":"137578","NeighbourURN":"139049","Dist":"0.728172529","Rank":"15"},{"URN":"137578","NeighbourURN":"140128","Dist":"0.735954981","Rank":"16"},{"URN":"137578","NeighbourURN":"104290","Dist":"0.739223774","Rank":"17"},{"URN":"137578","NeighbourURN":"122476","Dist":"0.73935719","Rank":"18"},{"URN":"137578","NeighbourURN":"108769","Dist":"0.740133234","Rank":"19"},{"URN":"137578","NeighbourURN":"139002","Dist":"0.744026218","Rank":"20"},{"URN":"137578","NeighbourURN":"108676","Dist":"0.746176955","Rank":"21"},{"URN":"137578","NeighbourURN":"130259","Dist":"0.750364409","Rank":"22"},{"URN":"137578","NeighbourURN":"144918","Dist":"0.750733699","Rank":"23"},{"URN":"137578","NeighbourURN":"105042","Dist":"0.754111477","Rank":"24"},{"URN":"137578","NeighbourURN":"105048","Dist":"0.755360358","Rank":"25"},{"URN":"137578","NeighbourURN":"123433","Dist":"0.756119526","Rank":"26"},{"URN":"137578","NeighbourURN":"105913","Dist":"0.757274856","Rank":"27"},{"URN":"137578","NeighbourURN":"139269","Dist":"0.76392993","Rank":"28"},{"URN":"137578","NeighbourURN":"108321","Dist":"0.771261879","Rank":"29"},{"URN":"137578","NeighbourURN":"139305","Dist":"0.771775166","Rank":"30"},{"URN":"137578","NeighbourURN":"140889","Dist":"0.773931373","Rank":"31"},{"URN":"137578","NeighbourURN":"141102","Dist":"0.774121512","Rank":"32"},{"URN":"137578","NeighbourURN":"139133","Dist":"0.775631794","Rank":"33"},{"URN":"137578","NeighbourURN":"139959","Dist":"0.775849241","Rank":"34"},{"URN":"137578","NeighbourURN":"144482","Dist":"0.779766827","Rank":"35"},{"URN":"137578","NeighbourURN":"112569","Dist":"0.78179866","Rank":"36"},{"URN":"137578","NeighbourURN":"111626","Dist":"0.790338833","Rank":"37"},{"URN":"137578","NeighbourURN":"142965","Dist":"0.791441261","Rank":"38"},{"URN":"137578","NeighbourURN":"135139","Dist":"0.791639897","Rank":"39"},{"URN":"137578","NeighbourURN":"138104","Dist":"0.79731027","Rank":"40"},{"URN":"137578","NeighbourURN":"136006","Dist":"0.79890251","Rank":"41"},{"URN":"137578","NeighbourURN":"138995","Dist":"0.800423516","Rank":"42"},{"URN":"137578","NeighbourURN":"147394","Dist":"0.803246947","Rank":"43"},{"URN":"137578","NeighbourURN":"141706","Dist":"0.809267199","Rank":"44"},{"URN":"137578","NeighbourURN":"143403","Dist":"0.812037555","Rank":"45"},{"URN":"137578","NeighbourURN":"133759","Dist":"0.813531742","Rank":"46"},{"URN":"137578","NeighbourURN":"140555","Dist":"0.813995672","Rank":"47"},{"URN":"137578","NeighbourURN":"143271","Dist":"0.818238936","Rank":"48"},{"URN":"137578","NeighbourURN":"134751","Dist":"0.818943524","Rank":"49"},{"URN":"137578","NeighbourURN":"138416","Dist":"0.819906472","Rank":"50"},{"URN":"137770","NeighbourURN":"138475","Dist":"0.21038102","Rank":"1"},{"URN":"137770","NeighbourURN":"139796","Dist":"0.308003092","Rank":"2"},{"URN":"137770","NeighbourURN":"107562","Dist":"0.328247998","Rank":"3"},{"URN":"137770","NeighbourURN":"135877","Dist":"0.408307731","Rank":"4"},{"URN":"137770","NeighbourURN":"141165","Dist":"0.418364978","Rank":"5"},{"URN":"137770","NeighbourURN":"137656","Dist":"0.509774719","Rank":"6"},{"URN":"137770","NeighbourURN":"145063","Dist":"0.525255051","Rank":"7"},{"URN":"137770","NeighbourURN":"142869","Dist":"0.539574453","Rank":"8"},{"URN":"137770","NeighbourURN":"137753","Dist":"0.551829642","Rank":"9"},{"URN":"137770","NeighbourURN":"139686","Dist":"0.556420712","Rank":"10"},{"URN":"137770","NeighbourURN":"138582","Dist":"0.562761118","Rank":"11"},{"URN":"137770","NeighbourURN":"145916","Dist":"0.599369408","Rank":"12"},{"URN":"137770","NeighbourURN":"138764","Dist":"0.622503197","Rank":"13"},{"URN":"137770","NeighbourURN":"137947","Dist":"0.651037713","Rank":"14"},{"URN":"137770","NeighbourURN":"139658","Dist":"0.655722304","Rank":"15"},{"URN":"137770","NeighbourURN":"144954","Dist":"0.66255519","Rank":"16"},{"URN":"137770","NeighbourURN":"104995","Dist":"0.674658557","Rank":"17"},{"URN":"137770","NeighbourURN":"136013","Dist":"0.675146935","Rank":"18"},{"URN":"137770","NeighbourURN":"135050","Dist":"0.683677956","Rank":"19"},{"URN":"137770","NeighbourURN":"100749","Dist":"0.696364721","Rank":"20"},{"URN":"137770","NeighbourURN":"101193","Dist":"0.699159571","Rank":"21"},{"URN":"137770","NeighbourURN":"138073","Dist":"0.721455081","Rank":"22"},{"URN":"137770","NeighbourURN":"137487","Dist":"0.722248783","Rank":"23"},{"URN":"137770","NeighbourURN":"136348","Dist":"0.723162096","Rank":"24"},{"URN":"137770","NeighbourURN":"100747","Dist":"0.724700405","Rank":"25"},{"URN":"137770","NeighbourURN":"136713","Dist":"0.726504854","Rank":"26"},{"URN":"137770","NeighbourURN":"142453","Dist":"0.729759459","Rank":"27"},{"URN":"137770","NeighbourURN":"103791","Dist":"0.730624214","Rank":"28"},{"URN":"137770","NeighbourURN":"139171","Dist":"0.731125902","Rank":"29"},{"URN":"137770","NeighbourURN":"103696","Dist":"0.736000241","Rank":"30"},{"URN":"137770","NeighbourURN":"136413","Dist":"0.750584279","Rank":"31"},{"URN":"137770","NeighbourURN":"137971","Dist":"0.759516426","Rank":"32"},{"URN":"137770","NeighbourURN":"143101","Dist":"0.760573875","Rank":"33"},{"URN":"137770","NeighbourURN":"108059","Dist":"0.768307549","Rank":"34"},{"URN":"137770","NeighbourURN":"143110","Dist":"0.77122846","Rank":"35"},{"URN":"137770","NeighbourURN":"137271","Dist":"0.776402672","Rank":"36"},{"URN":"137770","NeighbourURN":"137599","Dist":"0.77706452","Rank":"37"},{"URN":"137770","NeighbourURN":"139286","Dist":"0.781878192","Rank":"38"},{"URN":"137770","NeighbourURN":"146688","Dist":"0.787744133","Rank":"39"},{"URN":"137770","NeighbourURN":"141184","Dist":"0.792702582","Rank":"40"},{"URN":"137770","NeighbourURN":"134774","Dist":"0.792853474","Rank":"41"},{"URN":"137770","NeighbourURN":"114403","Dist":"0.794967175","Rank":"42"},{"URN":"137770","NeighbourURN":"135966","Dist":"0.798911727","Rank":"43"},{"URN":"137770","NeighbourURN":"137697","Dist":"0.799915564","Rank":"44"},{"URN":"137770","NeighbourURN":"143338","Dist":"0.800150903","Rank":"45"},{"URN":"137770","NeighbourURN":"136445","Dist":"0.801376728","Rank":"46"},{"URN":"137770","NeighbourURN":"113216","Dist":"0.804297993","Rank":"47"},{"URN":"137770","NeighbourURN":"118919","Dist":"0.806226551","Rank":"48"},{"URN":"137770","NeighbourURN":"136560","Dist":"0.807143907","Rank":"49"},{"URN":"137770","NeighbourURN":"139668","Dist":"0.807731624","Rank":"50"}]
+[
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "135563",
+        "Dist":  "1.330734516",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "135584",
+        "Dist":  "2.734238328",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.981906377",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "143101",
+        "Dist":  "3.038576211",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "146327",
+        "Dist":  "3.157377096",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "109567",
+        "Dist":  "3.253551781",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "103080",
+        "Dist":  "3.309363573",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "137578",
+        "Dist":  "3.332031399",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "135597",
+        "Dist":  "3.347906418",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "100590",
+        "NeighbourURN":  "137010",
+        "Dist":  "3.349825435",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "146327",
+        "Dist":  "1.278172754",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "140935",
+        "Dist":  "1.756023501",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "144142",
+        "Dist":  "1.900205214",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "135264",
+        "Dist":  "1.932675983",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.074379738",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.140290717",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "135296",
+        "Dist":  "2.177349584",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "137487",
+        "Dist":  "2.178415517",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "137093",
+        "Dist":  "2.427554116",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "100747",
+        "NeighbourURN":  "112951",
+        "Dist":  "2.440316121",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "101243",
+        "Dist":  "1.137575289",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.115379421",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "112951",
+        "Dist":  "2.407255079",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.432901565",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.749537166",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.752711271",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "139016",
+        "Dist":  "2.925572893",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "136413",
+        "Dist":  "3.139995597",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "134369",
+        "Dist":  "3.382656056",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "100749",
+        "NeighbourURN":  "125279",
+        "Dist":  "3.500075128",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "125279",
+        "Dist":  "0.689234273",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "145106",
+        "Dist":  "2.960423209",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "137770",
+        "Dist":  "3.181588227",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "116407",
+        "Dist":  "3.431173737",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "100747",
+        "Dist":  "3.516223609",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "146327",
+        "Dist":  "3.572919454",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "143101",
+        "Dist":  "3.782809652",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "100749",
+        "Dist":  "3.789391153",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "107562",
+        "Dist":  "3.85776372",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "101193",
+        "NeighbourURN":  "136891",
+        "Dist":  "3.867256028",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "135958",
+        "Dist":  "0.925200556",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "134369",
+        "Dist":  "2.614840613",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.622447908",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "101230",
+        "Dist":  "2.783740338",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.845011695",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "135584",
+        "Dist":  "2.849396019",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "137010",
+        "Dist":  "2.918924101",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "112951",
+        "Dist":  "2.922045499",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.960988948",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "101206",
+        "NeighbourURN":  "136413",
+        "Dist":  "2.975648706",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "135423",
+        "Dist":  "1.208575478",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "140204",
+        "Dist":  "2.682879513",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.783740338",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "109567",
+        "Dist":  "2.797890902",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "135597",
+        "Dist":  "2.831386957",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.863589637",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "137010",
+        "Dist":  "3.064399764",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "135958",
+        "Dist":  "3.176200034",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "135584",
+        "Dist":  "3.190088731",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "101230",
+        "NeighbourURN":  "135563",
+        "Dist":  "3.295149695",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "100749",
+        "Dist":  "1.137575289",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "112951",
+        "Dist":  "1.945466875",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.0833447",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.186747684",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "139016",
+        "Dist":  "2.244967939",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.459156249",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.748139744",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "135367",
+        "Dist":  "3.267024101",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "140204",
+        "Dist":  "3.435032815",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "101243",
+        "NeighbourURN":  "144142",
+        "Dist":  "3.575403385",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "140935",
+        "Dist":  "1.312161044",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "112951",
+        "Dist":  "1.392993735",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.074379738",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.082306558",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "100749",
+        "Dist":  "2.115379421",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "101243",
+        "Dist":  "2.186747684",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "139016",
+        "Dist":  "2.208788173",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "135958",
+        "Dist":  "2.713966926",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.845011695",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "103080",
+        "NeighbourURN":  "140204",
+        "Dist":  "2.867333325",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "143101",
+        "Dist":  "0.986922562",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "137770",
+        "Dist":  "1.920024928",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "137487",
+        "Dist":  "2.787736671",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "116407",
+        "Dist":  "2.805108567",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.83338091",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "137093",
+        "Dist":  "2.84333777",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.968220106",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.978160646",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.995807983",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "107562",
+        "NeighbourURN":  "135507",
+        "Dist":  "3.113763314",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "135597",
+        "Dist":  "1.577945599",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "140204",
+        "Dist":  "2.680080566",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.758407693",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "101230",
+        "Dist":  "2.797890902",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "135423",
+        "Dist":  "3.223405543",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "100590",
+        "Dist":  "3.253551781",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "135563",
+        "Dist":  "3.411358167",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "146327",
+        "Dist":  "3.90231002",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "137274",
+        "Dist":  "3.958501302",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "109567",
+        "NeighbourURN":  "137010",
+        "Dist":  "3.969446445",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "139016",
+        "Dist":  "1.183538388",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "103080",
+        "Dist":  "1.392993735",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "140935",
+        "Dist":  "1.451354961",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "101243",
+        "Dist":  "1.945466875",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.164806855",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "100749",
+        "Dist":  "2.407255079",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.440316121",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "135958",
+        "Dist":  "2.570416888",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.863630952",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "112951",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.922045499",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "145106",
+        "Dist":  "1.057517205",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "135507",
+        "Dist":  "1.353389575",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "145140",
+        "Dist":  "1.627433168",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.410559076",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.765652339",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "107562",
+        "Dist":  "2.805108567",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "137093",
+        "Dist":  "2.912728134",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "137349",
+        "Dist":  "3.000138165",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "125279",
+        "Dist":  "3.054562643",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "116407",
+        "NeighbourURN":  "143101",
+        "Dist":  "3.207342676",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "101193",
+        "Dist":  "0.689234273",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "145106",
+        "Dist":  "2.576330993",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.766706193",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.958373123",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "116407",
+        "Dist":  "3.054562643",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "146327",
+        "Dist":  "3.128120489",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "135507",
+        "Dist":  "3.399617803",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "144142",
+        "Dist":  "3.405263754",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "135264",
+        "Dist":  "3.447796284",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "125279",
+        "NeighbourURN":  "136891",
+        "Dist":  "3.458192916",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "135296",
+        "Dist":  "0.834939824",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "135264",
+        "Dist":  "1.530305274",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.140290717",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.257572237",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "137010",
+        "Dist":  "2.391090338",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "135584",
+        "Dist":  "2.45468407",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "137487",
+        "Dist":  "2.542348491",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.779830303",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "134369",
+        "Dist":  "2.873334866",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "131752",
+        "NeighbourURN":  "136413",
+        "Dist":  "2.899778587",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "136413",
+        "Dist":  "0.910594241",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.139287173",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "135958",
+        "Dist":  "2.396113322",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.614840613",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.653412143",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.737050697",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.873334866",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.934673181",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "146327",
+        "Dist":  "3.04309546",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "134369",
+        "NeighbourURN":  "135296",
+        "Dist":  "3.049190229",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "144142",
+        "Dist":  "1.493414233",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "131752",
+        "Dist":  "1.530305274",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "135296",
+        "Dist":  "1.762249401",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "100747",
+        "Dist":  "1.932675983",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "137487",
+        "Dist":  "2.109405923",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "135584",
+        "Dist":  "2.279103034",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.425930822",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.451922901",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "136413",
+        "Dist":  "2.645964814",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135264",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.700473238",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "131752",
+        "Dist":  "0.834939824",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "135264",
+        "Dist":  "1.762249401",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.177349584",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.185608435",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.393259032",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "137487",
+        "Dist":  "2.485887361",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.655091939",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "137010",
+        "Dist":  "2.708860426",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "135584",
+        "Dist":  "2.792031341",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135296",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.95204823",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "140204",
+        "Dist":  "1.175522378",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.316596733",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.721206662",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "109567",
+        "Dist":  "2.758407693",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "137306",
+        "Dist":  "2.772339308",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "135423",
+        "Dist":  "2.835880663",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "101230",
+        "Dist":  "2.863589637",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "112951",
+        "Dist":  "2.863630952",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "138073",
+        "Dist":  "2.879582563",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135367",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.892524933",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "101230",
+        "Dist":  "1.208575478",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "140204",
+        "Dist":  "2.817118431",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.835880663",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "101206",
+        "Dist":  "3.107086539",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "135597",
+        "Dist":  "3.159589201",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "109567",
+        "Dist":  "3.223405543",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "135563",
+        "Dist":  "3.439578084",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "135958",
+        "Dist":  "3.470309819",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "138073",
+        "Dist":  "3.652820724",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135423",
+        "NeighbourURN":  "140935",
+        "Dist":  "3.730365347",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "145140",
+        "Dist":  "1.23692524",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "116407",
+        "Dist":  "1.353389575",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "145106",
+        "Dist":  "1.679014042",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "137093",
+        "Dist":  "2.466247733",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.469745009",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.568815614",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "136454",
+        "Dist":  "2.843910705",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.875333369",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "107562",
+        "Dist":  "3.113763314",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135507",
+        "NeighbourURN":  "100747",
+        "Dist":  "3.166246135",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "100590",
+        "Dist":  "1.330734516",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "135597",
+        "Dist":  "3.105386779",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "135367",
+        "Dist":  "3.210145734",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "140935",
+        "Dist":  "3.254647485",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "101230",
+        "Dist":  "3.295149695",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "137578",
+        "Dist":  "3.343674233",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "135584",
+        "Dist":  "3.389522146",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "109567",
+        "Dist":  "3.411358167",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "135423",
+        "Dist":  "3.439578084",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135563",
+        "NeighbourURN":  "140204",
+        "Dist":  "3.625600565",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "137010",
+        "Dist":  "1.337876919",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.279103034",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.45468407",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.514273438",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "100590",
+        "Dist":  "2.734238328",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "135958",
+        "Dist":  "2.786548194",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "135296",
+        "Dist":  "2.792031341",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.843419897",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.849396019",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135584",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.923690036",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "109567",
+        "Dist":  "1.577945599",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "101230",
+        "Dist":  "2.831386957",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.93562554",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "135563",
+        "Dist":  "3.105386779",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "135423",
+        "Dist":  "3.159589201",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "140204",
+        "Dist":  "3.268803751",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "100590",
+        "Dist":  "3.347906418",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "137578",
+        "Dist":  "3.820454159",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "112951",
+        "Dist":  "4.289316011",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135597",
+        "NeighbourURN":  "137274",
+        "Dist":  "4.307740346",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "145063",
+        "Dist":  "0.971654094",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.119858784",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.362512385",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "135866",
+        "Dist":  "2.895192341",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "138073",
+        "Dist":  "2.933612054",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "137306",
+        "Dist":  "3.11954115",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "136454",
+        "Dist":  "3.166835517",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "144142",
+        "Dist":  "3.201840274",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "136952",
+        "Dist":  "3.204934276",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135619",
+        "NeighbourURN":  "137770",
+        "Dist":  "3.219700577",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "138073",
+        "Dist":  "1.530101936",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "135966",
+        "Dist":  "1.734345465",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "136952",
+        "Dist":  "2.282322697",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.511418668",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.531718099",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "137306",
+        "Dist":  "2.660875258",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.815056305",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "135619",
+        "Dist":  "2.895192341",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "137770",
+        "Dist":  "3.087713533",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135866",
+        "NeighbourURN":  "100747",
+        "Dist":  "3.144864291",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "101206",
+        "Dist":  "0.925200556",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "134369",
+        "Dist":  "2.396113322",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "112951",
+        "Dist":  "2.570416888",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.66489038",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.713966926",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "135584",
+        "Dist":  "2.786548194",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "137010",
+        "Dist":  "2.82974125",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "136413",
+        "Dist":  "2.833778108",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "100747",
+        "Dist":  "3.058265665",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135958",
+        "NeighbourURN":  "138073",
+        "Dist":  "3.116084212",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "136952",
+        "Dist":  "1.484547919",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "135866",
+        "Dist":  "1.734345465",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "137770",
+        "Dist":  "1.982060869",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "137306",
+        "Dist":  "2.091644537",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.194153014",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "138073",
+        "Dist":  "2.345696557",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "135619",
+        "Dist":  "2.362512385",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.364825004",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.570924892",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135966",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.898227625",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "134369",
+        "Dist":  "2.139287173",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.275345868",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "136413",
+        "Dist":  "2.340557091",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.451922901",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "135866",
+        "Dist":  "2.511418668",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.570924892",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.606190474",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.6377679",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "135296",
+        "Dist":  "2.655091939",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "135968",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.779830303",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "134369",
+        "Dist":  "0.910594241",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.340557091",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.645964814",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "135958",
+        "Dist":  "2.833778108",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.856440517",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.899778587",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.975648706",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "103080",
+        "Dist":  "3.082952573",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "135296",
+        "Dist":  "3.119315643",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "136413",
+        "NeighbourURN":  "146327",
+        "Dist":  "3.131738786",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.437853752",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "135507",
+        "Dist":  "2.843910705",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.93433412",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "135619",
+        "Dist":  "3.166835517",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "145063",
+        "Dist":  "3.23767621",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "145140",
+        "Dist":  "3.292457841",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "135966",
+        "Dist":  "3.314614553",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "137306",
+        "Dist":  "3.36862738",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "135968",
+        "Dist":  "3.37652833",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "136454",
+        "NeighbourURN":  "135866",
+        "Dist":  "3.409926081",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.260731281",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "116407",
+        "Dist":  "2.410559076",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "145140",
+        "Dist":  "2.453340253",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "135507",
+        "Dist":  "2.469745009",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.550080079",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "145106",
+        "Dist":  "2.666579632",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "136952",
+        "Dist":  "2.696150892",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.898227625",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "136454",
+        "Dist":  "2.93433412",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "136891",
+        "NeighbourURN":  "137306",
+        "Dist":  "3.081438232",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "135966",
+        "Dist":  "1.484547919",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "135866",
+        "Dist":  "2.282322697",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.50171241",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "137306",
+        "Dist":  "2.601030875",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.696150892",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.746586568",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "135296",
+        "Dist":  "3.198932466",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "135619",
+        "Dist":  "3.204934276",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "135968",
+        "Dist":  "3.330861044",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "136952",
+        "NeighbourURN":  "138073",
+        "Dist":  "3.374229355",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "135584",
+        "Dist":  "1.337876919",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.391090338",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "135296",
+        "Dist":  "2.708860426",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.741095592",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "135958",
+        "Dist":  "2.82974125",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.869089747",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.918924101",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "101230",
+        "Dist":  "3.064399764",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "137093",
+        "Dist":  "3.108970196",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137010",
+        "NeighbourURN":  "112951",
+        "Dist":  "3.27182412",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.427554116",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "135507",
+        "Dist":  "2.466247733",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "143101",
+        "Dist":  "2.794886691",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "107562",
+        "Dist":  "2.84333777",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.855950388",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "116407",
+        "Dist":  "2.912728134",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "145106",
+        "Dist":  "3.020352541",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "137010",
+        "Dist":  "3.108970196",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "137770",
+        "Dist":  "3.298103323",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137093",
+        "NeighbourURN":  "145140",
+        "Dist":  "3.298405111",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "144142",
+        "Dist":  "3.086278015",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "135866",
+        "Dist":  "3.198902173",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "138073",
+        "Dist":  "3.358482115",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "135968",
+        "Dist":  "3.421250607",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "135966",
+        "Dist":  "3.449296018",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "135367",
+        "Dist":  "3.467143475",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "135264",
+        "Dist":  "3.570857363",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "135584",
+        "Dist":  "3.698662913",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "135619",
+        "Dist":  "3.705987001",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137274",
+        "NeighbourURN":  "140204",
+        "Dist":  "3.777798966",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.091644537",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.126678504",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "140204",
+        "Dist":  "2.504965447",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "136952",
+        "Dist":  "2.601030875",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "135866",
+        "Dist":  "2.660875258",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.691330873",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.772339308",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.996516373",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "136891",
+        "Dist":  "3.081438232",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137306",
+        "NeighbourURN":  "135619",
+        "Dist":  "3.11954115",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "135619",
+        "Dist":  "2.119858784",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "137306",
+        "Dist":  "2.126678504",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.194153014",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "136454",
+        "Dist":  "2.437853752",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "145063",
+        "Dist":  "2.500896887",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "135866",
+        "Dist":  "2.531718099",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.550080079",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "135507",
+        "Dist":  "2.568815614",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "136952",
+        "Dist":  "2.746586568",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137349",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.765239878",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "144142",
+        "Dist":  "1.582967853",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.109405923",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.178415517",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "135296",
+        "Dist":  "2.485887361",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.494556279",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.542348491",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.664335714",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "107562",
+        "Dist":  "2.787736671",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "135966",
+        "Dist":  "3.046914144",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137487",
+        "NeighbourURN":  "140935",
+        "Dist":  "3.090443304",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "135584",
+        "Dist":  "3.289319047",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "100590",
+        "Dist":  "3.332031399",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "135563",
+        "Dist":  "3.343674233",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "101230",
+        "Dist":  "3.524834632",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "135597",
+        "Dist":  "3.820454159",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "137274",
+        "Dist":  "3.87754456",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "135423",
+        "Dist":  "3.945396562",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "137010",
+        "Dist":  "4.042800572",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "109567",
+        "Dist":  "4.158041146",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137578",
+        "NeighbourURN":  "135264",
+        "Dist":  "4.311822625",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "107562",
+        "Dist":  "1.920024928",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "135966",
+        "Dist":  "1.982060869",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "143101",
+        "Dist":  "2.233431964",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.241820183",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.260731281",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "135296",
+        "Dist":  "2.393259032",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.475538497",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "137487",
+        "Dist":  "2.494556279",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "136952",
+        "Dist":  "2.50171241",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "137770",
+        "NeighbourURN":  "137306",
+        "Dist":  "2.691330873",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "135866",
+        "Dist":  "1.530101936",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.345696557",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.798652555",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.812653071",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.879582563",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "135619",
+        "Dist":  "2.933612054",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.940309855",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "144142",
+        "Dist":  "2.995167047",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "135958",
+        "Dist":  "3.116084212",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "138073",
+        "NeighbourURN":  "140204",
+        "Dist":  "3.12654365",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "112951",
+        "Dist":  "1.183538388",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "140935",
+        "Dist":  "1.80313584",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.208788173",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "101243",
+        "Dist":  "2.244967939",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.526284041",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "100749",
+        "Dist":  "2.925572893",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "100747",
+        "Dist":  "3.091038122",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "135958",
+        "Dist":  "3.146578838",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "135367",
+        "Dist":  "3.304398883",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "139016",
+        "NeighbourURN":  "101206",
+        "Dist":  "3.501038798",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "135367",
+        "Dist":  "1.175522378",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "146327",
+        "Dist":  "2.320240307",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "137306",
+        "Dist":  "2.504965447",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.624635858",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.665054635",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "109567",
+        "Dist":  "2.680080566",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "101230",
+        "Dist":  "2.682879513",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "135423",
+        "Dist":  "2.817118431",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.867333325",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "140204",
+        "NeighbourURN":  "112951",
+        "Dist":  "2.931664415",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "103080",
+        "Dist":  "1.312161044",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "112951",
+        "Dist":  "1.451354961",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "146327",
+        "Dist":  "1.546653879",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "100747",
+        "Dist":  "1.756023501",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "139016",
+        "Dist":  "1.80313584",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "101243",
+        "Dist":  "2.459156249",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "101206",
+        "Dist":  "2.622447908",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "135958",
+        "Dist":  "2.66489038",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "140204",
+        "Dist":  "2.665054635",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "140935",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.721206662",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "107562",
+        "Dist":  "0.986922562",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.233431964",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "137093",
+        "Dist":  "2.794886691",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "100747",
+        "Dist":  "2.88832504",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.943765545",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "146327",
+        "Dist":  "3.014759019",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "100590",
+        "Dist":  "3.038576211",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "135584",
+        "Dist":  "3.040094101",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "144142",
+        "Dist":  "3.040585918",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "143101",
+        "NeighbourURN":  "135966",
+        "Dist":  "3.073651428",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "135264",
+        "Dist":  "1.493414233",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "137487",
+        "Dist":  "1.582967853",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "100747",
+        "Dist":  "1.900205214",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "146327",
+        "Dist":  "1.923311871",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "135296",
+        "Dist":  "2.185608435",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.241820183",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "131752",
+        "Dist":  "2.257572237",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "135968",
+        "Dist":  "2.275345868",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.364825004",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "144142",
+        "NeighbourURN":  "140935",
+        "Dist":  "2.813894942",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "135619",
+        "Dist":  "0.971654094",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "137349",
+        "Dist":  "2.500896887",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "135966",
+        "Dist":  "2.963313386",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "136454",
+        "Dist":  "3.23767621",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "135866",
+        "Dist":  "3.312459215",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "135507",
+        "Dist":  "3.427573998",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "136952",
+        "Dist":  "3.545473494",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "138073",
+        "Dist":  "3.571262242",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "145140",
+        "Dist":  "3.574394173",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "145063",
+        "NeighbourURN":  "137306",
+        "Dist":  "3.592762749",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "116407",
+        "Dist":  "1.057517205",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "135507",
+        "Dist":  "1.679014042",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "145140",
+        "Dist":  "2.144034534",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "125279",
+        "Dist":  "2.576330993",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.666579632",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "137770",
+        "Dist":  "2.791441899",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "101193",
+        "Dist":  "2.960423209",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "137093",
+        "Dist":  "3.020352541",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "107562",
+        "Dist":  "3.1391461",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "145106",
+        "NeighbourURN":  "137349",
+        "Dist":  "3.258194411",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "135507",
+        "Dist":  "1.23692524",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "116407",
+        "Dist":  "1.627433168",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "145106",
+        "Dist":  "2.144034534",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "136891",
+        "Dist":  "2.453340253",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "137770",
+        "Dist":  "3.01983873",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "137349",
+        "Dist":  "3.033960793",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "136454",
+        "Dist":  "3.292457841",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "137093",
+        "Dist":  "3.298405111",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "107562",
+        "Dist":  "3.30663502",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "145140",
+        "NeighbourURN":  "100747",
+        "Dist":  "3.573427716",
+        "Rank":  "10"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "100747",
+        "Dist":  "1.278172754",
+        "Rank":  "1"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "140935",
+        "Dist":  "1.546653879",
+        "Rank":  "2"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "144142",
+        "Dist":  "1.923311871",
+        "Rank":  "3"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "103080",
+        "Dist":  "2.082306558",
+        "Rank":  "4"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "101243",
+        "Dist":  "2.0833447",
+        "Rank":  "5"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "112951",
+        "Dist":  "2.164806855",
+        "Rank":  "6"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "135367",
+        "Dist":  "2.316596733",
+        "Rank":  "7"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "140204",
+        "Dist":  "2.320240307",
+        "Rank":  "8"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "135264",
+        "Dist":  "2.425930822",
+        "Rank":  "9"
+    },
+    {
+        "URN":  "146327",
+        "NeighbourURN":  "100749",
+        "Dist":  "2.432901565",
+        "Rank":  "10"
+    }
+]

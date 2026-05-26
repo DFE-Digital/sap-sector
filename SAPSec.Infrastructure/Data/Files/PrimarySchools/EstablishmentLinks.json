@@ -1,1 +1,72 @@
-{"urn":"000000","linkurn":"000001","linkname":"Dummy Linked Primary School","linktype":"Predecessor","linkestablisheddate":null}
+[
+    {
+        "urn":  "100590",
+        "linkurn":  "135563",
+        "linkname":  "Lincolnshire Primary School 21",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "100747",
+        "linkurn":  "135264",
+        "linkname":  "Lewisham Primary School 16",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "100749",
+        "linkurn":  "101243",
+        "linkname":  "Barking and Dagenham Primary School 07",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "101193",
+        "linkurn":  "125279",
+        "linkname":  "Surrey Primary School 13",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "101206",
+        "linkurn":  "135958",
+        "linkname":  "Enfield Primary School 26",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "101230",
+        "linkurn":  "135423",
+        "linkname":  "Newcastle upon Tyne Primary School 19",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "103080",
+        "linkurn":  "140935",
+        "linkname":  "Waltham Forest Primary School 44",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "107562",
+        "linkurn":  "143101",
+        "linkname":  "Calderdale Primary School 45",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "109567",
+        "linkurn":  "135597",
+        "linkname":  "Bristol, City of Primary School 23",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    },
+    {
+        "urn":  "112951",
+        "linkurn":  "139016",
+        "linkname":  "Derby Primary School 42",
+        "linktype":  "Federated partner",
+        "linkestablisheddate":  "2024-09-01"
+    }
+]
