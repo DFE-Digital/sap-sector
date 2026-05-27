@@ -1,3 +1,3 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Development"
-FeatureManagement__HomePagePilotContent: "true"
+FeatureManagement__EnablePrimarySchools: "true"

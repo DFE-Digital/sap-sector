@@ -5,8 +5,10 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using SAPSec.Core.Configuration;
+using SAPSec.Core.Features.Home;
+using SAPSec.Core.Features.Home.UseCases;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Controllers;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -25,15 +27,16 @@ public class HomeControllerTests
         _mockFeatureFlagService = new();
         _mockUrlHelper = new();
         Mock<IOptions<DfeSignInSettings>> options = new();
+        var getEnablePrimarySchools = new GetEnablePrimarySchools(_mockFeatureFlagService.Object);
 
-        _controller = new(options.Object, _mockEnvironment.Object, _mockFeatureFlagService.Object)
+        _controller = new(options.Object, _mockEnvironment.Object, getEnablePrimarySchools)
         {
             Url = _mockUrlHelper.Object
         };
 
         options.Setup(x => x.Value).Returns(new DfeSignInSettings { SignInUri = _signInUri });
         _mockFeatureFlagService
-            .Setup(x => x.IsEnabledAsync(It.IsAny<string>()))
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
             .ReturnsAsync(false);
     }
 
@@ -48,7 +51,7 @@ public class HomeControllerTests
         var homeViewModel = (result as ViewResult)!.Model as HomeViewModel;
         homeViewModel.Should().NotBeNull();
         homeViewModel.StartNowUri.Should().Be(_signInUri);
-        homeViewModel.HomePagePilotContentEnabled.Should().BeFalse();
+        homeViewModel.EnablePrimarySchools.Should().BeFalse();
     }
 
     [Fact]
@@ -64,6 +67,6 @@ public class HomeControllerTests
         var homeViewModel = (result as ViewResult)!.Model as HomeViewModel;
         homeViewModel.Should().NotBeNull();
         homeViewModel.StartNowUri.Should().Be("/school-search");
-        homeViewModel.HomePagePilotContentEnabled.Should().BeFalse();
+        homeViewModel.EnablePrimarySchools.Should().BeFalse();
     }
 }
