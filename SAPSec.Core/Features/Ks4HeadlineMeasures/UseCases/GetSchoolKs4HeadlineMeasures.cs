@@ -48,8 +48,9 @@ public class GetSchoolKs4HeadlineMeasures(
 
         var filterBy = request.FilterBy ?? new Dictionary<string, string>();
 
-        var attainment8 = Measure.Build(
+        var attainment8 = SchoolMeasure.Build(
             "attainment8",
+            "Attainment 8",
             MeasureDataType.Number,
             [],
             schoolData,
@@ -67,8 +68,9 @@ public class GetSchoolKs4HeadlineMeasures(
 
         var engMathsGrade = filterBy.ContainsKey("eng-maths:grade") ? filterBy["eng-maths:grade"] : "4";
 
-        var engMaths = Measure.Build(
+        var engMaths = SchoolMeasure.Build(
             "eng-maths",
+            "Grade achieved in English and maths GCSEs",
             MeasureDataType.Percentage,
             [
                 new MeasureAvailableFilter(
@@ -105,8 +107,9 @@ public class GetSchoolKs4HeadlineMeasures(
             });
 
         var destinationType = filterBy.ContainsKey("destinations:destination") ? filterBy["destinations:destination"] : "all";
-        var destinations = Measure.Build(
+        var destinations = SchoolMeasure.Build(
             "destinations",
+            "Staying in education or entering employment",
             MeasureDataType.Percentage,
             [
                 new MeasureAvailableFilter(
@@ -169,6 +172,6 @@ public record GetSchoolKs4HeadlineMeasuresRequest(
 public record GetSchoolKs4HeadlineMeasuresResponse(
     SchoolDetails SchoolDetails,
     int SimilarSchoolsCount,
-    Measure Attainment8,
-    Measure EnglishAndMaths,
-    Measure Destinations);
+    SchoolMeasure Attainment8,
+    SchoolMeasure EnglishAndMaths,
+    SchoolMeasure Destinations);

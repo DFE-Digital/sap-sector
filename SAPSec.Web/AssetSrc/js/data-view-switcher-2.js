@@ -1,17 +1,22 @@
 (function () {
-    function buildRequestUrl(endpoint, queryKey, selectedValue) {
-        var separator = endpoint.indexOf("?") === -1 ? "?" : "&";
-        return endpoint + separator + queryKey + "=" + encodeURIComponent(selectedValue);
+    function buildRequestUrl(queryKey, selectedValue) {
+        var endpoint = window.location.href;
+        var anchorIndex = endpoint.indexOf("#");
+        var anchor = anchorIndex === -1 ? "" : endpoint.substring(anchorIndex);
+        var endpointBeforeAnchor = endpoint.substring(0, anchorIndex);
+        var separator = endpointBeforeAnchor.indexOf("?") === -1 ? "?" : "&";
+        var url = endpointBeforeAnchor + separator + queryKey + "=" + encodeURIComponent(selectedValue) + anchor;
+        console.log(url);
+        return url;
     }
 
     function init() {
         document.querySelectorAll("[data-view-switcher='true']").forEach(function (select) {
-            var dataEndpoint = select.getAttribute("data-endpoint");
             var queryKey = select.getAttribute("data-query-key");
             var targetId = select.getAttribute("data-target-id");
             var activeRequestId = 0;
 
-            if (!dataEndpoint || !queryKey || !targetId) {
+            if (!queryKey || !targetId) {
                 return;
             }
 
@@ -19,7 +24,9 @@
                 activeRequestId += 1;
                 var requestId = activeRequestId;
 
-                return fetch(buildRequestUrl(dataEndpoint, queryKey, selectedValue), {
+                var requestUrl = buildRequestUrl(queryKey, selectedValue);
+                console.log('querying: ' + requestUrl);
+                return fetch(requestUrl, {
                     headers: {
                         Accept: "text/html"
                     }
@@ -55,7 +62,7 @@
 
             select.addEventListener("change", refreshSelection);
             select.addEventListener("input", refreshSelection);
-            window.requestAnimationFrame(refreshSelection);
+            //window.requestAnimationFrame(refreshSelection);
         });
     }
 

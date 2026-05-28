@@ -88,6 +88,8 @@ public class SimilarSchoolsComparisonViewModel
     public CoreSubjectSection? Maths { get; set; }
     public CoreSubjectSection? CombinedScienceDoubleAward { get; set; }
 
+    public IEnumerable<MeasureViewModel>? Measures { get; set; }
+
     public string ThisSchoolAttainment8Display => DisplayValue(ThisSchoolAttainment8ThreeYearAverage);
     public string SelectedSchoolAttainment8Display => DisplayValue(SelectedSchoolAttainment8ThreeYearAverage);
     public string EnglandAttainment8Display => DisplayValue(EnglandAttainment8ThreeYearAverage);

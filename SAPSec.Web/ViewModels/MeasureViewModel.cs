@@ -3,43 +3,99 @@ using System.Globalization;
 
 namespace SAPSec.Web.ViewModels;
 
-public class MeasureViewModel
+public record MeasureViewModel(
+    MeasureInfoViewModel MeasureInfo,
+    IEnumerable<SubMeasureViewModel> SubMeasures);
+
+public record MeasureInfoViewModel(
+    string HtmlPrefix,
+    string Name,
+    MeasureDataType DataType,
+    IEnumerable<MeasureAvailableFilterViewModel> Filters,
+    IEnumerable<string> Labels);
+
+public record MeasureAvailableFilterViewModel(
+    string Key,
+    string Name,
+    IEnumerable<MeasureFilterOptionViewModel> Options);
+
+public record MeasureFilterOptionViewModel(
+    string Key,
+    string Name,
+    int Count,
+    bool Selected);
+
+public abstract record SubMeasureViewModel(
+    string Id,
+    string Name,
+    MeasureInfoViewModel MeasureInfo)
 {
-    public required string SchoolUrn { get; set; }
-    public required string SchoolName { get; set; }
-    public required string HtmlPrefix { get; set; }
-    public required MeasureDataType DataType { get; set; }
-    public required decimal? SchoolThreeYearAverage { get; set; }
-    public required decimal? SimilarSchoolsThreeYearAverage { get; set; }
-    public required decimal? LocalAuthorityThreeYearAverage { get; set; }
-    public required decimal? EnglandThreeYearAverage { get; set; }
-    public required IReadOnlyList<TopPerformerRow> TopPerformers { get; set; }
-    public required Ks4HeadlineMeasureSeries SchoolYearByYear { get; set; }
-    public required Ks4HeadlineMeasureSeries SimilarSchoolsYearByYear { get; set; }
-    public required Ks4HeadlineMeasureSeries LocalAuthorityYearByYear { get; set; }
-    public required Ks4HeadlineMeasureSeries EnglandYearByYear { get; set; }
-
-    public string SimilarSchoolsLabel => "Similar schools average";
-    public string LocalAuthorityLabel => "Local authority schools average";
-    public string EnglandLabel => "Schools in England average";
-
     public string DisplayNumber(decimal? value) =>
-        this.DataType == MeasureDataType.Number
+        MeasureInfo.DataType == MeasureDataType.Number
             ? DisplayValue(value)
             : DisplayWholePercent(value);
 
     private static string DisplayValue(decimal? value) =>
-        value.HasValue ? value.Value.ToString("0.0", CultureInfo.InvariantCulture) : "No available data";
+        value.HasValue
+            ? value.Value.ToString("0.0", CultureInfo.InvariantCulture)
+            : "No available data";
 
     private static string DisplayWholePercent(decimal? value) =>
         value.HasValue
             ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
             : "No available data";
-
-    public string SchoolDisplay => DisplayWholePercent(SchoolThreeYearAverage);
-    public string SimilarSchoolsDisplay => DisplayWholePercent(SimilarSchoolsThreeYearAverage);
-    public string LocalAuthorityDisplay => DisplayWholePercent(LocalAuthorityThreeYearAverage);
-    public string EnglandDisplay => DisplayWholePercent(EnglandThreeYearAverage);
 }
 
-public record GradeOptionViewModel(string Key, string Name);
+public record ThreeYearAverageSubMeasureViewModel(
+    string Id,
+    string Name,
+    MeasureInfoViewModel MeasureInfo,
+    IEnumerable<decimal?> Averages,
+    IEnumerable<string>? Colors = null) : SubMeasureViewModel(Id, Name, MeasureInfo)
+{
+}
+
+public record TopPerformersSubMeasureViewModel(
+    string Id,
+    string Name,
+    MeasureInfoViewModel MeasureInfo,
+    IEnumerable<TopPerformersSubMeasureItemViewModel> TopPerformers,
+    string SimilarSchoolsLink)
+    : SubMeasureViewModel(Id, Name, MeasureInfo)
+{
+}
+
+public record TopPerformersSubMeasureItemViewModel(
+    int Rank,
+    string Urn,
+    string Name,
+    string Link,
+    decimal? Value,
+    bool IsCurrentSchool);
+
+public record YearByYearSubMeasureViewModel(
+    string Id,
+    string Name,
+    MeasureInfoViewModel MeasureInfo,
+    IEnumerable<YearByYearSeriesViewModel> Series,
+    IEnumerable<string>? Colors = null) : SubMeasureViewModel(Id, Name, MeasureInfo)
+{
+}
+
+public record YearByYearSeriesViewModel(
+    decimal? Current,
+    decimal? Previous,
+    decimal? Previous2);
+
+public record TableSubMeasureViewModel(
+    string Id,
+    string Name,
+    MeasureInfoViewModel MeasureInfo,
+    IEnumerable<TableSubMeasureRowViewModel> Rows) : SubMeasureViewModel(Id, Name, MeasureInfo)
+{
+}
+
+public record TableSubMeasureRowViewModel(
+    string Key,
+    YearByYearSeriesViewModel YearByYear,
+    decimal? ThreeYearAverage);

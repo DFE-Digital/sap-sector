@@ -2,17 +2,9 @@
 @using System.Text.Json
 @using SAPSec.Web.ViewModels
 
-@model MeasureViewModel
+@model TableSubMeasureViewModel
 
 @{
-    var rows = new[]
-    {
-        (Key: "this", Label: Model.SchoolName, Series: Model.SchoolYearByYear, Display: Model.SchoolDisplay),
-        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.SimilarSchoolsYearByYear, Display: Model.SimilarSchoolsDisplay),
-        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.LocalAuthorityYearByYear, Display: Model.LocalAuthorityDisplay),
-        (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandYearByYear, Display: Model.EnglandDisplay)
-    };
-
     var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
 }
 
@@ -27,14 +19,14 @@
         </tr>
     </thead>
     <tbody class="govuk-table__body">
-        @foreach (var row in rows)
+        @foreach (var (label, row) in Model.MeasureInfo.Labels.Zip(Model.Rows))
         {
             <tr class="govuk-table__row">
-                <th scope="row" class="govuk-table__header">@row.Label</th>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-prev2")">@Model.DisplayNumber(row.Series.Previous2)</td>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-prev")">@Model.DisplayNumber(row.Series.Previous)</td>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-current")">@Model.DisplayNumber(row.Series.Current)</td>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.HtmlPrefix-cell="@($"{row.Key}-avg")">@row.Display</td>
+                <th scope="row" class="govuk-table__header">@label</th>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-prev2")">@Model.DisplayNumber(row.YearByYear.Previous2)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-prev")">@Model.DisplayNumber(row.YearByYear.Previous)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-current")">@Model.DisplayNumber(row.YearByYear.Current)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-avg")">@Model.DisplayNumber(row.ThreeYearAverage)</td>
             </tr>
         }
     </tbody>

@@ -3,60 +3,38 @@
 @using SAPSec.Web.ViewModels
 @using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases
 
-@model MeasureViewModel
+@model YearByYearSubMeasureViewModel
 
 @{
-    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var chartData = new
+    {
+        labels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear,
+        datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
+            new {
+                label = x.First,
+                data = new decimal?[] {
+                    x.Second.Previous2,
+                    x.Second.Previous,
+                    x.Second.Current
+                }
+            })
+            .ToArray()
+    };
 }
 
 <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-    <canvas id="@Model.HtmlPrefix-school-yearbyyear-chart"
+    <canvas id="@Model.MeasureInfo.HtmlPrefix-school-yearbyyear-chart"
             class="js-chart js-chart--school-ks4-line"
             data-type="line"
             data-axis-min="0"
-            data-axis-step="@(Model.DataType == MeasureDataType.Percentage? 25 : 30)"
-            data-axis-max="@(Model.DataType == MeasureDataType.Percentage? 100 : 90)"
+            data-axis-step="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage ? 25 : 30)"
+            data-axis-max="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage ? 100 : 90)"
             data-axis-auto-skip="false"
-            data-axis-suffix="@(Model.DataType == MeasureDataType.Percentage? "%" : "")"
+            data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage ? "%" : "")"
             data-show-x-grid="true"
             data-show-legend="true"
             data-show-datalabels="false"
-            data-chart='@Html.Raw(JsonSerializer.Serialize(
-                new { 
-                    labels = ks4YearLabels, 
-                    datasets = new object[] { 
-                        new { 
-                            label = Model.SchoolName, 
-                            data = new decimal?[] { 
-                                Model.SchoolYearByYear.Previous2, 
-                                Model.SchoolYearByYear.Previous, 
-                                Model.SchoolYearByYear.Current 
-                            } 
-                        }, 
-                        new { 
-                            label = Model.SimilarSchoolsLabel, 
-                            data = new decimal?[] { 
-                                Model.SimilarSchoolsYearByYear.Previous2, 
-                                Model.SimilarSchoolsYearByYear.Previous, 
-                                Model.SimilarSchoolsYearByYear.Current 
-                            } 
-                        }, 
-                        new { 
-                            label = Model.LocalAuthorityLabel, 
-                            data = new decimal?[] { 
-                                Model.LocalAuthorityYearByYear.Previous2, 
-                                Model.LocalAuthorityYearByYear.Previous, 
-                                Model.LocalAuthorityYearByYear.Current 
-                            } 
-                        }, new { 
-                            label = Model.EnglandLabel, 
-                            data = new decimal?[] { 
-                                Model.EnglandYearByYear.Previous2, 
-                                Model.EnglandYearByYear.Previous, 
-                                Model.EnglandYearByYear.Current 
-                            } 
-                        } 
-                    } 
-                }))'>
+            data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+            @if (Model.Colors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.Colors))'</text> }>
     </canvas>
 </div>

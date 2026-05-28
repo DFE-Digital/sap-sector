@@ -1,11 +1,9 @@
 (function () {
     var MOBILE_MEDIA_QUERY = "(max-width: 40.0625em)";
 
-    function isMobileView() {
-        return window.matchMedia(MOBILE_MEDIA_QUERY).matches;
-    }
+    function setActivePanel(tabContainer, targetId, initial = false) {
+        console.log('setActivePanel(', tabContainer.id, targetId, initial, ')');
 
-    function setActivePanel(tabContainer, targetId) {
         var tabs = tabContainer.querySelectorAll(".govuk-tabs__tab");
         var listItems = tabContainer.querySelectorAll(".govuk-tabs__list-item");
         var panels = tabContainer.querySelectorAll(".govuk-tabs__panel");
@@ -37,6 +35,12 @@
             }
         });
 
+        if (!initial) {
+            var newUrl = window.location.href.substring(0, window.location.href.indexOf('#')) + '#' + targetId;
+            console.log(newUrl);
+            window.history.replaceState(null, '', newUrl);
+        }
+
         requestAnimationFrame(function () {
             resizeVisibleCharts(tabContainer);
         });
@@ -59,6 +63,13 @@
     }
 
     function getInitialTargetId(tabContainer) {
+        var target = window.location.href.substring(window.location.href.indexOf('#'));
+        var tabSelectedInUrl = tabContainer.querySelector(`.govuk-tabs__list-item--selected .govuk-tabs__tab[href="${target}"]`);
+        if (tabSelectedInUrl) {
+            console.log(target);
+            return target.substring(1);
+        }
+
         var selectedTab = tabContainer.querySelector(".govuk-tabs__list-item--selected .govuk-tabs__tab");
         if (selectedTab) {
             var selectedHref = selectedTab.getAttribute("href") || "";
@@ -79,7 +90,7 @@
     function initTabContainer(tabContainer) {
         var initialTargetId = getInitialTargetId(tabContainer);
         if (initialTargetId) {
-            setActivePanel(tabContainer, initialTargetId);
+            setActivePanel(tabContainer, initialTargetId, true);
         }
 
         if (tabContainer.dataset.mobileTabsBound === "true") {
@@ -136,7 +147,7 @@
     // GOV.UK tabs may re-apply classes after module init; enforce mobile state again.
     window.addEventListener("load", () => init(document));
     window.setTimeout(() => init(document), 100);
-    window.addEventListener("resize", () => init(document));
+    window.addEventListener("resize", () => { console.log('resizing'); init(document); });
     window.matchMedia(MOBILE_MEDIA_QUERY).addEventListener("change", () => init(document));
 
     window.MeasureTabs = {

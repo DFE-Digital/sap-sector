@@ -7,13 +7,7 @@ public class Ks4CoreSubjectsPageViewModel
 {
     public required SchoolDetails SchoolDetails { get; set; }
     public required int SimilarSchoolsCount { get; set; }
-    public required MeasureViewModel EnglishLanguage { get; set; }
-    public required MeasureViewModel EnglishLiterature { get; set; }
-    public required MeasureViewModel Biology { get; set; }
-    public required MeasureViewModel Chemistry { get; set; }
-    public required MeasureViewModel Physics { get; set; }
-    public required MeasureViewModel Mathematics { get; set; }
-    public required MeasureViewModel CombinedScienceDoubleAward { get; set; }
+    public required IEnumerable<MeasureViewModel> Measures { get; set; }
 
     public string SchoolLabel => SchoolDetails.Name;
     public string SimilarSchoolsLabel => "Similar schools average";

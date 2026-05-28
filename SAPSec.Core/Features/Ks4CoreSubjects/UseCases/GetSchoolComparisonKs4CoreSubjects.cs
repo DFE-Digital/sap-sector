@@ -9,45 +9,51 @@ using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 
-public class GetSchoolKs4CoreSubjects(
+public class GetSchoolComparisonKs4CoreSubjects(
     IKs4PerformanceRepository performanceRepository,
     ISchoolDetailsService schoolDetailsService,
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
 {
-    public async Task<GetSchoolKs4CoreSubjectsResponse> Execute(GetSchoolKs4CoreSubjectsRequest request)
+    public async Task<GetSchoolComparisonKs4CoreSubjectsResponse> Execute(GetSchoolComparisonKs4CoreSubjectsRequest request)
     {
-        var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
-        var schoolData = new SchoolData(
-            request.Urn,
-            schoolDetails.Name,
-            await performanceRepository.GetByUrnAsync(request.Urn),
+        var currentSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.CurrentSchoolUrn);
+        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
+
+        var currentSchoolData = new SchoolData(
+            request.CurrentSchoolUrn,
+            currentSchoolDetails.Name,
+            await performanceRepository.GetByUrnAsync(request.CurrentSchoolUrn),
             null);
 
-        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.Urn))
+        var similarSchoolsUrns = (await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn))
             .Select(g => g.NeighbourURN)
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var similarSchoolData = ((await performanceRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
+
+        var similarSchoolsPerformance = ((await performanceRepository.GetByUrnsAsync(similarSchoolsUrns)) ?? [])
             .ToDictionary(x => x.URN, x => x, StringComparer.Ordinal);
-        var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
+
+        var similarSchoolsDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolsUrns))
                 ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
 
-        var similarSchools = similarSchoolUrns
-            .Where(similarSchoolDetails.ContainsKey)
+        var similarSchoolsData = similarSchoolsUrns
+            .Where(similarSchoolsDetails.ContainsKey)
             .Select(urn => new SchoolData(
                 urn,
-                similarSchoolDetails[urn].EstablishmentName,
-                similarSchoolData.GetValueOrDefault(urn),
+                similarSchoolsDetails[urn].EstablishmentName,
+                similarSchoolsPerformance.GetValueOrDefault(urn),
                 null))
-            .ToArray();
+            .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
+
+        var similarSchoolData = similarSchoolsData[request.SimilarSchoolUrn];
 
         var filterBy = request.FilterBy ?? new Dictionary<string, string>();
 
-        IReadOnlyCollection<SchoolMeasure> measures = [
+        IReadOnlyCollection<SchoolComparisonMeasure> measures = [
             BuildSubjectMeasure(
                 "english-language",
                 "English language",
@@ -283,11 +289,12 @@ public class GetSchoolKs4CoreSubjects(
         ];
 
         return new(
-            schoolDetails,
-            similarSchools.Length,
+            currentSchoolDetails,
+            similarSchoolDetails,
+            similarSchoolsData.Values.Count,
             measures);
 
-        SchoolMeasure BuildSubjectMeasure(
+        SchoolComparisonMeasure BuildSubjectMeasure(
             string key,
             string name,
             MeasureFieldSelector grade4Fields,
@@ -298,7 +305,7 @@ public class GetSchoolKs4CoreSubjects(
             var filterKey = $"{key}:grade";
             var grade = filterBy.ContainsKey(filterKey) ? filterBy[filterKey] : "4";
 
-            return SchoolMeasure.Build(
+            return SchoolComparisonMeasure.Build(
                 key,
                 name,
                 MeasureDataType.Percentage,
@@ -311,8 +318,9 @@ public class GetSchoolKs4CoreSubjects(
                             new FilterOption("7", hasCombinedGrades ? "Grade 7-7 and above" : "Grade 7 and above", 0, grade == "7")
                         ]),
                 ],
-                schoolData,
-                similarSchools,
+                currentSchoolData,
+                similarSchoolData,
+                similarSchoolsData.Values,
                 grade switch
                 {
                     "5" => grade5Fields,
@@ -323,11 +331,13 @@ public class GetSchoolKs4CoreSubjects(
     }
 }
 
-public record GetSchoolKs4CoreSubjectsRequest(
-    string Urn,
+public record GetSchoolComparisonKs4CoreSubjectsRequest(
+    string CurrentSchoolUrn,
+    string SimilarSchoolUrn,
     IDictionary<string, string>? FilterBy = null);
 
-public record GetSchoolKs4CoreSubjectsResponse(
-    SchoolDetails SchoolDetails,
+public record GetSchoolComparisonKs4CoreSubjectsResponse(
+    SchoolDetails CurrentSchoolDetails,
+    SchoolDetails SimilarSchoolDetails,
     int SimilarSchoolsCount,
-    IReadOnlyCollection<SchoolMeasure> Measures);
+    IReadOnlyCollection<SchoolComparisonMeasure> Measures);

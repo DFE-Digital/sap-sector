@@ -231,44 +231,74 @@ public class SchoolController : Controller
         {
             SchoolDetails = response.SchoolDetails,
             SimilarSchoolsCount = response.SimilarSchoolsCount,
-            EnglishLanguage = MapMeasure(response.EnglishLanguage, response.SchoolDetails),
-            EnglishLiterature = MapMeasure(response.EnglishLiterature, response.SchoolDetails),
-            Biology = MapMeasure(response.Biology, response.SchoolDetails),
-            Chemistry = MapMeasure(response.Chemistry, response.SchoolDetails),
-            Physics = MapMeasure(response.Physics, response.SchoolDetails),
-            Mathematics = MapMeasure(response.Mathematics, response.SchoolDetails),
-            CombinedScienceDoubleAward = MapMeasure(response.CombinedScienceDoubleAward, response.SchoolDetails)
+            Measures = response.Measures.Select(m => MapMeasure(m, response.SchoolDetails))
         };
 
-    private static MeasureViewModel MapMeasure(Measure measure, SchoolDetails schoolDetails) =>
-         new()
-         {
-             SchoolUrn = schoolDetails.Urn,
-             SchoolName = schoolDetails.Name,
-             HtmlPrefix = measure.Key,
-             DataType = measure.DataType,
-             SchoolThreeYearAverage = measure.ThreeYearAverage.SchoolValue,
-             SimilarSchoolsThreeYearAverage = measure.ThreeYearAverage.SimilarSchoolsValue,
-             LocalAuthorityThreeYearAverage = measure.ThreeYearAverage.LocalAuthorityValue,
-             EnglandThreeYearAverage = measure.ThreeYearAverage.EnglandValue,
-             TopPerformers = MapTopPerformers(measure),
-             SchoolYearByYear = measure.YearByYear.School,
-             SimilarSchoolsYearByYear = measure.YearByYear.SimilarSchools,
-             LocalAuthorityYearByYear = measure.YearByYear.LocalAuthority,
-             EnglandYearByYear = measure.YearByYear.England
-         };
-
-    private static IReadOnlyList<TopPerformerRow> MapTopPerformers(Measure measure)
+    private static MeasureViewModel MapMeasure(SchoolMeasure measure, SchoolDetails schoolDetails)
     {
-        Func<decimal?, string> formatter = measure.DataType == MeasureDataType.Percentage
-            ? Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent
-            : Ks4HeadlineMeasuresPageViewModel.DisplayValue;
+        var measureInfo = new MeasureInfoViewModel(
+            measure.Key,
+            measure.Name,
+            measure.DataType,
+            measure.AvailableFilters.Select(MapAvailableFilter),
+            [
+                schoolDetails.Name,
+                "Similar schools average",
+                "Local authority schools average",
+                "Schools in England average",
+            ]);
 
-        return measure.TopPerformers
-            .Select(x => new TopPerformerRow(x.Rank, x.Urn, x.Name, x.Value, formatter(x.Value), x.IsCurrentSchool))
-            .ToList()
-            .AsReadOnly();
+        return new(measureInfo, [
+            new ThreeYearAverageSubMeasureViewModel(
+                "three-year-average",
+                "3-year average",
+                measureInfo,
+                [
+                    measure.ThreeYearAverage.SchoolValue,
+                    measure.ThreeYearAverage.SimilarSchoolsValue,
+                    measure.ThreeYearAverage.LocalAuthorityValue,
+                    measure.ThreeYearAverage.EnglandValue,
+                ]),
+            new YearByYearSubMeasureViewModel(
+                "year-by-year",
+                "Year by year",
+                measureInfo,
+                [
+                    MapYearByYear(measure.YearByYear.School),
+                    MapYearByYear(measure.YearByYear.SimilarSchools),
+                    MapYearByYear(measure.YearByYear.LocalAuthority),
+                    MapYearByYear(measure.YearByYear.England),
+                ]),
+            new TableSubMeasureViewModel(
+                "table-view",
+                "Table",
+                measureInfo,
+                [
+                    new("this", MapYearByYear(measure.YearByYear.School), measure.ThreeYearAverage.SchoolValue),
+                    new("similar", MapYearByYear(measure.YearByYear.SimilarSchools), measure.ThreeYearAverage.SimilarSchoolsValue),
+                    new("la", MapYearByYear(measure.YearByYear.LocalAuthority), measure.ThreeYearAverage.LocalAuthorityValue),
+                    new("england", MapYearByYear(measure.YearByYear.England), measure.ThreeYearAverage.EnglandValue),
+                ]),
+            new TopPerformersSubMeasureViewModel(
+                "top-performers",
+                "Top performers",
+                measureInfo,
+                measure.TopPerformers.Select(t => new TopPerformersSubMeasureItemViewModel(
+                    t.Rank,
+                    t.Urn,
+                    t.Name,
+                    Routes.SimilarSchoolComparison(schoolDetails.Urn, t.Urn),
+                    t.Value,
+                    t.IsCurrentSchool)),
+                Routes.SimilarSchools(schoolDetails.Urn))
+        ]);
     }
+
+    private static MeasureAvailableFilterViewModel MapAvailableFilter(MeasureAvailableFilter availableFilter) =>
+        new(availableFilter.Key, availableFilter.Name, availableFilter.Options.Select(o => new MeasureFilterOptionViewModel(o.Key, o.Name, o.Count, o.Selected)));
+
+    private static YearByYearSeriesViewModel MapYearByYear(MeasureYearByYearSeries yearByYear) =>
+        new(yearByYear.Current, yearByYear.Previous, yearByYear.Previous2);
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
     {

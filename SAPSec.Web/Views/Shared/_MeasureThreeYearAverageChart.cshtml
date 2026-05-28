@@ -3,29 +3,33 @@
 @using SAPSec.Web.ViewModels
 @using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases
 
-@model MeasureViewModel
+@model ThreeYearAverageSubMeasureViewModel
 
 @{
-    var barData = new decimal?[] { Model.SchoolThreeYearAverage, Model.SimilarSchoolsThreeYearAverage, Model.LocalAuthorityThreeYearAverage, Model.EnglandThreeYearAverage };
-    var labels = new[] { Model.SchoolName, Model.SimilarSchoolsLabel, Model.LocalAuthorityLabel, Model.EnglandLabel };
-    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
+    var chartData = new
+    {
+        labels = Model.MeasureInfo.Labels.ToArray(),
+        data = Model.Averages.ToArray()
+    };
+    var hasAnyData = Model.Averages.Any();
 }
 
 <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-    @if (HasAnyData(barData))
+    @if (hasAnyData)
     {
-        <canvas id="@Model.HtmlPrefix-school-chart"
+        <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
                 class="js-chart js-chart--school-ks4-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
-                data-axis-step="@(Model.DataType == MeasureDataType.Percentage? 25 : 30)"
-                data-axis-max="@(Model.DataType == MeasureDataType.Percentage? 100 : 90)"
-                data-label-decimals="@(Model.DataType == MeasureDataType.Percentage? 0 : 1)"
+                data-axis-step="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? 25 : 30)"
+                data-axis-max="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? 100 : 90)"
+                data-label-decimals="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? 0 : 1)"
                 data-bar-thickness="50"
                 data-category-percentage="0.6"
                 data-bar-percentage="1"
-                data-axis-suffix="@(Model.DataType == MeasureDataType.Percentage? "%" : "")"
-                data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = barData }))'>
+                data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? "%" : "")"
+                data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                @if (Model.Colors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.Colors))'</text> }>
         </canvas>
     }
     else
