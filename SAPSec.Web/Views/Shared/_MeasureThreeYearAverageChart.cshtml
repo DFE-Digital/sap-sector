@@ -22,13 +22,16 @@
                 class="js-chart js-chart--school-ks4-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
-                data-axis-step="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? 25 : 30)"
-                data-axis-max="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? 100 : 90)"
-                data-label-decimals="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? 0 : 1)"
+                data-axis-step="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 30 : 25)"
+                data-axis-max="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 90 : 100)"
+                data-label-decimals="@(Model.MeasureInfo.DataType switch
+                {
+                    MeasureDataType.Score => 1,
+                    MeasureDataType.AbsencePercentage => 2,
+                    _ => 0
+                })"
                 data-bar-thickness="50"
-                data-category-percentage="0.6"
-                data-bar-percentage="1"
-                data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? "%" : "")"
+                data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.AbsencePercentage? "%" : "")"
                 data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
                 @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
         </canvas>

@@ -611,7 +611,7 @@ internal static class Ks4CoreSubjects
         return Measure.ForSchool(
             key,
             name,
-            MeasureDataType.Percentage,
+            MeasureDataType.GradePercentage,
             [
                 new MeasureAvailableFilter(
                     filterKey,
@@ -649,7 +649,7 @@ internal static class Ks4CoreSubjects
         return Measure.ForSchoolComparison(
             key,
             name,
-            MeasureDataType.Percentage,
+            MeasureDataType.GradePercentage,
             [
                 new MeasureAvailableFilter(
                     filterKey,

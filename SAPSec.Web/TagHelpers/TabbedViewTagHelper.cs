@@ -19,39 +19,48 @@ public class TabbedViewTagHelper : TagHelper
         tabContext.HtmlPrefix = HtmlPrefix;
         context.Items.Add(typeof(TabbedViewTagHelper), tabContext);
 
+        output.TagName = "div";
+        //output.Attributes.SetAttribute("id", HtmlPrefix);
+        output.Attributes.SetAttribute("class", "govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs");
+        output.Attributes.SetAttribute("data-module", "govuk-tabs");
+
         await output.GetChildContentAsync();
 
-        output.Content.AppendFormat(
-            """
-            <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
-                <ul class="govuk-tabs__list">
-            """);
-
+        output.Content.AppendHtml(
+        $"""
+            <ul class="govuk-tabs__list">
+        """);
 
         foreach (var (tab, i) in tabContext.Tabs.Select((t, i) => (t, i)))
         {
             var selected = i == 0 ? "govuk-tabs__list-item--selected" : "";
-            output.Content.AppendFormat(
-                """
-                    <li class="govuk-tabs__list-item {3}"><a class="govuk-tabs__tab" href="#{0}-{1}">{2}</a></li>
-                """, HtmlPrefix, tab.Id, tab.Name, selected);
+            output.Content.AppendHtml(
+        $"""
+                <li class="govuk-tabs__list-item {selected}">
+                    <a class="govuk-tabs__tab" href="#{HtmlPrefix}-{tab.Id}">{tab.Name}</a>
+                </li>
+        """);
         }
 
-        output.Content.AppendHtml("</ul>");
+        output.Content.AppendHtml(
+        """
+            </ul>
+        """);
 
         foreach (var tab in tabContext.Tabs)
         {
-            output.Content.AppendFormat(
-                """
-                <div class="govuk-tabs__panel" id="{0}-{1}">
-            """, HtmlPrefix, tab.Id);
+            output.Content.AppendHtml(
+            $"""
+                <div class="govuk-tabs__panel" id="{HtmlPrefix}-{tab.Id}">
+            """);
 
             output.Content.AppendHtml(tab.Content);
 
-            output.Content.AppendHtml("</div>");
+            output.Content.AppendHtml(
+            """
+                </div>
+            """);
         }
-
-        output.Content.AppendHtml("</div>");
     }
 }
 

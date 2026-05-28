@@ -12,19 +12,25 @@
     How @Model.Name compares with @Model.SimilarSchoolName based on KS4 core subject GCSE results.
 </p>
 
-@foreach (var measure in Model.Measures!)
-{
-    <section aria-labelledby="@measure.MeasureInfo.HtmlPrefix-heading" class="app-ks4-attainment govuk-!-margin-top-9">
-        <h2 class="govuk-heading-m" id="@measure.MeasureInfo.HtmlPrefix-heading">@measure.MeasureInfo.Name</h2>
+<form action="" method="get">
+    @foreach (var measure in Model.Measures!)
+    {
+        <section aria-labelledby="@measure.MeasureInfo.HtmlPrefix-heading" class="app-ks4-attainment govuk-!-margin-top-9">
+            <h2 class="govuk-heading-m" id="@measure.MeasureInfo.HtmlPrefix-heading">@measure.MeasureInfo.Name</h2>
         
-        <partial name="_Measure" model=@measure />
-    </section>
-}
+            <partial name="_Measure" model=@measure />
+        </section>
+    }
+</form>
 
 @section Scripts {
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+    </script>
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/data-view-switcher-2.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }

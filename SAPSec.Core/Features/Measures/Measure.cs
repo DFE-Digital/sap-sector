@@ -55,8 +55,9 @@ public record Measure(
 
 public enum MeasureDataType
 {
-    Number,
-    Percentage
+    Score,
+    GradePercentage,
+    AbsencePercentage
 }
 
 public record MeasureAvailableFilter(

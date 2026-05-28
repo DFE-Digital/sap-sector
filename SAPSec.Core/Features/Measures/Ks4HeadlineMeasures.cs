@@ -11,7 +11,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 "attainment8",
                 "Attainment 8",
-                MeasureDataType.Number,
+                MeasureDataType.Score,
                 [],
                 schoolData,
                 similarSchools,
@@ -32,7 +32,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 "attainment8",
                 "Attainment 8",
-                MeasureDataType.Number,
+                MeasureDataType.Score,
                 [],
                 currentSchoolData,
                 similarSchoolData,
@@ -59,7 +59,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 "eng-maths",
                 "Grade achieved in English and maths GCSEs",
-                MeasureDataType.Percentage,
+                MeasureDataType.GradePercentage,
                 [
                     new MeasureAvailableFilter(
                     "eng-maths:grade",
@@ -102,7 +102,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 "eng-maths",
                 "Grade achieved in English and maths GCSEs",
-                MeasureDataType.Percentage,
+                MeasureDataType.GradePercentage,
                 [
                     new MeasureAvailableFilter(
                     "eng-maths:grade",
@@ -149,7 +149,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchool(
                 "destinations",
                 "Staying in education or entering employment",
-                MeasureDataType.Percentage,
+                MeasureDataType.GradePercentage,
                 [
                     new MeasureAvailableFilter(
                     "destinations:destination",
@@ -203,7 +203,7 @@ internal static class Ks4HeadlineMeasures
             return Measure.ForSchoolComparison(
                 "destinations",
                 "Staying in education or entering employment",
-                MeasureDataType.Percentage,
+                MeasureDataType.GradePercentage,
                 [
                     new MeasureAvailableFilter(
                     "destinations:destination",

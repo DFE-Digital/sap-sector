@@ -231,14 +231,37 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
             </div>
         </div>
     </footer>
-    <script type="module" src="/js/govuk-frontend.min.js" asp-append-version="true"></script>
+    <script type="module" src="/js/govuk-frontend.unmin.js" asp-append-version="true"></script>
     <script type="module" src="/js/moj-frontend.min.js" asp-append-version="true"></script>
     <script src="/js/dfefrontend.js" asp-append-version="true"></script>
     <script type="module" add-nonce="true">
         import * as GOVUKFrontend from '/js/govuk-frontend.min.js'
         import * as MOJFrontend from '/js/moj-frontend.min.js'
+        import { MobileCollapsedTabs } from '/js/mobile-collapsed-tabs.js'
 
-        GOVUKFrontend.initAll();
+        // Override GOVUKFrontend initAll() to replace Tabs component with MobileCollapsedTabs
+        function initAll() {
+            [
+                GOVUKFrontend.Accordion,
+                GOVUKFrontend.Button,
+                GOVUKFrontend.CharacterCount,
+                GOVUKFrontend.Checkboxes,
+                GOVUKFrontend.ErrorSummary,
+                GOVUKFrontend.ExitThisPage,
+                GOVUKFrontend.FileUpload,
+                GOVUKFrontend.Header,
+                GOVUKFrontend.NotificationBanner,
+                GOVUKFrontend.PasswordInput,
+                GOVUKFrontend.Radios,
+                GOVUKFrontend.ServiceNavigation,
+                GOVUKFrontend.SkipLink,
+                MobileCollapsedTabs // Replace Tabs component with MobileCollapsedTabs
+            ].forEach(Component => {
+                GOVUKFrontend.createAll(Component, {} , {})
+            })
+        }
+
+        initAll();
         MOJFrontend.initAll();
     </script>
     <script add-nonce="true">
@@ -267,6 +290,5 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
     <script src="/js/site.js" asp-append-version="true"></script>
     
     @await RenderSectionAsync("scripts", false)
-
 </body>
 </html>

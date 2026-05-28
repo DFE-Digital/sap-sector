@@ -12,7 +12,7 @@ public abstract record SubMeasureViewModel(
     public abstract string Name { get; }
 
     public string DisplayNumber(decimal? value) =>
-        MeasureInfo.DataType == MeasureDataType.Number
+        MeasureInfo.DataType == MeasureDataType.Score
             ? DisplayValue(value)
             : DisplayWholePercent(value);
 
