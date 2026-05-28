@@ -1,6 +1,6 @@
 ﻿@using SAPSec.Web.Constants
 @using System.Text.Json
-@using SAPSec.Web.ViewModels
+@using SAPSec.Web.ViewModels.Measures
 
 @model TableSubMeasureViewModel
 
@@ -23,10 +23,10 @@
         {
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">@label</th>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-prev2")">@Model.DisplayNumber(row.YearByYear.Previous2)</td>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-prev")">@Model.DisplayNumber(row.YearByYear.Previous)</td>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-current")">@Model.DisplayNumber(row.YearByYear.Current)</td>
-                <td class="govuk-table__cell govuk-table__cell--numeric" data-@Model.MeasureInfo.HtmlPrefix-cell="@($"{row.Key}-avg")">@Model.DisplayNumber(row.ThreeYearAverage)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.YearByYear.Previous2)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.YearByYear.Previous)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.YearByYear.Current)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.ThreeYearAverage)</td>
             </tr>
         }
     </tbody>

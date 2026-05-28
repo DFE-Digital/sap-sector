@@ -1,6 +1,7 @@
 ﻿@using SAPSec.Web.Constants
 @using System.Text.Json
-@using SAPSec.Web.ViewModels
+@using SAPSec.Web.ViewModels.Measures
+@using SAPSec.Core.Features.Measures
 @using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases
 
 @model ThreeYearAverageSubMeasureViewModel
@@ -29,7 +30,7 @@
                 data-bar-percentage="1"
                 data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.Percentage? "%" : "")"
                 data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                @if (Model.Colors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.Colors))'</text> }>
+                @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
         </canvas>
     }
     else

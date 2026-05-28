@@ -21,8 +21,8 @@ public static class DependenciesExtensions
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
         // Use cases
-        services.AddSingleton<GetKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4HeadlineMeasures>();
+        services.AddSingleton<GetSchoolComparisonKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4CoreSubjects>();
         services.AddSingleton<GetSchoolComparisonKs4CoreSubjects>();
         services.AddSingleton<GetAttendanceMeasures>();

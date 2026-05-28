@@ -42,10 +42,12 @@ public class SimilarSchoolsComparisonControllerTests
             schoolDetailsService,
             _ks4PerformanceRepositoryMock.Object,
             _absenceRepositoryMock.Object);
-        var ks4UseCase = new GetKs4HeadlineMeasures(
+        var ks4ComparisonHeadlineMeasuresUseCase = new GetSchoolComparisonKs4HeadlineMeasures(
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object,
-            schoolDetailsService);
+            schoolDetailsService,
+            _establishmentRepositoryMock.Object,
+            _repoMock.Object);
         var ks4CoreComparisonSubjectsUseCase = new GetSchoolComparisonKs4CoreSubjects(
             _ks4PerformanceRepositoryMock.Object,
             schoolDetailsService,
@@ -83,7 +85,7 @@ public class SimilarSchoolsComparisonControllerTests
             getSimilarSchoolDetails,
             attendanceUseCase,
             ks4CoreComparisonSubjectsUseCase,
-            ks4UseCase,
+            ks4ComparisonHeadlineMeasuresUseCase,
             getCharacteristicsComparison,
             characteristicsFormatter,
             _loggerMock.Object);

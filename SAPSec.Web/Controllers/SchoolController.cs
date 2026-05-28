@@ -3,10 +3,12 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 using System.Globalization;
 
 namespace SAPSec.Web.Controllers;
@@ -57,6 +59,30 @@ public class SchoolController : Controller
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewData(school);
         return View(school);
+    }
+
+    [HttpGet]
+    [Route("ks4-headline-measures")]
+    public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
+    {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn, filters));
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(response.SchoolDetails);
+
+        return View(BuildKs4HeadlineMeasuresViewModel(response));
+    }
+
+    [HttpGet]
+    [Route("ks4-core-subjects")]
+    public async Task<IActionResult> Ks4CoreSubjects(string urn)
+    {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn, filters));
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        SetSchoolViewData(response.SchoolDetails);
+
+        return View(BuildKs4CoreSubjectsViewModel(response));
     }
 
     [HttpGet]
@@ -187,30 +213,6 @@ public class SchoolController : Controller
         });
     }
 
-    [HttpGet]
-    [Route("ks4-headline-measures")]
-    public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
-    {
-        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn, filters));
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(response.SchoolDetails);
-
-        return View(BuildKs4HeadlineMeasuresViewModel(response));
-    }
-
-    [HttpGet]
-    [Route("ks4-core-subjects")]
-    public async Task<IActionResult> Ks4CoreSubjects(string urn)
-    {
-        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn, filters));
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(response.SchoolDetails);
-
-        return View(BuildKs4CoreSubjectsViewModel(response));
-    }
-
     private void SetSchoolViewData(Core.Model.SchoolDetails school)
     {
         ViewData["SchoolDetails"] = school;
@@ -234,71 +236,13 @@ public class SchoolController : Controller
             Measures = response.Measures.Select(m => MapMeasure(m, response.SchoolDetails))
         };
 
-    private static MeasureViewModel MapMeasure(SchoolMeasure measure, SchoolDetails schoolDetails)
-    {
-        var measureInfo = new MeasureInfoViewModel(
-            measure.Key,
-            measure.Name,
-            measure.DataType,
-            measure.AvailableFilters.Select(MapAvailableFilter),
-            [
-                schoolDetails.Name,
-                "Similar schools average",
-                "Local authority schools average",
-                "Schools in England average",
-            ]);
-
-        return new(measureInfo, [
-            new ThreeYearAverageSubMeasureViewModel(
-                "three-year-average",
-                "3-year average",
-                measureInfo,
-                [
-                    measure.ThreeYearAverage.SchoolValue,
-                    measure.ThreeYearAverage.SimilarSchoolsValue,
-                    measure.ThreeYearAverage.LocalAuthorityValue,
-                    measure.ThreeYearAverage.EnglandValue,
-                ]),
-            new YearByYearSubMeasureViewModel(
-                "year-by-year",
-                "Year by year",
-                measureInfo,
-                [
-                    MapYearByYear(measure.YearByYear.School),
-                    MapYearByYear(measure.YearByYear.SimilarSchools),
-                    MapYearByYear(measure.YearByYear.LocalAuthority),
-                    MapYearByYear(measure.YearByYear.England),
-                ]),
-            new TableSubMeasureViewModel(
-                "table-view",
-                "Table",
-                measureInfo,
-                [
-                    new("this", MapYearByYear(measure.YearByYear.School), measure.ThreeYearAverage.SchoolValue),
-                    new("similar", MapYearByYear(measure.YearByYear.SimilarSchools), measure.ThreeYearAverage.SimilarSchoolsValue),
-                    new("la", MapYearByYear(measure.YearByYear.LocalAuthority), measure.ThreeYearAverage.LocalAuthorityValue),
-                    new("england", MapYearByYear(measure.YearByYear.England), measure.ThreeYearAverage.EnglandValue),
-                ]),
-            new TopPerformersSubMeasureViewModel(
-                "top-performers",
-                "Top performers",
-                measureInfo,
-                measure.TopPerformers.Select(t => new TopPerformersSubMeasureItemViewModel(
-                    t.Rank,
-                    t.Urn,
-                    t.Name,
-                    Routes.SimilarSchoolComparison(schoolDetails.Urn, t.Urn),
-                    t.Value,
-                    t.IsCurrentSchool)),
-                Routes.SimilarSchools(schoolDetails.Urn))
+    private static MeasureViewModel MapMeasure(Measure measure, SchoolDetails schoolDetails) =>
+        MeasureViewModel.FromMeasure(measure, schoolDetails, [
+            schoolDetails.Name,
+            "Similar schools average",
+            "Local authority schools average",
+            "Schools in England average",
         ]);
-    }
-
-    private static MeasureAvailableFilterViewModel MapAvailableFilter(MeasureAvailableFilter availableFilter) =>
-        new(availableFilter.Key, availableFilter.Name, availableFilter.Options.Select(o => new MeasureFilterOptionViewModel(o.Key, o.Name, o.Count, o.Selected)));
-
-    private static YearByYearSeriesViewModel MapYearByYear(MeasureYearByYearSeries yearByYear) =>
-        new(yearByYear.Current, yearByYear.Previous, yearByYear.Previous2);
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
     {
