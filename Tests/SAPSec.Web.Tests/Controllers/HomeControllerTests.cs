@@ -5,10 +5,9 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using SAPSec.Core.Configuration;
-using SAPSec.Core.Features.Home;
-using SAPSec.Core.Features.Home.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Constants;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -27,9 +26,8 @@ public class HomeControllerTests
         _mockFeatureFlagService = new();
         _mockUrlHelper = new();
         Mock<IOptions<DfeSignInSettings>> options = new();
-        var getEnablePrimarySchools = new GetEnablePrimarySchools(_mockFeatureFlagService.Object);
 
-        _controller = new(options.Object, _mockEnvironment.Object, getEnablePrimarySchools)
+        _controller = new(options.Object, _mockEnvironment.Object, _mockFeatureFlagService.Object)
         {
             Url = _mockUrlHelper.Object
         };
