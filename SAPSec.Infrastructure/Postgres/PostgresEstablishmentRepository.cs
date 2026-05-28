@@ -28,6 +28,10 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
             FROM public.v_establishment;
         """;
 
+        //"PhaseOfEducationName",
+        //"AgeRangeLow",
+        //"AgeRangeHigh",
+
         var result = await conn.QueryAsync<Establishment>(sql);
         return result.ToList();
     }

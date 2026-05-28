@@ -8,9 +8,9 @@ public class LuceneShoolSearchIndexReader(LuceneIndexContext context, LuceneToke
 {
     public async Task<IList<(int urn, string resultText)>> SearchAsync(string query, int maxResults = 10)
     {
-        if (string.IsNullOrWhiteSpace(query)) return [];
+     if (string.IsNullOrWhiteSpace(query)) return [];
 
-        var tokens = luceneTokeniser.Tokenise(query).ToList();
+     var tokens = luceneTokeniser.Tokenise(query).ToList();
         if (!tokens.Any()) return [];
 
         await Task.Yield();
@@ -42,6 +42,9 @@ public class LuceneShoolSearchIndexReader(LuceneIndexContext context, LuceneToke
                 { new PrefixQuery(new Term(FieldName.Postcode, tokens.Last())), Occur.SHOULD }
             };
             must.Add(lastTokenQuery, Occur.MUST);
+
+            
+            must.Add(new TermQuery(new Term(FieldName.PhaseOfEducationName, "Primary")), Occur.MUST);
 
             //Phrase boost – original order
             var phrase = new PhraseQuery { Slop = 2, Boost = 5f };
