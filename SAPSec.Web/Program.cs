@@ -257,6 +257,10 @@ public class Program
         app.MapRazorPages();
 
         app.MapControllerRoute(
+          name: "Areas",
+          pattern: "{area:exists}/{controller=School}/{action=Index}/{id?}");
+
+        app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
