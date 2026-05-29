@@ -38,6 +38,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         var configurationValues = new Dictionary<string, string?>
         {
             { "Establishments:CsvPath", testDataFilePath },
+            { "FeatureManagement:EnablePrimarySchools", "true" },
             { "DsiConfiguration:ClientId", TestValues.ClientId },
             { "DsiConfiguration:ClientSecret", TestValues.ClientSecret },
             { "DsiConfiguration:Authority", TestValues.Authority },

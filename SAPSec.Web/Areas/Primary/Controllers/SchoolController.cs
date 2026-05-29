@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.FeatureManagement;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Services;
@@ -14,31 +14,38 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Area("Primary")]
 [Route("school/primary/{urn}")]
 [Authorize]
-public class SchoolController (IFeatureFlagService featureFlagService) : Controller
+public class SchoolController(
+    ISchoolDetailsService schoolDetailsService,
+    IFeatureFlagService featureFlagService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        //if (await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
-        //{
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+        {
+            return NotFound();
+        }
 
-            return View();
-        //}
-        //else
-        //{
-          //  return null;
-        //}
+        var school = await schoolDetailsService.GetByUrnAsync(urn);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        ViewData["SchoolDetails"] = school;
 
+        return View(school);
     }
 
     [HttpGet]
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-       // var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+        {
+            return NotFound();
+        }
+
+        var school = await schoolDetailsService.GetByUrnAsync(urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        //SetSchoolViewData(school);
-        return View();
+        ViewData["SchoolDetails"] = school;
+
+        return View(school);
     }
 }
