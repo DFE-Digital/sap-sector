@@ -1,5 +1,6 @@
 ﻿using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
+using Dfe.Analytics.Events;
 using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -19,6 +20,7 @@ using SAPSec.Web.Setup;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
@@ -112,7 +114,7 @@ public class Program
                 .Build();
         });
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -248,14 +250,19 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             app.UseDfeAnalytics();
         }
 
-        app.MapGet("/tracking", (string targetUrl, HttpContext context) =>
-        {
-            context.GetWebRequestEvent()?.AddData("External link click", targetUrl);
+        app.MapGet("/tracking", async (string targetUrl, HttpContext context, IEventSender eventSender) =>
+        { 
+            var customEvent = eventSender.CreateEvent("outbound_link_click");
+
+            customEvent.AddData("External link click", targetUrl);
+
+            //context.GetWebRequestEvent()?.AddData("External link click", targetUrl);
+            await eventSender.SendEventAsync(customEvent);
 
             return Results.Redirect(targetUrl);
         });
