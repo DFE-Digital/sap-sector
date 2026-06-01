@@ -76,9 +76,6 @@ public class SchoolSearchController(
 
             var results = await _searchService.SearchAsync(query ?? string.Empty);
 
-            //Exclude primary schools
-            var resultsPrimary = results.Where(x => x.PhaseOfEducationName.Equals("Secondary")).ToList();
-
             // Preserve direct navigation when the query uniquely matches a school name,
             // even if hidden filters would later reduce results to zero.
             if (!string.IsNullOrWhiteSpace(query) && (localAuthorities == null || localAuthorities.Length == 0))
