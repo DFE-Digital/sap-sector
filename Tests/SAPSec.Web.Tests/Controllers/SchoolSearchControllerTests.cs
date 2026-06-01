@@ -5,6 +5,7 @@ using Moq;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -13,6 +14,7 @@ public class SchoolSearchControllerTests
 {
     private readonly Mock<ILogger<SchoolSearchController>> _mockLogger;
     private readonly Mock<ISchoolSearchService> _mockSearchService;
+    private readonly Mock<IFeatureFlagService> _featureFlagServiceMock;
     private readonly SchoolSearchController _controller;
 
     private static Establishment FakeEstablishment1 = new()
@@ -22,6 +24,7 @@ public class SchoolSearchControllerTests
         LAId = "100",
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment One",
+        PhaseOfEducationName = "Secondary",
         LAName = "Leeds",
         Easting = 430000,
         Northing = 433000,
@@ -34,6 +37,7 @@ public class SchoolSearchControllerTests
         LAId = "100",
         EstablishmentNumber = "1",
         EstablishmentName = "Fake Establishment Two",
+        PhaseOfEducationName = "Secondary",
         LAName = "Leeds",
         Easting = 430100,
         Northing = 433100,
@@ -43,7 +47,9 @@ public class SchoolSearchControllerTests
     {
         _mockLogger = new Mock<ILogger<SchoolSearchController>>();
         _mockSearchService = new Mock<ISchoolSearchService>();
-        _controller = new SchoolSearchController(_mockLogger.Object, _mockSearchService.Object);
+        _featureFlagServiceMock = new Mock<IFeatureFlagService>();
+        _featureFlagServiceMock.Setup(x => x.IsEnabledAsync("EnablePrimarySchools")).ReturnsAsync(false);
+        _controller = new SchoolSearchController(_mockLogger.Object, _mockSearchService.Object, _featureFlagServiceMock.Object);
     }
 
     #region Index GET Tests
@@ -189,6 +195,28 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
+    public async Task Index_Post_WithPrimaryNumericQuery_WhenFeatureToggleIsOff_RedirectsToSearch()
+    {
+        var viewModel = new SchoolSearchQueryViewModel
+        {
+            Query = "123456"
+        };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query))
+            .ReturnsAsync(new Establishment
+            {
+                URN = "123456",
+                EstablishmentName = "Primary School",
+                PhaseOfEducationName = "Primary"
+            });
+
+        var result = await _controller.Index(viewModel);
+
+        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirectResult.ActionName.Should().Be("Search");
+        redirectResult.RouteValues!["query"].Should().Be("123456");
+    }
+
+    [Fact]
     public async Task Index_Post_WithUnmatchedNumericQuery_RedirectsToSearch()
     {
         var viewModel = new SchoolSearchQueryViewModel
@@ -246,7 +274,7 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithNumericQuery_RedirectsToSchoolDetails()
     {
         const string query = "10000001";
-        var establishment = new Establishment { URN = "123456", UKPRN = query, EstablishmentName = "School by UKPRN" };
+        var establishment = new Establishment { URN = "123456", UKPRN = query, EstablishmentName = "School by UKPRN", PhaseOfEducationName = "Secondary" };
         _mockSearchService.Setup(s => s.SearchByNumberAsync(query))
             .ReturnsAsync(establishment);
 
@@ -258,6 +286,21 @@ public class SchoolSearchControllerTests
         redirectResult!.ActionName.Should().Be("Index");
         redirectResult.ControllerName.Should().Be("School");
         redirectResult.RouteValues!["urn"].Should().Be("123456");
+    }
+
+    [Fact]
+    public async Task Search_Get_WithPrimaryNumericQuery_WhenFeatureToggleIsOff_DoesNotRedirectToSchoolDetails()
+    {
+        const string query = "10000001";
+        var establishment = new Establishment { URN = "123456", UKPRN = query, EstablishmentName = "Primary School", PhaseOfEducationName = "Primary" };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(query))
+            .ReturnsAsync(establishment);
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(new List<SchoolSearchResult>());
+
+        var result = await _controller.Search(query, null, 1);
+
+        result.Should().BeOfType<ViewResult>();
     }
 
     [Fact]
@@ -381,7 +424,8 @@ public class SchoolSearchControllerTests
             UKPRN = "10",
             LAId = "100",
             EstablishmentNumber = "1",
-            EstablishmentName = query
+            EstablishmentName = query,
+            PhaseOfEducationName = "Secondary"
         };
 
         _mockSearchService.Setup(s => s.SearchAsync(query))
@@ -637,7 +681,7 @@ public class SchoolSearchControllerTests
             Urn = "123456"
         };
         _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Urn))
-            .ReturnsAsync(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
+            .ReturnsAsync(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn", PhaseOfEducationName = "Secondary" });
 
         var result = await _controller.Search(viewModel);
 
@@ -823,6 +867,158 @@ public class SchoolSearchControllerTests
     }
 
     [Fact]
+    public async Task Search_Get_ExcludesPrimarySchools_WhenFeatureToggleIsOff()
+    {
+        var query = "School";
+        var primarySchool = SchoolSearchResult.FromNameAndEstablishment("Primary School", new Establishment
+        {
+            URN = "111111",
+            EstablishmentName = "Primary School",
+            PhaseOfEducationName = "Primary",
+            LAName = "Leeds"
+        });
+        var secondarySchool = SchoolSearchResult.FromNameAndEstablishment("Secondary School", new Establishment
+        {
+            URN = "222222",
+            EstablishmentName = "Secondary School",
+            PhaseOfEducationName = "Secondary",
+            LAName = "Leeds"
+        });
+
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync([primarySchool, secondarySchool]);
+
+        var result = await _controller.Search(query, null, 1);
+
+        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirectResult.ControllerName.Should().Be("School");
+        redirectResult.RouteValues!["urn"].Should().Be("222222");
+    }
+
+    [Fact]
+    public async Task Search_Get_IncludesPrimarySchools_WhenFeatureToggleIsOn()
+    {
+        var query = "School";
+        _featureFlagServiceMock.Setup(x => x.IsEnabledAsync("EnablePrimarySchools")).ReturnsAsync(true);
+
+        var primarySchool = SchoolSearchResult.FromNameAndEstablishment("Primary School", new Establishment
+        {
+            URN = "111111",
+            EstablishmentName = "Primary School",
+            PhaseOfEducationName = "Primary",
+            LAName = "Leeds"
+        });
+        var secondarySchool = SchoolSearchResult.FromNameAndEstablishment("Secondary School", new Establishment
+        {
+            URN = "222222",
+            EstablishmentName = "Secondary School",
+            PhaseOfEducationName = "Secondary",
+            LAName = "Leeds"
+        });
+
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync([primarySchool, secondarySchool]);
+
+        var result = await _controller.Search(query, null, 1);
+
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var model = viewResult.Model.Should().BeOfType<SchoolSearchResultsViewModel>().Subject;
+        model.Results.Should().HaveCount(2);
+    }
+
+    [Fact]
+    public async Task Search_Get_IncludesAllThroughSchools_WhenFeatureToggleIsOn()
+    {
+        var query = "School";
+        _featureFlagServiceMock.Setup(x => x.IsEnabledAsync("EnablePrimarySchools")).ReturnsAsync(true);
+
+        var allThroughSchool = SchoolSearchResult.FromNameAndEstablishment("All-through School", new Establishment
+        {
+            URN = "111111",
+            EstablishmentName = "All-through School",
+            PhaseOfEducationName = "All-through",
+            LAName = "Leeds"
+        });
+        var secondarySchool = SchoolSearchResult.FromNameAndEstablishment("Secondary School", new Establishment
+        {
+            URN = "222222",
+            EstablishmentName = "Secondary School",
+            PhaseOfEducationName = "Secondary",
+            LAName = "Leeds"
+        });
+
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync([allThroughSchool, secondarySchool]);
+
+        var result = await _controller.Search(query, null, 1);
+
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var model = viewResult.Model.Should().BeOfType<SchoolSearchResultsViewModel>().Subject;
+        model.Results.Should().HaveCount(2);
+        model.Results.Select(x => x.SchoolName).Should().Contain(["All-through School", "Secondary School"]);
+    }
+
+    [Fact]
+    public async Task Search_Get_ExcludesAllThroughSchools_WhenFeatureToggleIsOff()
+    {
+        var query = "School";
+
+        var allThroughSchool = SchoolSearchResult.FromNameAndEstablishment("All-through School", new Establishment
+        {
+            URN = "111111",
+            EstablishmentName = "All-through School",
+            PhaseOfEducationName = "All-through",
+            LAName = "Leeds"
+        });
+        var secondarySchool = SchoolSearchResult.FromNameAndEstablishment("Secondary School", new Establishment
+        {
+            URN = "222222",
+            EstablishmentName = "Secondary School",
+            PhaseOfEducationName = "Secondary",
+            LAName = "Leeds"
+        });
+
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync([allThroughSchool, secondarySchool]);
+
+        var result = await _controller.Search(query, null, 1);
+
+        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
+        redirectResult.ControllerName.Should().Be("School");
+        redirectResult.RouteValues!["urn"].Should().Be("222222");
+    }
+
+    [Fact]
+    public async Task Suggest_ExcludesPrimarySchools_WhenFeatureToggleIsOff()
+    {
+        var queryPart = "School";
+        var primarySchool = SchoolSearchResult.FromNameAndEstablishment("Primary School", new Establishment
+        {
+            URN = "111111",
+            EstablishmentName = "Primary School",
+            PhaseOfEducationName = "Primary",
+            LAName = "Leeds"
+        });
+        var secondarySchool = SchoolSearchResult.FromNameAndEstablishment("Secondary School", new Establishment
+        {
+            URN = "222222",
+            EstablishmentName = "Secondary School",
+            PhaseOfEducationName = "Secondary",
+            LAName = "Leeds"
+        });
+
+        _mockSearchService.Setup(s => s.SuggestAsync(queryPart))
+            .ReturnsAsync([primarySchool, secondarySchool]);
+
+        var result = await _controller.Suggest(queryPart);
+
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        var suggestions = okResult.Value.Should().BeAssignableTo<IReadOnlyList<SchoolSearchResult>>().Subject;
+        suggestions.Should().ContainSingle();
+        suggestions[0].EstablishmentName.Should().Be("Secondary School");
+    }
+
+    [Fact]
     public async Task Suggest_WithSpecialCharacters_CallsService()
     {
         var queryPart = "St. * + Mary's";
@@ -885,7 +1081,7 @@ public class SchoolSearchControllerTests
         };
 
         _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Urn))
-            .ReturnsAsync(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn" });
+            .ReturnsAsync(new Establishment { URN = "123456", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "School by Urn", PhaseOfEducationName = "Secondary" });
 
         var result = await _controller.Search(viewModel);
 
@@ -918,7 +1114,7 @@ public class SchoolSearchControllerTests
         var query = "Unique School";
         var searchResults = new List<SchoolSearchResult>
         {
-            SchoolSearchResult.FromNameAndEstablishment("Unique School", new Establishment{ URN = "999999", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "Unique School" })
+            SchoolSearchResult.FromNameAndEstablishment("Unique School", new Establishment{ URN = "999999", UKPRN = "10", LAId = "100", EstablishmentNumber = "1", EstablishmentName = "Unique School", PhaseOfEducationName = "Secondary" })
         };
 
         _mockSearchService.Setup(s => s.SearchAsync(query))
@@ -1034,6 +1230,7 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "1",
             EstablishmentName = "Test School",
+            PhaseOfEducationName = "Secondary",
             LAName = "Leeds",
             Easting = 430000,
             Northing = 433000,
@@ -1045,6 +1242,7 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "2",
             EstablishmentName = "Another School",
+            PhaseOfEducationName = "Secondary",
             LAName = "Leeds",
             Easting = 430100,
             Northing = 433100
@@ -1077,6 +1275,7 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "1",
             EstablishmentName = "Test School",
+            PhaseOfEducationName = "Secondary",
             LAName = "Leeds",
             Easting = 430000,
             Northing = 433000,
@@ -1091,6 +1290,7 @@ public class SchoolSearchControllerTests
             LAId = "100",
             EstablishmentNumber = "2",
             EstablishmentName = "Another School",
+            PhaseOfEducationName = "Secondary",
             LAName = "Leeds",
             Easting = 430100,
             Northing = 433100
@@ -1128,6 +1328,7 @@ public class SchoolSearchControllerTests
                 LAId = "100",
                 EstablishmentNumber = i.ToString(),
                 EstablishmentName = $"School {i}",
+                PhaseOfEducationName = "Secondary",
                 LAName = localAuthority,
                 Easting = 430000 + i,
                 Northing = 433000 + i,

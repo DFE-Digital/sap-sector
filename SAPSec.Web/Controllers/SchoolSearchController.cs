@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using System.Text.RegularExpressions;
 
@@ -11,7 +12,8 @@ namespace SAPSec.Web.Controllers;
 [Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
-    ISchoolSearchService _searchService) : Controller
+    ISchoolSearchService _searchService,
+    IFeatureFlagService featureFlagService) : Controller
 {
     private const int PageSize = 10;
     public const string Hint = "Search by name or school ID";
@@ -26,6 +28,7 @@ public class SchoolSearchController(
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(searchQueryViewModel.Urn);
+            var primarySchoolsEnabled = await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
 
             if (!ModelState.IsValid)
             {
@@ -41,7 +44,7 @@ public class SchoolSearchController(
             }
 
             var school = await _searchService.SearchByNumberAsync(schoolNumber);
-            if (!string.IsNullOrWhiteSpace(school?.URN))
+            if (!string.IsNullOrWhiteSpace(school?.URN) && IsIncludedPhase(school.PhaseOfEducationName, primarySchoolsEnabled))
             {
                 return RedirectToAction("Index", "School", new
                 {
@@ -63,18 +66,21 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { query, page }))
         {
+            var primarySchoolsEnabled = await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
             if (page < 1) page = 1;
 
             if (IsSchoolNumberCandidate(query))
             {
                 var school = await _searchService.SearchByNumberAsync(query!.Trim());
-                if (!string.IsNullOrWhiteSpace(school?.URN))
+                if (!string.IsNullOrWhiteSpace(school?.URN) && IsIncludedPhase(school.PhaseOfEducationName, primarySchoolsEnabled))
                 {
                     return RedirectToAction("Index", "School", new { urn = school.URN });
                 }
             }
 
-            var results = await _searchService.SearchAsync(query ?? string.Empty);
+            var results = FilterSearchResults(
+                await _searchService.SearchAsync(query ?? string.Empty),
+                primarySchoolsEnabled);
 
             // Preserve direct navigation when the query uniquely matches a school name,
             // even if hidden filters would later reduce results to zero.
@@ -179,6 +185,7 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
+            var primarySchoolsEnabled = await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
             if (!ModelState.IsValid)
             {
                 return View(new SchoolSearchResultsViewModel
@@ -196,7 +203,7 @@ public class SchoolSearchController(
             }
 
             var school = await _searchService.SearchByNumberAsync(schoolNumber);
-            if (!string.IsNullOrWhiteSpace(school?.URN))
+            if (!string.IsNullOrWhiteSpace(school?.URN) && IsIncludedPhase(school.PhaseOfEducationName, primarySchoolsEnabled))
             {
                 return RedirectToAction("Index", "School", new
                 {
@@ -216,10 +223,33 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { queryPart }))
         {
-            var suggestions = await _searchService.SuggestAsync(queryPart);
+            var suggestions = FilterSearchResults(
+                await _searchService.SuggestAsync(queryPart),
+                await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools));
 
             return Ok(suggestions);
         }
+    }
+
+    private static IReadOnlyList<SchoolSearchResult> FilterSearchResults(
+        IReadOnlyList<SchoolSearchResult> results,
+        bool primarySchoolsEnabled) =>
+        results.Where(result => IsIncludedPhase(result.PhaseOfEducationName, primarySchoolsEnabled)).ToList();
+
+    private static bool IsIncludedPhase(string? phaseOfEducation, bool primarySchoolsEnabled)
+    {
+        if (string.IsNullOrWhiteSpace(phaseOfEducation))
+        {
+            return false;
+        }
+
+        return phaseOfEducation.Trim() switch
+        {
+            "Secondary" => true,
+            "Primary" => primarySchoolsEnabled,
+            "All-through" => primarySchoolsEnabled,
+            _ => false
+        };
     }
 
     private static RouteValueDictionary BuildSearchRouteValues(

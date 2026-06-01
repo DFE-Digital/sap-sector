@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
@@ -9,7 +8,6 @@ public class StartupIndexBuilder(
     ILogger<StartupIndexBuilder> logger,
     LuceneIndexWriter writer,
     IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
     int retryIntervalMilliseconds = 10000)
     : BackgroundService
 {
@@ -49,8 +47,7 @@ public class StartupIndexBuilder(
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var similarSchoolUrns = await similarSchoolsRepository.GetAllUrnsInSimilarSchoolsDataSet();
-            var schools = await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns);
+            var schools = await establishmentRepository.GetAllEstablishmentsAsync();
 
             if (!schools.Any())
             {
