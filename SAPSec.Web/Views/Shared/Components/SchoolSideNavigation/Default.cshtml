@@ -2,7 +2,7 @@
 
 <div class="app-side-navigation-container">
     <nav class="app-side-navigation"
-         aria-label="School navigation"
+         aria-label="Side"
          role="navigation">
         <button class="app-side-navigation__button"
                 data-label-hide="Hide navigation"
@@ -32,7 +32,7 @@
 
 <script add-nonce="true">
     (() => {
-        const root = document.currentScript?.closest('.app-side-navigation-container');
+        const root = document.currentScript?.previousElementSibling;
         const sideNavButton = root?.querySelector('.app-side-navigation__button');
         const sideNavList = root?.querySelector('.app-side-navigation__list');
 
