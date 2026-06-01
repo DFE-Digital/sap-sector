@@ -1,0 +1,55 @@
+@model SAPSec.Web.ViewModels.SchoolSideNavigationViewModel
+
+<div class="app-side-navigation-container">
+    <nav class="app-side-navigation"
+         aria-label="School navigation"
+         role="navigation">
+        <button class="app-side-navigation__button"
+                data-label-hide="Hide navigation"
+                data-label-show="Show navigation"
+                aria-expanded="false"
+                aria-controls="side-navigation">
+            <span class="app-side-navigation__section-toggle-focus">
+                <span class="app-side-navigation__chevron app-side-navigation__chevron--down"></span>
+                <span class="app-side-navigation__section-toggle-text">Show navigation</span>
+            </span>
+        </button>
+
+        <ul id="side-navigation" class="app-side-navigation__list app-side-navigation--mobile">
+            @foreach (var item in Model.Items)
+            {
+                <li class="app-side-navigation__item @(item.IsSelected ? "app-side-navigation__item--selected" : string.Empty)">
+                    <a href="@item.Href"
+                       class="app-side-navigation__link @(item.IsSelected ? "app-side-navigation__link--selected" : string.Empty)"
+                       aria-current="@(item.IsSelected ? "page" : null)">
+                        @item.Text
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<script add-nonce="true">
+    (() => {
+        const root = document.currentScript?.closest('.app-side-navigation-container');
+        const sideNavButton = root?.querySelector('.app-side-navigation__button');
+        const sideNavList = root?.querySelector('.app-side-navigation__list');
+
+        if (!sideNavButton || !sideNavList) {
+            return;
+        }
+
+        sideNavButton.addEventListener('click', ev => {
+            ev.preventDefault();
+            const expanded = sideNavButton.getAttribute('aria-expanded') === 'false';
+            sideNavButton.setAttribute('aria-expanded', expanded);
+            sideNavButton.querySelector('.app-side-navigation__section-toggle-text').innerHTML = expanded
+                ? sideNavButton.dataset.labelHide
+                : sideNavButton.dataset.labelShow;
+            sideNavButton.querySelector('.app-side-navigation__chevron').classList
+                .toggle('app-side-navigation__chevron--down');
+            sideNavList.classList.toggle('app-side-navigation--mobile');
+        });
+    })();
+</script>
