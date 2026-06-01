@@ -67,6 +67,36 @@ public class PrimarySchoolControllerTests
         viewResult.Model.Should().Be(school);
     }
 
+    [Theory]
+    [InlineData("Ks2", "123456")]
+    [InlineData("Attendance", "123456")]
+    [InlineData("ViewSimilarSchools", "123456")]
+    [InlineData("SchoolDetails", "123456")]
+    public async Task PrimaryPages_WhenFeatureEnabled_ReturnViewWithSchoolDetails(string actionName, string urn)
+    {
+        var school = CreateTestSchoolDetails(urn, "Test Primary School");
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
+            .ReturnsAsync(true);
+        _schoolDetailsServiceMock
+            .Setup(x => x.GetByUrnAsync(urn))
+            .ReturnsAsync(school);
+
+        var sut = new SchoolController(_schoolDetailsServiceMock.Object, _featureFlagServiceMock.Object);
+
+        var result = actionName switch
+        {
+            "Ks2" => await sut.Ks2(urn),
+            "Attendance" => await sut.Attendance(urn),
+            "ViewSimilarSchools" => await sut.ViewSimilarSchools(urn),
+            "SchoolDetails" => await sut.SchoolDetails(urn),
+            _ => throw new InvalidOperationException($"Unexpected action '{actionName}'")
+        };
+
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        viewResult.Model.Should().Be(school);
+    }
+
     private static SchoolDetails CreateTestSchoolDetails(string urn, string name) =>
         new()
         {

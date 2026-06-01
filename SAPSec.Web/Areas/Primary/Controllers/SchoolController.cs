@@ -21,21 +21,45 @@ public class SchoolController(
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
-        {
-            return NotFound();
-        }
+        return await RenderPrimarySchoolViewAsync(urn);
+    }
 
-        var school = await schoolDetailsService.GetByUrnAsync(urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData["SchoolDetails"] = school;
+    [HttpGet]
+    [Route("ks2")]
+    public async Task<IActionResult> Ks2(string urn)
+    {
+        return await RenderPrimarySchoolViewAsync(urn);
+    }
 
-        return View(school);
+    [HttpGet]
+    [Route("attendance")]
+    public async Task<IActionResult> Attendance(string urn)
+    {
+        return await RenderPrimarySchoolViewAsync(urn);
+    }
+
+    [HttpGet]
+    [Route("view-similar-schools")]
+    public async Task<IActionResult> ViewSimilarSchools(string urn)
+    {
+        return await RenderPrimarySchoolViewAsync(urn);
+    }
+
+    [HttpGet]
+    [Route("school-details")]
+    public async Task<IActionResult> SchoolDetails(string urn)
+    {
+        return await RenderPrimarySchoolViewAsync(urn);
     }
 
     [HttpGet]
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
+    {
+        return await RenderPrimarySchoolViewAsync(urn);
+    }
+
+    private async Task<IActionResult> RenderPrimarySchoolViewAsync(string urn)
     {
         if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
         {

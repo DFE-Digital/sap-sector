@@ -33,6 +33,23 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
     }
 
     [Fact]
+    public async Task GetSchoolOverview_ContainsSecondaryNavigationInExpectedOrder()
+    {
+        var response = await fixture.Client.GetAsync(SchoolOverviewPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        AssertInOrder(content,
+            "Overview",
+            "KS4 headline measures",
+            "KS4 core subjects",
+            "Attendance",
+            "View similar schools",
+            "School details",
+            "What is a similar school?");
+    }
+
+    [Fact]
     public async Task GetSchoolOverview_HomeBreadcrumb_LinksToSchoolSearch()
     {
         var response = await fixture.Client.GetAsync(SchoolOverviewPath);
@@ -73,5 +90,17 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         content.Should().Contain("href='https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release' class=\"govuk-link\"");
         content.Should().Contain("href='https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/' class=\"govuk-link\"");
+    }
+
+    private static void AssertInOrder(string content, params string[] expectedText)
+    {
+        var currentIndex = -1;
+
+        foreach (var text in expectedText)
+        {
+            var nextIndex = content.IndexOf(text, currentIndex + 1, StringComparison.Ordinal);
+            nextIndex.Should().BeGreaterThan(currentIndex, $"expected '{text}' to appear after the previous navigation item");
+            currentIndex = nextIndex;
+        }
     }
 }
