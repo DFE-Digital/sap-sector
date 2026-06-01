@@ -29,6 +29,7 @@ public class LuceneIndexWriter(LuceneIndexContext context)
                 new StringField(FieldName.Urn, e.URN.ToString(), Field.Store.YES),
                 new Field(FieldName.EstablishmentName, e.EstablishmentName, TermVectorFieldType),
                 new SortedDocValuesField(FieldName.EstablishmentNameSort, new BytesRef(e.EstablishmentName)),
+                new StringField(FieldName.PhaseOfEducationName, e.PhaseOfEducationName, Field.Store.YES),
                 new Field(FieldName.Street, e.Address3 ?? string.Empty, TermVectorFieldType),
                 new Field(FieldName.Postcode, e.Postcode ?? string.Empty, TermVectorFieldType)
                 // new Field(FieldName.EstablishmentNameSchoolId, e.EstablishmentNameSchoolId, TermVectorFieldType),

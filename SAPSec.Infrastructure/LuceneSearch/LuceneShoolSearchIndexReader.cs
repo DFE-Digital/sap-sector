@@ -6,7 +6,7 @@ namespace SAPSec.Infrastructure.LuceneSearch;
 
 public class LuceneShoolSearchIndexReader(LuceneIndexContext context, LuceneTokeniser luceneTokeniser, LuceneHighlighter highlighter) : ISchoolSearchIndexReader
 {
-    public async Task<IList<(int urn, string resultText)>> SearchAsync(string query, int maxResults = 10)
+    public async Task<IList<(int urn, string resultText)>> SearchAsync(string query, string phaseOfEducation, int maxResults = 10)
     {
         if (string.IsNullOrWhiteSpace(query)) return [];
 
@@ -28,6 +28,9 @@ public class LuceneShoolSearchIndexReader(LuceneIndexContext context, LuceneToke
                 var tokenQuery = new BooleanQuery
                 {
                     { new TermQuery(new Term(FieldName.EstablishmentName, t)), Occur.SHOULD },
+                    { new TermQuery(new Term(FieldName.PhaseOfEducationName, "Primary")), Occur.SHOULD },
+                    { new TermQuery(new Term(FieldName.PhaseOfEducationName, "Secondary")), Occur.SHOULD },
+                    { new TermQuery(new Term(FieldName.PhaseOfEducationName, "All-through")), Occur.SHOULD },
                     { new TermQuery(new Term(FieldName.Street, t)), Occur.SHOULD },
                     { new TermQuery(new Term(FieldName.Postcode, t)), Occur.SHOULD }
                 };
@@ -38,6 +41,9 @@ public class LuceneShoolSearchIndexReader(LuceneIndexContext context, LuceneToke
             var lastTokenQuery = new BooleanQuery
             {
                 { new PrefixQuery(new Term(FieldName.EstablishmentName, tokens.Last())), Occur.SHOULD },
+                { new PrefixQuery(new Term(FieldName.PhaseOfEducationName, "Primary")), Occur.SHOULD },
+                { new PrefixQuery(new Term(FieldName.PhaseOfEducationName, "Secondary")), Occur.SHOULD },
+                { new PrefixQuery(new Term(FieldName.PhaseOfEducationName, "All-through")), Occur.SHOULD },
                 { new PrefixQuery(new Term(FieldName.Street, tokens.Last())), Occur.SHOULD },
                 { new PrefixQuery(new Term(FieldName.Postcode, tokens.Last())), Occur.SHOULD }
             };
