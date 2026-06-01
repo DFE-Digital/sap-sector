@@ -11,7 +11,7 @@ public class GenerateRawTables
     private readonly string _sqlDir;
     private readonly string _tableMappingPath;
     private readonly List<string> _sqlFiles;
-    private readonly HashSet<string> _preservedLogicalKeys;
+    private readonly HashSet<string> _logicalKeysToRebuild;
 
     private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
 
@@ -21,15 +21,15 @@ public class GenerateRawTables
         string sqlDir,
         string tableMappingPath,
         List<string> sqlFiles,
-        IEnumerable<string>? preservedLogicalKeys = null)
+        IEnumerable<string>? logicalKeysToRebuild = null)
     {
         _inputDir = inputDir;
         _cleanDir = cleanDir;
         _sqlDir = sqlDir;
         _tableMappingPath = tableMappingPath;
         _sqlFiles = sqlFiles;
-        _preservedLogicalKeys = new HashSet<string>(
-            preservedLogicalKeys ?? Array.Empty<string>(),
+        _logicalKeysToRebuild = new HashSet<string>(
+            logicalKeysToRebuild ?? Array.Empty<string>(),
             StringComparer.OrdinalIgnoreCase);
     }
 
@@ -78,7 +78,7 @@ public class GenerateRawTables
 
         // Physical table name: prefix-free, based on logical identity (stable)
         string tableName = GenerateShortTableName(logicalKey);
-        bool preserveTable = _preservedLogicalKeys.Contains(logicalKey);
+        bool rebuildTable = _logicalKeysToRebuild.Contains(logicalKey);
 
         // Map BOTH keys to the same physical table
         // - DataMap will use logicalKey
@@ -135,9 +135,9 @@ public class GenerateRawTables
         // -----------------------------
         // CREATE TABLE
         // -----------------------------
-        if (preserveTable)
+        if (!rebuildTable)
         {
-            Console.WriteLine($"Preserving table for logical key '{logicalKey}' ({tableName}). Skipping DROP/CREATE/COPY.");
+            Console.WriteLine($"Leaving table for logical key '{logicalKey}' ({tableName}) unchanged. Skipping DROP/CREATE/COPY.");
             return;
         }
 
