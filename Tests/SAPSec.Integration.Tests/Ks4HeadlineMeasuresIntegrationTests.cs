@@ -36,8 +36,8 @@ public class Ks4HeadlineMeasuresIntegrationTests(WebApplicationSetupFixture fixt
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().Contain("Information about staying in education or entering employment data");
-        content.Should().Contain("The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021,2022 and 2023.");
-        content.Should().NotContain("The most recent data covers pupils who finished year 11 in 2023. The three-year average is the average of pupils completed year 11 in 2021,2022 and 2023.");
+        content.Should().Contain("The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021, 2022 and 2023.");
+        content.Should().NotContain("The most recent data covers pupils who finished year 11 in 2023. The three-year average is the average of pupils completed year 11 in 2021, 2022 and 2023.");
     }
 
     [Fact]

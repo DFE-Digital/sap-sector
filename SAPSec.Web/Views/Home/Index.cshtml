@@ -28,7 +28,7 @@
 
                 <ul class="govuk-list govuk-list--bullet">
                     <li>total number of pupils</li>
-                    <li>eligibility for pupil premimum</li>
+                    <li>eligibility for pupil premium</li>
                     <li>percentage of pupils with SEN support</li>
                 </ul>
 
@@ -37,6 +37,13 @@
                 <p class="govuk-body">
                     You'll need a <a href="https://help.signin.education.gov.uk/" class="govuk-link">DfE Sign-in</a> account to access this service.
                 </p>
+
+                @if (Model.EnablePrimarySchools)
+                {
+                    <p class="govuk-body">
+                        Pilot feature content is enabled for this environment.
+                    </p>
+                }
 
                 <a asp-controller="Auth"
                    asp-action="SignIn"

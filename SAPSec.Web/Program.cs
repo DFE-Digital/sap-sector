@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.FeatureManagement;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
+using SAPSec.Web.Services;
 using SAPSec.Web.Setup;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
@@ -45,6 +47,8 @@ public class Program
             });
 
         builder.Services.AddRazorPages();
+        builder.Services.AddFeatureManagement();
+        builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
         builder.Services.PostConfigure<AnalyticsSettings>(options =>
         {

@@ -516,6 +516,19 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         }
     }
 
+    [Fact]
+    public async Task PhaseBanner_HasCorrectLink()
+    {
+        // Arrange
+        await Page.GotoAsync(_fixture.BaseUrl);
+
+        // Act
+        var giveFeedbackLink = Page.Locator("a.govuk-link[href='https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-QBBClDaMHtAsZDhksQEJa5UQUZHRzRSV1RMMTg2TElGV1ZYNENPTk9SRCQlQCN0PWcu']");
+
+        //Assert
+        (await giveFeedbackLink.IsVisibleAsync()).Should().BeTrue();
+    }
+
     #endregion
 
     #region Responsive Navigation Tests

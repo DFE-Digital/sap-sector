@@ -1,0 +1,452 @@
+[
+    {
+        "Id":  "100590",
+        "LAId":  "925",
+        "LAName":  "Lincolnshire",
+        "RegionId":  "E",
+        "RegionName":  "East Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "13.6",
+        "Workforce_TotPupils_Est_Current_Num":  "295"
+    },
+    {
+        "Id":  "100747",
+        "LAId":  "209",
+        "LAName":  "Lewisham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.2",
+        "Workforce_TotPupils_Est_Current_Num":  "341"
+    },
+    {
+        "Id":  "100749",
+        "LAId":  "301",
+        "LAName":  "Barking and Dagenham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17.1",
+        "Workforce_TotPupils_Est_Current_Num":  "327"
+    },
+    {
+        "Id":  "101193",
+        "LAId":  "936",
+        "LAName":  "Surrey",
+        "RegionId":  "J",
+        "RegionName":  "South East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.2",
+        "Workforce_TotPupils_Est_Current_Num":  "310"
+    },
+    {
+        "Id":  "101206",
+        "LAId":  "308",
+        "LAName":  "Enfield",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.5",
+        "Workforce_TotPupils_Est_Current_Num":  "439"
+    },
+    {
+        "Id":  "101230",
+        "LAId":  "391",
+        "LAName":  "Newcastle upon Tyne",
+        "RegionId":  "A",
+        "RegionName":  "North East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "13.7",
+        "Workforce_TotPupils_Est_Current_Num":  "391"
+    },
+    {
+        "Id":  "101243",
+        "LAId":  "301",
+        "LAName":  "Barking and Dagenham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.4",
+        "Workforce_TotPupils_Est_Current_Num":  "344"
+    },
+    {
+        "Id":  "103080",
+        "LAId":  "320",
+        "LAName":  "Waltham Forest",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.7",
+        "Workforce_TotPupils_Est_Current_Num":  "354"
+    },
+    {
+        "Id":  "107562",
+        "LAId":  "381",
+        "LAName":  "Calderdale",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.2",
+        "Workforce_TotPupils_Est_Current_Num":  "336"
+    },
+    {
+        "Id":  "109567",
+        "LAId":  "801",
+        "LAName":  "Bristol, City of",
+        "RegionId":  "K",
+        "RegionName":  "South West",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.1",
+        "Workforce_TotPupils_Est_Current_Num":  "398"
+    },
+    {
+        "Id":  "112951",
+        "LAId":  "831",
+        "LAName":  "Derby",
+        "RegionId":  "E",
+        "RegionName":  "East Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.6",
+        "Workforce_TotPupils_Est_Current_Num":  "357"
+    },
+    {
+        "Id":  "116407",
+        "LAId":  "850",
+        "LAName":  "Hampshire",
+        "RegionId":  "J",
+        "RegionName":  "South East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.9",
+        "Workforce_TotPupils_Est_Current_Num":  "444"
+    },
+    {
+        "Id":  "125279",
+        "LAId":  "936",
+        "LAName":  "Surrey",
+        "RegionId":  "J",
+        "RegionName":  "South East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.6",
+        "Workforce_TotPupils_Est_Current_Num":  "332"
+    },
+    {
+        "Id":  "131752",
+        "LAId":  "205",
+        "LAName":  "Hammersmith and Fulham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.9",
+        "Workforce_TotPupils_Est_Current_Num":  "285"
+    },
+    {
+        "Id":  "134369",
+        "LAId":  "307",
+        "LAName":  "Ealing",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.9",
+        "Workforce_TotPupils_Est_Current_Num":  "466"
+    },
+    {
+        "Id":  "135264",
+        "LAId":  "209",
+        "LAName":  "Lewisham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.9",
+        "Workforce_TotPupils_Est_Current_Num":  "306"
+    },
+    {
+        "Id":  "135296",
+        "LAId":  "205",
+        "LAName":  "Hammersmith and Fulham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.8",
+        "Workforce_TotPupils_Est_Current_Num":  "324"
+    },
+    {
+        "Id":  "135367",
+        "LAId":  "380",
+        "LAName":  "Bradford",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.5",
+        "Workforce_TotPupils_Est_Current_Num":  "471"
+    },
+    {
+        "Id":  "135423",
+        "LAId":  "391",
+        "LAName":  "Newcastle upon Tyne",
+        "RegionId":  "A",
+        "RegionName":  "North East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.4",
+        "Workforce_TotPupils_Est_Current_Num":  "454"
+    },
+    {
+        "Id":  "135507",
+        "LAId":  "302",
+        "LAName":  "Barnet",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.2",
+        "Workforce_TotPupils_Est_Current_Num":  "505"
+    },
+    {
+        "Id":  "135563",
+        "LAId":  "925",
+        "LAName":  "Lincolnshire",
+        "RegionId":  "E",
+        "RegionName":  "East Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.2",
+        "Workforce_TotPupils_Est_Current_Num":  "316"
+    },
+    {
+        "Id":  "135584",
+        "LAId":  "210",
+        "LAName":  "Southwark",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.4",
+        "Workforce_TotPupils_Est_Current_Num":  "329"
+    },
+    {
+        "Id":  "135597",
+        "LAId":  "801",
+        "LAName":  "Bristol, City of",
+        "RegionId":  "K",
+        "RegionName":  "South West",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.5",
+        "Workforce_TotPupils_Est_Current_Num":  "313"
+    },
+    {
+        "Id":  "135619",
+        "LAId":  "929",
+        "LAName":  "Northumberland",
+        "RegionId":  "A",
+        "RegionName":  "North East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.4",
+        "Workforce_TotPupils_Est_Current_Num":  "562"
+    },
+    {
+        "Id":  "135866",
+        "LAId":  "380",
+        "LAName":  "Bradford",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.3",
+        "Workforce_TotPupils_Est_Current_Num":  "551"
+    },
+    {
+        "Id":  "135958",
+        "LAId":  "308",
+        "LAName":  "Enfield",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16",
+        "Workforce_TotPupils_Est_Current_Num":  "475"
+    },
+    {
+        "Id":  "135966",
+        "LAId":  "940",
+        "LAName":  "North Northamptonshire",
+        "RegionId":  "E",
+        "RegionName":  "East Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.2",
+        "Workforce_TotPupils_Est_Current_Num":  "524"
+    },
+    {
+        "Id":  "135968",
+        "LAId":  "306",
+        "LAName":  "Croydon",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.9",
+        "Workforce_TotPupils_Est_Current_Num":  "540"
+    },
+    {
+        "Id":  "136413",
+        "LAId":  "307",
+        "LAName":  "Ealing",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.1",
+        "Workforce_TotPupils_Est_Current_Num":  "442"
+    },
+    {
+        "Id":  "136454",
+        "LAId":  "826",
+        "LAName":  "Milton Keynes",
+        "RegionId":  "J",
+        "RegionName":  "South East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17.3",
+        "Workforce_TotPupils_Est_Current_Num":  "749"
+    },
+    {
+        "Id":  "136891",
+        "LAId":  "872",
+        "LAName":  "Wokingham",
+        "RegionId":  "J",
+        "RegionName":  "South East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17.6",
+        "Workforce_TotPupils_Est_Current_Num":  "539"
+    },
+    {
+        "Id":  "136952",
+        "LAId":  "940",
+        "LAName":  "North Northamptonshire",
+        "RegionId":  "E",
+        "RegionName":  "East Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.8",
+        "Workforce_TotPupils_Est_Current_Num":  "567"
+    },
+    {
+        "Id":  "137010",
+        "LAId":  "210",
+        "LAName":  "Southwark",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.4",
+        "Workforce_TotPupils_Est_Current_Num":  "380"
+    },
+    {
+        "Id":  "137093",
+        "LAId":  "208",
+        "LAName":  "Lambeth",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.6",
+        "Workforce_TotPupils_Est_Current_Num":  "465"
+    },
+    {
+        "Id":  "137274",
+        "LAId":  "335",
+        "LAName":  "Walsall",
+        "RegionId":  "F",
+        "RegionName":  "West Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.5",
+        "Workforce_TotPupils_Est_Current_Num":  "464"
+    },
+    {
+        "Id":  "137306",
+        "LAId":  "811",
+        "LAName":  "East Riding of Yorkshire",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16",
+        "Workforce_TotPupils_Est_Current_Num":  "591"
+    },
+    {
+        "Id":  "137349",
+        "LAId":  "839",
+        "LAName":  "Bournemouth, Christchurch and Poole",
+        "RegionId":  "K",
+        "RegionName":  "South West",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.7",
+        "Workforce_TotPupils_Est_Current_Num":  "620"
+    },
+    {
+        "Id":  "137487",
+        "LAId":  "382",
+        "LAName":  "Kirklees",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17",
+        "Workforce_TotPupils_Est_Current_Num":  "220"
+    },
+    {
+        "Id":  "137578",
+        "LAId":  "330",
+        "LAName":  "Birmingham",
+        "RegionId":  "F",
+        "RegionName":  "West Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.5",
+        "Workforce_TotPupils_Est_Current_Num":  "213"
+    },
+    {
+        "Id":  "137770",
+        "LAId":  "937",
+        "LAName":  "Warwickshire",
+        "RegionId":  "F",
+        "RegionName":  "West Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17.5",
+        "Workforce_TotPupils_Est_Current_Num":  "393"
+    },
+    {
+        "Id":  "138073",
+        "LAId":  "380",
+        "LAName":  "Bradford",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.5",
+        "Workforce_TotPupils_Est_Current_Num":  "563"
+    },
+    {
+        "Id":  "139016",
+        "LAId":  "831",
+        "LAName":  "Derby",
+        "RegionId":  "E",
+        "RegionName":  "East Midlands",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "15.1",
+        "Workforce_TotPupils_Est_Current_Num":  "346"
+    },
+    {
+        "Id":  "140204",
+        "LAId":  "380",
+        "LAName":  "Bradford",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.6",
+        "Workforce_TotPupils_Est_Current_Num":  "493"
+    },
+    {
+        "Id":  "140935",
+        "LAId":  "320",
+        "LAName":  "Waltham Forest",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.2",
+        "Workforce_TotPupils_Est_Current_Num":  "327"
+    },
+    {
+        "Id":  "143101",
+        "LAId":  "381",
+        "LAName":  "Calderdale",
+        "RegionId":  "D",
+        "RegionName":  "Yorkshire and the Humber",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "14.6",
+        "Workforce_TotPupils_Est_Current_Num":  "370"
+    },
+    {
+        "Id":  "144142",
+        "LAId":  "209",
+        "LAName":  "Lewisham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17.4",
+        "Workforce_TotPupils_Est_Current_Num":  "338"
+    },
+    {
+        "Id":  "145063",
+        "LAId":  "929",
+        "LAName":  "Northumberland",
+        "RegionId":  "A",
+        "RegionName":  "North East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17.6",
+        "Workforce_TotPupils_Est_Current_Num":  "561"
+    },
+    {
+        "Id":  "145106",
+        "LAId":  "850",
+        "LAName":  "Hampshire",
+        "RegionId":  "J",
+        "RegionName":  "South East",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "17.1",
+        "Workforce_TotPupils_Est_Current_Num":  "431"
+    },
+    {
+        "Id":  "145140",
+        "LAId":  "302",
+        "LAName":  "Barnet",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "18.3",
+        "Workforce_TotPupils_Est_Current_Num":  "435"
+    },
+    {
+        "Id":  "146327",
+        "LAId":  "209",
+        "LAName":  "Lewisham",
+        "RegionId":  "H",
+        "RegionName":  "London",
+        "Workforce_PupTeaRatio_Est_Current_Num":  "16.7",
+        "Workforce_TotPupils_Est_Current_Num":  "388"
+    }
+]
