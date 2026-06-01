@@ -16,7 +16,6 @@ public class SchoolSearchService(
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
     {
         var searchResults = await _indexReader.SearchAsync(query, MaxResults);
-        
         var results = new List<SchoolSearchResult>();
 
         if (!searchResults.Any())
