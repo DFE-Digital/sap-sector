@@ -114,7 +114,7 @@ public class Program
                 .Build();
         });
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -250,13 +250,13 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
         {
             app.UseDfeAnalytics();
         }
 
         app.MapGet("/tracking", async (string targetUrl, HttpContext context, IEventSender eventSender) =>
-        { 
+        {
             var customEvent = eventSender.CreateEvent("outbound_link_click");
 
             customEvent.AddData("External link click", targetUrl);
