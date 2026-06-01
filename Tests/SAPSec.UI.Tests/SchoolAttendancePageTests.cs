@@ -131,7 +131,7 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-top-performers']").ClickAsync();
 
         await Expect(Page.Locator("#attendance-top-performers")).ToContainTextAsync(
-            "These are the top performing similar schools schools for this measure.");
+            "These are the top performing similar schools for this measure.");
         await Expect(Page.Locator("#attendance-top-performers-table thead")).ToContainTextAsync("Rank");
         await Expect(Page.Locator("#attendance-top-performers-table thead")).ToContainTextAsync("School");
         await Expect(Page.Locator("#attendance-top-performers-table thead")).ToContainTextAsync("3-year average");
