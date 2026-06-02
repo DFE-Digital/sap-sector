@@ -75,7 +75,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
             new()
             {
                 URN = "123456",
-                KS2MRP = "104.25",
+                KS2MRP = "104.5",
                 PPPerc = "50.5",
                 PercentEAL = "10.1",
                 Polar4QuintilePupils = "3",

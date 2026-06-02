@@ -315,7 +315,7 @@ public class SimilarSchoolsComparisonControllerTests
             new SimilarSchoolsSecondaryValuesEntry
             {
                 URN = currentUrn,
-                KS2MRP = "104.5",
+                KS2MRP = "104.3",
                 NumberOfPupils = "760",
                 PStability = "90",
                 PPPerc = "52.0",
@@ -328,7 +328,7 @@ public class SimilarSchoolsComparisonControllerTests
             new SimilarSchoolsSecondaryValuesEntry
             {
                 URN = similarUrn,
-                KS2MRP = "103.7",
+                KS2MRP = "103.65",
                 NumberOfPupils = "962",
                 PStability = "91.7",
                 PPPerc = "41.2",
