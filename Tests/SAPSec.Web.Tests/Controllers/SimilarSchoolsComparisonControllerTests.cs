@@ -76,7 +76,7 @@ public class SimilarSchoolsComparisonControllerTests
                 PercentSchSupport = 5.530940m,
                 NumberOfPupils = 388.664809m,
                 PercentageStatementOrEHP = 1.678816m,
-                KS2AVG = 2.527329m
+                KS2MRP = 2.527329m
             });
         _repoMock
             .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
@@ -315,8 +315,7 @@ public class SimilarSchoolsComparisonControllerTests
             new SimilarSchoolsSecondaryValuesEntry
             {
                 URN = currentUrn,
-                KS2RP = "104.5",
-                KS2MP = "104.1",
+                KS2MRP = "104.5",
                 NumberOfPupils = "760",
                 PStability = "90",
                 PPPerc = "52.0",
@@ -329,8 +328,7 @@ public class SimilarSchoolsComparisonControllerTests
             new SimilarSchoolsSecondaryValuesEntry
             {
                 URN = similarUrn,
-                KS2RP = "103.7",
-                KS2MP = "103.6",
+                KS2MRP = "103.7",
                 NumberOfPupils = "962",
                 PStability = "91.7",
                 PPPerc = "41.2",
@@ -359,32 +357,27 @@ public class SimilarSchoolsComparisonControllerTests
             new()
             {
                 URN = groupUrns.ElementAt(0),
-                KS2RP = "101",
-                KS2MP = "101"
+                KS2MRP = "101"
             },
             new()
             {
                 URN = groupUrns.ElementAt(1),
-                KS2RP = "102",
-                KS2MP = "102"
+                KS2MRP = "102"
             },
             new()
             {
                 URN = groupUrns.ElementAt(2),
-                KS2RP = "103",
-                KS2MP = "103"
+                KS2MRP = "103"
             },
             new()
             {
                 URN = groupUrns.ElementAt(3),
-                KS2RP = "104",
-                KS2MP = "104"
+                KS2MRP = "104"
             },
             new()
             {
                 URN = groupUrns.ElementAt(4),
-                KS2RP = "105",
-                KS2MP = "105"
+                KS2MRP = "105"
             }
         };
 

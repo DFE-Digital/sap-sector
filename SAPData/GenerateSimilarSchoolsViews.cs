@@ -169,7 +169,6 @@ public sealed class GenerateSimilarSchoolsViews
 
         sb.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
         sb.AppendLine("-- Computes population standard deviation (stddev_pop) for each metric.");
-        sb.AppendLine("-- Includes ks2_avg to match UI metric Ks2AverageScore = (ks2_rp + ks2_mp) / 2.");
         sb.AppendLine();
         sb.AppendLine($"DROP MATERIALIZED VIEW IF EXISTS {viewName};");
         sb.AppendLine();
@@ -179,18 +178,7 @@ public sealed class GenerateSimilarSchoolsViews
         sb.AppendLine("SELECT");
         sb.AppendLine("    count(*)::int AS \"RowCount\",");
         sb.AppendLine();
-        sb.AppendLine("    -- Keep these if useful for debugging / reference");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_rp, 'NA'), '')::numeric(10,5))::numeric(10,5) AS \"KS2RP\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_mp, 'NA'), '')::numeric(10,5))::numeric(10,5) AS \"KS2MP\",");
-        sb.AppendLine();
-        sb.AppendLine("    -- SD for the same metric used in UI");
-        sb.AppendLine("    stddev_pop(");
-        sb.AppendLine("        ((");
-        sb.AppendLine("            NULLIF(NULLIF(ks2_rp, 'NA'), '')::numeric +");
-        sb.AppendLine("            NULLIF(NULLIF(ks2_mp, 'NA'), '')::numeric");
-        sb.AppendLine("        ) / 2.0)::numeric(10,5)");
-        sb.AppendLine("    )::numeric(10,5) AS \"KS2AVG\",");
-        sb.AppendLine();
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_mrp, 'NA'), '')::numeric(10,5))::numeric(10,5)                  AS \"KS2MRP\",");
         sb.AppendLine("    stddev_pop(NULLIF(NULLIF(pp_perc, 'NA'), '')::numeric(10,5))::numeric(10,5)                  AS \"PPPerc\",");
         sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_eal, 'NA'), '')::numeric(10,5))::numeric(10,5)              AS \"PercentEAL\",");
         sb.AppendLine("    stddev_pop(NULLIF(NULLIF(polar4quintile_pupils, 'NA'), '')::numeric(10,5))::numeric(10,5)    AS \"Polar4QuintilePupils\",");

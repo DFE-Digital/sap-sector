@@ -75,8 +75,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
             new()
             {
                 URN = "123456",
-                KS2RP = "104.5",
-                KS2MP = "104.0",
+                KS2MRP = "104.25",
                 PPPerc = "50.5",
                 PercentEAL = "10.1",
                 Polar4QuintilePupils = "3",
@@ -97,7 +96,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         Assert.Contains(result, v => v.URN == "123456");
 
         var a = result.Single(v => v.URN == "123456");
-        Assert.Equal("104.5", a.KS2RP);
+        Assert.Equal("104.5", a.KS2MRP);
         Assert.Equal("3", a.Polar4QuintilePupils);
         Assert.Equal("500", a.NumberOfPupils);
     }
@@ -109,7 +108,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         {
             new()
             {
-                KS2AVG = 2.45M,
+                KS2MRP = 2.45M,
                 PPPerc = 10M,
                 PercentEAL = 5M,
                 Polar4QuintilePupils = 1.1M,
@@ -126,6 +125,6 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         var result = await sut.GetSimilarSchoolsSecondaryStandardDeviationsAsync();
 
-        Assert.Equal(2.45m, result.KS2AVG);
+        Assert.Equal(2.45m, result.KS2MRP);
     }
 }

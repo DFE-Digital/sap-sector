@@ -255,7 +255,7 @@ public class GetCharacteristicsComparisonTests
         );
         _repo.SetupStandardDeviations(new()
         {
-            KS2AVG = 10m,
+            KS2MRP = 10m,
             PPPerc = 10m,
             PercentEAL = 10m,
             Polar4QuintilePupils = 1m,
@@ -314,7 +314,7 @@ public class GetCharacteristicsComparisonTests
         );
         _repo.SetupStandardDeviations(new()
         {
-            KS2AVG = 10m,
+            KS2MRP = 10m,
             PPPerc = 10m,
             PercentEAL = 10m,
             Polar4QuintilePupils = 1m,
@@ -463,8 +463,7 @@ public class GetCharacteristicsComparisonTests
         return new SimilarSchoolsSecondaryValuesEntry
         {
             URN = urn,
-            KS2RP = ks2Avg,
-            KS2MP = ks2Avg,
+            KS2MRP = ks2Avg,
             PPPerc = pp,
             PercentEAL = eal,
             Polar4QuintilePupils = polar4Quintile,
@@ -480,9 +479,7 @@ public class GetCharacteristicsComparisonTests
     {
         return new SimilarSchoolsSecondaryStandardDeviationsEntry
         {
-            KS2RP = ks2AvgSd,
-            KS2MP = ks2AvgSd,
-            KS2AVG = ks2AvgSd,
+            KS2MRP = ks2AvgSd,
             PPPerc = 1m,
             PercentEAL = 1m,
             Polar4QuintilePupils = 1m,

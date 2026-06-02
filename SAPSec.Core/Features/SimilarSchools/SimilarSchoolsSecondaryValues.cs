@@ -6,8 +6,7 @@ namespace SAPSec.Core.Features.SimilarSchools;
 public class SimilarSchoolsSecondaryValues
 {
     public string Urn { get; init; } = default!;
-    public decimal Ks2ReadingScore { get; init; }
-    public decimal Ks2MathsScore { get; init; }
+    public decimal Ks2AverageScore { get; init; }
     public decimal PupilPremiumEligibilityPercentage { get; init; }
     public decimal PupilsWithEalPercentage { get; init; }
     public decimal Polar4Quintile { get; init; }
@@ -17,15 +16,12 @@ public class SimilarSchoolsSecondaryValues
     public decimal PupilCount { get; init; }
     public decimal PupilsWithEhcPlanPercentage { get; init; }
 
-    public decimal Ks2AverageScore => (Ks2ReadingScore + Ks2MathsScore) / 2m;
-
     public static SimilarSchoolsSecondaryValues FromData(SimilarSchoolsSecondaryValuesEntry data)
     {
         return new()
         {
             Urn = data.URN,
-            Ks2ReadingScore = ParseNullableDecimal(data.KS2RP),
-            Ks2MathsScore = ParseNullableDecimal(data.KS2MP),
+            Ks2AverageScore = ParseNullableDecimal(data.KS2MRP),
             PupilPremiumEligibilityPercentage = ParseNullableDecimal(data.PPPerc),
             PupilsWithEalPercentage = ParseNullableDecimal(data.PercentEAL),
             Polar4Quintile = ParseNullableDecimal(data.Polar4QuintilePupils),
