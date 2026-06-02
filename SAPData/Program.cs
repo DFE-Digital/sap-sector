@@ -260,10 +260,6 @@ internal class Program
         sql.AppendLine("  LOOP");
         sql.AppendLine("    EXECUTE format('DROP TABLE IF EXISTS %I.%I CASCADE', r.schemaname, r.tablename);");
         sql.AppendLine("  END LOOP;");
-        sql.AppendLine();
-        sql.AppendLine("  EXECUTE 'DROP FUNCTION IF EXISTS clean_int(TEXT)';");
-        sql.AppendLine("  EXECUTE 'DROP FUNCTION IF EXISTS clean_numeric(TEXT)';");
-        sql.AppendLine("  EXECUTE 'DROP FUNCTION IF EXISTS clean_date(TEXT)';");
         sql.AppendLine("END $$;");
         sql.AppendLine();
         sql.AppendLine("-- =========================");

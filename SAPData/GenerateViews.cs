@@ -446,11 +446,17 @@ public sealed class GenerateViews
         var sb = new StringBuilder();
         sb.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
         sb.AppendLine("-- NOTE: This file was generated but the view SQL was skipped.");
+        sb.AppendLine("-- In selective rebuild mode, the existing materialized view must already exist.");
         sb.AppendLine($"-- REASON: {reason}");
         sb.AppendLine();
-        sb.AppendLine($"-- DROP MATERIALIZED VIEW IF EXISTS {viewName};");
-        sb.AppendLine($"-- CREATE MATERIALIZED VIEW {viewName} AS");
-        sb.AppendLine($"-- SELECT NULL::text AS \"Skipped\";");
+        sb.AppendLine("DO $$");
+        sb.AppendLine("DECLARE");
+        sb.AppendLine("  v_schema text := current_schema();");
+        sb.AppendLine("BEGIN");
+        sb.AppendLine($"  IF to_regclass(format('%I.%I', v_schema, '{viewName}')) IS NULL THEN");
+        sb.AppendLine($"    RAISE EXCEPTION 'Skipped view {viewName} does not exist in schema %, but is required for selective rebuild. {reason}', v_schema;");
+        sb.AppendLine("  END IF;");
+        sb.AppendLine("END $$;");
         return sb.ToString();
     }
 
