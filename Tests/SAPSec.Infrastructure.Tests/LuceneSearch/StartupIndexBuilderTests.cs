@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Test.Common;
 using SAPSec.Test.Common.Repositories.InMemory;
@@ -15,21 +15,28 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
     private TestOutputLogger<StartupIndexBuilder> logger = new(output);
     private InMemoryEstablishmentRepository establishmentRepo = new();
+    private InMemorySimilarSchoolsSecondaryRepository similarSchoolsRepo = new();
 
     [Fact]
     public async Task StartAsync_PopulatesIndexWithEstablishments_And_Completes()
     {
+        // Arrange
         logger.LogInformation("Start test");
         establishmentRepo.SetupEstablishments(
             new() { URN = "100001", EstablishmentName = "Test School 1" },
             new() { URN = "100002", EstablishmentName = "Test School 2" }
         );
+        similarSchoolsRepo.SetupValues(
+            new() { URN = "100001" },
+            new() { URN = "100002" }
+        );
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, similarSchoolsRepo,
             IndexBuilderDataReadIntervalMilliseconds);
 
+        // Act
         logger.LogInformation("Start builder");
         await Task.Run(async () => await sut.StartAsync(CancellationToken.None));
 
@@ -46,6 +53,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
         logger.LogInformation("Attempts complete");
 
+        // Assert
         await sut.StopAsync(CancellationToken.None);
         sut.IndexBuiltSuccessfully.Should().Be(true);
 
@@ -61,20 +69,23 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     [Fact]
     public async Task StartAsync_WhenEstablishmentsEmpty_DoesNotCompleteAndKeepsWaiting()
     {
+        // Arrange
         logger.LogInformation("Start test");
         establishmentRepo.SetupEstablishments();
+        similarSchoolsRepo.SetupValues();
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, similarSchoolsRepo,
             IndexBuilderDataReadIntervalMilliseconds);
 
+        // Act
         logger.LogInformation("Start builder");
         await Task.Run(async () => await sut.StartAsync(CancellationToken.None));
 
         logger.LogInformation("Start timer");
         using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(TimeBetweenAttemptsMilliseconds));
-        var attempts = 0;
+        var attempts = 0; ;
 
         while (!sut.IndexBuiltSuccessfully
             && ++attempts <= NumberOfAttemptsUntilTestTimeout
@@ -85,6 +96,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
         logger.LogInformation("Attempts complete");
 
+        // Assert
         await sut.StopAsync(CancellationToken.None);
         sut.IndexBuiltSuccessfully.Should().Be(false);
     }
@@ -92,19 +104,22 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     [Fact]
     public async Task StartAsync_WhenEstablishmentsInitiallyEmpty_WaitsUntilEstablishmentsPopulatedAndThenBuildsIndex()
     {
+        // Arrange
         establishmentRepo.SetupEstablishments();
+        similarSchoolsRepo.SetupValues();
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, similarSchoolsRepo,
             IndexBuilderDataReadIntervalMilliseconds);
 
+        // Act
         logger.LogInformation("Start builder");
         await Task.Run(async () => await sut.StartAsync(CancellationToken.None));
 
         logger.LogInformation("Start timer");
         using PeriodicTimer timer = new(TimeSpan.FromMilliseconds(TimeBetweenAttemptsMilliseconds));
-        var attempts = 0;
+        var attempts = 0; ;
 
         while (!sut.IndexBuiltSuccessfully
             && ++attempts <= NumberOfAttemptsUntilTestTimeout
@@ -120,12 +135,17 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
                         new() { URN = "100001", EstablishmentName = "Test School 1" },
                         new() { URN = "100002", EstablishmentName = "Test School 2" }
                     );
+                    similarSchoolsRepo.SetupValues(
+                        new() { URN = "100001" },
+                        new() { URN = "100002" }
+                    );
                 }
             }
         }
 
         logger.LogInformation("Attempts complete");
 
+        // Assert
         await sut.StopAsync(CancellationToken.None);
         sut.IndexBuiltSuccessfully.Should().Be(true);
 
@@ -139,8 +159,9 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task StartAsync_ShouldIndexAllEstablishments()
+    public async Task StartAsync_ShouldFilterOutEstablishmentsNotInSimilarSchoolsDataSet()
     {
+        // Arrange
         logger.LogInformation("Start test");
         establishmentRepo.SetupEstablishments(
             new() { URN = "100001", EstablishmentName = "Test School 1" },
@@ -148,12 +169,17 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
             new() { URN = "100003", EstablishmentName = "Test School 3" },
             new() { URN = "100004", EstablishmentName = "Test School 4" }
         );
+        similarSchoolsRepo.SetupValues(
+            new() { URN = "100001" },
+            new() { URN = "100002" }
+        );
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
-        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+        var sut = new StartupIndexBuilder(logger, writer, establishmentRepo, similarSchoolsRepo,
             IndexBuilderDataReadIntervalMilliseconds);
 
+        // Act
         logger.LogInformation("Start builder");
         await Task.Run(async () => await sut.StartAsync(CancellationToken.None));
 
@@ -170,6 +196,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 
         logger.LogInformation("Attempts complete");
 
+        // Assert
         await sut.StopAsync(CancellationToken.None);
         sut.IndexBuiltSuccessfully.Should().Be(true);
 
@@ -178,9 +205,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         var results = await reader.SearchAsync("test");
         results.Should().BeEquivalentTo([
             (100001, "*Test* School 1"),
-            (100002, "*Test* School 2"),
-            (100003, "*Test* School 3"),
-            (100004, "*Test* School 4")
+            (100002, "*Test* School 2")
         ]);
     }
 }
