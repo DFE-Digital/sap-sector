@@ -88,17 +88,6 @@ public class SchoolSearchService(
         }
 
         var establishment = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
-        return IsPrimaryOrSecondary(establishment) ? establishment : null;
-    }
-
-    private static bool IsPrimaryOrSecondary(Establishment? establishment)
-    {
-        var phase = establishment?.PhaseOfEducationName?.Trim();
-
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
-
-        return phase.Contains("Primary", StringComparison.OrdinalIgnoreCase)
-            || phase.Contains("Secondary", StringComparison.OrdinalIgnoreCase);
+        return SchoolSearchEligibility.IsSearchable(establishment) ? establishment : null;
     }
 }

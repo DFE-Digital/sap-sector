@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 
@@ -49,7 +49,7 @@ public class StartupIndexBuilder(
             cancellationToken.ThrowIfCancellationRequested();
 
             var schools = (await establishmentRepository.GetAllEstablishmentsAsync())
-                .Where(IsPrimaryOrSecondary)
+                .Where(SchoolSearchEligibility.IsSearchable)
                 .ToList();
 
             if (!schools.Any())
@@ -75,16 +75,5 @@ public class StartupIndexBuilder(
             // in Service Unavailable state
             logger.LogError(ex, "Reading establishment data failed.");
         }
-    }
-
-    private static bool IsPrimaryOrSecondary(Establishment school)
-    {
-        var phase = school.PhaseOfEducationName?.Trim();
-
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
-
-        return phase.Contains("Primary", StringComparison.OrdinalIgnoreCase)
-            || phase.Contains("Secondary", StringComparison.OrdinalIgnoreCase);
     }
 }

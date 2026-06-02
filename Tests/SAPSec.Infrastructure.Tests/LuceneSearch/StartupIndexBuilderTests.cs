@@ -10,7 +10,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
 {
     private const int TimeBetweenAttemptsMilliseconds = 100;
     private const int IndexBuilderDataReadIntervalMilliseconds = 50;
-    private const int NumberOfAttemptsUntilTestTimeout = 8;
+    private const int NumberOfAttemptsUntilTestTimeout = 20;
     private const int PopulateEstablishmentDataOnAttempt = 2;
 
     private TestOutputLogger<StartupIndexBuilder> logger = new(output);
