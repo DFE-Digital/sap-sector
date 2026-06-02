@@ -201,13 +201,8 @@ public class SchoolSearchControllerTests
         {
             Query = "123456"
         };
-        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query, It.IsAny<bool>()))
-            .ReturnsAsync(new Establishment
-            {
-                URN = "123456",
-                EstablishmentName = "Primary School",
-                PhaseOfEducationName = "Primary"
-            });
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query, false))
+            .ReturnsAsync((Establishment?)null);
 
         var result = await _controller.Index(viewModel);
 
@@ -292,10 +287,9 @@ public class SchoolSearchControllerTests
     public async Task Search_Get_WithPrimaryNumericQuery_WhenFeatureToggleIsOff_DoesNotRedirectToSchoolDetails()
     {
         const string query = "10000001";
-        var establishment = new Establishment { URN = "123456", UKPRN = query, EstablishmentName = "Primary School", PhaseOfEducationName = "Primary" };
-        _mockSearchService.Setup(s => s.SearchByNumberAsync(query, It.IsAny<bool>()))
-            .ReturnsAsync(establishment);
-        _mockSearchService.Setup(s => s.SearchAsync(query, It.IsAny<bool>()))
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(query, false))
+            .ReturnsAsync((Establishment?)null);
+        _mockSearchService.Setup(s => s.SearchAsync(query, false))
             .ReturnsAsync(new List<SchoolSearchResult>());
 
         var result = await _controller.Search(query, null, 1);
