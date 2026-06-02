@@ -43,8 +43,8 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(schoolNumber);
-            if (!string.IsNullOrWhiteSpace(school?.URN) && IsIncludedPhase(school.PhaseOfEducationName, primarySchoolsEnabled))
+            var school = await _searchService.SearchByNumberAsync(schoolNumber, primarySchoolsEnabled);
+            if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
                 {
@@ -71,16 +71,14 @@ public class SchoolSearchController(
 
             if (IsSchoolNumberCandidate(query))
             {
-                var school = await _searchService.SearchByNumberAsync(query!.Trim());
-                if (!string.IsNullOrWhiteSpace(school?.URN) && IsIncludedPhase(school.PhaseOfEducationName, primarySchoolsEnabled))
+                var school = await _searchService.SearchByNumberAsync(query!.Trim(), primarySchoolsEnabled);
+                if (!string.IsNullOrWhiteSpace(school?.URN))
                 {
                     return RedirectToAction("Index", "School", new { urn = school.URN });
                 }
             }
 
-            var results = FilterSearchResults(
-                await _searchService.SearchAsync(query ?? string.Empty),
-                primarySchoolsEnabled);
+            var results = await _searchService.SearchAsync(query ?? string.Empty, primarySchoolsEnabled);
 
             // Preserve direct navigation when the query uniquely matches a school name,
             // even if hidden filters would later reduce results to zero.
@@ -202,8 +200,8 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(schoolNumber);
-            if (!string.IsNullOrWhiteSpace(school?.URN) && IsIncludedPhase(school.PhaseOfEducationName, primarySchoolsEnabled))
+            var school = await _searchService.SearchByNumberAsync(schoolNumber, primarySchoolsEnabled);
+            if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
                 {
@@ -223,33 +221,12 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { queryPart }))
         {
-            var suggestions = FilterSearchResults(
-                await _searchService.SuggestAsync(queryPart),
+            var suggestions = await _searchService.SuggestAsync(
+                queryPart,
                 await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools));
 
             return Ok(suggestions);
         }
-    }
-
-    private static IReadOnlyList<SchoolSearchResult> FilterSearchResults(
-        IReadOnlyList<SchoolSearchResult> results,
-        bool primarySchoolsEnabled) =>
-        results.Where(result => IsIncludedPhase(result.PhaseOfEducationName, primarySchoolsEnabled)).ToList();
-
-    private static bool IsIncludedPhase(string? phaseOfEducation, bool primarySchoolsEnabled)
-    {
-        if (string.IsNullOrWhiteSpace(phaseOfEducation))
-        {
-            return false;
-        }
-
-        return phaseOfEducation.Trim() switch
-        {
-            "Secondary" => true,
-            "Primary" => primarySchoolsEnabled,
-            "All-through" => primarySchoolsEnabled,
-            _ => false
-        };
     }
 
     private static RouteValueDictionary BuildSearchRouteValues(

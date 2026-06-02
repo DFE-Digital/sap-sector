@@ -13,7 +13,7 @@ public class SchoolSearchService(
     private const int MaxSuggestions = 10;
     private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
-    public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
+    public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query, bool primarySchoolsEnabled = false)
     {
         var searchResults = await _indexReader.SearchAsync(query, MaxResults);
 
@@ -36,6 +36,11 @@ public class SchoolSearchService(
                 continue;
             }
 
+            if (!IsIncludedPhase(r.School.PhaseOfEducationName, primarySchoolsEnabled))
+            {
+                continue;
+            }
+
             var latLong = BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
                 ? CoordinateConverter.Convert(coords)
                 : null;
@@ -46,7 +51,7 @@ public class SchoolSearchService(
         return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 
-    public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
+    public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart, bool primarySchoolsEnabled = false)
     {
         var searchResults = await _indexReader.SearchAsync(queryPart, MaxSuggestions);
 
@@ -69,13 +74,18 @@ public class SchoolSearchService(
                 continue;
             }
 
+            if (!IsIncludedPhase(r.School.PhaseOfEducationName, primarySchoolsEnabled))
+            {
+                continue;
+            }
+
             results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, null));
         }
 
         return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 
-    public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
+    public async Task<Establishment?> SearchByNumberAsync(string schoolNumber, bool primarySchoolsEnabled = false)
     {
         var trimmedSchoolNumber = schoolNumber
             .Trim()
@@ -87,6 +97,26 @@ public class SchoolSearchService(
             return null;
         }
 
-        return await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
+        var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
+
+        return IsIncludedPhase(school?.PhaseOfEducationName, primarySchoolsEnabled)
+            ? school
+            : null;
+    }
+
+    private static bool IsIncludedPhase(string? phaseOfEducation, bool primarySchoolsEnabled)
+    {
+        if (string.IsNullOrWhiteSpace(phaseOfEducation))
+        {
+            return false;
+        }
+
+        return phaseOfEducation.Trim() switch
+        {
+            "Secondary" => true,
+            "Primary" => primarySchoolsEnabled,
+            "All-through" => primarySchoolsEnabled,
+            _ => false
+        };
     }
 }

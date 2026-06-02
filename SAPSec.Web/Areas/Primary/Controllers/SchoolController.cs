@@ -4,6 +4,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Services;
+using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -69,6 +70,15 @@ public class SchoolController(
         var school = await schoolDetailsService.GetByUrnAsync(urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData["SchoolDetails"] = school;
+        if (Url is not null)
+        {
+            ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.Create(
+                Url,
+                school?.Urn ?? urn,
+                ControllerContext.ActionDescriptor.ActionName,
+                primarySchoolsEnabled: true,
+                isPrimarySchool: true);
+        }
 
         return View(school);
     }

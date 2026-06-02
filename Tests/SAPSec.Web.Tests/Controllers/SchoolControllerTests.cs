@@ -13,6 +13,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Services;
 using System.Text.Json;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -27,6 +28,7 @@ public class SchoolControllerTests
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
+    private readonly Mock<IFeatureFlagService> _featureFlagServiceMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
 
@@ -42,7 +44,9 @@ public class SchoolControllerTests
         _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
         _ks4DestinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        _featureFlagServiceMock = new Mock<IFeatureFlagService>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
+        _featureFlagServiceMock.Setup(x => x.IsEnabledAsync("EnablePrimarySchools")).ReturnsAsync(false);
 
         var getAttendanceMeasures = new GetAttendanceMeasures(
             _absenceRepositoryMock.Object,
@@ -71,6 +75,7 @@ public class SchoolControllerTests
             getSchoolKs4CoreSubjects,
             getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,
+            _featureFlagServiceMock.Object,
             _loggerMock.Object);
     }
 

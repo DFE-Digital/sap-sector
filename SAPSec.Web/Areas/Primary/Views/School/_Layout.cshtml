@@ -1,18 +1,11 @@
 @using SAPSec.Core.Model
-@using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
-@using SAPSec.Web.Services
 @using SAPSec.Web.ViewModels
-@inject IFeatureFlagService FeatureFlagService
 @{
-    var school = ViewData["SchoolDetails"] as SAPSec.Core.Model.SchoolDetails;
+    var navigation = ViewData["SchoolNavigation"] as SchoolSideNavigationViewModel;
 }
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
-    var urnValue = school?.Urn ?? ViewContext.RouteData.Values["urn"]?.ToString() ?? string.Empty;
-    var isPrimarySchoolsEnabled = await FeatureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-    var navigation = SchoolSideNavigationViewModel.Create(Url, urnValue, currentAction, isPrimarySchoolsEnabled, isPrimarySchool: true);
 }
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
@@ -25,7 +18,10 @@
 }
 
 <div class="govuk-grid-row">
-    @await Component.InvokeAsync("SchoolSideNavigation", navigation)
+    @if (navigation is not null)
+    {
+        @await Component.InvokeAsync("SchoolSideNavigation", navigation)
+    }
 
     <div class="app-body-container-with-side-navigation">
         @RenderBody()
