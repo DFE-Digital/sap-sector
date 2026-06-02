@@ -1,4 +1,5 @@
 using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
 using System.Text.RegularExpressions;
@@ -88,6 +89,6 @@ public class SchoolSearchService(
         }
 
         var establishment = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
-        return SchoolSearchEligibility.IsSearchable(establishment) ? establishment : null;
+        return establishment.IsSearchable() ? establishment : null;
     }
 }

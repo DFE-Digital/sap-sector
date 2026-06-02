@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Features.SchoolSearch;
+using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
@@ -49,7 +49,7 @@ public class StartupIndexBuilder(
             cancellationToken.ThrowIfCancellationRequested();
 
             var schools = (await establishmentRepository.GetAllEstablishmentsAsync())
-                .Where(SchoolSearchEligibility.IsSearchable)
+                .Where(school => school.IsSearchable())
                 .ToList();
 
             if (!schools.Any())

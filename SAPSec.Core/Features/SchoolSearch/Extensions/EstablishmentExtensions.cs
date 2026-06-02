@@ -1,12 +1,12 @@
 using SAPSec.Core.Model.Generated;
 
-namespace SAPSec.Core.Features.SchoolSearch;
+namespace SAPSec.Core.Features.SchoolSearch.Extensions;
 
-public static class SchoolSearchEligibility
+public static class EstablishmentExtensions
 {
     private static readonly string[] SearchablePhases = ["Primary", "Secondary"];
 
-    public static bool IsSearchable(Establishment? establishment)
+    public static bool IsSearchable(this Establishment? establishment)
     {
         var phase = establishment?.PhaseOfEducationName?.Trim();
 
