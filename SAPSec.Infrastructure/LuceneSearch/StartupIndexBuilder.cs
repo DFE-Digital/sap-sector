@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 
@@ -9,7 +9,6 @@ public class StartupIndexBuilder(
     ILogger<StartupIndexBuilder> logger,
     LuceneIndexWriter writer,
     IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
     int retryIntervalMilliseconds = 10000)
     : BackgroundService
 {
@@ -49,8 +48,9 @@ public class StartupIndexBuilder(
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var similarSchoolUrns = await similarSchoolsRepository.GetAllUrnsInSimilarSchoolsDataSet();
-            var schools = await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns);
+            var schools = (await establishmentRepository.GetAllEstablishmentsAsync())
+                .Where(IsPrimaryOrSecondary)
+                .ToList();
 
             if (!schools.Any())
             {
@@ -75,5 +75,16 @@ public class StartupIndexBuilder(
             // in Service Unavailable state
             logger.LogError(ex, "Reading establishment data failed.");
         }
+    }
+
+    private static bool IsPrimaryOrSecondary(Establishment school)
+    {
+        var phase = school.PhaseOfEducationName?.Trim();
+
+        if (string.IsNullOrWhiteSpace(phase))
+            return false;
+
+        return phase.Contains("Primary", StringComparison.OrdinalIgnoreCase)
+            || phase.Contains("Secondary", StringComparison.OrdinalIgnoreCase);
     }
 }

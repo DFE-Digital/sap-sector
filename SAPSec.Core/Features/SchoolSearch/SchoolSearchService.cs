@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
 using System.Text.RegularExpressions;
@@ -24,7 +24,9 @@ public class SchoolSearchService(
             return results;
         }
 
-        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
+        var schools = (await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString())))
+            .Where(IsPrimaryOrSecondary)
+            .ToList();
 
         foreach (var r in searchResults.GroupJoin(schools,
             r => r.urn.ToString(),
@@ -57,7 +59,9 @@ public class SchoolSearchService(
             return results;
         }
 
-        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
+        var schools = (await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString())))
+            .Where(IsPrimaryOrSecondary)
+            .ToList();
 
         foreach (var r in searchResults.GroupJoin(schools,
             r => r.urn.ToString(),
@@ -87,6 +91,18 @@ public class SchoolSearchService(
             return null;
         }
 
-        return await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
+        var establishment = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
+        return IsPrimaryOrSecondary(establishment) ? establishment : null;
+    }
+
+    private static bool IsPrimaryOrSecondary(Establishment? establishment)
+    {
+        var phase = establishment?.PhaseOfEducationName?.Trim();
+
+        if (string.IsNullOrWhiteSpace(phase))
+            return false;
+
+        return phase.Contains("Primary", StringComparison.OrdinalIgnoreCase)
+            || phase.Contains("Secondary", StringComparison.OrdinalIgnoreCase);
     }
 }

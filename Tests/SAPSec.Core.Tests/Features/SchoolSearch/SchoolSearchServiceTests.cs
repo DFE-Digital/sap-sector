@@ -24,7 +24,7 @@ public class SchoolSearchServiceTests
     [InlineData(" 123456 ", "123456")]
     public async Task SearchByNumberAsync_WithSupportedNumberFormat_SearchesRepository(string input, string expectedNumber)
     {
-        var establishment = new Establishment { URN = "123456" };
+        var establishment = new Establishment { URN = "123456", PhaseOfEducationName = "Secondary" };
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync(expectedNumber))
             .ReturnsAsync(establishment);
@@ -42,5 +42,65 @@ public class SchoolSearchServiceTests
 
         result.Should().BeNull();
         _establishmentRepositoryMock.Verify(x => x.GetEstablishmentByAnyNumberAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task SearchByNumberAsync_WithNonPrimaryOrSecondarySchool_ReturnsNull()
+    {
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
+            .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Nursery" });
+
+        var result = await _sut.SearchByNumberAsync("123456");
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SearchAsync_FiltersOutNonPrimaryOrSecondarySchools()
+    {
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("test", It.IsAny<int>()))
+            .ReturnsAsync([
+                (100001, "Test Primary"),
+                (100002, "Test Nursery"),
+                (100003, "Test Secondary")
+            ]);
+
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment { URN = "100001", EstablishmentName = "Test Primary", PhaseOfEducationName = "Primary" },
+                new Establishment { URN = "100002", EstablishmentName = "Test Nursery", PhaseOfEducationName = "Nursery" },
+                new Establishment { URN = "100003", EstablishmentName = "Test Secondary", PhaseOfEducationName = "Secondary" }
+            ]);
+
+        var result = await _sut.SearchAsync("test");
+
+        result.Select(x => x.URN).Should().BeEquivalentTo(["100001", "100003"]);
+    }
+
+    [Fact]
+    public async Task SuggestAsync_FiltersOutNonPrimaryOrSecondarySchools()
+    {
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("test", It.IsAny<int>()))
+            .ReturnsAsync([
+                (100001, "Test Primary"),
+                (100002, "Test Nursery"),
+                (100003, "Test Secondary")
+            ]);
+
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment { URN = "100001", EstablishmentName = "Test Primary", PhaseOfEducationName = "Primary" },
+                new Establishment { URN = "100002", EstablishmentName = "Test Nursery", PhaseOfEducationName = "Nursery" },
+                new Establishment { URN = "100003", EstablishmentName = "Test Secondary", PhaseOfEducationName = "Secondary" }
+            ]);
+
+        var result = await _sut.SuggestAsync("test");
+
+        result.Select(x => x.URN).Should().BeEquivalentTo(["100001", "100003"]);
     }
 }
