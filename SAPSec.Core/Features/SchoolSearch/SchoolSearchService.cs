@@ -24,9 +24,7 @@ public class SchoolSearchService(
             return results;
         }
 
-        var schools = (await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString())))
-            .Where(IsPrimaryOrSecondary)
-            .ToList();
+        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
 
         foreach (var r in searchResults.GroupJoin(schools,
             r => r.urn.ToString(),
@@ -59,9 +57,7 @@ public class SchoolSearchService(
             return results;
         }
 
-        var schools = (await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString())))
-            .Where(IsPrimaryOrSecondary)
-            .ToList();
+        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
 
         foreach (var r in searchResults.GroupJoin(schools,
             r => r.urn.ToString(),
