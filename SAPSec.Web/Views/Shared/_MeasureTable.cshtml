@@ -1,0 +1,33 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels.Measures
+
+@model TableSubMeasureViewModel
+
+@{
+    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+}
+
+<table class="govuk-table">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">School(s)</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @foreach (var (label, row) in Model.MeasureInfo.Labels.Zip(Model.Rows))
+        {
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">@label</th>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.YearByYear.Previous2)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.YearByYear.Previous)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.YearByYear.Current)</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.ThreeYearAverage)</td>
+            </tr>
+        }
+    </tbody>
+</table>

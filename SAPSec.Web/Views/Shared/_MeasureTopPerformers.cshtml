@@ -1,0 +1,36 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels.Measures
+
+@model TopPerformersSubMeasureViewModel
+
+<p class="govuk-body">These are the top performing schools for this measure.</p>
+<table class="govuk-table" id="@Model.MeasureInfo.HtmlPrefix-top-performers-table">
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Rank</th>
+            <th scope="col" class="govuk-table__header">School</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        @foreach (var row in Model.TopPerformers)
+        {
+            <tr class="govuk-table__row">
+                <td class="govuk-table__cell">@row.Rank</td>
+                <th scope="row" class="govuk-table__header">
+                    @if (row.IsCurrentSchool)
+                    {
+                        @row.Name
+                    }
+                    else
+                    {
+                        <a href="@row.Link" class="govuk-link">@row.Name</a>
+                    }
+                </th>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.Value)</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<p class="govuk-body govuk-!-margin-bottom-1"><a href="@Model.SimilarSchoolsLink" class="govuk-link">See all similar schools</a></p>

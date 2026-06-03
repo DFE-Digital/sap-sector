@@ -1,0 +1,41 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels.Measures
+@using SAPSec.Core.Features.Measures
+@using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases
+
+@model YearByYearSubMeasureViewModel
+
+@{
+    var chartData = new
+    {
+        labels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear,
+        datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
+            new {
+                label = x.First,
+                data = new decimal?[] {
+                    x.Second.Previous2,
+                    x.Second.Previous,
+                    x.Second.Current
+                }
+            })
+            .ToArray()
+    };
+}
+
+<div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+    <canvas id="@Model.MeasureInfo.HtmlPrefix-school-yearbyyear-chart"
+            class="js-chart js-chart--school-ks4-line"
+            data-type="line"
+            data-axis-min="0"
+            data-axis-step="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? 25 : 30)"
+            data-axis-max="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? 100 : 90)"
+            data-axis-auto-skip="false"
+            data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? "%" : "")"
+            data-show-x-grid="true"
+            data-show-legend="true"
+            data-show-datalabels="false"
+            data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+            @if (Model.MeasureInfo.YearByYearColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.YearByYearColors))'</text> }>
+    </canvas>
+</div>

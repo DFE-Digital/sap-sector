@@ -1,0 +1,43 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels.Measures
+@using SAPSec.Core.Features.Measures
+@using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases
+
+@model ThreeYearAverageSubMeasureViewModel
+
+@{
+    var chartData = new
+    {
+        labels = Model.MeasureInfo.Labels.ToArray(),
+        data = Model.Averages.ToArray()
+    };
+    var hasAnyData = Model.Averages.Any();
+}
+
+<div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+    @if (hasAnyData)
+    {
+        <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
+                class="js-chart js-chart--school-ks4-bar"
+                data-type="bar"
+                data-show-no-data-labels="true"
+                data-axis-step="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 30 : 25)"
+                data-axis-max="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 90 : 100)"
+                data-label-decimals="@(Model.MeasureInfo.DataType switch
+                {
+                    MeasureDataType.Score => 1,
+                    MeasureDataType.AbsencePercentage => 2,
+                    _ => 0
+                })"
+                data-bar-thickness="50"
+                data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.AbsencePercentage? "%" : "")"
+                data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
+        </canvas>
+    }
+    else
+    {
+        <p class="govuk-body">No available data</p>
+    }
+</div>

@@ -1,0 +1,33 @@
+﻿@using SAPSec.Web.Constants
+@using System.Text.Json
+@using SAPSec.Web.ViewModels.Measures
+
+@model MeasureViewModel
+
+<partial name="_MeasureFilters" model=@Model.MeasureInfo />
+
+<div id="@Model.MeasureInfo.HtmlPrefix">
+    <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
+        @foreach (var subMeasure in Model.SubMeasures)
+        {
+            <tab-content id="@subMeasure.Id" name="@subMeasure.Name">
+                @if (subMeasure is ThreeYearAverageSubMeasureViewModel threeYearAverage)
+                {
+                    <partial name="_MeasureThreeYearAverageChart" model=@threeYearAverage />
+                }
+                else if (subMeasure is TopPerformersSubMeasureViewModel topPerformers)
+                {
+                    <partial name="_MeasureTopPerformers" model=@topPerformers />
+                }
+                else if (subMeasure is YearByYearSubMeasureViewModel yearByYear)
+                {
+                    <partial name="_MeasureYearByYearChart" model=@yearByYear />
+                }
+                else if (subMeasure is TableSubMeasureViewModel table)
+                {
+                    <partial name="_MeasureTable" model=@table />
+                }
+            </tab-content>
+        }
+    </tabbed-view>
+</div>

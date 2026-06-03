@@ -31,8 +31,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npm run build-fe",
     "build-fe": "gulp build-fe",
-    "watch-fe": "gulp watch-fe",
-    "watch": "concurrently --kill-others \"dotnet watch\" \"gulp watch-fe\""
+    "watch-fe": "gulp debug watch-fe",
+    "watch": "concurrently --raw --kill-others --handle-input \"dotnet watch\" \"gulp watch-fe\""
   },
   "author": "",
   "license": "MIT",

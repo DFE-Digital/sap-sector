@@ -8,4 +8,7 @@ public static class Routes
     public static string School(string urn) => $"/school/{urn}";
     public const string Error = "/error";
     public const string AccessDenied = "/error/403";
+
+    public static string SimilarSchools(string urn) => $"/school/{urn}/view-similar-schools";
+    public static string SimilarSchoolComparison(string urn, string similarSchoolUrn) => $"/school/{urn}/view-similar-schools/{similarSchoolUrn}";
 }
