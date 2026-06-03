@@ -18,7 +18,7 @@ namespace SAPSec.Web.Middleware
                     return Results.Redirect(data.Url);
                 }
 
-                if (!data.Url.StartsWith("https://get-school-improvement-insights-pr-218.test.teacherservices.cloud", StringComparison.OrdinalIgnoreCase))
+                if (!data.Url.StartsWith("https://get-school-improvement-insights-pr-240.test.teacherservices.cloud", StringComparison.OrdinalIgnoreCase))
                 {
                     var customEvent = eventSender.CreateEvent("outbound_link_click");
                     customEvent.AddData("Outbound link click", data.Url, data.Text);
