@@ -1,6 +1,7 @@
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
 using System.Text.RegularExpressions;
 
@@ -8,14 +9,17 @@ namespace SAPSec.Core.Features.SchoolSearch;
 
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,
-    IEstablishmentRepository _establishmentRepository) : ISchoolSearchService
+    IEstablishmentRepository _establishmentRepository,
+    IFeatureFlagService _featureFlagService) : ISchoolSearchService
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
+    private const string EnablePrimarySchoolsFeature = "EnablePrimarySchools";
     private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
-    public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query, bool primarySchoolsEnabled = false)
+    public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
     {
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(EnablePrimarySchoolsFeature);
         var searchResults = await _indexReader.SearchAsync(query, MaxResults);
 
         var results = new List<SchoolSearchResult>();
@@ -37,7 +41,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            if (!IsIncludedPhase(r.School.PhaseOfEducationName, primarySchoolsEnabled))
+            if (!r.School.IsSearchable(primarySchoolsEnabled))
             {
                 continue;
             }
@@ -52,8 +56,9 @@ public class SchoolSearchService(
         return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 
-    public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart, bool primarySchoolsEnabled = false)
+    public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
     {
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(EnablePrimarySchoolsFeature);
         var searchResults = await _indexReader.SearchAsync(queryPart, MaxSuggestions);
 
         var results = new List<SchoolSearchResult>();
@@ -75,7 +80,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            if (!IsIncludedPhase(r.School.PhaseOfEducationName, primarySchoolsEnabled))
+            if (!r.School.IsSearchable(primarySchoolsEnabled))
             {
                 continue;
             }
@@ -86,7 +91,7 @@ public class SchoolSearchService(
         return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 
-    public async Task<Establishment?> SearchByNumberAsync(string schoolNumber, bool primarySchoolsEnabled = false)
+    public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
     {
         var trimmedSchoolNumber = schoolNumber
             .Trim()
@@ -98,26 +103,11 @@ public class SchoolSearchService(
             return null;
         }
 
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(EnablePrimarySchoolsFeature);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return IsIncludedPhase(school?.PhaseOfEducationName, primarySchoolsEnabled)
+        return school.IsSearchable(primarySchoolsEnabled)
             ? school
             : null;
-    }
-
-    private static bool IsIncludedPhase(string? phaseOfEducation, bool primarySchoolsEnabled)
-    {
-        if (string.IsNullOrWhiteSpace(phaseOfEducation))
-        {
-            return false;
-        }
-
-        return phaseOfEducation.Trim() switch
-        {
-            "Secondary" => true,
-            "Primary" => primarySchoolsEnabled,
-            "All-through" => primarySchoolsEnabled,
-            _ => false
-        };
     }
 }

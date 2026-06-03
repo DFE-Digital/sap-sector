@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using SAPSec.Core.Configuration;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SmartBreadcrumbs.Attributes;
 

@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using System.Text.RegularExpressions;
 
@@ -12,8 +11,7 @@ namespace SAPSec.Web.Controllers;
 [Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
-    ISchoolSearchService _searchService,
-    IFeatureFlagService featureFlagService) : Controller
+    ISchoolSearchService _searchService) : Controller
 {
     private const int PageSize = 10;
     public const string Hint = "Search by name or school ID";
@@ -28,7 +26,6 @@ public class SchoolSearchController(
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
             ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(searchQueryViewModel.Urn);
-            var primarySchoolsEnabled = await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
 
             if (!ModelState.IsValid)
             {
@@ -43,7 +40,7 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(schoolNumber, primarySchoolsEnabled);
+            var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
@@ -66,19 +63,18 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { query, page }))
         {
-            var primarySchoolsEnabled = await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
             if (page < 1) page = 1;
 
             if (IsSchoolNumberCandidate(query))
             {
-                var school = await _searchService.SearchByNumberAsync(query!.Trim(), primarySchoolsEnabled);
+                var school = await _searchService.SearchByNumberAsync(query!.Trim());
                 if (!string.IsNullOrWhiteSpace(school?.URN))
                 {
                     return RedirectToAction("Index", "School", new { urn = school.URN });
                 }
             }
 
-            var results = await _searchService.SearchAsync(query ?? string.Empty, primarySchoolsEnabled);
+            var results = await _searchService.SearchAsync(query ?? string.Empty);
 
             // Preserve direct navigation when the query uniquely matches a school name,
             // even if hidden filters would later reduce results to zero.
@@ -183,7 +179,6 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
-            var primarySchoolsEnabled = await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
             if (!ModelState.IsValid)
             {
                 return View(new SchoolSearchResultsViewModel
@@ -200,7 +195,7 @@ public class SchoolSearchController(
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(schoolNumber, primarySchoolsEnabled);
+            var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
                 return RedirectToAction("Index", "School", new
@@ -221,9 +216,7 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { queryPart }))
         {
-            var suggestions = await _searchService.SuggestAsync(
-                queryPart,
-                await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools));
+            var suggestions = await _searchService.SuggestAsync(queryPart);
 
             return Ok(suggestions);
         }

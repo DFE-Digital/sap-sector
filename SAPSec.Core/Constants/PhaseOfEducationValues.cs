@@ -6,6 +6,10 @@
 /// </summary>
 public static class PhaseOfEducationValues
 {
+    public const string Primary = "Primary";
+    public const string Secondary = "Secondary";
+    public const string AllThrough = "All-through";
+
     #region Phase Patterns
 
     /// <summary>Patterns that indicate nursery provision</summary>
@@ -88,6 +92,27 @@ public static class PhaseOfEducationValues
         }
 
         return false;
+    }
+
+    public static bool IsPrimaryOrAllThrough(string? phase)
+    {
+        if (string.IsNullOrWhiteSpace(phase))
+            return false;
+
+        return phase.Trim() switch
+        {
+            Primary => true,
+            AllThrough => true,
+            _ => false
+        };
+    }
+
+    public static bool IsSecondary(string? phase)
+    {
+        if (string.IsNullOrWhiteSpace(phase))
+            return false;
+
+        return string.Equals(phase.Trim(), Secondary, StringComparison.OrdinalIgnoreCase);
     }
 
     #endregion

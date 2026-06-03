@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
 using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
@@ -428,8 +428,7 @@ public class SchoolController : Controller
             return;
         }
 
-        var isPrimarySchool = school.PhaseOfEducation.HasValue
-            && string.Equals(school.PhaseOfEducation.Value, "Primary", StringComparison.OrdinalIgnoreCase);
+        var isPrimarySchool = school.IsPrimarySchool();
 
         ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.Create(
             Url,

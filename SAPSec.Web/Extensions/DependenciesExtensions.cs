@@ -17,7 +17,7 @@ public static class DependenciesExtensions
     public static void AddDependencies(this IServiceCollection services)
     {
         services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
-        services.AddSingleton<ISchoolSearchService, SchoolSearchService>();
+        services.AddScoped<ISchoolSearchService, SchoolSearchService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
         // Use cases
