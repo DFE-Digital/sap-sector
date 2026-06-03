@@ -9,9 +9,7 @@ namespace SAPSec.Core.Model.Generated
     public class SimilarSchoolsSecondaryStandardDeviationsEntry
     {
         public int? RowCount { get; set; } = null;
-        public decimal? KS2RP { get; set; } = null;
-        public decimal? KS2MP { get; set; } = null;
-        public decimal? KS2AVG { get; set; } = null;
+        public decimal? KS2MRP { get; set; } = null;
         public decimal? PPPerc { get; set; } = null;
         public decimal? PercentEAL { get; set; } = null;
         public decimal? Polar4QuintilePupils { get; set; } = null;
