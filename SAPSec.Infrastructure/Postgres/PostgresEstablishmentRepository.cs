@@ -23,6 +23,7 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         const string sql = """
             SELECT "URN",
                    "EstablishmentName",
+                   "PhaseOfEducationName",
                    "Street",
                    "Postcode"
             FROM public.v_establishment;
