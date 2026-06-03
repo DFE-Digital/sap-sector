@@ -59,7 +59,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
     {
         const string sql = """
             SELECT
-                "KS2AVG",
+                "KS2MRP",
                 "PPPerc",
                 "PercentEAL",
                 "Polar4QuintilePupils",
