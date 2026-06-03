@@ -18,7 +18,7 @@ public class SimilarSchoolsSecondaryStandardDeviations
     {
         return new()
         {
-            Ks2AverageScore = data?.KS2AVG,
+            Ks2AverageScore = data?.KS2MRP,
             PupilPremiumEligibilityPercentage = data?.PPPerc,
             PupilsWithEalPercentage = data?.PercentEAL,
             Polar4Quintile = data?.Polar4QuintilePupils,

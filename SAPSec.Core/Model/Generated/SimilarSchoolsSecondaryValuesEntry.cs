@@ -9,8 +9,7 @@ namespace SAPSec.Core.Model.Generated
     public class SimilarSchoolsSecondaryValuesEntry
     {
         public string URN { get; set; } = string.Empty;
-        public string KS2RP { get; set; } = string.Empty;
-        public string KS2MP { get; set; } = string.Empty;
+        public string KS2MRP { get; set; } = string.Empty;
         public string PPPerc { get; set; } = string.Empty;
         public string PercentEAL { get; set; } = string.Empty;
         public string Polar4QuintilePupils { get; set; } = string.Empty;
