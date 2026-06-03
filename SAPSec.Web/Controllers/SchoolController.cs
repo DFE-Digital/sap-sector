@@ -52,7 +52,7 @@ public class SchoolController : Controller
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -62,7 +62,7 @@ public class SchoolController : Controller
     {
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -72,7 +72,7 @@ public class SchoolController : Controller
     {
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -83,7 +83,7 @@ public class SchoolController : Controller
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
         var attendanceMeasures = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        SetSchoolViewDataAsync(school);
         return View(new SchoolAttendancePageViewModel
         {
             SchoolDetails = school,
@@ -189,7 +189,7 @@ public class SchoolController : Controller
     {
         var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(response.SchoolDetails);
+        SetSchoolViewDataAsync(response.SchoolDetails);
 
         return View(BuildKs4HeadlineMeasuresViewModel(response));
     }
@@ -338,7 +338,7 @@ public class SchoolController : Controller
     {
         var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(response.SchoolDetails);
+        SetSchoolViewDataAsync(response.SchoolDetails);
         return View(BuildKs4CoreSubjectsViewModel(response));
     }
 
@@ -419,7 +419,7 @@ public class SchoolController : Controller
         });
     }
 
-    private async Task SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
+    private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
     {
         ViewData["SchoolDetails"] = school;
 
@@ -428,14 +428,10 @@ public class SchoolController : Controller
             return;
         }
 
-        var isPrimarySchool = school.IsPrimarySchool();
-
-        ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.Create(
+        ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             school.Urn,
-            ControllerContext.ActionDescriptor.ActionName,
-            await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools),
-            isPrimarySchool);
+            ControllerContext.ActionDescriptor.ActionName);
     }
 
     private static decimal?[] SeriesToArray(Ks4HeadlineMeasureSeries series) =>

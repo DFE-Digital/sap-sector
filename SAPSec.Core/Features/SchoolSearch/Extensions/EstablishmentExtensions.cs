@@ -20,13 +20,9 @@ public static class EstablishmentExtensions
 
     public static bool IsSearchable(this Establishment? establishment, bool primarySchoolsEnabled)
     {
-        var phase = establishment?.PhaseOfEducationName?.Trim();
+        var phase = establishment?.PhaseOfEducationName;
 
-        return phase switch
-        {
-            _ when PhaseOfEducationValues.IsSecondary(phase) => true,
-            _ when primarySchoolsEnabled && PhaseOfEducationValues.IsPrimaryOrAllThrough(phase) => true,
-            _ => false
-        };
+        return PhaseOfEducationValues.IsSecondary(phase)
+            || (primarySchoolsEnabled && PhaseOfEducationValues.IsPrimaryOrAllThrough(phase));
     }
 }

@@ -1,3 +1,4 @@
+using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
@@ -14,12 +15,11 @@ public class SchoolSearchService(
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
-    private const string EnablePrimarySchoolsFeature = "EnablePrimarySchools";
     private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
     {
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(EnablePrimarySchoolsFeature);
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var searchResults = await _indexReader.SearchAsync(query, MaxResults);
 
         var results = new List<SchoolSearchResult>();
@@ -58,7 +58,7 @@ public class SchoolSearchService(
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
     {
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(EnablePrimarySchoolsFeature);
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var searchResults = await _indexReader.SearchAsync(queryPart, MaxSuggestions);
 
         var results = new List<SchoolSearchResult>();
@@ -103,7 +103,7 @@ public class SchoolSearchService(
             return null;
         }
 
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(EnablePrimarySchoolsFeature);
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
         return school.IsSearchable(primarySchoolsEnabled)

@@ -6,12 +6,7 @@ public sealed class SchoolSideNavigationViewModel
 {
     public required IReadOnlyList<SchoolSideNavigationItemViewModel> Items { get; init; }
 
-    public static SchoolSideNavigationViewModel Create(IUrlHelper url, string urn, string? currentAction, bool primarySchoolsEnabled, bool isPrimarySchool) =>
-        primarySchoolsEnabled && isPrimarySchool
-            ? CreatePrimary(url, urn, currentAction)
-            : CreateSecondary(url, urn, currentAction);
-
-    private static SchoolSideNavigationViewModel CreatePrimary(IUrlHelper url, string urn, string? currentAction) =>
+    public static SchoolSideNavigationViewModel CreatePrimary(IUrlHelper url, string urn, string? currentAction) =>
         new()
         {
             Items =
@@ -25,7 +20,7 @@ public sealed class SchoolSideNavigationViewModel
             ]
         };
 
-    private static SchoolSideNavigationViewModel CreateSecondary(IUrlHelper url, string urn, string? currentAction) =>
+    public static SchoolSideNavigationViewModel CreateSecondary(IUrlHelper url, string urn, string? currentAction) =>
         new()
         {
             Items =

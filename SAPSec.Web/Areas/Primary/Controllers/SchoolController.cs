@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
@@ -71,12 +72,10 @@ public class SchoolController(
         ViewData["SchoolDetails"] = school;
         if (Url is not null)
         {
-            ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.Create(
+            ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreatePrimary(
                 Url,
                 school?.Urn ?? urn,
-                ControllerContext.ActionDescriptor.ActionName,
-                primarySchoolsEnabled: true,
-                isPrimarySchool: true);
+                ControllerContext.ActionDescriptor.ActionName);
         }
 
         return View(school);

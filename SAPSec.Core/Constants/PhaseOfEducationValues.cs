@@ -99,12 +99,10 @@ public static class PhaseOfEducationValues
         if (string.IsNullOrWhiteSpace(phase))
             return false;
 
-        return phase.Trim() switch
-        {
-            Primary => true,
-            AllThrough => true,
-            _ => false
-        };
+        var trimmedPhase = phase.Trim();
+
+        return string.Equals(trimmedPhase, Primary, StringComparison.OrdinalIgnoreCase)
+            || string.Equals(trimmedPhase, AllThrough, StringComparison.OrdinalIgnoreCase);
     }
 
     public static bool IsSecondary(string? phase)
