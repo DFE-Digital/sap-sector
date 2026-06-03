@@ -1,19 +1,29 @@
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 
 public class SchoolSearchServiceTests
 {
+    private const string EnablePrimarySchoolsFeature = "EnablePrimarySchools";
     private readonly Mock<ISchoolSearchIndexReader> _indexReaderMock = new();
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
+    private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
     private readonly SchoolSearchService _sut;
 
     public SchoolSearchServiceTests()
     {
-        _sut = new SchoolSearchService(_indexReaderMock.Object, _establishmentRepositoryMock.Object);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(false);
+
+        _sut = new SchoolSearchService(
+            _indexReaderMock.Object,
+            _establishmentRepositoryMock.Object,
+            _featureFlagServiceMock.Object);
     }
 
     [Theory]
@@ -72,11 +82,14 @@ public class SchoolSearchServiceTests
     public async Task SearchByNumberAsync_WithPrimarySchoolAndFeatureEnabled_ReturnsSchool()
     {
         var establishment = new Establishment { URN = "123456", PhaseOfEducationName = "Primary" };
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
 
-        var result = await _sut.SearchByNumberAsync("123456", true);
+        var result = await _sut.SearchByNumberAsync("123456");
 
         result.Should().Be(establishment);
     }
@@ -103,6 +116,9 @@ public class SchoolSearchServiceTests
     [Fact]
     public async Task SearchAsync_IncludesAllThroughSchools_WhenFeatureEnabled()
     {
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(true);
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "All-through School"), (2, "Secondary School")]);
@@ -113,7 +129,7 @@ public class SchoolSearchServiceTests
                 new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationName = "Secondary" }
             ]);
 
-        var results = await _sut.SearchAsync("school", true);
+        var results = await _sut.SearchAsync("school");
 
         results.Should().HaveCount(2);
         results.Select(x => x.URN).Should().Contain(["1", "2"]);
