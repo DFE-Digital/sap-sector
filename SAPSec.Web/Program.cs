@@ -255,16 +255,30 @@ public class Program
             app.UseDfeAnalytics();
         }
 
-        app.MapGet("/tracking", async (string targetUrl, HttpContext context, IEventSender eventSender) =>
+        app.MapPost("/tracking", async (ClickData data, HttpContext context, IEventSender eventSender) =>
         {
-            var customEvent = eventSender.CreateEvent("outbound_link_click");
+            if (data.Url.StartsWith("https://forms.cloud.microsoft", StringComparison.OrdinalIgnoreCase))
+            {
+                var customEvent = eventSender.CreateEvent("feedback_link_click");
+                customEvent.AddData("Feedback link click", data.Url, data.Text);
 
-            customEvent.AddData("External link click", targetUrl);
+                await eventSender.SendEventAsync(customEvent);
 
-            //context.GetWebRequestEvent()?.AddData("External link click", targetUrl);
-            await eventSender.SendEventAsync(customEvent);
+                return Results.Redirect(data.Url);
+            }
 
-            return Results.Redirect(targetUrl);
+            if (!data.Url.StartsWith("https://get-school-improvement-insights.education.gov.uk", StringComparison.OrdinalIgnoreCase))
+            {
+                var customEvent = eventSender.CreateEvent("outbound_link_click");
+                customEvent.AddData("Outbound link click", data.Url, data.Text);
+
+                await eventSender.SendEventAsync(customEvent);
+
+                return Results.Redirect(data.Url);
+            }
+   
+            return Results.NoContent();
+
         });
 
         app.MapControllers();
