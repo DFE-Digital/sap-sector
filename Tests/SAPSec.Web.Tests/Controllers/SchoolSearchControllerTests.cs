@@ -41,6 +41,19 @@ public class SchoolSearchControllerTests
         Northing = 433100,
     };
 
+    private static Establishment FakePrimaryEstablishment = new()
+    {
+        URN = "456789",
+        UKPRN = "11",
+        LAId = "101",
+        EstablishmentNumber = "2",
+        EstablishmentName = "Fake Primary Establishment",
+        PhaseOfEducationName = "Primary",
+        LAName = "Leeds",
+        Easting = 430200,
+        Northing = 433200,
+    };
+
     public SchoolSearchControllerTests()
     {
         _mockLogger = new Mock<ILogger<SchoolSearchController>>();
@@ -163,10 +176,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Index(viewModel);
 
-        result.Should().BeOfType<RedirectToActionResult>();
-
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.RouteValues!["urn"].Should().Be("123456");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/123456");
     }
 
     [Fact]
@@ -181,12 +192,24 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Index(viewModel);
 
-        result.Should().BeOfType<RedirectToActionResult>();
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/123456");
+    }
 
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+    [Fact]
+    public async Task Index_Post_WithPrimaryNumericQuery_RedirectsToPrimarySchoolDetails()
+    {
+        var viewModel = new SchoolSearchQueryViewModel
+        {
+            Query = "456789"
+        };
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(viewModel.Query))
+            .ReturnsAsync(FakePrimaryEstablishment);
+
+        var result = await _controller.Index(viewModel);
+
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/primary/456789");
     }
 
     [Fact]
@@ -270,12 +293,21 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(query, null, 1);
 
-        result.Should().BeOfType<RedirectToActionResult>();
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/123456");
+    }
 
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+    [Fact]
+    public async Task Search_Get_WithPrimaryNumericQuery_RedirectsToPrimarySchoolDetails()
+    {
+        const string query = "10000002";
+        _mockSearchService.Setup(s => s.SearchByNumberAsync(query))
+            .ReturnsAsync(FakePrimaryEstablishment);
+
+        var result = await _controller.Search(query, null, 1);
+
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/primary/456789");
     }
 
     [Fact]
@@ -373,9 +405,26 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(query, null, 1);
 
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/123456");
+    }
+
+    [Fact]
+    public async Task Search_Get_WithSinglePrimaryMatch_RedirectsToPrimarySchoolDetails()
+    {
+        var query = "Fake Primary Establishment";
+        var searchResults = new List<SchoolSearchResult>
+        {
+            SchoolSearchResult.FromNameAndEstablishment(query, FakePrimaryEstablishment)
+        };
+
+        _mockSearchService.Setup(s => s.SearchAsync(query))
+            .ReturnsAsync(searchResults);
+
+        var result = await _controller.Search(query, null, 1);
+
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/primary/456789");
     }
 
     [Fact]
@@ -422,10 +471,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(query, null, 1);
 
-        result.Should().BeOfType<RedirectToActionResult>();
-
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.RouteValues!["urn"].Should().Be("100273");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/100273");
     }
 
     #endregion
@@ -653,12 +700,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(viewModel);
 
-        result.Should().BeOfType<RedirectToActionResult>();
-
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/123456");
     }
 
     [Fact]
@@ -674,13 +717,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(viewModel);
 
-        result.Should().BeOfType<RedirectToActionResult>();
-
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ActionName.Should().Be("Index");
-        redirectResult.ControllerName.Should().Be("School");
-        redirectResult.RouteValues.Should().ContainKey("urn");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/123456");
     }
 
     [Fact]
@@ -879,9 +917,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(query, null, 1);
 
-        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectResult.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("222222");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/222222");
     }
 
     [Fact]
@@ -970,9 +1007,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(query, null, 1);
 
-        var redirectResult = result.Should().BeOfType<RedirectToActionResult>().Subject;
-        redirectResult.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("222222");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/222222");
     }
 
     [Fact]
@@ -1072,11 +1108,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(viewModel);
 
-        result.Should().BeOfType<RedirectToActionResult>();
-
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("123456");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/123456");
     }
 
     [Fact]
@@ -1109,11 +1142,8 @@ public class SchoolSearchControllerTests
 
         var result = await _controller.Search(query, null, 1);
 
-        result.Should().BeOfType<RedirectToActionResult>();
-
-        var redirectResult = result as RedirectToActionResult;
-        redirectResult!.ControllerName.Should().Be("School");
-        redirectResult.RouteValues!["urn"].Should().Be("999999");
+        var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
+        redirectResult.Url.Should().Be("/school/999999");
     }
 
     #endregion

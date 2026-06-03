@@ -22,7 +22,7 @@
         {
             <li class="app-school-result" id="search-result-@result.URN">
                 <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
-                   href="@Url.Action("Index", "School", new { result.URN })"
+                   href="@result.SchoolUrl"
                    aria-describedby="school-@result.URN-hint">
                     @result.SchoolName
                 </a>
