@@ -96,7 +96,8 @@ public class PrimarySchoolControllerIntegrationTests(WebApplicationSetupFixture 
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().NotContain("href=\"\"");
-        content.Should().Contain("You will be able to view the full list of schools most similar to this one");
+        content.Should().Contain("href=\"/school/primary/105574/view-similar-schools\"");
+        content.Should().Contain("view all the schools most similar to this one");
     }
 
     private static void AssertInOrder(string content, params string[] expectedText)
