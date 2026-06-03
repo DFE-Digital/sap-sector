@@ -130,6 +130,9 @@ public class SchoolController : Controller
         var englandThreeYearAverage = isPersistentAbsence
             ? response.PersistentAbsenceThreeYearAverage.EnglandValue
             : response.OverallAbsenceThreeYearAverage.EnglandValue;
+        var topPerformers = isPersistentAbsence
+            ? response.PersistentAbsenceTopPerformers
+            : response.OverallAbsenceTopPerformers;
 
         return Json(new
         {
@@ -179,7 +182,15 @@ public class SchoolController : Controller
                     DisplayPercentNullable(englandSeries.Current),
                     DisplayPercentNullable(englandThreeYearAverage)
                 }
-            }
+            },
+            topPerformers = topPerformers.Select(x => new
+            {
+                x.Rank,
+                x.Urn,
+                x.Name,
+                x.IsCurrentSchool,
+                DisplayValue = SchoolAttendancePageViewModel.DisplayPercentNullable(x.Value)
+            })
         });
     }
 

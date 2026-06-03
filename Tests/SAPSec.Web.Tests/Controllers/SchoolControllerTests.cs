@@ -268,7 +268,7 @@ public class SchoolControllerTests
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(urn))
-            .ReturnsAsync(new Establishment { URN = urn, LAId = "373" });
+            .ReturnsAsync(new Establishment { URN = urn, LAId = "373", EstablishmentName = "Test Academy" });
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
@@ -298,7 +298,7 @@ public class SchoolControllerTests
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(urn))
-            .ReturnsAsync(new Establishment { URN = urn, LAId = "373" });
+            .ReturnsAsync(new Establishment { URN = urn, LAId = "373", EstablishmentName = "Test Academy" });
         _absenceRepositoryMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(new AbsenceData(
@@ -368,6 +368,13 @@ public class SchoolControllerTests
                     null,
                     null)
             ]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200001", "200002" }))))
+            .ReturnsAsync(
+            [
+                new Establishment { URN = "200001", EstablishmentName = "Beta School" },
+                new Establishment { URN = "200002", EstablishmentName = "Alpha School" }
+            ]);
 
         var result = await _sut.AttendanceData(urn, "overall");
 
@@ -379,6 +386,8 @@ public class SchoolControllerTests
         root.GetProperty("bar").GetArrayLength().Should().Be(4);
         root.GetProperty("line").GetProperty("similarSchools").GetArrayLength().Should().Be(3);
         root.GetProperty("table").GetProperty("similarSchools").GetArrayLength().Should().Be(4);
+        root.GetProperty("topPerformers").GetArrayLength().Should().Be(3);
+        root.GetProperty("topPerformers")[0].GetProperty("Name").GetString().Should().Be("Test Academy");
     }
 
     #endregion
