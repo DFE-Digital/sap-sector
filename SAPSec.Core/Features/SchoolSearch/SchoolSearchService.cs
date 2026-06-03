@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
 using System.Text.RegularExpressions;

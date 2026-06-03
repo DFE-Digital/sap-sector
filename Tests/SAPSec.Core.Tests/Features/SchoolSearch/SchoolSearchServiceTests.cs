@@ -57,6 +57,18 @@ public class SchoolSearchServiceTests
     }
 
     [Fact]
+    public async Task SearchByNumberAsync_WithNonPrimaryOrSecondarySchool_ReturnsNull()
+    {
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
+            .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Nursery" });
+
+        var result = await _sut.SearchByNumberAsync("123456");
+
+        result.Should().BeNull();
+    }
+
+    [Fact]
     public async Task SearchByNumberAsync_WithPrimarySchoolAndFeatureEnabled_ReturnsSchool()
     {
         var establishment = new Establishment { URN = "123456", PhaseOfEducationName = "Primary" };
