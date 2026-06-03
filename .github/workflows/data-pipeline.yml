@@ -15,6 +15,15 @@ on:
         description: Pull request number of the review app (optional, this will run against the target environment to generate a backup file for that review app to use, and then restore the target DB from backup)
         type: string
         required: false
+      rebuild-all-raw-tables:
+        description: Ignore the rebuild list and rebuild all raw tables
+        type: boolean
+        required: false
+        default: false
+      raw-tables-to-rebuild-path:
+        description: Optional override path to the raw tables rebuild list
+        type: string
+        required: false
 
   schedule:
     - cron: "0 6 * * *"   # every day at 06:00 UTC
@@ -596,6 +605,9 @@ jobs:
           dotnet build SAPSec.sln --configuration Release
 
       - name: Generate SQL Scripts
+        env:
+          REBUILD_ALL_RAW_TABLES: ${{ github.event_name == 'workflow_dispatch' && inputs.rebuild-all-raw-tables || 'false' }}
+          RAW_TABLES_TO_REBUILD_PATH: ${{ github.event_name == 'workflow_dispatch' && inputs.raw-tables-to-rebuild-path || '' }}
         run: |
           dotnet run --configuration Release --project SAPData/SAPData.csproj
           echo "Generated SQL scripts."

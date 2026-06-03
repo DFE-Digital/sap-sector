@@ -12,6 +12,7 @@ public class GenerateRawTables
     private readonly string _tableMappingPath;
     private readonly List<string> _sqlFiles;
     private readonly HashSet<string> _logicalKeysToRebuild;
+    private readonly bool _rebuildAllRawTables;
 
     private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
 
@@ -21,7 +22,8 @@ public class GenerateRawTables
         string sqlDir,
         string tableMappingPath,
         List<string> sqlFiles,
-        IEnumerable<string>? logicalKeysToRebuild = null)
+        IEnumerable<string>? logicalKeysToRebuild = null,
+        bool rebuildAllRawTables = false)
     {
         _inputDir = inputDir;
         _cleanDir = cleanDir;
@@ -31,6 +33,7 @@ public class GenerateRawTables
         _logicalKeysToRebuild = new HashSet<string>(
             logicalKeysToRebuild ?? Array.Empty<string>(),
             StringComparer.OrdinalIgnoreCase);
+        _rebuildAllRawTables = rebuildAllRawTables;
     }
 
     public void Run()
@@ -78,7 +81,7 @@ public class GenerateRawTables
 
         // Physical table name: prefix-free, based on logical identity (stable)
         string tableName = GenerateShortTableName(logicalKey);
-        bool rebuildTable = _logicalKeysToRebuild.Contains(logicalKey);
+        bool rebuildTable = _rebuildAllRawTables || _logicalKeysToRebuild.Contains(logicalKey);
 
         // Map BOTH keys to the same physical table
         // - DataMap will use logicalKey

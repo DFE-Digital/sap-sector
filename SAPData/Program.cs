@@ -29,7 +29,7 @@ internal class Program
         string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
         string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
         string sqlDir = Path.Combine(baseDir, "Sql");
-        string rawTablesToRebuildPath = Path.Combine(baseDir, "raw_tables_to_rebuild.txt");
+        string rawTablesToRebuildPath = ResolveRawTablesToRebuildPath(baseDir, configuration);
         string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
         List<string> sqlFiles = new();
 
@@ -56,10 +56,14 @@ internal class Program
 
         Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
 
-        var logicalKeysToRebuild = LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
+        var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
+        var logicalKeysToRebuild = rebuildAllRawTables
+            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
         WriteCleanupSql(
             Path.Combine(sqlDir, "00_cleanup.sql"),
-            logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName));
+            logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
+            rebuildAllRawTables);
 
         // -------------------------------------------------
         // 2. Generate raw tables + cleaned files + mapping
@@ -70,7 +74,8 @@ internal class Program
             sqlDir,
             tableMappingPath,
             sqlFiles,
-            logicalKeysToRebuild
+            logicalKeysToRebuild,
+            rebuildAllRawTables
         ).Run();
 
         // -------------------------------------------------
@@ -202,6 +207,41 @@ internal class Program
         return Path.GetDirectoryName(preferred)!;
     }
 
+    private static string ResolveRawTablesToRebuildPath(string baseDir, IConfiguration configuration)
+    {
+        var configuredPath =
+            configuration["RawTablesToRebuildPath"]
+            ?? Environment.GetEnvironmentVariable("RAW_TABLES_TO_REBUILD_PATH");
+
+        if (string.IsNullOrWhiteSpace(configuredPath))
+        {
+            return Path.Combine(baseDir, "raw_tables_to_rebuild.txt");
+        }
+
+        var resolvedPath = Path.IsPathRooted(configuredPath)
+            ? configuredPath
+            : Path.GetFullPath(Path.Combine(baseDir, configuredPath));
+
+        Console.WriteLine($"Using raw table rebuild list from: {resolvedPath}");
+        return resolvedPath;
+    }
+
+    private static bool ShouldRebuildAllRawTables(IConfiguration configuration)
+    {
+        var configuredValue =
+            configuration["RebuildAllRawTables"]
+            ?? Environment.GetEnvironmentVariable("REBUILD_ALL_RAW_TABLES");
+
+        var rebuildAll = bool.TryParse(configuredValue, out var parsed) && parsed;
+
+        if (rebuildAll)
+        {
+            Console.WriteLine("Full raw-table rebuild enabled. The rebuild list will be ignored.");
+        }
+
+        return rebuildAll;
+    }
+
     private static HashSet<string> LoadLogicalKeysToRebuild(string path)
     {
         if (!File.Exists(path))
@@ -219,7 +259,7 @@ internal class Program
         return keys;
     }
 
-    private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild)
+    private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables)
     {
         var tablesToRebuild = tableNamesToRebuild
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -256,7 +296,14 @@ internal class Program
         sql.AppendLine("    SELECT schemaname, tablename");
         sql.AppendLine("    FROM pg_tables");
         sql.AppendLine("    WHERE schemaname = v_schema");
-        sql.AppendLine("      AND tablename = ANY(tables_to_rebuild)");
+        if (rebuildAllRawTables)
+        {
+            sql.AppendLine("      AND tablename LIKE 't\\_%' ESCAPE '\\'");
+        }
+        else
+        {
+            sql.AppendLine("      AND tablename = ANY(tables_to_rebuild)");
+        }
         sql.AppendLine("  LOOP");
         sql.AppendLine("    EXECUTE format('DROP TABLE IF EXISTS %I.%I CASCADE', r.schemaname, r.tablename);");
         sql.AppendLine("  END LOOP;");
