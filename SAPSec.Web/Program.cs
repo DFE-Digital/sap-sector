@@ -20,7 +20,6 @@ using SAPSec.Web.Setup;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
-using System.Diagnostics.Tracing;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
@@ -255,31 +254,8 @@ public class Program
             app.UseDfeAnalytics();
         }
 
-        app.MapPost("/tracking", async (ClickData data, HttpContext context, IEventSender eventSender) =>
-        {
-            if (data.Url.StartsWith("https://forms.cloud.microsoft", StringComparison.OrdinalIgnoreCase))
-            {
-                var customEvent = eventSender.CreateEvent("feedback_link_click");
-                customEvent.AddData("Feedback link click", data.Url, data.Text);
-
-                await eventSender.SendEventAsync(customEvent);
-
-                return Results.Redirect(data.Url);
-            }
-
-            if (!data.Url.StartsWith("https://get-school-improvement-insights.education.gov.uk", StringComparison.OrdinalIgnoreCase))
-            {
-                var customEvent = eventSender.CreateEvent("outbound_link_click");
-                customEvent.AddData("Outbound link click", data.Url, data.Text);
-
-                await eventSender.SendEventAsync(customEvent);
-
-                return Results.Redirect(data.Url);
-            }
-   
-            return Results.NoContent();
-
-        });
+        //move into above
+        app.MapCustomEventTracking();
 
         app.MapControllers();
         app.MapRazorPages();
