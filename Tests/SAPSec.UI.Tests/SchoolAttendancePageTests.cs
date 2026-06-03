@@ -42,6 +42,7 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-colors", "[\"#D53780\",\"#2a1950\",\"#2a1950\",\"#2a1950\"]");
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-year-by-year']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']")).ToBeVisibleAsync();
+        await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-top-performers']")).ToBeVisibleAsync();
         await Expect(Page.Locator("label[for='attendanceAbsenceType']")).ToHaveClassAsync(new Regex("govuk-label--s"));
         await Expect(Page.Locator("#attendanceAbsenceType")).ToHaveValueAsync("overall");
     }
@@ -120,5 +121,37 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await tableTab.ClickAsync();
         await Expect(Page.Locator("#attendance-table .govuk-table")).ToBeVisibleAsync();
         await Expect(Page.Locator("#attendance-table .govuk-table")).ToContainTextAsync("Similar schools average");
+    }
+
+    [Fact]
+    public async Task Attendance_TopPerformersTab_RendersExpectedContent_AndUpdatesForPersistentAbsence()
+    {
+        await NavigateToAttendanceAsync();
+
+        await Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-top-performers']").ClickAsync();
+
+        await Expect(Page.Locator("#attendance-top-performers")).ToContainTextAsync(
+            "These are the top performing similar schools for this measure.");
+        await Expect(Page.Locator("#attendance-top-performers-table thead")).ToContainTextAsync("Rank");
+        await Expect(Page.Locator("#attendance-top-performers-table thead")).ToContainTextAsync("School");
+        await Expect(Page.Locator("#attendance-top-performers-table thead")).ToContainTextAsync("3-year average");
+        await Expect(Page.Locator("#attendance-top-performers-table tbody tr")).ToHaveCountAsync(3);
+        await Expect(Page.Locator("#attendance-top-performers-table tbody tr").Nth(0)).ToContainTextAsync("1");
+        await Expect(Page.GetByRole(AriaRole.Link, new() { Name = "See all similar schools" }))
+            .ToHaveAttributeAsync("href", "/school/145327/view-similar-schools");
+
+        var initialValues = await Page.Locator("#attendance-top-performers-table tbody [data-top-performer-value], #attendance-top-performers-table tbody .govuk-table__cell--numeric")
+            .AllTextContentsAsync();
+
+        await Page.SelectOptionAsync("#attendanceAbsenceType", "persistent");
+        await Expect(Page.Locator("#attendanceAbsenceType")).ToHaveValueAsync("persistent");
+        await Expect(Page.Locator("#attendance-top-performers-table tbody tr")).ToHaveCountAsync(3);
+
+        await Page.WaitForFunctionAsync(
+            @"([selector, initial]) => {
+                const values = Array.from(document.querySelectorAll(selector)).map(x => x.textContent.trim());
+                return JSON.stringify(values) !== initial;
+            }",
+            new object[] { "#attendance-top-performers-table tbody .govuk-table__cell--numeric", System.Text.Json.JsonSerializer.Serialize(initialValues) });
     }
 }
