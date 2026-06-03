@@ -40,7 +40,7 @@ public class GetAttendanceMeasuresTests
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
-            .ReturnsAsync(new Establishment { URN = "123456", LAId = "373" });
+            .ReturnsAsync(new Establishment { URN = "123456", LAId = "373", EstablishmentName = "Current School" });
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
@@ -111,18 +111,37 @@ public class GetAttendanceMeasuresTests
                     null,
                     null)
             ]);
+        establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200001", "200002" }))))
+            .ReturnsAsync(
+            [
+                new Establishment { URN = "200001", EstablishmentName = "Beta School" },
+                new Establishment { URN = "200002", EstablishmentName = "Alpha School" }
+            ]);
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(5.2m, 5.7m, 4.83m, 4.9m));
+        result.OverallAbsenceTopPerformers.Should().BeEquivalentTo(
+        [
+            new AttendanceTopPerformer(1, "200002", "Alpha School", 5.2m),
+            new AttendanceTopPerformer(2, "123456", "Current School", 5.2m, true),
+            new AttendanceTopPerformer(3, "200001", "Beta School", 6.2m)
+        ], options => options.WithStrictOrdering());
         result.OverallAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(5.0m, 5.2m, 5.4m));
         result.OverallAbsenceYearByYear.SimilarSchools.Should().Be(new AttendanceMeasureSeries(5.5m, 5.7m, 5.9m));
         result.OverallAbsenceYearByYear.LocalAuthority.Should().Be(new AttendanceMeasureSeries(4.7m, 4.8m, 5.0m));
         result.OverallAbsenceYearByYear.England.Should().Be(new AttendanceMeasureSeries(4.8m, 4.9m, 5.0m));
 
         result.PersistentAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(16.4m, 17.9m, 15.3m, 15.83m));
+        result.PersistentAbsenceTopPerformers.Should().BeEquivalentTo(
+        [
+            new AttendanceTopPerformer(1, "123456", "Current School", 16.4m, true),
+            new AttendanceTopPerformer(2, "200002", "Alpha School", 17.4m),
+            new AttendanceTopPerformer(3, "200001", "Beta School", 18.4m)
+        ], options => options.WithStrictOrdering());
         result.PersistentAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(16.0m, 16.4m, 16.8m));
         result.PersistentAbsenceYearByYear.SimilarSchools.Should().Be(new AttendanceMeasureSeries(17.5m, 17.9m, 18.3m));
         result.PersistentAbsenceYearByYear.LocalAuthority.Should().Be(new AttendanceMeasureSeries(15.1m, 15.3m, 15.5m));
@@ -152,11 +171,13 @@ public class GetAttendanceMeasuresTests
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(null, null, null, null));
+        result.OverallAbsenceTopPerformers.Should().BeEmpty();
         result.OverallAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(null, null, null));
         result.OverallAbsenceYearByYear.SimilarSchools.Should().Be(new AttendanceMeasureSeries(null, null, null));
         result.OverallAbsenceYearByYear.LocalAuthority.Should().Be(new AttendanceMeasureSeries(null, null, null));
         result.OverallAbsenceYearByYear.England.Should().Be(new AttendanceMeasureSeries(null, null, null));
         result.PersistentAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(null, null, null, null));
+        result.PersistentAbsenceTopPerformers.Should().BeEmpty();
         result.PersistentAbsenceYearByYear.School.Should().Be(new AttendanceMeasureSeries(null, null, null));
         result.PersistentAbsenceYearByYear.SimilarSchools.Should().Be(new AttendanceMeasureSeries(null, null, null));
         result.PersistentAbsenceYearByYear.LocalAuthority.Should().Be(new AttendanceMeasureSeries(null, null, null));
@@ -214,7 +235,9 @@ public class GetAttendanceMeasuresTests
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(null, null, null, null));
+        result.OverallAbsenceTopPerformers.Should().BeEmpty();
         result.PersistentAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(null, null, null, null));
+        result.PersistentAbsenceTopPerformers.Should().BeEmpty();
     }
 
 }
