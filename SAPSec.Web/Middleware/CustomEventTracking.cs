@@ -1,4 +1,6 @@
 ﻿using Dfe.Analytics.Events;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace SAPSec.Web.Middleware
 {
@@ -10,30 +12,31 @@ namespace SAPSec.Web.Middleware
             {
                 if (data.Url.StartsWith("https://forms.cloud.microsoft", StringComparison.OrdinalIgnoreCase))
                 {
-                    var customEvent = eventSender.CreateEvent("feedback_link_click");
-                    customEvent.AddData("Feedback link click", data.Url, data.Text);
-
-                    await eventSender.SendEventAsync(customEvent);
-
-                    return Results.Redirect(data.Url);
+                   return await SendCustomEvent(eventSender, data, "feedback_link_click");
                 }
 
                 if (!data.Url.StartsWith("https://get-school-improvement-insights-pr-240.test.teacherservices.cloud", StringComparison.OrdinalIgnoreCase))
                 {
-                    var customEvent = eventSender.CreateEvent("outbound_link_click");
-                    customEvent.AddData("Outbound link click", data.Url, data.Text);
-
-                    await eventSender.SendEventAsync(customEvent);
-
-                    return Results.Redirect(data.Url);
+                   return await SendCustomEvent(eventSender, data, "outbound_link_click");
                 }
 
                 return Results.NoContent();
-
             });
+        }
 
+        private static async Task<IResult> SendCustomEvent(IEventSender eventSender, ClickData data, string eventName)
+        {
+            var customEvent = eventSender.CreateEvent(eventName);
+            customEvent.AddData(eventName, data.Url, data.Text);
+
+            await eventSender.SendEventAsync(customEvent);
+
+            return Results.Redirect(data.Url);
         }
     }
 
     public record ClickData(string Url, string Text);
+
+    //https://get-school-improvement-insights-pr-240.test.teacherservices.cloud
+    //https://localhost:44300
 }
