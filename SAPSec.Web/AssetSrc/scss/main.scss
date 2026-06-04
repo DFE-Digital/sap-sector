@@ -1101,11 +1101,13 @@ $app-ks4-color-track: #f3f2f1;
 
 .app-ks4-chart-toggle__title {
   margin-bottom: 0;
+  font-size: 1.1875rem;
+  line-height: 1.3157894737;
 }
 
 .app-ks4-chart-toggle__button {
   border: 0;
-  border-bottom: 2px solid currentColor;
+  border-bottom: 2px solid #949494;
   background: #f3f2f1;
   color: #0b0c0c;
   cursor: pointer;
@@ -1114,10 +1116,6 @@ $app-ks4-color-track: #f3f2f1;
   line-height: 1.25;
   padding: 12px 18px;
   text-decoration: none;
-}
-
-.app-ks4-chart-toggle__button:hover {
-  background: #e7ecf0;
 }
 
 .app-ks4-chart-toggle__button:focus {
