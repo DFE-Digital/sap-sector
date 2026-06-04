@@ -10,4 +10,5 @@ public record SchoolSearchResultViewModel
     public string? LocalAuthority { get; init; }
     public string? Latitude { get; init; }
     public string? Longitude { get; init; }
+    public string? SchoolUrl { get; init; }
 }

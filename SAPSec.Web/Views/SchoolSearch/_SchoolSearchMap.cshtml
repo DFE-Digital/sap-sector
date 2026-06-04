@@ -22,7 +22,7 @@
                 la = s.LocalAuthority,
                 lat,
                 lon,
-                url = Url.Action("Index", "School", new { urn = s.URN })
+                url = s.SchoolUrl
             };
         })
         .Where(x => x != null)

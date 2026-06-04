@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SchoolSearch;
+using SAPSec.Core.Model.Generated;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using System.Text.RegularExpressions;
@@ -43,10 +45,7 @@ public class SchoolSearchController(
             var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
-                return RedirectToAction("Index", "School", new
-                {
-                    school?.URN
-                });
+                return RedirectToSchool(school);
             }
 
             return RedirectToAction("Search", BuildSearchRouteValues(
@@ -70,7 +69,7 @@ public class SchoolSearchController(
                 var school = await _searchService.SearchByNumberAsync(query!.Trim());
                 if (!string.IsNullOrWhiteSpace(school?.URN))
                 {
-                    return RedirectToAction("Index", "School", new { urn = school.URN });
+                    return RedirectToSchool(school);
                 }
             }
 
@@ -89,7 +88,7 @@ public class SchoolSearchController(
 
                 if (exactMatches.Count == 1 && !string.IsNullOrWhiteSpace(exactMatches[0].URN))
                 {
-                    return RedirectToAction("Index", "School", new { urn = exactMatches[0].URN });
+                    return RedirectToSchool(exactMatches[0]);
                 }
             }
 
@@ -109,7 +108,7 @@ public class SchoolSearchController(
 
             if (results.Count == 1 && (localAuthorities == null || localAuthorities.Length == 0))
             {
-                return RedirectToAction("Index", "School", new { results[0].URN });
+                return RedirectToSchool(results[0]);
             }
 
             var totalResults = results.Count;
@@ -136,6 +135,7 @@ public class SchoolSearchController(
                 LocalAuthority = s.LANAme,
                 Latitude = s.Latitude,
                 Longitude = s.Longitude,
+                SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
                 Address = string.Join(", ", new[]
                 {
                     s.AddressStreet,
@@ -160,6 +160,7 @@ public class SchoolSearchController(
                     LocalAuthority = s.LANAme,
                     Latitude = s.Latitude,
                     Longitude = s.Longitude,
+                    SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
                     Address = string.Join(", ", new[]
                     {
                         s.AddressStreet,
@@ -198,10 +199,7 @@ public class SchoolSearchController(
             var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
-                return RedirectToAction("Index", "School", new
-                {
-                    school.URN
-                });
+                return RedirectToSchool(school);
             }
 
             ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
@@ -243,4 +241,15 @@ public class SchoolSearchController(
     private static bool IsSchoolNumberCandidate(string? value) =>
         !string.IsNullOrWhiteSpace(value) &&
         Regex.IsMatch(value.Trim(), @"^(\d+|\d+[\\/]\d+)$");
+
+    private RedirectResult RedirectToSchool(Establishment school) =>
+        Redirect(BuildSchoolUrl(school.URN, school.PhaseOfEducationName));
+
+    private RedirectResult RedirectToSchool(SchoolSearchResult school) =>
+        Redirect(BuildSchoolUrl(school.URN, school.PhaseOfEducationName));
+
+    private static string BuildSchoolUrl(string urn, string? phaseOfEducationName) =>
+        PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
+            ? $"/school/primary/{urn}"
+            : $"/school/{urn}";
 }
