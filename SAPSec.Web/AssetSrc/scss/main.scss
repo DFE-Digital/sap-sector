@@ -1093,10 +1093,11 @@ $app-ks4-color-track: #f3f2f1;
 
 .app-ks4-chart-toggle {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-bottom: 20px;
+  padding-top: 10px;
 }
 
 .app-ks4-chart-toggle__title {
@@ -1218,8 +1219,11 @@ $app-ks4-color-track: #f3f2f1;
   }
 
   .app-ks4-chart-toggle__button {
-    align-self: flex-start;
+    align-self: stretch;
     font-size: 1.1875rem;
+    line-height: 1.3157894737;
+    text-align: center;
+    width: 100%;
   }
 
   .app-ks4-tabs .govuk-table {
