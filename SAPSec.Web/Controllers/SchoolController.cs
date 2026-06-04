@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
@@ -24,6 +25,7 @@ public class SchoolController : Controller
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
     private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
+    private readonly IFeatureFlagService _featureFlagService;
     private readonly ILogger<SchoolController> _logger;
 
     public SchoolController(
@@ -32,6 +34,7 @@ public class SchoolController : Controller
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
         GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetAttendanceMeasures getAttendanceMeasures,
+        IFeatureFlagService featureFlagService,
         ILogger<SchoolController> logger)
     {
         _schoolDetailsService = schoolDetailsService;
@@ -39,6 +42,7 @@ public class SchoolController : Controller
         _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects;
         _getFilteredSchoolKs4CoreSubject = getFilteredSchoolKs4CoreSubject;
         _getAttendanceMeasures = getAttendanceMeasures;
+        _featureFlagService = featureFlagService;
         _logger = logger;
     }
 
@@ -48,7 +52,7 @@ public class SchoolController : Controller
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
+        SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -58,7 +62,7 @@ public class SchoolController : Controller
     {
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
+        SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -68,7 +72,7 @@ public class SchoolController : Controller
     {
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
+        SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -79,7 +83,7 @@ public class SchoolController : Controller
         var school = await _schoolDetailsService.GetByUrnAsync(urn);
         var attendanceMeasures = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
+        SetSchoolViewDataAsync(school);
         return View(new SchoolAttendancePageViewModel
         {
             SchoolDetails = school,
@@ -196,7 +200,7 @@ public class SchoolController : Controller
     {
         var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(response.SchoolDetails);
+        SetSchoolViewDataAsync(response.SchoolDetails);
 
         return View(BuildKs4HeadlineMeasuresViewModel(response));
     }
@@ -345,7 +349,7 @@ public class SchoolController : Controller
     {
         var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(response.SchoolDetails);
+        SetSchoolViewDataAsync(response.SchoolDetails);
         return View(BuildKs4CoreSubjectsViewModel(response));
     }
 
@@ -426,9 +430,19 @@ public class SchoolController : Controller
         });
     }
 
-    private void SetSchoolViewData(Core.Model.SchoolDetails school)
+    private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
     {
         ViewData["SchoolDetails"] = school;
+
+        if (Url is null)
+        {
+            return;
+        }
+
+        ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreateSecondary(
+            Url,
+            school.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
     }
 
     private static decimal?[] SeriesToArray(Ks4HeadlineMeasureSeries series) =>

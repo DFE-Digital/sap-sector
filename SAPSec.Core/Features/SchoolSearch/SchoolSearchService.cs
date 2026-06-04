@@ -1,6 +1,8 @@
+using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
 using System.Text.RegularExpressions;
 
@@ -8,7 +10,8 @@ namespace SAPSec.Core.Features.SchoolSearch;
 
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,
-    IEstablishmentRepository _establishmentRepository) : ISchoolSearchService
+    IEstablishmentRepository _establishmentRepository,
+    IFeatureFlagService _featureFlagService) : ISchoolSearchService
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
@@ -16,6 +19,7 @@ public class SchoolSearchService(
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
     {
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var searchResults = await _indexReader.SearchAsync(query, MaxResults);
 
         var results = new List<SchoolSearchResult>();
@@ -37,6 +41,11 @@ public class SchoolSearchService(
                 continue;
             }
 
+            if (!r.School.IsSearchable(primarySchoolsEnabled))
+            {
+                continue;
+            }
+
             var latLong = BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
                 ? CoordinateConverter.Convert(coords)
                 : null;
@@ -49,6 +58,7 @@ public class SchoolSearchService(
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
     {
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var searchResults = await _indexReader.SearchAsync(queryPart, MaxSuggestions);
 
         var results = new List<SchoolSearchResult>();
@@ -66,6 +76,11 @@ public class SchoolSearchService(
             (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
         {
             if (r.School == null)
+            {
+                continue;
+            }
+
+            if (!r.School.IsSearchable(primarySchoolsEnabled))
             {
                 continue;
             }
@@ -88,7 +103,11 @@ public class SchoolSearchService(
             return null;
         }
 
-        var establishment = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
-        return establishment.IsSearchable() ? establishment : null;
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+        var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
+
+        return school.IsSearchable(primarySchoolsEnabled)
+            ? school
+            : null;
     }
 }
