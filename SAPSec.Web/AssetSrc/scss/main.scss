@@ -449,6 +449,95 @@
   margin-top: 15px !important;
 }
 
+.app-primary-overview {
+  max-width: 960px;
+}
+
+.app-primary-overview__header {
+  margin-bottom: 72px;
+}
+
+.app-primary-overview__title {
+  margin-bottom: 12px;
+}
+
+.app-primary-overview__address {
+  margin-bottom: 0;
+  color: #505a5f;
+}
+
+.app-primary-overview__section {
+  max-width: 1080px;
+  margin-bottom: 44px;
+}
+
+.app-primary-overview__lead {
+  max-width: 1100px;
+}
+
+.app-primary-overview__section-heading {
+  margin-bottom: 24px;
+}
+
+.app-primary-overview__list {
+  margin-bottom: 32px;
+}
+
+.app-primary-similar-school {
+  max-width: 1120px;
+}
+
+.app-primary-similar-school__header {
+  margin-bottom: 48px;
+}
+
+.app-primary-similar-school__caption {
+  margin-bottom: 8px;
+  color: #505a5f;
+}
+
+.app-primary-similar-school__title {
+  margin-bottom: 0;
+}
+
+.app-primary-similar-school__section {
+  margin-bottom: 56px;
+}
+
+.app-primary-similar-school__lead {
+  max-width: 1120px;
+}
+
+.app-primary-similar-school__section-heading {
+  margin-bottom: 28px;
+}
+
+.app-primary-similar-school__table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.app-primary-similar-school__header-cell {
+  font-size: 1.5rem;
+  line-height: 1.25;
+}
+
+.app-primary-similar-school__criteria {
+  width: 34%;
+}
+
+.app-primary-similar-school__table .govuk-table__cell,
+.app-primary-similar-school__table .govuk-table__header {
+  padding-top: 18px;
+  padding-bottom: 18px;
+  vertical-align: top;
+}
+
+.app-primary-similar-school__table-link {
+  margin-top: 24px;
+  margin-bottom: 0;
+}
+
 @media (max-width: 40.0625em) {
   .app-ks4-tabs .govuk-tabs__list-item {
     background: transparent !important;
@@ -469,6 +558,35 @@
   .app-width-container .app-ks4-headline-mobile-layout .govuk-back-link:visited,
   .app-width-container .app-ks4-headline-mobile-layout .govuk-back-link:hover {
     color: #1d70b8;
+  }
+
+  .app-primary-overview__header {
+    margin-bottom: 40px;
+  }
+
+  .app-primary-overview__section {
+    margin-bottom: 32px;
+  }
+
+  .app-primary-similar-school__header {
+    margin-bottom: 32px;
+  }
+
+  .app-primary-similar-school__section {
+    margin-bottom: 36px;
+  }
+
+  .app-primary-similar-school__header-cell {
+    font-size: 1.1875rem;
+    line-height: 1.3157894737;
+  }
+
+  .app-primary-similar-school__table {
+    table-layout: auto;
+  }
+
+  .app-primary-similar-school__criteria {
+    width: auto;
   }
 }
 

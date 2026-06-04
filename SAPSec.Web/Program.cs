@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
@@ -255,6 +256,10 @@ public class Program
 
         app.MapControllers();
         app.MapRazorPages();
+
+        app.MapControllerRoute(
+          name: "Areas",
+          pattern: "{area:exists}/{controller=School}/{action=Index}/{id?}");
 
         app.MapControllerRoute(
             name: "default",

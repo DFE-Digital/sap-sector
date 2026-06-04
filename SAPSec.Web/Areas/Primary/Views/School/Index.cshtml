@@ -1,0 +1,55 @@
+﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Helpers
+@model SchoolDetails
+
+ @{
+    Layout = "_Layout.cshtml";
+    ViewData["Title"] = Model.Name;
+} 
+
+<div class="app-primary-overview">
+    <header class="app-primary-overview__header">
+        <h1 class="govuk-heading-xl app-primary-overview__title">@Model.Name</h1>
+        <p class="govuk-body-l app-primary-overview__address">@Model.Address.Display()</p>
+    </header>
+
+    <section class="app-primary-overview__section">
+        <p class="govuk-body app-primary-overview__lead">
+            We've identified <strong>50</strong> similar primary phase schools (including all-throughs) to help you:
+        </p>
+        <ul class="govuk-list govuk-list--bullet app-primary-overview__list">
+            <li>compare performance data</li>
+            <li>find improvement opportunities</li>
+            <li>connect with school leaders and share insights</li>
+        </ul>
+
+        <p class="govuk-body">
+            We use 9 characteristics to find schools similar to yours. Similar schools will not
+            match every characteristic but they will be similar across a large number of them.
+        </p>
+        <p class="govuk-body">
+            Find out more about <a href="/school/primary/@Model.Urn/what-is-a-similar-school" class="govuk-link">how the DfE defines what a similar school is</a>.
+        </p>
+    </section>
+
+    <section class="app-primary-overview__section">
+        <h2 class="govuk-heading-l app-primary-overview__section-heading">Compare school performance</h2>
+        <p class="govuk-body">
+            Explore this school's performance data across all education phases and compare:
+        </p>
+        <ul class="govuk-list govuk-list--bullet app-primary-overview__list">
+            <li>similar school averages</li>
+            <li>the local authority average</li>
+            <li>the national average</li>
+        </ul>
+    </section>
+
+    <section class="app-primary-overview__section">
+        <h2 class="govuk-heading-l app-primary-overview__section-heading">View similar schools to connect with</h2>
+        <p class="govuk-body">
+            Review the full list of schools you've matched with individually to compare their
+            performance and find top-performing schools with similar characteristics. After
+            finding the right match, use their contact details to connect with them.
+        </p>
+    </section>
+</div>
