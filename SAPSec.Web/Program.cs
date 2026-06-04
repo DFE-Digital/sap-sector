@@ -254,8 +254,9 @@ public class Program
             app.UseDfeAnalytics();
         }
 
-        //move into above
-        app.MapCustomEventTracking();
+            //move into above
+            app.MapCustomEventTracking();
+        //}
 
         app.MapControllers();
         app.MapRazorPages();

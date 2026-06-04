@@ -10,22 +10,22 @@ namespace SAPSec.Web.Middleware
             {
                 if (data.Url.StartsWith("https://forms.cloud.microsoft", StringComparison.OrdinalIgnoreCase))
                 {
-                    return await SendCustomEvent(eventSender, data, "feedback_link_click", "Feedback Link Click");
+                    return await SendCustomEvent(eventSender, data, "feedback_link_click");
                 }
 
                 if (!data.Url.StartsWith("https://get-school-improvement-insights-pr-240.test.teacherservices.cloud", StringComparison.OrdinalIgnoreCase))
                 {
-                    return await SendCustomEvent(eventSender, data, "outbound_link_click", "Outbound Link Click");
+                    return await SendCustomEvent(eventSender, data, "outbound_link_click");
                 }
 
                 return Results.NoContent();
             });
         }
 
-        private static async Task<IResult> SendCustomEvent(IEventSender eventSender, ClickData data, string eventName, string eventLabel)
+        private static async Task<IResult> SendCustomEvent(IEventSender eventSender, ClickData data, string eventName)
         {
             var customEvent = eventSender.CreateEvent(eventName);
-            customEvent.AddData(eventLabel, data.Url, data.Text);
+            customEvent.AddData(data.Text, data.Url);
 
             await eventSender.SendEventAsync(customEvent);
 
@@ -37,4 +37,12 @@ namespace SAPSec.Web.Middleware
 
     //https://get-school-improvement-insights-pr-240.test.teacherservices.cloud
     //https://localhost:44300
+    //check for clicks on Start button on homepage
+    //scroll depth
+    //ignoring certain webrequest events 
+    //Capture when someone visits the Overview page
+    //Inbound link clicks - things that start with #
+    //school details interaction
+    //disclosure interactions
+    
 }

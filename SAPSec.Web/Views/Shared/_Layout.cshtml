@@ -13,6 +13,9 @@
     var clarityId = analytics.ClarityId;
     var loadAnalytics = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
 }
+@{
+    var environment = Context.RequestServices.GetRequiredService<IWebHostEnvironment>();
+}
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
@@ -265,8 +268,12 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
         })
     </script>
     <script src="/js/site.js" asp-append-version="true"></script>
-    <script src="/js/custom-event-tracking.js" asp-append-version="true"></script>
     
+   @*  @if (environment.IsProduction())
+    { *@
+        <script src="/js/custom-event-tracking.js" asp-append-version="true"></script>                
+    @* } *@
+
     @await RenderSectionAsync("scripts", false)
 
 </body>
