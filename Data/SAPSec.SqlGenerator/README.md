@@ -35,7 +35,7 @@ The workflow is intentionally simple and deterministic:
 
 Before running locally, ensure you:
 
-1. Obtain the raw data files and place them in `SAPData/DataMap/SourceFiles`
+1. Obtain the raw data files and place them in `Data/SAPSec.SqlGenerator/DataMap/SourceFiles`
 2. Have pgAdmin installed locally (includes psql SQL Shell which is needed to run '02_copy_into_raw_local.sql')
 
 ---
@@ -113,7 +113,7 @@ High-level steps:
 ## Local development
 
 Typical local workflow:
-1. Place raw CSVs in `SAPData/DataMap/SourceFiles`
+1. Place raw CSVs in `Data/SAPSec.SqlGenerator/DataMap/SourceFiles`
 2. Run the SQL generator (`dotnet run`, or set as startup project in Visual Studio and run in VS)
 3. Execute `02_copy_into_raw_local.sql` using psql SQL Shell (Command: "\i '<PATH TO SQL FOLDER>/Sql/02_copy_into_raw_local.sql'")
 4. Run `run-all.sql` against a local PostgreSQL instance, or run individual sql files as needed.
@@ -133,7 +133,7 @@ Typical local workflow:
 
 ## Repository structure (simplified)
 
-- `SAPData/`
+- `Data/SAPSec.SqlGenerator/`
   - `DataMap/SourceFiles` – downloaded source files (not committed)
   - `DataMap/CleanedFiles` – normalised CSVs (not committed)
   - `Sql/` – generated SQL scripts

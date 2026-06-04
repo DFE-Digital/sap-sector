@@ -88,9 +88,9 @@ dotnet user-secrets list
 
 ---
 
-## Database setup (SAPData + local Postgres)
+## Database setup (SAPSec.SqlGenerator + local Postgres)
 
-SAPSec.Web expects a local Postgres database populated using the **SAPData** project.
+SAPSec.Web expects a local Postgres database populated using the **SAPSec.SqlGenerator** project.
 
 > **Note:** CSV data files must be obtained from the team/storage account and **must not be committed**.
 
@@ -106,16 +106,16 @@ Create an empty database for local development.
 
 Download **all CSV files** from the **sap-sector** storage account `s189t01sapsecdptssa`, container `schooldata`, into:
 
-* `SAPData/DataMap/SourceFiles`
+* `Data/SAPSec.SqlGenerator/DataMap/SourceFiles`
 
 Do **not** check these files into git.
 
-### 4) Generate SQL scripts using SAPData
+### 4) Generate SQL scripts using SAPSec.SqlGenerator
 
 From the repo root:
 
 ```bash
-cd SAPData
+cd Data/SAPSec.SqlGenerator
 
 dotnet run
 ```

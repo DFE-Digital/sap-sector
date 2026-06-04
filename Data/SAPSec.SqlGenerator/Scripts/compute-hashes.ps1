@@ -1,6 +1,6 @@
 param (
-    [string]$RawFolder = "SAPData/Data/Raw",
-    [string]$HashFolder = "SAPData/hashes",
+    [string]$RawFolder = "Data/SAPSec.SqlGenerator/Data/Raw",
+    [string]$HashFolder = "Data/SAPSec.SqlGenerator/hashes",
     [switch]$CompareOnly
 )
 

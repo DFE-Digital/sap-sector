@@ -1,7 +1,6 @@
-using SAPData.Models;
 using System.Text;
 
-namespace SAPData;
+namespace SAPSec.SqlGenerator;
 
 public sealed class GenerateSimilarSchoolsViews
 {

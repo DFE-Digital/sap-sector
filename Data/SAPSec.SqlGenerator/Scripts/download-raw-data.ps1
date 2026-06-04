@@ -1,6 +1,6 @@
 param(
-    [string]$ConfigFile = "SAPData/raw_sources.json",
-    [string]$RawFolder = "SAPData/Data/Raw"
+    [string]$ConfigFile = "Data/SAPSec.SqlGenerator/raw_sources.json",
+    [string]$RawFolder = "Data/SAPSec.SqlGenerator/Data/Raw"
 )
 
 $json = Get-Content $ConfigFile | ConvertFrom-Json

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace SAPData;
+namespace SAPSec.SqlGenerator;
 
 public class GenerateIndexes
 {
