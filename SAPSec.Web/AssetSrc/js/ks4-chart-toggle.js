@@ -1,8 +1,4 @@
 (function () {
-    function getTabText(tabLink) {
-        return (tabLink && tabLink.textContent ? tabLink.textContent : "").trim().toLowerCase();
-    }
-
     function setHidden(element, hidden) {
         if (!element) {
             return;
@@ -31,17 +27,33 @@
         });
     }
 
+    function getTabTarget(tabLink) {
+        if (!tabLink) {
+            return "";
+        }
+
+        return tabLink.getAttribute("href") || "";
+    }
+
+    function isAverageTabTarget(target) {
+        return /^#.+three-year-average$/i.test(target) || target === "#three-year-average";
+    }
+
+    function isYearByYearTabTarget(target) {
+        return /^#.+year-by-year$/i.test(target) || target === "#year-by-year";
+    }
+
     function buildToggleHeader() {
         var header = document.createElement("div");
-        header.className = "app-ks4-chart-toggle";
+        header.className = "app-content-toggle__header";
 
         var title = document.createElement("h3");
-        title.className = "govuk-heading-m app-ks4-chart-toggle__title";
+        title.className = "govuk-heading-m app-content-toggle__title";
         title.textContent = "3-year average";
 
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "govuk-button govuk-button--secondary app-ks4-chart-toggle__button";
+        button.className = "govuk-button govuk-button--secondary app-content-toggle__button";
         button.textContent = "Show year by year";
         button.setAttribute("aria-pressed", "false");
         button.setAttribute("data-module", "govuk-button");
@@ -69,48 +81,70 @@
             return;
         }
 
-        if (getTabText(firstTab) !== "3-year average" || getTabText(secondTab) !== "year by year") {
+        var firstTabTarget = getTabTarget(firstTab);
+        var secondTabTarget = getTabTarget(secondTab);
+
+        if (!isAverageTabTarget(firstTabTarget) || !isYearByYearTabTarget(secondTabTarget)) {
             return;
         }
 
         var averageChart = firstPanel.querySelector(".app-ks4-chart-container");
         var yearlyChart = secondPanel.querySelector(".app-ks4-chart-container");
 
-        if (!averageChart || !yearlyChart) {
+        if (!averageChart || !yearlyChart || firstPanel.querySelector(".app-content-toggle")) {
             return;
         }
 
+        var chartsPanelId = firstTabTarget.slice(1).replace(/three-year-average$/i, "charts");
+
         firstTab.textContent = "Charts";
+        firstTab.setAttribute("href", "#" + chartsPanelId);
+        firstPanel.id = chartsPanelId;
         listItems[1].remove();
 
-        averageChart.classList.add("app-ks4-chart-view");
-        yearlyChart.classList.add("app-ks4-chart-view");
-        averageChart.classList.add("app-ks4-chart-view--active");
-
-        setHidden(yearlyChart, true);
-
-        firstPanel.insertBefore(yearlyChart, firstPanel.firstChild);
-        firstPanel.insertBefore(averageChart, yearlyChart);
+        var toggleContainer = document.createElement("div");
+        toggleContainer.className = "app-content-toggle";
+        toggleContainer.setAttribute("data-module", "app-content-toggle");
 
         var toggle = buildToggleHeader();
-        firstPanel.insertBefore(toggle.header, firstPanel.firstChild);
+        toggleContainer.appendChild(toggle.header);
+
+        var averagePanel = document.createElement("div");
+        averagePanel.className = "app-content-toggle__panel app-content-toggle__panel--active";
+        averagePanel.setAttribute("data-content-toggle-panel", "true");
+        averagePanel.setAttribute("data-content-toggle-name", "3-year average");
+        averagePanel.id = firstTabTarget.slice(1);
+        averagePanel.appendChild(averageChart);
+
+        var yearlyPanel = document.createElement("div");
+        yearlyPanel.className = "app-content-toggle__panel";
+        yearlyPanel.setAttribute("data-content-toggle-panel", "true");
+        yearlyPanel.setAttribute("data-content-toggle-name", "Year by year");
+        yearlyPanel.id = secondTabTarget.slice(1);
+        yearlyPanel.setAttribute("hidden", "hidden");
+        yearlyPanel.appendChild(yearlyChart);
+
+        toggleContainer.appendChild(averagePanel);
+        toggleContainer.appendChild(yearlyPanel);
+
+        firstPanel.insertBefore(toggleContainer, firstPanel.firstChild);
 
         var showingYearly = false;
 
         toggle.button.addEventListener("click", function () {
             showingYearly = !showingYearly;
 
-            averageChart.classList.toggle("app-ks4-chart-view--active", !showingYearly);
-            yearlyChart.classList.toggle("app-ks4-chart-view--active", showingYearly);
+            averagePanel.classList.toggle("app-content-toggle__panel--active", !showingYearly);
+            yearlyPanel.classList.toggle("app-content-toggle__panel--active", showingYearly);
 
-            setHidden(averageChart, showingYearly);
-            setHidden(yearlyChart, !showingYearly);
+            setHidden(averagePanel, showingYearly);
+            setHidden(yearlyPanel, !showingYearly);
 
             toggle.title.textContent = showingYearly ? "Year by year" : "3-year average";
             toggle.button.textContent = showingYearly ? "Show 3-year average" : "Show year by year";
             toggle.button.setAttribute("aria-pressed", showingYearly ? "true" : "false");
 
-            resizeCharts(showingYearly ? yearlyChart : averageChart);
+            resizeCharts(showingYearly ? yearlyPanel : averagePanel);
         });
 
         secondPanel.remove();

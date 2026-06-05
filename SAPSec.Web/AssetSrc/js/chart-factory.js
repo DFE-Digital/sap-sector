@@ -245,7 +245,15 @@
             : gdsStyles.text;
     }
 
-    function buildExplicitTicks(axisMin, axisMax, stepSize) {
+    function buildExplicitTicks(axisMin, axisMax, stepSize, tickValues) {
+        if (Array.isArray(tickValues) && tickValues.length) {
+            return function (axis) {
+                axis.ticks = tickValues.map(function (value) {
+                    return { value };
+                });
+            };
+        }
+
         if (axisMin === null || axisMax === null || !stepSize) {
             return undefined;
         }
@@ -312,29 +320,43 @@
             return null;
         }
 
+        const rawMin = Math.min.apply(null, values);
         const rawMax = Math.max.apply(null, values);
-        const range = rawMax;
+        const range = rawMax - rawMin;
         const padding = range === 0
             ? Math.max(Math.abs(rawMax) * 0.1, axisSuffix === '%' ? 2 : 1)
             : Math.max(range * 0.2, axisSuffix === '%' ? 2 : 1);
 
-        let min = 0;
+        const zoomedMin = Math.max(0, rawMin - padding);
         let max = rawMax + padding;
 
         if (axisSuffix === '%') {
             max = Math.min(100, max);
         }
 
-        if (min === max) {
-            max = min + (axisSuffix === '%' ? 4 : 2);
+        let step = getNiceStepSize(max - zoomedMin);
+        let clusteredMin = roundDownToStep(zoomedMin, step);
+        let clusteredMax = roundUpToStep(max, step);
+
+        if (clusteredMin === clusteredMax) {
+            clusteredMax = clusteredMin + (axisSuffix === '%' ? 4 : 2);
+            step = getNiceStepSize(clusteredMax - clusteredMin);
+            clusteredMin = roundDownToStep(clusteredMin, step);
+            clusteredMax = roundUpToStep(clusteredMax, step);
         }
 
-        const step = getNiceStepSize(max - min);
+        const tickValues = [0];
+        for (let value = clusteredMin; value <= clusteredMax; value += step) {
+            if (value > 0 && !tickValues.includes(value)) {
+                tickValues.push(value);
+            }
+        }
 
         return {
-            min: roundDownToStep(min, step),
-            max: roundUpToStep(max, step),
-            step
+            min: 0,
+            max: clusteredMax,
+            step,
+            tickValues
         };
     }
 
@@ -361,10 +383,11 @@
         const resolvedAxisMin = dynamicLineAxis ? dynamicLineAxis.min : axisMin;
         const resolvedAxisMax = dynamicLineAxis ? dynamicLineAxis.max : axisMax;
         const stepSize = dynamicLineAxis ? dynamicLineAxis.step : axisStep;
+        const tickValues = dynamicLineAxis ? dynamicLineAxis.tickValues : null;
         const axisTickCount = resolvedAxisMin !== null && resolvedAxisMax !== null && stepSize
             ? Math.floor((resolvedAxisMax - resolvedAxisMin) / stepSize) + 1
             : undefined;
-        const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize);
+        const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize, tickValues);
 
         const legendOptions = {
             display: showLegend,

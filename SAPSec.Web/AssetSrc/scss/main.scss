@@ -1091,7 +1091,7 @@ $app-ks4-color-track: #f3f2f1;
   height: 330px;
 }
 
-.app-ks4-chart-toggle {
+.app-content-toggle__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1100,17 +1100,17 @@ $app-ks4-color-track: #f3f2f1;
   padding-top: 10px;
 }
 
-.app-ks4-chart-toggle__title {
+.app-content-toggle__title {
   margin-bottom: 0;
   @include govuk-font($size: 19, $weight: bold);
 }
 
-.app-ks4-chart-toggle__button {
+.app-content-toggle__button {
   @include govuk-font($size: 24);
   margin-bottom: 0;
 }
 
-.app-ks4-chart-view[hidden] {
+.app-content-toggle__panel[hidden] {
   display: none !important;
 }
 
@@ -1198,12 +1198,12 @@ $app-ks4-color-track: #f3f2f1;
     -webkit-overflow-scrolling: touch;
   }
 
-  .app-ks4-chart-toggle {
+  .app-content-toggle__header {
     align-items: stretch;
     flex-direction: column;
   }
 
-  .app-ks4-chart-toggle__button {
+  .app-content-toggle__button {
     align-self: stretch;
     @include govuk-font($size: 19);
     text-align: center;
