@@ -53,7 +53,7 @@
 
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "govuk-button govuk-button--secondary app-content-toggle__button";
+        button.className = "govuk-button govuk-button--secondary";
         button.textContent = "Show year by year";
         button.setAttribute("aria-pressed", "false");
         button.setAttribute("data-module", "govuk-button");
