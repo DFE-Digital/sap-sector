@@ -29,7 +29,7 @@
 
     function initialiseToggle(toggle) {
         var title = toggle.querySelector(".app-content-toggle__title");
-        var button = toggle.querySelector(".app-content-toggle__button");
+        var button = toggle.querySelector(".app-content-toggle__header button[type='button']");
         var panels = Array.prototype.slice.call(toggle.querySelectorAll("[data-content-toggle-panel]"));
 
         if (!title || !button || panels.length < 2) {
