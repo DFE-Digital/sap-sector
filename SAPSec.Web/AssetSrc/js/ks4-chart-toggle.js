@@ -41,9 +41,10 @@
 
         var button = document.createElement("button");
         button.type = "button";
-        button.className = "app-ks4-chart-toggle__button";
+        button.className = "govuk-button govuk-button--secondary app-ks4-chart-toggle__button";
         button.textContent = "Show year by year";
         button.setAttribute("aria-pressed", "false");
+        button.setAttribute("data-module", "govuk-button");
 
         header.appendChild(title);
         header.appendChild(button);

@@ -259,7 +259,90 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function getNumericSeriesValues(chartData) {
+        if (!chartData || !Array.isArray(chartData.datasets)) {
+            return [];
+        }
+
+        return chartData.datasets
+            .flatMap(function (dataset) {
+                return Array.isArray(dataset.data) ? dataset.data : [];
+            })
+            .filter(function (value) {
+                return value !== null && value !== undefined && !Number.isNaN(Number(value));
+            })
+            .map(Number);
+    }
+
+    function getNiceStepSize(range) {
+        if (!range || range <= 0) {
+            return 1;
+        }
+
+        const roughStep = range / 4;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const normalised = roughStep / magnitude;
+
+        if (normalised <= 1) {
+            return magnitude;
+        }
+
+        if (normalised <= 2) {
+            return 2 * magnitude;
+        }
+
+        if (normalised <= 5) {
+            return 5 * magnitude;
+        }
+
+        return 10 * magnitude;
+    }
+
+    function roundDownToStep(value, step) {
+        return Math.floor(value / step) * step;
+    }
+
+    function roundUpToStep(value, step) {
+        return Math.ceil(value / step) * step;
+    }
+
+    function getDynamicLineAxisConfig(chartData, axisSuffix) {
+        const values = getNumericSeriesValues(chartData);
+        if (!values.length) {
+            return null;
+        }
+
+        const rawMin = Math.min.apply(null, values);
+        const rawMax = Math.max.apply(null, values);
+        const range = rawMax - rawMin;
+        const padding = range === 0
+            ? Math.max(Math.abs(rawMax) * 0.1, axisSuffix === '%' ? 2 : 1)
+            : Math.max(range * 0.2, axisSuffix === '%' ? 2 : 1);
+
+        let min = rawMin - padding;
+        let max = rawMax + padding;
+
+        if (axisSuffix === '%') {
+            min = Math.max(0, min);
+            max = Math.min(100, max);
+        } else {
+            min = Math.max(0, min);
+        }
+
+        if (min === max) {
+            max = min + (axisSuffix === '%' ? 4 : 2);
+        }
+
+        const step = getNiceStepSize(max - min);
+
+        return {
+            min: roundDownToStep(min, step),
+            max: roundUpToStep(max, step),
+            step
+        };
+    }
+
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -271,11 +354,13 @@
             size: gdsStyles.fontSize
         };
 
-        const stepSize = axisStep;
-        const axisTickCount = axisMin !== null && axisMax !== null && stepSize
-            ? Math.floor((axisMax - axisMin) / stepSize) + 1
+        const resolvedAxisMin = dynamicLineAxis ? dynamicLineAxis.min : axisMin;
+        const resolvedAxisMax = dynamicLineAxis ? dynamicLineAxis.max : axisMax;
+        const stepSize = dynamicLineAxis ? dynamicLineAxis.step : axisStep;
+        const axisTickCount = resolvedAxisMin !== null && resolvedAxisMax !== null && stepSize
+            ? Math.floor((resolvedAxisMax - resolvedAxisMin) / stepSize) + 1
             : undefined;
-        const explicitTicks = buildExplicitTicks(axisMin, axisMax, stepSize);
+        const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize);
 
         const legendOptions = {
             display: showLegend,
@@ -300,9 +385,9 @@
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        min: axisMin ?? undefined,
-                        max: axisMax ?? undefined,
+                        beginAtZero: !dynamicLineAxis,
+                        min: resolvedAxisMin ?? undefined,
+                        max: resolvedAxisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         afterBuildTicks: explicitTicks,
                         grid: {
@@ -340,7 +425,16 @@
                     }
                 },
                 plugins: {
-                    tooltip: { enabled: false },
+                    tooltip: {
+                        enabled: true,
+                        callbacks: {
+                            label: function (context) {
+                                const label = context.dataset.label ? context.dataset.label + ': ' : '';
+                                const value = context.parsed.y;
+                                return `${label}${value}${axisSuffix}`;
+                            }
+                        }
+                    },
                     legend: legendOptions,
                     title: {
                         display: false,
@@ -573,6 +667,13 @@
         return ks4CoreSubjectYearByYearChartIds.has(canvas.id);
     }
 
+    function isYearByYearLineChart(canvas) {
+        return canvas && (
+            canvas.id.includes('yearbyyear-chart')
+            || canvas.id.includes('year-by-year-chart')
+        );
+    }
+
     function initCharts() {
         document.querySelectorAll('.js-chart').forEach(canvas => {
             if (charts[canvas.id]) {
@@ -611,6 +712,9 @@
                 : CHART_CONFIG.defaults.axisSuffix;
             const labelDecimals = canvas.dataset.labelDecimals
                 ? parseInt(canvas.dataset.labelDecimals, 10)
+                : null;
+            const dynamicLineAxis = type === 'line' && isYearByYearLineChart(canvas)
+                ? getDynamicLineAxisConfig(chartData, axisSuffix)
                 : null;
 
             const rawColors = canvas.dataset.colors
@@ -652,7 +756,8 @@
                     showLegend,
                     showDataLabels,
                     showXGrid,
-                    barLabelAlign),
+                    barLabelAlign,
+                    dynamicLineAxis),
                 plugins: [
                     ...(showDataLabels ? [ChartDataLabels] : []),
                     noDataBarLabelsPlugin
