@@ -370,7 +370,7 @@
 
         const legendOptions = {
             display: showLegend,
-            position: CHART_CONFIG.legend.position,
+            position: type === 'line' ? 'top' : CHART_CONFIG.legend.position,
             labels: {
                 usePointStyle: true,
                 pointStyle: CHART_CONFIG.legend.pointStyle,
