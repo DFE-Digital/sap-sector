@@ -312,21 +312,17 @@
             return null;
         }
 
-        const rawMin = Math.min.apply(null, values);
         const rawMax = Math.max.apply(null, values);
-        const range = rawMax - rawMin;
+        const range = rawMax;
         const padding = range === 0
             ? Math.max(Math.abs(rawMax) * 0.1, axisSuffix === '%' ? 2 : 1)
             : Math.max(range * 0.2, axisSuffix === '%' ? 2 : 1);
 
-        let min = rawMin - padding;
+        let min = 0;
         let max = rawMax + padding;
 
         if (axisSuffix === '%') {
-            min = Math.max(0, min);
             max = Math.min(100, max);
-        } else {
-            min = Math.max(0, min);
         }
 
         if (min === max) {
@@ -340,6 +336,14 @@
             max: roundUpToStep(max, step),
             step
         };
+    }
+
+    function formatTooltipValue(value, axisSuffix) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return 'No data';
+        }
+
+        return `${Number(value)}${axisSuffix}`;
     }
 
     function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis) {
@@ -377,6 +381,10 @@
         if (type === 'line') {
             return {
                 ...common,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 layout: {
                     padding: {
                         top: CHART_CONFIG.line.layout.topPadding,
@@ -427,11 +435,15 @@
                 plugins: {
                     tooltip: {
                         enabled: true,
+                        displayColors: false,
                         callbacks: {
+                            title: function (contexts) {
+                                return contexts?.[0]?.label ?? '';
+                            },
                             label: function (context) {
                                 const label = context.dataset.label ? context.dataset.label + ': ' : '';
                                 const value = context.parsed.y;
-                                return `${label}${value}${axisSuffix}`;
+                                return `${label}${formatTooltipValue(value, axisSuffix)}`;
                             }
                         }
                     },
