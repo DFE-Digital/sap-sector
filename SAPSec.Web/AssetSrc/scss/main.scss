@@ -1102,8 +1102,7 @@ $app-ks4-color-track: #f3f2f1;
 
 .app-ks4-chart-toggle__title {
   margin-bottom: 0;
-  font-size: 1.1875rem;
-  line-height: 1.3157894737;
+  @include govuk-font($size: 19, $weight: bold);
 }
 
 .app-ks4-chart-toggle__button {
@@ -1113,8 +1112,7 @@ $app-ks4-color-track: #f3f2f1;
   color: #0b0c0c;
   cursor: pointer;
   font-family: "GDS Transport", Arial, sans-serif;
-  font-size: 1.5rem;
-  line-height: 1.25;
+  @include govuk-font($size: 24);
   padding: 12px 18px;
   text-decoration: none;
 }
@@ -1122,7 +1120,6 @@ $app-ks4-color-track: #f3f2f1;
 .app-ks4-chart-toggle__button:focus {
   outline: 3px solid #fd0;
   outline-offset: 0;
-  box-shadow: inset 0 -2px 0 #0b0c0c;
 }
 
 .app-ks4-chart-view[hidden] {
@@ -1220,8 +1217,7 @@ $app-ks4-color-track: #f3f2f1;
 
   .app-ks4-chart-toggle__button {
     align-self: stretch;
-    font-size: 1.1875rem;
-    line-height: 1.3157894737;
+    @include govuk-font($size: 19);
     text-align: center;
     width: 100%;
   }
