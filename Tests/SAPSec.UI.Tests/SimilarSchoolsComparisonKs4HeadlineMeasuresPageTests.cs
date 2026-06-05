@@ -74,7 +74,7 @@ public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplication
         var max = axis.GetProperty("max").GetDouble();
         var ticks = axis.GetProperty("ticks").EnumerateArray().Select(tick => tick.GetString()).ToArray();
 
-        min.Should().Be(0d);
+        min.Should().BeGreaterThan(0d);
         max.Should().BeGreaterThan(min);
         (max - min).Should().BeLessThan(90d);
         ticks.Should().HaveCountGreaterThan(1);
