@@ -5,9 +5,9 @@ namespace SAPSec.Data.Json;
 
 public class JsonKs4PerformanceStore(
     IEstablishmentStore establishmentRepository,
-    IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
-    IJsonFile<LAPerformance> localAuthorityPerformanceRepository,
-    IJsonFile<EnglandPerformance> englandPerformanceRepository) : IKs4PerformanceStore
+    IJsonFile<EstablishmentPerformance> establishmentPerformanceJsonFile,
+    IJsonFile<LAPerformance> localAuthorityPerformanceJsonFile,
+    IJsonFile<EnglandPerformance> englandPerformanceJsonFile) : IKs4PerformanceStore
 {
     public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
     {
@@ -30,7 +30,7 @@ public class JsonKs4PerformanceStore(
         var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
-        var performanceByUrn = (await establishmentPerformanceRepository.ReadAllAsync())
+        var performanceByUrn = (await establishmentPerformanceJsonFile.ReadAllAsync())
             .Where(x => establishments.ContainsKey(x.Id))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
@@ -39,11 +39,11 @@ public class JsonKs4PerformanceStore(
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var localAuthorityPerformanceByLaId = (await localAuthorityPerformanceRepository.ReadAllAsync())
+        var localAuthorityPerformanceByLaId = (await localAuthorityPerformanceJsonFile.ReadAllAsync())
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandPerformance = (await englandPerformanceRepository.ReadAllAsync()).FirstOrDefault();
+        var englandPerformance = (await englandPerformanceJsonFile.ReadAllAsync()).FirstOrDefault();
 
         var results = new List<Ks4PerformanceData>(requestedUrns.Length);
 

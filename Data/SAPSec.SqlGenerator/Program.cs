@@ -33,9 +33,7 @@ internal class Program
         List<string> sqlFiles = new();
 
         string dataDir = Directory.GetParent(baseDir)!.FullName;
-        string rootDir = Directory.GetParent(dataDir)!.FullName;
-        string infrastructureDir = Path.Combine(rootDir, "SAPSec.Infrastructure");
-        string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
+        string jsonDir = Path.Combine(dataDir, "SAPSec.Data.Json", "Files");
         string generatedJsonDir = Path.Combine(jsonDir, "Generated");
         string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
 

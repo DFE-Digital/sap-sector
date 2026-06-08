@@ -5,9 +5,9 @@ namespace SAPSec.Data.Json;
 
 public class JsonKs4DestinationsStore(
     IEstablishmentStore establishmentRepository,
-    IJsonFile<EstablishmentDestinations> establishmentDestinationsRepository,
-    IJsonFile<LADestinations> localAuthorityDestinationsRepository,
-    IJsonFile<EnglandDestinations> englandDestinationsRepository) : IKs4DestinationsStore
+    IJsonFile<EstablishmentDestinations> establishmentDestinationsJsonFile,
+    IJsonFile<LADestinations> localAuthorityDestinationsJsonFile,
+    IJsonFile<EnglandDestinations> englandDestinationsJsonFile) : IKs4DestinationsStore
 {
     public async Task<Ks4DestinationsData?> GetByUrnAsync(string urn)
     {
@@ -30,7 +30,7 @@ public class JsonKs4DestinationsStore(
         var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
-        var destinationsByUrn = (await establishmentDestinationsRepository.ReadAllAsync())
+        var destinationsByUrn = (await establishmentDestinationsJsonFile.ReadAllAsync())
             .Where(x => establishments.ContainsKey(x.Id))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
@@ -39,11 +39,11 @@ public class JsonKs4DestinationsStore(
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var localAuthorityDestinationsByLaId = (await localAuthorityDestinationsRepository.ReadAllAsync())
+        var localAuthorityDestinationsByLaId = (await localAuthorityDestinationsJsonFile.ReadAllAsync())
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandDestinations = (await englandDestinationsRepository.ReadAllAsync()).FirstOrDefault();
+        var englandDestinations = (await englandDestinationsJsonFile.ReadAllAsync()).FirstOrDefault();
 
         var results = new List<Ks4DestinationsData>(requestedUrns.Length);
 

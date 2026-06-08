@@ -8,8 +8,8 @@ public class Program
     public static async Task Main(string[] args)
     {
         string baseDir = FindProjectDirectoryDownwards("SAPSec.DtoGenerator");
-        string jsonDir = Path.Combine(baseDir, "..\\..\\SAPSec.Infrastructure\\Data\\Files\\Generated");
-        string csDir = Path.Combine(baseDir, "..\\..\\SAPSec.Core\\Model\\Generated");
+        string jsonDir = Path.Combine(baseDir, "..\\SAPSec.Data.Json\\Files\\Generated");
+        string csDir = Path.Combine(baseDir, "..\\SAPSec.Data\\Dto");
 
         foreach (var csFile in Directory.GetFiles(csDir))
         {

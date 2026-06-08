@@ -10,13 +10,13 @@ public class JsonSimilarSchoolsSecondaryStore : ISimilarSchoolsSecondaryStore
     private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> _standardDeviations;
 
     public JsonSimilarSchoolsSecondaryStore(
-        IJsonFile<SimilarSchoolsSecondaryGroupsEntry> similarSchoolsGroupsRepository,
-        IJsonFile<SimilarSchoolsSecondaryValuesEntry> similarSchoolsValuesRepository,
-        IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> standardDeviationsRepository)
+        IJsonFile<SimilarSchoolsSecondaryGroupsEntry> similarSchoolsGroupsJsonFile,
+        IJsonFile<SimilarSchoolsSecondaryValuesEntry> similarSchoolsValuesJsonFile,
+        IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> standardDeviationsJsonFile)
     {
-        _similarSchoolsGroups = similarSchoolsGroupsRepository;
-        _similarSchoolsValues = similarSchoolsValuesRepository;
-        _standardDeviations = standardDeviationsRepository;
+        _similarSchoolsGroups = similarSchoolsGroupsJsonFile;
+        _similarSchoolsValues = similarSchoolsValuesJsonFile;
+        _standardDeviations = standardDeviationsJsonFile;
     }
 
     public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)

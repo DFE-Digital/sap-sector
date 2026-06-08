@@ -5,9 +5,9 @@ namespace SAPSec.Data.Json;
 
 public class JsonAbsenceStore(
     IEstablishmentStore establishmentRepository,
-    IJsonFile<EstablishmentAbsence> establishmentAbsenceRepository,
-    IJsonFile<LAAbsence> laAbsenceRepository,
-    IJsonFile<EnglandAbsence> englandAbsenceRepository) : IAbsenceStore
+    IJsonFile<EstablishmentAbsence> establishmentAbsenceJsonFile,
+    IJsonFile<LAAbsence> laAbsenceJsonFile,
+    IJsonFile<EnglandAbsence> englandAbsenceJsonFile) : IAbsenceStore
 {
     public async Task<AbsenceData?> GetByUrnAsync(string urn)
     {
@@ -30,7 +30,7 @@ public class JsonAbsenceStore(
         var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
-        var absenceByUrn = (await establishmentAbsenceRepository.ReadAllAsync())
+        var absenceByUrn = (await establishmentAbsenceJsonFile.ReadAllAsync())
             .Where(x => establishments.ContainsKey(x.Id))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
@@ -39,11 +39,11 @@ public class JsonAbsenceStore(
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var localAuthorityAbsenceByLaId = (await laAbsenceRepository.ReadAllAsync())
+        var localAuthorityAbsenceByLaId = (await laAbsenceJsonFile.ReadAllAsync())
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandAbsence = (await englandAbsenceRepository.ReadAllAsync()).FirstOrDefault();
+        var englandAbsence = (await englandAbsenceJsonFile.ReadAllAsync()).FirstOrDefault();
 
         var results = new List<AbsenceData>(requestedUrns.Length);
 
