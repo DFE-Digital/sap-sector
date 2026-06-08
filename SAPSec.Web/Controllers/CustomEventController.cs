@@ -25,7 +25,8 @@ public class CustomEventController(ICustomEventService customEventService) : Con
     const string OverviewPagePattern = $"^{ServiceUrlPrefix}/school/\\d+$";
 
     [HttpPost("/custom-event-tracking")]
-    public async Task<IResult> CustomEventTracking([FromBody] ClickData clickData)
+   // [IgnoreAntiforgeryToken]
+    public async Task<IActionResult> CustomEventTracking([FromBody] ClickData clickData)
     {
         if (clickData.Url.StartsWith(SignInPrefix, StringComparison.OrdinalIgnoreCase))
         {
@@ -35,6 +36,8 @@ public class CustomEventController(ICustomEventService customEventService) : Con
         if (clickData.Url.StartsWith(FeedbackFormPrefix, StringComparison.OrdinalIgnoreCase))
         {
             await customEventService.SendCustomEvent(clickData, "feedback_link_click");
+
+            return Ok(new { success = true});
         }
 
         if (clickData.Url.StartsWith(MailToPrefix, StringComparison.OrdinalIgnoreCase))
@@ -63,6 +66,6 @@ public class CustomEventController(ICustomEventService customEventService) : Con
             await customEventService.SendCustomEvent(clickData, "overview_page");
         }
 
-        return Results.NoContent();
+        return Ok();
     }
 }
