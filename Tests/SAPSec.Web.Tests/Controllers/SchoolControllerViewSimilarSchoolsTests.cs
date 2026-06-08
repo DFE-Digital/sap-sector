@@ -3,14 +3,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
@@ -19,10 +16,10 @@ namespace SAPSec.Web.Tests.Controllers;
 public class SimilarSchoolsControllerTests
 {
     //private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepoMock = new();
-    private readonly Mock<IEstablishmentRepository> _establishmentRepoMock = new();
-    private readonly Mock<IKs4PerformanceRepository> _performanceRepoMock = new();
-    private readonly Mock<IAbsenceRepository> _absenceRepoMock = new();
+    private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsRepoMock = new();
+    private readonly Mock<IEstablishmentStore> _establishmentRepoMock = new();
+    private readonly Mock<IKs4PerformanceStore> _performanceRepoMock = new();
+    private readonly Mock<IAbsenceStore> _absenceRepoMock = new();
     private readonly Mock<ILogger<SimilarSchoolsController>> _loggerMock = new();
     private readonly SimilarSchoolsController _sut;
 

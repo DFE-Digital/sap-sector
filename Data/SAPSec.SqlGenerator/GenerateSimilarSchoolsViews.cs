@@ -1,3 +1,4 @@
+using SAPSec.SqlGenerator.Models;
 using System.Text;
 
 namespace SAPSec.SqlGenerator;

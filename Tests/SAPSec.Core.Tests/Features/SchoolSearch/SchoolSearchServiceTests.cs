@@ -1,8 +1,8 @@
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 
@@ -10,7 +10,7 @@ public class SchoolSearchServiceTests
 {
     private const string EnablePrimarySchoolsFeature = "EnablePrimarySchools";
     private readonly Mock<ISchoolSearchIndexReader> _indexReaderMock = new();
-    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
+    private readonly Mock<IEstablishmentStore> _establishmentRepositoryMock = new();
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
     private readonly SchoolSearchService _sut;
 

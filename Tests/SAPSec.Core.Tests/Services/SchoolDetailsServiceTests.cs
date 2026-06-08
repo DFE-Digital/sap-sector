@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Services;
 
@@ -13,13 +13,13 @@ namespace SAPSec.Core.Tests.Services;
 /// </summary>
 public class SchoolDetailsServiceTests
 {
-    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
+    private readonly Mock<IEstablishmentStore> _establishmentRepositoryMock;
     private readonly Mock<ILogger<SchoolDetailsService>> _loggerMock;
     private readonly SchoolDetailsService _sut;
 
     public SchoolDetailsServiceTests()
     {
-        _establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        _establishmentRepositoryMock = new Mock<IEstablishmentStore>();
         _loggerMock = new Mock<ILogger<SchoolDetailsService>>();
 
         _sut = new SchoolDetailsService(

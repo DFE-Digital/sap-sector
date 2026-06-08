@@ -1,5 +1,6 @@
 ﻿using CsvHelper;
 using Microsoft.Extensions.Configuration;
+using SAPSec.SqlGenerator.Models;
 using System.Globalization;
 using System.Text;
 
@@ -31,7 +32,9 @@ internal class Program
         string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
         List<string> sqlFiles = new();
 
-        string infrastructureDir = Path.Combine(Directory.GetParent(baseDir)!.FullName, "SAPSec.Infrastructure");
+        string dataDir = Directory.GetParent(baseDir)!.FullName;
+        string rootDir = Directory.GetParent(dataDir)!.FullName;
+        string infrastructureDir = Path.Combine(rootDir, "SAPSec.Infrastructure");
         string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
         string generatedJsonDir = Path.Combine(jsonDir, "Generated");
         string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");

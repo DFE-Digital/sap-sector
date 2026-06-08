@@ -2,16 +2,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Services;
 using System.Text.Json;
@@ -23,11 +20,11 @@ public class SchoolControllerTests
     #region Fields
 
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
-    private readonly Mock<IAbsenceRepository> _absenceRepositoryMock;
-    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
-    private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
-    private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock;
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
+    private readonly Mock<IAbsenceStore> _absenceRepositoryMock;
+    private readonly Mock<IEstablishmentStore> _establishmentRepositoryMock;
+    private readonly Mock<IKs4PerformanceStore> _ks4PerformanceRepositoryMock;
+    private readonly Mock<IKs4DestinationsStore> _ks4DestinationsRepositoryMock;
+    private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsRepositoryMock;
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
@@ -39,11 +36,11 @@ public class SchoolControllerTests
     public SchoolControllerTests()
     {
         _schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        _absenceRepositoryMock = new Mock<IAbsenceRepository>();
-        _establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        _ks4DestinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
-        _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        _absenceRepositoryMock = new Mock<IAbsenceStore>();
+        _establishmentRepositoryMock = new Mock<IEstablishmentStore>();
+        _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+        _ks4DestinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
+        _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryStore>();
         _featureFlagServiceMock = new Mock<IFeatureFlagService>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
         _featureFlagServiceMock.Setup(x => x.IsEnabledAsync("EnablePrimarySchools")).ReturnsAsync(false);

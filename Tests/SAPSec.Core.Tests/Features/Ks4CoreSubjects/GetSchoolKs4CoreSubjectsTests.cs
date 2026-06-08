@@ -2,12 +2,10 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;
 
@@ -611,9 +609,9 @@ public class GetSchoolKs4CoreSubjectsTests
 
     private sealed class TestContext
     {
-        private readonly Mock<IKs4PerformanceRepository> _repositoryMock = new();
-        private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
-        private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
+        private readonly Mock<IKs4PerformanceStore> _repositoryMock = new();
+        private readonly Mock<IEstablishmentStore> _establishmentRepositoryMock = new();
+        private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsRepositoryMock = new();
         private Ks4PerformanceData _currentSchoolData = CreateMeasures("100001");
 
         public TestContext()

@@ -1,6 +1,8 @@
+using SAPSec.Data.Store;
+
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository repository)
+public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryStore repository)
 {
     public async Task<GetCharacteristicsComparisonResponse> Execute(GetCharacteristicsComparisonRequest request)
     {

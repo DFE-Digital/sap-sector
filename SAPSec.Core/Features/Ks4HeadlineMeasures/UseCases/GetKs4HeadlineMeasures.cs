@@ -1,11 +1,12 @@
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
 public class GetKs4HeadlineMeasures(
-    IKs4PerformanceRepository performanceRepository,
-    IKs4DestinationsRepository destinationsRepository,
+    IKs4PerformanceStore performanceRepository,
+    IKs4DestinationsStore destinationsRepository,
     ISchoolDetailsService schoolDetailsService)
 {
     public async Task<GetKs4HeadlineMeasuresResponse> Execute(GetKs4HeadlineMeasuresRequest request)

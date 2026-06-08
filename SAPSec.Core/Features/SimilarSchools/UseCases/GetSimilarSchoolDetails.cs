@@ -1,18 +1,16 @@
-﻿using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Interfaces.Repositories;
+﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class GetSimilarSchoolDetails(
-    IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    IEstablishmentStore establishmentRepository,
+    ISimilarSchoolsSecondaryStore similarSchoolsRepository,
     ISchoolDetailsService schoolDetailsService,
-    IKs4PerformanceRepository performanceRepository,
-    IAbsenceRepository absenceRepository)
+    IKs4PerformanceStore performanceRepository,
+    IAbsenceStore absenceRepository)
 {
     public async Task<GetSimilarSchoolDetailsResponse> Execute(GetSimilarSchoolDetailsRequest request)
     {

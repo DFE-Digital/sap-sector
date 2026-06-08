@@ -1,21 +1,19 @@
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class FindSimilarSchools(
-    IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
-    IKs4PerformanceRepository performanceRepository,
-    IAbsenceRepository absenceRepository)
+    IEstablishmentStore establishmentRepository,
+    ISimilarSchoolsSecondaryStore similarSchoolsRepository,
+    IKs4PerformanceStore performanceRepository,
+    IAbsenceStore absenceRepository)
 {
     public async Task<FindSimilarSchoolsResponse> Execute(FindSimilarSchoolsRequest request)
     {

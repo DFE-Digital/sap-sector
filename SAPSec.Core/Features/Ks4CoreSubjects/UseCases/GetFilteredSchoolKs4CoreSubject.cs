@@ -1,15 +1,14 @@
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 
 public class GetFilteredSchoolKs4CoreSubject(
-    IKs4PerformanceRepository repository,
+    IKs4PerformanceStore repository,
     ISchoolDetailsService schoolDetailsService,
-    IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
+    IEstablishmentStore establishmentRepository,
+    ISimilarSchoolsSecondaryStore similarSchoolsRepository)
 {
     public async Task<GetFilteredSchoolKs4CoreSubjectResponse> Execute(GetFilteredSchoolKs4CoreSubjectRequest request)
     {
@@ -25,7 +24,7 @@ public class GetFilteredSchoolKs4CoreSubject(
         var similarSchoolData = ((await repository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.URN, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
+                ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var similarSchools = similarSchoolUrns

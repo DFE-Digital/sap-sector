@@ -1,10 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Rules;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Services;
 
@@ -14,7 +14,7 @@ namespace SAPSec.Core.Services;
 /// </summary>
 public sealed class SchoolDetailsService : ISchoolDetailsService
 {
-    private readonly IEstablishmentRepository _establishmentRepository;
+    private readonly IEstablishmentStore _establishmentRepository;
     private readonly ILogger<SchoolDetailsService> _logger;
 
     // Rules instantiated directly - they are stateless pure functions
@@ -25,7 +25,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
     private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
 
     public SchoolDetailsService(
-        IEstablishmentRepository establishmentRepository,
+        IEstablishmentStore establishmentRepository,
         ILogger<SchoolDetailsService> logger)
     {
         _establishmentRepository = establishmentRepository;

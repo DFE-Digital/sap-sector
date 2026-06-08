@@ -1,16 +1,16 @@
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;
 
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,
-    IEstablishmentRepository _establishmentRepository,
+    IEstablishmentStore _establishmentRepository,
     IFeatureFlagService _featureFlagService) : ISchoolSearchService
 {
     private const int MaxResults = 1000;

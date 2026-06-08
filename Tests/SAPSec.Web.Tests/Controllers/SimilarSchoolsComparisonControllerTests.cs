@@ -2,17 +2,15 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
@@ -23,11 +21,11 @@ namespace SAPSec.Web.Tests.Controllers;
 
 public class SimilarSchoolsComparisonControllerTests
 {
-    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
-    private readonly Mock<IAbsenceRepository> _absenceRepositoryMock = new();
-    private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
-    private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock = new();
+    private readonly Mock<IEstablishmentStore> _establishmentRepositoryMock = new();
+    private readonly Mock<ISimilarSchoolsSecondaryStore> _repoMock = new();
+    private readonly Mock<IAbsenceStore> _absenceRepositoryMock = new();
+    private readonly Mock<IKs4PerformanceStore> _ks4PerformanceRepositoryMock = new();
+    private readonly Mock<IKs4DestinationsStore> _ks4DestinationsRepositoryMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
     private readonly SimilarSchoolsComparisonController _sut;
 
