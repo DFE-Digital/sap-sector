@@ -268,11 +268,8 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
         })
     </script>
     <script src="/js/site.js" asp-append-version="true"></script>
-    
-   @*  @if (environment.IsProduction())
-    { *@
-        <script src="/js/custom-event-tracking.js" asp-append-version="true"></script>                
-    @* } *@
+    <script src="/js/custom-event-tracking.js" asp-append-version="true"></script>                
+
 
     @await RenderSectionAsync("scripts", false)
 

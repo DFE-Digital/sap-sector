@@ -121,6 +121,9 @@ public class Program
                 options.RequestFilter = ctx =>
                     ctx.Request.Path != "/healthcheck";
             });
+        } else
+        {
+            builder.Services.AddFakeDfeAnalytics();
         }
 
         builder.Services.AddDistributedMemoryCache();
@@ -254,10 +257,6 @@ public class Program
         {
             app.UseDfeAnalytics();
         }
-
-            //move into above
-            app.MapCustomEventTracking();
-        //}
 
         app.MapControllers();
         app.MapRazorPages();

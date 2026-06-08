@@ -7,6 +7,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Services;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Formatters;
+using SAPSec.Web.Services;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Web.Extensions;
@@ -18,6 +19,7 @@ public static class DependenciesExtensions
     {
         services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
         services.AddScoped<ISchoolSearchService, SchoolSearchService>();
+        services.AddScoped<ICustomEventService, CustomEventService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
         // Use cases

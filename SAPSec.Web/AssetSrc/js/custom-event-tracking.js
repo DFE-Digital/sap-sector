@@ -8,10 +8,20 @@
                 Text: link.innerText.trim()
             };
 
-            fetch('/custom-event-tracking', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
+        fetch('/custom-event-tracking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Request failed with status " + response.status);
+                }
+                return response.json();
             });
+            // }).then(data => {
+            //     // Safe redirection handled by the browser context
+            //     window.location.href = data.url;
+            // });
     });
 })();
