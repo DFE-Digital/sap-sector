@@ -12,9 +12,14 @@ namespace SAPSec.Web.Controllers;
 public class CustomEventController(ICustomEventService customEventService) : Controller
 {
     const string FeedbackFormPrefix = "https://forms.cloud.microsoft";
-    const string ServiceUrlPrefix = "https://localhost:44300";
-    const string SignInPrefix = "https://localhost:44300/auth/signin";
+    const string ServiceUrlPrefix = "https://get-school-improvement-insights-pr-240.test.teacherservices.cloud";
+    const string SignInPrefix = "https://get-school-improvement-insights-pr-240.test.teacherservices.cloud/auth/signin";
     const string MailToPrefix = "mailto:";
+
+    //const string FeedbackFormPrefix = "https://forms.cloud.microsoft";
+    //const string ServiceUrlPrefix = "https://localhost:44300";
+    //const string SignInPrefix = "https://localhost:44300/auth/signin";
+    //const string MailToPrefix = "mailto:";
 
     const string InboundLinkPattern = @"(?<=#).*$";
     const string OverviewPagePattern = $"^{ServiceUrlPrefix}/school/\\d+$";
