@@ -17,7 +17,7 @@
             if (!response.ok) {
                 throw new Error("Request failed with status " + response.status);
             }
-            Console.log("Event tracked successfully");
+            console.log("Event tracked successfully");
             //return response.json();
         });
             // }).then(data => {
