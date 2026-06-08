@@ -88,7 +88,8 @@ internal class Program
             jsonDir,
             generatedJsonDir,
             sqlFiles,
-            logicalKeysToRebuild
+            logicalKeysToRebuild,
+            rebuildAllRawTables
         ).Run();
 
         // -------------------------------------------------
@@ -108,7 +109,8 @@ internal class Program
             sqlDir,
             generatedJsonDir,
             sqlFiles,
-            logicalKeysToRebuild
+            logicalKeysToRebuild,
+            rebuildAllRawTables
         ).Run();
 
         // -------------------------------------------------

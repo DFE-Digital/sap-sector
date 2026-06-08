@@ -11,6 +11,7 @@ public sealed class GenerateSimilarSchoolsViews
     private readonly string _generatedJsonDir;
     private readonly List<string> _sqlFiles;
     private readonly HashSet<string> _rawTableNamesToRebuild;
+    private readonly bool _rebuildAllRawTables;
 
     private sealed record ViewSpec(
         string ViewName,
@@ -33,13 +34,15 @@ public sealed class GenerateSimilarSchoolsViews
         string sqlDir,
         string generatedJsonDir,
         List<string> sqlFiles,
-        IEnumerable<string>? logicalKeysToRebuild = null)
+        IEnumerable<string>? logicalKeysToRebuild = null,
+        bool rebuildAllRawTables = false)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
         _generatedJsonDir = generatedJsonDir;
         _sqlFiles = sqlFiles;
+        _rebuildAllRawTables = rebuildAllRawTables;
         _rawTableNamesToRebuild = new HashSet<string>(
             (logicalKeysToRebuild ?? Array.Empty<string>())
                 .Select(GenerateRawTables.GenerateShortTableName),
@@ -100,6 +103,9 @@ public sealed class GenerateSimilarSchoolsViews
 
     private bool ShouldRebuildView(List<DataMapRow> rows, Dictionary<string, string> tableMap)
     {
+        if (_rebuildAllRawTables)
+            return true;
+
         if (_rawTableNamesToRebuild.Count == 0)
             return false;
 

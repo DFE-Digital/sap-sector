@@ -14,6 +14,7 @@ public sealed class GenerateViews
     private readonly string _generatedJsonDir;
     private readonly List<string> _sqlFiles;
     private readonly HashSet<string> _rawTableNamesToRebuild;
+    private readonly bool _rebuildAllRawTables;
 
     // raw_sources.json path in repo
     private static readonly string[] RawSourcesCandidates =
@@ -77,7 +78,8 @@ public sealed class GenerateViews
         string jsonDir,
         string generatedJsonDir,
         List<string> sqlFiles,
-        IEnumerable<string>? logicalKeysToRebuild = null)
+        IEnumerable<string>? logicalKeysToRebuild = null,
+        bool rebuildAllRawTables = false)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
@@ -85,6 +87,7 @@ public sealed class GenerateViews
         _jsonDir = jsonDir;
         _generatedJsonDir = generatedJsonDir;
         _sqlFiles = sqlFiles;
+        _rebuildAllRawTables = rebuildAllRawTables;
         _rawTableNamesToRebuild = new HashSet<string>(
             (logicalKeysToRebuild ?? Array.Empty<string>())
                 .Select(GenerateRawTables.GenerateShortTableName),
@@ -465,6 +468,9 @@ public sealed class GenerateViews
         List<RawSource> sources,
         string viewName)
     {
+        if (_rebuildAllRawTables)
+            return true;
+
         if (_rawTableNamesToRebuild.Count == 0)
             return false;
 
@@ -532,6 +538,9 @@ public sealed class GenerateViews
         Dictionary<string, string> tableMap,
         bool rebuildEstablishmentDependentViews)
     {
+        if (_rebuildAllRawTables)
+            return true;
+
         if (_rawTableNamesToRebuild.Count == 0)
             return false;
 
