@@ -1,24 +1,23 @@
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data.Store;
 using System.Globalization;
 
 namespace SAPSec.Core.Features.Attendance.UseCases;
 
 public class GetAttendanceMeasures(
-    IAbsenceRepository repository,
-    IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
+    IAbsenceStore repository,
+    IEstablishmentStore establishmentStore,
+    ISimilarSchoolsSecondaryStore similarSchoolsStore)
 {
     public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
     {
-        var establishment = await establishmentRepository.GetEstablishmentAsync(request.Urn);
+        var establishment = await establishmentStore.GetEstablishmentAsync(request.Urn);
         if (establishment is null)
         {
             throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
 
         var data = await repository.GetByUrnAsync(request.Urn);
-        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.Urn))
+        var similarSchoolUrns = (await similarSchoolsStore.GetSimilarSchoolsGroupAsync(request.Urn))
             .Select(x => x.NeighbourURN)
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
@@ -30,9 +29,9 @@ public class GetAttendanceMeasures(
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var similarSchoolDetails = similarSchoolUrns.Length == 0
-            ? Array.Empty<SAPSec.Core.Model.Generated.Establishment>()
-            : (await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>();
+            ? Array.Empty<SAPSec.Data.Dto.Establishment>()
+            : (await establishmentStore.GetEstablishmentsAsync(similarSchoolUrns))
+                ?? Array.Empty<SAPSec.Data.Dto.Establishment>();
         var similarSchoolDetailsByUrn = similarSchoolDetails
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
@@ -159,7 +158,7 @@ public class GetAttendanceMeasures(
     }
 
     private static IReadOnlyList<AttendanceTopPerformer> BuildTopPerformers(
-        SAPSec.Core.Model.Generated.Establishment currentSchool,
+        SAPSec.Data.Dto.Establishment currentSchool,
         decimal? currentSchoolValue,
         IEnumerable<SimilarSchoolAttendanceMeasure> similarSchools,
         Func<SimilarSchoolAttendanceMeasure, decimal?> selector)

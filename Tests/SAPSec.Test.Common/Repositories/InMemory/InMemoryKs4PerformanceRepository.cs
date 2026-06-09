@@ -1,9 +1,9 @@
-﻿using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Model.Generated;
+﻿using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Test.Common.Repositories.InMemory;
 
-public class InMemoryKs4PerformanceRepository : IKs4PerformanceRepository
+public class InMemoryKs4PerformanceStore : IKs4PerformanceStore
 {
     private List<EstablishmentPerformance> _establishment = new();
     private List<LAPerformance> _la = new();

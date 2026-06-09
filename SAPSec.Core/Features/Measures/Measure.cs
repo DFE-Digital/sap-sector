@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Measures;
 

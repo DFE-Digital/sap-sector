@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
 
@@ -18,7 +18,7 @@ public class JsonFileTests : IDisposable
 
     public JsonFileTests()
     {
-        // JSONRepository uses AppContext.BaseDirectory + "Data/Files/Generated"
+        // JSONStore uses AppContext.BaseDirectory + "Data/Files/Generated"
         _dataDir = Path.Combine(AppContext.BaseDirectory, "Data");
         _filesDir = Path.Combine(_dataDir, "Files", "Generated");
         Directory.CreateDirectory(_filesDir);

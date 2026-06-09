@@ -1,6 +1,6 @@
 using Moq;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
 
@@ -10,7 +10,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesEntry>> _valuesRepo = new();
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>> _standardDeviationsRepo = new();
 
-    private JsonSimilarSchoolsSecondaryRepository CreateSut() =>
+    private JsonSimilarSchoolsSecondaryStore CreateSut() =>
         new(
             _groupsRepo.Object,
             _valuesRepo.Object,

@@ -1,9 +1,9 @@
-﻿using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Model.Generated;
+﻿using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Test.Common.Repositories.InMemory;
 
-public class InMemoryAbsenceRepository : IAbsenceRepository
+public class InMemoryAbsenceStore : IAbsenceStore
 {
     private List<EstablishmentAbsence> _establishment = new();
     private List<LAAbsence> _la = new();

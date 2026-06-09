@@ -27,6 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Data\SAPSec.Data.Json\SAPSec.Data.Json.csproj" />
+    <ProjectReference Include="..\..\Data\SAPSec.Data.PostgreSql\SAPSec.Data.PostgreSql.csproj" />
     <ProjectReference Include="..\..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
     <ProjectReference Include="..\SAPSec.Test.Common\SAPSec.Test.Common.csproj" />
   </ItemGroup>

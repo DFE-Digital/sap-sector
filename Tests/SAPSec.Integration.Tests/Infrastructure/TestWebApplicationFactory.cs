@@ -4,14 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Infrastructure.Json;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Json;
+using SAPSec.Data.Store;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
 
@@ -69,11 +66,11 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IUserService, MockDsiUserService>();
                 services.AddScoped<IDsiClient, MockDsiApiService>();
 
-                services.RemoveAll<IEstablishmentRepository>();
-                services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
-                services.RemoveAll<IKs4PerformanceRepository>();
-                services.RemoveAll<IKs4DestinationsRepository>();
-                services.RemoveAll<IAbsenceRepository>();
+                services.RemoveAll<IEstablishmentStore>();
+                services.RemoveAll<ISimilarSchoolsSecondaryStore>();
+                services.RemoveAll<IKs4PerformanceStore>();
+                services.RemoveAll<IKs4DestinationsStore>();
+                services.RemoveAll<IAbsenceStore>();
 
                 // JSON files
                 services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
@@ -92,11 +89,11 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
                 services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
 
-                services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
-                services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-                services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
-                services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
-                services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
+                services.AddSingleton<IEstablishmentStore, JsonEstablishmentStore>();
+                services.AddSingleton<ISimilarSchoolsSecondaryStore, JsonSimilarSchoolsSecondaryStore>();
+                services.AddSingleton<IKs4PerformanceStore, JsonKs4PerformanceStore>();
+                services.AddSingleton<IKs4DestinationsStore, JsonKs4DestinationsStore>();
+                services.AddSingleton<IAbsenceStore, JsonAbsenceStore>();
             });
     }
 

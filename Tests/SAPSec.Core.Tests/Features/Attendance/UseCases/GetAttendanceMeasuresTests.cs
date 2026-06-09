@@ -2,8 +2,8 @@ using Moq;
 using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Store;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Features.Attendance.UseCases;
 
@@ -12,9 +12,9 @@ public class GetAttendanceMeasuresTests
     [Fact]
     public async Task Execute_WhenSchoolMissing_ThrowsNotFoundException()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("999999"))
@@ -34,9 +34,9 @@ public class GetAttendanceMeasuresTests
     [Fact]
     public async Task Execute_WhenDataExists_MapsOverallAndPersistentValues()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -151,9 +151,9 @@ public class GetAttendanceMeasuresTests
     [Fact]
     public async Task Execute_WhenRepositoryReturnsNull_ReturnsNullMeasures()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -187,9 +187,9 @@ public class GetAttendanceMeasuresTests
     [Fact]
     public async Task Execute_WhenAnyYearMissing_ThreeYearAverageIsNull()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
         establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))

@@ -4,8 +4,8 @@
 //using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 //using SAPSec.Core.Features.Ks4HeadlineMeasures;
 //using SAPSec.Core.Features.SimilarSchools;
-//using SAPSec.Core.Interfaces.Repositories;
-//using SAPSec.Core.Model.Generated;
+//using SAPSec.Data.Store;
+//using SAPSec.Data.Dto;
 //using SAPSec.Core.Services;
 
 //namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;
@@ -56,9 +56,9 @@
 
 //    private sealed class TestContext
 //    {
-//        private readonly Mock<IKs4PerformanceRepository> _repositoryMock = new();
-//        private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
-//        private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
+//        private readonly Mock<IKs4PerformanceStore> _repositoryMock = new();
+//        private readonly Mock<IEstablishmentStore> _establishmentRepositoryMock = new();
+//        private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsRepositoryMock = new();
 
 //        public TestContext()
 //        {

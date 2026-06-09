@@ -32,6 +32,7 @@
 	</ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Data\SAPSec.Data.PostgreSql\SAPSec.Data.PostgreSql.csproj" />
     <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
     <ProjectReference Include="..\SAPSec.Infrastructure\SAPSec.Infrastructure.csproj" />
   </ItemGroup>

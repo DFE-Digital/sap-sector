@@ -3,7 +3,7 @@
 //using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 //using SAPSec.Core.Interfaces.Services;
 //using SAPSec.Core.Model;
-//using SAPSec.Core.Model.Generated;
+//using SAPSec.Data.Dto;
 
 //namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
 
@@ -13,8 +13,8 @@
 //    public async Task Execute_WhenDataExists_ReturnsThreeYearAverages()
 //    {
 //        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-//        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-//        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+//        var performanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+//        var destinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
 
 //        schoolDetailsServiceMock
 //            .Setup(x => x.GetByUrnAsync("123456"))
@@ -65,8 +65,8 @@
 //    public async Task Execute_WhenSchoolMissing_ThrowsNotFoundException()
 //    {
 //        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-//        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-//        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+//        var performanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+//        var destinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
 
 //        schoolDetailsServiceMock
 //            .Setup(x => x.GetByUrnAsync("999999"))
@@ -83,8 +83,8 @@
 //    public async Task Execute_WhenLaAndEnglandContainNonNumericValues_TreatsValuesAsMissing()
 //    {
 //        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-//        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-//        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+//        var performanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+//        var destinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
 
 //        schoolDetailsServiceMock
 //            .Setup(x => x.GetByUrnAsync("123456"))
@@ -134,8 +134,8 @@
 //    public async Task Execute_WhenRepositoryReturnsNullData_ReturnsResponseWithNullMeasures()
 //    {
 //        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-//        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-//        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+//        var performanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+//        var destinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
 
 //        schoolDetailsServiceMock
 //            .Setup(x => x.GetByUrnAsync("123456"))
@@ -183,8 +183,8 @@
 //    public async Task Execute_WhenDestinationsDataExists_ReturnsDestinationMeasures()
 //    {
 //        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-//        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-//        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+//        var performanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+//        var destinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
 
 //        schoolDetailsServiceMock
 //            .Setup(x => x.GetByUrnAsync("123456"))
@@ -263,8 +263,8 @@
 //    public async Task Execute_WhenDestinationsContainNullAndNonNumericValues_TreatsValuesAsMissing()
 //    {
 //        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-//        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-//        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+//        var performanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+//        var destinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
 
 //        schoolDetailsServiceMock
 //            .Setup(x => x.GetByUrnAsync("123456"))
@@ -343,8 +343,8 @@
 //    public async Task Execute_WhenDataContainsMixedNumericAndStringValues_MapsAllResponseProperties()
 //    {
 //        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-//        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-//        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+//        var performanceRepositoryMock = new Mock<IKs4PerformanceStore>();
+//        var destinationsRepositoryMock = new Mock<IKs4DestinationsStore>();
 
 //        schoolDetailsServiceMock
 //            .Setup(x => x.GetByUrnAsync("123456"))

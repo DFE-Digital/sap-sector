@@ -1,18 +1,18 @@
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data.Store;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 
 public class GetSchoolKs4CoreSubjects(
-    IKs4PerformanceRepository performanceRepository,
+    IKs4PerformanceStore performanceStore,
     ISchoolDetailsService schoolDetailsService,
-    IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
+    IEstablishmentStore establishmentStore,
+    ISimilarSchoolsSecondaryStore similarSchoolsStore)
 {
     public async Task<GetSchoolKs4CoreSubjectsResponse> Execute(GetSchoolKs4CoreSubjectsRequest request)
     {
@@ -20,17 +20,17 @@ public class GetSchoolKs4CoreSubjects(
         var schoolData = new SchoolData(
             request.Urn,
             schoolDetails.Name,
-            await performanceRepository.GetByUrnAsync(request.Urn),
+            await performanceStore.GetByUrnAsync(request.Urn),
             null);
 
-        var similarSchoolUrns = (await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.Urn))
+        var similarSchoolUrns = (await similarSchoolsStore.GetSimilarSchoolsGroupAsync(request.Urn))
             .Select(g => g.NeighbourURN)
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var similarSchoolData = ((await performanceRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
+        var similarSchoolData = ((await performanceStore.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.URN, x => x, StringComparer.Ordinal);
-        var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
+        var similarSchoolDetails = ((await establishmentStore.GetEstablishmentsAsync(similarSchoolUrns))
                 ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);

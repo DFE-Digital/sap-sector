@@ -1,14 +1,14 @@
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Store;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 
 public class SchoolSearchServiceTests
 {
     private readonly Mock<ISchoolSearchIndexReader> _indexReaderMock = new();
-    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
+    private readonly Mock<IEstablishmentStore> _establishmentRepositoryMock = new();
     private readonly SchoolSearchService _sut;
 
     public SchoolSearchServiceTests()

@@ -1,13 +1,13 @@
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 using SAPSec.Test.Common.Repositories.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
 public class GetCharacteristicsComparisonTests
 {
-    private readonly InMemorySimilarSchoolsSecondaryRepository _repo = new();
+    private readonly InMemorySimilarSchoolsSecondaryStore _repo = new();
 
     private GetCharacteristicsComparison CreateSut() => new(_repo);
 

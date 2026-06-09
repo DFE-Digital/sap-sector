@@ -1,9 +1,9 @@
-﻿using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model.Generated;
+﻿using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Test.Common.Repositories.InMemory;
 
-public class InMemorySimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
+public class InMemorySimilarSchoolsSecondaryStore : ISimilarSchoolsSecondaryStore
 {
     private List<SimilarSchoolsSecondaryGroupsEntry> _groups = new();
     private List<SimilarSchoolsSecondaryValuesEntry> _values = new();
