@@ -1,6 +1,6 @@
 ﻿using Moq;
-using SAPSec.Core.SchoolDetails;
-using SAPSec.Core.SimilarSchools;
+using SAPSec.Core.School.Details;
+using SAPSec.Core.School.Similarity;
 using SAPSec.Test.Common.Repositories.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
@@ -109,7 +109,7 @@ public class GetSimilarSchoolDetailsTests
     {
     }
 
-    private SchoolDetails.SchoolDetails SchoolDetails(string urn, Func<SchoolDetailsBuilder, SchoolDetailsBuilder> build = null)
+    private School.Details.SchoolDetails SchoolDetails(string urn, Func<SchoolDetailsBuilder, SchoolDetailsBuilder> build = null)
     {
         build ??= b => b;
         var builder = new SchoolDetailsBuilder(urn);

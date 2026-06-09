@@ -1,5 +1,5 @@
 ﻿using FluentAssertions;
-using SAPSec.Core.SchoolSearch;
+using SAPSec.Core.School.Search;
 using SAPSec.Integration.Tests.Infrastructure;
 using System.Net;
 using System.Text.Json;

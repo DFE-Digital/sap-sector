@@ -1,4 +1,4 @@
-using SAPSec.Core.SimilarSchools;
+using SAPSec.Core.School.Similarity;
 using SAPSec.Web.ViewModels.Measures;
 using System.Globalization;
 

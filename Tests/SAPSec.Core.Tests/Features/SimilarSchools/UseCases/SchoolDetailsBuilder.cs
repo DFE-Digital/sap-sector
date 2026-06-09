@@ -1,5 +1,5 @@
 ﻿using SAPSec.Core.DataPoints;
-using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
@@ -13,9 +13,9 @@ public class SchoolDetailsBuilder(string urn)
         return this;
     }
 
-    public SchoolDetails.SchoolDetails Build()
+    public SchoolDetails Build()
     {
-        return new SchoolDetails.SchoolDetails
+        return new SchoolDetails
         {
             Urn = urn,
             Name = _name ?? "",

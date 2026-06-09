@@ -1,5 +1,5 @@
 using SAPSec.Core.Exceptions;
-using SAPSec.Core.SimilarSchools;
+using SAPSec.Core.School.Similarity;
 using SAPSec.Data.Dto;
 using SAPSec.Test.Common.Repositories.InMemory;
 

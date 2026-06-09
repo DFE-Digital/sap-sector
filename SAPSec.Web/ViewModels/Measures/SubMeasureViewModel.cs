@@ -1,5 +1,5 @@
 using SAPSec.Core.Measures;
-using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.School.Info;
 using SAPSec.Web.Constants;
 using System.Globalization;
 

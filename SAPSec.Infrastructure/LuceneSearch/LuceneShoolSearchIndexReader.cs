@@ -1,6 +1,6 @@
 ﻿using Lucene.Net.Index;
 using Lucene.Net.Search;
-using SAPSec.Core.SchoolSearch;
+using SAPSec.Core.School.Search;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 

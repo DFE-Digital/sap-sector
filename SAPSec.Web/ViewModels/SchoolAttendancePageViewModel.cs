@@ -1,4 +1,4 @@
-using SAPSec.Core.Attendance;
+using SAPSec.Core.School.Attendance;
 using System.Globalization;
 
 namespace SAPSec.Web.ViewModels;

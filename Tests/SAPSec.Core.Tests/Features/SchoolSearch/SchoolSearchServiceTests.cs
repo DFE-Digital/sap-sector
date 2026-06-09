@@ -1,7 +1,7 @@
 using Moq;
 using SAPSec.Data.Store;
 using SAPSec.Data.Dto;
-using SAPSec.Core.SchoolSearch;
+using SAPSec.Core.School.Search;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 

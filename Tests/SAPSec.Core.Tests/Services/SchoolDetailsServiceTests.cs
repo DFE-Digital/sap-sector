@@ -2,7 +2,7 @@
 using Moq;
 using SAPSec.Core.DataPoints;
 using SAPSec.Core.Exceptions;
-using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.School.Details;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Store;
 

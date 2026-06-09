@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using SAPSec.Core.DataPoints;
-using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.School.Details;
 using SAPSec.Web.Helpers;
 using Xunit;
 

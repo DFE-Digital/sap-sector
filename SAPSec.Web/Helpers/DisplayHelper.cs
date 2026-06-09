@@ -1,5 +1,5 @@
 ﻿using SAPSec.Core.DataPoints;
-using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Web.Helpers;
 

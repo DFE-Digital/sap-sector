@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.SimilarSchools;
+﻿using SAPSec.Core.School.Similarity;
 using SAPSec.Core.Sorting;
 using SAPSec.Core.Validation;
 

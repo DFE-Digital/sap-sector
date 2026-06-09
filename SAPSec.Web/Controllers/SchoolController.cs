@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Attendance;
-using SAPSec.Core.Ks4CoreSubjects;
-using SAPSec.Core.Ks4HeadlineMeasures;
 using SAPSec.Core.Measures;
-using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.School.Attendance;
+using SAPSec.Core.School.Details;
+using SAPSec.Core.School.Info;
+using SAPSec.Core.School.Secondary.Ks4CoreSubjects;
+using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;

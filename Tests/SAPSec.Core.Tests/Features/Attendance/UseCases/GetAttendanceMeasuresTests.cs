@@ -1,6 +1,6 @@
 using Moq;
-using SAPSec.Core.Attendance;
 using SAPSec.Core.Exceptions;
+using SAPSec.Core.School.Attendance;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Store;
 

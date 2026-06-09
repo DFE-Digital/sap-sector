@@ -20,8 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Primary\" />
-    <Folder Include="Secondary\" />
+    <Folder Include="School\Primary\" />
   </ItemGroup>
 
 </Project>
