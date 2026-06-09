@@ -57,7 +57,7 @@ public class CustomEventController(ICustomEventService customEventService) : Con
             await customEventService.SendCustomEvent(clickData, "inbound_link_click");
         }
 
-        await customEventService.IgnoreWebRequestEvent();
+        //await customEventService.IgnoreWebRequestEvent();
 
         return Ok();
     }
