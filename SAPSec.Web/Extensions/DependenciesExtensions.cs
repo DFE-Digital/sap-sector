@@ -1,9 +1,9 @@
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4CoreSubjects;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Attendance;
+using SAPSec.Core.Ks4CoreSubjects;
+using SAPSec.Core.Ks4HeadlineMeasures;
+using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.SchoolSearch;
+using SAPSec.Core.SimilarSchools;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Formatters;
 using System.Diagnostics.CodeAnalysis;

@@ -6,12 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Authentication;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Json;
 using SAPSec.Data.Store;
-using SAPSec.UI.Tests.Mocks;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
 
@@ -72,7 +70,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
                 services.AddSingleton<IJsonFile<EnglandAbsence>, JsonFile<EnglandAbsence>>();
                 services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
-                services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
 
                 services.AddSingleton<IEstablishmentStore, JsonEstablishmentStore>();
                 services.AddSingleton<ISimilarSchoolsSecondaryStore, JsonSimilarSchoolsSecondaryStore>();

@@ -1,12 +1,11 @@
-using System.Security.Cryptography;
-using System.Text;
-using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
-using SAPSec.Core.Configuration;
-using SAPSec.Core.Services;
+using SAPSec.Core.Authentication;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 namespace SAPSec.Core.Tests.Services;
 

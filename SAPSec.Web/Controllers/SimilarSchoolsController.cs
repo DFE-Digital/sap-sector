@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;

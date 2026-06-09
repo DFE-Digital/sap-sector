@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4CoreSubjects;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Model;
+using SAPSec.Core.Attendance;
+using SAPSec.Core.DataPoints;
+using SAPSec.Core.Ks4CoreSubjects;
+using SAPSec.Core.Ks4HeadlineMeasures;
+using SAPSec.Core.SchoolDetails;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Store;
 using SAPSec.Web.Controllers;

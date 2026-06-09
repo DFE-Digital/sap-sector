@@ -1,5 +1,5 @@
-using SAPSec.Core.Features;
-using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Measures;
+using SAPSec.Core.SchoolDetails;
 
 namespace SAPSec.Web.ViewModels.Measures;
 

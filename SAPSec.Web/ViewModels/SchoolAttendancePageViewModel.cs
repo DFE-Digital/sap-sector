@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Attendance;
 using System.Globalization;
 
 namespace SAPSec.Web.ViewModels;

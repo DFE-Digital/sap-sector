@@ -1,10 +1,10 @@
 //using Microsoft.Extensions.Logging;
 //using Moq;
-//using SAPSec.Core.Features.Geography;
-//using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-//using SAPSec.Core.Features.Ks4HeadlineMeasures;
-//using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-//using SAPSec.Core.Features.SimilarSchools;
+//using SAPSec.Core.Geography;
+//using SAPSec.Core.Ks4CoreSubjects.UseCases;
+//using SAPSec.Core.Ks4HeadlineMeasures;
+//using SAPSec.Core.Ks4HeadlineMeasures.UseCases;
+//using SAPSec.Core.SimilarSchools;
 //using SAPSec.Data.Store;
 //using SAPSec.Data.Dto;
 //using SAPSec.Core.Services;

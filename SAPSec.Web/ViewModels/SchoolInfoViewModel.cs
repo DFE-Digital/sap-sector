@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features;
+﻿using SAPSec.Core.SchoolDetails;
 
 namespace SAPSec.Web.ViewModels;
 

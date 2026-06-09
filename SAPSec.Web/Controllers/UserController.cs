@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Authentication;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Controllers;

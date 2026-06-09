@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Data.Store;
-using SAPSec.Core.Model;
+using SAPSec.Core.DataPoints;
+using SAPSec.Core.Exceptions;
+using SAPSec.Core.SchoolDetails;
 using SAPSec.Data.Dto;
-using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Services;
 

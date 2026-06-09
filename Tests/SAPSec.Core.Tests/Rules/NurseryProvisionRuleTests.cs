@@ -1,6 +1,6 @@
-﻿using SAPSec.Core.Model;
-using SAPSec.Data.Dto;
-using SAPSec.Core.Rules;
+﻿using SAPSec.Data.Dto;
+using SAPSec.Core.SchoolDetails;
+using SAPSec.Core.DataPoints;
 
 namespace SAPSec.Core.Tests.Rules;
 

@@ -1,5 +1,5 @@
 ﻿using SAPSec.Data.Dto;
-using SAPSec.Core.Rules;
+using SAPSec.Core.SchoolDetails;
 
 namespace SAPSec.Core.Tests.Rules;
 

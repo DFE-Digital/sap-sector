@@ -1,5 +1,6 @@
-﻿using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.DataPoints;
+using SAPSec.Core.Exceptions;
+using SAPSec.Core.SimilarSchools;
 using SAPSec.Test.Common.Repositories.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;

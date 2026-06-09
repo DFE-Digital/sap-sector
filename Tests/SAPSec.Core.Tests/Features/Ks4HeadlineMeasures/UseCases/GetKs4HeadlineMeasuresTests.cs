@@ -1,6 +1,6 @@
 //using Moq;
-//using SAPSec.Core.Features.Ks4HeadlineMeasures;
-//using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+//using SAPSec.Core.Ks4HeadlineMeasures;
+//using SAPSec.Core.Ks4HeadlineMeasures.UseCases;
 //using SAPSec.Core.Interfaces.Services;
 //using SAPSec.Core.Model;
 //using SAPSec.Data.Dto;

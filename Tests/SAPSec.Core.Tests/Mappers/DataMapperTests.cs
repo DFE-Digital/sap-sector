@@ -1,5 +1,4 @@
-﻿using SAPSec.Core.Mappers;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.DataPoints;
 using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Mappers;

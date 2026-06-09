@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
-using SAPSec.Core.Configuration;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Core.Authentication;
 
 namespace SAPSec.Web.Tests.Controllers;
 

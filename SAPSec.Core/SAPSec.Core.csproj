@@ -7,22 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Model\KS4\**" />
-    <Compile Remove="Model\Search\**" />
-    <Compile Remove="UseCases\**" />
-    <EmbeddedResource Remove="Model\KS4\**" />
-    <EmbeddedResource Remove="Model\Search\**" />
-    <EmbeddedResource Remove="UseCases\**" />
-    <None Remove="Model\KS4\**" />
-    <None Remove="Model\Search\**" />
-    <None Remove="UseCases\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Model\Establishment.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="IeuanWalker.GeoUK" Version="1.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
@@ -33,6 +17,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Data\SAPSec.Data\SAPSec.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Primary\" />
+    <Folder Include="Secondary\" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 //using Moq;
-//using SAPSec.Core.Features.Ks4HeadlineMeasures;
-//using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-//using SAPSec.Core.Features.SimilarSchools;
+//using SAPSec.Core.Ks4HeadlineMeasures;
+//using SAPSec.Core.Ks4HeadlineMeasures.UseCases;
+//using SAPSec.Core.SimilarSchools;
 //using SAPSec.Data.Store;
 //using SAPSec.Core.Interfaces.Services;
 //using SAPSec.Core.Model;

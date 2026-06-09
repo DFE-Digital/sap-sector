@@ -1,5 +1,5 @@
-﻿using SAPSec.Core.Features.SchoolDetails;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.DataPoints;
+using SAPSec.Core.SchoolDetails;
 
 namespace SAPSec.Web.ViewModels;
 
