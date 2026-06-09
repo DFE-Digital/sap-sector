@@ -39,8 +39,7 @@
                 minor: 1
             },
             axis: {
-                grace: '5%',
-                breakRatio: 0.15
+                grace: '5%'
             },
             series: {
                 tension: 0.2,
@@ -96,90 +95,6 @@
     };
 
     const charts = {};
-
-    function registerBrokenLinearScale() {
-        if (!window.Chart || window.__appBrokenLinearScaleRegistered) {
-            return;
-        }
-
-        class BrokenLinearScale extends Chart.LinearScale {
-            static id = 'brokenLinear';
-
-            static defaults = {
-                ...Chart.LinearScale.defaults,
-                breakStart: null,
-                breakRatio: CHART_CONFIG.line.axis.breakRatio
-            };
-
-            getPixelForValue(value) {
-                if (this.isHorizontal()) {
-                    return super.getPixelForValue(value);
-                }
-
-                const numericValue = Number(value);
-                const min = Number(this.min);
-                const max = Number(this.max);
-                const breakStart = Number(this.options.breakStart);
-                const breakRatio = Number(this.options.breakRatio ?? CHART_CONFIG.line.axis.breakRatio);
-
-                if (!Number.isFinite(numericValue)
-                    || !Number.isFinite(min)
-                    || !Number.isFinite(max)
-                    || !Number.isFinite(breakStart)
-                    || breakStart <= min
-                    || breakStart >= max) {
-                    return super.getPixelForValue(value);
-                }
-
-                const totalHeight = this.bottom - this.top;
-                const lowerHeight = totalHeight * breakRatio;
-                const upperHeight = totalHeight - lowerHeight;
-
-                if (numericValue <= breakStart) {
-                    const lowerFraction = (numericValue - min) / Math.max(breakStart - min, 1e-6);
-                    return this.bottom - (lowerFraction * lowerHeight);
-                }
-
-                const upperFraction = (numericValue - breakStart) / Math.max(max - breakStart, 1e-6);
-                return (this.bottom - lowerHeight) - (upperFraction * upperHeight);
-            }
-
-            getValueForPixel(pixel) {
-                if (this.isHorizontal()) {
-                    return super.getValueForPixel(pixel);
-                }
-
-                const min = Number(this.min);
-                const max = Number(this.max);
-                const breakStart = Number(this.options.breakStart);
-                const breakRatio = Number(this.options.breakRatio ?? CHART_CONFIG.line.axis.breakRatio);
-
-                if (!Number.isFinite(min)
-                    || !Number.isFinite(max)
-                    || !Number.isFinite(breakStart)
-                    || breakStart <= min
-                    || breakStart >= max) {
-                    return super.getValueForPixel(pixel);
-                }
-
-                const totalHeight = this.bottom - this.top;
-                const lowerHeight = totalHeight * breakRatio;
-                const breakPixel = this.bottom - lowerHeight;
-
-                if (pixel >= breakPixel) {
-                    const lowerFraction = (this.bottom - pixel) / Math.max(lowerHeight, 1e-6);
-                    return min + (lowerFraction * (breakStart - min));
-                }
-
-                const upperHeight = totalHeight - lowerHeight;
-                const upperFraction = (breakPixel - pixel) / Math.max(upperHeight, 1e-6);
-                return breakStart + (upperFraction * (max - breakStart));
-            }
-        }
-
-        Chart.register(BrokenLinearScale);
-        window.__appBrokenLinearScaleRegistered = true;
-    }
 
     function gdsVars(canvas) {
         const s = getComputedStyle(canvas);
@@ -330,15 +245,7 @@
             : gdsStyles.text;
     }
 
-    function buildExplicitTicks(axisMin, axisMax, stepSize, tickValues) {
-        if (Array.isArray(tickValues) && tickValues.length) {
-            return function (axis) {
-                axis.ticks = tickValues.map(function (value) {
-                    return { value };
-                });
-            };
-        }
-
+    function buildExplicitTicks(axisMin, axisMax, stepSize) {
         if (axisMin === null || axisMax === null || !stepSize) {
             return undefined;
         }
@@ -412,37 +319,24 @@
             ? Math.max(Math.abs(rawMax) * 0.1, axisSuffix === '%' ? 2 : 1)
             : Math.max(range * 0.2, axisSuffix === '%' ? 2 : 1);
 
-        const zoomedMin = Math.max(0, rawMin - padding);
+        let min = rawMin - padding;
         let max = rawMax + padding;
 
         if (axisSuffix === '%') {
+            min = Math.max(0, min);
             max = Math.min(100, max);
         }
 
-        let step = getNiceStepSize(max - zoomedMin);
-        let clusteredMin = roundDownToStep(zoomedMin, step);
-        let clusteredMax = roundUpToStep(max, step);
-
-        if (clusteredMin === clusteredMax) {
-            clusteredMax = clusteredMin + (axisSuffix === '%' ? 4 : 2);
-            step = getNiceStepSize(clusteredMax - clusteredMin);
-            clusteredMin = roundDownToStep(clusteredMin, step);
-            clusteredMax = roundUpToStep(clusteredMax, step);
+        if (min === max) {
+            max = min + (axisSuffix === '%' ? 4 : 2);
         }
 
-        const tickValues = [0];
-        for (let value = clusteredMin; value <= clusteredMax; value += step) {
-            if (value > 0 && !tickValues.includes(value)) {
-                tickValues.push(value);
-            }
-        }
+        const step = getNiceStepSize(max - min);
 
         return {
-            min: 0,
-            max: clusteredMax,
-            step,
-            breakStart: clusteredMin,
-            tickValues
+            min: roundDownToStep(min, step),
+            max: roundUpToStep(max, step),
+            step
         };
     }
 
@@ -469,15 +363,15 @@
         const resolvedAxisMin = dynamicLineAxis ? dynamicLineAxis.min : axisMin;
         const resolvedAxisMax = dynamicLineAxis ? dynamicLineAxis.max : axisMax;
         const stepSize = dynamicLineAxis ? dynamicLineAxis.step : axisStep;
-        const tickValues = dynamicLineAxis ? dynamicLineAxis.tickValues : null;
         const axisTickCount = resolvedAxisMin !== null && resolvedAxisMax !== null && stepSize
             ? Math.floor((resolvedAxisMax - resolvedAxisMin) / stepSize) + 1
             : undefined;
-        const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize, tickValues);
+        const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize);
 
         const legendOptions = {
             display: showLegend,
             position: type === 'line' ? 'top' : CHART_CONFIG.legend.position,
+            align: type === 'line' ? 'start' : 'center',
             labels: {
                 usePointStyle: true,
                 pointStyle: CHART_CONFIG.legend.pointStyle,
@@ -502,12 +396,9 @@
                 },
                 scales: {
                     y: {
-                        type: dynamicLineAxis?.breakStart ? 'brokenLinear' : undefined,
                         beginAtZero: !dynamicLineAxis,
                         min: resolvedAxisMin ?? undefined,
                         max: resolvedAxisMax ?? undefined,
-                        breakStart: dynamicLineAxis?.breakStart ?? undefined,
-                        breakRatio: dynamicLineAxis?.breakStart ? CHART_CONFIG.line.axis.breakRatio : undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         afterBuildTicks: explicitTicks,
                         grid: {
@@ -547,7 +438,8 @@
                 plugins: {
                     tooltip: {
                         enabled: true,
-                        displayColors: false,
+                        displayColors: true,
+                        usePointStyle: true,
                         callbacks: {
                             title: function (contexts) {
                                 return contexts?.[0]?.label ?? '';
@@ -713,38 +605,6 @@
         }
     };
 
-    const brokenAxisMarkerPlugin = {
-        id: 'brokenAxisMarker',
-        afterDraw(chart) {
-            const yScale = chart.scales?.y;
-            if (!yScale || yScale.options?.type !== 'brokenLinear') {
-                return;
-            }
-
-            const breakStart = Number(yScale.options.breakStart);
-            if (!Number.isFinite(breakStart) || breakStart <= 0) {
-                return;
-            }
-
-            const y = yScale.getPixelForValue(breakStart);
-            const x = yScale.left + 8;
-            const ctx = chart.ctx;
-
-            ctx.save();
-            ctx.strokeStyle = '#0b0c0c';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(x - 4, y + 6);
-            ctx.lineTo(x + 2, y);
-            ctx.lineTo(x - 4, y - 6);
-            ctx.moveTo(x + 4, y + 6);
-            ctx.lineTo(x + 10, y);
-            ctx.lineTo(x + 4, y - 6);
-            ctx.stroke();
-            ctx.restore();
-        }
-    };
-
     function buildDatasets(type, chartData, colorConfig, barOptions) {
         if (type === 'line') {
             return chartData.datasets.map((ds, i) => {
@@ -831,8 +691,6 @@
     }
 
     function initCharts() {
-        registerBrokenLinearScale();
-
         document.querySelectorAll('.js-chart').forEach(canvas => {
             if (charts[canvas.id]) {
                 charts[canvas.id].destroy();
@@ -918,8 +776,7 @@
                     dynamicLineAxis),
                 plugins: [
                     ...(showDataLabels ? [ChartDataLabels] : []),
-                    noDataBarLabelsPlugin,
-                    brokenAxisMarkerPlugin
+                    noDataBarLabelsPlugin
                 ]
             };
 
