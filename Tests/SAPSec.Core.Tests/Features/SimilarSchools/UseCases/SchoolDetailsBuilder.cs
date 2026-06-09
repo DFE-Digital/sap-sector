@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 

@@ -1,4 +1,3 @@
-using SAPSec.Core.Model;
 using SAPSec.Web.ViewModels.Measures;
 using System.Globalization;
 
@@ -8,14 +7,14 @@ public record TopPerformerRow(int Rank, string Urn, string Name, decimal? Value,
 
 public class Ks4HeadlineMeasuresPageViewModel
 {
-    public required SchoolDetails SchoolDetails { get; set; }
+    public required SchoolInfoViewModel School { get; set; }
     public required int SimilarSchoolsCount { get; set; }
 
     public required MeasureViewModel Attainment8 { get; set; }
     public required MeasureViewModel EnglishAndMaths { get; set; }
     public required MeasureViewModel Destinations { get; set; }
 
-    public string SchoolLabel => SchoolDetails.Name;
+    public string SchoolLabel => School.Name;
     public string SimilarSchoolsLabel => $"Similar schools average";
     public string LocalAuthorityLabel => $"Local authority schools average";
     public string EnglandLabel => "Schools in England average";

@@ -1,5 +1,4 @@
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model;
 using SAPSec.Web.ViewModels.Measures;
 using System.Globalization;
 
@@ -26,7 +25,7 @@ public class SimilarSchoolsComparisonViewModel
             ? d.ToString("0.0", CultureInfo.InvariantCulture)
             : string.Empty;
 
-    public SchoolDetails? SimilarSchoolDetails { get; set; }
+    public SchoolDetailsViewModel? SimilarSchoolDetails { get; set; }
 
     // ----------------------------
     // Similarity (9 characteristics table)

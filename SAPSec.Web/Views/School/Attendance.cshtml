@@ -33,9 +33,9 @@
     };
     var chartColors = new[] { "#D53780", "#2a1950", "#2a1950", "#2a1950" };
     var lineChartColors = new[] { "#D53780", "#2a1950", "#5694CA", "#28A197" };
-    var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
+    var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.School.Urn });
+    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.School.Urn }) ?? $"/school/{Model.School.Urn}/view-similar-schools";
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.School.Urn, similarSchoolUrn }) ?? $"/school/{Model.School.Urn}/view-similar-schools/{similarSchoolUrn}";
 }
 
 <span class="govuk-caption-xl">@Model.SchoolName</span>
@@ -51,7 +51,7 @@
 </ul>
 
 <p class="govuk-body">
-    Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+    Find out <a href="/school/@Model.School.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
 
 <section aria-labelledby="attendance-heading" class="govuk-!-margin-top-9 app-ks4-attainment">
@@ -72,7 +72,7 @@
                     data-cell-prefixes='{"school":"school","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["school","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="attendance-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="/school/@Model.School.Urn/view-similar-schools">
                 <option value="overall" selected>Overall absence</option>
                 <option value="persistent">Persistent absence</option>
             </select>

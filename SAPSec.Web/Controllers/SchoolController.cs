@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features;
+using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Features.Ks4CoreSubjects;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
@@ -21,44 +21,50 @@ namespace SAPSec.Web.Controllers;
 [Authorize]
 public class SchoolController : Controller
 {
-    private readonly ISchoolDetailsService _schoolDetailsService;
-    private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
-    private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
-    private readonly GetAttendanceMeasures _getAttendanceMeasures;
+    private readonly GetSchoolInfoUseCase _getSchoolInfoUseCase;
+    private readonly GetSchoolDetailsUseCase _getSchoolDetailsUseCase;
+    private readonly GetSchoolKs4HeadlineMeasuresUseCase _getSchoolKs4HeadlineMeasuresUseCase;
+    private readonly GetSchoolKs4CoreSubjectsUseCase _getSchoolKs4CoreSubjectsUseCase;
+    private readonly GetAttendanceMeasuresUseCase _getAttendanceMeasuresUseCase;
     private readonly ILogger<SchoolController> _logger;
 
     public SchoolController(
-        ISchoolDetailsService schoolDetailsService,
-        GetSchoolKs4HeadlineMeasures getSchoolKs4HeadlineMeasures,
-        GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
-        GetAttendanceMeasures getAttendanceMeasures,
+        GetSchoolInfoUseCase getSchoolInfoUseCase,
+        GetSchoolDetailsUseCase getSchoolDetailsUseCase,
+        GetSchoolKs4HeadlineMeasuresUseCase getSchoolKs4HeadlineMeasuresUseCase,
+        GetSchoolKs4CoreSubjectsUseCase getSchoolKs4CoreSubjectsUseCase,
+        GetAttendanceMeasuresUseCase getAttendanceMeasuresUseCase,
         ILogger<SchoolController> logger)
     {
-        _schoolDetailsService = schoolDetailsService;
-        _getSchoolKs4HeadlineMeasures = getSchoolKs4HeadlineMeasures;
-        _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects;
-        _getAttendanceMeasures = getAttendanceMeasures;
+        _getSchoolInfoUseCase = getSchoolInfoUseCase;
+        _getSchoolDetailsUseCase = getSchoolDetailsUseCase;
+        _getSchoolKs4HeadlineMeasuresUseCase = getSchoolKs4HeadlineMeasuresUseCase;
+        _getSchoolKs4CoreSubjectsUseCase = getSchoolKs4CoreSubjectsUseCase;
+        _getAttendanceMeasuresUseCase = getAttendanceMeasuresUseCase;
         _logger = logger;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var response = await _getSchoolInfoUseCase.Execute(new(urn));
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
-        return View(school);
+        SetSchoolViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var response = await _getSchoolDetailsUseCase.Execute(new(urn));
+
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
-        return View(school);
+        SetSchoolViewData(response.SchoolDetails);
+
+        return View(SchoolDetailsViewModel.FromSchoolDetails(response.SchoolDetails));
     }
 
     [HttpGet]
@@ -66,9 +72,9 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn, filters));
+        var response = await _getSchoolKs4HeadlineMeasuresUseCase.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn, filters));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(response.SchoolDetails);
+        SetSchoolViewData(response.School);
 
         return View(BuildKs4HeadlineMeasuresViewModel(response));
     }
@@ -78,9 +84,9 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn, filters));
+        var response = await _getSchoolKs4CoreSubjectsUseCase.Execute(new GetSchoolKs4CoreSubjectsRequest(urn, filters));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(response.SchoolDetails);
+        SetSchoolViewData(response.School);
 
         return View(BuildKs4CoreSubjectsViewModel(response));
     }
@@ -89,23 +95,27 @@ public class SchoolController : Controller
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var response = await _getSchoolInfoUseCase.Execute(new(urn));
+
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
-        return View(school);
+        SetSchoolViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
-        var attendanceMeasures = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var response = await _getSchoolInfoUseCase.Execute(new(urn));
+
+        var attendanceMeasures = await _getAttendanceMeasuresUseCase.Execute(new GetAttendanceMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewData(school);
+        SetSchoolViewData(response.School);
+
         return View(new SchoolAttendancePageViewModel
         {
-            SchoolDetails = school,
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             AttendanceMeasures = attendanceMeasures
         });
     }
@@ -120,7 +130,7 @@ public class SchoolController : Controller
         }
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-        var response = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var response = await _getAttendanceMeasuresUseCase.Execute(new GetAttendanceMeasuresRequest(urn));
         var yearLabels = Ks4YearLabelConfig.YearByYear;
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
 
@@ -213,32 +223,49 @@ public class SchoolController : Controller
         });
     }
 
-    private void SetSchoolViewData(Core.Model.SchoolDetails school)
+    private void SetSchoolViewData(SchoolDetails school)
     {
-        ViewData["SchoolDetails"] = school;
+        var layoutModel = new SchoolLayoutModel
+        {
+            Urn = school.Urn,
+            Name = school.Name
+        };
+
+        ViewData["SchoolLayout"] = layoutModel;
+    }
+
+    private void SetSchoolViewData(SchoolInfo school)
+    {
+        var layoutModel = new SchoolLayoutModel
+        {
+            Urn = school.Urn,
+            Name = school.Name
+        };
+
+        ViewData["SchoolLayout"] = layoutModel;
     }
 
     private static Ks4HeadlineMeasuresPageViewModel BuildKs4HeadlineMeasuresViewModel(
         GetSchoolKs4HeadlineMeasuresResponse response) => new()
         {
-            SchoolDetails = response.SchoolDetails,
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             SimilarSchoolsCount = response.SimilarSchoolsCount,
-            Attainment8 = MapMeasure(response.Attainment8, response.SchoolDetails),
-            EnglishAndMaths = MapMeasure(response.EnglishAndMaths, response.SchoolDetails),
-            Destinations = MapMeasure(response.Destinations, response.SchoolDetails)
+            Attainment8 = MapMeasure(response.Attainment8, response.School),
+            EnglishAndMaths = MapMeasure(response.EnglishAndMaths, response.School),
+            Destinations = MapMeasure(response.Destinations, response.School)
         };
 
     private static Ks4CoreSubjectsPageViewModel BuildKs4CoreSubjectsViewModel(
         GetSchoolKs4CoreSubjectsResponse response) => new()
         {
-            SchoolDetails = response.SchoolDetails,
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             SimilarSchoolsCount = response.SimilarSchoolsCount,
-            Measures = response.Measures.Select(m => MapMeasure(m, response.SchoolDetails))
+            Measures = response.Measures.Select(m => MapMeasure(m, response.School))
         };
 
-    private static MeasureViewModel MapMeasure(Measure measure, SchoolDetails schoolDetails) =>
-        MeasureViewModel.FromMeasure(measure, schoolDetails, [
-            schoolDetails.Name,
+    private static MeasureViewModel MapMeasure(Measure measure, SchoolInfo school) =>
+        MeasureViewModel.FromMeasure(measure, school, [
+            school.Name,
             "Similar schools average",
             "Local authority schools average",
             "Schools in England average",

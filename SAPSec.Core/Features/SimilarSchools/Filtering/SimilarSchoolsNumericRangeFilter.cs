@@ -1,5 +1,4 @@
-﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 

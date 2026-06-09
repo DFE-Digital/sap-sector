@@ -1,18 +1,16 @@
-﻿using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
+﻿using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Data.Store;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 
-namespace SAPSec.Core.Features.SimilarSchools.UseCases;
+namespace SAPSec.Core.Features.SimilarSchools;
 
-public class GetSimilarSchoolDetails(
+public class GetSimilarSchoolDetailsUseCase(
     IEstablishmentStore establishmentStore,
     ISimilarSchoolsSecondaryStore similarSchoolsStore,
     ISchoolDetailsService schoolDetailsService,
     IKs4PerformanceStore performanceStore,
     IAbsenceStore absenceStore)
+    : IUseCase<GetSimilarSchoolDetailsRequest, GetSimilarSchoolDetailsResponse>
 {
     public async Task<GetSimilarSchoolDetailsResponse> Execute(GetSimilarSchoolDetailsRequest request)
     {
@@ -66,4 +64,4 @@ public record GetSimilarSchoolDetailsResponse(
     GeographicCoordinates? CurrentSchoolCoordinates,
     GeographicCoordinates? SimilarSchoolCoordinates,
     double? DistanceMiles,
-    SchoolDetails SimilarSchoolDetails);
+    SchoolDetails.SchoolDetails SimilarSchoolDetails);

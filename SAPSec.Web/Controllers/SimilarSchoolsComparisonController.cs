@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features;
+using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Features.Ks4CoreSubjects;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
@@ -18,20 +18,20 @@ namespace SAPSec.Web.Controllers;
 [Authorize]
 public class SimilarSchoolsComparisonController : Controller
 {
-    private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
-    private readonly GetAttendanceMeasures _getAttendanceMeasures;
-    private readonly GetSchoolComparisonKs4CoreSubjects _getSchoolComparisonKs4CoreSubjects;
-    private readonly GetSchoolComparisonKs4HeadlineMeasures _getSchoolComparisonKs4HeadlineMeasures;
-    private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
+    private readonly GetSimilarSchoolDetailsUseCase _getSimilarSchoolDetails;
+    private readonly GetAttendanceMeasuresUseCase _getAttendanceMeasures;
+    private readonly GetSchoolComparisonKs4CoreSubjectsUseCase _getSchoolComparisonKs4CoreSubjects;
+    private readonly GetSchoolComparisonKs4HeadlineMeasuresUseCase _getSchoolComparisonKs4HeadlineMeasures;
+    private readonly GetCharacteristicsComparisonUseCase _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
 
     public SimilarSchoolsComparisonController(
-        GetSimilarSchoolDetails getSimilarSchoolDetails,
-        GetAttendanceMeasures getAttendanceMeasures,
-        GetSchoolComparisonKs4CoreSubjects getSchoolComparisonKs4CoreSubjects,
-        GetSchoolComparisonKs4HeadlineMeasures getSchoolComparisonKs4HeadlineMeasures,
-        GetCharacteristicsComparison getCharacteristicsComparison,
+        GetSimilarSchoolDetailsUseCase getSimilarSchoolDetails,
+        GetAttendanceMeasuresUseCase getAttendanceMeasures,
+        GetSchoolComparisonKs4CoreSubjectsUseCase getSchoolComparisonKs4CoreSubjects,
+        GetSchoolComparisonKs4HeadlineMeasuresUseCase getSchoolComparisonKs4HeadlineMeasures,
+        GetCharacteristicsComparisonUseCase getCharacteristicsComparison,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
         ILogger<SimilarSchoolsComparisonController> logger)
     {
@@ -91,9 +91,9 @@ public class SimilarSchoolsComparisonController : Controller
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
 
         var model = modelResult.Model!;
-        model.Attainment8 = MapMeasure(response.Attainment8, response.CurrentSchoolDetails, response.SimilarSchoolDetails);
-        model.EnglishAndMaths = MapMeasure(response.EnglishAndMaths, response.CurrentSchoolDetails, response.SimilarSchoolDetails);
-        model.Destinations = MapMeasure(response.Destinations, response.CurrentSchoolDetails, response.SimilarSchoolDetails);
+        model.Attainment8 = MapMeasure(response.Attainment8, response.CurrentSchool, response.SimilarSchool);
+        model.EnglishAndMaths = MapMeasure(response.EnglishAndMaths, response.CurrentSchool, response.SimilarSchool);
+        model.Destinations = MapMeasure(response.Destinations, response.CurrentSchool, response.SimilarSchool);
         SetComparisonSchoolViewData(model);
 
         return View(model);
@@ -115,7 +115,7 @@ public class SimilarSchoolsComparisonController : Controller
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
 
         var model = modelResult.Model!;
-        model.Measures = response.Measures.Select(m => MapMeasure(m, response.CurrentSchoolDetails, response.SimilarSchoolDetails));
+        model.Measures = response.Measures.Select(m => MapMeasure(m, response.CurrentSchool, response.SimilarSchool));
         SetComparisonSchoolViewData(model);
 
         return View(model);
@@ -234,17 +234,17 @@ public class SimilarSchoolsComparisonController : Controller
         return View(modelResult.Model);
     }
 
-    private static MeasureViewModel MapMeasure(Measure measure, SchoolDetails currentSchoolDetails, SchoolDetails similarSchoolDetails)
+    private static MeasureViewModel MapMeasure(Measure measure, SchoolInfo currentSchool, SchoolInfo similarSchool)
     {
         // TODO: Should colours be in the view? Not sure how to do that yet.
         var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
         var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
 
-        return MeasureViewModel.FromMeasure(measure, currentSchoolDetails,
+        return MeasureViewModel.FromMeasure(measure, currentSchool,
             // TODO: Should labels be in the view? Not sure how to do that yet.
             [
-                currentSchoolDetails.Name,
-                similarSchoolDetails.Name,
+                currentSchool.Name,
+                similarSchool.Name,
                 "Schools in England average",
             ],
             chartColors,
@@ -326,14 +326,22 @@ public class SimilarSchoolsComparisonController : Controller
         model.SimilarSchoolLatitude = response.SimilarSchoolCoordinates?.Latitude;
         model.SimilarSchoolLongitude = response.SimilarSchoolCoordinates?.Longitude;
         model.Distance = response.DistanceMiles;
-        model.SimilarSchoolDetails = response.SimilarSchoolDetails;
+        model.SimilarSchoolDetails = SchoolDetailsViewModel.FromSchoolDetails(response.SimilarSchoolDetails);
 
         return (model, null);
     }
 
     private void SetComparisonSchoolViewData(SimilarSchoolsComparisonViewModel data)
     {
-        ViewData["ComparisonSchool"] = data;
+        var layoutModel = new SimilarSchoolsComparisonLayoutModel
+        {
+            Urn = data.Urn,
+            Name = data.Name,
+            SimilarSchoolUrn = data.SimilarSchoolUrn,
+            SimilarSchoolName = data.SimilarSchoolName
+        };
+
+        ViewData["LayoutModel"] = layoutModel;
     }
 
     private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>

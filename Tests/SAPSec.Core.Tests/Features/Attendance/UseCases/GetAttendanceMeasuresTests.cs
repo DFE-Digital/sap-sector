@@ -1,9 +1,7 @@
 using Moq;
 using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Data.Store;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Features.Attendance.UseCases;
 
@@ -23,7 +21,7 @@ public class GetAttendanceMeasuresTests
             .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasuresUseCase(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
         var act = async () => await sut.Execute(new GetAttendanceMeasuresRequest("999999"));
 
@@ -119,7 +117,7 @@ public class GetAttendanceMeasuresTests
                 new Establishment { URN = "200002", EstablishmentName = "Alpha School" }
             ]);
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasuresUseCase(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
@@ -166,7 +164,7 @@ public class GetAttendanceMeasuresTests
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync((AbsenceData?)null);
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasuresUseCase(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
@@ -230,7 +228,7 @@ public class GetAttendanceMeasuresTests
                     Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasuresUseCase(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 

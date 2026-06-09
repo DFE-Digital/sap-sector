@@ -3,16 +3,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Ks4CoreSubjects;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Data.Store;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Store;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.ViewModels;
 using System.Text.Json;
 
 namespace SAPSec.Web.Tests.Controllers;
@@ -44,33 +42,24 @@ public class SchoolControllerTests
         _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryStore>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
 
-        var getAttendanceMeasures = new GetAttendanceMeasures(
-            _absenceRepositoryMock.Object,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
-        var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
-            _ks4PerformanceRepositoryMock.Object,
-            _ks4DestinationsRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
-        var getSchoolKs4CoreSubjects = new GetSchoolKs4CoreSubjects(
-            _ks4PerformanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
-        //var getFilteredSchoolKs4CoreSubject = new GetFilteredSchoolKs4CoreSubject(
-        //    _ks4PerformanceRepositoryMock.Object,
-        //    _schoolDetailsServiceMock.Object,
-        //    _establishmentRepositoryMock.Object,
-        //    _similarSchoolsRepositoryMock.Object);
-
         _sut = new SchoolController(
-            _schoolDetailsServiceMock.Object,
-            getSchoolKs4HeadlineMeasures,
-            getSchoolKs4CoreSubjects,
-            //getFilteredSchoolKs4CoreSubject,
-            getAttendanceMeasures,
+            new GetSchoolInfoUseCase(
+                _establishmentRepositoryMock.Object),
+            new GetSchoolDetailsUseCase(
+                _schoolDetailsServiceMock.Object),
+            new GetSchoolKs4HeadlineMeasuresUseCase(
+                _ks4PerformanceRepositoryMock.Object,
+                _ks4DestinationsRepositoryMock.Object,
+                _establishmentRepositoryMock.Object,
+                _similarSchoolsRepositoryMock.Object),
+            new GetSchoolKs4CoreSubjectsUseCase(
+                _ks4PerformanceRepositoryMock.Object,
+                _establishmentRepositoryMock.Object,
+                _similarSchoolsRepositoryMock.Object),
+            new GetAttendanceMeasuresUseCase(
+                _absenceRepositoryMock.Object,
+                _establishmentRepositoryMock.Object,
+                _similarSchoolsRepositoryMock.Object),
             _loggerMock.Object);
     }
 
@@ -91,7 +80,7 @@ public class SchoolControllerTests
         var result = await _sut.Index(urn);
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
-        var model = viewResult.Model.Should().BeOfType<SchoolDetails>().Subject;
+        var model = viewResult.Model.Should().BeOfType<SchoolDetailsViewModel>().Subject;
         model.Urn.Should().Be(urn);
         model.Name.Should().Be("Test Academy");
     }
@@ -282,8 +271,8 @@ public class SchoolControllerTests
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         var model = viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.SchoolAttendancePageViewModel>().Subject;
-        model.SchoolDetails.Urn.Should().Be(urn);
-        model.SchoolDetails.Name.Should().Be("Test Academy");
+        model.School.Urn.Should().Be(urn);
+        model.School.Name.Should().Be("Test Academy");
     }
 
     [Fact]

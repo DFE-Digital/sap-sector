@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
+﻿using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using SAPSec.Test.Common.Repositories.InMemory;
 
@@ -10,11 +10,11 @@ public class FindSimilarSchoolsTests
     private readonly InMemoryEstablishmentStore _establishmentRepo = new();
     private readonly InMemoryKs4PerformanceStore _performanceRepo = new();
     private readonly InMemoryAbsenceStore _absenceRepo = new();
-    private readonly FindSimilarSchools _sut;
+    private readonly FindSimilarSchoolsUseCase _sut;
 
     public FindSimilarSchoolsTests()
     {
-        _sut = new FindSimilarSchools(
+        _sut = new FindSimilarSchoolsUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
             _performanceRepo,
@@ -39,7 +39,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.SchoolName.Should().Be("Test School");
+        response.School.Name.Should().Be("Test School");
         response.AllResults.Should().BeEmpty();
         response.ResultsPage.Should().BeEmpty();
     }

@@ -1,7 +1,6 @@
 ﻿using Moq;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Test.Common.Repositories.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
@@ -13,11 +12,11 @@ public class GetSimilarSchoolDetailsTests
     private readonly InMemoryKs4PerformanceStore _performanceRepo = new();
     private readonly InMemoryAbsenceStore _absenceRepo = new();
     private readonly Mock<ISchoolDetailsService> _schoolDetailsService = new Mock<ISchoolDetailsService>();
-    private readonly GetSimilarSchoolDetails _sut;
+    private readonly GetSimilarSchoolDetailsUseCase _sut;
 
     public GetSimilarSchoolDetailsTests()
     {
-        _sut = new GetSimilarSchoolDetails(
+        _sut = new GetSimilarSchoolDetailsUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
             _schoolDetailsService.Object,

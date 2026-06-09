@@ -3,14 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Data.Store;
-using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
-using SAPSec.Core.Services;
+using SAPSec.Data.Store;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
@@ -18,7 +14,6 @@ namespace SAPSec.Web.Tests.Controllers;
 
 public class SimilarSchoolsControllerTests
 {
-    //private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
     private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsRepoMock = new();
     private readonly Mock<IEstablishmentStore> _establishmentRepoMock = new();
     private readonly Mock<IKs4PerformanceStore> _performanceRepoMock = new();
@@ -28,11 +23,9 @@ public class SimilarSchoolsControllerTests
 
     public SimilarSchoolsControllerTests()
     {
-        //_schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var logger = new Mock<ILogger<SchoolDetailsService>>();
-        var schoolDetailsService = new SchoolDetailsService(_establishmentRepoMock.Object, logger.Object);
-        _sut = new SimilarSchoolsController(schoolDetailsService,
-            new FindSimilarSchools(
+        var schoolDetailsService = new SchoolDetailsService(_establishmentRepoMock.Object, new Mock<ILogger<SchoolDetailsService>>().Object);
+        _sut = new SimilarSchoolsController(
+            new FindSimilarSchoolsUseCase(
                 _establishmentRepoMock.Object,
                 _similarSchoolsRepoMock.Object,
                 _performanceRepoMock.Object,
@@ -70,7 +63,7 @@ public class SimilarSchoolsControllerTests
         await _sut.ViewSimilarSchools(urn);
 
         _sut.ViewData["BreadcrumbNode"].Should().NotBeNull();
-        _sut.ViewData["SchoolDetails"].Should().BeAssignableTo<SchoolDetails>()
+        _sut.ViewData["SchoolLayout"].Should().BeAssignableTo<SchoolLayoutModel>()
             .Which.Name.Should().Be(schoolDetails.EstablishmentName);
     }
 

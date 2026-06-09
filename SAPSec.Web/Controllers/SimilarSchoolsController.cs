@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
@@ -12,16 +11,13 @@ namespace SAPSec.Web.Controllers;
 [Authorize]
 public class SimilarSchoolsController : Controller
 {
-    private readonly ISchoolDetailsService _schoolDetailsService;
-    private readonly FindSimilarSchools _findSimilarSchools;
+    private readonly FindSimilarSchoolsUseCase _findSimilarSchools;
     private readonly ILogger<SimilarSchoolsController> _logger;
 
     public SimilarSchoolsController(
-        ISchoolDetailsService schoolDetailsService,
-        FindSimilarSchools findSimilarSchools,
+        FindSimilarSchoolsUseCase findSimilarSchools,
         ILogger<SimilarSchoolsController> logger)
     {
-        _schoolDetailsService = schoolDetailsService;
         _findSimilarSchools = findSimilarSchools;
         _logger = logger;
     }
@@ -33,10 +29,7 @@ public class SimilarSchoolsController : Controller
         [FromQuery] string? sortBy = null,
         [FromQuery] string? page = null)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
-
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData["SchoolDetails"] = school;
 
         var filterBy = BuildCoreFilters(Request.Query);
         var currentFilters = ExtractCurrentFilters(Request.Query);
@@ -46,6 +39,14 @@ public class SimilarSchoolsController : Controller
             filterBy,
             sortBy,
             page));
+
+        var layoutModel = new SchoolLayoutModel
+        {
+            Urn = urn,
+            Name = response.School.Name
+        };
+
+        ViewData["SchoolLayout"] = layoutModel;
 
         var schools = response.ResultsPage
             .Select(MapToViewModel)
@@ -59,8 +60,7 @@ public class SimilarSchoolsController : Controller
 
         var viewModel = new SimilarSchoolsPageViewModel
         {
-            EstablishmentName = school.Name,
-            PhaseOfEducation = school.PhaseOfEducation.Display(),
+            EstablishmentName = response.School.Name,
             Urn = int.TryParse(urn, out var urnValue) ? urnValue : 0,
             Schools = schools,
             MapSchools = allSchools,

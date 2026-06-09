@@ -1,6 +1,4 @@
-using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Model;
-using SAPSec.Web.Helpers;
+using SAPSec.Core.Features.Attendance;
 using System.Globalization;
 
 namespace SAPSec.Web.ViewModels;
@@ -9,12 +7,11 @@ public class SchoolAttendancePageViewModel
 {
     public record TopPerformerRow(int Rank, string Urn, string Name, decimal? Value, string DisplayValue, bool IsCurrentSchool);
 
-    public required SchoolDetails SchoolDetails { get; init; }
+    public required SchoolInfoViewModel School { get; init; }
     public required GetAttendanceMeasuresResponse AttendanceMeasures { get; init; }
 
-    public string SchoolName => SchoolDetails.Name;
+    public string SchoolName => School.Name;
     public string SimilarSchoolsLabel => "Similar schools average";
-    public string LocalAuthorityName => SchoolDetails.LocalAuthorityName.Display();
     public string LocalAuthorityLabel => "Local authority schools average";
     public string EnglandLabel => "Schools in England average";
     public string[] AcademicYears => Ks4YearLabelConfig.YearByYear;

@@ -3,16 +3,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Ks4CoreSubjects;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Data.Store;
 using SAPSec.Data.Dto;
-using SAPSec.Core.Services;
+using SAPSec.Data.Store;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
@@ -36,29 +33,27 @@ public class SimilarSchoolsComparisonControllerTests
         var schoolDetailsService = new SchoolDetailsService(
             _establishmentRepositoryMock.Object,
             new Mock<ILogger<SchoolDetailsService>>().Object);
-        var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
+        var getSimilarSchoolDetails = new GetSimilarSchoolDetailsUseCase(
             _establishmentRepositoryMock.Object,
             _repoMock.Object,
             schoolDetailsService,
             _ks4PerformanceRepositoryMock.Object,
             _absenceRepositoryMock.Object);
-        var ks4ComparisonHeadlineMeasuresUseCase = new GetSchoolComparisonKs4HeadlineMeasures(
+        var ks4ComparisonHeadlineMeasuresUseCase = new GetSchoolComparisonKs4HeadlineMeasuresUseCase(
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object,
-            schoolDetailsService,
             _establishmentRepositoryMock.Object,
             _repoMock.Object);
-        var ks4CoreComparisonSubjectsUseCase = new GetSchoolComparisonKs4CoreSubjects(
+        var ks4CoreComparisonSubjectsUseCase = new GetSchoolComparisonKs4CoreSubjectsUseCase(
             _ks4PerformanceRepositoryMock.Object,
-            schoolDetailsService,
             _establishmentRepositoryMock.Object,
             _repoMock.Object);
-        var attendanceUseCase = new GetAttendanceMeasures(
+        var attendanceUseCase = new GetAttendanceMeasuresUseCase(
             _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object,
             _repoMock.Object);
 
-        var getCharacteristicsComparison = new GetCharacteristicsComparison(
+        var getCharacteristicsComparison = new GetCharacteristicsComparisonUseCase(
             _repoMock.Object);
 
         _repoMock
@@ -121,7 +116,12 @@ public class SimilarSchoolsComparisonControllerTests
         model.SimilarSchoolName.Should().Be(similarSchool.EstablishmentName);
 
         _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
-        _sut.ViewData["ComparisonSchool"].Should().BeSameAs(model);
+
+        var layout = _sut.ViewData["LayoutModel"].Should().BeOfType<SimilarSchoolsComparisonLayoutModel>().Subject;
+        layout.Urn.Should().Be(urn);
+        layout.SimilarSchoolUrn.Should().Be(similarUrn);
+        layout.Name.Should().Be(currentSchool.EstablishmentName);
+        layout.SimilarSchoolName.Should().Be(similarSchool.EstablishmentName);
     }
 
     [Fact]

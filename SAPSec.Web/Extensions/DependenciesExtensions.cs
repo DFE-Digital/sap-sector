@@ -1,10 +1,9 @@
-using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Features.Ks4CoreSubjects;
+using SAPSec.Core.Features.Ks4HeadlineMeasures;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Services;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Formatters;
 using System.Diagnostics.CodeAnalysis;
@@ -21,14 +20,14 @@ public static class DependenciesExtensions
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
         // Use cases
-        services.AddSingleton<GetSchoolKs4HeadlineMeasures>();
-        services.AddSingleton<GetSchoolComparisonKs4HeadlineMeasures>();
-        services.AddSingleton<GetSchoolKs4CoreSubjects>();
-        services.AddSingleton<GetSchoolComparisonKs4CoreSubjects>();
-        services.AddSingleton<GetAttendanceMeasures>();
-        services.AddSingleton<FindSimilarSchools>();
-        services.AddSingleton<GetSimilarSchoolDetails>();
-        services.AddSingleton<GetCharacteristicsComparison>();
+        services.AddSingleton<GetSchoolKs4HeadlineMeasuresUseCase>();
+        services.AddSingleton<GetSchoolComparisonKs4HeadlineMeasuresUseCase>();
+        services.AddSingleton<GetSchoolKs4CoreSubjectsUseCase>();
+        services.AddSingleton<GetSchoolComparisonKs4CoreSubjectsUseCase>();
+        services.AddSingleton<GetAttendanceMeasuresUseCase>();
+        services.AddSingleton<FindSimilarSchoolsUseCase>();
+        services.AddSingleton<GetSimilarSchoolDetailsUseCase>();
+        services.AddSingleton<GetCharacteristicsComparisonUseCase>();
 
         // Formatters
         services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();

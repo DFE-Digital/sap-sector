@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Model;
 
-namespace SAPSec.Core.Model;
+namespace SAPSec.Core.Features.SchoolDetails;
 
 /// <summary>
 /// School details with data availability information.

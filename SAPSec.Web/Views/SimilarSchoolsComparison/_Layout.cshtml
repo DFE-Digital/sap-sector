@@ -4,7 +4,7 @@
 @{
     Layout = "Views/Shared/_Layout";
 
-    var comparisonModel = ViewData["ComparisonSchool"] as SimilarSchoolsComparisonViewModel;
+    var comparisonModel = ViewData["LayoutModel"] as SimilarSchoolsComparisonLayoutModel;
 
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
 

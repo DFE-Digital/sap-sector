@@ -1,25 +1,32 @@
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Store;
 
-namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
+namespace SAPSec.Core.Features.Ks4CoreSubjects;
 
-public class GetSchoolComparisonKs4CoreSubjects(
+public class GetSchoolComparisonKs4CoreSubjectsUseCase(
     IKs4PerformanceStore performanceStore,
-    ISchoolDetailsService schoolDetailsService,
     IEstablishmentStore establishmentStore,
     ISimilarSchoolsSecondaryStore similarSchoolsStore)
+    : IUseCase<GetSchoolComparisonKs4CoreSubjectsRequest, GetSchoolComparisonKs4CoreSubjectsResponse>
 {
     public async Task<GetSchoolComparisonKs4CoreSubjectsResponse> Execute(GetSchoolComparisonKs4CoreSubjectsRequest request)
     {
-        var currentSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.CurrentSchoolUrn);
-        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
+        var currentSchool = await establishmentStore.GetEstablishmentAsync(request.CurrentSchoolUrn);
+        if (currentSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
+        }
+
+        var similarSchool = await establishmentStore.GetEstablishmentAsync(request.SimilarSchoolUrn);
+        if (similarSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
+        }
 
         var currentSchoolData = new SchoolData(
             request.CurrentSchoolUrn,
-            currentSchoolDetails.Name,
+            currentSchool.EstablishmentName,
             await performanceStore.GetByUrnAsync(request.CurrentSchoolUrn),
             null);
 
@@ -29,10 +36,10 @@ public class GetSchoolComparisonKs4CoreSubjects(
             .Distinct(StringComparer.Ordinal)
             .ToArray();
 
-        var similarSchoolsPerformance = ((await performanceStore.GetByUrnsAsync(similarSchoolsUrns)) ?? [])
+        var similarSchoolsPerformance = (await performanceStore.GetByUrnsAsync(similarSchoolsUrns) ?? [])
             .ToDictionary(x => x.URN, x => x, StringComparer.Ordinal);
 
-        var similarSchoolsDetails = ((await establishmentStore.GetEstablishmentsAsync(similarSchoolsUrns))
+        var similarSchoolsDetails = (await establishmentStore.GetEstablishmentsAsync(similarSchoolsUrns)
                 ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
@@ -51,8 +58,8 @@ public class GetSchoolComparisonKs4CoreSubjects(
         var filterBy = request.FilterBy ?? new Dictionary<string, string>();
 
         return new(
-            currentSchoolDetails,
-            similarSchoolDetails,
+            new(currentSchool.URN, currentSchool.EstablishmentName),
+            new(similarSchool.URN, similarSchool.EstablishmentName),
             similarSchoolsData.Values.Count,
             [
                 Measures.Ks4CoreSubjects.EnglishLanguage.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
@@ -72,7 +79,7 @@ public record GetSchoolComparisonKs4CoreSubjectsRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetSchoolComparisonKs4CoreSubjectsResponse(
-    SchoolDetails CurrentSchoolDetails,
-    SchoolDetails SimilarSchoolDetails,
+    SchoolInfo CurrentSchool,
+    SchoolInfo SimilarSchool,
     int SimilarSchoolsCount,
     IReadOnlyCollection<Measure> Measures);

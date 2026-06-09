@@ -1,12 +1,13 @@
 using SAPSec.Data.Store;
 using System.Globalization;
 
-namespace SAPSec.Core.Features.Attendance.UseCases;
+namespace SAPSec.Core.Features.Attendance;
 
-public class GetAttendanceMeasures(
+public class GetAttendanceMeasuresUseCase(
     IAbsenceStore repository,
     IEstablishmentStore establishmentStore,
     ISimilarSchoolsSecondaryStore similarSchoolsStore)
+    : IUseCase<GetAttendanceMeasuresRequest, GetAttendanceMeasuresResponse>
 {
     public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
     {
@@ -29,9 +30,9 @@ public class GetAttendanceMeasures(
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var similarSchoolDetails = similarSchoolUrns.Length == 0
-            ? Array.Empty<SAPSec.Data.Dto.Establishment>()
-            : (await establishmentStore.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Data.Dto.Establishment>();
+            ? Array.Empty<Data.Dto.Establishment>()
+            : await establishmentStore.GetEstablishmentsAsync(similarSchoolUrns)
+                ?? Array.Empty<Data.Dto.Establishment>();
         var similarSchoolDetailsByUrn = similarSchoolDetails
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
@@ -158,7 +159,7 @@ public class GetAttendanceMeasures(
     }
 
     private static IReadOnlyList<AttendanceTopPerformer> BuildTopPerformers(
-        SAPSec.Data.Dto.Establishment currentSchool,
+        Data.Dto.Establishment currentSchool,
         decimal? currentSchoolValue,
         IEnumerable<SimilarSchoolAttendanceMeasure> similarSchools,
         Func<SimilarSchoolAttendanceMeasure, decimal?> selector)

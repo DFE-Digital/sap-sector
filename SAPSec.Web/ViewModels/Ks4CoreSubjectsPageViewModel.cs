@@ -1,4 +1,3 @@
-using SAPSec.Core.Model;
 using SAPSec.Web.ViewModels.Measures;
 using System.Globalization;
 
@@ -6,11 +5,11 @@ namespace SAPSec.Web.ViewModels;
 
 public class Ks4CoreSubjectsPageViewModel
 {
-    public required SchoolDetails SchoolDetails { get; set; }
+    public required SchoolInfoViewModel School { get; set; }
     public required int SimilarSchoolsCount { get; set; }
     public required IEnumerable<MeasureViewModel> Measures { get; set; }
 
-    public string SchoolLabel => SchoolDetails.Name;
+    public string SchoolLabel => School.Name;
     public string SimilarSchoolsLabel => "Similar schools average";
     public string LocalAuthorityLabel => "Local authority schools average";
     public string EnglandLabel => "Schools in England average";

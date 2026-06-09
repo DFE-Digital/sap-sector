@@ -1,5 +1,5 @@
+using SAPSec.Core.Features;
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using System.Globalization;
 
@@ -26,7 +26,7 @@ public abstract record SubMeasureViewModel(
             ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
             : "No available data";
 
-    public static SubMeasureViewModel FromSubMeasure(SubMeasure m, MeasureInfoViewModel measureInfo, SchoolDetails schoolDetails)
+    public static SubMeasureViewModel FromSubMeasure(SubMeasure m, MeasureInfoViewModel measureInfo, SchoolInfo schoolInfo)
     {
         return m switch
         {
@@ -44,10 +44,10 @@ public abstract record SubMeasureViewModel(
                     t.Rank,
                     t.Urn,
                     t.Name,
-                    Routes.SimilarSchoolComparison(schoolDetails.Urn, t.Urn),
+                    Routes.SimilarSchoolComparison(schoolInfo.Urn, t.Urn),
                     t.Value,
                     t.IsCurrentSchool)),
-                Routes.SimilarSchools(schoolDetails.Urn)),
+                Routes.SimilarSchools(schoolInfo.Urn)),
 
             _ => throw new NotImplementedException($"SubMeasure type {m.GetType()} does not have a corresponding view model type associated.")
         };

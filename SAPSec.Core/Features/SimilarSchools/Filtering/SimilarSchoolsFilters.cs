@@ -1,6 +1,4 @@
-﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
-
-namespace SAPSec.Core.Features.SimilarSchools.Filtering;
+﻿namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filterValues, SimilarSchool currentSchool)
 {

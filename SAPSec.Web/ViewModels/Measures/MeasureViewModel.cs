@@ -1,5 +1,5 @@
+using SAPSec.Core.Features;
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Model;
 
 namespace SAPSec.Web.ViewModels.Measures;
 
@@ -9,7 +9,7 @@ public record MeasureViewModel(
 {
     public static MeasureViewModel FromMeasure(
         Measure measure,
-        SchoolDetails schoolDetails,
+        SchoolInfo schoolInfo,
         IEnumerable<string> labels,
         IEnumerable<string>? chartColors = null,
         IEnumerable<string>? yearByYearColors = null)
@@ -23,7 +23,7 @@ public record MeasureViewModel(
             chartColors,
             yearByYearColors);
 
-        var subMeasures = measure.SubMeasures.Select(m => SubMeasureViewModel.FromSubMeasure(m, measureInfo, schoolDetails));
+        var subMeasures = measure.SubMeasures.Select(m => SubMeasureViewModel.FromSubMeasure(m, measureInfo, schoolInfo));
         var table = TableSubMeasureViewModel.FromOtherSubMeasures(subMeasures, measureInfo);
 
         return new(

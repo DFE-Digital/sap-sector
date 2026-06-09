@@ -3,7 +3,7 @@ using Moq;
 using SAPSec.Data.Store;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
-using SAPSec.Core.Services;
+using SAPSec.Core.Features.SchoolDetails;
 
 namespace SAPSec.Core.Tests.Services;
 

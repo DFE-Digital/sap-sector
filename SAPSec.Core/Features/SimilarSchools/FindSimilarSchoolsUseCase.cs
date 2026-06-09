@@ -1,21 +1,20 @@
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Data.Store;
 using SAPSec.Core.Model;
+using SAPSec.Data.Store;
 
-namespace SAPSec.Core.Features.SimilarSchools.UseCases;
+namespace SAPSec.Core.Features.SimilarSchools;
 
-public class FindSimilarSchools(
+public class FindSimilarSchoolsUseCase(
     IEstablishmentStore establishmentStore,
     ISimilarSchoolsSecondaryStore similarSchoolsStore,
     IKs4PerformanceStore performanceStore,
     IAbsenceStore absenceStore)
+    : IUseCase<FindSimilarSchoolsRequest, FindSimilarSchoolsResponse>
 {
     public async Task<FindSimilarSchoolsResponse> Execute(FindSimilarSchoolsRequest request)
     {
@@ -67,7 +66,7 @@ public class FindSimilarSchools(
         var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
 
         return new(
-            currentSchool.Name,
+            new(currentSchool.URN, currentSchool.Name),
             sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
             filters.AsAvailableFilters(similarSchools),
             resultsPage,
@@ -85,7 +84,7 @@ public record FindSimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindSimilarSchoolsResponse(
-    string SchoolName,
+    SchoolInfo School,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
     IPagedCollection<SimilarSchoolResult> ResultsPage,

@@ -1,5 +1,4 @@
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Data.Dto;
 using SAPSec.Test.Common.Repositories.InMemory;
 
@@ -9,7 +8,7 @@ public class GetCharacteristicsComparisonTests
 {
     private readonly InMemorySimilarSchoolsSecondaryStore _repo = new();
 
-    private GetCharacteristicsComparison CreateSut() => new(_repo);
+    private GetCharacteristicsComparisonUseCase CreateSut() => new(_repo);
 
     [Theory]
     [InlineData(0.2, SchoolSimilarity.Similar)]

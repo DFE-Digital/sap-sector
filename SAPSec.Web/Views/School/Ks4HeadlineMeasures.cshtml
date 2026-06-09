@@ -8,7 +8,7 @@
 }
 
 <div class="app-ks4-school-page">
-    <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
+    <span class="govuk-caption-xl">@Model.School.Name</span>
     <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
     <p class="govuk-body">
@@ -22,7 +22,7 @@
     </ul>
 
     <p class="govuk-body">
-        Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+        Find out <a href="/school/@Model.School.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
     </p>
 
     <partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
