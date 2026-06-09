@@ -1083,12 +1083,19 @@ $app-ks4-color-track: #f3f2f1;
 }
 
 .app-ks4-chart-container {
+  display: flex;
+  flex-direction: column;
   height: 260px;
   max-width: 760px;
 }
 
 .app-ks4-chart-container--school-headline {
   height: 330px;
+}
+
+.app-ks4-chart-container .js-chart {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .app-content-toggle__header {
@@ -1115,6 +1122,7 @@ $app-ks4-color-track: #f3f2f1;
 }
 
 .chart-legend--top {
+  flex: 0 0 auto;
   margin-bottom: 12px;
 }
 
