@@ -5,6 +5,7 @@ using Moq;
 using SAPSec.Core.Geography;
 using SAPSec.Core.School.Attendance;
 using SAPSec.Core.School.Details;
+using SAPSec.Core.School.Secondary;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures;
 using SAPSec.Core.School.Similarity;
@@ -40,14 +41,17 @@ public class SimilarSchoolsComparisonControllerTests
             _ks4PerformanceRepositoryMock.Object,
             _absenceRepositoryMock.Object);
         var ks4ComparisonHeadlineMeasuresUseCase = new GetSchoolComparisonKs4HeadlineMeasuresUseCase(
-            _ks4PerformanceRepositoryMock.Object,
-            _ks4DestinationsRepositoryMock.Object,
-            _establishmentRepositoryMock.Object,
-            _repoMock.Object);
+            new SecondarySchoolsRepository(
+                _establishmentRepositoryMock.Object,
+                _repoMock.Object,
+                _ks4PerformanceRepositoryMock.Object,
+                _ks4DestinationsRepositoryMock.Object));
         var ks4CoreComparisonSubjectsUseCase = new GetSchoolComparisonKs4CoreSubjectsUseCase(
-            _ks4PerformanceRepositoryMock.Object,
-            _establishmentRepositoryMock.Object,
-            _repoMock.Object);
+            new SecondarySchoolsRepository(
+                _establishmentRepositoryMock.Object,
+                _repoMock.Object,
+                _ks4PerformanceRepositoryMock.Object,
+                _ks4DestinationsRepositoryMock.Object));
         var attendanceUseCase = new GetAttendanceMeasuresUseCase(
             _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object,

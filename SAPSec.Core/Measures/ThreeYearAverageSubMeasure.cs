@@ -1,46 +1,48 @@
+using SAPSec.Core.School.Secondary;
+
 namespace SAPSec.Core.Measures;
 
 public record ThreeYearAverageSubMeasure(
     IEnumerable<decimal?> Averages) : SubMeasure
 {
-    internal static ThreeYearAverageSubMeasure ForSchool(
-        SchoolData schoolData,
-        IEnumerable<SchoolData> similarSchools,
-        MeasureFieldSelector fieldSelector) => new([
+    internal static ThreeYearAverageSubMeasure ForSecondarySchool<T>(
+        SecondarySchoolData<T> schoolData,
+        IEnumerable<SecondarySchoolData<T>> similarSchools,
+        MeasureFieldSelector<T> fieldSelector) => new([
             MeasureHelper.AverageFrom(
-                fieldSelector.SchoolCurrent(schoolData),
-                fieldSelector.SchoolPrevious(schoolData),
-                fieldSelector.SchoolPrevious2(schoolData)),
+                fieldSelector.SchoolCurrent(schoolData.Data),
+                fieldSelector.SchoolPrevious(schoolData.Data),
+                fieldSelector.SchoolPrevious2(schoolData.Data)),
             MeasureHelper.Average(similarSchools.Select(x => MeasureHelper.AverageFrom(
-                fieldSelector.SchoolCurrent(x),
-                fieldSelector.SchoolPrevious(x),
-                fieldSelector.SchoolPrevious2(x)))),
+                fieldSelector.SchoolCurrent(x.Data),
+                fieldSelector.SchoolPrevious(x.Data),
+                fieldSelector.SchoolPrevious2(x.Data)))),
             MeasureHelper.AverageFrom(
-                fieldSelector.LocalAuthorityCurrent(schoolData),
-                fieldSelector.LocalAuthorityPrevious(schoolData),
-                fieldSelector.LocalAuthorityPrevious2(schoolData)),
+                fieldSelector.LocalAuthorityCurrent(schoolData.Data),
+                fieldSelector.LocalAuthorityPrevious(schoolData.Data),
+                fieldSelector.LocalAuthorityPrevious2(schoolData.Data)),
             MeasureHelper.AverageFrom(
-                fieldSelector.EnglandCurrent(schoolData),
-                fieldSelector.EnglandPrevious(schoolData),
-                fieldSelector.EnglandPrevious2(schoolData))
+                fieldSelector.EnglandCurrent(schoolData.Data),
+                fieldSelector.EnglandPrevious(schoolData.Data),
+                fieldSelector.EnglandPrevious2(schoolData.Data))
         ]);
 
-    internal static ThreeYearAverageSubMeasure ForSchoolComparison(
-        SchoolData currentSchool,
-        SchoolData similarSchool,
-        MeasureFieldSelector fieldSelector) => new([
+    internal static ThreeYearAverageSubMeasure ForSecondarySchoolComparison<T>(
+        SecondarySchoolData<T> currentSchool,
+        SecondarySchoolData<T> similarSchool,
+        MeasureFieldSelector<T> fieldSelector) => new([
             MeasureHelper.AverageFrom(
-                fieldSelector.SchoolCurrent(currentSchool),
-                fieldSelector.SchoolPrevious(currentSchool),
-                fieldSelector.SchoolPrevious2(currentSchool)),
+                fieldSelector.SchoolCurrent(currentSchool.Data),
+                fieldSelector.SchoolPrevious(currentSchool.Data),
+                fieldSelector.SchoolPrevious2(currentSchool.Data)),
             MeasureHelper.AverageFrom(
-                fieldSelector.SchoolCurrent(similarSchool),
-                fieldSelector.SchoolPrevious(similarSchool),
-                fieldSelector.SchoolPrevious2(similarSchool)),
+                fieldSelector.SchoolCurrent(similarSchool.Data),
+                fieldSelector.SchoolPrevious(similarSchool.Data),
+                fieldSelector.SchoolPrevious2(similarSchool.Data)),
             MeasureHelper.AverageFrom(
-                fieldSelector.EnglandCurrent(currentSchool),
-                fieldSelector.EnglandPrevious(currentSchool),
-                fieldSelector.EnglandPrevious2(currentSchool))
+                fieldSelector.EnglandCurrent(currentSchool.Data),
+                fieldSelector.EnglandPrevious(currentSchool.Data),
+                fieldSelector.EnglandPrevious2(currentSchool.Data))
             ]);
 
 }

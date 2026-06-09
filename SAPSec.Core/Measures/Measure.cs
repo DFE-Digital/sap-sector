@@ -1,5 +1,5 @@
 using SAPSec.Core.Filtering;
-using SAPSec.Data.Store;
+using SAPSec.Core.School.Secondary;
 
 namespace SAPSec.Core.Measures;
 
@@ -10,14 +10,14 @@ public record Measure(
     IEnumerable<MeasureAvailableFilter> Filters,
     IEnumerable<SubMeasure> SubMeasures)
 {
-    internal static Measure ForSchool(
+    internal static Measure ForSecondarySchool<T>(
         string key,
         string name,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
-        SchoolData schoolData,
-        IEnumerable<SchoolData> similarSchools,
-        MeasureFieldSelector fieldSelector)
+        SecondarySchoolData<T> currentSchool,
+        IEnumerable<SecondarySchoolData<T>> similarSchools,
+        MeasureFieldSelector<T> fieldSelector)
     {
         return new Measure(
             key,
@@ -25,21 +25,21 @@ public record Measure(
             dataType,
             availableFilters.ToList(),
             [
-                ThreeYearAverageSubMeasure.ForSchool(schoolData, similarSchools, fieldSelector),
-                TopPerformersSubMeasure.ForSchool(schoolData, similarSchools, fieldSelector),
-                YearByYearSubMeasure.ForSchool(schoolData, similarSchools, fieldSelector)
+                ThreeYearAverageSubMeasure.ForSecondarySchool(currentSchool, similarSchools, fieldSelector),
+                TopPerformersSubMeasure.ForSecondarySchool(currentSchool, similarSchools, fieldSelector),
+                YearByYearSubMeasure.ForSecondarySchool(currentSchool, similarSchools, fieldSelector)
             ]);
     }
 
-    internal static Measure ForSchoolComparison(
+    internal static Measure ForSecondarySchoolComparison<T>(
         string key,
         string name,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
-        SchoolData currentSchoolData,
-        SchoolData similarSchoolData,
-        IEnumerable<SchoolData> similarSchools,
-        MeasureFieldSelector fieldSelector)
+        SecondarySchoolData<T> currentSchool,
+        SecondarySchoolData<T> similarSchool,
+        IEnumerable<SecondarySchoolData<T>> similarSchools,
+        MeasureFieldSelector<T> fieldSelector)
     {
         return new Measure(
             key,
@@ -47,8 +47,8 @@ public record Measure(
             dataType,
             availableFilters.ToList(),
             [
-                ThreeYearAverageSubMeasure.ForSchoolComparison(currentSchoolData, similarSchoolData, fieldSelector),
-                    YearByYearSubMeasure.ForSchoolComparison(currentSchoolData, similarSchoolData, fieldSelector)
+                ThreeYearAverageSubMeasure.ForSecondarySchoolComparison(currentSchool, similarSchool, fieldSelector),
+                YearByYearSubMeasure.ForSecondarySchoolComparison(currentSchool, similarSchool, fieldSelector)
             ]);
     }
 }
@@ -65,19 +65,13 @@ public record MeasureAvailableFilter(
     string Name,
     IReadOnlyCollection<FilterOption> Options);
 
-internal record MeasureFieldSelector(
-    Func<SchoolData?, string?> SchoolCurrent,
-    Func<SchoolData?, string?> SchoolPrevious,
-    Func<SchoolData?, string?> SchoolPrevious2,
-    Func<SchoolData?, string?> LocalAuthorityCurrent,
-    Func<SchoolData?, string?> LocalAuthorityPrevious,
-    Func<SchoolData?, string?> LocalAuthorityPrevious2,
-    Func<SchoolData?, string?> EnglandCurrent,
-    Func<SchoolData?, string?> EnglandPrevious,
-    Func<SchoolData?, string?> EnglandPrevious2);
-
-internal sealed record SchoolData(
-    string Urn,
-    string Name,
-    Ks4PerformanceData? PerformanceData,
-    Ks4DestinationsData? DestinationsData);
+internal record MeasureFieldSelector<T>(
+    Func<T?, string?> SchoolCurrent,
+    Func<T?, string?> SchoolPrevious,
+    Func<T?, string?> SchoolPrevious2,
+    Func<T?, string?> LocalAuthorityCurrent,
+    Func<T?, string?> LocalAuthorityPrevious,
+    Func<T?, string?> LocalAuthorityPrevious2,
+    Func<T?, string?> EnglandCurrent,
+    Func<T?, string?> EnglandPrevious,
+    Func<T?, string?> EnglandPrevious2);

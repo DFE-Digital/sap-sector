@@ -1,31 +1,33 @@
+using SAPSec.Core.School.Secondary;
+
 namespace SAPSec.Core.Measures;
 
 public record TopPerformersSubMeasure(
     IEnumerable<TopPerformer> TopPerformers)
     : SubMeasure
 {
-    internal static TopPerformersSubMeasure ForSchool(
-        SchoolData currentSchool,
-        IEnumerable<SchoolData> similarSchools,
-        MeasureFieldSelector fieldSelector)
+    internal static TopPerformersSubMeasure ForSecondarySchool<T>(
+        SecondarySchoolData<T> currentSchool,
+        IEnumerable<SecondarySchoolData<T>> similarSchools,
+        MeasureFieldSelector<T> fieldSelector)
     {
         var currentSchoolCandidate = new TopPerformerCandidate(
-            currentSchool.Urn,
-            currentSchool.Name,
+            currentSchool.SchoolInfo.Urn,
+            currentSchool.SchoolInfo.Name,
             MeasureHelper.AverageFrom(
-                fieldSelector.SchoolCurrent(currentSchool),
-                fieldSelector.SchoolPrevious(currentSchool),
-                fieldSelector.SchoolPrevious2(currentSchool)),
+                fieldSelector.SchoolCurrent(currentSchool.Data),
+                fieldSelector.SchoolPrevious(currentSchool.Data),
+                fieldSelector.SchoolPrevious2(currentSchool.Data)),
             IsCurrentSchool: true);
 
         return new(similarSchools
             .Select(x => new TopPerformerCandidate(
-                x.Urn,
-                x.Name,
+                x.SchoolInfo.Urn,
+                x.SchoolInfo.Name,
                 MeasureHelper.AverageFrom(
-                    fieldSelector.SchoolCurrent(x),
-                    fieldSelector.SchoolPrevious(x),
-                    fieldSelector.SchoolPrevious2(x)),
+                    fieldSelector.SchoolCurrent(x.Data),
+                    fieldSelector.SchoolPrevious(x.Data),
+                    fieldSelector.SchoolPrevious2(x.Data)),
                 IsCurrentSchool: false))
             .Append(currentSchoolCandidate)
             .Where(x => x.Value.HasValue)

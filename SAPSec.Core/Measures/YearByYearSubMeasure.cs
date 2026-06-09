@@ -1,46 +1,48 @@
+using SAPSec.Core.School.Secondary;
+
 namespace SAPSec.Core.Measures;
 
 public record YearByYearSubMeasure(
     IEnumerable<YearByYearSeries> Series) : SubMeasure
 {
-    internal static YearByYearSubMeasure ForSchool(
-        SchoolData schoolData,
-        IEnumerable<SchoolData> similarSchools,
-        MeasureFieldSelector fieldSelector) => new([
+    internal static YearByYearSubMeasure ForSecondarySchool<T>(
+        SecondarySchoolData<T> currentSchool,
+        IEnumerable<SecondarySchoolData<T>> similarSchools,
+        MeasureFieldSelector<T> fieldSelector) => new([
             MeasureHelper.SeriesFrom(
-                fieldSelector.SchoolCurrent(schoolData),
-                fieldSelector.SchoolPrevious(schoolData),
-                fieldSelector.SchoolPrevious2(schoolData)),
+                fieldSelector.SchoolCurrent(currentSchool.Data),
+                fieldSelector.SchoolPrevious(currentSchool.Data),
+                fieldSelector.SchoolPrevious2(currentSchool.Data)),
             new YearByYearSeries(
-                MeasureHelper.AverageFrom(similarSchools.Select(x => fieldSelector.SchoolCurrent(x))),
-                MeasureHelper.AverageFrom(similarSchools.Select(x => fieldSelector.SchoolPrevious(x))),
-                MeasureHelper.AverageFrom(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x)))),
+                MeasureHelper.AverageFrom(similarSchools.Select(x => fieldSelector.SchoolCurrent(x.Data))),
+                MeasureHelper.AverageFrom(similarSchools.Select(x => fieldSelector.SchoolPrevious(x.Data))),
+                MeasureHelper.AverageFrom(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x.Data)))),
             MeasureHelper.SeriesFrom(
-                fieldSelector.LocalAuthorityCurrent(schoolData),
-                fieldSelector.LocalAuthorityPrevious(schoolData),
-                fieldSelector.LocalAuthorityPrevious2(schoolData)),
+                fieldSelector.LocalAuthorityCurrent(currentSchool.Data),
+                fieldSelector.LocalAuthorityPrevious(currentSchool.Data),
+                fieldSelector.LocalAuthorityPrevious2(currentSchool.Data)),
             MeasureHelper.SeriesFrom(
-                fieldSelector.EnglandCurrent(schoolData),
-                fieldSelector.EnglandPrevious(schoolData),
-                fieldSelector.EnglandPrevious2(schoolData))
+                fieldSelector.EnglandCurrent(currentSchool.Data),
+                fieldSelector.EnglandPrevious(currentSchool.Data),
+                fieldSelector.EnglandPrevious2(currentSchool.Data))
         ]);
 
-    internal static YearByYearSubMeasure ForSchoolComparison(
-        SchoolData currentSchoolData,
-        SchoolData similarSchoolData,
-        MeasureFieldSelector fieldSelector) => new([
+    internal static YearByYearSubMeasure ForSecondarySchoolComparison<T>(
+        SecondarySchoolData<T> currentSchool,
+        SecondarySchoolData<T> similarSchool,
+        MeasureFieldSelector<T> fieldSelector) => new([
             MeasureHelper.SeriesFrom(
-                fieldSelector.SchoolCurrent(currentSchoolData),
-                fieldSelector.SchoolPrevious(currentSchoolData),
-                fieldSelector.SchoolPrevious2(currentSchoolData)),
+                fieldSelector.SchoolCurrent(currentSchool.Data),
+                fieldSelector.SchoolPrevious(currentSchool.Data),
+                fieldSelector.SchoolPrevious2(currentSchool.Data)),
             MeasureHelper.SeriesFrom(
-                fieldSelector.SchoolCurrent(similarSchoolData),
-                fieldSelector.SchoolPrevious(similarSchoolData),
-                fieldSelector.SchoolPrevious2(similarSchoolData)),
+                fieldSelector.SchoolCurrent(similarSchool.Data),
+                fieldSelector.SchoolPrevious(similarSchool.Data),
+                fieldSelector.SchoolPrevious2(similarSchool.Data)),
             MeasureHelper.SeriesFrom(
-                fieldSelector.EnglandCurrent(currentSchoolData),
-                fieldSelector.EnglandPrevious(currentSchoolData),
-                fieldSelector.EnglandPrevious2(currentSchoolData))
+                fieldSelector.EnglandCurrent(currentSchool.Data),
+                fieldSelector.EnglandPrevious(currentSchool.Data),
+                fieldSelector.EnglandPrevious2(currentSchool.Data))
         ]);
 }
 

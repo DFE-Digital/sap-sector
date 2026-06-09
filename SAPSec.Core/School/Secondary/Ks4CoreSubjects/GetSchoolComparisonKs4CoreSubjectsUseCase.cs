@@ -2,76 +2,37 @@ using SAPSec.Core.Exceptions;
 using SAPSec.Core.Measures;
 using SAPSec.Core.School.Info;
 using SAPSec.Core.UseCases;
-using SAPSec.Data.Dto;
-using SAPSec.Data.Store;
 
 namespace SAPSec.Core.School.Secondary.Ks4CoreSubjects;
 
 public class GetSchoolComparisonKs4CoreSubjectsUseCase(
-    IKs4PerformanceStore performanceStore,
-    IEstablishmentStore establishmentStore,
-    ISimilarSchoolsSecondaryStore similarSchoolsStore)
+    ISecondarySchoolsRepository repository)
     : IUseCase<GetSchoolComparisonKs4CoreSubjectsRequest, GetSchoolComparisonKs4CoreSubjectsResponse>
 {
     public async Task<GetSchoolComparisonKs4CoreSubjectsResponse> Execute(GetSchoolComparisonKs4CoreSubjectsRequest request)
     {
-        var currentSchool = await establishmentStore.GetEstablishmentAsync(request.CurrentSchoolUrn);
-        if (currentSchool is null)
-        {
-            throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
-        }
+        var (currentSchool, similarSchools) = await repository.GetSimilarSchoolsPerformance(request.CurrentSchoolUrn);
 
-        var similarSchool = await establishmentStore.GetEstablishmentAsync(request.SimilarSchoolUrn);
+        var similarSchool = similarSchools.FirstOrDefault(s => s.SchoolInfo.Urn == request.SimilarSchoolUrn);
         if (similarSchool is null)
         {
             throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
         }
 
-        var currentSchoolData = new SchoolData(
-            request.CurrentSchoolUrn,
-            currentSchool.EstablishmentName,
-            await performanceStore.GetByUrnAsync(request.CurrentSchoolUrn),
-            null);
-
-        var similarSchoolsUrns = (await similarSchoolsStore.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn))
-            .Select(g => g.NeighbourURN)
-            .Where(urn => !string.IsNullOrWhiteSpace(urn))
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
-
-        var similarSchoolsPerformance = (await performanceStore.GetByUrnsAsync(similarSchoolsUrns) ?? [])
-            .ToDictionary(x => x.URN, x => x, StringComparer.Ordinal);
-
-        var similarSchoolsDetails = (await establishmentStore.GetEstablishmentsAsync(similarSchoolsUrns)
-                ?? Array.Empty<Establishment>())
-            .Where(x => !string.IsNullOrWhiteSpace(x.URN))
-            .ToDictionary(x => x.URN, StringComparer.Ordinal);
-
-        var similarSchoolsData = similarSchoolsUrns
-            .Where(similarSchoolsDetails.ContainsKey)
-            .Select(urn => new SchoolData(
-                urn,
-                similarSchoolsDetails[urn].EstablishmentName,
-                similarSchoolsPerformance.GetValueOrDefault(urn),
-                null))
-            .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
-
-        var similarSchoolData = similarSchoolsData[request.SimilarSchoolUrn];
-
         var filterBy = request.FilterBy ?? new Dictionary<string, string>();
 
         return new(
-            new(currentSchool.URN, currentSchool.EstablishmentName),
-            new(similarSchool.URN, similarSchool.EstablishmentName),
-            similarSchoolsData.Values.Count,
+            currentSchool.SchoolInfo,
+            similarSchool.SchoolInfo,
+            similarSchools.Count,
             [
-                Ks4CoreSubjects.EnglishLanguage.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
-                Ks4CoreSubjects.EnglishLiterature.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
-                Ks4CoreSubjects.Biology.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
-                Ks4CoreSubjects.Chemistry.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
-                Ks4CoreSubjects.Physics.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
-                Ks4CoreSubjects.Mathematics.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
-                Ks4CoreSubjects.CombinedScience.ForSchoolComparison(currentSchoolData, similarSchoolData, similarSchoolsData, filterBy),
+                Ks4CoreSubjects.EnglishLanguage.ForSecondarySchoolComparison(currentSchool, similarSchool, similarSchools, filterBy),
+                Ks4CoreSubjects.EnglishLiterature.ForSecondarySchoolComparison(currentSchool, similarSchool, similarSchools, filterBy),
+                Ks4CoreSubjects.Biology.ForSecondarySchoolComparison(currentSchool, similarSchool, similarSchools, filterBy),
+                Ks4CoreSubjects.Chemistry.ForSecondarySchoolComparison(currentSchool, similarSchool, similarSchools, filterBy),
+                Ks4CoreSubjects.Physics.ForSecondarySchoolComparison(currentSchool, similarSchool, similarSchools, filterBy),
+                Ks4CoreSubjects.Mathematics.ForSecondarySchoolComparison(currentSchool, similarSchool, similarSchools, filterBy),
+                Ks4CoreSubjects.CombinedScience.ForSecondarySchoolComparison(currentSchool, similarSchool, similarSchools, filterBy),
             ]);
     }
 }

@@ -6,6 +6,7 @@ using SAPSec.Core.DataPoints;
 using SAPSec.Core.School.Attendance;
 using SAPSec.Core.School.Details;
 using SAPSec.Core.School.Info;
+using SAPSec.Core.School.Secondary;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures;
 using SAPSec.Data.Dto;
@@ -49,14 +50,17 @@ public class SchoolControllerTests
             new GetSchoolDetailsUseCase(
                 _schoolDetailsServiceMock.Object),
             new GetSchoolKs4HeadlineMeasuresUseCase(
-                _ks4PerformanceRepositoryMock.Object,
-                _ks4DestinationsRepositoryMock.Object,
-                _establishmentRepositoryMock.Object,
-                _similarSchoolsRepositoryMock.Object),
+                new SecondarySchoolsRepository(
+                    _establishmentRepositoryMock.Object,
+                    _similarSchoolsRepositoryMock.Object,
+                    _ks4PerformanceRepositoryMock.Object,
+                    _ks4DestinationsRepositoryMock.Object)),
             new GetSchoolKs4CoreSubjectsUseCase(
-                _ks4PerformanceRepositoryMock.Object,
-                _establishmentRepositoryMock.Object,
-                _similarSchoolsRepositoryMock.Object),
+                new SecondarySchoolsRepository(
+                    _establishmentRepositoryMock.Object,
+                    _similarSchoolsRepositoryMock.Object,
+                    _ks4PerformanceRepositoryMock.Object,
+                    _ks4DestinationsRepositoryMock.Object)),
             new GetAttendanceMeasuresUseCase(
                 _absenceRepositoryMock.Object,
                 _establishmentRepositoryMock.Object,
