@@ -5,4 +5,6 @@ namespace SAPSec.Core.Interfaces.Services;
 public interface ICustomEventService  
 {
     Task SendCustomEvent(ClickData clickData, string eventName);
+
+    Task IgnoreWebRequestEvent();
 }

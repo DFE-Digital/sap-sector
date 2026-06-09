@@ -121,9 +121,6 @@ public class Program
                 options.RequestFilter = ctx =>
                     ctx.Request.Path != "/healthcheck";
             });
-        } else
-        {
-            builder.Services.AddFakeDfeAnalytics();
         }
 
         builder.Services.AddDistributedMemoryCache();
@@ -172,7 +169,7 @@ public class Program
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
-        builder.Services.AddDependencies();
+        builder.Services.AddDependencies(builder.Environment);
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();

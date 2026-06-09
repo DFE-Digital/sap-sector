@@ -15,12 +15,20 @@ namespace SAPSec.Web.Extensions;
 [ExcludeFromCodeCoverage]
 public static class DependenciesExtensions
 {
-    public static void AddDependencies(this IServiceCollection services)
+    public static void AddDependencies(this IServiceCollection services, IWebHostEnvironment environment)
     {
         services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
         services.AddScoped<ISchoolSearchService, SchoolSearchService>();
-        services.AddScoped<ICustomEventService, CustomEventService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
+
+       // if (environment.IsDevelopment())
+       // {
+         //   services.AddScoped<ICustomEventService, FakeCustomEventService>();
+       // }
+       // else
+       // {
+            services.AddScoped<ICustomEventService, CustomEventService>();
+       // }
 
         // Use cases
         services.AddSingleton<GetKs4HeadlineMeasures>();

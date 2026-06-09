@@ -16,4 +16,9 @@ public class CustomEventService(IHttpContextAccessor httpContextAccessor, IEvent
 
         httpContextAccessor?.HttpContext?.IgnoreWebRequestEvent();
     }
+
+    public async Task IgnoreWebRequestEvent()
+    {
+        httpContextAccessor?.HttpContext?.IgnoreWebRequestEvent();
+    }
 }
