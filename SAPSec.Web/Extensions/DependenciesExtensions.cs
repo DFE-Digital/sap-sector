@@ -28,7 +28,7 @@ public static class DependenciesExtensions
         //else
         //{
             services.AddScoped<ICustomEventService, CustomEventService>();
-        //}
+       // }
 
         // Use cases
         services.AddSingleton<GetKs4HeadlineMeasures>();
