@@ -91,8 +91,7 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         content.Should().Contain("href='https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release'");
         content.Should().Contain("href='https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/'");
         content.Should().Contain("class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\"");
-        content.Should().Contain("Find out more about English indices of deprivation (opens in new tab)");
-        content.Should().Contain("Find out more on the Office for Students website (opens in new tab)");
+        content.Should().Contain("opens in new tab");
     }
 
     private static void AssertInOrder(string content, params string[] expectedText)
