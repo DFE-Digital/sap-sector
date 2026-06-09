@@ -3,6 +3,10 @@ using SAPSec.Core.Model;
 
 namespace SAPSec.Web.Services;
 
+/// <summary>
+/// A fake implementation of ICustomEventService for development purposes.
+/// Required as Dfe.Analytics is not available for local development.
+/// </summary>
 public class FakeCustomEventService : ICustomEventService
 {
     public Task SendCustomEvent(ClickData clickData, string eventName)

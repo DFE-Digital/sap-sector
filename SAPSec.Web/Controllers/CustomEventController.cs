@@ -6,55 +6,52 @@ using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;
 
+/// <summary>
+/// Handles requests from client side /custom-event-tracking.
+/// Used FakeCustomEventService in development as Dfe.Analytics is not available for local development.
+/// </summary>
+/// <param name="customEventService"></param>
 [AllowAnonymous]
 public class CustomEventController(ICustomEventService customEventService) : Controller
 {
-    //const string FeedbackForm = "https://forms.cloud.microsoft";
-    //const string ServiceUrl = "https://get-school-improvement-insights.education.gov.uk/";
-    //https://get-school-improvement-insights-test.test.teacherservices.cloud/
-    //const string SignIn = "/auth/signin";
-    //const string MailTo = "mailto:";
+    const string FeedbackForm = @"^https:\/\/forms.cloud.microsoft.+$";
+    const string SignIn = @".*\/auth\/signin.*$";
+    const string MailTo = @"^mailto:.+$";
+   // const string ServiceUrl = @"^(?!(https://get-school-improvement-insights\.education\.gov\.uk/.*$|https://get-school-improvement-insights-test\.test\.teacherservices\.cloud/.*$))";
 
-    const string FeedbackForm = "https://forms.cloud.microsoft";
-    //const string ServiceUrl = "https://localhost:44300";
-    const string SignIn = "/auth/signin";
-    const string MailTo = "mailto:";
-    const string External = "https://www";
-
-    const string InboundLinkPattern = @"(?<=#).*$";
-   // const string ServiceUrlPattern = @"https:\/\/localhost:44300\/.*$";
-    //const string ServiceUrlPattern = @"https:\/\/https://get-school-improvement-insights.*$";
-    // const string OverviewPagePattern = $"^{ServiceUrlPrefix}/school/\\d+$";
+    const string ServiceUrl = @"^https:\/\/get-school-improvement-insights-pr-240\.test\.teacherservices\.cloud\/.*$";
+    // const string ServiceUrl = @"^https:\/\/localhost:44300\/.*$";
 
     [HttpPost("/custom-event-tracking")]
     public async Task<IActionResult> CustomEventTracking([FromBody] ClickData clickData)
     {
-        if (clickData.Url.Contains(SignIn, StringComparison.OrdinalIgnoreCase))
+        var patterns = new Dictionary<string, string> {
+            { FeedbackForm, "feedback_link_click" },
+            { SignIn, "cta_start_now_click" },
+            { MailTo, "mailto_link_click" } };
+
+        foreach (var pattern in patterns)
         {
-            await customEventService.SendCustomEvent(clickData, "cta_start_now_click");
+            Match match = Regex.Match(clickData.Url, pattern.Key);
+
+            if (match.Success)
+            {
+                clickData.Text = match.Value;
+                await customEventService.SendCustomEvent(clickData, pattern.Value);
+
+                return Ok();
+            }
+
         }
 
-        if (clickData.Url.StartsWith(FeedbackForm, StringComparison.OrdinalIgnoreCase))
-        {
-            await customEventService.SendCustomEvent(clickData, "feedback_link_click");
-        }
+        Match matchServiceUrl = Regex.Match(clickData.Url, ServiceUrl);
 
-        if (clickData.Url.StartsWith(MailTo, StringComparison.OrdinalIgnoreCase))
+        if (!matchServiceUrl.Success)
         {
-            await customEventService.SendCustomEvent(clickData, "mailto_link_click");
-        }
-
-        if (clickData.Url.StartsWith(External, StringComparison.OrdinalIgnoreCase))
-        {
+            clickData.Text = matchServiceUrl.Value;
             await customEventService.SendCustomEvent(clickData, "outbound_link_click");
-        }
 
-        Match matchInbound = Regex.Match(clickData.Url, InboundLinkPattern);
-
-        if (matchInbound.Success)
-        {
-            clickData.Text = matchInbound.Value;
-            await customEventService.SendCustomEvent(clickData, "inbound_link_click");
+            return Ok();
         }
 
         await customEventService.IgnoreWebRequestEvent();

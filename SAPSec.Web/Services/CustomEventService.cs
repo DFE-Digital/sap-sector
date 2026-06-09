@@ -5,6 +5,11 @@ using SAPSec.Core.Model;
 
 namespace SAPSec.Web.Services;
 
+/// <summary>
+/// Creates and sends custom events to Big Query using Dfe.Analytics.
+/// </summary>
+/// <param name="httpContextAccessor"></param>
+/// <param name="eventSender"></param>
 public class CustomEventService(IHttpContextAccessor httpContextAccessor, IEventSender eventSender) : ICustomEventService
 {
     public async Task SendCustomEvent(ClickData clickData, string eventName)
@@ -14,8 +19,11 @@ public class CustomEventService(IHttpContextAccessor httpContextAccessor, IEvent
 
         await eventSender.SendEventAsync(customEvent);
 
+
+        //Ignore the web request event for this custom event to avoid creating a duplicate entry in Big Query
         httpContextAccessor?.HttpContext?.IgnoreWebRequestEvent();
     }
+
 
     public async Task IgnoreWebRequestEvent()
     {

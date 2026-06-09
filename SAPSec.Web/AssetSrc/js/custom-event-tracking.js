@@ -17,12 +17,6 @@
             if (!response.ok) {
                 throw new Error("Request failed with status " + response.status);
             }
-            console.log("Event tracked successfully");
-            //return response.json();
         });
-            // }).then(data => {
-            //     // Safe redirection handled by the browser context
-            //     window.location.href = data.url;
-            // });
     });
 })();
