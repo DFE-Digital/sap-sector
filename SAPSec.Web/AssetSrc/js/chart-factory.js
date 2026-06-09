@@ -369,9 +369,9 @@
         const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize);
 
         const legendOptions = {
-            display: showLegend,
-            position: type === 'line' ? 'top' : CHART_CONFIG.legend.position,
-            align: type === 'line' ? 'start' : 'center',
+            display: type === 'line' ? false : showLegend,
+            position: CHART_CONFIG.legend.position,
+            align: 'center',
             labels: {
                 usePointStyle: true,
                 pointStyle: CHART_CONFIG.legend.pointStyle,
@@ -801,9 +801,9 @@
             charts[canvas.id] = chart;
 
             if (showLegend) {
-                const legendContainer = document.querySelector(
-                    `.chart-legend[data-chart-id="${canvas.id}"]`
-                );
+                const legendContainer = type === 'line'
+                    ? ensureTopLegendContainer(canvas)
+                    : document.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
                 if (legendContainer) {
                     buildVerticalLegend(chart, legendContainer);
                 }
@@ -830,19 +830,24 @@
     }
 
     function buildVerticalLegend(chart, container) {
+        container.innerHTML = '';
+
         const datasets = Array.isArray(chart.data.datasets)
             ? chart.data.datasets
             : [chart.data.datasets];
 
         const ul = document.createElement('ul');
+        ul.classList.add('app-chart-legend');
 
         datasets.forEach(ds => {
             const li = document.createElement('li');
+            li.classList.add('app-chart-legend__item');
             const box = document.createElement('span');
-            box.classList.add('legend-box');
+            box.classList.add('app-chart-legend__box');
             box.style.backgroundColor = ds.backgroundColor || ds.borderColor || CHART_CONFIG.fallbacks.legendBoxColor;
 
             const label = document.createElement('span');
+            label.classList.add('app-chart-legend__label');
             label.textContent = ds.label;
 
             li.appendChild(box);
@@ -851,6 +856,23 @@
         });
 
         container.appendChild(ul);
+    }
+
+    function ensureTopLegendContainer(canvas) {
+        const chartContainer = canvas.parentElement;
+        if (!chartContainer) {
+            return null;
+        }
+
+        let legendContainer = chartContainer.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
+        if (!legendContainer) {
+            legendContainer = document.createElement('div');
+            legendContainer.className = 'chart-legend chart-legend--top';
+            legendContainer.setAttribute('data-chart-id', canvas.id);
+            chartContainer.insertBefore(legendContainer, chartContainer.firstChild);
+        }
+
+        return legendContainer;
     }
 
     function adjustChartResize() {
