@@ -114,7 +114,7 @@ public class Program
                 .Build();
         });
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -250,7 +250,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             app.UseDfeAnalytics();
         }
