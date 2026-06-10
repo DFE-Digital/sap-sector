@@ -1,4 +1,5 @@
 ﻿using Dfe.Analytics.Events;
+using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NSubstitute;
@@ -20,17 +21,17 @@ public class CustomEventControllerTests
     }
 
     [Theory]
-    [InlineData("https://forms.cloud.microsoft", "feedback_link_click")]
-    [InlineData("https://get-school-improvement-insights.education.gov.uk//auth/signin", "cta_start_now_click")]
+    [InlineData("https://forms.cloud.microsoft/Pages", "feedback_link_click")]
+    [InlineData("https://get-school-improvement-insights.education.gov.uk/auth/signin", "cta_start_now_click")]
     [InlineData("https://www.example.com", "outbound_link_click")]
-    [InlineData("https://get-school-improvement-insights.education.gov.uk/school/136994/route#location", "inbound_link_clik")]
-    [InlineData("https://get-school-improvement-insights.education.gov.uk/school/136994", "overview_page")]
-
+    [InlineData("mailto:test@example.com", "mailto_link_click")]
     public async Task CustomEventTracking_SendsCustomEvent(string url, string eventName)
     {
         var clickData = new ClickData { Text = "text", Url = url };
 
         var result = await _sut.CustomEventTracking(clickData);
+
+        result.Should().BeOfType<OkResult>();
 
         _customEventServiceMock.Verify(x => x.SendCustomEvent(It.Is<ClickData>(c => c.Url == url), eventName), Times.Once);
     }

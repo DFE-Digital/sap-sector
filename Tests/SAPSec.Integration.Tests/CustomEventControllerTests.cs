@@ -11,26 +11,13 @@ public class CustomEventControllerTests(WebApplicationSetupFixture fixture)
     #region POST /custom-event-tracking Tests
 
     [Fact]
-    public async Task PostCustomEventTracking_ReturnRedirect()
+    public async Task PostCustomEventTracking_ReturnsOK()
     {
-        var payload = new { Url = "https://forms.cloud.microsoft", Text = "Text" };
-    
-
-//var json = System.Text.Json.JsonSerializer.Serialize(payload);
-  //      var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-        // Ensure the request/response headers are set to JSON
-        //  fixture.Client.DefaultRequestHeaders.Accept.Clear();
-        // fixture.Client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-
-        //var response = await fixture.Client.PostAsync("/custom-event-tracking", content);
+        var payload = new { Url = "https://forms.cloud.microsoft/Pages", Text = "Text" };
 
         var response = await fixture.Client.PostAsJsonAsync("/custom-event-tracking", payload);
 
-
-        response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/custom-event-tracking");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
     #endregion
 }

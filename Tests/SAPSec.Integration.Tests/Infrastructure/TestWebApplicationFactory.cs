@@ -15,6 +15,7 @@ using SAPSec.Core.Model.Generated;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Integration.Tests.Infrastructure;
 
@@ -70,7 +71,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IDsiClient>();
                 services.AddScoped<IUserService, MockDsiUserService>();
                 services.AddScoped<IDsiClient, MockDsiApiService>();
-              //  services.AddScoped<ICustomEventSender, FakeEventSender>();
+                services.AddScoped<ICustomEventService, FakeCustomEventService>();
 
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
