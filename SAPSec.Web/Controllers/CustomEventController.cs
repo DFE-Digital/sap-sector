@@ -17,7 +17,7 @@ public class CustomEventController(ICustomEventService customEventService) : Con
     const string FeedbackForm = @"^https:\/\/forms.cloud.microsoft.+$";
     const string SignIn = @".*\/auth\/signin.*$";
     const string MailTo = @"^mailto:.+$";
-    const string ServiceUrl = @"^(?!(https://get-school-improvement-insights\.education\.gov\.uk/.*$|https://get-school-improvement-insights-test\.test\.teacherservices\.cloud/.*$))";
+    const string ServiceUrl = @"^https://get-school-improvement-insights\.education\.gov\.uk/.*$|https://get-school-improvement-insights-test\.test\.teacherservices\.cloud/.*$";
 
     [HttpPost("/custom-event-tracking")]
     public async Task<IActionResult> CustomEventTracking([FromBody] ClickData clickData)
