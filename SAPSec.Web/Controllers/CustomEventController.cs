@@ -8,7 +8,7 @@ namespace SAPSec.Web.Controllers;
 
 /// <summary>
 /// Handles requests from client side /custom-event-tracking.
-/// Used FakeCustomEventService in development as Dfe.Analytics is not available for local development.
+/// Uses FakeCustomEventService in development as Dfe.Analytics is not available for local development.
 /// </summary>
 /// <param name="customEventService"></param>
 [AllowAnonymous]
