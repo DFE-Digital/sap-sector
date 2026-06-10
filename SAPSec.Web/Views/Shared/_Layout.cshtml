@@ -13,9 +13,6 @@
     var clarityId = analytics.ClarityId;
     var loadAnalytics = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
 }
-@{
-    var environment = Context.RequestServices.GetRequiredService<IWebHostEnvironment>();
-}
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
