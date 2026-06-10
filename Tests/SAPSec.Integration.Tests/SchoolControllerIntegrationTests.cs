@@ -88,8 +88,10 @@ public class SchoolControllerIntegrationTests(WebApplicationSetupFixture fixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("href='https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release' class=\"govuk-link\"");
-        content.Should().Contain("href='https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/' class=\"govuk-link\"");
+        content.Should().Contain("href='https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release'");
+        content.Should().Contain("href='https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/'");
+        content.Should().Contain("class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\"");
+        content.Should().Contain("opens in new tab");
     }
 
     private static void AssertInOrder(string content, params string[] expectedText)
