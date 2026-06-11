@@ -1,0 +1,8 @@
+# One logical dataset key per line to rebuild in the production environment.
+# Lines starting with # are ignored.
+
+# GIAS sources
+edubasealldataYYYYmmDD
+links_edubasealldataYYYYmmDD
+grouplinks_edubaseallacademiesandfreeYYYYmmDD
+secondary-email-addresses-12-01-2026
