@@ -6,9 +6,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "38.56",
         "Abs_Tot_LA_Current_Pct":  "11.06",
         "Abs_Tot_LA_Previous_Pct":  "10.86",
-        "Abs_Tot_LA_Previous2_Pct":  "11.16",
-        "Auth_Tot_LA_Current_Pct":  "7.25",
-        "UnAuth_Tot_LA_Current_Pct":  "3.81"
+        "Abs_Tot_LA_Previous2_Pct":  "11.16"
     },
     {
         "Id":  "209",
@@ -17,9 +15,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "28.09",
         "Abs_Tot_LA_Current_Pct":  "8.81",
         "Abs_Tot_LA_Previous_Pct":  "8.71",
-        "Abs_Tot_LA_Previous2_Pct":  "8.93",
-        "Auth_Tot_LA_Current_Pct":  "5.57",
-        "UnAuth_Tot_LA_Current_Pct":  "3.24"
+        "Abs_Tot_LA_Previous2_Pct":  "8.93"
     },
     {
         "Id":  "301",
@@ -28,9 +24,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "30.14",
         "Abs_Tot_LA_Current_Pct":  "8.83",
         "Abs_Tot_LA_Previous_Pct":  "8.6",
-        "Abs_Tot_LA_Previous2_Pct":  "8.6",
-        "Auth_Tot_LA_Current_Pct":  "5.68",
-        "UnAuth_Tot_LA_Current_Pct":  "3.15"
+        "Abs_Tot_LA_Previous2_Pct":  "8.6"
     },
     {
         "Id":  "936",
@@ -39,9 +33,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "13.23",
         "Abs_Tot_LA_Current_Pct":  "6.18",
         "Abs_Tot_LA_Previous_Pct":  "5.69",
-        "Abs_Tot_LA_Previous2_Pct":  "5.58",
-        "Auth_Tot_LA_Current_Pct":  "3.54",
-        "UnAuth_Tot_LA_Current_Pct":  "2.64"
+        "Abs_Tot_LA_Previous2_Pct":  "5.58"
     },
     {
         "Id":  "308",
@@ -50,9 +42,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "33.5",
         "Abs_Tot_LA_Current_Pct":  "10.7",
         "Abs_Tot_LA_Previous_Pct":  "11.15",
-        "Abs_Tot_LA_Previous2_Pct":  "10.85",
-        "Auth_Tot_LA_Current_Pct":  "7",
-        "UnAuth_Tot_LA_Current_Pct":  "3.71"
+        "Abs_Tot_LA_Previous2_Pct":  "10.85"
     },
     {
         "Id":  "391",
@@ -61,9 +51,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "43.06",
         "Abs_Tot_LA_Current_Pct":  "12.4",
         "Abs_Tot_LA_Previous_Pct":  "12.05",
-        "Abs_Tot_LA_Previous2_Pct":  "12.99",
-        "Auth_Tot_LA_Current_Pct":  "8.46",
-        "UnAuth_Tot_LA_Current_Pct":  "3.94"
+        "Abs_Tot_LA_Previous2_Pct":  "12.99"
     },
     {
         "Id":  "320",
@@ -72,9 +60,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "32.53",
         "Abs_Tot_LA_Current_Pct":  "9.55",
         "Abs_Tot_LA_Previous_Pct":  "9.2",
-        "Abs_Tot_LA_Previous2_Pct":  "9.51",
-        "Auth_Tot_LA_Current_Pct":  "6.01",
-        "UnAuth_Tot_LA_Current_Pct":  "3.54"
+        "Abs_Tot_LA_Previous2_Pct":  "9.51"
     },
     {
         "Id":  "381",
@@ -83,9 +69,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "21.9",
         "Abs_Tot_LA_Current_Pct":  "8.18",
         "Abs_Tot_LA_Previous_Pct":  "8.28",
-        "Abs_Tot_LA_Previous2_Pct":  "7.96",
-        "Auth_Tot_LA_Current_Pct":  "5.09",
-        "UnAuth_Tot_LA_Current_Pct":  "3.09"
+        "Abs_Tot_LA_Previous2_Pct":  "7.96"
     },
     {
         "Id":  "801",
@@ -94,9 +78,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "44.39",
         "Abs_Tot_LA_Current_Pct":  "11.9",
         "Abs_Tot_LA_Previous_Pct":  "11.54",
-        "Abs_Tot_LA_Previous2_Pct":  "12.41",
-        "Auth_Tot_LA_Current_Pct":  "8.39",
-        "UnAuth_Tot_LA_Current_Pct":  "3.51"
+        "Abs_Tot_LA_Previous2_Pct":  "12.41"
     },
     {
         "Id":  "831",
@@ -105,9 +87,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "30.67",
         "Abs_Tot_LA_Current_Pct":  "9.91",
         "Abs_Tot_LA_Previous_Pct":  "10",
-        "Abs_Tot_LA_Previous2_Pct":  "10.35",
-        "Auth_Tot_LA_Current_Pct":  "6.42",
-        "UnAuth_Tot_LA_Current_Pct":  "3.49"
+        "Abs_Tot_LA_Previous2_Pct":  "10.35"
     },
     {
         "Id":  "850",
@@ -116,9 +96,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "15.81",
         "Abs_Tot_LA_Current_Pct":  "6.47",
         "Abs_Tot_LA_Previous_Pct":  "7.05",
-        "Abs_Tot_LA_Previous2_Pct":  "6",
-        "Auth_Tot_LA_Current_Pct":  "3.77",
-        "UnAuth_Tot_LA_Current_Pct":  "2.69"
+        "Abs_Tot_LA_Previous2_Pct":  "6"
     },
     {
         "Id":  "205",
@@ -127,9 +105,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "31.54",
         "Abs_Tot_LA_Current_Pct":  "9.99",
         "Abs_Tot_LA_Previous_Pct":  "9.82",
-        "Abs_Tot_LA_Previous2_Pct":  "9.54",
-        "Auth_Tot_LA_Current_Pct":  "6.47",
-        "UnAuth_Tot_LA_Current_Pct":  "3.53"
+        "Abs_Tot_LA_Previous2_Pct":  "9.54"
     },
     {
         "Id":  "307",
@@ -138,9 +114,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "21.98",
         "Abs_Tot_LA_Current_Pct":  "9.12",
         "Abs_Tot_LA_Previous_Pct":  "8.95",
-        "Abs_Tot_LA_Previous2_Pct":  "8.97",
-        "Auth_Tot_LA_Current_Pct":  "5.82",
-        "UnAuth_Tot_LA_Current_Pct":  "3.31"
+        "Abs_Tot_LA_Previous2_Pct":  "8.97"
     },
     {
         "Id":  "380",
@@ -149,9 +123,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "29.75",
         "Abs_Tot_LA_Current_Pct":  "9.7",
         "Abs_Tot_LA_Previous_Pct":  "9.69",
-        "Abs_Tot_LA_Previous2_Pct":  "9.16",
-        "Auth_Tot_LA_Current_Pct":  "6.31",
-        "UnAuth_Tot_LA_Current_Pct":  "3.39"
+        "Abs_Tot_LA_Previous2_Pct":  "9.16"
     },
     {
         "Id":  "302",
@@ -160,9 +132,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "16.31",
         "Abs_Tot_LA_Current_Pct":  "6.69",
         "Abs_Tot_LA_Previous_Pct":  "6.71",
-        "Abs_Tot_LA_Previous2_Pct":  "6.5",
-        "Auth_Tot_LA_Current_Pct":  "4.01",
-        "UnAuth_Tot_LA_Current_Pct":  "2.68"
+        "Abs_Tot_LA_Previous2_Pct":  "6.5"
     },
     {
         "Id":  "210",
@@ -171,9 +141,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "38.66",
         "Abs_Tot_LA_Current_Pct":  "10.84",
         "Abs_Tot_LA_Previous_Pct":  "10.57",
-        "Abs_Tot_LA_Previous2_Pct":  "10.89",
-        "Auth_Tot_LA_Current_Pct":  "7.26",
-        "UnAuth_Tot_LA_Current_Pct":  "3.58"
+        "Abs_Tot_LA_Previous2_Pct":  "10.89"
     },
     {
         "Id":  "929",
@@ -182,9 +150,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "24.91",
         "Abs_Tot_LA_Current_Pct":  "7.04",
         "Abs_Tot_LA_Previous_Pct":  "7.64",
-        "Abs_Tot_LA_Previous2_Pct":  "6.96",
-        "Auth_Tot_LA_Current_Pct":  "4.39",
-        "UnAuth_Tot_LA_Current_Pct":  "2.66"
+        "Abs_Tot_LA_Previous2_Pct":  "6.96"
     },
     {
         "Id":  "940",
@@ -193,9 +159,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "23.74",
         "Abs_Tot_LA_Current_Pct":  "8.4",
         "Abs_Tot_LA_Previous_Pct":  "8.39",
-        "Abs_Tot_LA_Previous2_Pct":  "8.8",
-        "Auth_Tot_LA_Current_Pct":  "5.32",
-        "UnAuth_Tot_LA_Current_Pct":  "3.08"
+        "Abs_Tot_LA_Previous2_Pct":  "8.8"
     },
     {
         "Id":  "306",
@@ -204,9 +168,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "24.34",
         "Abs_Tot_LA_Current_Pct":  "8.92",
         "Abs_Tot_LA_Previous_Pct":  "8.6",
-        "Abs_Tot_LA_Previous2_Pct":  "9.22",
-        "Auth_Tot_LA_Current_Pct":  "5.66",
-        "UnAuth_Tot_LA_Current_Pct":  "3.26"
+        "Abs_Tot_LA_Previous2_Pct":  "9.22"
     },
     {
         "Id":  "826",
@@ -215,9 +177,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "16.51",
         "Abs_Tot_LA_Current_Pct":  "7.09",
         "Abs_Tot_LA_Previous_Pct":  "7.01",
-        "Abs_Tot_LA_Previous2_Pct":  "7.94",
-        "Auth_Tot_LA_Current_Pct":  "4.24",
-        "UnAuth_Tot_LA_Current_Pct":  "2.86"
+        "Abs_Tot_LA_Previous2_Pct":  "7.94"
     },
     {
         "Id":  "872",
@@ -226,9 +186,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "11",
         "Abs_Tot_LA_Current_Pct":  "5.96",
         "Abs_Tot_LA_Previous_Pct":  "6.66",
-        "Abs_Tot_LA_Previous2_Pct":  "5.75",
-        "Auth_Tot_LA_Current_Pct":  "3.43",
-        "UnAuth_Tot_LA_Current_Pct":  "2.53"
+        "Abs_Tot_LA_Previous2_Pct":  "5.75"
     },
     {
         "Id":  "208",
@@ -237,9 +195,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "24.07",
         "Abs_Tot_LA_Current_Pct":  "9",
         "Abs_Tot_LA_Previous_Pct":  "8.58",
-        "Abs_Tot_LA_Previous2_Pct":  "9.32",
-        "Auth_Tot_LA_Current_Pct":  "5.67",
-        "UnAuth_Tot_LA_Current_Pct":  "3.32"
+        "Abs_Tot_LA_Previous2_Pct":  "9.32"
     },
     {
         "Id":  "335",
@@ -248,9 +204,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "34.43",
         "Abs_Tot_LA_Current_Pct":  "11.89",
         "Abs_Tot_LA_Previous_Pct":  "11.7",
-        "Abs_Tot_LA_Previous2_Pct":  "12.74",
-        "Auth_Tot_LA_Current_Pct":  "8.33",
-        "UnAuth_Tot_LA_Current_Pct":  "3.57"
+        "Abs_Tot_LA_Previous2_Pct":  "12.74"
     },
     {
         "Id":  "811",
@@ -259,9 +213,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "22.36",
         "Abs_Tot_LA_Current_Pct":  "7.79",
         "Abs_Tot_LA_Previous_Pct":  "7.48",
-        "Abs_Tot_LA_Previous2_Pct":  "7.9",
-        "Auth_Tot_LA_Current_Pct":  "4.87",
-        "UnAuth_Tot_LA_Current_Pct":  "2.93"
+        "Abs_Tot_LA_Previous2_Pct":  "7.9"
     },
     {
         "Id":  "839",
@@ -270,9 +222,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "18.51",
         "Abs_Tot_LA_Current_Pct":  "7.38",
         "Abs_Tot_LA_Previous_Pct":  "7.35",
-        "Abs_Tot_LA_Previous2_Pct":  "7.67",
-        "Auth_Tot_LA_Current_Pct":  "4.48",
-        "UnAuth_Tot_LA_Current_Pct":  "2.9"
+        "Abs_Tot_LA_Previous2_Pct":  "7.67"
     },
     {
         "Id":  "382",
@@ -281,9 +231,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "28.36",
         "Abs_Tot_LA_Current_Pct":  "8.51",
         "Abs_Tot_LA_Previous_Pct":  "8.5",
-        "Abs_Tot_LA_Previous2_Pct":  "9.27",
-        "Auth_Tot_LA_Current_Pct":  "5.39",
-        "UnAuth_Tot_LA_Current_Pct":  "3.12"
+        "Abs_Tot_LA_Previous2_Pct":  "9.27"
     },
     {
         "Id":  "330",
@@ -292,9 +240,7 @@
         "Abs_Persistent_LA_Previous2_Pct":  "45.21",
         "Abs_Tot_LA_Current_Pct":  "13.74",
         "Abs_Tot_LA_Previous_Pct":  "13.86",
-        "Abs_Tot_LA_Previous2_Pct":  "12.99",
-        "Auth_Tot_LA_Current_Pct":  "9.7",
-        "UnAuth_Tot_LA_Current_Pct":  "4.04"
+        "Abs_Tot_LA_Previous2_Pct":  "12.99"
     },
     {
         "Id":  "937",
@@ -303,8 +249,6 @@
         "Abs_Persistent_LA_Previous2_Pct":  "25.44",
         "Abs_Tot_LA_Current_Pct":  "8.5",
         "Abs_Tot_LA_Previous_Pct":  "8.67",
-        "Abs_Tot_LA_Previous2_Pct":  "7.69",
-        "Auth_Tot_LA_Current_Pct":  "5.08",
-        "UnAuth_Tot_LA_Current_Pct":  "3.42"
+        "Abs_Tot_LA_Previous2_Pct":  "7.69"
     }
 ]

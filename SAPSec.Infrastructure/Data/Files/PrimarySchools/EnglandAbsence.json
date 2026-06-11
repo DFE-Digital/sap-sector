@@ -6,9 +6,7 @@
         "Abs_Persistent_Eng_Previous2_Pct":  "27.46429",
         "Abs_Tot_Eng_Current_Pct":  "9.09107",
         "Abs_Tot_Eng_Previous_Pct":  "9.04679",
-        "Abs_Tot_Eng_Previous2_Pct":  "9.13036",
-        "Auth_Tot_Eng_Current_Pct":  "5.84321",
-        "UnAuth_Tot_Eng_Current_Pct":  "3.24964"
+        "Abs_Tot_Eng_Previous2_Pct":  "9.13036"
     },
     {
         "Id":  "Regional",
@@ -17,9 +15,7 @@
         "Abs_Persistent_Eng_Previous2_Pct":  "29.3177",
         "Abs_Tot_Eng_Current_Pct":  "9.4044",
         "Abs_Tot_Eng_Previous_Pct":  "9.38381",
-        "Abs_Tot_Eng_Previous2_Pct":  "9.44384",
-        "Auth_Tot_Eng_Current_Pct":  "6.12424",
-        "UnAuth_Tot_Eng_Current_Pct":  "3.28015"
+        "Abs_Tot_Eng_Previous2_Pct":  "9.44384"
     },
     {
         "Id":  "National",
@@ -28,8 +24,6 @@
         "Abs_Persistent_Eng_Previous2_Pct":  "28.06938",
         "Abs_Tot_Eng_Current_Pct":  "9.14652",
         "Abs_Tot_Eng_Previous_Pct":  "9.0997",
-        "Abs_Tot_Eng_Previous2_Pct":  "9.14069",
-        "Auth_Tot_Eng_Current_Pct":  "5.88163",
-        "UnAuth_Tot_Eng_Current_Pct":  "3.26489"
+        "Abs_Tot_Eng_Previous2_Pct":  "9.14069"
     }
 ]
