@@ -6,6 +6,7 @@ using NSubstitute;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
+using System.Net;
 
 namespace SAPSec.Web.Tests.Controllers;
 
@@ -34,5 +35,19 @@ public class CustomEventControllerTests
         result.Should().BeOfType<OkResult>();
 
         _customEventServiceMock.Verify(x => x.SendCustomEvent(It.Is<ClickData>(c => c.Url == url), eventName), Times.Once);
+    }
+
+    [Theory]
+    [InlineData("https://get-school-improvement-insights.education.gov.uk/school/123456")]
+    [InlineData("https://get-school-improvement-insights-test.test.teacherservices.cloud/school/123456")]
+    public async Task PostCustomEventTracking_DoesNotSendEventForNonMatchingUrls(string url)
+    {
+        var clickData = new ClickData { Text = "text", Url = url };
+
+        var result = await _sut.CustomEventTracking(clickData);
+
+        result.Should().BeOfType<OkResult>();
+
+        _customEventServiceMock.Verify(x => x.SendCustomEvent(It.Is<ClickData>(c => c.Url == url), It.IsAny<string>()), Times.Never);
     }
 }
