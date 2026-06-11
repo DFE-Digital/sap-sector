@@ -1,5 +1,6 @@
 ﻿using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
+using Dfe.Analytics.Events;
 using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -50,7 +51,9 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddFeatureManagement();
         builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.Configure<CustomEventPatterns>(builder.Configuration.GetSection("CustomEventPatterns"));
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
+
         builder.Services.PostConfigure<AnalyticsSettings>(options =>
         {
             var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
@@ -113,6 +116,7 @@ public class Program
                 .Build();
         });
 
+        //Remove 'or "Development" to test in review app
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
@@ -168,7 +172,7 @@ public class Program
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
-        builder.Services.AddDependencies();
+        builder.Services.AddDependencies(builder.Environment);
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();
@@ -249,6 +253,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
+        //Remove 'or "Development" to test in review app
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
         {
             app.UseDfeAnalytics();

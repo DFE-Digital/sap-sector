@@ -7,6 +7,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Services;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Formatters;
+using SAPSec.Web.Services;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Web.Extensions;
@@ -14,11 +15,21 @@ namespace SAPSec.Web.Extensions;
 [ExcludeFromCodeCoverage]
 public static class DependenciesExtensions
 {
-    public static void AddDependencies(this IServiceCollection services)
+    public static void AddDependencies(this IServiceCollection services, IWebHostEnvironment environment)
     {
         services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
         services.AddScoped<ISchoolSearchService, SchoolSearchService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
+
+        //Comment out IsDevelopment check for Review app testing
+        if (environment.IsDevelopment())
+        {
+            services.AddScoped<ICustomEventService, NoOpCustomEventService>();
+        }
+        else
+        {
+            services.AddScoped<ICustomEventService, CustomEventService>();
+        }
 
         // Use cases
         services.AddSingleton<GetKs4HeadlineMeasures>();
