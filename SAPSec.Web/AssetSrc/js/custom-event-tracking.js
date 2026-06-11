@@ -3,10 +3,10 @@
         const link = event.target.closest('a');
         if (!link) return;
 
-            const data = {
-                Url: link.href,
-                Text: link.innerText.trim()
-            };
+        const data = {
+            Url: link.href,
+            Text: link.innerText.trim()
+        };
 
         fetch('/custom-event-tracking', {
             method: 'POST',

@@ -23,7 +23,7 @@ public static class DependenciesExtensions
 
         if (environment.IsDevelopment())
         {
-            services.AddScoped<ICustomEventService, FakeCustomEventService>();
+            services.AddScoped<ICustomEventService, NoOpCustomEventService>();
         }
         else
         {

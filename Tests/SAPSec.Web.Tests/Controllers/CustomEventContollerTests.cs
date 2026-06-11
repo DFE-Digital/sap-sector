@@ -1,10 +1,12 @@
 ﻿using Dfe.Analytics.Events;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Moq;
 using NSubstitute;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Web.Configuration;
 using SAPSec.Web.Controllers;
 using System.Net;
 
@@ -13,12 +15,21 @@ namespace SAPSec.Web.Tests.Controllers;
 public class CustomEventControllerTests
 {
     private readonly Mock<ICustomEventService> _customEventServiceMock;
+    private readonly Mock<IOptions<CustomEventPatterns>> _optionsMock;
     private readonly CustomEventController _sut;
 
     public CustomEventControllerTests()
     {
         _customEventServiceMock = new Mock<ICustomEventService>();
-        _sut = new CustomEventController(_customEventServiceMock.Object);
+        _optionsMock = new Mock<IOptions<CustomEventPatterns>>();
+        _optionsMock.Setup(x => x.Value).Returns(new CustomEventPatterns
+        {
+            FeedbackForm = "^https://forms.cloud.microsoft.+$",
+            SignIn = "^.*/auth/signin.*$",
+            MailTo = "^mailto:.*$",
+            ServiceUrls = "^https://get-school-improvement-insights.education.gov.uk.*$|https://get-school-improvement-insights-test.test.teacherservices.cloud.*$"
+        });
+        _sut = new CustomEventController(_customEventServiceMock.Object, _optionsMock.Object);
     }
 
     [Theory]

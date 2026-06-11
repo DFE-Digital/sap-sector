@@ -71,7 +71,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IDsiClient>();
                 services.AddScoped<IUserService, MockDsiUserService>();
                 services.AddScoped<IDsiClient, MockDsiApiService>();
-                services.AddScoped<ICustomEventService, FakeCustomEventService>();
+                services.AddScoped<ICustomEventService, NoOpCustomEventService>();
 
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();

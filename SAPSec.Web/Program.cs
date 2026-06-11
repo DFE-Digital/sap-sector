@@ -51,7 +51,9 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddFeatureManagement();
         builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.Configure<CustomEventPatterns>(builder.Configuration.GetSection("CustomEventPatterns"));
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
+
         builder.Services.PostConfigure<AnalyticsSettings>(options =>
         {
             var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
@@ -114,7 +116,8 @@ public class Program
                 .Build();
         });
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        //Remove 'or "Development" to test in review app
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -250,7 +253,8 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        //Remove 'or "Development" to test in review app
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests"))
         {
             app.UseDfeAnalytics();
         }
