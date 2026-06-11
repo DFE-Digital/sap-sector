@@ -11,7 +11,7 @@
         <span class="app-filter-toggle__hide">Hide filters</span>
     </button>
 
-    <form method="get" action="@Url.Action("Search", "SchoolSearch")" id="app-filter-panel" class="app-filter-panel @panelVisibleClass">
+    <form method="get" action="@Url.Action("Index", "SchoolSearch")" id="app-filter-panel" class="app-filter-panel @panelVisibleClass">
         <input type="hidden" name="query" value="@Model.Query" />
         <input type="hidden" name="secondaryOnly" value="@Model.SecondaryOnly.ToString().ToLowerInvariant()" />
         <input type="hidden" name="similarSchoolsOnly" value="@Model.SimilarSchoolsOnly.ToString().ToLowerInvariant()" />
