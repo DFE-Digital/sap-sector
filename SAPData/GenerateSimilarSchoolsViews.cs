@@ -10,6 +10,8 @@ public sealed class GenerateSimilarSchoolsViews
     private readonly string _sqlDir;
     private readonly string _generatedJsonDir;
     private readonly List<string> _sqlFiles;
+    private readonly HashSet<string> _rawTableNamesToRebuild;
+    private readonly bool _rebuildAllRawTables;
 
     private sealed record ViewSpec(
         string ViewName,
@@ -31,13 +33,20 @@ public sealed class GenerateSimilarSchoolsViews
         string tableMappingPath,
         string sqlDir,
         string generatedJsonDir,
-        List<string> sqlFiles)
+        List<string> sqlFiles,
+        IEnumerable<string>? logicalKeysToRebuild = null,
+        bool rebuildAllRawTables = false)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
         _generatedJsonDir = generatedJsonDir;
         _sqlFiles = sqlFiles;
+        _rebuildAllRawTables = rebuildAllRawTables;
+        _rawTableNamesToRebuild = new HashSet<string>(
+            (logicalKeysToRebuild ?? Array.Empty<string>())
+                .Select(GenerateRawTables.GenerateShortTableName),
+            StringComparer.OrdinalIgnoreCase);
     }
 
     public void Run()
@@ -57,6 +66,17 @@ public sealed class GenerateSimilarSchoolsViews
             if (viewRows.Count == 0)
                 continue;
 
+            if (!ShouldRebuildView(viewRows, tableMap))
+            {
+                sql = BuildSkippedSql(view.ViewName, "No rebuilt raw tables affect this view.");
+                WriteSql("50", view.ViewName, sql);
+
+                var skippedModelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
+                var skippedJsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""URN"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{skippedModelFile}' with(format text);";
+                WriteSql("70", view.ViewName, skippedJsonSql);
+                continue;
+            }
+
             sql = GenerateMaterializedView(view.ViewName, viewRows, tableMap);
             WriteSql("50", view.ViewName, sql);
 
@@ -71,11 +91,70 @@ public sealed class GenerateSimilarSchoolsViews
         var modelName = "SimilarSchoolsSecondaryStandardDeviationsEntry";
         var sdModelFile = Path.Combine(_generatedJsonDir, $"{modelName}.json");
 
-        var sdSql = GenerateSecondaryValuesNationalSdView(viewName, tableMap);
+        var rebuildSecondaryNationalSd = ShouldRebuildSecondaryValuesNationalSd(tableMap);
+        var sdSql = rebuildSecondaryNationalSd
+            ? GenerateSecondaryValuesNationalSdView(viewName, tableMap)
+            : BuildSkippedSql(viewName, "No rebuilt raw tables affect this view.");
         WriteSql("50", viewName, sdSql);
 
         var sdJsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {viewName}) r)) to '{sdModelFile}' with(format text);";
         WriteSql("70", viewName, sdJsonSql);
+    }
+
+    private bool ShouldRebuildView(List<DataMapRow> rows, Dictionary<string, string> tableMap)
+    {
+        if (_rebuildAllRawTables)
+            return true;
+
+        if (_rawTableNamesToRebuild.Count == 0)
+            return false;
+
+        var datasetKeys = rows
+            .Select(r => (r.FileName ?? "").Trim().TrimStart('\uFEFF'))
+            .Where(k => !string.IsNullOrWhiteSpace(k))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var datasetKey in datasetKeys)
+        {
+            if (TryResolveRawTable(tableMap, datasetKey, out var rawTable) &&
+                !string.IsNullOrWhiteSpace(rawTable) &&
+                _rawTableNamesToRebuild.Contains(rawTable))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool ShouldRebuildSecondaryValuesNationalSd(Dictionary<string, string> tableMap)
+    {
+        var viewRows = _rows
+            .Where(r => r.Range == "SimilarSchools")
+            .Where(r => r.Type == "SecondaryValues")
+            .Where(r => !string.IsNullOrWhiteSpace(r.FileName))
+            .ToList();
+
+        return ShouldRebuildView(viewRows, tableMap);
+    }
+
+    private static string BuildSkippedSql(string viewName, string reason)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
+        sb.AppendLine("-- NOTE: This file was generated but the view SQL was skipped.");
+        sb.AppendLine("-- In selective rebuild mode, the existing materialized view must already exist.");
+        sb.AppendLine($"-- REASON: {reason}");
+        sb.AppendLine();
+        sb.AppendLine("DO $$");
+        sb.AppendLine("DECLARE");
+        sb.AppendLine("  v_schema text := current_schema();");
+        sb.AppendLine("BEGIN");
+        sb.AppendLine($"  IF to_regclass(format('%I.%I', v_schema, '{viewName}')) IS NULL THEN");
+        sb.AppendLine($"    RAISE EXCEPTION 'Skipped view {viewName} does not exist in schema %, but is required for selective rebuild. {reason}', v_schema;");
+        sb.AppendLine("  END IF;");
+        sb.AppendLine("END $$;");
+        return sb.ToString();
     }
 
     // =====================================================
