@@ -38,6 +38,10 @@
                 major: 2,
                 minor: 1
             },
+            container: {
+                baseHeight: 420,
+                withLegendExtraHeight: 80
+            },
             axis: {
                 grace: '5%'
             },
@@ -259,7 +263,96 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function getNumericSeriesValues(chartData) {
+        if (!chartData || !Array.isArray(chartData.datasets)) {
+            return [];
+        }
+
+        return chartData.datasets
+            .flatMap(function (dataset) {
+                return Array.isArray(dataset.data) ? dataset.data : [];
+            })
+            .filter(function (value) {
+                return value !== null && value !== undefined && !Number.isNaN(Number(value));
+            })
+            .map(Number);
+    }
+
+    function getNiceStepSize(range) {
+        if (!range || range <= 0) {
+            return 1;
+        }
+
+        const roughStep = range / 4;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const normalised = roughStep / magnitude;
+
+        if (normalised <= 1) {
+            return magnitude;
+        }
+
+        if (normalised <= 2) {
+            return 2 * magnitude;
+        }
+
+        if (normalised <= 5) {
+            return 5 * magnitude;
+        }
+
+        return 10 * magnitude;
+    }
+
+    function roundDownToStep(value, step) {
+        return Math.floor(value / step) * step;
+    }
+
+    function roundUpToStep(value, step) {
+        return Math.ceil(value / step) * step;
+    }
+
+    function getDynamicLineAxisConfig(chartData, axisSuffix) {
+        const values = getNumericSeriesValues(chartData);
+        if (!values.length) {
+            return null;
+        }
+
+        const rawMin = Math.min.apply(null, values);
+        const rawMax = Math.max.apply(null, values);
+        const range = rawMax - rawMin;
+        const padding = range === 0
+            ? Math.max(Math.abs(rawMax) * 0.1, axisSuffix === '%' ? 2 : 1)
+            : Math.max(range * 0.2, axisSuffix === '%' ? 2 : 1);
+
+        let min = rawMin - padding;
+        let max = rawMax + padding;
+
+        if (axisSuffix === '%') {
+            min = Math.max(0, min);
+            max = Math.min(100, max);
+        }
+
+        if (min === max) {
+            max = min + (axisSuffix === '%' ? 4 : 2);
+        }
+
+        const step = getNiceStepSize(max - min);
+
+        return {
+            min: roundDownToStep(min, step),
+            max: roundUpToStep(max, step),
+            step
+        };
+    }
+
+    function formatTooltipValue(value, axisSuffix) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return 'No data';
+        }
+
+        return `${Number(value)}${axisSuffix}`;
+    }
+
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -271,15 +364,18 @@
             size: gdsStyles.fontSize
         };
 
-        const stepSize = axisStep;
-        const axisTickCount = axisMin !== null && axisMax !== null && stepSize
-            ? Math.floor((axisMax - axisMin) / stepSize) + 1
+        const resolvedAxisMin = dynamicLineAxis ? dynamicLineAxis.min : axisMin;
+        const resolvedAxisMax = dynamicLineAxis ? dynamicLineAxis.max : axisMax;
+        const stepSize = dynamicLineAxis ? dynamicLineAxis.step : axisStep;
+        const axisTickCount = resolvedAxisMin !== null && resolvedAxisMax !== null && stepSize
+            ? Math.floor((resolvedAxisMax - resolvedAxisMin) / stepSize) + 1
             : undefined;
-        const explicitTicks = buildExplicitTicks(axisMin, axisMax, stepSize);
+        const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize);
 
         const legendOptions = {
-            display: showLegend,
+            display: type === 'line' ? false : showLegend,
             position: CHART_CONFIG.legend.position,
+            align: 'center',
             labels: {
                 usePointStyle: true,
                 pointStyle: CHART_CONFIG.legend.pointStyle,
@@ -292,6 +388,10 @@
         if (type === 'line') {
             return {
                 ...common,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 layout: {
                     padding: {
                         top: CHART_CONFIG.line.layout.topPadding,
@@ -300,9 +400,9 @@
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        min: axisMin ?? undefined,
-                        max: axisMax ?? undefined,
+                        beginAtZero: !dynamicLineAxis,
+                        min: resolvedAxisMin ?? undefined,
+                        max: resolvedAxisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         afterBuildTicks: explicitTicks,
                         grid: {
@@ -340,7 +440,26 @@
                     }
                 },
                 plugins: {
-                    tooltip: { enabled: false },
+                    tooltip: {
+                        enabled: true,
+                        displayColors: true,
+                        usePointStyle: true,
+                        backgroundColor: '#ffffff',
+                        titleColor: '#0b0c0c',
+                        bodyColor: '#0b0c0c',
+                        borderColor: '#b1b4b6',
+                        borderWidth: 1,
+                        callbacks: {
+                            title: function (contexts) {
+                                return contexts?.[0]?.label ?? '';
+                            },
+                            label: function (context) {
+                                const label = context.dataset.label ? context.dataset.label + ': ' : '';
+                                const value = context.parsed.y;
+                                return `${label}${formatTooltipValue(value, axisSuffix)}`;
+                            }
+                        }
+                    },
                     legend: legendOptions,
                     title: {
                         display: false,
@@ -569,8 +688,27 @@
         container.style.height = `${height}px`;
     }
 
+    function resizeLineChartContainer(canvas, showLegend) {
+        const container = canvas.parentElement;
+        if (!container) {
+            return;
+        }
+
+        const height = CHART_CONFIG.line.container.baseHeight
+            + (showLegend ? CHART_CONFIG.line.container.withLegendExtraHeight : 0);
+
+        container.style.height = `${height}px`;
+    }
+
     function isKs4CoreSubjectYearByYearChart(canvas) {
         return ks4CoreSubjectYearByYearChartIds.has(canvas.id);
+    }
+
+    function isYearByYearLineChart(canvas) {
+        return canvas && (
+            canvas.id.includes('yearbyyear-chart')
+            || canvas.id.includes('year-by-year-chart')
+        );
     }
 
     function initCharts() {
@@ -587,10 +725,14 @@
 
             const chartData = JSON.parse(canvas.dataset.chart);
             const type = canvas.dataset.type;
+            const showLegend = canvas.dataset.showLegend === "true";
+
             if (type === 'bar') {
                 resizeBarChartContainer(canvas, chartData);
             }
-            const showLegend = canvas.dataset.showLegend === "true";
+            if (type === 'line' && isYearByYearLineChart(canvas)) {
+                resizeLineChartContainer(canvas, showLegend);
+            }
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
             const forceKs4CoreSubjectTicks = isKs4CoreSubjectYearByYearChart(canvas);
@@ -611,6 +753,9 @@
                 : CHART_CONFIG.defaults.axisSuffix;
             const labelDecimals = canvas.dataset.labelDecimals
                 ? parseInt(canvas.dataset.labelDecimals, 10)
+                : null;
+            const dynamicLineAxis = type === 'line' && isYearByYearLineChart(canvas)
+                ? getDynamicLineAxisConfig(chartData, axisSuffix)
                 : null;
 
             const rawColors = canvas.dataset.colors
@@ -652,7 +797,8 @@
                     showLegend,
                     showDataLabels,
                     showXGrid,
-                    barLabelAlign),
+                    barLabelAlign,
+                    dynamicLineAxis),
                 plugins: [
                     ...(showDataLabels ? [ChartDataLabels] : []),
                     noDataBarLabelsPlugin
@@ -680,9 +826,9 @@
             charts[canvas.id] = chart;
 
             if (showLegend) {
-                const legendContainer = document.querySelector(
-                    `.chart-legend[data-chart-id="${canvas.id}"]`
-                );
+                const legendContainer = type === 'line'
+                    ? ensureTopLegendContainer(canvas)
+                    : document.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
                 if (legendContainer) {
                     buildVerticalLegend(chart, legendContainer);
                 }
@@ -709,19 +855,24 @@
     }
 
     function buildVerticalLegend(chart, container) {
+        container.innerHTML = '';
+
         const datasets = Array.isArray(chart.data.datasets)
             ? chart.data.datasets
             : [chart.data.datasets];
 
         const ul = document.createElement('ul');
+        ul.classList.add('app-chart-legend');
 
         datasets.forEach(ds => {
             const li = document.createElement('li');
+            li.classList.add('app-chart-legend__item');
             const box = document.createElement('span');
-            box.classList.add('legend-box');
+            box.classList.add('app-chart-legend__box');
             box.style.backgroundColor = ds.backgroundColor || ds.borderColor || CHART_CONFIG.fallbacks.legendBoxColor;
 
             const label = document.createElement('span');
+            label.classList.add('app-chart-legend__label');
             label.textContent = ds.label;
 
             li.appendChild(box);
@@ -730,6 +881,23 @@
         });
 
         container.appendChild(ul);
+    }
+
+    function ensureTopLegendContainer(canvas) {
+        const chartContainer = canvas.parentElement;
+        if (!chartContainer) {
+            return null;
+        }
+
+        let legendContainer = chartContainer.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
+        if (!legendContainer) {
+            legendContainer = document.createElement('div');
+            legendContainer.className = 'chart-legend chart-legend--top';
+            legendContainer.setAttribute('data-chart-id', canvas.id);
+            chartContainer.insertBefore(legendContainer, chartContainer.firstChild);
+        }
+
+        return legendContainer;
     }
 
     function adjustChartResize() {

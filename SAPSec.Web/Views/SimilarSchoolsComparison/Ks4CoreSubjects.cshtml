@@ -188,59 +188,59 @@
         <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
             <ul class="govuk-tabs__list">
                 <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
-                    <a class="govuk-tabs__tab" href="#@($"{item.Key}-three-year-average")">3-year average</a>
-                </li>
-                <li class="govuk-tabs__list-item">
-                    <a class="govuk-tabs__tab" href="#@($"{item.Key}-year-by-year")">Year by year</a>
+                    <a class="govuk-tabs__tab" href="#@($"{item.Key}-charts")">Charts</a>
                 </li>
                 <li class="govuk-tabs__list-item">
                     <a class="govuk-tabs__tab" href="#@($"{item.Key}-table-view")">Table</a>
                 </li>
             </ul>
 
-            <div class="govuk-tabs__panel" id="@($"{item.Key}-three-year-average")">
-                <div class="app-ks4-chart-container">
-                    @if (HasAnyData(chartData.data))
-                    {
-                        <canvas id="@item.ChartId"
-                                class="js-chart"
-                                data-type="bar"
-                                data-show-no-data-labels="true"
-                                data-axis-step="25"
-                                data-axis-max="100"
-                                data-axis-suffix="%"
-                                data-label-decimals="0"
-                                data-bar-thickness="50"
-                                data-category-percentage="0.7"
-                                data-bar-percentage="1"
-                                data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                                data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                        </canvas>
-                    }
-                    else
-                    {
-                        <p class="govuk-body">No available data</p>
-                    }
-                </div>
-            </div>
-
-            <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="@($"{item.Key}-year-by-year")">
-                <div class="app-ks4-chart-container">
-                    <canvas id="@item.LineChartId"
-                            class="js-chart"
-                            data-type="line"
-                            data-axis-min="0"
-                            data-axis-step="25"
-                            data-axis-max="100"
-                            data-axis-auto-skip="false"
-                            data-axis-suffix="%"
-                            data-show-legend="true"
-                            data-show-datalabels="false"
-                            data-show-x-grid="true"
-                            data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
-                            data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
-                    </canvas>
-                </div>
+            <div class="govuk-tabs__panel" id="@($"{item.Key}-charts")">
+                <content-toggle>
+                    <toggle-content id="@($"{item.Key}-three-year-average")" name="3-year average" active="true">
+                        <div class="app-ks4-chart-container">
+                            @if (HasAnyData(chartData.data))
+                            {
+                                <canvas id="@item.ChartId"
+                                        class="js-chart"
+                                        data-type="bar"
+                                        data-show-no-data-labels="true"
+                                        data-axis-step="25"
+                                        data-axis-max="100"
+                                        data-axis-suffix="%"
+                                        data-label-decimals="0"
+                                        data-bar-thickness="50"
+                                        data-category-percentage="0.7"
+                                        data-bar-percentage="1"
+                                        data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                                </canvas>
+                            }
+                            else
+                            {
+                                <p class="govuk-body">No available data</p>
+                            }
+                        </div>
+                    </toggle-content>
+                    <toggle-content id="@($"{item.Key}-year-by-year")" name="Year by year">
+                        <div class="app-ks4-chart-container">
+                            <canvas id="@item.LineChartId"
+                                    class="js-chart"
+                                    data-type="line"
+                                    data-axis-min="0"
+                                    data-axis-step="25"
+                                    data-axis-max="100"
+                                    data-axis-auto-skip="false"
+                                    data-axis-suffix="%"
+                                    data-show-legend="true"
+                                    data-show-datalabels="false"
+                                    data-show-x-grid="true"
+                                    data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
+                                    data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                            </canvas>
+                        </div>
+                    </toggle-content>
+                </content-toggle>
             </div>
 
             <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="@($"{item.Key}-table-view")">
@@ -288,5 +288,6 @@
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
