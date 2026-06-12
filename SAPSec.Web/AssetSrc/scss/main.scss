@@ -1117,6 +1117,10 @@ $app-ks4-color-track: #f3f2f1;
   margin-bottom: 0;
 }
 
+.app-content-toggle .govuk-button {
+  margin-bottom: 0;
+}
+
 .app-content-toggle__panel[hidden] {
   display: none !important;
 }

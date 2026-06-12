@@ -39,7 +39,8 @@
                 minor: 1
             },
             container: {
-                baseHeight: 420
+                baseHeight: 420,
+                withLegendExtraHeight: 80
             },
             axis: {
                 grace: '5%'
@@ -443,6 +444,11 @@
                         enabled: true,
                         displayColors: true,
                         usePointStyle: true,
+                        backgroundColor: '#ffffff',
+                        titleColor: '#0b0c0c',
+                        bodyColor: '#0b0c0c',
+                        borderColor: '#b1b4b6',
+                        borderWidth: 1,
                         callbacks: {
                             title: function (contexts) {
                                 return contexts?.[0]?.label ?? '';
@@ -682,13 +688,16 @@
         container.style.height = `${height}px`;
     }
 
-    function resizeLineChartContainer(canvas) {
+    function resizeLineChartContainer(canvas, showLegend) {
         const container = canvas.parentElement;
         if (!container) {
             return;
         }
 
-        container.style.height = `${CHART_CONFIG.line.container.baseHeight}px`;
+        const height = CHART_CONFIG.line.container.baseHeight
+            + (showLegend ? CHART_CONFIG.line.container.withLegendExtraHeight : 0);
+
+        container.style.height = `${height}px`;
     }
 
     function isKs4CoreSubjectYearByYearChart(canvas) {
@@ -722,7 +731,7 @@
                 resizeBarChartContainer(canvas, chartData);
             }
             if (type === 'line' && isYearByYearLineChart(canvas)) {
-                resizeLineChartContainer(canvas);
+                resizeLineChartContainer(canvas, showLegend);
             }
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
@@ -876,17 +885,16 @@
 
     function ensureTopLegendContainer(canvas) {
         const chartContainer = canvas.parentElement;
-        const chartWrapper = chartContainer?.parentElement;
-        if (!chartContainer || !chartWrapper) {
+        if (!chartContainer) {
             return null;
         }
 
-        let legendContainer = chartWrapper.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
+        let legendContainer = chartContainer.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
         if (!legendContainer) {
             legendContainer = document.createElement('div');
             legendContainer.className = 'chart-legend chart-legend--top';
             legendContainer.setAttribute('data-chart-id', canvas.id);
-            chartWrapper.insertBefore(legendContainer, chartContainer);
+            chartContainer.insertBefore(legendContainer, chartContainer.firstChild);
         }
 
         return legendContainer;
