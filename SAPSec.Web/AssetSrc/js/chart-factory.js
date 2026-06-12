@@ -38,6 +38,10 @@
                 major: 2,
                 minor: 1
             },
+            container: {
+                baseHeight: 420,
+                withLegendExtraHeight: 80
+            },
             axis: {
                 grace: '5%'
             },
@@ -679,6 +683,18 @@
         container.style.height = `${height}px`;
     }
 
+    function resizeLineChartContainer(canvas, showLegend) {
+        const container = canvas.parentElement;
+        if (!container) {
+            return;
+        }
+
+        const height = CHART_CONFIG.line.container.baseHeight
+            + (showLegend ? CHART_CONFIG.line.container.withLegendExtraHeight : 0);
+
+        container.style.height = `${height}px`;
+    }
+
     function isKs4CoreSubjectYearByYearChart(canvas) {
         return ks4CoreSubjectYearByYearChartIds.has(canvas.id);
     }
@@ -704,10 +720,14 @@
 
             const chartData = JSON.parse(canvas.dataset.chart);
             const type = canvas.dataset.type;
+            const showLegend = canvas.dataset.showLegend === "true";
+
             if (type === 'bar') {
                 resizeBarChartContainer(canvas, chartData);
             }
-            const showLegend = canvas.dataset.showLegend === "true";
+            if (type === 'line' && isYearByYearLineChart(canvas)) {
+                resizeLineChartContainer(canvas, showLegend);
+            }
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
             const forceKs4CoreSubjectTicks = isKs4CoreSubjectYearByYearChart(canvas);
