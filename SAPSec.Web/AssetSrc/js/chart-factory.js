@@ -39,8 +39,7 @@
                 minor: 1
             },
             container: {
-                baseHeight: 420,
-                withLegendExtraHeight: 80
+                baseHeight: 420
             },
             axis: {
                 grace: '5%'
@@ -683,16 +682,13 @@
         container.style.height = `${height}px`;
     }
 
-    function resizeLineChartContainer(canvas, showLegend) {
+    function resizeLineChartContainer(canvas) {
         const container = canvas.parentElement;
         if (!container) {
             return;
         }
 
-        const height = CHART_CONFIG.line.container.baseHeight
-            + (showLegend ? CHART_CONFIG.line.container.withLegendExtraHeight : 0);
-
-        container.style.height = `${height}px`;
+        container.style.height = `${CHART_CONFIG.line.container.baseHeight}px`;
     }
 
     function isKs4CoreSubjectYearByYearChart(canvas) {
@@ -726,7 +722,7 @@
                 resizeBarChartContainer(canvas, chartData);
             }
             if (type === 'line' && isYearByYearLineChart(canvas)) {
-                resizeLineChartContainer(canvas, showLegend);
+                resizeLineChartContainer(canvas);
             }
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
@@ -880,16 +876,17 @@
 
     function ensureTopLegendContainer(canvas) {
         const chartContainer = canvas.parentElement;
-        if (!chartContainer) {
+        const chartWrapper = chartContainer?.parentElement;
+        if (!chartContainer || !chartWrapper) {
             return null;
         }
 
-        let legendContainer = chartContainer.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
+        let legendContainer = chartWrapper.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
         if (!legendContainer) {
             legendContainer = document.createElement('div');
             legendContainer.className = 'chart-legend chart-legend--top';
             legendContainer.setAttribute('data-chart-id', canvas.id);
-            chartContainer.insertBefore(legendContainer, chartContainer.firstChild);
+            chartWrapper.insertBefore(legendContainer, chartContainer);
         }
 
         return legendContainer;
