@@ -443,6 +443,12 @@
                         backgroundColor: '#ffffff',
                         titleColor: '#0b0c0c',
                         bodyColor: '#0b0c0c',
+                        titleFont: {
+                            size: 14
+                        },
+                        bodyFont: {
+                            size: 14
+                        },
                         borderColor: '#b1b4b6',
                         borderWidth: 1,
                         callbacks: {
