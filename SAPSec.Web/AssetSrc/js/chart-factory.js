@@ -885,16 +885,17 @@
 
     function ensureTopLegendContainer(canvas) {
         const chartContainer = canvas.parentElement;
-        if (!chartContainer) {
+        const legendHost = chartContainer?.parentElement;
+        if (!chartContainer || !legendHost) {
             return null;
         }
 
-        let legendContainer = chartContainer.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
+        let legendContainer = legendHost.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
         if (!legendContainer) {
             legendContainer = document.createElement('div');
             legendContainer.className = 'chart-legend chart-legend--top';
             legendContainer.setAttribute('data-chart-id', canvas.id);
-            chartContainer.insertBefore(legendContainer, chartContainer.firstChild);
+            legendHost.insertBefore(legendContainer, chartContainer);
         }
 
         return legendContainer;
