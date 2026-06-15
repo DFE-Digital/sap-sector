@@ -38,10 +38,6 @@
                 major: 2,
                 minor: 1
             },
-            container: {
-                baseHeight: 420,
-                withLegendExtraHeight: 80
-            },
             axis: {
                 grace: '5%'
             },
@@ -688,18 +684,6 @@
         container.style.height = `${height}px`;
     }
 
-    function resizeLineChartContainer(canvas, showLegend) {
-        const container = canvas.parentElement;
-        if (!container) {
-            return;
-        }
-
-        const height = CHART_CONFIG.line.container.baseHeight
-            + (showLegend ? CHART_CONFIG.line.container.withLegendExtraHeight : 0);
-
-        container.style.height = `${height}px`;
-    }
-
     function isKs4CoreSubjectYearByYearChart(canvas) {
         return ks4CoreSubjectYearByYearChartIds.has(canvas.id);
     }
@@ -729,9 +713,6 @@
 
             if (type === 'bar') {
                 resizeBarChartContainer(canvas, chartData);
-            }
-            if (type === 'line' && isYearByYearLineChart(canvas)) {
-                resizeLineChartContainer(canvas, showLegend);
             }
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
@@ -890,7 +871,11 @@
             return null;
         }
 
-        let legendContainer = legendHost.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
+        let legendContainer = chartContainer.previousElementSibling;
+        if (legendContainer?.getAttribute('data-chart-id') !== canvas.id || !legendContainer.classList.contains('chart-legend')) {
+            legendContainer = null;
+        }
+
         if (!legendContainer) {
             legendContainer = document.createElement('div');
             legendContainer.className = 'chart-legend chart-legend--top';
