@@ -29,10 +29,10 @@ Every PR is expected to follow them.
 ## Standard 1 — New Features Must Be Built as UseCases
 ### Currently this is getting addressed in the SPIKE: Use Cases https://trello.com/c/G7VRi351
 
-**Rule:** All new application behaviour must be implemented using the `IUseCase<TIn, TOut>` pattern. No new `Service` classes should be introduced for application logic.
+**Rule:** New application behaviour should normally be implemented using the `IUseCase<TIn, TOut>` pattern.  
+Where a genuinely shared piece of business logic exists across multiple use cases and does not belong naturally on a single domain object, a shared domain service is acceptable.
 
-**Why:** Services are vague, data-centric, and cannot express intent or be easily substituted in tests. UseCases make behaviour explicit, testable, and replaceable.
-
+**Why:** UseCases make behaviour explicit, testable, and replaceable. Shared domain services still have a role when behaviour needs to be reused across use cases.
 ### Pattern
 
 ```csharp
@@ -366,37 +366,28 @@ ValueObjects are introduced **incrementally**, one model per sprint. A raw `stri
 
 ---
 
-## Standard 8 — Search Must Go Through `ISearchServiceAdaptor`
+## Standard 8 — Search Must Go Through `ISchoolSearchIndexReader`
 
-> ⚠️ **TODO** — Interface design to be agreed prior to implementation.
-
-**Direction:** The existing Lucene implementation should be wrapped behind an `ISearchServiceAdaptor` contract. This decouples the application from Lucene and enables the planned migration to Postgres text search without changing any consumer.
+**Direction:** The existing search index reader should remain the abstraction consumed by application code. If a broader search abstraction is needed later, it should build on the existing interface rather than duplicate it.
 
 ```csharp
-// Target interface — to be agreed
-public interface ISearchServiceAdaptor
+public interface ISchoolSearchIndexReader
 {
     Task<SearchResult> SearchAsync(SearchQuery query, CancellationToken cancellationToken);
 }
-
-// Registration — swapping implementations becomes a one-line change
-// Today:
-services.AddLuceneSearch();
-
-// When Postgres is ready:
-services.AddPostgresSearch();
 ```
 
 **References:**
+- [`SAPSec.Core/Features/SchoolSearch/ISchoolSearchIndexReader.cs`](https://github.com/DFE-Digital/sap-sector/blob/main/SAPSec.Core/Features/SchoolSearch/ISchoolSearchIndexReader.cs)
 - [`infrastructure/share-infrastructure.md`](https://github.com/aahmed-dfe/school-profiles-design-feedback/blob/main/infrastructure/share-infrastructure.md)
 - [Issue #5 — Feedback](https://github.com/aahmed-dfe/school-profiles-design-feedback/issues/5): *"Aim to move to Postgres and away from Lucene"*
 
 ---
 
-## Standard 9 — Existing Services Are Retrofitted to UseCases Incrementally
+## Standard 9 — Existing Services where relavant are Retrofitted to UseCases Incrementally
 ### Currently this is getting addressed in the SPIKE:Use Cases https://trello.com/c/G7VRi351
 
-**Rule:** Existing `Service` classes are not replaced all at once. Each sprint, Services consumed by controllers that are being touched for feature work are converted to UseCases as part of that ticket. No Service-to-UseCase conversion should be a standalone large refactor.
+**Rule:** Existing `Service` classes (Which are not Domain Services or Pure business logic services)are not replaced all at once. Each sprint, Services consumed by controllers that are being touched for feature work are converted to UseCases as part of that ticket. No Service-to-UseCase conversion should be a standalone large refactor.
 
 **Why:** A big-bang rewrite is high risk. Incremental conversion tied to feature work ensures each conversion is tested and reviewed in context.
 
@@ -421,10 +412,12 @@ Follow Standard 1 for the target UseCase structure. The conversion steps for any
 
 ---
 
-## Standard 10 — Measures Are Modelled as a Domain Concept
+Standard 10 — Measure-like Concepts Must Use a Distinct Domain Name
+
 > ⚠️ **TODO** — To be agreed prior to implementation. Currently this is getting addressed in the SPIKE:Components https://trello.com/c/2nK4EItQ
 
 **Rule:** A `Measure` (e.g. Attendance, Progress8, Attainment8) is a first-class domain concept with a typed identifier and a typed value. New measure-related features must use these types. Raw `decimal?`, `string`, or `null` must not be passed between layers as measure data.
+The domain concept currently described as Measure must use a distinct name that does not clash with the existing UI component Measure
 
 **Why:** A measure value can take three distinct forms — scalar, estimated with a confidence interval, or redacted. Without a domain model, every consumer must handle all three forms independently, duplicating logic and spreading invariants across the codebase.
 
