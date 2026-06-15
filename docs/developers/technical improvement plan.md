@@ -362,7 +362,7 @@ public sealed class Establishment
 
 ValueObjects are introduced **incrementally**, one model per sprint. A raw `string urn` on an existing type is not changed until that type is touched by feature work — no big-bang migration.
 
-**Location:** `SAPSec.Core/Domain/ValueObjects/`
+**Location:** `SAPSec.Core/Domain/`
 
 ---
 
@@ -415,6 +415,11 @@ Follow Standard 1 for the target UseCase structure. The conversion steps for any
 Standard 10 — Measure-like Concepts Must Use a Distinct Domain Name
 
 > ⚠️ **TODO** — To be agreed prior to implementation. Currently this is getting addressed in the SPIKE:Components https://trello.com/c/2nK4EItQ
+
+We have a similar implementation with DataWithAvailability<T>
+https://github.com/DFE-Digital/sap-sector/blob/main/SAPSec.Core/Model/DataWithAvailability.cs
+
+Please make a decision on whether to use that or a new implementation.
 
 **Rule:** A `Measure` (e.g. Attendance, Progress8, Attainment8) is a first-class domain concept with a typed identifier and a typed value. New measure-related features must use these types. Raw `decimal?`, `string`, or `null` must not be passed between layers as measure data.
 The domain concept currently described as Measure must use a distinct name that does not clash with the existing UI component Measure
