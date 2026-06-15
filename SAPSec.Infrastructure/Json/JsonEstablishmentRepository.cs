@@ -43,6 +43,13 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
         return establishment;
     }
 
+    public async Task<IReadOnlyCollection<EstablishmentEmail>> GetEstablishmentEmailsAsync(IEnumerable<string> urns)
+    {
+        var establishmentEmails = await _establishmentEmailJsonFile.ReadAllAsync();
+
+        return establishmentEmails.Where(e => urns.Contains(e.URN)).ToList().AsReadOnly();
+    }
+
     public async Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
     {
         var allEstablishments = await _establishmentJsonFile.ReadAllAsync();

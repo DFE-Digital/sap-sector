@@ -22,5 +22,6 @@ namespace SAPSec.Core.Model.Generated
         public string PhaseOfEducationName { get; set; } = string.Empty;
         public string TypeOfEstablishmentName { get; set; } = string.Empty;
         public string URN { get; set; } = string.Empty;
+        public string EstablishmentStatusId { get; set; } = string.Empty;
     }
 }

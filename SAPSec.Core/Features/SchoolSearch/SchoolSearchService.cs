@@ -1,6 +1,6 @@
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.SchoolSearch.Extensions;
+using SAPSec.Core.Features.SchoolSearch.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
@@ -11,85 +11,18 @@ namespace SAPSec.Core.Features.SchoolSearch;
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,
     IEstablishmentRepository _establishmentRepository,
-    IFeatureFlagService _featureFlagService) : ISchoolSearchService
+    IFeatureFlagService _featureFlagService,
+    DetermineSchoolSearchEligibility _determineSchoolSearchEligibility) : ISchoolSearchService
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
     private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
-    {
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-        var searchResults = await _indexReader.SearchAsync(query, MaxResults);
-
-        var results = new List<SchoolSearchResult>();
-
-        if (!searchResults.Any())
-        {
-            return results;
-        }
-
-        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
-
-        foreach (var r in searchResults.GroupJoin(schools,
-            r => r.urn.ToString(),
-            s => s.URN,
-            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
-        {
-            if (r.School == null)
-            {
-                continue;
-            }
-
-            if (!r.School.IsSearchable(primarySchoolsEnabled))
-            {
-                continue;
-            }
-
-            var latLong = BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
-                ? CoordinateConverter.Convert(coords)
-                : null;
-
-            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
-        }
-
-        return results.OrderBy(r => r.EstablishmentName).ToList();
-    }
+        => await SearchInternalAsync(query, MaxResults, includeCoordinates: true);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
-    {
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-        var searchResults = await _indexReader.SearchAsync(queryPart, MaxSuggestions);
-
-        var results = new List<SchoolSearchResult>();
-
-        if (!searchResults.Any())
-        {
-            return results;
-        }
-
-        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
-
-        foreach (var r in searchResults.GroupJoin(schools,
-            r => r.urn.ToString(),
-            s => s.URN,
-            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
-        {
-            if (r.School == null)
-            {
-                continue;
-            }
-
-            if (!r.School.IsSearchable(primarySchoolsEnabled))
-            {
-                continue;
-            }
-
-            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, null));
-        }
-
-        return results.OrderBy(r => r.EstablishmentName).ToList();
-    }
+        => await SearchInternalAsync(queryPart, MaxSuggestions, includeCoordinates: false);
 
     public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
     {
@@ -105,9 +38,59 @@ public class SchoolSearchService(
 
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
+        var establishmentEmail = school == null
+            ? null
+            : await _establishmentRepository.GetEstablishmentEmailAsync(school.URN);
 
-        return school.IsSearchable(primarySchoolsEnabled)
+        return _determineSchoolSearchEligibility.CanSearch(school, establishmentEmail, primarySchoolsEnabled)
             ? school
             : null;
+    }
+
+    private async Task<IReadOnlyList<SchoolSearchResult>> SearchInternalAsync(string query, int maxResults, bool includeCoordinates)
+    {
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+        var searchResults = await _indexReader.SearchAsync(query, maxResults);
+
+        var results = new List<SchoolSearchResult>();
+
+        if (!searchResults.Any())
+        {
+            return results;
+        }
+
+        var urns = searchResults.Select(r => r.urn.ToString()).ToArray();
+        var schools = await _establishmentRepository.GetEstablishmentsAsync(urns);
+        var establishmentEmails = await _establishmentRepository.GetEstablishmentEmailsAsync(urns);
+        var establishmentEmailsByUrn = establishmentEmails
+            .GroupBy(x => x.URN)
+            .ToDictionary(x => x.Key, x => x.First());
+
+        foreach (var r in searchResults.GroupJoin(schools,
+            r => r.urn.ToString(),
+            s => s.URN,
+            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
+        {
+            if (r.School == null)
+            {
+                continue;
+            }
+
+            establishmentEmailsByUrn.TryGetValue(r.School.URN, out var establishmentEmail);
+
+            if (!_determineSchoolSearchEligibility.CanSearch(r.School, establishmentEmail, primarySchoolsEnabled))
+            {
+                continue;
+            }
+
+            var latLong = includeCoordinates
+                && BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
+                    ? CoordinateConverter.Convert(coords)
+                    : null;
+
+            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
+        }
+
+        return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 }

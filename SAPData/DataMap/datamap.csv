@@ -1881,6 +1881,7 @@ Establishment,,EstablishmentNumber,,,,,GIAS,,,Email,,,,secondary-email-addresses
 Establishment,,EstablishmentName,,,,,GIAS,,,Email,,,,secondary-email-addresses-12-01-2026,EstablishmentName,string,,URN,,,,,,,,,,,No,,,,
 Establishment,,TypeOfEstablishmentName,,,,,GIAS,,,Email,,,,secondary-email-addresses-12-01-2026,TypeOfEstablishment (name),string,,URN,,,,,,,,,,,No,,,,
 Establishment,,EstablishmentTypeGroupName,,,,,GIAS,,,Email,,,,secondary-email-addresses-12-01-2026,EstablishmentTypeGroup (name),string,,URN,,,,,,,,,,,No,,,,
+Establishment,,EstablishmentStatusId,,,,,GIAS,,,Email,,,,secondary-email-addresses-12-01-2026,EstablishmentStatus (code),string,,URN,,,,,,,,,,,No,,,,
 Establishment,,EstablishmentStatusName,,,,,GIAS,,,Email,,,,secondary-email-addresses-12-01-2026,EstablishmentStatus (name),string,,URN,,,,,,,,,,,No,,,,
 Establishment,,CloseDate,,,,,GIAS,,,Email,,,,secondary-email-addresses-12-01-2026,CloseDate,string,,URN,,,,,,,,,,,No,,,,
 Establishment,,PhaseOfEducationName,,,,,GIAS,,,Email,,,,secondary-email-addresses-12-01-2026,PhaseOfEducation (name),string,,URN,,,,,,,,,,,No,,,,

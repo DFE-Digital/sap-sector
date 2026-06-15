@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using SAPSec.Core.Features.SchoolSearch.UseCases;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Test.Common;
 using SAPSec.Test.Common.Repositories.InMemory;
@@ -14,6 +15,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     private const int PopulateEstablishmentDataOnAttempt = 2;
 
     private TestOutputLogger<StartupIndexBuilder> logger = new(output);
+    private DetermineSchoolSearchEligibility eligibility = new();
     private InMemoryEstablishmentRepository establishmentRepo = new();
 
     [Fact]
@@ -28,6 +30,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -67,6 +70,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -97,6 +101,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -139,19 +144,20 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task StartAsync_ShouldIndexOnlyPrimaryAndSecondaryEstablishments()
+    public async Task StartAsync_ShouldIndexOnlySearchableEstablishments()
     {
         logger.LogInformation("Start test");
         establishmentRepo.SetupEstablishments(
-            new() { URN = "100001", EstablishmentName = "Test Primary 1", PhaseOfEducationName = "Primary" },
-            new() { URN = "100002", EstablishmentName = "Test Secondary 2", PhaseOfEducationName = "Secondary" },
-            new() { URN = "100003", EstablishmentName = "Test Nursery 3", PhaseOfEducationName = "Nursery" },
-            new() { URN = "100004", EstablishmentName = "Test All Through 4", PhaseOfEducationName = "All-through" }
+            new() { URN = "100001", EstablishmentName = "Test Primary 1", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2" },
+            new() { URN = "100002", EstablishmentName = "Test Secondary 2", PhaseOfEducationName = "Secondary", PhaseOfEducationId = "4" },
+            new() { URN = "100003", EstablishmentName = "Test Nursery 3", PhaseOfEducationName = "Nursery", PhaseOfEducationId = "1" },
+            new() { URN = "100004", EstablishmentName = "Test All Through 4", PhaseOfEducationName = "All-through", PhaseOfEducationId = "7" }
         );
 
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
+            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -178,7 +184,8 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         var results = await reader.SearchAsync("test");
         results.Should().BeEquivalentTo([
             (100001, "*Test* Primary 1"),
-            (100002, "*Test* Secondary 2")
+            (100002, "*Test* Secondary 2"),
+            (100004, "*Test* All Through 4")
         ]);
     }
 }
