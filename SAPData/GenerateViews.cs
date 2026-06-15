@@ -345,6 +345,13 @@ public sealed class GenerateViews
                     select "URN" 
                     from test_establishments_urns
                 )
+                union all 
+                select "NeighbourURN" 
+                from v_similar_schools_primary_groups 
+                where "URN" in (
+                    select "URN" 
+                    from test_establishments_urns
+                )
                 """;
 
             jsonSql = view switch
@@ -354,7 +361,10 @@ public sealed class GenerateViews
                     \copy (
                         select json_array(
                             select row_to_json(r) 
-                            from (select * from {view.ViewName}) r
+                            from (
+                                select * from {view.ViewName}
+                                order by "{view.IdColumn}"
+                            ) r
                         )
                     )
                     to '{modelFile}'
@@ -377,6 +387,7 @@ public sealed class GenerateViews
                                     )
                                 ) 
                                 and "subject" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])
+                                order by "{view.IdColumn}"
                             ) r
                         )
                     )
@@ -397,6 +408,7 @@ public sealed class GenerateViews
                                     {establishmentFilterSubquery}
                                 ) 
                                 and "subject" = ANY(ARRAY['Biology','Chemistry','Mathematics','Physics','English Language','English Literature','Combined Science'])
+                                order by "{view.IdColumn}"
                             ) r
                         )
                     )
@@ -416,6 +428,7 @@ public sealed class GenerateViews
                                 where "{view.IdColumn}" in (
                                     {establishmentFilterSubquery}
                                 )
+                                order by "{view.IdColumn}"
                             ) r
                         )
                     )
@@ -432,6 +445,7 @@ public sealed class GenerateViews
                             from (
                                 select * 
                                 from {view.ViewName}
+                                order by "{view.IdColumn}"
                             ) r
                         )
                     )
