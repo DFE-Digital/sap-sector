@@ -64,6 +64,27 @@
         return { header: header, title: title, button: button };
     }
 
+    function moveChartBlock(chartContainer, targetPanel) {
+        if (!chartContainer || !targetPanel) {
+            return;
+        }
+
+        var chartCanvas = chartContainer.querySelector("canvas");
+        var expectedChartId = chartCanvas ? chartCanvas.id : "";
+        var previousSibling = chartContainer.previousElementSibling;
+        var legend = previousSibling
+            && previousSibling.classList.contains("chart-legend")
+            && previousSibling.getAttribute("data-chart-id") === expectedChartId
+            ? previousSibling
+            : null;
+
+        if (legend) {
+            targetPanel.appendChild(legend);
+        }
+
+        targetPanel.appendChild(chartContainer);
+    }
+
     function initialiseTabSet(tabSet) {
         var listItems = tabSet.querySelectorAll(".govuk-tabs__list-item");
         if (listItems.length < 2) {
@@ -114,7 +135,7 @@
         averagePanel.setAttribute("data-content-toggle-panel", "true");
         averagePanel.setAttribute("data-content-toggle-name", "3-year average");
         averagePanel.id = firstTabTarget.slice(1);
-        averagePanel.appendChild(averageChart);
+        moveChartBlock(averageChart, averagePanel);
 
         var yearlyPanel = document.createElement("div");
         yearlyPanel.className = "app-content-toggle__panel";
@@ -122,7 +143,7 @@
         yearlyPanel.setAttribute("data-content-toggle-name", "Year by year");
         yearlyPanel.id = secondTabTarget.slice(1);
         yearlyPanel.setAttribute("hidden", "hidden");
-        yearlyPanel.appendChild(yearlyChart);
+        moveChartBlock(yearlyChart, yearlyPanel);
 
         toggleContainer.appendChild(averagePanel);
         toggleContainer.appendChild(yearlyPanel);
