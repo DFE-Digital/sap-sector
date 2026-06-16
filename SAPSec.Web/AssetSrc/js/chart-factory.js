@@ -28,8 +28,8 @@
             position: 'bottom',
             pointStyle: 'circle',
             box: {
-                width: 10,
-                height: 10
+                width: 14,
+                height: 14
             },
             padding: 16
         },
@@ -425,7 +425,15 @@
                         title: { display: false },
                         ticks: {
                             color: gdsStyles.text,
-                            font: fonts,
+                            font: function (context) {
+                                const fontSize = gdsVars(context.chart.canvas).fontSize;
+
+                                return {
+                                    family: gdsStyles.fontFamily,
+                                    size: fontSize,
+                                    weight: context.index === context.chart.$activeXAxisTickIndex ? 'bold' : 'normal'
+                                };
+                            },
                             display: true
                         },
                         grid: {
@@ -443,10 +451,15 @@
                         backgroundColor: '#ffffff',
                         titleColor: '#0b0c0c',
                         bodyColor: '#0b0c0c',
+                        titleMarginBottom: 10,
+                        bodySpacing: 8,
+                        boxPadding: 6,
+                        boxWidth: CHART_CONFIG.legend.box.width,
+                        boxHeight: CHART_CONFIG.legend.box.height,
                         titleFont: {
                             family: gdsStyles.fontFamily,
                             size: 14,
-                            weight: 'normal'
+                            weight: 'bold'
                         },
                         bodyFont: {
                             family: gdsStyles.fontFamily,
@@ -617,6 +630,25 @@
             });
 
             ctx.restore();
+        }
+    };
+
+    const activeLineXAxisTickPlugin = {
+        id: 'activeLineXAxisTick',
+        afterEvent(chart) {
+            if (chart.config.type !== 'line') {
+                return;
+            }
+
+            const activeElements = chart.tooltip?.getActiveElements?.() ?? [];
+            const nextActiveIndex = activeElements.length ? activeElements[0].index : null;
+
+            if (chart.$activeXAxisTickIndex === nextActiveIndex) {
+                return;
+            }
+
+            chart.$activeXAxisTickIndex = nextActiveIndex;
+            chart.draw();
         }
     };
 
@@ -792,7 +824,8 @@
                     dynamicLineAxis),
                 plugins: [
                     ...(showDataLabels ? [ChartDataLabels] : []),
-                    noDataBarLabelsPlugin
+                    noDataBarLabelsPlugin,
+                    activeLineXAxisTickPlugin
                 ]
             };
 
@@ -904,7 +937,7 @@
                 Object.values(charts).forEach(chart => {
                     const fontSizePx = gdsVars(chart.canvas).fontSize;
 
-                    if (chart.options.scales.x.ticks.font) {
+                    if (chart.options.scales.x.ticks.font && typeof chart.options.scales.x.ticks.font !== 'function') {
                         chart.options.scales.x.ticks.font.size = fontSizePx;
                     }
 
