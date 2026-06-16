@@ -1,0 +1,15 @@
+# One logical dataset key per line to rebuild.
+# Lines starting with # are ignored.
+#
+# Only the listed raw tables will be dropped, recreated and reloaded.
+# All other raw tables are left unchanged.
+#
+# Example:
+# gias_all_establishment_current
+# ees_ks4_performance_metadata_current_v1.0
+
+# GIAS sources
+edubasealldataYYYYmmDD
+links_edubasealldataYYYYmmDD
+grouplinks_edubaseallacademiesandfreeYYYYmmDD
+secondary-email-addresses-12-01-2026

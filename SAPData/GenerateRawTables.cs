@@ -11,16 +11,29 @@ public class GenerateRawTables
     private readonly string _sqlDir;
     private readonly string _tableMappingPath;
     private readonly List<string> _sqlFiles;
+    private readonly HashSet<string> _logicalKeysToRebuild;
+    private readonly bool _rebuildAllRawTables;
 
     private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
 
-    public GenerateRawTables(string inputDir, string cleanDir, string sqlDir, string tableMappingPath, List<string> sqlFiles)
+    public GenerateRawTables(
+        string inputDir,
+        string cleanDir,
+        string sqlDir,
+        string tableMappingPath,
+        List<string> sqlFiles,
+        IEnumerable<string>? logicalKeysToRebuild = null,
+        bool rebuildAllRawTables = false)
     {
         _inputDir = inputDir;
         _cleanDir = cleanDir;
         _sqlDir = sqlDir;
         _tableMappingPath = tableMappingPath;
         _sqlFiles = sqlFiles;
+        _logicalKeysToRebuild = new HashSet<string>(
+            logicalKeysToRebuild ?? Array.Empty<string>(),
+            StringComparer.OrdinalIgnoreCase);
+        _rebuildAllRawTables = rebuildAllRawTables;
     }
 
     public void Run()
@@ -68,6 +81,7 @@ public class GenerateRawTables
 
         // Physical table name: prefix-free, based on logical identity (stable)
         string tableName = GenerateShortTableName(logicalKey);
+        bool rebuildTable = _rebuildAllRawTables || _logicalKeysToRebuild.Contains(logicalKey);
 
         // Map BOTH keys to the same physical table
         // - DataMap will use logicalKey
@@ -124,6 +138,12 @@ public class GenerateRawTables
         // -----------------------------
         // CREATE TABLE
         // -----------------------------
+        if (!rebuildTable)
+        {
+            Console.WriteLine($"Leaving table for logical key '{logicalKey}' ({tableName}) unchanged. Skipping DROP/CREATE/COPY.");
+            return;
+        }
+
         createSql.AppendLine($"DROP TABLE IF EXISTS {tableName};");
         createSql.AppendLine($"CREATE TABLE {tableName} (");
 
@@ -322,7 +342,7 @@ public class GenerateRawTables
     // =====================================================
     // HELPERS
     // =====================================================
-    private static string GenerateShortTableName(string logicalKey)
+    public static string GenerateShortTableName(string logicalKey)
     {
         using var sha1 = SHA1.Create();
 

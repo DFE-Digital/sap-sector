@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance;
@@ -72,6 +73,25 @@ public class SimilarSchoolsControllerTests
         _sut.ViewData["BreadcrumbNode"].Should().NotBeNull();
         _sut.ViewData["SchoolDetails"].Should().BeAssignableTo<SchoolDetails>()
             .Which.Name.Should().Be(schoolDetails.EstablishmentName);
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchools_SetsSecondarySchoolNavigationInViewData()
+    {
+        var urn = "105574";
+        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
+        SetupSimilarSchoolsRepo(urn, schoolDetails);
+        _sut.Url = CreateUrlHelperMock(urn).Object;
+
+        await _sut.ViewSimilarSchools(urn);
+
+        var navigation = _sut.ViewData["SchoolNavigation"]
+            .Should().BeOfType<SchoolSideNavigationViewModel>().Subject;
+
+        navigation.Items.Should().Contain(item =>
+            item.Text == "View similar schools" &&
+            item.IsSelected &&
+            item.Href == $"/school/{urn}/view-similar-schools");
     }
 
     [Fact]
@@ -236,6 +256,54 @@ public class SimilarSchoolsControllerTests
         _performanceRepoMock
             .Setup(r => r.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new List<Ks4PerformanceData>());
+    }
+
+    private static Mock<IUrlHelper> CreateUrlHelperMock(string urn)
+    {
+        var urlHelperMock = new Mock<IUrlHelper>();
+        urlHelperMock
+            .Setup(x => x.Action(It.IsAny<UrlActionContext>()))
+            .Returns<UrlActionContext>(context =>
+            {
+                if (context.Action == "Index" && context.Controller == "School")
+                {
+                    return $"/school/{urn}";
+                }
+
+                if (context.Action == "Ks4HeadlineMeasures" && context.Controller == "School")
+                {
+                    return $"/school/{urn}/ks4-headline-measures";
+                }
+
+                if (context.Action == "Ks4CoreSubjects" && context.Controller == "School")
+                {
+                    return $"/school/{urn}/ks4-core-subjects";
+                }
+
+                if (context.Action == "Attendance" && context.Controller == "School")
+                {
+                    return $"/school/{urn}/attendance";
+                }
+
+                if (context.Action == "ViewSimilarSchools" && context.Controller == "SimilarSchools")
+                {
+                    return $"/school/{urn}/view-similar-schools";
+                }
+
+                if (context.Action == "SchoolDetails" && context.Controller == "School")
+                {
+                    return $"/school/{urn}/school-details";
+                }
+
+                if (context.Action == "WhatIsASimilarSchool" && context.Controller == "School")
+                {
+                    return $"/school/{urn}/what-is-a-similar-school";
+                }
+
+                return null;
+            });
+
+        return urlHelperMock;
     }
 
     private static Establishment CreateSimilarSchool(string urn, string name, string urbanId, string urbanName)
