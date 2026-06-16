@@ -10,10 +10,15 @@ public class JsonFile<T> : IJsonFile<T> where T : class
     private readonly Lazy<List<T>> _cache;
 
     public JsonFile(ILogger<JsonFile<T>> logger)
+        : this(logger, JsonDataSource.Generated)
     {
-        _logger = logger ?? throw new ArgumentNullException();
+    }
+
+    public JsonFile(ILogger<JsonFile<T>> logger, JsonDataSource dataSource)
+    {
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         var basePath = AppContext.BaseDirectory;
-        _filePath = Path.Combine(basePath, "Data", "Files", "Generated");
+        _filePath = Path.Combine(basePath, "Data", "Files", ResolveFolder(dataSource));
         _cache = new Lazy<List<T>>(
             LoadCache,
             LazyThreadSafetyMode.ExecutionAndPublication);
@@ -58,5 +63,15 @@ public class JsonFile<T> : IJsonFile<T> where T : class
         }
 
         return [];
+    }
+
+    private static string ResolveFolder(JsonDataSource dataSource)
+    {
+        return dataSource switch
+        {
+            JsonDataSource.Generated => "Generated",
+            JsonDataSource.PrimarySchools => "PrimarySchools",
+            _ => throw new ArgumentOutOfRangeException(nameof(dataSource), dataSource, "Unknown JSON data source")
+        };
     }
 }
