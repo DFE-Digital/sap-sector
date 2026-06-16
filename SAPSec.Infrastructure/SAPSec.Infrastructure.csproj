@@ -100,7 +100,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Data\Files\PrimarySchools\" />
+    <None Update="Data\Files\PrimarySchools\**\*.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

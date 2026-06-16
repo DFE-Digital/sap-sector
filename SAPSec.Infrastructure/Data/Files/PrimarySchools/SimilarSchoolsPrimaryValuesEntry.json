@@ -156,18 +156,6 @@
         "ReadMatAverage":  "103.5"
     },
     {
-        "URN":  "131752",
-        "PPPerc":  "47.87472036",
-        "Polar4QuintilePupils":  "4",
-        "PStability":  "79.266896",
-        "PercentSchSupport":  "12.695492",
-        "PercentEAL":  "31.007752",
-        "IdaciPupils":  "0.268658",
-        "PercentageStatementOrEhp":  "1.839926",
-        "NumberOfPupils":  "285",
-        "ReadMatAverage":  "103"
-    },
-    {
         "URN":  "134369",
         "PPPerc":  "41.11888112",
         "Polar4QuintilePupils":  "4",
@@ -322,18 +310,6 @@
         "PercentageStatementOrEhp":  "1.399354",
         "NumberOfPupils":  "524",
         "ReadMatAverage":  "103.5"
-    },
-    {
-        "URN":  "135968",
-        "PPPerc":  "47.21003135",
-        "Polar4QuintilePupils":  "3",
-        "PStability":  "74.818242",
-        "PercentSchSupport":  "8.493151",
-        "PercentEAL":  "32.613511",
-        "IdaciPupils":  "0.212195",
-        "PercentageStatementOrEhp":  "1.917808",
-        "NumberOfPupils":  "540",
-        "ReadMatAverage":  "104"
     },
     {
         "URN":  "136413",
@@ -504,18 +480,6 @@
         "ReadMatAverage":  "103.9"
     },
     {
-        "URN":  "140204",
-        "PPPerc":  "51.34459931",
-        "Polar4QuintilePupils":  "2",
-        "PStability":  "82.380301",
-        "PercentSchSupport":  "13.120193",
-        "PercentEAL":  "30.113102",
-        "IdaciPupils":  "0.25669",
-        "PercentageStatementOrEhp":  "3.578663",
-        "NumberOfPupils":  "493",
-        "ReadMatAverage":  "99.4"
-    },
-    {
         "URN":  "140935",
         "PPPerc":  "39.36907707",
         "Polar4QuintilePupils":  "2",
@@ -586,17 +550,5 @@
         "PercentageStatementOrEhp":  "2.194057",
         "NumberOfPupils":  "435",
         "ReadMatAverage":  "107.4"
-    },
-    {
-        "URN":  "146327",
-        "PPPerc":  "36.18459581",
-        "Polar4QuintilePupils":  "2",
-        "PStability":  "75.036632",
-        "PercentSchSupport":  "12.509335",
-        "PercentEAL":  "32.444643",
-        "IdaciPupils":  "0.178888",
-        "PercentageStatementOrEhp":  "3.648011",
-        "NumberOfPupils":  "388",
-        "ReadMatAverage":  "103.5"
     }
 ]
