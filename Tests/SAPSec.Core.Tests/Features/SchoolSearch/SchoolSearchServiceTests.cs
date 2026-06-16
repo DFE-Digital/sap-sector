@@ -92,7 +92,12 @@ public class SchoolSearchServiceTests
     [Fact]
     public async Task SearchByNumberAsync_WithPrimarySchoolAndFeatureEnabled_ReturnsSchool()
     {
-        var establishment = new Establishment { URN = "123456", PhaseOfEducationName = "Primary" };
+        var establishment = new Establishment
+        {
+            URN = "123456",
+            PhaseOfEducationName = "Primary",
+            EstablishmentStatusId = "1"
+        };
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
             .ReturnsAsync(true);
@@ -112,6 +117,31 @@ public class SchoolSearchServiceTests
     public async Task SearchByNumberAsync_WithSecondarySchoolAndMissingEmail_ReturnsSchool()
     {
         var establishment = new Establishment { URN = "123456", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" };
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
+            .ReturnsAsync(establishment);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
+            .ReturnsAsync((EstablishmentEmail?)null);
+
+        var result = await _sut.SearchByNumberAsync("123456");
+
+        result.Should().Be(establishment);
+    }
+
+    [Fact]
+    public async Task SearchByNumberAsync_WithPrimarySchoolAndEstablishmentStatusButMissingEmail_ReturnsSchool()
+    {
+        var establishment = new Establishment
+        {
+            URN = "123456",
+            PhaseOfEducationId = "2",
+            PhaseOfEducationName = "Primary",
+            EstablishmentStatusId = "1"
+        };
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(true);
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
@@ -192,6 +222,37 @@ public class SchoolSearchServiceTests
 
         results.Should().HaveCount(2);
         results.Select(x => x.URN).Should().Contain(["1", "2"]);
+    }
+
+    [Fact]
+    public async Task SearchAsync_IncludesPrimarySchools_WhenFeatureEnabledAndStatusExistsOnEstablishment()
+    {
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(true);
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(1, "Primary School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment
+                {
+                    URN = "1",
+                    EstablishmentName = "Primary School",
+                    PhaseOfEducationId = "2",
+                    PhaseOfEducationName = "Primary",
+                    EstablishmentStatusId = "1"
+                }
+            ]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([]);
+
+        var results = await _sut.SearchAsync("school");
+
+        results.Should().ContainSingle();
+        results[0].URN.Should().Be("1");
     }
 
     [Fact]

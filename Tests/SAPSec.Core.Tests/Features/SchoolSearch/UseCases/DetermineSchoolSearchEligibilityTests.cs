@@ -135,4 +135,20 @@ public class DetermineSchoolSearchEligibilityTests
 
         result.Should().BeFalse();
     }
+
+    [Fact]
+    public void CanSearch_WithPrimarySchoolAndEstablishmentStatus_ReturnsTrue()
+    {
+        var result = _sut.CanSearch(
+            new Establishment
+            {
+                PhaseOfEducationId = "2",
+                PhaseOfEducationName = "Primary",
+                EstablishmentStatusId = "1"
+            },
+            establishmentEmail: null,
+            primarySchoolsEnabled: true);
+
+        result.Should().BeTrue();
+    }
 }

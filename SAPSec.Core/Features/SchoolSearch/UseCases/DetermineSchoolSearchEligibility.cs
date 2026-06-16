@@ -35,14 +35,13 @@ public class DetermineSchoolSearchEligibility
             return false;
         }
 
-        if (HasMissingStatus(establishmentEmail))
+        if (HasMissingStatus(establishment, establishmentEmail))
         {
             return HasSecondaryPhase(establishment);
         }
 
-        return EstablishmentStatusValues.IsIncludedInSearch(
-            establishmentEmail?.EstablishmentStatusId,
-            establishmentEmail?.EstablishmentStatusName);
+        var resolvedStatus = ResolveStatus(establishment, establishmentEmail);
+        return EstablishmentStatusValues.IsIncludedInSearch(resolvedStatus.StatusId, resolvedStatus.StatusName);
     }
 
     private static bool HasSearchablePhase(Establishment establishment, bool primarySchoolsEnabled)
@@ -70,10 +69,29 @@ public class DetermineSchoolSearchEligibility
             || PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName);
     }
 
-    private static bool HasMissingStatus(EstablishmentEmail? establishmentEmail)
+    private static bool HasMissingStatus(
+        Establishment establishment,
+        EstablishmentEmail? establishmentEmail)
     {
-        return establishmentEmail == null
-            || (string.IsNullOrWhiteSpace(establishmentEmail.EstablishmentStatusId)
-                && string.IsNullOrWhiteSpace(establishmentEmail.EstablishmentStatusName));
+        return string.IsNullOrWhiteSpace(establishment.EstablishmentStatusId)
+            && string.IsNullOrWhiteSpace(establishment.EstablishmentStatusName)
+            && (establishmentEmail == null
+                || (string.IsNullOrWhiteSpace(establishmentEmail.EstablishmentStatusId)
+                    && string.IsNullOrWhiteSpace(establishmentEmail.EstablishmentStatusName)));
+    }
+
+    private static (string? StatusId, string? StatusName) ResolveStatus(
+        Establishment establishment,
+        EstablishmentEmail? establishmentEmail)
+    {
+        var statusId = string.IsNullOrWhiteSpace(establishment.EstablishmentStatusId)
+            ? establishmentEmail?.EstablishmentStatusId
+            : establishment.EstablishmentStatusId;
+
+        var statusName = string.IsNullOrWhiteSpace(establishment.EstablishmentStatusName)
+            ? establishmentEmail?.EstablishmentStatusName
+            : establishment.EstablishmentStatusName;
+
+        return (statusId, statusName);
     }
 }
