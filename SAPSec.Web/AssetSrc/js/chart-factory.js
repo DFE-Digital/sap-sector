@@ -444,10 +444,14 @@
                         titleColor: '#0b0c0c',
                         bodyColor: '#0b0c0c',
                         titleFont: {
-                            size: 14
+                            family: gdsStyles.fontFamily,
+                            size: 14,
+                            weight: 'normal'
                         },
                         bodyFont: {
-                            size: 14
+                            family: gdsStyles.fontFamily,
+                            size: 14,
+                            weight: 'normal'
                         },
                         borderColor: '#b1b4b6',
                         borderWidth: 1,
