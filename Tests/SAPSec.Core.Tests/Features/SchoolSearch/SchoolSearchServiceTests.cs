@@ -40,9 +40,6 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync(expectedNumber))
             .ReturnsAsync(establishment);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
-            .ReturnsAsync(new EstablishmentEmail { URN = "123456", EstablishmentStatusId = "1" });
 
         var result = await _sut.SearchByNumberAsync(input);
 
@@ -65,9 +62,6 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Primary" });
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
-            .ReturnsAsync(new EstablishmentEmail { URN = "123456", EstablishmentStatusId = "1" });
 
         var result = await _sut.SearchByNumberAsync("123456");
 
@@ -80,9 +74,6 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Nursery" });
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
-            .ReturnsAsync(new EstablishmentEmail { URN = "123456", EstablishmentStatusId = "1" });
 
         var result = await _sut.SearchByNumberAsync("123456");
 
@@ -104,9 +95,6 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
-            .ReturnsAsync(new EstablishmentEmail { URN = "123456", EstablishmentStatusId = "1" });
 
         var result = await _sut.SearchByNumberAsync("123456");
 
@@ -114,15 +102,12 @@ public class SchoolSearchServiceTests
     }
 
     [Fact]
-    public async Task SearchByNumberAsync_WithSecondarySchoolAndMissingEmail_ReturnsSchool()
+    public async Task SearchByNumberAsync_WithSecondarySchoolAndMissingStatus_ReturnsSchool()
     {
         var establishment = new Establishment { URN = "123456", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" };
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
-            .ReturnsAsync((EstablishmentEmail?)null);
 
         var result = await _sut.SearchByNumberAsync("123456");
 
@@ -130,7 +115,7 @@ public class SchoolSearchServiceTests
     }
 
     [Fact]
-    public async Task SearchByNumberAsync_WithPrimarySchoolAndEstablishmentStatusButMissingEmail_ReturnsSchool()
+    public async Task SearchByNumberAsync_WithPrimarySchoolAndEstablishmentStatus_ReturnsSchool()
     {
         var establishment = new Establishment
         {
@@ -145,9 +130,6 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
-            .ReturnsAsync((EstablishmentEmail?)null);
 
         var result = await _sut.SearchByNumberAsync("123456");
 
@@ -161,10 +143,7 @@ public class SchoolSearchServiceTests
     {
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
-            .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Secondary" });
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
-            .ReturnsAsync(new EstablishmentEmail { URN = "123456", EstablishmentStatusId = statusId });
+            .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Secondary", EstablishmentStatusId = statusId });
 
         var result = await _sut.SearchByNumberAsync("123456");
 
@@ -180,14 +159,8 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary" },
-                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationName = "Secondary" }
-            ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([
-                new EstablishmentEmail { URN = "1", EstablishmentStatusId = "1" },
-                new EstablishmentEmail { URN = "2", EstablishmentStatusId = "1" }
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", EstablishmentStatusId = "1" },
+                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationName = "Secondary", EstablishmentStatusId = "1" }
             ]);
 
         var results = await _sut.SearchAsync("school");
@@ -208,14 +181,8 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "All-through School", PhaseOfEducationName = "All-through" },
-                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationName = "Secondary" }
-            ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([
-                new EstablishmentEmail { URN = "1", EstablishmentStatusId = "1" },
-                new EstablishmentEmail { URN = "2", EstablishmentStatusId = "1" }
+                new Establishment { URN = "1", EstablishmentName = "All-through School", PhaseOfEducationName = "All-through", EstablishmentStatusId = "1" },
+                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationName = "Secondary", EstablishmentStatusId = "1" }
             ]);
 
         var results = await _sut.SearchAsync("school");
@@ -245,10 +212,6 @@ public class SchoolSearchServiceTests
                     EstablishmentStatusId = "1"
                 }
             ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([]);
-
         var results = await _sut.SearchAsync("school");
 
         results.Should().ContainSingle();
@@ -264,14 +227,8 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary" },
-                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationName = "Secondary" }
-            ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([
-                new EstablishmentEmail { URN = "1", EstablishmentStatusId = "1" },
-                new EstablishmentEmail { URN = "2", EstablishmentStatusId = "1" }
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", EstablishmentStatusId = "1" },
+                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationName = "Secondary", EstablishmentStatusId = "1" }
             ]);
 
         var results = await _sut.SuggestAsync("school");
@@ -292,12 +249,7 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" }
-            ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([
-                new EstablishmentEmail { URN = "1", EstablishmentStatusId = "2" }
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationId = "2", PhaseOfEducationName = "Primary", EstablishmentStatusId = "2" }
             ]);
 
         var results = await _sut.SuggestAsync("school");
@@ -316,9 +268,6 @@ public class SchoolSearchServiceTests
             .ReturnsAsync([
                 new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" }
             ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([]);
 
         var results = await _sut.SearchAsync("school");
 
@@ -340,12 +289,7 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2" }
-            ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([
-                new EstablishmentEmail { URN = "1", EstablishmentStatusId = statusId }
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = statusId }
             ]);
 
         var results = await _sut.SearchAsync("school");
@@ -367,12 +311,7 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2" }
-            ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([
-                new EstablishmentEmail { URN = "1", EstablishmentStatusId = statusId }
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = statusId }
             ]);
 
         var results = await _sut.SearchAsync("school");
@@ -397,12 +336,7 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
-                new Establishment { URN = "1", EstablishmentName = "Excluded School", PhaseOfEducationName = phaseName, PhaseOfEducationId = phaseId }
-            ]);
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync([
-                new EstablishmentEmail { URN = "1", EstablishmentStatusId = "1" }
+                new Establishment { URN = "1", EstablishmentName = "Excluded School", PhaseOfEducationName = phaseName, PhaseOfEducationId = phaseId, EstablishmentStatusId = "1" }
             ]);
 
         var results = await _sut.SearchAsync("school");

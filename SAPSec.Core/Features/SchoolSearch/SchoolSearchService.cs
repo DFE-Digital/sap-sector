@@ -38,11 +38,8 @@ public class SchoolSearchService(
 
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
-        var establishmentEmail = school == null
-            ? null
-            : await _establishmentRepository.GetEstablishmentEmailAsync(school.URN);
 
-        return _determineSchoolSearchEligibility.CanSearch(school, establishmentEmail, primarySchoolsEnabled)
+        return _determineSchoolSearchEligibility.CanSearch(school, primarySchoolsEnabled)
             ? school
             : null;
     }
@@ -61,10 +58,6 @@ public class SchoolSearchService(
 
         var urns = searchResults.Select(r => r.urn.ToString()).ToArray();
         var schools = await _establishmentRepository.GetEstablishmentsAsync(urns);
-        var establishmentEmails = await _establishmentRepository.GetEstablishmentEmailsAsync(urns);
-        var establishmentEmailsByUrn = establishmentEmails
-            .GroupBy(x => x.URN)
-            .ToDictionary(x => x.Key, x => x.First());
 
         foreach (var r in searchResults.GroupJoin(schools,
             r => r.urn.ToString(),
@@ -76,9 +69,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            establishmentEmailsByUrn.TryGetValue(r.School.URN, out var establishmentEmail);
-
-            if (!_determineSchoolSearchEligibility.CanSearch(r.School, establishmentEmail, primarySchoolsEnabled))
+            if (!_determineSchoolSearchEligibility.CanSearch(r.School, primarySchoolsEnabled))
             {
                 continue;
             }

@@ -61,8 +61,11 @@ public class DetermineSchoolSearchEligibilityTests
     public void CanSearch_UsesPhaseIdAndFeatureFlag(string phaseId, bool primarySchoolsEnabled, bool expected)
     {
         var result = _sut.CanSearch(
-            new Establishment { PhaseOfEducationId = phaseId },
-            new EstablishmentEmail { EstablishmentStatusId = "1" },
+            new Establishment
+            {
+                PhaseOfEducationId = phaseId,
+                EstablishmentStatusId = expected ? "1" : string.Empty
+            },
             primarySchoolsEnabled);
 
         result.Should().Be(expected);
@@ -76,8 +79,7 @@ public class DetermineSchoolSearchEligibilityTests
     public void CanSearch_UsesStatusId(string statusId, bool expected)
     {
         var result = _sut.CanSearch(
-            new Establishment { PhaseOfEducationId = "4" },
-            new EstablishmentEmail { EstablishmentStatusId = statusId },
+            new Establishment { PhaseOfEducationId = "4", EstablishmentStatusId = statusId },
             primarySchoolsEnabled: false);
 
         result.Should().Be(expected);
@@ -91,8 +93,7 @@ public class DetermineSchoolSearchEligibilityTests
     public void CanSearch_FallsBackToStatusName(string statusName, bool expected)
     {
         var result = _sut.CanSearch(
-            new Establishment { PhaseOfEducationName = "Secondary" },
-            new EstablishmentEmail { EstablishmentStatusName = statusName },
+            new Establishment { PhaseOfEducationName = "Secondary", EstablishmentStatusName = statusName },
             primarySchoolsEnabled: false);
 
         result.Should().Be(expected);
@@ -107,8 +108,7 @@ public class DetermineSchoolSearchEligibilityTests
     public void CanSearch_FallsBackToPhaseName(string phaseName, bool primarySchoolsEnabled, bool expected)
     {
         var result = _sut.CanSearch(
-            new Establishment { PhaseOfEducationName = phaseName },
-            new EstablishmentEmail { EstablishmentStatusId = "1" },
+            new Establishment { PhaseOfEducationName = phaseName, EstablishmentStatusId = "1" },
             primarySchoolsEnabled);
 
         result.Should().Be(expected);
@@ -119,7 +119,6 @@ public class DetermineSchoolSearchEligibilityTests
     {
         var result = _sut.CanSearch(
             new Establishment { PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" },
-            establishmentEmail: null,
             primarySchoolsEnabled: false);
 
         result.Should().BeTrue();
@@ -130,7 +129,6 @@ public class DetermineSchoolSearchEligibilityTests
     {
         var result = _sut.CanSearch(
             new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" },
-            establishmentEmail: null,
             primarySchoolsEnabled: true);
 
         result.Should().BeFalse();
@@ -146,7 +144,6 @@ public class DetermineSchoolSearchEligibilityTests
                 PhaseOfEducationName = "Primary",
                 EstablishmentStatusId = "1"
             },
-            establishmentEmail: null,
             primarySchoolsEnabled: true);
 
         result.Should().BeTrue();
