@@ -22,14 +22,14 @@ public static class DependenciesExtensions
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
         //Comment out IsDevelopment check for Review app testing
-        //if (environment.IsDevelopment())
-        //{
-        //    services.AddScoped<ICustomEventService, NoOpCustomEventService>();
-        //}
-        //else
-        //{
+        if (environment.IsEnvironment("Development"))
+        {
+            services.AddScoped<ICustomEventService, NoOpCustomEventService>();
+        }
+        else
+        {
             services.AddScoped<ICustomEventService, CustomEventService>();
-        //}
+        }
 
         // Use cases
         services.AddSingleton<GetKs4HeadlineMeasures>();

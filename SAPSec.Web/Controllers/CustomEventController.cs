@@ -26,7 +26,7 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
 
        // Match match = feedbackFormRegex.Match(clickData.Url);
 
-        if (clickData.Url.Contains(customEventLocations.Value.FeedbackForm))
+        if (clickData.Url.StartsWith(customEventLocations.Value.FeedbackForm))
         {
             clickData.Text = clickData.Url;
             await customEventService.SendCustomEvent(clickData, "feedback_link_click");
@@ -52,7 +52,7 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
 
         //match = mailToRegex.Match(clickData.Url);
 
-        if (clickData.Url.Contains(customEventLocations.Value.MailTo))
+        if (clickData.Url.StartsWith(customEventLocations.Value.MailTo))
         {
             clickData.Text = clickData.Url;
             await customEventService.SendCustomEvent(clickData, "mailto_link_click");
@@ -71,6 +71,18 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
 
             return Ok();
         }
+
+
+        //var reviewAppUrlRegex = new Regex(".*-pr-\\d+\\.test");
+
+        //match = reviewAppUrlRegex.Match(clickData.Url);
+
+        //if (!match.Success)
+        //{
+        //    await customEventService.SendCustomEvent(clickData, "outbound_link_click");
+
+        //    return Ok();
+        //}
 
         //Don't record the request from '/custom-event-tracking' as an additional web request event.
         //Requests to the backend are already recorded as a web request event.
