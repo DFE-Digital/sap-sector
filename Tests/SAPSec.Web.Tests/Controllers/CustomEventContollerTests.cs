@@ -15,19 +15,19 @@ namespace SAPSec.Web.Tests.Controllers;
 public class CustomEventControllerTests
 {
     private readonly Mock<ICustomEventService> _customEventServiceMock;
-    private readonly Mock<IOptions<CustomEventPatterns>> _optionsMock;
+    private readonly Mock<IOptions<CustomEventLocations>> _optionsMock;
     private readonly CustomEventController _sut;
 
     public CustomEventControllerTests()
     {
         _customEventServiceMock = new Mock<ICustomEventService>();
-        _optionsMock = new Mock<IOptions<CustomEventPatterns>>();
-        _optionsMock.Setup(x => x.Value).Returns(new CustomEventPatterns
+        _optionsMock = new Mock<IOptions<CustomEventLocations>>();
+        _optionsMock.Setup(x => x.Value).Returns(new CustomEventLocations
         {
-            FeedbackForm = "^https://forms.cloud.microsoft.+$",
-            SignIn = "^.*/auth/signin.*$",
-            MailTo = "^mailto:.*$",
-            ServiceUrls = "^https://get-school-improvement-insights.education.gov.uk.*$|https://get-school-improvement-insights-test.test.teacherservices.cloud.*$"
+            FeedbackForm = "https://forms.cloud.microsoft",
+            SignIn = "/auth/signin",
+            MailTo = "mailto:",
+            ServiceUrls = ["https://get-school-improvement-insights.education.gov.uk","https://get-school-improvement-insights-test.test.teacherservices.cloud"]
         });
         _sut = new CustomEventController(_customEventServiceMock.Object, _optionsMock.Object);
     }

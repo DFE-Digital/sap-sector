@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Configuration;
+using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;
@@ -14,33 +15,57 @@ namespace SAPSec.Web.Controllers;
 /// </summary>
 /// <param name="customEventService"></param>
 [AllowAnonymous]
-public class CustomEventController(ICustomEventService customEventService, IOptions<CustomEventPatterns> customEventPatterns) : Controller
+public class CustomEventController(ICustomEventService customEventService, IOptions<CustomEventLocations> customEventLocations) : Controller
 {
+
     [HttpPost("/custom-event-tracking")]
     public async Task<IActionResult> CustomEventTracking([FromBody] ClickData clickData)
     {
-        var patterns = new Dictionary<string, string> {
-            { customEventPatterns.Value.FeedbackForm, "feedback_link_click" },
-            { customEventPatterns.Value.SignIn, "cta_start_now_click" },
-            { customEventPatterns.Value.MailTo, "mailto_link_click" } };
 
-        foreach (var pattern in patterns)
+      //  var feedbackFormRegex = new Regex($".*{Regex.Escape(customEventLocations.Value.FeedbackForm)}.+$");
+
+       // Match match = feedbackFormRegex.Match(clickData.Url);
+
+        if (clickData.Url.Contains(customEventLocations.Value.FeedbackForm))
         {
-            Match match = Regex.Match(clickData.Url, pattern.Key);
+            clickData.Text = clickData.Url;
+            await customEventService.SendCustomEvent(clickData, "feedback_link_click");
 
-            if (match.Success)
-            {
-                clickData.Text = match.Value;
-                await customEventService.SendCustomEvent(clickData, pattern.Value);
-
-                return Ok();
-            }
-
+            return Ok();
         }
 
-        Match matchServiceUrl = Regex.Match(clickData.Url, customEventPatterns.Value.ServiceUrls);
 
-        if (!matchServiceUrl.Success)
+        //var signInRegex = new Regex($".*{Regex.Escape(customEventLocations.Value.SignIn)}.+$");
+
+      //  match = signInRegex.Match(clickData.Url);
+
+        if (clickData.Url.Contains(customEventLocations.Value.SignIn))
+        {
+            clickData.Text = clickData.Url;
+            await customEventService.SendCustomEvent(clickData, "cta_start_now_click");
+
+            return Ok();
+        }
+
+
+        //var mailToRegex = new Regex($"^{Regex.Escape(customEventLocations.Value.MailTo)}.+$");
+
+        //match = mailToRegex.Match(clickData.Url);
+
+        if (clickData.Url.Contains(customEventLocations.Value.MailTo))
+        {
+            clickData.Text = clickData.Url;
+            await customEventService.SendCustomEvent(clickData, "mailto_link_click");
+
+            return Ok();
+        }
+
+
+        var serviceUrlsRegex = new Regex(string.Join("|", customEventLocations.Value.ServiceUrls.Select(url => $@"^{Regex.Escape(url)}/.*$")));
+
+        Match match = serviceUrlsRegex.Match(clickData.Url);
+
+        if (!match.Success)
         {
             await customEventService.SendCustomEvent(clickData, "outbound_link_click");
 
