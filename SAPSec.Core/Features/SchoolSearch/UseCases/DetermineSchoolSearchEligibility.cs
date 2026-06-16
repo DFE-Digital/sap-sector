@@ -30,10 +30,19 @@ public class DetermineSchoolSearchEligibility
             return false;
         }
 
-        return HasSearchablePhase(establishment, primarySchoolsEnabled)
-            && EstablishmentStatusValues.IsIncludedInSearch(
-                establishmentEmail?.EstablishmentStatusId,
-                establishmentEmail?.EstablishmentStatusName);
+        if (!HasSearchablePhase(establishment, primarySchoolsEnabled))
+        {
+            return false;
+        }
+
+        if (HasMissingStatus(establishmentEmail))
+        {
+            return HasSecondaryPhase(establishment);
+        }
+
+        return EstablishmentStatusValues.IsIncludedInSearch(
+            establishmentEmail?.EstablishmentStatusId,
+            establishmentEmail?.EstablishmentStatusName);
     }
 
     private static bool HasSearchablePhase(Establishment establishment, bool primarySchoolsEnabled)
@@ -53,5 +62,18 @@ public class DetermineSchoolSearchEligibility
     {
         return PhaseOfEducationValues.IsSecondary(phaseOfEducationName)
             || PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName);
+    }
+
+    private static bool HasSecondaryPhase(Establishment establishment)
+    {
+        return PhaseOfEducationValues.IsSearchableSearchPhaseId(establishment.PhaseOfEducationId, primarySchoolsEnabled: false)
+            || PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName);
+    }
+
+    private static bool HasMissingStatus(EstablishmentEmail? establishmentEmail)
+    {
+        return establishmentEmail == null
+            || (string.IsNullOrWhiteSpace(establishmentEmail.EstablishmentStatusId)
+                && string.IsNullOrWhiteSpace(establishmentEmail.EstablishmentStatusName));
     }
 }

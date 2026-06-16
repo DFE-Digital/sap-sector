@@ -108,6 +108,22 @@ public class SchoolSearchServiceTests
         result.Should().Be(establishment);
     }
 
+    [Fact]
+    public async Task SearchByNumberAsync_WithSecondarySchoolAndMissingEmail_ReturnsSchool()
+    {
+        var establishment = new Establishment { URN = "123456", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" };
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
+            .ReturnsAsync(establishment);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentEmailAsync("123456"))
+            .ReturnsAsync((EstablishmentEmail?)null);
+
+        var result = await _sut.SearchByNumberAsync("123456");
+
+        result.Should().Be(establishment);
+    }
+
     [Theory]
     [InlineData("2")]
     [InlineData("4")]
@@ -226,6 +242,27 @@ public class SchoolSearchServiceTests
         var results = await _sut.SuggestAsync("school");
 
         results.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task SearchAsync_IncludesSecondarySchools_WhenStatusRecordMissing()
+    {
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(2, "Secondary School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" }
+            ]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentEmailsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([]);
+
+        var results = await _sut.SearchAsync("school");
+
+        results.Should().ContainSingle();
+        results[0].URN.Should().Be("2");
     }
 
     [Theory]

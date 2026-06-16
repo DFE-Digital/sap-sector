@@ -113,4 +113,26 @@ public class DetermineSchoolSearchEligibilityTests
 
         result.Should().Be(expected);
     }
+
+    [Fact]
+    public void CanSearch_WithSecondarySchoolAndMissingStatus_ReturnsTrue()
+    {
+        var result = _sut.CanSearch(
+            new Establishment { PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" },
+            establishmentEmail: null,
+            primarySchoolsEnabled: false);
+
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void CanSearch_WithPrimarySchoolAndMissingStatus_ReturnsFalse()
+    {
+        var result = _sut.CanSearch(
+            new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" },
+            establishmentEmail: null,
+            primarySchoolsEnabled: true);
+
+        result.Should().BeFalse();
+    }
 }
