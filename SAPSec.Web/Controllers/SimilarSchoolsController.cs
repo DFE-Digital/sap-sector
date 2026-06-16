@@ -37,6 +37,13 @@ public class SimilarSchoolsController : Controller
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData["SchoolDetails"] = school;
+        if (Url is not null)
+        {
+            ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreateSecondary(
+                Url,
+                school?.Urn ?? urn,
+                nameof(ViewSimilarSchools));
+        }
 
         var filterBy = BuildCoreFilters(Request.Query);
         var currentFilters = ExtractCurrentFilters(Request.Query);
