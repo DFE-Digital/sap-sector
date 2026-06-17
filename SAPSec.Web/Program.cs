@@ -285,11 +285,4 @@ public class Program
                || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
                || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
-
-    //private static bool IsLocalDevelopment()
-    //{
-    //    bool isLocalDevelopment = Environment.GetEnvironmentVariable("IS_LOCAL_DEVELOPMENT") == "true";
-
-    //    return isLocalDevelopment;
-    //}
 }

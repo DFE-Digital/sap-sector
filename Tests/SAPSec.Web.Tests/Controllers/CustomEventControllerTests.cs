@@ -50,8 +50,9 @@ public class CustomEventControllerTests
 
     [Theory]
     [InlineData("https://get-school-improvement-insights.education.gov.uk/school/123456")]
-  //  [InlineData("https://get-school-improvement-insights-test.test.teacherservices.cloud/school/123456")]
-   // [InlineData("https://get-school-improvement-insights-pr-240.test.teacherservices.cloud/school/123456")]
+    [InlineData("https://get-school-improvement-insights-test.test.teacherservices.cloud/school/123456")]
+    [InlineData("https://test.get-school-improvement-insights.gov.uk")]
+    [InlineData("https://get-school-improvement-insights-pr-240.test.teacherservices.cloud/school/123456")]
     public async Task PostCustomEventTracking_DoesNotSendEventForNonMatchingUrls(string url)
     {
         var clickData = new ClickData { Text = "text", Url = url };

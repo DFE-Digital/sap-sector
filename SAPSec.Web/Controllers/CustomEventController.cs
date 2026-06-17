@@ -4,7 +4,6 @@ using Microsoft.Extensions.Options;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Configuration;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;
@@ -22,10 +21,6 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
     public async Task<IActionResult> CustomEventTracking([FromBody] ClickData clickData)
     {
 
-      //  var feedbackFormRegex = new Regex($".*{Regex.Escape(customEventLocations.Value.FeedbackForm)}.+$");
-
-       // Match match = feedbackFormRegex.Match(clickData.Url);
-
         if (clickData.Url.StartsWith(customEventLocations.Value.FeedbackForm))
         {
             clickData.Text = clickData.Url;
@@ -34,11 +29,6 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
             return Ok();
         }
 
-
-        //var signInRegex = new Regex($".*{Regex.Escape(customEventLocations.Value.SignIn)}.+$");
-
-      //  match = signInRegex.Match(clickData.Url);
-
         if (clickData.Url.Contains(customEventLocations.Value.SignIn))
         {
             clickData.Text = clickData.Url;
@@ -46,11 +36,6 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
 
             return Ok();
         }
-
-
-        //var mailToRegex = new Regex($"^{Regex.Escape(customEventLocations.Value.MailTo)}.+$");
-
-        //match = mailToRegex.Match(clickData.Url);
 
         if (clickData.Url.StartsWith(customEventLocations.Value.MailTo))
         {
@@ -61,28 +46,18 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
         }
 
 
+        //check for outbound link clicks
         var serviceUrlsRegex = new Regex(string.Join("|", customEventLocations.Value.ServiceUrls.Select(url => $@"^{Regex.Escape(url)}/.*$")));
 
         Match match = serviceUrlsRegex.Match(clickData.Url);
 
-        if (!match.Success || !clickData.Url.Contains("-pr-"))
+        //"-pr-" checks for review app url
+        if (!match.Success && !clickData.Url.Contains("-pr-"))
         {
             await customEventService.SendCustomEvent(clickData, "outbound_link_click");
 
             return Ok();
         }
-
-
-        //var reviewAppUrlRegex = new Regex(".*-pr-\\d+\\.test");
-
-        //match = reviewAppUrlRegex.Match(clickData.Url);
-
-        //if (!match.Success)
-        //{
-        //    await customEventService.SendCustomEvent(clickData, "outbound_link_click");
-
-        //    return Ok();
-        //}
 
         //Don't record the request from '/custom-event-tracking' as an additional web request event.
         //Requests to the backend are already recorded as a web request event.
