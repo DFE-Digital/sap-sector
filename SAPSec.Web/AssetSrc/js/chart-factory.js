@@ -424,7 +424,17 @@
         });
 
         const position = chart.canvas.getBoundingClientRect();
-        const left = position.left + window.pageXOffset + tooltip.caretX + 16;
+        const viewportLeft = window.pageXOffset;
+        const viewportRight = viewportLeft + document.documentElement.clientWidth;
+        const tooltipWidth = tooltipElement.offsetWidth;
+        const gap = 16;
+        const pointLeft = position.left + window.pageXOffset + tooltip.caretX;
+        const rightCandidate = pointLeft + gap;
+        const leftCandidate = pointLeft - tooltipWidth - gap;
+        const hasRoomOnRight = rightCandidate + tooltipWidth <= viewportRight - gap;
+        const left = hasRoomOnRight
+            ? rightCandidate
+            : Math.max(viewportLeft + gap, leftCandidate);
         const top = position.top + window.pageYOffset + tooltip.caretY;
 
         tooltipElement.style.left = `${left}px`;
