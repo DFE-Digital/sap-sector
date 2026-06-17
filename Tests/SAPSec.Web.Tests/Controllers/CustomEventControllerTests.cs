@@ -27,7 +27,10 @@ public class CustomEventControllerTests
             FeedbackForm = "https://forms.cloud.microsoft",
             SignIn = "/auth/signin",
             MailTo = "mailto:",
-            ServiceUrls = ["https://get-school-improvement-insights.education.gov.uk","https://get-school-improvement-insights-test.test.teacherservices.cloud"]
+            ServiceUrls = [
+                "https://get-school-improvement-insights.education.gov.uk",
+                "https://get-school-improvement-insights-test.test.teacherservices.cloud",
+                "https://test.get-school-improvement-insights.gov.uk"]
         });
         _sut = new CustomEventController(_customEventServiceMock.Object, _optionsMock.Object);
     }
@@ -51,7 +54,7 @@ public class CustomEventControllerTests
     [Theory]
     [InlineData("https://get-school-improvement-insights.education.gov.uk/school/123456")]
     [InlineData("https://get-school-improvement-insights-test.test.teacherservices.cloud/school/123456")]
-    [InlineData("https://test.get-school-improvement-insights.gov.uk")]
+    [InlineData("https://test.get-school-improvement-insights.gov.uk/school/123456")]
     [InlineData("https://get-school-improvement-insights-pr-240.test.teacherservices.cloud/school/123456")]
     public async Task PostCustomEventTracking_DoesNotSendEventForNonMatchingUrls(string url)
     {
