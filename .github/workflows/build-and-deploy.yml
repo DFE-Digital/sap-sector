@@ -315,6 +315,14 @@ jobs:
           BACKUP_FILE: seed.sql.gz
         run: |
           $ErrorActionPreference = "Stop"
+          $accountName = ""
+          if ($env:AZURE_STORAGE_CONNECTION_STRING -match 'AccountName=([^;]+)') {
+            $accountName = $Matches[1]
+          }
+          Write-Host "Review seed storage account: $accountName"
+          Write-Host "Review seed container source: AZURE_STORAGE_CONTAINER secret"
+          Write-Host "Review seed PR blob candidate: $env:BACKUP_BLOB_PR"
+          Write-Host "Review seed fallback blob candidate: $env:BACKUP_BLOB_TEST"
 
           # -----------------------------
           # Helpers (retries + reporting)

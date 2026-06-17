@@ -674,6 +674,27 @@ jobs:
           echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
           echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
 
+      # ==============================
+      # 8b. Backup target DB before ETL when running a review-app seed flow
+      #     This gives step 12 a real artifact to restore after ETL completes.
+      # ==============================
+      - name: Backup ${{ env.DEPLOY_ENV }} postgres before ETL (review app flow)
+        if: ${{ env.DEPLOY_ENV == 'test' && inputs.review-app-number != '' }}
+        timeout-minutes: 180
+        uses: DFE-Digital/github-actions/backup-postgres@master
+        with:
+          storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
+          resource-group: ${{ env.RESOURCE_GROUP_NAME }}
+          app-name: ${{ env.SERVICE_NAME }}-${{ env.DEPLOY_ENV }}
+          namespace: ${{ env.NAMESPACE }}
+          cluster: ${{ env.CLUSTER }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          backup-file: ${{ env.BACKUP_FILE }}.sql
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+
       - name: Enable maintenance page
         if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
         shell: bash
@@ -987,9 +1008,32 @@ jobs:
             if [ $upload_delay -gt 120 ]; then upload_delay=120; fi
             upload_attempt=$((upload_attempt + 1))
           done
+          account_name="$(printf '%s' "${AZURE_STORAGE_CONNECTION_STRING}" | sed -n 's/.*AccountName=\([^;]*\).*/\1/p')"
+          metadata_dir="$GITHUB_WORKSPACE/SAPData/Work/ReviewSeed"
+          mkdir -p "${metadata_dir}"
+          metadata_file="${metadata_dir}/review-seed-target.json"
+          cat > "${metadata_file}" <<EOF
+          {
+            "storageAccount": "${account_name}",
+            "containerSource": "AZURE_STORAGE_CONTAINER secret",
+            "blobName": "${LATEST_BLOB}",
+            "reviewAppNumber": "${REVIEW_SEED_SUFFIX}",
+            "createdAtUtc": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+          }
+          EOF
           echo "Seed backup uploaded:"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
+          echo "Review seed blob name: ${LATEST_BLOB}"
+          echo "Review seed storage account: ${account_name}"
+
+      - name: Upload review seed target artifact
+        if: ${{ always() && env.DEPLOY_ENV == 'test' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-seed-target
+          path: SAPData/Work/ReviewSeed/review-seed-target.json
+          if-no-files-found: warn
       
       # ==============================
       # 11. Backup target DB (if pipeline was run normally)
