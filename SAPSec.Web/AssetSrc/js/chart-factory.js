@@ -353,6 +353,85 @@
         return `${formattedValue}${axisSuffix}`;
     }
 
+    function getOrCreateHtmlTooltip(chart) {
+        const chartContainer = chart.canvas.parentElement;
+        if (!chartContainer) {
+            return null;
+        }
+
+        let tooltip = chartContainer.querySelector('.app-chart-tooltip');
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'app-chart-tooltip';
+
+            const title = document.createElement('div');
+            title.className = 'app-chart-tooltip__title';
+            tooltip.appendChild(title);
+
+            const body = document.createElement('div');
+            body.className = 'app-chart-tooltip__body';
+            tooltip.appendChild(body);
+
+            chartContainer.appendChild(tooltip);
+        }
+
+        return tooltip;
+    }
+
+    function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
+        const { chart, tooltip } = context;
+        const tooltipElement = getOrCreateHtmlTooltip(chart);
+
+        if (!tooltipElement) {
+            return;
+        }
+
+        if (!tooltip || tooltip.opacity === 0) {
+            tooltipElement.classList.remove('app-chart-tooltip--visible');
+            return;
+        }
+
+        const titleElement = tooltipElement.querySelector('.app-chart-tooltip__title');
+        const bodyElement = tooltipElement.querySelector('.app-chart-tooltip__body');
+
+        if (!titleElement || !bodyElement) {
+            return;
+        }
+
+        titleElement.textContent = tooltip.title?.[0] ?? '';
+        bodyElement.innerHTML = '';
+
+        tooltip.dataPoints.forEach(function (point) {
+            const row = document.createElement('div');
+            row.className = 'app-chart-tooltip__row';
+
+            const marker = document.createElement('span');
+            marker.className = 'app-chart-tooltip__marker';
+            marker.style.backgroundColor = point.dataset.borderColor || point.dataset.backgroundColor || CHART_CONFIG.fallbacks.legendBoxColor;
+
+            const label = document.createElement('span');
+            label.className = 'app-chart-tooltip__label';
+            label.textContent = point.dataset.label || '';
+
+            const value = document.createElement('span');
+            value.className = 'app-chart-tooltip__value';
+            value.textContent = formatTooltipValue(point.parsed.y, axisSuffix, tooltipDecimals);
+
+            row.appendChild(marker);
+            row.appendChild(label);
+            row.appendChild(value);
+            bodyElement.appendChild(row);
+        });
+
+        const position = chart.canvas.getBoundingClientRect();
+        const left = position.left + window.pageXOffset + tooltip.caretX + 16;
+        const top = position.top + window.pageYOffset + tooltip.caretY;
+
+        tooltipElement.style.left = `${left}px`;
+        tooltipElement.style.top = `${top}px`;
+        tooltipElement.classList.add('app-chart-tooltip--visible');
+    }
+
     function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis, tooltipDecimals) {
         const common = {
             responsive: true,
@@ -442,24 +521,10 @@
                 },
                 plugins: {
                     tooltip: {
-                        enabled: true,
-                        displayColors: true,
-                        usePointStyle: true,
-                        backgroundColor: '#ffffff',
-                        titleColor: '#0b0c0c',
-                        bodyColor: '#0b0c0c',
-                        titleFont: {
-                            family: gdsStyles.fontFamily,
-                            size: 14,
-                            weight: 'bold'
+                        enabled: false,
+                        external: function (context) {
+                            renderHtmlTooltip(context, axisSuffix, tooltipDecimals);
                         },
-                        bodyFont: {
-                            family: gdsStyles.fontFamily,
-                            size: 14,
-                            weight: 'normal'
-                        },
-                        borderColor: '#b1b4b6',
-                        borderWidth: 1,
                         callbacks: {
                             title: function (contexts) {
                                 return contexts?.[0]?.label ?? '';

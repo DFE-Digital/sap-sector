@@ -1161,6 +1161,62 @@ $app-ks4-color-track: #f3f2f1;
   width: 14px;
 }
 
+.app-chart-tooltip {
+  background: #ffffff;
+  border: 1px solid #b1b4b6;
+  color: #0b0c0c;
+  display: none;
+  left: 0;
+  max-width: 280px;
+  padding: 12px 14px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: translate(0, -50%);
+  z-index: 20;
+}
+
+.app-chart-tooltip--visible {
+  display: block;
+}
+
+.app-chart-tooltip__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.app-chart-tooltip__body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.app-chart-tooltip__row {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 14px 1fr auto;
+}
+
+.app-chart-tooltip__marker {
+  border-radius: 50%;
+  display: block;
+  height: 14px;
+  width: 14px;
+}
+
+.app-chart-tooltip__label,
+.app-chart-tooltip__value {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.app-chart-tooltip__value {
+  font-weight: 700;
+}
+
 .app-ks4-copy {
   max-width: 660px;
   line-height: 1.45;
