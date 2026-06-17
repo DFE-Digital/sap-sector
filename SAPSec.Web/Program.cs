@@ -254,7 +254,6 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        //Remove 'or "Development" to test in review app
         if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests") && !isLocalDevelopment)
         {
             app.UseDfeAnalytics();
