@@ -36,11 +36,15 @@ jobs:
   ingest:
     name: Ingest Raw Data & Build Warehouse (${{ matrix.target_env }})
     runs-on: ubuntu-latest
+    timeout-minutes: 720
     strategy:
       fail-fast: false
       matrix:
         target_env: ${{ fromJson(github.event_name == 'schedule' && '["test","production"]' || format('["{0}"]', inputs.environment || 'test')) }}
     environment: ${{ matrix.target_env }}
+    concurrency:
+      group: data_pipeline_${{ matrix.target_env }}
+      cancel-in-progress: false
 
     env:
       # Blob (currently from GitHub secrets)
@@ -127,8 +131,28 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
-          kubelogin convert-kubeconfig -l azurecli
+          : "${AKS_RESOURCE_GROUP:?AKS_RESOURCE_GROUP is not set}"
+          : "${AKS_CLUSTER_NAME:?AKS_CLUSTER_NAME is not set}"
+          max_attempts=10
+          delay=10
+          attempt=1
+          while [ $attempt -le $max_attempts ]; do
+            echo "AKS credentials attempt $attempt/$max_attempts"
+            if az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"; then
+              kubelogin convert-kubeconfig -l azurecli
+              exit 0
+            fi
+            if [ $attempt -eq $max_attempts ]; then
+              break
+            fi
+            echo "AKS credential setup failed. Retrying after ${delay}s..."
+            sleep $delay
+            delay=$((delay * 2))
+            if [ $delay -gt 120 ]; then delay=120; fi
+            attempt=$((attempt + 1))
+          done
+          echo "Failed to configure AKS credentials after $max_attempts attempts."
+          exit 1
       - name: Download konduit.sh
         shell: bash
         run: |
@@ -541,6 +565,23 @@ jobs:
           LATEST_FILES: ${{ steps.version.outputs.latest_files }}
         run: |
           $ErrorActionPreference = "Stop"
+          function Invoke-WithRetry([scriptblock]$Action, [int]$MaxAttempts = 10, [int]$InitialDelaySeconds = 2, [string]$Label = "operation") {
+            $attempt = 0
+            $delay = $InitialDelaySeconds
+            while ($true) {
+              try {
+                $attempt++
+                return & $Action
+              } catch {
+                if ($attempt -ge $MaxAttempts) {
+                  throw "Failed $Label after $attempt attempts. Last error: $($_.Exception.Message)"
+                }
+                Write-Host "Retrying $Label (attempt $attempt/$MaxAttempts). Waiting ${delay}s. Error: $($_.Exception.Message)"
+                Start-Sleep -Seconds $delay
+                $delay = [Math]::Min($delay * 2, 30)
+              }
+            }
+          }
           $rawDir = "SAPData/DataMap/SourceFiles"
           New-Item -ItemType Directory -Force -Path $rawDir | Out-Null
           Get-ChildItem -Path $rawDir -Force | Remove-Item -Force -Recurse -ErrorAction SilentlyContinue
@@ -554,10 +595,12 @@ jobs:
             [void]$latestManagedFiles.Add($fn)
           }
           # ---- List all blobs in container ----
-          $blobNamesJson = az storage blob list `
-            --container-name $env:AZURE_STORAGE_CONTAINER `
-            --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
-            --query "[].name" -o json
+          $blobNamesJson = Invoke-WithRetry {
+            az storage blob list `
+              --container-name $env:AZURE_STORAGE_CONTAINER `
+              --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+              --query "[].name" -o json
+          } -Label "list blobs"
           $blobNames = $blobNamesJson | ConvertFrom-Json
           if ($blobNames -isnot [System.Array]) { $blobNames = @($blobNames) }
           if (-not $blobNames -or $blobNames.Count -eq 0) {
@@ -587,12 +630,14 @@ jobs:
           Write-Host "Downloading $($toDownload.Count) blobs (manual_* + latest managed only)"
           foreach ($blob in $toDownload) {
             $dest = Join-Path $rawDir $blob
-            az storage blob download `
-              --container-name $env:AZURE_STORAGE_CONTAINER `
-              --name $blob `
-              --file $dest `
-              --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
-              --overwrite true | Out-Null
+            Invoke-WithRetry {
+              az storage blob download `
+                --container-name $env:AZURE_STORAGE_CONTAINER `
+                --name $blob `
+                --file $dest `
+                --connection-string $env:AZURE_STORAGE_CONNECTION_STRING `
+                --overwrite true | Out-Null
+            } -Label "download $blob"
           }
           Write-Host "Downloaded files:"
           $files = Get-ChildItem -Path $rawDir -File | Sort-Object Name
@@ -632,8 +677,31 @@ jobs:
       - name: Enable maintenance page
         if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
         shell: bash
+        timeout-minutes: 30
         run: |
           set -euo pipefail
+          apply_with_retry() {
+            local input_file="$1"
+            local label="$2"
+            local max_attempts=10
+            local delay=10
+            local attempt=1
+            while [ $attempt -le $max_attempts ]; do
+              if kubectl apply -f "$input_file"; then
+                return 0
+              fi
+              if [ $attempt -eq $max_attempts ]; then
+                break
+              fi
+              echo "kubectl apply failed for ${label}. Retrying after ${delay}s..."
+              sleep $delay
+              delay=$((delay * 2))
+              if [ $delay -gt 120 ]; then delay=120; fi
+              attempt=$((attempt + 1))
+            done
+            echo "kubectl apply failed for ${label} after $max_attempts attempts."
+            return 1
+          }
           primary_service="${SERVICE_NAME}-${DEPLOY_ENV}"
           maintenance_dir="${RUNNER_TEMP}/maintenance"
           backup_file="${maintenance_dir}/${DEPLOY_ENV}-ingresses.json"
@@ -707,6 +775,7 @@ jobs:
           while IFS= read -r ingress_name; do
             current_file="${maintenance_dir}/${ingress_name}.json"
             kubectl -n "${NAMESPACE}" get ingress "${ingress_name}" -o json > "${current_file}"
+            rendered_file="${maintenance_dir}/${ingress_name}.patched.json"
             jq \
               --arg svc "${primary_service}" \
               --arg maint "${maintenance_service}" \
@@ -738,7 +807,8 @@ jobs:
                     },
                     spec
                   }
-              ' "${current_file}" | kubectl apply -f -
+              ' "${current_file}" > "${rendered_file}"
+            apply_with_retry "${rendered_file}" "${ingress_name}"
           done <<< "${matching_ingresses}"
 
       # ==============================
@@ -747,6 +817,7 @@ jobs:
       - name: Run ETL pipeline via konduit (retry on transient DB disconnect)
         working-directory: SAPData/Sql
         shell: bash
+        timeout-minutes: 480
         run: |
           set -euo pipefail
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
@@ -791,8 +862,31 @@ jobs:
       - name: Disable maintenance page
         if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
         shell: bash
+        timeout-minutes: 30
         run: |
           set -euo pipefail
+          apply_with_retry() {
+            local input_file="$1"
+            local label="$2"
+            local max_attempts=10
+            local delay=10
+            local attempt=1
+            while [ $attempt -le $max_attempts ]; do
+              if kubectl apply -f "$input_file"; then
+                return 0
+              fi
+              if [ $attempt -eq $max_attempts ]; then
+                break
+              fi
+              echo "kubectl apply failed for ${label}. Retrying after ${delay}s..."
+              sleep $delay
+              delay=$((delay * 2))
+              if [ $delay -gt 120 ]; then delay=120; fi
+              attempt=$((attempt + 1))
+            done
+            echo "kubectl apply failed for ${label} after $max_attempts attempts."
+            return 1
+          }
           backup_file="${RUNNER_TEMP}/maintenance/${DEPLOY_ENV}-ingresses.json"
           if [ ! -f "${backup_file}" ]; then
             echo "No ingress backup found for ${DEPLOY_ENV}; skipping maintenance restore."
@@ -800,7 +894,9 @@ jobs:
           fi
 
           jq -c '.items[]' "${backup_file}" | while IFS= read -r ingress_spec; do
-            printf '%s\n' "${ingress_spec}" | kubectl apply -f -
+            current_file="$(mktemp)"
+            printf '%s\n' "${ingress_spec}" > "${current_file}"
+            apply_with_retry "${current_file}" "maintenance restore"
           done
 
       # ==============================
@@ -809,15 +905,22 @@ jobs:
       - name: Create + upload review seed DB backup
         if: ${{ env.DEPLOY_ENV == 'test' }}
         shell: bash
+        timeout-minutes: 180
+        env:
+          REVIEW_APP_NUMBER: ${{ inputs.review-app-number }}
         run: |
           set -euo pipefail
           TODAY=$(TZ=Europe/London date +"%F")
           LOCAL_FILE="sapsec_review_seed_${TODAY}.sql.gz"
           LOG_FILE="konduit_pg_dump.log"
-          max_attempts=8
+          max_attempts=10
           delay=10
           # Only ever keep this single blob in storage
-          LATEST_BLOB="db-backups/sapsec_review_seed_${{ case(github.event.inputs.review-app-number == '', 'test', github.event.inputs.review-app-number) }}.sql.gz"
+          REVIEW_SEED_SUFFIX="${REVIEW_APP_NUMBER:-test}"
+          if [ -z "${REVIEW_SEED_SUFFIX}" ]; then
+            REVIEW_SEED_SUFFIX="test"
+          fi
+          LATEST_BLOB="db-backups/sapsec_review_seed_${REVIEW_SEED_SUFFIX}.sql.gz"
           echo "Creating DB dump -> ${LOCAL_FILE}"
           echo "AKS_NAMESPACE=${AKS_NAMESPACE}"
           echo "KONDUIT_APP_NAME=${KONDUIT_APP_NAME}"
@@ -862,12 +965,28 @@ jobs:
           fi
           ls -lh "${LOCAL_FILE}"
           echo "Uploading (overwriting) ${LATEST_BLOB} in container ${AZURE_STORAGE_CONTAINER}"
-          az storage blob upload \
-            --container-name "${AZURE_STORAGE_CONTAINER}" \
-            --name "${LATEST_BLOB}" \
-            --file "${LOCAL_FILE}" \
-            --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
-            --overwrite true >/dev/null
+          upload_attempt=1
+          upload_max_attempts=10
+          upload_delay=10
+          while [ $upload_attempt -le $upload_max_attempts ]; do
+            if az storage blob upload \
+              --container-name "${AZURE_STORAGE_CONTAINER}" \
+              --name "${LATEST_BLOB}" \
+              --file "${LOCAL_FILE}" \
+              --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
+              --overwrite true >/dev/null; then
+              break
+            fi
+            if [ $upload_attempt -eq $upload_max_attempts ]; then
+              echo "Seed backup upload failed after $upload_max_attempts attempts."
+              exit 1
+            fi
+            echo "Seed backup upload failed. Retrying after ${upload_delay}s..."
+            sleep $upload_delay
+            upload_delay=$((upload_delay * 2))
+            if [ $upload_delay -gt 120 ]; then upload_delay=120; fi
+            upload_attempt=$((upload_attempt + 1))
+          done
           echo "Seed backup uploaded:"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
@@ -877,6 +996,7 @@ jobs:
       # ==============================
       - name: Backup ${{ env.DEPLOY_ENV }} postgres (if pipeline was run normally)
         if: ${{ env.DEPLOY_ENV == 'test' && inputs.review-app-number == '' }}
+        timeout-minutes: 180
         uses: DFE-Digital/github-actions/backup-postgres@master
         with:
           storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
@@ -896,6 +1016,7 @@ jobs:
       # ==============================
       - name: Restore ${{ env.DEPLOY_ENV }} postgres (if pipeline was run to to create a backup for a review app)
         if: ${{ env.DEPLOY_ENV == 'test' && inputs.review-app-number != '' }}
+        timeout-minutes: 180
         uses: DFE-Digital/github-actions/restore-postgres-backup@master
         with:
           storage-account: ${{ env.STORAGE_ACCOUNT_NAME }}
