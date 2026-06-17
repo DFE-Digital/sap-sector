@@ -751,7 +751,7 @@ jobs:
           set -euo pipefail
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
           ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
-          max_attempts=5
+          max_attempts=10
           delay=10
           log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
           attempt=1
