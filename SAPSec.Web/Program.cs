@@ -116,8 +116,9 @@ public class Program
                 .Build();
         });
 
-        //Remove 'or "Development" to test in review app
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        bool isLocalDevelopment = Environment.GetEnvironmentVariable("IS_LOCAL_DEVELOPMENT") == "true";
+
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests") && !isLocalDevelopment)
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -172,7 +173,7 @@ public class Program
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
-        builder.Services.AddDependencies(builder.Environment);
+        builder.Services.AddDependencies(isLocalDevelopment);
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();
@@ -254,7 +255,7 @@ public class Program
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
         //Remove 'or "Development" to test in review app
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests") && !isLocalDevelopment)
         {
             app.UseDfeAnalytics();
         }
@@ -284,4 +285,11 @@ public class Program
                || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
                || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
+
+    //private static bool IsLocalDevelopment()
+    //{
+    //    bool isLocalDevelopment = Environment.GetEnvironmentVariable("IS_LOCAL_DEVELOPMENT") == "true";
+
+    //    return isLocalDevelopment;
+    //}
 }

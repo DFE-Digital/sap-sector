@@ -15,14 +15,13 @@ namespace SAPSec.Web.Extensions;
 [ExcludeFromCodeCoverage]
 public static class DependenciesExtensions
 {
-    public static void AddDependencies(this IServiceCollection services, IWebHostEnvironment environment)
+    public static void AddDependencies(this IServiceCollection services, bool isLocalDevelopment)
     {
         services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
         services.AddScoped<ISchoolSearchService, SchoolSearchService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
 
-        //Comment out IsDevelopment check for Review app testing
-        if (environment.IsEnvironment("Development"))
+        if (isLocalDevelopment)
         {
             services.AddScoped<ICustomEventService, NoOpCustomEventService>();
         }

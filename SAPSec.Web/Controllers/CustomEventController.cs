@@ -65,7 +65,7 @@ public class CustomEventController(ICustomEventService customEventService, IOpti
 
         Match match = serviceUrlsRegex.Match(clickData.Url);
 
-        if (!match.Success)
+        if (!match.Success || !clickData.Url.Contains("-pr-"))
         {
             await customEventService.SendCustomEvent(clickData, "outbound_link_click");
 
