@@ -456,7 +456,7 @@
                         bodyFont: {
                             family: gdsStyles.fontFamily,
                             size: 14,
-                            weight: 'bold'
+                            weight: 'normal'
                         },
                         borderColor: '#b1b4b6',
                         borderWidth: 1,
