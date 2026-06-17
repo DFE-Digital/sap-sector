@@ -116,16 +116,7 @@ public class Program
                 .Build();
         });
 
-        bool isLocalDevelopment = Environment.GetEnvironmentVariable("IS_LOCAL_DEVELOPMENT") == "true";
-
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests") && !isLocalDevelopment)
-        {
-            builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
-            {
-                options.RequestFilter = ctx =>
-                    ctx.Request.Path != "/healthcheck";
-            });
-        }
+        builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -173,7 +164,7 @@ public class Program
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
-        builder.Services.AddDependencies(isLocalDevelopment);
+        builder.Services.AddDependencies();
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();
@@ -254,10 +245,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests") && !isLocalDevelopment)
-        {
-            app.UseDfeAnalytics();
-        }
+        app.UseAnalytics(app.Environment);
 
         app.MapControllers();
         app.MapRazorPages();
