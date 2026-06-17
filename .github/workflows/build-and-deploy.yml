@@ -224,6 +224,9 @@ jobs:
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Resolve review DB config
         id: review_db_config
         shell: bash
