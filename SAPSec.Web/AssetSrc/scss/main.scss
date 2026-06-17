@@ -1171,7 +1171,7 @@ $app-ks4-color-track: #f3f2f1;
   max-width: 280px;
   padding: 10px 12px;
   pointer-events: none;
-  position: absolute;
+  position: fixed;
   top: 0;
   transform: translate(0, -50%);
   z-index: 20;

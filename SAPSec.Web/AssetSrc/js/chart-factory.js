@@ -354,15 +354,11 @@
     }
 
     function getOrCreateHtmlTooltip(chart) {
-        const chartContainer = chart.canvas.parentElement;
-        if (!chartContainer) {
-            return null;
-        }
-
-        let tooltip = chartContainer.querySelector('.app-chart-tooltip');
+        let tooltip = document.querySelector(`.app-chart-tooltip[data-chart-id="${chart.canvas.id}"]`);
         if (!tooltip) {
             tooltip = document.createElement('div');
             tooltip.className = 'app-chart-tooltip';
+            tooltip.setAttribute('data-chart-id', chart.canvas.id);
 
             const title = document.createElement('div');
             title.className = 'app-chart-tooltip__title';
@@ -372,7 +368,7 @@
             body.className = 'app-chart-tooltip__body';
             tooltip.appendChild(body);
 
-            chartContainer.appendChild(tooltip);
+            document.body.appendChild(tooltip);
         }
 
         return tooltip;
@@ -423,23 +419,24 @@
             bodyElement.appendChild(row);
         });
 
+        tooltipElement.classList.add('app-chart-tooltip--visible');
+
         const position = chart.canvas.getBoundingClientRect();
-        const viewportLeft = window.pageXOffset;
-        const viewportRight = viewportLeft + document.documentElement.clientWidth;
+        const viewportLeft = 0;
+        const viewportRight = document.documentElement.clientWidth;
         const tooltipWidth = tooltipElement.offsetWidth;
         const gap = 16;
-        const pointLeft = position.left + window.pageXOffset + tooltip.caretX;
+        const pointLeft = position.left + tooltip.caretX;
         const rightCandidate = pointLeft + gap;
         const leftCandidate = pointLeft - tooltipWidth - gap;
         const hasRoomOnRight = rightCandidate + tooltipWidth <= viewportRight - gap;
         const left = hasRoomOnRight
             ? rightCandidate
             : Math.max(viewportLeft + gap, leftCandidate);
-        const top = position.top + window.pageYOffset + tooltip.caretY;
+        const top = position.top + tooltip.caretY;
 
         tooltipElement.style.left = `${left}px`;
         tooltipElement.style.top = `${top}px`;
-        tooltipElement.classList.add('app-chart-tooltip--visible');
     }
 
     function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis, tooltipDecimals) {
