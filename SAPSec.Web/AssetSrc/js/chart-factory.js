@@ -340,15 +340,20 @@
         };
     }
 
-    function formatTooltipValue(value, axisSuffix) {
+    function formatTooltipValue(value, axisSuffix, decimals) {
         if (value === null || value === undefined || Number.isNaN(Number(value))) {
             return 'No data';
         }
 
-        return `${Number(value)}${axisSuffix}`;
+        const numericValue = Number(value);
+        const formattedValue = decimals !== null && decimals !== undefined
+            ? numericValue.toFixed(decimals)
+            : numericValue;
+
+        return `${formattedValue}${axisSuffix}`;
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis) {
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis, tooltipDecimals) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -446,12 +451,12 @@
                         titleFont: {
                             family: gdsStyles.fontFamily,
                             size: 14,
-                            weight: 'normal'
+                            weight: 'bold'
                         },
                         bodyFont: {
                             family: gdsStyles.fontFamily,
                             size: 14,
-                            weight: 'normal'
+                            weight: 'bold'
                         },
                         borderColor: '#b1b4b6',
                         borderWidth: 1,
@@ -462,7 +467,7 @@
                             label: function (context) {
                                 const label = context.dataset.label ? context.dataset.label + ': ' : '';
                                 const value = context.parsed.y;
-                                return `${label}${formatTooltipValue(value, axisSuffix)}`;
+                                return `${label}${formatTooltipValue(value, axisSuffix, tooltipDecimals)}`;
                             }
                         }
                     },
@@ -745,6 +750,9 @@
             const labelDecimals = canvas.dataset.labelDecimals
                 ? parseInt(canvas.dataset.labelDecimals, 10)
                 : null;
+            const tooltipDecimals = canvas.dataset.tooltipDecimals
+                ? parseInt(canvas.dataset.tooltipDecimals, 10)
+                : null;
             const dynamicLineAxis = type === 'line' && isYearByYearLineChart(canvas)
                 ? getDynamicLineAxisConfig(chartData, axisSuffix)
                 : null;
@@ -789,7 +797,8 @@
                     showDataLabels,
                     showXGrid,
                     barLabelAlign,
-                    dynamicLineAxis),
+                    dynamicLineAxis,
+                    tooltipDecimals),
                 plugins: [
                     ...(showDataLabels ? [ChartDataLabels] : []),
                     noDataBarLabelsPlugin
