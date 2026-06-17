@@ -232,7 +232,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          config_reset_review_db="$(ruby -e "require 'yaml'; config = YAML.load_file('terraform/application/config/review.yml') || {}; value = config.fetch('reset_review_db', true); puts(value ? 'true' : 'false')")"
+          config_reset_review_db="$(ruby -e "require 'yaml'; config = YAML.load_file('terraform/application/config/review.yml') || {}; value = config.fetch('reset_review_db', true); normalized = case value when true then true when false then false else value.to_s.strip.downcase == 'true' end; puts(normalized ? 'true' : 'false')")"
           echo "config_reset_review_db=${config_reset_review_db}" >> "$GITHUB_OUTPUT"
           echo "effective_reset_review_db=${config_reset_review_db}" >> "$GITHUB_OUTPUT"
 
@@ -510,7 +510,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          config_reset_review_db="$(ruby -e "require 'yaml'; config = YAML.load_file('terraform/application/config/review.yml') || {}; value = config.fetch('reset_review_db', true); puts(value ? 'true' : 'false')")"
+          config_reset_review_db="$(ruby -e "require 'yaml'; config = YAML.load_file('terraform/application/config/review.yml') || {}; value = config.fetch('reset_review_db', true); normalized = case value when true then true when false then false else value.to_s.strip.downcase == 'true' end; puts(normalized ? 'true' : 'false')")"
           if [ "${config_reset_review_db}" = "true" ] && [ "${{ inputs.refresh-review-db }}" = "true" ]; then
             effective_reset_review_db="true"
           else
