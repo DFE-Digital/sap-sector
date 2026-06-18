@@ -1,6 +1,6 @@
 using SAPSec.Core.Constants;
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.SchoolSearch.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
@@ -11,8 +11,7 @@ namespace SAPSec.Core.Features.SchoolSearch;
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,
     IEstablishmentRepository _establishmentRepository,
-    IFeatureFlagService _featureFlagService,
-    DetermineSchoolSearchEligibility _determineSchoolSearchEligibility) : ISchoolSearchService
+    IFeatureFlagService _featureFlagService) : ISchoolSearchService
 {
     private const int MaxResults = 1000;
     private const int MaxSuggestions = 10;
@@ -39,7 +38,7 @@ public class SchoolSearchService(
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return _determineSchoolSearchEligibility.CanSearch(school, primarySchoolsEnabled)
+        return school.CanSearch(primarySchoolsEnabled)
             ? school
             : null;
     }
@@ -69,7 +68,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            if (!_determineSchoolSearchEligibility.CanSearch(r.School, primarySchoolsEnabled))
+            if (!r.School.CanSearch(primarySchoolsEnabled))
             {
                 continue;
             }

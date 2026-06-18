@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Features.SchoolSearch.UseCases;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Test.Common;
 using SAPSec.Test.Common.Repositories.InMemory;
@@ -15,7 +14,6 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     private const int PopulateEstablishmentDataOnAttempt = 2;
 
     private TestOutputLogger<StartupIndexBuilder> logger = new(output);
-    private DetermineSchoolSearchEligibility eligibility = new();
     private InMemoryEstablishmentRepository establishmentRepo = new();
 
     [Fact]
@@ -30,7 +28,6 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
-            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -70,7 +67,6 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
-            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -101,7 +97,6 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
-            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");
@@ -157,7 +152,6 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         using var ctx = new LuceneIndexContext();
         var writer = new LuceneIndexWriter(ctx);
         var sut = new StartupIndexBuilder(logger, writer, establishmentRepo,
-            eligibility,
             IndexBuilderDataReadIntervalMilliseconds);
 
         logger.LogInformation("Start builder");

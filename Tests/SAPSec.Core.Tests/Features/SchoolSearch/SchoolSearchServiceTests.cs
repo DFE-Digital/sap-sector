@@ -1,6 +1,5 @@
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.SchoolSearch.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
@@ -24,8 +23,7 @@ public class SchoolSearchServiceTests
         _sut = new SchoolSearchService(
             _indexReaderMock.Object,
             _establishmentRepositoryMock.Object,
-            _featureFlagServiceMock.Object,
-            new DetermineSchoolSearchEligibility());
+            _featureFlagServiceMock.Object);
     }
 
     [Theory]

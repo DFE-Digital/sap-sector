@@ -2,7 +2,6 @@ using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.SchoolSearch.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Services;
@@ -30,7 +29,6 @@ public static class DependenciesExtensions
         services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<GetSimilarSchoolDetails>();
         services.AddSingleton<GetCharacteristicsComparison>();
-        services.AddSingleton<DetermineSchoolSearchEligibility>();
 
         // Formatters
         services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
