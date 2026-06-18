@@ -8,7 +8,7 @@ using SAPSec.Core.Authentication;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Json;
 using SAPSec.Data.Store;
-using SAPSec.Integration.Tests.Mocks;
+using SAPSec.Test.Common.Authentication;
 using SAPSec.Web;
 
 namespace SAPSec.Integration.Tests.Infrastructure;

@@ -1,7 +1,7 @@
 ﻿using SAPSec.Core.Authentication;
 using System.Security.Claims;
 
-namespace SAPSec.Integration.Tests.Mocks;
+namespace SAPSec.Test.Common.Authentication;
 
 public class MockDsiUserService : IUserService
 {

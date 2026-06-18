@@ -13,7 +13,7 @@ public class JsonFile<T> : IJsonFile<T> where T : class
     {
         _logger = logger ?? throw new ArgumentNullException();
         var basePath = AppContext.BaseDirectory;
-        _filePath = Path.Combine(basePath, "Data", "Files", "Generated");
+        _filePath = Path.Combine(basePath, "Files", "Generated");
         _cache = new Lazy<List<T>>(
             LoadCache,
             LazyThreadSafetyMode.ExecutionAndPublication);
@@ -26,17 +26,9 @@ public class JsonFile<T> : IJsonFile<T> where T : class
 
     private string ReadFile(string fileName)
     {
-        try
-        {
-            var fullPath = Path.Combine(_filePath, $"{fileName}.json");
+        var fullPath = Path.Combine(_filePath, $"{fileName}.json");
 
-            return File.ReadAllText(fullPath);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Failed to Read file {fileName}! - {ex.Message}, {ex}");
-            return string.Empty;
-        }
+        return File.ReadAllText(fullPath);
     }
 
     private List<T> LoadCache()
@@ -44,19 +36,12 @@ public class JsonFile<T> : IJsonFile<T> where T : class
         _logger.LogInformation("Loading lookup cache...");
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
-        try
+        var fileData = ReadFile(typeof(T).Name);
+        if (string.IsNullOrWhiteSpace(fileData))
         {
-            var fileData = ReadFile(typeof(T).Name);
-            if (!string.IsNullOrWhiteSpace(fileData))
-            {
-                return JsonConvert.DeserializeObject<List<T>>(fileData) ?? [];
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError($"Failed to execute generic readall for {typeof(T).Name}! - {ex.Message}, {ex}");
+            return [];
         }
 
-        return [];
+        return JsonConvert.DeserializeObject<List<T>>(fileData) ?? [];
     }
 }

@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
+using SAPSec.Core;
 using SAPSec.Data.PostgreSql;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Authentication;
 using SAPSec.Web.Configuration;
-using SAPSec.Web.Extensions;
+using SAPSec.Web.Formatters;
 using SAPSec.Web.Middleware;
 using SAPSec.Web.Services;
 using SAPSec.Web.Setup;
@@ -90,7 +91,7 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests")
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -112,7 +113,7 @@ public class Program
                 .Build();
         });
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "EndToEndTests" or "IntegrationTests" or "Development"))
         {
             builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -160,14 +161,14 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-        var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
-
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
-        builder.Services.AddDependencies();
+        builder.Services.AddCoreDependencies();
+
+        builder.Services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
 
         // Add custom error handler for NotFoundExceptions
         builder.Services.AddProblemDetails();
@@ -248,7 +249,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
+        if (builder.Environment.EnvironmentName is not ("UITests" or "EndToEndTests" or "IntegrationTests" or "Development"))
         {
             app.UseDfeAnalytics();
         }

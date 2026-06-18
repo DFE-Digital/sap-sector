@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Xunit.Abstractions;
 
-namespace SAPSec.Test.Common;
+namespace SAPSec.Test.Common.Logging;
 
 public class TestOutputLogger<T>(ITestOutputHelper output) : ILogger<T>
 {

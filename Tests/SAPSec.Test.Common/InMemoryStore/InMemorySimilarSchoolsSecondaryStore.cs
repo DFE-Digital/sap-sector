@@ -1,7 +1,7 @@
 ﻿using SAPSec.Data.Dto;
 using SAPSec.Data.Store;
 
-namespace SAPSec.Test.Common.Repositories.InMemory;
+namespace SAPSec.Test.Common.InMemoryStore;
 
 public class InMemorySimilarSchoolsSecondaryStore : ISimilarSchoolsSecondaryStore
 {

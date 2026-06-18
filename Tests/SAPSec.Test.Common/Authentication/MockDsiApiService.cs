@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Authentication;
 
-namespace SAPSec.Integration.Tests.Mocks;
+namespace SAPSec.Test.Common.Authentication;
 
 public class MockDsiApiService : IDsiClient
 {

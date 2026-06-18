@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using SAPSec.Core.School.Attendance;
 using SAPSec.Core.School.Details;
 using SAPSec.Core.School.Info;
@@ -6,18 +7,15 @@ using SAPSec.Core.School.Secondary;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures;
 using SAPSec.Core.School.Similarity;
-using SAPSec.Infrastructure.LuceneSearch;
-using SAPSec.Web.Formatters;
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Web.Extensions;
+namespace SAPSec.Core;
 
 [ExcludeFromCodeCoverage]
-public static class DependenciesExtensions
+public static class ServiceCollectionExtensions
 {
-    public static void AddDependencies(this IServiceCollection services)
+    public static void AddCoreDependencies(this IServiceCollection services)
     {
-        services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
         services.AddSingleton<ISchoolSearchService, SchoolSearchService>();
         services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
         services.AddSingleton<ISecondarySchoolsRepository, SecondarySchoolsRepository>();
@@ -36,6 +34,5 @@ public static class DependenciesExtensions
         services.AddSingleton<GetSearchResultsUseCase>();
 
         // Formatters
-        services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
     }
 }

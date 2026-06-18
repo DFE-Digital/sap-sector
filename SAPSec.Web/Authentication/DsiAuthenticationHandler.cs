@@ -147,7 +147,7 @@ public static class DsiAuthenticationHandler
         }
         else if (user.Organisations.Count > 1)
         {
-            context.Properties!.RedirectUri = Routes.FindASchool;
+            context.Properties!.RedirectUri = Routes.FindASchool();
         }
     }
 
