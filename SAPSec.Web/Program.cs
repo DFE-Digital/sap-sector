@@ -1,5 +1,6 @@
 ﻿using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
+using Dfe.Analytics.Events;
 using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -50,7 +51,9 @@ public class Program
         builder.Services.AddRazorPages();
         builder.Services.AddFeatureManagement();
         builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.Configure<CustomEventLocations>(builder.Configuration.GetSection("CustomEventLocations"));
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
+
         builder.Services.PostConfigure<AnalyticsSettings>(options =>
         {
             var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
@@ -113,14 +116,7 @@ public class Program
                 .Build();
         });
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
-        {
-            builder.Services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
-            {
-                options.RequestFilter = ctx =>
-                    ctx.Request.Path != "/healthcheck";
-            });
-        }
+        builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -249,10 +245,7 @@ public class Program
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
 
-        if (builder.Environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "Development"))
-        {
-            app.UseDfeAnalytics();
-        }
+        app.UseAnalytics(app.Environment);
 
         app.MapControllers();
         app.MapRazorPages();
