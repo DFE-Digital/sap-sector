@@ -11,7 +11,7 @@ namespace SAPSec.Web.Controllers;
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
     ISchoolSearchService _searchService,
-    GetSearchResultsUseCase useCase) : Controller
+    FindASchoolUseCase useCase) : Controller
 {
     private const int PageSize = 10;
     public const string Hint = "Search by name or school ID";

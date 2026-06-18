@@ -8,7 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.School.Search;
 
-public class GetSearchResultsUseCase(
+public class FindASchoolUseCase(
     IEstablishmentStore establishmentStore,
     ISchoolSearchIndexReader indexReader)
     : IUseCase<GetSearchResultsRequest, GetSearchResultsResponse>

@@ -2,7 +2,7 @@
 
 namespace SAPSec.Core.School.Search;
 
-public class GetSearchSuggestionsUseCase(
+public class FindASchoolSuggestionsUseCase(
     ISchoolSearchService searchService)
     : IUseCase<GetSearchSuggestionsRequest, GetSearchSuggestionsResponse>
 {

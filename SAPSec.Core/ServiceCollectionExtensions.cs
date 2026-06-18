@@ -31,7 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<GetCharacteristicsComparisonUseCase>();
         services.AddSingleton<GetSchoolInfoUseCase>();
         services.AddSingleton<GetSchoolDetailsUseCase>();
-        services.AddSingleton<GetSearchResultsUseCase>();
+        services.AddSingleton<FindASchoolUseCase>();
 
         // Formatters
     }
