@@ -751,42 +751,51 @@ jobs:
           set -euo pipefail
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
           ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
-          max_attempts=10
-          delay=10
+
+          # Keep TCP session alive during long COPY operations
+          export PGOPTIONS='-c tcp_keepalives_idle=60 -c tcp_keepalives_interval=30 -c tcp_keepalives_count=10'
+
+          max_attempts=5
+          delay=20
           log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
           attempt=1
+
           while [ $attempt -le $max_attempts ]; do
             echo "ETL attempt $attempt/$max_attempts"
+
             set +e
             "$GITHUB_WORKSPACE/konduit.sh" \
               -n "${AKS_NAMESPACE}" \
               -t 28800 \
               -x \
               -i "$GITHUB_WORKSPACE/SAPData/Sql/run_all.sql" \
-              "${KONDUIT_APP_NAME}" -- psql 2>&1 | tee "$log_file"
+              "${KONDUIT_APP_NAME}" -- \
+              psql -X -v ON_ERROR_STOP=1 -f - 2>&1 | tee "$log_file"
             exit_code=${PIPESTATUS[0]}
             set -e
+
             if [ $exit_code -eq 0 ]; then
               echo "ETL succeeded on attempt $attempt"
               exit 0
             fi
+
             if grep -Eqi \
-              "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected" \
+              "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected|Container does not exist or connection cannot be established|failed to exec in container|no running task found|task .* not found|Internal error occurred: error executing command in container" \
               "$log_file"; then
-              echo "Detected transient DB disconnect. Retrying after ${delay}s..."
+              echo "Detected transient ETL connection issue. Retrying after ${delay}s..."
               sleep $delay
               delay=$((delay * 2))
-              if [ $delay -gt 120 ]; then delay=120; fi
+              if [ $delay -gt 180 ]; then delay=180; fi
               attempt=$((attempt + 1))
               continue
             fi
+
             echo "ETL failed with exit code $exit_code (not classified as transient)."
             exit $exit_code
           done
-          if [ $exit_code -ne 0 ]; then
-            echo "ETL failed after $max_attempts attempts."
-            exit 2
-          fi
+
+          echo "ETL failed after $max_attempts attempts."
+          exit 2
 
       - name: Disable maintenance page
         if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
@@ -811,36 +820,76 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           TODAY=$(TZ=Europe/London date +"%F")
           LOCAL_FILE="sapsec_review_seed_${TODAY}.sql.gz"
-          # Only ever keep this single blob in storage
           LATEST_BLOB="db-backups/sapsec_review_seed_${{ case(github.event.inputs.review-app-number == '', 'test', github.event.inputs.review-app-number) }}.sql.gz"
+          LOG_FILE="konduit_pg_dump.log"
+
           echo "Creating DB dump -> ${LOCAL_FILE}"
-          echo "AKS_NAMESPACE=${AKS_NAMESPACE}"
-          echo "KONDUIT_APP_NAME=${KONDUIT_APP_NAME}"
-          set +e
-          "$GITHUB_WORKSPACE/konduit.sh" \
-            -n "${AKS_NAMESPACE}" \
-            -t 28800 \
-            -x \
-            "${KONDUIT_APP_NAME}" -- \
-            pg_dump --format=plain --no-owner --no-privileges 2> konduit_pg_dump.log | gzip -c > "${LOCAL_FILE}"
-          exit_code=${PIPESTATUS[0]}
-          set -e
-          if [ $exit_code -ne 0 ]; then
-            echo "konduit/pg_dump failed with exit code ${exit_code}"
-            exit $exit_code
+
+          # Keep connection alive through tunnel
+          export PGOPTIONS='-c tcp_keepalives_idle=60 -c tcp_keepalives_interval=30 -c tcp_keepalives_count=10'
+
+          max_attempts=5
+          delay=20
+          attempt=1
+
+          while [ $attempt -le $max_attempts ]; do
+            echo "Backup dump attempt $attempt/$max_attempts"
+            rm -f "${LOCAL_FILE}" "${LOG_FILE}"
+
+            set +e
+            "$GITHUB_WORKSPACE/konduit.sh" \
+              -n "${AKS_NAMESPACE}" \
+              -t 28800 \
+              -x \
+              "${KONDUIT_APP_NAME}" -- \
+              pg_dump --format=plain --no-owner --no-privileges \
+              2> "${LOG_FILE}" | gzip -c > "${LOCAL_FILE}"
+            dump_rc=${PIPESTATUS[0]}
+            set -e
+
+            if [ $dump_rc -eq 0 ] && [ -s "${LOCAL_FILE}" ]; then
+              echo "DB dump succeeded on attempt $attempt"
+              break
+            fi
+
+            if grep -Eqi \
+              "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|EOF detected|connection reset|failed to exec in container|no running task found|Internal error occurred: error executing command in container" \
+              "${LOG_FILE}"; then
+              echo "Transient dump connection issue detected. Retrying after ${delay}s..."
+              tail -n 80 "${LOG_FILE}" || true
+              sleep $delay
+              delay=$((delay * 2))
+              if [ $delay -gt 180 ]; then delay=180; fi
+              attempt=$((attempt + 1))
+              continue
+            fi
+
+            echo "pg_dump failed with non-transient error (exit ${dump_rc})"
+            tail -n 200 "${LOG_FILE}" || true
+            exit ${dump_rc}
           fi
+
+          if [ ! -s "${LOCAL_FILE}" ]; then
+            echo "DB dump failed after ${max_attempts} attempts or output file is empty."
+            tail -n 200 "${LOG_FILE}" || true
+            exit 1
+          fi
+
           ls -lh "${LOCAL_FILE}"
+
           echo "Uploading (overwriting) ${LATEST_BLOB} in container ${AZURE_STORAGE_CONTAINER}"
           az storage blob upload \
             --container-name "${AZURE_STORAGE_CONTAINER}" \
             --name "${LATEST_BLOB}" \
             --file "${LOCAL_FILE}" \
             --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
-            --overwrite true >/dev/null
+            --overwrite true \
+            --only-show-errors
+
           echo "Seed backup uploaded:"
-          echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
       
       # ==============================
