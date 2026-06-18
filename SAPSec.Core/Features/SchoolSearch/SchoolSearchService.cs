@@ -1,6 +1,6 @@
 using SAPSec.Core.Constants;
-using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
@@ -48,7 +48,7 @@ public class SchoolSearchService(
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var searchResults = await _indexReader.SearchAsync(query, maxResults);
 
-        var results = new List<SchoolSearchResult>();
+         var results = new List<SchoolSearchResult>();
 
         if (!searchResults.Any())
         {

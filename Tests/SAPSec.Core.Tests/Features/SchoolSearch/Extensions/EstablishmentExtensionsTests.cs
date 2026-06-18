@@ -1,9 +1,9 @@
-using SAPSec.Core.Extensions;
+using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Model.Generated;
 
-namespace SAPSec.Core.Tests.Extensions;
+namespace SAPSec.Core.Tests.Features.SchoolSearch.Extensions;
 
-public class SchoolDetailsExtensionsTests
+public class EstablishmentExtensionsTests
 {
     [Theory]
     [InlineData("2", "Primary")]
