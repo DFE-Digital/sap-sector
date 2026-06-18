@@ -10,3 +10,24 @@
 <p class="govuk-body">
     KS2 information for this primary school will appear here.
 </p>
+
+
+<div class="app-ks4-school-page">
+    <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
+    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+    <p class="govuk-body">
+        Compare this school's  KS4 headline performance measures with:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li><b>50</b> similar secondary phase schools (including all-throughs)</li>
+        <li>the local authority average</li>
+        <li>the national average</li>
+    </ul>
+
+    <p class="govuk-body">
+        Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+    </p>
+
+    <partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
