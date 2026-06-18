@@ -353,8 +353,17 @@
         return `${formattedValue}${axisSuffix}`;
     }
 
+    function getTooltipContainer(chart) {
+        return chart.canvas.closest('.app-ks4-chart-container') || chart.canvas.parentElement;
+    }
+
     function getOrCreateHtmlTooltip(chart) {
-        let tooltip = document.querySelector(`.app-chart-tooltip[data-chart-id="${chart.canvas.id}"]`);
+        const container = getTooltipContainer(chart);
+        if (!container) {
+            return null;
+        }
+
+        let tooltip = container.querySelector(`.app-chart-tooltip[data-chart-id="${chart.canvas.id}"]`);
         if (!tooltip) {
             tooltip = document.createElement('div');
             tooltip.className = 'app-chart-tooltip';
@@ -368,10 +377,16 @@
             body.className = 'app-chart-tooltip__body';
             tooltip.appendChild(body);
 
-            document.body.appendChild(tooltip);
+            container.appendChild(tooltip);
         }
 
         return tooltip;
+    }
+
+    function hideAllHtmlTooltips() {
+        document.querySelectorAll('.app-chart-tooltip--visible').forEach(function (tooltip) {
+            tooltip.classList.remove('app-chart-tooltip--visible');
+        });
     }
 
     function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
@@ -421,19 +436,24 @@
 
         tooltipElement.classList.add('app-chart-tooltip--visible');
 
-        const position = chart.canvas.getBoundingClientRect();
-        const viewportLeft = 0;
-        const viewportRight = document.documentElement.clientWidth;
+        const container = getTooltipContainer(chart);
+        if (!container) {
+            return;
+        }
+
+        const canvasRect = chart.canvas.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
         const tooltipWidth = tooltipElement.offsetWidth;
         const gap = 16;
-        const pointLeft = position.left + tooltip.caretX;
+        const pointLeft = canvasRect.left - containerRect.left + tooltip.caretX;
         const rightCandidate = pointLeft + gap;
         const leftCandidate = pointLeft - tooltipWidth - gap;
-        const hasRoomOnRight = rightCandidate + tooltipWidth <= viewportRight - gap;
+        const containerWidth = container.clientWidth;
+        const hasRoomOnRight = rightCandidate + tooltipWidth <= containerWidth - gap;
         const left = hasRoomOnRight
             ? rightCandidate
-            : Math.max(viewportLeft + gap, leftCandidate);
-        const top = position.top + tooltip.caretY;
+            : Math.max(gap, leftCandidate);
+        const top = canvasRect.top - containerRect.top + tooltip.caretY;
 
         tooltipElement.style.left = `${left}px`;
         tooltipElement.style.top = `${top}px`;
@@ -653,6 +673,9 @@
 
         return common;
     }
+
+    window.addEventListener('scroll', hideAllHtmlTooltips, { passive: true });
+    window.addEventListener('resize', hideAllHtmlTooltips, { passive: true });
 
     const noDataBarLabelsPlugin = {
         id: 'noDataBarLabels',

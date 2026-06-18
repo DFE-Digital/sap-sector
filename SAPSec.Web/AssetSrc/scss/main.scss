@@ -1205,6 +1205,7 @@ $app-ks4-color-track: #f3f2f1;
   flex-direction: column;
   height: 260px;
   max-width: 760px;
+  position: relative;
 }
 
 .app-ks4-chart-container--school-headline {
@@ -1289,7 +1290,7 @@ $app-ks4-color-track: #f3f2f1;
   max-width: 280px;
   padding: 10px 12px;
   pointer-events: none;
-  position: fixed;
+  position: absolute;
   top: 0;
   transform: translate(0, -50%);
   z-index: 20;
