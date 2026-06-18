@@ -17,6 +17,11 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
     }
 
+    private ILocator AttendanceTabs => Page.Locator(".app-attendance-tabs");
+
+    private ILocator AttendanceToggleButton =>
+        AttendanceTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+
     [Fact]
     public async Task Attendance_LoadsSuccessfully()
     {
@@ -40,8 +45,9 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToBeVisibleAsync();
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-show-no-data-labels", "true");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-colors", "[\"#D53780\",\"#2a1950\",\"#2a1950\",\"#2a1950\"]");
-        await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-year-by-year']")).ToBeVisibleAsync();
+        await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-charts']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']")).ToBeVisibleAsync();
+        await Expect(AttendanceTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" })).ToBeVisibleAsync();
         await Expect(Page.Locator("label[for='attendanceAbsenceType']")).ToHaveClassAsync(new Regex("govuk-label--s"));
         await Expect(Page.Locator("#attendanceAbsenceType")).ToHaveValueAsync("overall");
     }
@@ -91,21 +97,24 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         updatedDataset.Should().NotBe(initialDataset);
 
         var selectedView = Page.Locator(".govuk-tabs__list-item--selected .govuk-tabs__tab");
-        await Expect(selectedView).ToHaveTextAsync(new Regex("3-year average"));
+        await Expect(selectedView).ToHaveTextAsync("Charts");
+        await Expect(Page.Locator(".app-content-toggle__title")).ToHaveTextAsync("3-year average");
     }
 
     [Fact]
-    public async Task Attendance_ChartOnlyVisibleWhenThreeYearAverageTabIsActive()
+    public async Task Attendance_ChartToggleSwitchesBetweenThreeYearAverageAndYearByYear()
     {
         await NavigateToAttendanceAsync();
 
-        await Expect(Page.Locator("#attendance-three-year-average")).Not.ToHaveClassAsync(new Regex("govuk-tabs__panel--hidden"));
+        await Expect(Page.Locator(".app-content-toggle__title")).ToHaveTextAsync("3-year average");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#attendance-year-by-year")).ToHaveAttributeAsync("hidden", "hidden");
 
-        await Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-year-by-year']").ClickAsync();
+        await AttendanceToggleButton.ClickAsync();
 
-        await Expect(Page.Locator("#attendance-year-by-year")).Not.ToHaveClassAsync(new Regex("govuk-tabs__panel--hidden"));
-        await Expect(Page.Locator("#attendance-three-year-average")).ToHaveClassAsync(new Regex("govuk-tabs__panel--hidden"));
+        await Expect(Page.Locator(".app-content-toggle__title")).ToHaveTextAsync("Year by year");
+        await Expect(Page.Locator("#school-attendance-year-by-year-chart")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#attendance-three-year-average")).ToHaveAttributeAsync("hidden", "hidden");
     }
 
     [Fact]
@@ -113,8 +122,9 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
     {
         await NavigateToAttendanceAsync();
 
-        await Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-year-by-year']").ClickAsync();
+        await AttendanceToggleButton.ClickAsync();
         await Expect(Page.Locator("#school-attendance-year-by-year-chart")).ToBeVisibleAsync();
+        await Expect(AttendanceTabs.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average" })).ToBeVisibleAsync();
 
         var tableTab = Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']");
         await tableTab.ClickAsync();
