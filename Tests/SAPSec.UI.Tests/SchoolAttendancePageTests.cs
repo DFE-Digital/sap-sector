@@ -47,6 +47,7 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-colors", "[\"#D53780\",\"#2a1950\",\"#2a1950\",\"#2a1950\"]");
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-charts']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']")).ToBeVisibleAsync();
+        await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-top-performers']")).ToBeVisibleAsync();
         await Expect(AttendanceTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" })).ToBeVisibleAsync();
         await Expect(Page.Locator("label[for='attendanceAbsenceType']")).ToHaveClassAsync(new Regex("govuk-label--s"));
         await Expect(Page.Locator("#attendanceAbsenceType")).ToHaveValueAsync("overall");

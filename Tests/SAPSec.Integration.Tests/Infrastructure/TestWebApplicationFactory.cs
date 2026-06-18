@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Dfe.Analytics.Events;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ using SAPSec.Core.Model.Generated;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Integration.Tests.Mocks;
 using SAPSec.Web;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Integration.Tests.Infrastructure;
 
@@ -38,6 +40,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         var configurationValues = new Dictionary<string, string?>
         {
             { "Establishments:CsvPath", testDataFilePath },
+            { "FeatureManagement:EnablePrimarySchools", "true" },
             { "DsiConfiguration:ClientId", TestValues.ClientId },
             { "DsiConfiguration:ClientSecret", TestValues.ClientSecret },
             { "DsiConfiguration:Authority", TestValues.Authority },
@@ -68,6 +71,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.RemoveAll<IDsiClient>();
                 services.AddScoped<IUserService, MockDsiUserService>();
                 services.AddScoped<IDsiClient, MockDsiApiService>();
+                services.AddScoped<ICustomEventService, NoOpCustomEventService>();
 
                 services.RemoveAll<IEstablishmentRepository>();
                 services.RemoveAll<ISimilarSchoolsSecondaryRepository>();

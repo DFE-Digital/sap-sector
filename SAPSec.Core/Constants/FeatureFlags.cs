@@ -1,4 +1,4 @@
-namespace SAPSec.Web.Constants;
+namespace SAPSec.Core.Constants;
 
 public static class FeatureFlags
 {

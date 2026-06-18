@@ -1,0 +1,31 @@
+@using SAPSec.Core.Model
+@using SAPSec.Web.Helpers
+@using SAPSec.Web.ViewModels
+@{
+    var navigation = ViewData["SchoolNavigation"] as SchoolSideNavigationViewModel;
+}
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
+
+<div class="govuk-grid-row">
+    @if (navigation is not null)
+    {
+        @await Component.InvokeAsync("SchoolSideNavigation", navigation)
+    }
+
+    <div class="app-body-container-with-side-navigation">
+        @RenderBody()
+    </div>
+</div>
+
+@await RenderSectionAsync("Scripts", required: false)

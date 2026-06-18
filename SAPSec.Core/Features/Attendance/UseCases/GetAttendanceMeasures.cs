@@ -26,6 +26,23 @@ public class GetAttendanceMeasures(
         var similarSchoolData = similarSchoolUrns.Length == 0
             ? Array.Empty<AbsenceData>()
             : await repository.GetByUrnsAsync(similarSchoolUrns);
+        var similarSchoolDataByUrn = similarSchoolData
+            .Where(x => !string.IsNullOrWhiteSpace(x.URN))
+            .ToDictionary(x => x.URN, StringComparer.Ordinal);
+        var similarSchoolDetails = similarSchoolUrns.Length == 0
+            ? Array.Empty<SAPSec.Core.Model.Generated.Establishment>()
+            : (await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
+                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>();
+        var similarSchoolDetailsByUrn = similarSchoolDetails
+            .Where(x => !string.IsNullOrWhiteSpace(x.URN))
+            .ToDictionary(x => x.URN, StringComparer.Ordinal);
+        var similarSchoolMeasures = similarSchoolUrns
+            .Where(similarSchoolDetailsByUrn.ContainsKey)
+            .Select(urn => new SimilarSchoolAttendanceMeasure(
+                urn,
+                similarSchoolDetailsByUrn[urn].EstablishmentName,
+                similarSchoolDataByUrn.GetValueOrDefault(urn)))
+            .ToArray();
 
         var overallSchoolSeries = new AttendanceMeasureSeries(
             ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct),
@@ -71,6 +88,14 @@ public class GetAttendanceMeasures(
                     ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Tot_Est_Previous2_Pct)))),
                 Average(overallLocalAuthoritySeries.Current, overallLocalAuthoritySeries.Previous, overallLocalAuthoritySeries.Previous2),
                 Average(overallEnglandSeries.Current, overallEnglandSeries.Previous, overallEnglandSeries.Previous2)),
+            BuildTopPerformers(
+                establishment,
+                Average(overallSchoolSeries.Current, overallSchoolSeries.Previous, overallSchoolSeries.Previous2),
+                similarSchoolMeasures,
+                x => Average(
+                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct),
+                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Tot_Est_Previous_Pct),
+                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Tot_Est_Previous2_Pct))),
             new AttendanceMeasureYearByYear(
                 overallSchoolSeries,
                 overallSimilarSchoolsSeries,
@@ -84,6 +109,14 @@ public class GetAttendanceMeasures(
                     ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct)))),
                 Average(persistentLocalAuthoritySeries.Current, persistentLocalAuthoritySeries.Previous, persistentLocalAuthoritySeries.Previous2),
                 Average(persistentEnglandSeries.Current, persistentEnglandSeries.Previous, persistentEnglandSeries.Previous2)),
+            BuildTopPerformers(
+                establishment,
+                Average(persistentSchoolSeries.Current, persistentSchoolSeries.Previous, persistentSchoolSeries.Previous2),
+                similarSchoolMeasures,
+                x => Average(
+                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct),
+                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct),
+                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct))),
             new AttendanceMeasureYearByYear(
                 persistentSchoolSeries,
                 persistentSimilarSchoolsSeries,
@@ -124,6 +157,38 @@ public class GetAttendanceMeasures(
             ? null
             : Math.Round(availableValues.Average(), 2, MidpointRounding.AwayFromZero);
     }
+
+    private static IReadOnlyList<AttendanceTopPerformer> BuildTopPerformers(
+        SAPSec.Core.Model.Generated.Establishment currentSchool,
+        decimal? currentSchoolValue,
+        IEnumerable<SimilarSchoolAttendanceMeasure> similarSchools,
+        Func<SimilarSchoolAttendanceMeasure, decimal?> selector)
+    {
+        var currentSchoolCandidate = new AttendanceTopPerformerCandidate(
+            currentSchool.URN,
+            currentSchool.EstablishmentName,
+            currentSchoolValue,
+            IsCurrentSchool: true);
+
+        return similarSchools
+            .Select(x => new AttendanceTopPerformerCandidate(x.Urn, x.Name, selector(x), IsCurrentSchool: false))
+            .Append(currentSchoolCandidate)
+            .Where(x => x.Value.HasValue)
+            .GroupBy(x => x.Urn, StringComparer.Ordinal)
+            .Select(x => x.OrderByDescending(candidate => candidate.IsCurrentSchool).First())
+            .OrderBy(x => x.Value)
+            .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
+            .Take(3)
+            .Select((x, index) => new AttendanceTopPerformer(index + 1, x.Urn, x.Name, x.Value, x.IsCurrentSchool))
+            .ToList()
+            .AsReadOnly();
+    }
+
+    private sealed record AttendanceTopPerformerCandidate(
+        string Urn,
+        string Name,
+        decimal? Value,
+        bool IsCurrentSchool);
 }
 
 public record GetAttendanceMeasuresRequest(string Urn);
@@ -147,6 +212,20 @@ public record AttendanceMeasureYearByYear(
 
 public record GetAttendanceMeasuresResponse(
     AttendanceMeasureAverage OverallAbsenceThreeYearAverage,
+    IReadOnlyList<AttendanceTopPerformer> OverallAbsenceTopPerformers,
     AttendanceMeasureYearByYear OverallAbsenceYearByYear,
     AttendanceMeasureAverage PersistentAbsenceThreeYearAverage,
+    IReadOnlyList<AttendanceTopPerformer> PersistentAbsenceTopPerformers,
     AttendanceMeasureYearByYear PersistentAbsenceYearByYear);
+
+public record AttendanceTopPerformer(
+    int Rank,
+    string Urn,
+    string Name,
+    decimal? Value,
+    bool IsCurrentSchool = false);
+
+internal sealed record SimilarSchoolAttendanceMeasure(
+    string Urn,
+    string Name,
+    AbsenceData? AbsenceData);

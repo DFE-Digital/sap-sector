@@ -1,3 +1,4 @@
+using SAPSec.Core.Constants;
 using SAPSec.Core.Model.Generated;
 
 namespace SAPSec.Core.Features.SchoolSearch.Extensions;
@@ -15,5 +16,13 @@ public static class EstablishmentExtensions
 
         return SearchablePhases.Any(allowedPhase =>
             phase.Contains(allowedPhase, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static bool IsSearchable(this Establishment? establishment, bool primarySchoolsEnabled)
+    {
+        var phase = establishment?.PhaseOfEducationName;
+
+        return PhaseOfEducationValues.IsSecondary(phase)
+            || (primarySchoolsEnabled && PhaseOfEducationValues.IsPrimaryOrAllThrough(phase));
     }
 }

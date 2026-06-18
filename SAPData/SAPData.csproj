@@ -237,6 +237,9 @@
     <None Remove="Sql\70_v_similar_schools_secondary_values.sql" />
     <None Remove="Sql\70_v_similar_schools_secondary_values_national_sd.sql" />
     <None Remove="Sql\tablemapping.csv" />
+    <None Update="DataMap\PrimarySchools\datamap.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
@@ -262,6 +265,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="raw_sources.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="raw_tables_to_rebuild.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Sql\00_cleanup.sql">

@@ -10,6 +10,8 @@ public sealed class GenerateSimilarSchoolsViews
     private readonly string _sqlDir;
     private readonly string _generatedJsonDir;
     private readonly List<string> _sqlFiles;
+    private readonly HashSet<string> _rawTableNamesToRebuild;
+    private readonly bool _rebuildAllRawTables;
 
     private sealed record ViewSpec(
         string ViewName,
@@ -31,13 +33,20 @@ public sealed class GenerateSimilarSchoolsViews
         string tableMappingPath,
         string sqlDir,
         string generatedJsonDir,
-        List<string> sqlFiles)
+        List<string> sqlFiles,
+        IEnumerable<string>? logicalKeysToRebuild = null,
+        bool rebuildAllRawTables = false)
     {
         _rows = rows;
         _tableMappingPath = tableMappingPath;
         _sqlDir = sqlDir;
         _generatedJsonDir = generatedJsonDir;
         _sqlFiles = sqlFiles;
+        _rebuildAllRawTables = rebuildAllRawTables;
+        _rawTableNamesToRebuild = new HashSet<string>(
+            (logicalKeysToRebuild ?? Array.Empty<string>())
+                .Select(GenerateRawTables.GenerateShortTableName),
+            StringComparer.OrdinalIgnoreCase);
     }
 
     public void Run()
@@ -57,6 +66,17 @@ public sealed class GenerateSimilarSchoolsViews
             if (viewRows.Count == 0)
                 continue;
 
+            if (!ShouldRebuildView(viewRows, tableMap))
+            {
+                sql = BuildSkippedSql(view.ViewName, "No rebuilt raw tables affect this view.");
+                WriteSql("50", view.ViewName, sql);
+
+                var skippedModelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
+                var skippedJsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {view.ViewName} where ""URN"" in (select ""URN"" from test_establishments_urns union all select ""NeighbourURN"" from v_similar_schools_secondary_groups where ""URN"" in (select ""URN"" from test_establishments_urns))) r)) to '{skippedModelFile}' with(format text);";
+                WriteSql("70", view.ViewName, skippedJsonSql);
+                continue;
+            }
+
             sql = GenerateMaterializedView(view.ViewName, viewRows, tableMap);
             WriteSql("50", view.ViewName, sql);
 
@@ -71,11 +91,70 @@ public sealed class GenerateSimilarSchoolsViews
         var modelName = "SimilarSchoolsSecondaryStandardDeviationsEntry";
         var sdModelFile = Path.Combine(_generatedJsonDir, $"{modelName}.json");
 
-        var sdSql = GenerateSecondaryValuesNationalSdView(viewName, tableMap);
+        var rebuildSecondaryNationalSd = ShouldRebuildSecondaryValuesNationalSd(tableMap);
+        var sdSql = rebuildSecondaryNationalSd
+            ? GenerateSecondaryValuesNationalSdView(viewName, tableMap)
+            : BuildSkippedSql(viewName, "No rebuilt raw tables affect this view.");
         WriteSql("50", viewName, sdSql);
 
         var sdJsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {viewName}) r)) to '{sdModelFile}' with(format text);";
         WriteSql("70", viewName, sdJsonSql);
+    }
+
+    private bool ShouldRebuildView(List<DataMapRow> rows, Dictionary<string, string> tableMap)
+    {
+        if (_rebuildAllRawTables)
+            return true;
+
+        if (_rawTableNamesToRebuild.Count == 0)
+            return false;
+
+        var datasetKeys = rows
+            .Select(r => (r.FileName ?? "").Trim().TrimStart('\uFEFF'))
+            .Where(k => !string.IsNullOrWhiteSpace(k))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var datasetKey in datasetKeys)
+        {
+            if (TryResolveRawTable(tableMap, datasetKey, out var rawTable) &&
+                !string.IsNullOrWhiteSpace(rawTable) &&
+                _rawTableNamesToRebuild.Contains(rawTable))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool ShouldRebuildSecondaryValuesNationalSd(Dictionary<string, string> tableMap)
+    {
+        var viewRows = _rows
+            .Where(r => r.Range == "SimilarSchools")
+            .Where(r => r.Type == "SecondaryValues")
+            .Where(r => !string.IsNullOrWhiteSpace(r.FileName))
+            .ToList();
+
+        return ShouldRebuildView(viewRows, tableMap);
+    }
+
+    private static string BuildSkippedSql(string viewName, string reason)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
+        sb.AppendLine("-- NOTE: This file was generated but the view SQL was skipped.");
+        sb.AppendLine("-- In selective rebuild mode, the existing materialized view must already exist.");
+        sb.AppendLine($"-- REASON: {reason}");
+        sb.AppendLine();
+        sb.AppendLine("DO $$");
+        sb.AppendLine("DECLARE");
+        sb.AppendLine("  v_schema text := current_schema();");
+        sb.AppendLine("BEGIN");
+        sb.AppendLine($"  IF to_regclass(format('%I.%I', v_schema, '{viewName}')) IS NULL THEN");
+        sb.AppendLine($"    RAISE EXCEPTION 'Skipped view {viewName} does not exist in schema %, but is required for selective rebuild. {reason}', v_schema;");
+        sb.AppendLine("  END IF;");
+        sb.AppendLine("END $$;");
+        return sb.ToString();
     }
 
     // =====================================================
@@ -169,7 +248,6 @@ public sealed class GenerateSimilarSchoolsViews
 
         sb.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
         sb.AppendLine("-- Computes population standard deviation (stddev_pop) for each metric.");
-        sb.AppendLine("-- Includes ks2_avg to match UI metric Ks2AverageScore = (ks2_rp + ks2_mp) / 2.");
         sb.AppendLine();
         sb.AppendLine($"DROP MATERIALIZED VIEW IF EXISTS {viewName};");
         sb.AppendLine();
@@ -179,18 +257,7 @@ public sealed class GenerateSimilarSchoolsViews
         sb.AppendLine("SELECT");
         sb.AppendLine("    count(*)::int AS \"RowCount\",");
         sb.AppendLine();
-        sb.AppendLine("    -- Keep these if useful for debugging / reference");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_rp, 'NA'), '')::numeric(10,5))::numeric(10,5) AS \"KS2RP\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_mp, 'NA'), '')::numeric(10,5))::numeric(10,5) AS \"KS2MP\",");
-        sb.AppendLine();
-        sb.AppendLine("    -- SD for the same metric used in UI");
-        sb.AppendLine("    stddev_pop(");
-        sb.AppendLine("        ((");
-        sb.AppendLine("            NULLIF(NULLIF(ks2_rp, 'NA'), '')::numeric +");
-        sb.AppendLine("            NULLIF(NULLIF(ks2_mp, 'NA'), '')::numeric");
-        sb.AppendLine("        ) / 2.0)::numeric(10,5)");
-        sb.AppendLine("    )::numeric(10,5) AS \"KS2AVG\",");
-        sb.AppendLine();
+        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_mrp, 'NA'), '')::numeric(10,5))::numeric(10,5)                  AS \"KS2MRP\",");
         sb.AppendLine("    stddev_pop(NULLIF(NULLIF(pp_perc, 'NA'), '')::numeric(10,5))::numeric(10,5)                  AS \"PPPerc\",");
         sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_eal, 'NA'), '')::numeric(10,5))::numeric(10,5)              AS \"PercentEAL\",");
         sb.AppendLine("    stddev_pop(NULLIF(NULLIF(polar4quintile_pupils, 'NA'), '')::numeric(10,5))::numeric(10,5)    AS \"Polar4QuintilePupils\",");
