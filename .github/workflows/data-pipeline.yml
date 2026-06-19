@@ -893,6 +893,16 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          extract_reason() {
+            local file="$1"
+            grep -Eim1 "error|fatal|failed|exception|unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected" "$file" 2>/dev/null || true
+          }
+
+          extract_excerpt() {
+            local file="$1"
+            tail -n 20 "$file" 2>/dev/null || true
+          }
+
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
           ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
           max_attempts=5
@@ -958,12 +968,16 @@ jobs:
             echo "ETL failed with exit code $exit_code (not classified as transient)."
             last_classification="non_retryable"
             cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "$log_file")"
+            log_excerpt="$(extract_excerpt "$log_file")"
             jq -n \
               --arg stage "09-etl" \
               --arg status "failed" \
               --arg summary "ETL failed without matching retry classification." \
               --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
               --arg logFile "${PIPELINE_LOG_DIR}/psql.log" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
               --argjson attempts "$attempt" \
               --argjson retryCount "$retry_count" \
               --arg classification "$last_classification" \
@@ -978,7 +992,9 @@ jobs:
                   retryCount: $retryCount,
                   retryClassification: $classification,
                   exitCode: $exitCode,
-                  logFile: $logFile
+                  logFile: $logFile,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt
                 }
               }' > "$report_file"
             exit $exit_code
@@ -987,12 +1003,16 @@ jobs:
             echo "ETL failed after $max_attempts attempts."
             last_classification="transient_db_disconnect"
             cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "$log_file")"
+            log_excerpt="$(extract_excerpt "$log_file")"
             jq -n \
               --arg stage "09-etl" \
               --arg status "failed" \
               --arg summary "ETL exhausted all retry attempts." \
               --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
               --arg logFile "${PIPELINE_LOG_DIR}/psql.log" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
               --argjson attempts "$attempt" \
               --argjson retryCount "$retry_count" \
               --arg classification "$last_classification" \
@@ -1007,7 +1027,9 @@ jobs:
                   retryCount: $retryCount,
                   retryClassification: $classification,
                   maxAttempts: $maxAttempts,
-                  logFile: $logFile
+                  logFile: $logFile,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt
                 }
               }' > "$report_file"
             exit 2
@@ -1062,9 +1084,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          extract_reason() {
+            local file="$1"
+            grep -Eim1 "error|fatal|failed|exception|server closed the connection unexpectedly|permission denied|forbidden|unauthorized|timed out|conflict|SSL" "$file" 2>/dev/null || true
+          }
+
+          extract_excerpt() {
+            local file="$1"
+            tail -n 20 "$file" 2>/dev/null || true
+          }
+
           TODAY=$(TZ=Europe/London date +"%F")
           LOCAL_FILE="sapsec_review_seed_${TODAY}.sql.gz"
           report_file="${PIPELINE_REPORT_DIR}/stage-10-review-seed-backup.json"
+          upload_log="${PIPELINE_LOG_DIR}/review_seed_upload.log"
           # Only ever keep this single blob in storage
           LATEST_BLOB="db-backups/sapsec_review_seed_${{ case(github.event.inputs.review-app-number == '', 'test', github.event.inputs.review-app-number) }}.sql.gz"
           echo "Creating DB dump -> ${LOCAL_FILE}"
@@ -1082,6 +1115,8 @@ jobs:
           if [ $exit_code -ne 0 ]; then
             echo "konduit/pg_dump failed with exit code ${exit_code}"
             cp konduit_pg_dump.log "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "konduit_pg_dump.log")"
+            log_excerpt="$(extract_excerpt "konduit_pg_dump.log")"
             jq -n \
               --arg stage "10-review-seed-backup" \
               --arg status "failed" \
@@ -1090,6 +1125,9 @@ jobs:
               --arg localFile "$LOCAL_FILE" \
               --arg blobName "$LATEST_BLOB" \
               --arg logFile "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" \
+              --arg failurePhase "pg_dump" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
               --argjson exitCode "$exit_code" \
               '{
                 stage: $stage,
@@ -1101,6 +1139,9 @@ jobs:
                   blobName: $blobName,
                   exitCode: $exitCode,
                   logFile: $logFile,
+                  failurePhase: $failurePhase,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt,
                   retried: false
                 }
               }' > "$report_file"
@@ -1108,12 +1149,49 @@ jobs:
           fi
           ls -lh "${LOCAL_FILE}"
           echo "Uploading (overwriting) ${LATEST_BLOB} in container ${AZURE_STORAGE_CONTAINER}"
+          set +e
           az storage blob upload \
             --container-name "${AZURE_STORAGE_CONTAINER}" \
             --name "${LATEST_BLOB}" \
             --file "${LOCAL_FILE}" \
             --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
-            --overwrite true >/dev/null
+            --overwrite true > /dev/null 2> "${upload_log}"
+          exit_code=$?
+          set -e
+          if [ $exit_code -ne 0 ]; then
+            echo "Seed backup upload failed with exit code ${exit_code}"
+            failure_reason="$(extract_reason "${upload_log}")"
+            log_excerpt="$(extract_excerpt "${upload_log}")"
+            jq -n \
+              --arg stage "10-review-seed-backup" \
+              --arg status "failed" \
+              --arg summary "Review seed backup failed during blob upload." \
+              --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --arg localFile "$LOCAL_FILE" \
+              --arg blobName "$LATEST_BLOB" \
+              --arg logFile "${upload_log}" \
+              --arg failurePhase "upload" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
+              --argjson exitCode "$exit_code" \
+              '{
+                stage: $stage,
+                status: $status,
+                utcTime: $utcTime,
+                summary: $summary,
+                metadata: {
+                  localFile: $localFile,
+                  blobName: $blobName,
+                  exitCode: $exitCode,
+                  logFile: $logFile,
+                  failurePhase: $failurePhase,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt,
+                  retried: false
+                }
+              }' > "$report_file"
+            exit $exit_code
+          fi
           echo "Seed backup uploaded:"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
