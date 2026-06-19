@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using SAPSec.Core.Interfaces.Services;
@@ -10,8 +11,8 @@ namespace SAPSec.Web.Tests.Controllers;
 
 public class PrimarySchoolControllerTests
 {
-    private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
+    private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock = new();
 
     [Fact]
     public async Task Index_WhenFeatureDisabled_ReturnsNotFound()
@@ -20,7 +21,7 @@ public class PrimarySchoolControllerTests
             .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
             .ReturnsAsync(false);
 
-        var sut = new SchoolController(_schoolDetailsServiceMock.Object, _featureFlagServiceMock.Object);
+        var sut = new SchoolController(_featureFlagServiceMock.Object, _requestSchoolAccessorMock.Object);
 
         var result = await sut.Index("123456");
 
@@ -34,11 +35,11 @@ public class PrimarySchoolControllerTests
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
             .ReturnsAsync(true);
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), "123456"))
             .ReturnsAsync(school);
 
-        var sut = new SchoolController(_schoolDetailsServiceMock.Object, _featureFlagServiceMock.Object);
+        var sut = new SchoolController(_featureFlagServiceMock.Object, _requestSchoolAccessorMock.Object);
 
         var result = await sut.Index("123456");
 
@@ -55,11 +56,11 @@ public class PrimarySchoolControllerTests
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
             .ReturnsAsync(true);
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), "123456"))
             .ReturnsAsync(school);
 
-        var sut = new SchoolController(_schoolDetailsServiceMock.Object, _featureFlagServiceMock.Object);
+        var sut = new SchoolController(_featureFlagServiceMock.Object, _requestSchoolAccessorMock.Object);
 
         var result = await sut.WhatIsASimilarSchool("123456");
 
@@ -78,11 +79,11 @@ public class PrimarySchoolControllerTests
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
             .ReturnsAsync(true);
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
             .ReturnsAsync(school);
 
-        var sut = new SchoolController(_schoolDetailsServiceMock.Object, _featureFlagServiceMock.Object);
+        var sut = new SchoolController(_featureFlagServiceMock.Object, _requestSchoolAccessorMock.Object);
 
         var result = actionName switch
         {

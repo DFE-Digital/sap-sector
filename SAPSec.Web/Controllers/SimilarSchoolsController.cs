@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Filters;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.ViewModels;
 
@@ -10,6 +11,7 @@ namespace SAPSec.Web.Controllers;
 
 [Route("school/{urn}")]
 [Authorize]
+[RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SimilarSchoolsController : Controller
 {
     private readonly ISchoolDetailsService _schoolDetailsService;
