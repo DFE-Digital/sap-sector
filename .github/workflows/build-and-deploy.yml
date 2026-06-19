@@ -224,6 +224,18 @@ jobs:
       KONDUIT_APP_NAME: ${{ secrets.KONDUIT_APP_NAME }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve review DB config
+        id: review_db_config
+        shell: bash
+        run: |
+          set -euo pipefail
+          config_reset_review_db="$(ruby -e "require 'yaml'; config = YAML.load_file('terraform/application/config/review.yml') || {}; value = config.fetch('reset_review_db', true); normalized = case value when true then true when false then false else value.to_s.strip.downcase == 'true' end; puts(normalized ? 'true' : 'false')")"
+          echo "config_reset_review_db=${config_reset_review_db}" >> "$GITHUB_OUTPUT"
+          echo "effective_reset_review_db=${config_reset_review_db}" >> "$GITHUB_OUTPUT"
+
       - name: Deploy App to Review
         id: deploy_review
         uses: DFE-Digital/github-actions/deploy-to-aks@master
@@ -245,18 +257,18 @@ jobs:
       # REVIEW APP DATABASE DEPLOYMENT (PR)
       # ---------------------------
       - name: Checkout (needed for workspace consistency)
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         uses: actions/checkout@v4
 
       - name: Install Azure CLI
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
       - name: Azure login (OIDC)
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -264,7 +276,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Install kubectl (pinned)
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -274,7 +286,7 @@ jobs:
           kubectl version --client=true
 
       - name: Install kubelogin (pinned)
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -285,7 +297,7 @@ jobs:
           kubelogin --version
 
       - name: Configure AKS credentials
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -295,7 +307,7 @@ jobs:
           kubelogin convert-kubeconfig -l azurecli
 
       - name: Download konduit.sh
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -305,7 +317,7 @@ jobs:
           ls -la "$GITHUB_WORKSPACE/konduit.sh"
 
       - name: Download seed backup from Blob
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: pwsh
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
@@ -367,7 +379,7 @@ jobs:
             } -Label "download $env:BACKUP_BLOB_TEST"
           }
       - name: Reset PR review DB
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         env:
           AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
@@ -413,7 +425,7 @@ jobs:
             "${APP_NAME}" -- psql
 
       - name: Restore backup into PR review DB
-        if: ${{ github.event_name != 'workflow_dispatch' || (inputs.environment == 'review' && inputs.refresh-review-db) }}
+        if: ${{ steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         env:
           AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
@@ -491,6 +503,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Resolve review DB config
+        id: review_db_config
+        if: ${{ inputs.environment == 'review' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          config_reset_review_db="$(ruby -e "require 'yaml'; config = YAML.load_file('terraform/application/config/review.yml') || {}; value = config.fetch('reset_review_db', true); normalized = case value when true then true when false then false else value.to_s.strip.downcase == 'true' end; puts(normalized ? 'true' : 'false')")"
+          if [ "${config_reset_review_db}" = "true" ] && [ "${{ inputs.refresh-review-db }}" = "true" ]; then
+            effective_reset_review_db="true"
+          else
+            effective_reset_review_db="false"
+          fi
+          echo "config_reset_review_db=${config_reset_review_db}" >> "$GITHUB_OUTPUT"
+          echo "effective_reset_review_db=${effective_reset_review_db}" >> "$GITHUB_OUTPUT"
 
       - name: Deploy app to ${{ matrix.environment }}
         id: deploy_app
@@ -646,18 +673,18 @@ jobs:
           kubectl -n "${namespace}" rollout status deployment/get-school-improvement-insights-maintenance --timeout=180s
 
       - name: Checkout (needed for workspace consistency)
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         uses: actions/checkout@v4
 
       - name: Install Azure CLI
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
           curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
       - name: Azure login (OIDC)
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -665,7 +692,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Install kubectl (pinned)
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -675,7 +702,7 @@ jobs:
           kubectl version --client=true
 
       - name: Install kubelogin (pinned)
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -686,7 +713,7 @@ jobs:
           kubelogin --version
 
       - name: Configure AKS credentials
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -696,7 +723,7 @@ jobs:
           kubelogin convert-kubeconfig -l azurecli
 
       - name: Download konduit.sh
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -706,7 +733,7 @@ jobs:
           ls -la "$GITHUB_WORKSPACE/konduit.sh"
 
       - name: Download seed backup from Blob
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         env:
           AZURE_STORAGE_CONNECTION_STRING: ${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}
@@ -726,7 +753,7 @@ jobs:
           ls -lh "${BACKUP_FILE}"
 
       - name: Reset PR review DB
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         env:
           AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}
@@ -772,7 +799,7 @@ jobs:
             "${APP_NAME}" -- psql
 
       - name: Restore backup into PR review DB
-        if: ${{ inputs.environment == 'review' && inputs.refresh-review-db }}
+        if: ${{ inputs.environment == 'review' && steps.review_db_config.outputs.effective_reset_review_db == 'true' }}
         shell: bash
         env:
           AKS_NAMESPACE: ${{ secrets.AKS_REVIEW_NAMESPACE }}

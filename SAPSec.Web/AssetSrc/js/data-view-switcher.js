@@ -1,4 +1,136 @@
 (function () {
+    function getNumericSeriesValues(seriesMap, seriesKeys) {
+        return seriesKeys
+            .flatMap(function (seriesKey) {
+                var values = seriesMap && Array.isArray(seriesMap[seriesKey]) ? seriesMap[seriesKey] : [];
+                return values;
+            })
+            .filter(function (value) {
+                return value !== null && value !== undefined && !Number.isNaN(Number(value));
+            })
+            .map(Number);
+    }
+
+    function getNiceStepSize(range) {
+        if (!range || range <= 0) {
+            return 1;
+        }
+
+        var roughStep = range / 4;
+        var magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        var normalised = roughStep / magnitude;
+
+        if (normalised <= 1) {
+            return magnitude;
+        }
+
+        if (normalised <= 2) {
+            return 2 * magnitude;
+        }
+
+        if (normalised <= 5) {
+            return 5 * magnitude;
+        }
+
+        return 10 * magnitude;
+    }
+
+    function roundDownToStep(value, step) {
+        return Math.floor(value / step) * step;
+    }
+
+    function roundUpToStep(value, step) {
+        return Math.ceil(value / step) * step;
+    }
+
+    function buildExplicitTicks(axisMin, axisMax, stepSize) {
+        if (axisMin === null || axisMax === null || !stepSize) {
+            return undefined;
+        }
+
+        return function (axis) {
+            var ticks = [];
+            for (var value = axisMin; value <= axisMax; value += stepSize) {
+                ticks.push({ value: value });
+            }
+            axis.ticks = ticks;
+        };
+    }
+
+    function getDynamicLineAxisConfig(seriesMap, seriesKeys, axisSuffix) {
+        var values = getNumericSeriesValues(seriesMap, seriesKeys);
+        if (!values.length) {
+            return null;
+        }
+
+        var rawMin = Math.min.apply(null, values);
+        var rawMax = Math.max.apply(null, values);
+        var range = rawMax - rawMin;
+        var padding = range === 0
+            ? Math.max(Math.abs(rawMax) * 0.1, axisSuffix === "%" ? 2 : 1)
+            : Math.max(range * 0.2, axisSuffix === "%" ? 2 : 1);
+
+        var min = rawMin - padding;
+        var max = rawMax + padding;
+
+        if (axisSuffix === "%") {
+            min = Math.max(0, min);
+            max = Math.min(100, max);
+        }
+
+        if (min === max) {
+            max = min + (axisSuffix === "%" ? 4 : 2);
+        }
+
+        var step = getNiceStepSize(max - min);
+
+        return {
+            min: roundDownToStep(min, step),
+            max: roundUpToStep(max, step),
+            step: step
+        };
+    }
+
+    function isYearByYearLineChart(chart) {
+        var chartId = chart && chart.canvas ? chart.canvas.id : "";
+        return chartId.indexOf("yearbyyear-chart") >= 0 || chartId.indexOf("year-by-year-chart") >= 0;
+    }
+
+    function updateLineChartAxis(lineChart, seriesMap, seriesKeys) {
+        if (!lineChart || !lineChart.options || !lineChart.options.scales || !lineChart.options.scales.y) {
+            return;
+        }
+
+        if (!isYearByYearLineChart(lineChart)) {
+            return;
+        }
+
+        var axisSuffix = lineChart.canvas && lineChart.canvas.dataset
+            ? (lineChart.canvas.dataset.axisSuffix || "%")
+            : "%";
+        var dynamicAxis = getDynamicLineAxisConfig(seriesMap, seriesKeys, axisSuffix);
+        var yScale = lineChart.options.scales.y;
+
+        if (!dynamicAxis) {
+            yScale.min = undefined;
+            yScale.max = undefined;
+            yScale.afterBuildTicks = undefined;
+            if (yScale.ticks) {
+                yScale.ticks.stepSize = undefined;
+                yScale.ticks.count = undefined;
+            }
+            return;
+        }
+
+        yScale.min = dynamicAxis.min;
+        yScale.max = dynamicAxis.max;
+        yScale.afterBuildTicks = buildExplicitTicks(dynamicAxis.min, dynamicAxis.max, dynamicAxis.step);
+        if (yScale.ticks) {
+            yScale.ticks.stepSize = dynamicAxis.step;
+            yScale.ticks.count = Math.floor((dynamicAxis.max - dynamicAxis.min) / dynamicAxis.step) + 1;
+        }
+    }
+
     function updateTableRow(cells, values) {
         cells.forEach(function (cell, index) {
             if (cell) {
@@ -117,6 +249,7 @@
                 config.seriesKeys.forEach(function (seriesKey, index) {
                     lineChart.data.datasets[index].data = data.line && data.line[seriesKey] ? data.line[seriesKey] : [];
                 });
+                updateLineChartAxis(lineChart, data.line, config.seriesKeys);
                 lineChart.update();
             }
         }
