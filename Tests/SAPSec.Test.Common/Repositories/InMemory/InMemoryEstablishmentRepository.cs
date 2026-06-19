@@ -24,9 +24,6 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
     public Task<Establishment?> GetEstablishmentAsync(string urn)
         => Task.FromResult(_establishments.FirstOrDefault(i => i.URN == urn));
 
-    public Task<IReadOnlyCollection<EstablishmentEmail>> GetEstablishmentEmailsAsync(IEnumerable<string> urns)
-        => Task.FromResult((IReadOnlyCollection<EstablishmentEmail>)_establishmentEmails.Where(x => urns.Contains(x.URN)).ToList());
-
     public Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
         => Task.FromResult(_establishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.LAESTAB == number));
 

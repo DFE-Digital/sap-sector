@@ -66,20 +66,6 @@ public class PostgresEstablishmentRepository : IEstablishmentRepository
         return result;
     }
 
-    public async Task<IReadOnlyCollection<EstablishmentEmail>> GetEstablishmentEmailsAsync(IEnumerable<string> urns)
-    {
-        using var conn = await _factory.Create().OpenConnectionAsync();
-
-        const string sql = """
-            SELECT *
-            FROM public.v_establishment_email
-            WHERE "URN" = ANY(@urns);
-        """;
-
-        var result = await conn.QueryAsync<EstablishmentEmail>(sql, new { urns = urns.ToArray() });
-        return result.ToList();
-    }
-
     public async Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
     {
         if (string.IsNullOrWhiteSpace(number))
