@@ -1,0 +1,194 @@
+name: Manage Website Maintenance Mode
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to update
+        required: true
+        default: test
+        type: choice
+        options:
+        - test
+        - production
+      action:
+        description: Route traffic to the maintenance page or back to the app
+        required: true
+        default: enable
+        type: choice
+        options:
+        - enable
+        - disable
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  toggle:
+    name: ${{ inputs.action }} maintenance mode (${{ inputs.environment }})
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    env:
+      AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+      AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+      AKS_NAMESPACE: ${{ secrets.AKS_NAMESPACE }}
+      SERVICE_NAME: get-school-improvement-insights
+      SERVICE_SHORT: sapsec
+      TF_VARS_PATH: terraform/application/config
+      DEPLOY_ENV: ${{ inputs.environment }}
+      TOGGLE_ACTION: ${{ inputs.action }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq unzip
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubectl (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="v1.29.8"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client=true
+
+      - name: Install kubelogin (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBELOGIN_VERSION="v0.1.6"
+          curl -fsSLo kubelogin.zip "https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip"
+          unzip -q kubelogin.zip
+          sudo install -m 0755 bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
+          kubelogin --version
+
+      - name: Configure AKS credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
+          kubelogin convert-kubeconfig -l azurecli
+
+      - name: Set deployment variables
+        shell: bash
+        run: |
+          set -euo pipefail
+          source "global_config/${DEPLOY_ENV}.sh"
+          tf_vars_file="${TF_VARS_PATH}/${DEPLOY_ENV}.tfvars.json"
+          echo "NAMESPACE=$(jq -r '.namespace' "${tf_vars_file}")" >> "$GITHUB_ENV"
+
+      - name: Toggle maintenance page routing
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          primary_service="${SERVICE_NAME}-${DEPLOY_ENV}"
+          maintenance_service="$(
+            kubectl -n "${NAMESPACE}" get svc -o json |
+              jq -r --arg exact "${SERVICE_NAME}-${DEPLOY_ENV}-maintenance" --arg generic "${SERVICE_NAME}-maintenance" '
+                ([.items[].metadata.name] | unique) as $names
+                | if ($names | index($exact)) then $exact
+                  elif ($names | index($generic)) then $generic
+                  else ($names[] | select(test("maintenance")))
+                  end
+              ' | head -n 1
+          )"
+
+          if [ -z "${maintenance_service}" ] || [ "${maintenance_service}" = "null" ]; then
+            echo "No maintenance service found in namespace ${NAMESPACE}."
+            kubectl -n "${NAMESPACE}" get svc
+            exit 1
+          fi
+
+          if [ "${TOGGLE_ACTION}" = "enable" ]; then
+            source_service="${primary_service}"
+            target_service="${maintenance_service}"
+          else
+            source_service="${maintenance_service}"
+            target_service="${primary_service}"
+          fi
+
+          target_port_name="$(kubectl -n "${NAMESPACE}" get svc "${target_service}" -o jsonpath='{.spec.ports[0].name}')"
+          target_port_number="$(kubectl -n "${NAMESPACE}" get svc "${target_service}" -o jsonpath='{.spec.ports[0].port}')"
+
+          ingress_json="$(kubectl -n "${NAMESPACE}" get ingress -o json)"
+          matching_ingresses="$(
+            printf '%s' "${ingress_json}" |
+              jq -r --arg svc "${source_service}" '
+                .items[]
+                | select(
+                    ((.spec.defaultBackend.service.name // "") == $svc)
+                    or any(.spec.rules[]?.http.paths[]?.backend.service.name; . == $svc)
+                  )
+                | .metadata.name
+              '
+          )"
+
+          if [ -z "${matching_ingresses}" ]; then
+            echo "No ingress found routing to service ${source_service} in namespace ${NAMESPACE}."
+            echo "Assuming routing is already in the requested state."
+            kubectl -n "${NAMESPACE}" get ingress -o wide
+            exit 0
+          fi
+
+          while IFS= read -r ingress_name; do
+            current_file="${RUNNER_TEMP}/${ingress_name}.json"
+            kubectl -n "${NAMESPACE}" get ingress "${ingress_name}" -o json > "${current_file}"
+            jq \
+              --arg svc "${source_service}" \
+              --arg target "${target_service}" \
+              --arg portName "${target_port_name}" \
+              --arg portNumber "${target_port_number}" '
+                def targetPort:
+                  if ($portName | length) > 0
+                  then {name: $portName}
+                  else {number: ($portNumber | tonumber)}
+                  end;
+                .spec.defaultBackend |=
+                  (if .service.name == $svc then {service: {name: $target, port: targetPort}} else . end)
+                | .spec.rules |= ((. // []) | map(
+                    .http.paths |= (((. // [])) | map(
+                      if .backend.service.name == $svc
+                      then .backend.service = {name: $target, port: targetPort}
+                      else .
+                      end
+                    ))
+                  ))
+                | {
+                    apiVersion,
+                    kind,
+                    metadata: {
+                      name: .metadata.name,
+                      namespace: .metadata.namespace,
+                      labels: .metadata.labels,
+                      annotations: .metadata.annotations
+                    },
+                    spec
+                  }
+              ' "${current_file}" | kubectl apply -f -
+          done <<< "${matching_ingresses}"
+
+          {
+            echo "## Maintenance page toggle"
+            echo ""
+            echo "- Action: ${TOGGLE_ACTION}"
+            echo "- Environment: ${DEPLOY_ENV}"
+            echo "- Namespace: ${NAMESPACE}"
+            echo "- From service: ${source_service}"
+            echo "- To service: ${target_service}"
+            echo "- Updated ingresses:"
+            printf '%s\n' "${matching_ingresses}" | sed 's/^/  - /'
+          } >> "$GITHUB_STEP_SUMMARY"
