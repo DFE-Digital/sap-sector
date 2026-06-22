@@ -13,7 +13,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
     private const string SchoolSearchPath = "/find-a-school";
-    private const string SchoolSearchResultsPath = "/find-a-school/search";
+    private const string SchoolSearchResultsPath = "/find-a-school";
     private const string SchoolSuggestPath = "/find-a-school/suggest";
 
     #region Index Page Tests
@@ -94,9 +94,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.WaitForURLAsync("**/find-a-school/search**");
+        await Page.WaitForURLAsync("**/find-a-school**");
 
-        Page.Url.Should().Contain("/find-a-school/search");
+        Page.Url.Should().Contain("/find-a-school");
         Page.Url.Should().Contain("query=Test");
     }
 
@@ -319,7 +319,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("input[name='__Query']").PressAsync("Enter");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("/find-a-school/search", "Pressing Enter should submit the form");
+        Page.Url.Should().Contain("/find-a-school", "Pressing Enter should submit the form");
     }
 
     [Fact]
@@ -696,7 +696,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/search?query=wibbly%20wobbly%20primary%20%26%20daycare%20(primary)");
+        Page.Url.Should().Contain("school?query=wibbly%20wobbly%20primary%20%26%20daycare%20(primary)");
     }
 
     [Fact]
@@ -708,7 +708,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("/find-a-school/search?query=123456");
+        Page.Url.Should().Contain("/find-a-school?query=123456");
     }
 
     [Fact]
@@ -722,7 +722,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var response = Page.Url;
-        response.Should().Contain($"school/search?query={longQuery}");
+        response.Should().Contain($"school?query={longQuery}");
     }
 
     [Fact]
@@ -884,7 +884,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await jsDisabledPage.Locator("button[name='Search']").ClickAsync();
         await jsDisabledPage.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        jsDisabledPage.Url.Should().Contain("/find-a-school/search");
+        jsDisabledPage.Url.Should().Contain("/find-a-school");
 
         await jsDisabledPage.CloseAsync();
     }

@@ -12,7 +12,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithPageParameter_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -20,7 +20,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithPage2_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=2");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=2");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -28,7 +28,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithHighPageNumber_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=100");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=100");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -36,7 +36,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithZeroPage_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=0");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=0");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -44,7 +44,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithNegativePage_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=-1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=-1");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -52,7 +52,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithNonNumericPage_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=abc");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=abc");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -60,7 +60,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithDecimalPage_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1.5");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1.5");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -72,7 +72,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithPageAndFilter_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1&localAuthorities=Leeds");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1&localAuthorities=Leeds");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -80,7 +80,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_WithPageAndMultipleFilters_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1&localAuthorities=Leeds&localAuthorities=Bradford");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1&localAuthorities=Leeds&localAuthorities=Bradford");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -88,7 +88,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_Page2WithFilter_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=2&localAuthorities=Leeds");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=2&localAuthorities=Leeds");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -100,7 +100,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_Page1_ContainsPaginationMarkup()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -114,7 +114,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_Page2_ContainsPreviousLink()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=2");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=2");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -128,7 +128,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_Page1_DoesNotContainPreviousLink()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -139,7 +139,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_ContainsResultsCount()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -154,7 +154,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_Page2_ShowsCorrectResultRange()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=2");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=2");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -173,7 +173,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_PaginationLinks_ContainQueryParameter()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=TestQuery&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=TestQuery&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -187,7 +187,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_NextLink_HasCorrectPageNumber()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -202,7 +202,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_PreviousLink_HasCorrectPageNumber()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=3");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=3");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -221,7 +221,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_Pagination_HasAriaLabel()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -235,7 +235,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_CurrentPage_HasAriaCurrent()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -249,7 +249,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_NextLink_HasRelNext()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -263,7 +263,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_PreviousLink_HasRelPrev()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=2");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=2");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -277,7 +277,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_PageLinks_HaveAriaLabels()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -295,7 +295,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     [Fact]
     public async Task GetSearch_Page2_HasPageNumberInTitle()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=2");
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=2");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -318,7 +318,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
 
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=1", cts.Token);
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=1", cts.Token);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -328,7 +328,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(20));
 
-        var response = await fixture.Client.GetAsync("/find-a-school/search?query=School&page=10", cts.Token);
+        var response = await fixture.Client.GetAsync("/find-a-school?query=School&page=10", cts.Token);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -341,7 +341,7 @@ public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTes
     public async Task GetSearch_PageParameter_IsNotVulnerableToInjection()
     {
         var maliciousPage = "<script>alert('xss')</script>";
-        var response = await fixture.Client.GetAsync($"/find-a-school/search?query=School&page={Uri.EscapeDataString(maliciousPage)}");
+        var response = await fixture.Client.GetAsync($"/find-a-school?query=School&page={Uri.EscapeDataString(maliciousPage)}");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

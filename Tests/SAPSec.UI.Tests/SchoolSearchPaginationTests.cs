@@ -9,7 +9,7 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolSearchResultsPath = "/find-a-school/search";
+    private const string SchoolSearchResultsPath = "/find-a-school";
 
     #region Pagination Visibility Tests
 

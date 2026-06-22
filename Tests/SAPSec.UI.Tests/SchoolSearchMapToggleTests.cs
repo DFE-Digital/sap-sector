@@ -9,7 +9,7 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolSearchResultsPath = "/find-a-school/search";
+    private const string SchoolSearchResultsPath = "/find-a-school";
 
     #region Toggle Button Tests
 
