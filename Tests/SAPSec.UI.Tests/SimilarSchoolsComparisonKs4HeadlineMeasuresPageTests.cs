@@ -1,6 +1,8 @@
 using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Infrastructure;
+using System.Linq;
+using System.Text.Json;
 using Xunit;
 
 namespace SAPSec.UI.Tests;
@@ -9,6 +11,12 @@ namespace SAPSec.UI.Tests;
 public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private const string Path = "/school/108088/view-similar-schools/137621/Ks4HeadlineMeasures";
+
+    private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
+    {
+        var chartTabs = Page.Locator(".app-ks4-tabs").Nth(chartGroupIndex);
+        await chartTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
+    }
 
     [Fact]
     public async Task Ks4HeadlineMeasuresComparison_LoadsSuccessfully()
@@ -47,17 +55,28 @@ public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplication
         await Page.GotoAsync(Path);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator(".govuk-tabs__tab[href='#year-by-year']").ClickAsync();
+        await ToggleChartViewAsync();
         var lineChart = Page.Locator("#ks4-attainment8-comparison-yearbyyear-chart");
         await Expect(lineChart).ToBeVisibleAsync();
 
-        var tickLabels = await lineChart.EvaluateAsync<string[]>(@"
+        var axis = await lineChart.EvaluateAsync<JsonElement>(@"
             el => {
                 const chart = window.Chart && window.Chart.getChart(el);
-                return chart?.scales?.y?.ticks?.map(tick => tick.label) ?? [];
+                return {
+                    min: chart?.scales?.y?.min ?? null,
+                    max: chart?.scales?.y?.max ?? null,
+                    ticks: chart?.scales?.y?.ticks?.map(tick => tick.label) ?? []
+                };
             }
         ");
 
-        tickLabels.Should().Equal("0", "30", "60", "90");
+        var min = axis.GetProperty("min").GetDouble();
+        var max = axis.GetProperty("max").GetDouble();
+        var ticks = axis.GetProperty("ticks").EnumerateArray().Select(tick => tick.GetString()).ToArray();
+
+        min.Should().BeGreaterThan(0d);
+        max.Should().BeGreaterThan(min);
+        (max - min).Should().BeLessThan(90d);
+        ticks.Should().HaveCountGreaterThan(1);
     }
 }
