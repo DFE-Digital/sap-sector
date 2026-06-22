@@ -12,8 +12,11 @@ public abstract class BasePageTest : PageTest
     {
         _fixture = fixture;
 
-        //Uncomment to run tests in headed mode
-        //Environment.SetEnvironmentVariable("HEADED", "1");
+        // Run in headed mode when debugging
+        if (System.Diagnostics.Debugger.IsAttached)
+        {
+            Environment.SetEnvironmentVariable("HEADED", "1");
+        }
     }
 
     public override BrowserNewContextOptions ContextOptions()

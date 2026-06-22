@@ -20,46 +20,15 @@ public class SchoolSearchController(
     public const string NoResultsErrorMessage = "We could not find any schools matching your search criteria";
 
     [HttpGet]
-    public IActionResult Index() => View(new SchoolSearchQueryViewModel());
-
-    [HttpPost]
-    public async Task<IActionResult> Index(SchoolSearchQueryViewModel searchQueryViewModel)
+    public async Task<IActionResult> Index(
+        [FromQuery] string? query = null,
+        [FromQuery] string[]? localAuthorities = null,
+        [FromQuery] int? page = null)
     {
-        using (logger.BeginScope(new { searchQueryViewModel }))
-        {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(searchQueryViewModel.Urn);
+        query ??= string.Empty;
+        localAuthorities ??= [];
+        page ??= 1;
 
-            if (!ModelState.IsValid)
-            {
-                return View(searchQueryViewModel);
-            }
-
-            var schoolNumber = SchoolNumberFrom(searchQueryViewModel);
-            if (string.IsNullOrWhiteSpace(schoolNumber))
-            {
-                var routeValues = BuildSearchRouteValues(
-                    searchQueryViewModel.Query);
-                return RedirectToAction("Search", routeValues);
-            }
-
-            var school = await _searchService.SearchByNumberAsync(schoolNumber);
-            if (!string.IsNullOrWhiteSpace(school?.URN))
-            {
-                return RedirectToSchool(school);
-            }
-
-            return RedirectToAction("Search", BuildSearchRouteValues(
-                searchQueryViewModel.Query));
-        }
-    }
-
-    [HttpGet]
-    [Route("search")]
-    public async Task<IActionResult> Search(
-        [FromQuery] string? query,
-        [FromQuery] string[]? localAuthorities,
-        [FromQuery] int page = 1)
-    {
         using (logger.BeginScope(new { query, page }))
         {
             if (page < 1) page = 1;
@@ -114,7 +83,7 @@ public class SchoolSearchController(
             var totalResults = results.Count;
 
             var pagedResults = results
-                .Skip((page - 1) * PageSize)
+                .Skip(((page ?? 1) - 1) * PageSize)
                 .Take(PageSize)
                 .ToList();
 
@@ -124,7 +93,7 @@ public class SchoolSearchController(
                 var routeValues = BuildSearchRouteValues(query);
                 routeValues["localAuthorities"] = localAuthorities;
                 routeValues["page"] = totalPages;
-                return RedirectToAction("Search", routeValues);
+                return RedirectToAction("Index", routeValues);
             }
 
             // Map all results for display
@@ -148,9 +117,10 @@ public class SchoolSearchController(
             return View(new SchoolSearchResultsViewModel
             {
                 Query = query ?? string.Empty,
+                HasNoResults = !string.IsNullOrWhiteSpace(query) && totalResults == 0,
                 LocalAuthorities = allLocalAuthorities,
                 SelectedLocalAuthorities = localAuthorities ?? Array.Empty<string>(),
-                CurrentPage = page,
+                CurrentPage = page ?? 1,
                 PageSize = PageSize,
                 TotalResults = totalResults,
                 Results = pagedResults.Select(s => new SchoolSearchResultViewModel
@@ -175,16 +145,18 @@ public class SchoolSearchController(
     }
 
     [HttpPost]
-    [Route("search")]
-    public async Task<IActionResult> Search(SchoolSearchQueryViewModel searchQueryViewModel)
+    public async Task<IActionResult> Index(SchoolSearchQueryViewModel searchQueryViewModel)
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
+            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(searchQueryViewModel.Urn);
+
             if (!ModelState.IsValid)
             {
                 return View(new SchoolSearchResultsViewModel
                 {
-                    Query = searchQueryViewModel.Query
+                    Query = searchQueryViewModel.Query,
+                    HasNoResults = false
                 });
             }
 
@@ -193,7 +165,7 @@ public class SchoolSearchController(
             {
                 var routeValues = BuildSearchRouteValues(
                     searchQueryViewModel.Query);
-                return RedirectToAction("Search", routeValues);
+                return RedirectToAction("Index", routeValues);
             }
 
             var school = await _searchService.SearchByNumberAsync(schoolNumber);
@@ -205,7 +177,8 @@ public class SchoolSearchController(
             ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
             var fallbackRouteValues = BuildSearchRouteValues(
                 searchQueryViewModel.Query);
-            return RedirectToAction("Search", fallbackRouteValues);
+
+            return RedirectToAction("Index", fallbackRouteValues);
         }
     }
 
