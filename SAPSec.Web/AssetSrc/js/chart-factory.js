@@ -259,7 +259,207 @@
         };
     }
 
-    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign) {
+    function getNumericSeriesValues(chartData) {
+        if (!chartData || !Array.isArray(chartData.datasets)) {
+            return [];
+        }
+
+        return chartData.datasets
+            .flatMap(function (dataset) {
+                return Array.isArray(dataset.data) ? dataset.data : [];
+            })
+            .filter(function (value) {
+                return value !== null && value !== undefined && !Number.isNaN(Number(value));
+            })
+            .map(Number);
+    }
+
+    function getNiceStepSize(range) {
+        if (!range || range <= 0) {
+            return 1;
+        }
+
+        const roughStep = range / 4;
+        const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+        const normalised = roughStep / magnitude;
+
+        if (normalised <= 1) {
+            return magnitude;
+        }
+
+        if (normalised <= 2) {
+            return 2 * magnitude;
+        }
+
+        if (normalised <= 5) {
+            return 5 * magnitude;
+        }
+
+        return 10 * magnitude;
+    }
+
+    function roundDownToStep(value, step) {
+        return Math.floor(value / step) * step;
+    }
+
+    function roundUpToStep(value, step) {
+        return Math.ceil(value / step) * step;
+    }
+
+    function getDynamicLineAxisConfig(chartData, axisSuffix) {
+        const values = getNumericSeriesValues(chartData);
+        if (!values.length) {
+            return null;
+        }
+
+        const rawMin = Math.min.apply(null, values);
+        const rawMax = Math.max.apply(null, values);
+        const range = rawMax - rawMin;
+        const padding = range === 0
+            ? Math.max(Math.abs(rawMax) * 0.1, axisSuffix === '%' ? 2 : 1)
+            : Math.max(range * 0.2, axisSuffix === '%' ? 2 : 1);
+
+        let min = rawMin - padding;
+        let max = rawMax + padding;
+
+        if (axisSuffix === '%') {
+            min = Math.max(0, min);
+            max = Math.min(100, max);
+        }
+
+        if (min === max) {
+            max = min + (axisSuffix === '%' ? 4 : 2);
+        }
+
+        const step = getNiceStepSize(max - min);
+
+        return {
+            min: roundDownToStep(min, step),
+            max: roundUpToStep(max, step),
+            step
+        };
+    }
+
+    function formatTooltipValue(value, axisSuffix, decimals) {
+        if (value === null || value === undefined || Number.isNaN(Number(value))) {
+            return 'No data';
+        }
+
+        const numericValue = Number(value);
+        const formattedValue = decimals !== null && decimals !== undefined
+            ? numericValue.toFixed(decimals)
+            : numericValue;
+
+        return `${formattedValue}${axisSuffix}`;
+    }
+
+    function getTooltipContainer(chart) {
+        return chart.canvas.closest('.app-ks4-chart-container') || chart.canvas.parentElement;
+    }
+
+    function getOrCreateHtmlTooltip(chart) {
+        const container = getTooltipContainer(chart);
+        if (!container) {
+            return null;
+        }
+
+        let tooltip = container.querySelector(`.app-chart-tooltip[data-chart-id="${chart.canvas.id}"]`);
+        if (!tooltip) {
+            tooltip = document.createElement('div');
+            tooltip.className = 'app-chart-tooltip';
+            tooltip.setAttribute('data-chart-id', chart.canvas.id);
+
+            const title = document.createElement('div');
+            title.className = 'app-chart-tooltip__title';
+            tooltip.appendChild(title);
+
+            const body = document.createElement('div');
+            body.className = 'app-chart-tooltip__body';
+            tooltip.appendChild(body);
+
+            container.appendChild(tooltip);
+        }
+
+        return tooltip;
+    }
+
+    function hideAllHtmlTooltips() {
+        document.querySelectorAll('.app-chart-tooltip--visible').forEach(function (tooltip) {
+            tooltip.classList.remove('app-chart-tooltip--visible');
+        });
+    }
+
+    function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
+        const { chart, tooltip } = context;
+        const tooltipElement = getOrCreateHtmlTooltip(chart);
+
+        if (!tooltipElement) {
+            return;
+        }
+
+        if (!tooltip || tooltip.opacity === 0) {
+            tooltipElement.classList.remove('app-chart-tooltip--visible');
+            return;
+        }
+
+        const titleElement = tooltipElement.querySelector('.app-chart-tooltip__title');
+        const bodyElement = tooltipElement.querySelector('.app-chart-tooltip__body');
+
+        if (!titleElement || !bodyElement) {
+            return;
+        }
+
+        titleElement.textContent = tooltip.title?.[0] ?? '';
+        bodyElement.innerHTML = '';
+
+        tooltip.dataPoints.forEach(function (point) {
+            const row = document.createElement('div');
+            row.className = 'app-chart-tooltip__row';
+
+            const marker = document.createElement('span');
+            marker.className = 'app-chart-tooltip__marker';
+            marker.style.backgroundColor = point.dataset.borderColor || point.dataset.backgroundColor || CHART_CONFIG.fallbacks.legendBoxColor;
+
+            const label = document.createElement('span');
+            label.className = 'app-chart-tooltip__label';
+            label.textContent = point.dataset.label || '';
+
+            const value = document.createElement('span');
+            value.className = 'app-chart-tooltip__value';
+            value.textContent = formatTooltipValue(point.parsed.y, axisSuffix, tooltipDecimals);
+
+            row.appendChild(marker);
+            row.appendChild(label);
+            row.appendChild(value);
+            bodyElement.appendChild(row);
+        });
+
+        tooltipElement.classList.add('app-chart-tooltip--visible');
+
+        const container = getTooltipContainer(chart);
+        if (!container) {
+            return;
+        }
+
+        const canvasRect = chart.canvas.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const tooltipWidth = tooltipElement.offsetWidth;
+        const gap = 16;
+        const pointLeft = canvasRect.left - containerRect.left + tooltip.caretX;
+        const rightCandidate = pointLeft + gap;
+        const leftCandidate = pointLeft - tooltipWidth - gap;
+        const containerWidth = container.clientWidth;
+        const hasRoomOnRight = rightCandidate + tooltipWidth <= containerWidth - gap;
+        const left = hasRoomOnRight
+            ? rightCandidate
+            : Math.max(gap, leftCandidate);
+        const top = canvasRect.top - containerRect.top + tooltip.caretY;
+
+        tooltipElement.style.left = `${left}px`;
+        tooltipElement.style.top = `${top}px`;
+    }
+
+    function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis, tooltipDecimals) {
         const common = {
             responsive: true,
             maintainAspectRatio: false,
@@ -271,15 +471,18 @@
             size: gdsStyles.fontSize
         };
 
-        const stepSize = axisStep;
-        const axisTickCount = axisMin !== null && axisMax !== null && stepSize
-            ? Math.floor((axisMax - axisMin) / stepSize) + 1
+        const resolvedAxisMin = dynamicLineAxis ? dynamicLineAxis.min : axisMin;
+        const resolvedAxisMax = dynamicLineAxis ? dynamicLineAxis.max : axisMax;
+        const stepSize = dynamicLineAxis ? dynamicLineAxis.step : axisStep;
+        const axisTickCount = resolvedAxisMin !== null && resolvedAxisMax !== null && stepSize
+            ? Math.floor((resolvedAxisMax - resolvedAxisMin) / stepSize) + 1
             : undefined;
-        const explicitTicks = buildExplicitTicks(axisMin, axisMax, stepSize);
+        const explicitTicks = buildExplicitTicks(resolvedAxisMin, resolvedAxisMax, stepSize);
 
         const legendOptions = {
-            display: showLegend,
+            display: type === 'line' ? false : showLegend,
             position: CHART_CONFIG.legend.position,
+            align: 'center',
             labels: {
                 usePointStyle: true,
                 pointStyle: CHART_CONFIG.legend.pointStyle,
@@ -292,6 +495,10 @@
         if (type === 'line') {
             return {
                 ...common,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
                 layout: {
                     padding: {
                         top: CHART_CONFIG.line.layout.topPadding,
@@ -300,9 +507,9 @@
                 },
                 scales: {
                     y: {
-                        beginAtZero: true,
-                        min: axisMin ?? undefined,
-                        max: axisMax ?? undefined,
+                        beginAtZero: !dynamicLineAxis,
+                        min: resolvedAxisMin ?? undefined,
+                        max: resolvedAxisMax ?? undefined,
                         grace: CHART_CONFIG.line.axis.grace,
                         afterBuildTicks: explicitTicks,
                         grid: {
@@ -340,7 +547,22 @@
                     }
                 },
                 plugins: {
-                    tooltip: { enabled: false },
+                    tooltip: {
+                        enabled: false,
+                        external: function (context) {
+                            renderHtmlTooltip(context, axisSuffix, tooltipDecimals);
+                        },
+                        callbacks: {
+                            title: function (contexts) {
+                                return contexts?.[0]?.label ?? '';
+                            },
+                            label: function (context) {
+                                const label = context.dataset.label ? context.dataset.label + ': ' : '';
+                                const value = context.parsed.y;
+                                return `${label}${formatTooltipValue(value, axisSuffix, tooltipDecimals)}`;
+                            }
+                        }
+                    },
                     legend: legendOptions,
                     title: {
                         display: false,
@@ -451,6 +673,9 @@
 
         return common;
     }
+
+    window.addEventListener('scroll', hideAllHtmlTooltips, { passive: true });
+    window.addEventListener('resize', hideAllHtmlTooltips, { passive: true });
 
     const noDataBarLabelsPlugin = {
         id: 'noDataBarLabels',
@@ -573,6 +798,13 @@
         return ks4CoreSubjectYearByYearChartIds.has(canvas.id);
     }
 
+    function isYearByYearLineChart(canvas) {
+        return canvas && (
+            canvas.id.includes('yearbyyear-chart')
+            || canvas.id.includes('year-by-year-chart')
+        );
+    }
+
     function initCharts() {
         document.querySelectorAll('.js-chart').forEach(canvas => {
             if (charts[canvas.id]) {
@@ -587,10 +819,11 @@
 
             const chartData = JSON.parse(canvas.dataset.chart);
             const type = canvas.dataset.type;
+            const showLegend = canvas.dataset.showLegend === "true";
+
             if (type === 'bar') {
                 resizeBarChartContainer(canvas, chartData);
             }
-            const showLegend = canvas.dataset.showLegend === "true";
             const showDataLabels = canvas.dataset.showDatalabels !== "false";
             const showXGrid = canvas.dataset.showXGrid === "true";
             const forceKs4CoreSubjectTicks = isKs4CoreSubjectYearByYearChart(canvas);
@@ -611,6 +844,12 @@
                 : CHART_CONFIG.defaults.axisSuffix;
             const labelDecimals = canvas.dataset.labelDecimals
                 ? parseInt(canvas.dataset.labelDecimals, 10)
+                : null;
+            const tooltipDecimals = canvas.dataset.tooltipDecimals
+                ? parseInt(canvas.dataset.tooltipDecimals, 10)
+                : null;
+            const dynamicLineAxis = type === 'line' && isYearByYearLineChart(canvas)
+                ? getDynamicLineAxisConfig(chartData, axisSuffix)
                 : null;
 
             const rawColors = canvas.dataset.colors
@@ -652,7 +891,9 @@
                     showLegend,
                     showDataLabels,
                     showXGrid,
-                    barLabelAlign),
+                    barLabelAlign,
+                    dynamicLineAxis,
+                    tooltipDecimals),
                 plugins: [
                     ...(showDataLabels ? [ChartDataLabels] : []),
                     noDataBarLabelsPlugin
@@ -680,9 +921,9 @@
             charts[canvas.id] = chart;
 
             if (showLegend) {
-                const legendContainer = document.querySelector(
-                    `.chart-legend[data-chart-id="${canvas.id}"]`
-                );
+                const legendContainer = type === 'line'
+                    ? ensureTopLegendContainer(canvas)
+                    : document.querySelector(`.chart-legend[data-chart-id="${canvas.id}"]`);
                 if (legendContainer) {
                     buildVerticalLegend(chart, legendContainer);
                 }
@@ -709,19 +950,24 @@
     }
 
     function buildVerticalLegend(chart, container) {
+        container.innerHTML = '';
+
         const datasets = Array.isArray(chart.data.datasets)
             ? chart.data.datasets
             : [chart.data.datasets];
 
         const ul = document.createElement('ul');
+        ul.classList.add('app-chart-legend');
 
         datasets.forEach(ds => {
             const li = document.createElement('li');
+            li.classList.add('app-chart-legend__item');
             const box = document.createElement('span');
-            box.classList.add('legend-box');
+            box.classList.add('app-chart-legend__box');
             box.style.backgroundColor = ds.backgroundColor || ds.borderColor || CHART_CONFIG.fallbacks.legendBoxColor;
 
             const label = document.createElement('span');
+            label.classList.add('app-chart-legend__label');
             label.textContent = ds.label;
 
             li.appendChild(box);
@@ -732,6 +978,28 @@
         container.appendChild(ul);
     }
 
+    function ensureTopLegendContainer(canvas) {
+        const chartContainer = canvas.parentElement;
+        const legendHost = chartContainer?.parentElement;
+        if (!chartContainer || !legendHost) {
+            return null;
+        }
+
+        let legendContainer = chartContainer.previousElementSibling;
+        if (legendContainer?.getAttribute('data-chart-id') !== canvas.id || !legendContainer.classList.contains('chart-legend')) {
+            legendContainer = null;
+        }
+
+        if (!legendContainer) {
+            legendContainer = document.createElement('div');
+            legendContainer.className = 'chart-legend chart-legend--top';
+            legendContainer.setAttribute('data-chart-id', canvas.id);
+            legendHost.insertBefore(legendContainer, chartContainer);
+        }
+
+        return legendContainer;
+    }
+
     function adjustChartResize() {
         let resizeTimeout;
         window.addEventListener('resize', () => {
@@ -740,7 +1008,7 @@
                 Object.values(charts).forEach(chart => {
                     const fontSizePx = gdsVars(chart.canvas).fontSize;
 
-                    if (chart.options.scales.x.ticks.font) {
+                    if (chart.options.scales.x.ticks.font && typeof chart.options.scales.x.ticks.font !== 'function') {
                         chart.options.scales.x.ticks.font.size = fontSizePx;
                     }
 

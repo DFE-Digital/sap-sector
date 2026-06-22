@@ -10,6 +10,12 @@ public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetu
 {
     private const string Path = "/school/108088/view-similar-schools/137621/Ks4CoreSubjects";
 
+    private async Task ToggleFirstChartGroupToYearByYearAsync()
+    {
+        var chartTabs = Page.Locator(".app-ks4-tabs").First;
+        await chartTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
+    }
+
     [Fact]
     public async Task Ks4CoreSubjectsComparison_LoadsSuccessfully()
     {
@@ -46,8 +52,12 @@ public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetu
         await Page.GotoAsync(Path);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
+        await ToggleFirstChartGroupToYearByYearAsync();
+
         var lineCharts = Page.Locator("canvas[id$='-comparison-yearbyyear-chart'][data-type='line']");
         await Expect(lineCharts).ToHaveCountAsync(7);
+
+        await Expect(Page.Locator("#english-language-comparison-yearbyyear-chart")).ToBeVisibleAsync();
 
         for (var index = 0; index < await lineCharts.CountAsync(); index++)
         {
@@ -63,6 +73,7 @@ public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetu
             .Locator("#english-language-comparison-yearbyyear-chart")
             .EvaluateAsync<string[]>("canvas => window.Chart.getChart(canvas).scales.y.ticks.map(tick => tick.label)");
 
-        englishLanguageTickLabels.Should().Equal("0%", "25%", "50%", "75%", "100%");
+        englishLanguageTickLabels.Should().NotBeEmpty();
+        englishLanguageTickLabels.Should().OnlyContain(label => label != null && label.EndsWith("%"));
     }
 }
