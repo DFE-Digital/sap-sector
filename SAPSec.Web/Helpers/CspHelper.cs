@@ -25,10 +25,10 @@ public static class CspHelper
             "frame-ancestors 'none';",
             "form-action 'self' https://oidc.signin.education.gov.uk;",
             "connect-src 'self' *.google-analytics.com *.analytics.google.com https://*.clarity.ms",
-            "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/ https://*.tile.openstreetmap.org;",
+            "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://*.clarity.ms https://c.bing.com https://*.tile.openstreetmap.org;",
             "style-src 'self';",
             "font-src 'self' data:;",
-            $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/;");
+            $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com;");
         }
         else
         {
@@ -38,31 +38,16 @@ public static class CspHelper
             "default-src 'self';",
             "frame-ancestors 'none';",
             "form-action 'self' https://test-oidc.signin.education.gov.uk https://pp-oidc.signin.education.gov.uk;",
-            "connect-src 'self' *.google-analytics.com *.analytics.google.com https://*.clarity.ms https://*.visualstudio.com/ https://localhost:*;",
-            "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/ https://*.tile.openstreetmap.org;",
+            "connect-src 'self' *.google-analytics.com *.analytics.google.com https://*.clarity.ms https://*.visualstudio.com/ ws://localhost:* http://localhost:*;",
+            "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://*.clarity.ms https://c.bing.com https://*.tile.openstreetmap.org;",
             "style-src 'self';",
             "font-src 'self' data:;",
-            $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/;");
+            $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com;");
          }
 
         //Notes:
         //https://c.bing.com is required by Clarity
         //https://*.visualstudio.com/ used for live share in Visual Studio
-        //wss://localhost:* used by browsersync
+        //ws://localhost:* http://localhost:* used by https://browsersync.io/
     }
-
-    //public static string BuildPolicy(string nonce)
-    //{
-    //    return string.Join(" ",
-    //        "base-uri 'self';",
-    //        "object-src 'none';",
-    //        "default-src 'self';",
-    //        "frame-ancestors 'none';",
-    //        "form-action 'self' https://test-oidc.signin.education.gov.uk https://pp-oidc.signin.education.gov.uk https://oidc.signin.education.gov.uk;",
-    //        "connect-src 'self' *.google-analytics.com *.analytics.google.com https://www.compare-school-performance.service.gov.uk https://api.postcodes.io https://*.doubleclick.net https://*.clarity.ms https://c.bing.com https://*.applicationinsights.azure.com/ https://*.visualstudio.com/ wss://localhost:*;",
-    //        "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://atlas.microsoft.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/ https://*.tile.openstreetmap.org;",
-    //        "style-src 'self' 'unsafe-inline';",
-    //        "font-src 'self' data:;",
-    //        $"script-src 'self' 'nonce-{nonce}' https://www.googletagmanager.com *.google-analytics.com https://*.clarity.ms https://c.bing.com https://js.monitor.azure.com/;");
-    //}
 }
