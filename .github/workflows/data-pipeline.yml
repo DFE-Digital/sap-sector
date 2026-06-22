@@ -80,6 +80,13 @@ jobs:
           report_dir="${RUNNER_TEMP}/data-pipeline-report"
           log_dir="${report_dir}/logs"
           mkdir -p "${report_dir}" "${log_dir}"
+          cat <<EOF > "${log_dir}/README.txt"
+          Data pipeline logs for ${GITHUB_WORKFLOW}
+          Run ID: ${GITHUB_RUN_ID}
+          Run attempt: ${GITHUB_RUN_ATTEMPT}
+          Environment: ${DEPLOY_ENV}
+          Logs are added here by later workflow steps.
+          EOF
           echo "PIPELINE_REPORT_DIR=${report_dir}" >> "$GITHUB_ENV"
           echo "PIPELINE_LOG_DIR=${log_dir}" >> "$GITHUB_ENV"
 
@@ -747,6 +754,51 @@ jobs:
           echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
           echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
 
+      - name: Capture pipeline execution context
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          context_file="${PIPELINE_LOG_DIR}/pipeline-context.txt"
+          {
+            echo "workflow=${GITHUB_WORKFLOW}"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "run_attempt=${GITHUB_RUN_ATTEMPT}"
+            echo "job=${GITHUB_JOB}"
+            echo "trigger=${GITHUB_EVENT_NAME}"
+            echo "target_environment=${DEPLOY_ENV}"
+            echo "aks_resource_group=${AKS_RESOURCE_GROUP}"
+            echo "aks_cluster_name=${AKS_CLUSTER_NAME}"
+            echo "aks_namespace=${AKS_NAMESPACE}"
+            echo "app_namespace=${NAMESPACE}"
+            echo "konduit_app_name=${KONDUIT_APP_NAME}"
+            echo "cluster=${CLUSTER}"
+            echo "backup_file=${BACKUP_FILE}"
+            echo "runner_os=${RUNNER_OS}"
+            echo "runner_temp=${RUNNER_TEMP}"
+            echo "workspace=${GITHUB_WORKSPACE}"
+            echo "utc_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            echo
+            echo "[tool-versions]"
+            kubectl version --client=true 2>&1 || true
+            az version 2>&1 || true
+            dotnet --info 2>&1 || true
+            pwsh --version 2>&1 || true
+          } > "${context_file}"
+
+      - name: Capture baseline cluster snapshot
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          snapshot_dir="${PIPELINE_LOG_DIR}/cluster"
+          mkdir -p "${snapshot_dir}"
+          kubectl config current-context > "${snapshot_dir}/current-context.txt" 2>&1 || true
+          kubectl -n "${AKS_NAMESPACE}" get pods -o wide > "${snapshot_dir}/aks-namespace-pods.txt" 2>&1 || true
+          kubectl -n "${AKS_NAMESPACE}" get jobs > "${snapshot_dir}/aks-namespace-jobs.txt" 2>&1 || true
+          kubectl -n "${NAMESPACE}" get svc > "${snapshot_dir}/app-namespace-services.txt" 2>&1 || true
+          kubectl -n "${NAMESPACE}" get ingress -o wide > "${snapshot_dir}/app-namespace-ingress.txt" 2>&1 || true
+
       - name: Enable maintenance page
         id: enable_maintenance
         if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
@@ -1348,6 +1400,32 @@ jobs:
           }
           $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-12-review-restore.json")
 
+      - name: Capture failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          diagnostics_dir="${PIPELINE_LOG_DIR}/failure-diagnostics"
+          mkdir -p "${diagnostics_dir}"
+
+          kubectl -n "${AKS_NAMESPACE}" get events --sort-by=.lastTimestamp > "${diagnostics_dir}/aks-namespace-events.txt" 2>&1 || true
+          kubectl -n "${NAMESPACE}" get events --sort-by=.lastTimestamp > "${diagnostics_dir}/app-namespace-events.txt" 2>&1 || true
+          kubectl -n "${AKS_NAMESPACE}" get pods -o wide > "${diagnostics_dir}/aks-namespace-pods.txt" 2>&1 || true
+
+          pod_list="$(kubectl -n "${AKS_NAMESPACE}" get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null | grep "${KONDUIT_APP_NAME}" || true)"
+          if [ -z "${pod_list}" ]; then
+            pod_list="$(kubectl -n "${AKS_NAMESPACE}" get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null | head -n 5 || true)"
+          fi
+
+          while IFS= read -r pod_name; do
+            if [ -z "${pod_name}" ]; then
+              continue
+            fi
+            safe_name="$(printf '%s' "${pod_name}" | tr '/:' '__')"
+            kubectl -n "${AKS_NAMESPACE}" describe pod "${pod_name}" > "${diagnostics_dir}/${safe_name}-describe.txt" 2>&1 || true
+            kubectl -n "${AKS_NAMESPACE}" logs "${pod_name}" --all-containers --tail=200 > "${diagnostics_dir}/${safe_name}-logs.txt" 2>&1 || true
+          done <<< "${pod_list}"
+
       - name: Publish pipeline stage summary
         if: always()
         shell: pwsh
@@ -1390,6 +1468,37 @@ jobs:
           $lines.Add("Failed: " + ($(if ($failedStages.Count -gt 0) { $failedStages -join ", " } else { "none" })))
           $lines.Add("Retried: " + ($(if ($retriedStages.Count -gt 0) { $retriedStages -join ", " } else { "none" })))
           $lines | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+
+      - name: Prepare pipeline log artifact manifest
+        if: always()
+        shell: pwsh
+        run: |
+          $logDir = $env:PIPELINE_LOG_DIR
+          New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+          $manifestPath = Join-Path $logDir "artifact-manifest.txt"
+          $files = @(Get-ChildItem -Path $logDir -Recurse -File -ErrorAction SilentlyContinue | Sort-Object FullName)
+          $lines = New-Object System.Collections.Generic.List[string]
+          $lines.Add("Data pipeline log artifact")
+          $lines.Add("Workflow: $env:GITHUB_WORKFLOW")
+          $lines.Add("Run ID: $env:GITHUB_RUN_ID")
+          $lines.Add("Run attempt: $env:GITHUB_RUN_ATTEMPT")
+          $lines.Add("Environment: $env:DEPLOY_ENV")
+          $lines.Add("UTC generated: $([DateTime]::UtcNow.ToString('o'))")
+          $lines.Add("")
+          $lines.Add("Files:")
+          foreach ($file in $files) {
+            $relativePath = $file.FullName.Substring($logDir.Length).TrimStart('\', '/')
+            $lines.Add("- $relativePath ($($file.Length) bytes)")
+          }
+          $lines | Set-Content -Path $manifestPath
+
+      - name: Upload pipeline log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-pipeline-logs-${{ matrix.target_env }}
+          path: ${{ env.PIPELINE_LOG_DIR }}
+          if-no-files-found: error
 
       - name: Upload pipeline stage report artifact
         if: always()
