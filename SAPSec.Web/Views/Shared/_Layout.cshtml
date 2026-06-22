@@ -71,7 +71,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
     @if (loadAnalytics && !string.IsNullOrWhiteSpace(gtmId))
     {
     <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=@gtmId@Html.Raw(gtmAdditional)" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=@gtmId@Html.Raw(gtmAdditional)" height="0" width="0" hidden"></iframe></noscript>
     <!-- End Google Tag Manager (noscript) -->
     }
     <script add-nonce="true">

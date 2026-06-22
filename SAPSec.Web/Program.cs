@@ -201,7 +201,7 @@ public class Program
             app.UseHsts();
         }
         app.UseForwardedHeaders();
-        app.UseMiddleware<SecurityHeadersMiddleware>();
+        app.UseMiddleware<SecurityHeadersMiddleware>(app.Environment);
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider
