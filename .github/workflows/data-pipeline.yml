@@ -957,24 +957,32 @@ jobs:
 
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
           ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
+
+          # Keep TCP session alive during long COPY operations
+          export PGOPTIONS='-c tcp_keepalives_idle=60 -c tcp_keepalives_interval=30 -c tcp_keepalives_count=10'
+
           max_attempts=5
-          delay=10
+          delay=20
           log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
           report_file="${PIPELINE_REPORT_DIR}/stage-09-etl.json"
           retry_count=0
           last_classification="none"
           attempt=1
+
           while [ $attempt -le $max_attempts ]; do
             echo "ETL attempt $attempt/$max_attempts"
+
             set +e
             "$GITHUB_WORKSPACE/konduit.sh" \
               -n "${AKS_NAMESPACE}" \
               -t 28800 \
               -x \
               -i "$GITHUB_WORKSPACE/SAPData/Sql/run_all.sql" \
-              "${KONDUIT_APP_NAME}" -- psql 2>&1 | tee "$log_file"
+              "${KONDUIT_APP_NAME}" -- \
+              psql -X -v ON_ERROR_STOP=1 -f - 2>&1 | tee "$log_file"
             exit_code=${PIPESTATUS[0]}
             set -e
+
             if [ $exit_code -eq 0 ]; then
               echo "ETL succeeded on attempt $attempt"
               cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
@@ -1005,18 +1013,20 @@ jobs:
               echo "log_file=$log_file" >> "$GITHUB_OUTPUT"
               exit 0
             fi
+
             if grep -Eqi \
-              "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected" \
+              "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected|Container does not exist or connection cannot be established|failed to exec in container|no running task found|task .* not found|Internal error occurred: error executing command in container" \
               "$log_file"; then
-              echo "Detected transient DB disconnect. Retrying after ${delay}s..."
+              echo "Detected transient ETL connection issue. Retrying after ${delay}s..."
               retry_count=$((retry_count + 1))
-              last_classification="transient_db_disconnect"
+              last_classification="transient_etl_connection_issue"
               sleep $delay
               delay=$((delay * 2))
-              if [ $delay -gt 120 ]; then delay=120; fi
+              if [ $delay -gt 180 ]; then delay=180; fi
               attempt=$((attempt + 1))
               continue
             fi
+
             echo "ETL failed with exit code $exit_code (not classified as transient)."
             last_classification="non_retryable"
             cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
@@ -1053,7 +1063,7 @@ jobs:
           done
           if [ $exit_code -ne 0 ]; then
             echo "ETL failed after $max_attempts attempts."
-            last_classification="transient_db_disconnect"
+            last_classification="transient_etl_connection_issue"
             cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
             failure_reason="$(extract_reason "$log_file")"
             log_excerpt="$(extract_excerpt "$log_file")"
@@ -1145,30 +1155,67 @@ jobs:
             local file="$1"
             tail -n 20 "$file" 2>/dev/null || true
           }
-
           TODAY=$(TZ=Europe/London date +"%F")
           LOCAL_FILE="sapsec_review_seed_${TODAY}.sql.gz"
           report_file="${PIPELINE_REPORT_DIR}/stage-10-review-seed-backup.json"
           upload_log="${PIPELINE_LOG_DIR}/review_seed_upload.log"
-          # Only ever keep this single blob in storage
           LATEST_BLOB="db-backups/sapsec_review_seed_${{ case(github.event.inputs.review-app-number == '', 'test', github.event.inputs.review-app-number) }}.sql.gz"
+          LOG_FILE="konduit_pg_dump.log"
+
           echo "Creating DB dump -> ${LOCAL_FILE}"
           echo "AKS_NAMESPACE=${AKS_NAMESPACE}"
           echo "KONDUIT_APP_NAME=${KONDUIT_APP_NAME}"
-          set +e
-          "$GITHUB_WORKSPACE/konduit.sh" \
-            -n "${AKS_NAMESPACE}" \
-            -t 28800 \
-            -x \
-            "${KONDUIT_APP_NAME}" -- \
-            pg_dump --format=plain --no-owner --no-privileges 2> konduit_pg_dump.log | gzip -c > "${LOCAL_FILE}"
-          exit_code=${PIPESTATUS[0]}
-          set -e
-          if [ $exit_code -ne 0 ]; then
-            echo "konduit/pg_dump failed with exit code ${exit_code}"
-            cp konduit_pg_dump.log "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
-            failure_reason="$(extract_reason "konduit_pg_dump.log")"
-            log_excerpt="$(extract_excerpt "konduit_pg_dump.log")"
+
+          # Keep connection alive through tunnel
+          export PGOPTIONS='-c tcp_keepalives_idle=60 -c tcp_keepalives_interval=30 -c tcp_keepalives_count=10'
+
+          max_attempts=5
+          delay=20
+          attempt=1
+          retry_count=0
+          last_classification="none"
+          dump_rc=0
+
+          while [ $attempt -le $max_attempts ]; do
+            echo "Backup dump attempt $attempt/$max_attempts"
+            rm -f "${LOCAL_FILE}" "${LOG_FILE}"
+
+            set +e
+            "$GITHUB_WORKSPACE/konduit.sh" \
+              -n "${AKS_NAMESPACE}" \
+              -t 28800 \
+              -x \
+              "${KONDUIT_APP_NAME}" -- \
+              pg_dump --format=plain --no-owner --no-privileges \
+              2> "${LOG_FILE}" | gzip -c > "${LOCAL_FILE}"
+            dump_rc=${PIPESTATUS[0]}
+            set -e
+
+            if [ $dump_rc -eq 0 ] && [ -s "${LOCAL_FILE}" ]; then
+              echo "DB dump succeeded on attempt $attempt"
+              break
+            fi
+
+            if grep -Eqi \
+              "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|EOF detected|connection reset|failed to exec in container|no running task found|Internal error occurred: error executing command in container" \
+              "${LOG_FILE}"; then
+              echo "Transient dump connection issue detected. Retrying after ${delay}s..."
+              retry_count=$((retry_count + 1))
+              last_classification="transient_dump_connection_issue"
+              tail -n 80 "${LOG_FILE}" || true
+              sleep $delay
+              delay=$((delay * 2))
+              if [ $delay -gt 180 ]; then delay=180; fi
+              attempt=$((attempt + 1))
+              continue
+            fi
+
+            echo "pg_dump failed with non-transient error (exit ${dump_rc})"
+            last_classification="non_retryable"
+            tail -n 200 "${LOG_FILE}" || true
+            cp "${LOG_FILE}" "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "${LOG_FILE}")"
+            log_excerpt="$(extract_excerpt "${LOG_FILE}")"
             jq -n \
               --arg stage "10-review-seed-backup" \
               --arg status "failed" \
@@ -1180,7 +1227,10 @@ jobs:
               --arg failurePhase "pg_dump" \
               --arg failureReason "$failure_reason" \
               --arg logExcerpt "$log_excerpt" \
-              --argjson exitCode "$exit_code" \
+              --arg classification "$last_classification" \
+              --argjson exitCode "$dump_rc" \
+              --argjson attempts "$attempt" \
+              --argjson retryCount "$retry_count" \
               '{
                 stage: $stage,
                 status: $status,
@@ -1194,12 +1244,62 @@ jobs:
                   failurePhase: $failurePhase,
                   failureReason: $failureReason,
                   logExcerpt: $logExcerpt,
-                  retried: false
+                  retryClassification: $classification,
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retried: ($retryCount > 0)
                 }
               }' > "$report_file"
-            exit $exit_code
+            exit ${dump_rc}
+          done
+
+          if [ ! -s "${LOCAL_FILE}" ]; then
+            echo "DB dump failed after ${max_attempts} attempts or output file is empty."
+            last_classification="transient_dump_connection_issue"
+            tail -n 200 "${LOG_FILE}" || true
+            cp "${LOG_FILE}" "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "${LOG_FILE}")"
+            log_excerpt="$(extract_excerpt "${LOG_FILE}")"
+            jq -n \
+              --arg stage "10-review-seed-backup" \
+              --arg status "failed" \
+              --arg summary "Review seed backup exhausted all retry attempts." \
+              --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --arg localFile "$LOCAL_FILE" \
+              --arg blobName "$LATEST_BLOB" \
+              --arg logFile "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" \
+              --arg failurePhase "pg_dump" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
+              --arg classification "$last_classification" \
+              --argjson exitCode "$dump_rc" \
+              --argjson attempts "$max_attempts" \
+              --argjson retryCount "$retry_count" \
+              '{
+                stage: $stage,
+                status: $status,
+                utcTime: $utcTime,
+                summary: $summary,
+                metadata: {
+                  localFile: $localFile,
+                  blobName: $blobName,
+                  exitCode: $exitCode,
+                  logFile: $logFile,
+                  failurePhase: $failurePhase,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt,
+                  retryClassification: $classification,
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retried: ($retryCount > 0)
+                }
+              }' > "$report_file"
+            exit 1
           fi
+
+          cp "${LOG_FILE}" "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
           ls -lh "${LOCAL_FILE}"
+
           echo "Uploading (overwriting) ${LATEST_BLOB} in container ${AZURE_STORAGE_CONTAINER}"
           set +e
           az storage blob upload \
@@ -1226,6 +1326,8 @@ jobs:
               --arg failureReason "$failure_reason" \
               --arg logExcerpt "$log_excerpt" \
               --argjson exitCode "$exit_code" \
+              --argjson attempts "$attempt" \
+              --argjson retryCount "$retry_count" \
               '{
                 stage: $stage,
                 status: $status,
@@ -1239,15 +1341,16 @@ jobs:
                   failurePhase: $failurePhase,
                   failureReason: $failureReason,
                   logExcerpt: $logExcerpt,
-                  retried: false
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retried: ($retryCount > 0)
                 }
               }' > "$report_file"
             exit $exit_code
           fi
+
           echo "Seed backup uploaded:"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
-          echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
-          cp konduit_pg_dump.log "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
           file_size_bytes="$(wc -c < "${LOCAL_FILE}" | xargs)"
           jq -n \
             --arg stage "10-review-seed-backup" \
@@ -1259,6 +1362,9 @@ jobs:
             --arg containerName "$AZURE_STORAGE_CONTAINER" \
             --arg logFile "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" \
             --argjson fileSizeBytes "$file_size_bytes" \
+            --argjson attempts "$attempt" \
+            --argjson retryCount "$retry_count" \
+            --arg classification "$last_classification" \
             '{
               stage: $stage,
               status: $status,
@@ -1270,7 +1376,10 @@ jobs:
                 containerName: $containerName,
                 fileSizeBytes: $fileSizeBytes,
                 logFile: $logFile,
-                retried: false
+                attempts: $attempts,
+                retryCount: $retryCount,
+                retryClassification: $classification,
+                retried: ($retryCount > 0)
               }
             }' > "$report_file"
       
