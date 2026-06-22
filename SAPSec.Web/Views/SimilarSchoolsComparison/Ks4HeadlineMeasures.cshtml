@@ -24,6 +24,7 @@
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
 
@@ -31,132 +32,132 @@
     <partial name="~/Views/Shared/_Ks4Attainment8Intro.cshtml" />
 
     <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
-        <h3 class="govuk-tabs__title">Attainment 8 views</h3>
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
-                <a class="govuk-tabs__tab" href="#three-year-average">3-year average</a>
-            </li>
-            <li class="govuk-tabs__list-item">
-                <a class="govuk-tabs__tab" href="#year-by-year">Year by year</a>
+                <a class="govuk-tabs__tab" href="#charts">Charts</a>
             </li>
             <li class="govuk-tabs__list-item">
                 <a class="govuk-tabs__tab" href="#table-view">Table</a>
             </li>
         </ul>
 
-        <div class="govuk-tabs__panel" id="three-year-average">
-            @{
-                var chartData = new
-                {
-                    labels = new[]
-                    {
-                        Model.Name,
-                        Model.SimilarSchoolName,
-                        "Schools in England average"
-                    },
-                    data = new decimal?[]
-                    {
-                        Model.ThisSchoolAttainment8ThreeYearAverage,
-                        Model.SelectedSchoolAttainment8ThreeYearAverage,
-                        Model.EnglandAttainment8ThreeYearAverage
+        <div class="govuk-tabs__panel" id="charts">
+            <content-toggle>
+                <toggle-content id="three-year-average" name="3-year average" active="true">
+                    @{
+                        var chartData = new
+                        {
+                            labels = new[]
+                            {
+                                Model.Name,
+                                Model.SimilarSchoolName,
+                                "Schools in England average"
+                            },
+                            data = new decimal?[]
+                            {
+                                Model.ThisSchoolAttainment8ThreeYearAverage,
+                                Model.SelectedSchoolAttainment8ThreeYearAverage,
+                                Model.EnglandAttainment8ThreeYearAverage
+                            }
+                        };
                     }
-                };
-            }
-            <div class="app-ks4-chart-container">
-                @if (HasAnyData(chartData.data))
-                {
-                    <canvas id="ks4-attainment8-comparison-chart"
-                            class="js-chart"
-                            data-type="bar"
-                            data-show-no-data-labels="true"
-                            data-axis-step="30"
-                            data-axis-max="90"
-                            data-label-decimals="1"
-                            data-bar-thickness="50"
-                            data-category-percentage="0.7"
-                            data-bar-percentage="1"
-                            data-axis-suffix=""
-                            data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                    </canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
-            </div>
-        </div>
-
-        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="year-by-year">
-            @{
-                var yearByYearData = new
-                {
-                    labels = ks4YearLabels,
-                    datasets = new object[]
-                    {
-                        new
+                    <div class="app-ks4-chart-container">
+                        @if (HasAnyData(chartData.data))
                         {
-                            label = Model.Name,
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal[]
-                            {
-                                Model.ThisSchoolAttainment8YearByYear?.Previous2 ?? 0m,
-                                Model.ThisSchoolAttainment8YearByYear?.Previous ?? 0m,
-                                Model.ThisSchoolAttainment8YearByYear?.Current ?? 0m
-                            }
-                        },
-                        new
-                        {
-                            label = Model.SimilarSchoolName,
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal[]
-                            {
-                                Model.SelectedSchoolAttainment8YearByYear?.Previous2 ?? 0m,
-                                Model.SelectedSchoolAttainment8YearByYear?.Previous ?? 0m,
-                                Model.SelectedSchoolAttainment8YearByYear?.Current ?? 0m
-                            }
-                        },
-                        new
-                        {
-                            label = "Schools in England average",
-                            borderWidth = 2,
-                            borderColor = yearByYearColors[2],
-                            backgroundColor = yearByYearColors[2],
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal[]
-                            {
-                                Model.EnglandAttainment8YearByYear?.Previous2 ?? 0m,
-                                Model.EnglandAttainment8YearByYear?.Previous ?? 0m,
-                                Model.EnglandAttainment8YearByYear?.Current ?? 0m
-                            }
+                            <canvas id="ks4-attainment8-comparison-chart"
+                                    class="js-chart"
+                                    data-type="bar"
+                                    data-show-no-data-labels="true"
+                                    data-axis-step="30"
+                                    data-axis-max="90"
+                                    data-label-decimals="1"
+                                    data-bar-thickness="50"
+                                    data-category-percentage="0.7"
+                                    data-bar-percentage="1"
+                                    data-axis-suffix=""
+                                    data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                                    data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                            </canvas>
                         }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="year-by-year" name="Year by year">
+                    @{
+                        var yearByYearData = new
+                        {
+                            labels = ks4YearLabels,
+                            datasets = new object[]
+                            {
+                                new
+                                {
+                                    label = Model.Name,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal[]
+                                    {
+                                        Model.ThisSchoolAttainment8YearByYear?.Previous2 ?? 0m,
+                                        Model.ThisSchoolAttainment8YearByYear?.Previous ?? 0m,
+                                        Model.ThisSchoolAttainment8YearByYear?.Current ?? 0m
+                                    }
+                                },
+                                new
+                                {
+                                    label = Model.SimilarSchoolName,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal[]
+                                    {
+                                        Model.SelectedSchoolAttainment8YearByYear?.Previous2 ?? 0m,
+                                        Model.SelectedSchoolAttainment8YearByYear?.Previous ?? 0m,
+                                        Model.SelectedSchoolAttainment8YearByYear?.Current ?? 0m
+                                    }
+                                },
+                                new
+                                {
+                                    label = "Schools in England average",
+                                    borderWidth = 2,
+                                    borderColor = yearByYearColors[2],
+                                    backgroundColor = yearByYearColors[2],
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal[]
+                                    {
+                                        Model.EnglandAttainment8YearByYear?.Previous2 ?? 0m,
+                                        Model.EnglandAttainment8YearByYear?.Previous ?? 0m,
+                                        Model.EnglandAttainment8YearByYear?.Current ?? 0m
+                                    }
+                                }
+                            }
+                        };
                     }
-                };
-            }
-            <div class="app-ks4-chart-container">
-                <canvas id="ks4-attainment8-comparison-yearbyyear-chart"
-                        class="js-chart"
-                        data-type="line"
-                        data-axis-min="0"
-                        data-axis-step="30"
-                        data-axis-max="90"
-                        data-axis-auto-skip="false"
-                        data-axis-suffix=""
-                        data-show-x-grid="true"
-                        data-show-legend="true"
-                        data-show-datalabels="false"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
-                </canvas>
-            </div>
+                    <div class="app-ks4-chart-container">
+                        <canvas id="ks4-attainment8-comparison-yearbyyear-chart"
+                                class="js-chart"
+                                data-type="line"
+                                data-axis-min="0"
+                                data-axis-step="30"
+                                data-axis-max="90"
+                                data-axis-auto-skip="false"
+                                data-axis-suffix=""
+                                data-tooltip-decimals="1"
+                                data-show-x-grid="true"
+                                data-show-legend="true"
+                                data-show-datalabels="false"
+                                data-chart='@Html.Raw(JsonSerializer.Serialize(yearByYearData))'
+                                data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                        </canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="table-view">
@@ -225,126 +226,126 @@
     <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6 govuk-!-margin-bottom-3" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
-                <a class="govuk-tabs__tab" href="#eng-maths-three-year-average">3-year average</a>
-            </li>
-            <li class="govuk-tabs__list-item">
-                <a class="govuk-tabs__tab" href="#eng-maths-year-by-year">Year by year</a>
+                <a class="govuk-tabs__tab" href="#eng-maths-charts">Charts</a>
             </li>
             <li class="govuk-tabs__list-item">
                 <a class="govuk-tabs__tab" href="#eng-maths-table-view">Table</a>
             </li>
         </ul>
 
-        <div class="govuk-tabs__panel" id="eng-maths-three-year-average">
-            @{
-                var engMathsChartData = new
-                {
-                    labels = new[]
-                    {
-                        Model.Name,
-                        Model.SimilarSchoolName,
-                        "Schools in England average"
-                    },
-                    data = new decimal?[]
-                    {
-                        Model.ThisSchoolEngMaths49ThreeYearAverage,
-                        Model.SelectedSchoolEngMaths49ThreeYearAverage,
-                        Model.EnglandEngMaths49ThreeYearAverage
+        <div class="govuk-tabs__panel" id="eng-maths-charts">
+            <content-toggle>
+                <toggle-content id="eng-maths-three-year-average" name="3-year average" active="true">
+                    @{
+                        var engMathsChartData = new
+                        {
+                            labels = new[]
+                            {
+                                Model.Name,
+                                Model.SimilarSchoolName,
+                                "Schools in England average"
+                            },
+                            data = new decimal?[]
+                            {
+                                Model.ThisSchoolEngMaths49ThreeYearAverage,
+                                Model.SelectedSchoolEngMaths49ThreeYearAverage,
+                                Model.EnglandEngMaths49ThreeYearAverage
+                            }
+                        };
                     }
-                };
-            }
-            <div class="app-ks4-chart-container">
-                @if (HasAnyData(engMathsChartData.data))
-                {
-                    <canvas id="eng-maths-comparison-chart"
-                            class="js-chart"
-                            data-type="bar"
-                            data-show-no-data-labels="true"
-                            data-axis-step="25"
-                            data-axis-max="100"
-                            data-axis-suffix="%"
-                            data-label-decimals="0"
-                            data-bar-thickness="50"
-                            data-category-percentage="0.7"
-                            data-bar-percentage="1"
-                            data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
-                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                    </canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
-            </div>
-
-        </div>
-
-        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-year-by-year">
-            @{
-                var engMathsYearByYearData = new
-                {
-                    labels = ks4YearLabels,
-                    datasets = new object[]
-                    {
-                        new
+                    <div class="app-ks4-chart-container">
+                        @if (HasAnyData(engMathsChartData.data))
                         {
-                            label = Model.Name,
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal?[]
-                            {
-                                Model.ThisSchoolEngMaths49YearByYear?.Previous2,
-                                Model.ThisSchoolEngMaths49YearByYear?.Previous,
-                                Model.ThisSchoolEngMaths49YearByYear?.Current
-                            }
-                        },
-                        new
-                        {
-                            label = Model.SimilarSchoolName,
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal?[]
-                            {
-                                Model.SelectedSchoolEngMaths49YearByYear?.Previous2,
-                                Model.SelectedSchoolEngMaths49YearByYear?.Previous,
-                                Model.SelectedSchoolEngMaths49YearByYear?.Current
-                            }
-                        },
-                        new
-                        {
-                            label = "Schools in England average",
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal?[]
-                            {
-                                Model.EnglandEngMaths49YearByYear?.Previous2,
-                                Model.EnglandEngMaths49YearByYear?.Previous,
-                                Model.EnglandEngMaths49YearByYear?.Current
-                            }
+                            <canvas id="eng-maths-comparison-chart"
+                                    class="js-chart"
+                                    data-type="bar"
+                                    data-show-no-data-labels="true"
+                                    data-axis-step="25"
+                                    data-axis-max="100"
+                                    data-axis-suffix="%"
+                                    data-label-decimals="0"
+                                    data-bar-thickness="50"
+                                    data-category-percentage="0.7"
+                                    data-bar-percentage="1"
+                                    data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsChartData))'
+                                    data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                            </canvas>
                         }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="eng-maths-year-by-year" name="Year by year">
+                    @{
+                        var engMathsYearByYearData = new
+                        {
+                            labels = ks4YearLabels,
+                            datasets = new object[]
+                            {
+                                new
+                                {
+                                    label = Model.Name,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        Model.ThisSchoolEngMaths49YearByYear?.Previous2,
+                                        Model.ThisSchoolEngMaths49YearByYear?.Previous,
+                                        Model.ThisSchoolEngMaths49YearByYear?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = Model.SimilarSchoolName,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        Model.SelectedSchoolEngMaths49YearByYear?.Previous2,
+                                        Model.SelectedSchoolEngMaths49YearByYear?.Previous,
+                                        Model.SelectedSchoolEngMaths49YearByYear?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = "Schools in England average",
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        Model.EnglandEngMaths49YearByYear?.Previous2,
+                                        Model.EnglandEngMaths49YearByYear?.Previous,
+                                        Model.EnglandEngMaths49YearByYear?.Current
+                                    }
+                                }
+                            }
+                        };
                     }
-                };
-            }
-            <div class="app-ks4-chart-container">
-                <canvas id="eng-maths-comparison-yearbyyear-chart"
-                        class="js-chart"
-                        data-type="line"
-                        data-axis-step="25"
-                        data-axis-max="100"
-                        data-axis-suffix="%"
-                        data-show-legend="true"
-                        data-show-datalabels="false"
-                        data-show-x-grid="true"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
-                </canvas>
-            </div>
+                    <div class="app-ks4-chart-container">
+                        <canvas id="eng-maths-comparison-yearbyyear-chart"
+                                class="js-chart"
+                                data-type="line"
+                                data-axis-step="25"
+                                data-axis-max="100"
+                                data-axis-suffix="%"
+                                data-tooltip-decimals="0"
+                                data-show-legend="true"
+                                data-show-datalabels="false"
+                                data-show-x-grid="true"
+                                data-chart='@Html.Raw(JsonSerializer.Serialize(engMathsYearByYearData))'
+                                data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                        </canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-table-view">
@@ -428,125 +429,126 @@
     <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
-                <a class="govuk-tabs__tab" href="#destinations-three-year-average">3-year average</a>
-            </li>
-            <li class="govuk-tabs__list-item">
-                <a class="govuk-tabs__tab" href="#destinations-year-by-year">Year by year</a>
+                <a class="govuk-tabs__tab" href="#destinations-charts">Charts</a>
             </li>
             <li class="govuk-tabs__list-item">
                 <a class="govuk-tabs__tab" href="#destinations-table-view">Table</a>
             </li>
         </ul>
 
-        <div class="govuk-tabs__panel" id="destinations-three-year-average">
-            @{
-                var destinationsChartData = new
-                {
-                    labels = new[]
-                    {
-                        Model.Name,
-                        Model.SimilarSchoolName,
-                        "Schools in England average"
-                    },
-                    data = new decimal?[]
-                    {
-                        Model.ThisSchoolDestinationsThreeYearAverage,
-                        Model.SelectedSchoolDestinationsThreeYearAverage,
-                        Model.EnglandDestinationsThreeYearAverage
+        <div class="govuk-tabs__panel" id="destinations-charts">
+            <content-toggle>
+                <toggle-content id="destinations-three-year-average" name="3-year average" active="true">
+                    @{
+                        var destinationsChartData = new
+                        {
+                            labels = new[]
+                            {
+                                Model.Name,
+                                Model.SimilarSchoolName,
+                                "Schools in England average"
+                            },
+                            data = new decimal?[]
+                            {
+                                Model.ThisSchoolDestinationsThreeYearAverage,
+                                Model.SelectedSchoolDestinationsThreeYearAverage,
+                                Model.EnglandDestinationsThreeYearAverage
+                            }
+                        };
                     }
-                };
-            }
-            <div class="app-ks4-chart-container">
-                @if (HasAnyData(destinationsChartData.data))
-                {
-                    <canvas id="destinations-comparison-chart"
-                            class="js-chart"
-                            data-type="bar"
-                            data-show-no-data-labels="true"
-                            data-axis-step="25"
-                            data-axis-max="100"
-                            data-axis-suffix="%"
-                            data-label-decimals="0"
-                            data-bar-thickness="50"
-                            data-category-percentage="0.7"
-                            data-bar-percentage="1"
-                            data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
-                            data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
-                    </canvas>
-                }
-                else
-                {
-                    <p class="govuk-body">No available data</p>
-                }
-            </div>
-        </div>
-
-        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-year-by-year">
-            @{
-                var destinationsYearByYearData = new
-                {
-                    labels = ks4YearLabels,
-                    datasets = new object[]
-                    {
-                        new
+                    <div class="app-ks4-chart-container">
+                        @if (HasAnyData(destinationsChartData.data))
                         {
-                            label = Model.Name,
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal?[]
-                            {
-                                Model.ThisSchoolDestinationsYearByYear?.Previous2,
-                                Model.ThisSchoolDestinationsYearByYear?.Previous,
-                                Model.ThisSchoolDestinationsYearByYear?.Current
-                            }
-                        },
-                        new
-                        {
-                            label = Model.SimilarSchoolName,
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal?[]
-                            {
-                                Model.SelectedSchoolDestinationsYearByYear?.Previous2,
-                                Model.SelectedSchoolDestinationsYearByYear?.Previous,
-                                Model.SelectedSchoolDestinationsYearByYear?.Current
-                            }
-                        },
-                        new
-                        {
-                            label = "Schools in England average",
-                            borderWidth = 2,
-                            pointRadius = 4,
-                            pointHoverRadius = 5,
-                            tension = 0,
-                            data = new decimal?[]
-                            {
-                                Model.EnglandDestinationsYearByYear?.Previous2,
-                                Model.EnglandDestinationsYearByYear?.Previous,
-                                Model.EnglandDestinationsYearByYear?.Current
-                            }
+                            <canvas id="destinations-comparison-chart"
+                                    class="js-chart"
+                                    data-type="bar"
+                                    data-show-no-data-labels="true"
+                                    data-axis-step="25"
+                                    data-axis-max="100"
+                                    data-axis-suffix="%"
+                                    data-label-decimals="0"
+                                    data-bar-thickness="50"
+                                    data-category-percentage="0.7"
+                                    data-bar-percentage="1"
+                                    data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsChartData))'
+                                    data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                            </canvas>
                         }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="destinations-year-by-year" name="Year by year">
+                    @{
+                        var destinationsYearByYearData = new
+                        {
+                            labels = ks4YearLabels,
+                            datasets = new object[]
+                            {
+                                new
+                                {
+                                    label = Model.Name,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        Model.ThisSchoolDestinationsYearByYear?.Previous2,
+                                        Model.ThisSchoolDestinationsYearByYear?.Previous,
+                                        Model.ThisSchoolDestinationsYearByYear?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = Model.SimilarSchoolName,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        Model.SelectedSchoolDestinationsYearByYear?.Previous2,
+                                        Model.SelectedSchoolDestinationsYearByYear?.Previous,
+                                        Model.SelectedSchoolDestinationsYearByYear?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = "Schools in England average",
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        Model.EnglandDestinationsYearByYear?.Previous2,
+                                        Model.EnglandDestinationsYearByYear?.Previous,
+                                        Model.EnglandDestinationsYearByYear?.Current
+                                    }
+                                }
+                            }
+                        };
                     }
-                };
-            }
-            <div class="app-ks4-chart-container">
-                <canvas id="destinations-comparison-yearbyyear-chart"
-                        class="js-chart"
-                        data-type="line"
-                        data-axis-step="25"
-                        data-axis-max="100"
-                        data-axis-suffix="%"
-                        data-show-legend="true"
-                        data-show-datalabels="false"
-                        data-show-x-grid="true"
-                        data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearData))'
-                        data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
-                </canvas>
-            </div>
+                    <div class="app-ks4-chart-container">
+                        <canvas id="destinations-comparison-yearbyyear-chart"
+                                class="js-chart"
+                                data-type="line"
+                                data-axis-step="25"
+                                data-axis-max="100"
+                                data-axis-suffix="%"
+                                data-tooltip-decimals="0"
+                                data-show-legend="true"
+                                data-show-datalabels="false"
+                                data-show-x-grid="true"
+                                data-chart='@Html.Raw(JsonSerializer.Serialize(destinationsYearByYearData))'
+                                data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                        </canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-table-view">

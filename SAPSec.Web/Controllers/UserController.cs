@@ -78,8 +78,8 @@ public class UserController(
             org.Id,
             org.Name,
             org.Urn,
-            Routes.School(org.Urn));
+            Routes.School(org.Urn, org.PhaseOfEducation?.Name));
 
-        return Redirect(Routes.School(org.Urn));
+        return Redirect(Routes.School(org.Urn, org.PhaseOfEducation?.Name));
     }
 }
