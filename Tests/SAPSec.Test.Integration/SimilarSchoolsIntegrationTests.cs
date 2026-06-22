@@ -1,12 +1,12 @@
 using FluentAssertions;
-using SAPSec.Integration.Tests.Infrastructure;
+using SAPSec.Test.Integration.Setup;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
 [Collection("IntegrationTestsCollection")]
-public class SimilarSchoolsIntegrationTests(WebApplicationSetupFixture fixture)
+public class SimilarSchoolsIntegrationTests(IntegrationTestFixture fixture)
 {
     [Fact]
     public async Task ViewSimilarSchools_SchoolNotFound_RedirectsToNotFound()

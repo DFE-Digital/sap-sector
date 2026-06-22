@@ -1,10 +1,10 @@
-﻿using System.Net;
-using SAPSec.Integration.Tests.Infrastructure;
+﻿using SAPSec.Test.Integration.Setup;
+using System.Net;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
 [Collection("IntegrationTestsCollection")]
-public class PageTests(WebApplicationSetupFixture fixture)
+public class PageTests(IntegrationTestFixture fixture)
 {
     [Fact]
     public async Task HomePage_ReturnsSuccess()

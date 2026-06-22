@@ -1,12 +1,12 @@
-﻿using System.Net;
-using System.Net.Http.Json;
-using SAPSec.Integration.Tests.Infrastructure;
+﻿using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Domain;
+using System.Net;
+using System.Net.Http.Json;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
 [Collection("IntegrationTestsCollection")]
-public class HealthEndpointTests(WebApplicationSetupFixture fixture)
+public class HealthEndpointTests(IntegrationTestFixture fixture)
 {
     [Fact]
     public async Task HealthEndpoint_ReturnsSuccess()
@@ -127,6 +127,6 @@ public class HealthEndpointTests(WebApplicationSetupFixture fixture)
 
         // Assert
         Assert.NotNull(healthResponse);
-        Assert.NotEqual(default(DateTime), healthResponse.Timestamp);
+        Assert.NotEqual(default, healthResponse.Timestamp);
     }
 }

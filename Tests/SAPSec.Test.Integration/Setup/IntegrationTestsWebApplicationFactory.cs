@@ -2,8 +2,8 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Data.Json;
 using SAPSec.Test.Common.Authentication;
-using SAPSec.Test.Common.InMemoryStore;
 using SAPSec.Web;
 
 namespace SAPSec.Test.Integration.Setup;
@@ -38,7 +38,7 @@ public class IntegrationTestsWebApplicationFactory : WebApplicationFactory<Progr
             {
                 // Add or replace any services that the application needs during testing.
                 services.AddTestDsiDependencies();
-                services.AddMemoryStoreDependencies();
+                services.AddJsonDependencies();
             });
     }
 }

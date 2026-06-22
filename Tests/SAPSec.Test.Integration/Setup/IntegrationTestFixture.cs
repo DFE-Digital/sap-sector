@@ -5,9 +5,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SAPSec.Data.Store;
 using SAPSec.Infrastructure.LuceneSearch;
-using SAPSec.Test.Common.InMemoryStore;
 using System.Net;
 
 namespace SAPSec.Test.Integration.Setup;
@@ -23,10 +21,10 @@ public class IntegrationTestFixture : IAsyncLifetime
 
     public HttpClient NonRedirectingClient { get; private set; } = null!;
 
-    public InMemoryEstablishmentStore EstablishmentStore => (InMemoryEstablishmentStore)_factory.Services.GetRequiredService<IEstablishmentStore>();
-    public StartupIndexBuilder IndexBuilder => _factory.Services.GetServices<IHostedService>()
-        .OfType<StartupIndexBuilder>()
-        .Single();
+    //public InMemoryEstablishmentStore EstablishmentStore => (InMemoryEstablishmentStore)_factory.Services.GetRequiredService<IEstablishmentStore>();
+    //public StartupIndexBuilder IndexBuilder => _factory.Services.GetServices<IHostedService>()
+    //    .OfType<StartupIndexBuilder>()
+    //    .Single();
 
     public Task InitializeAsync()
     {
@@ -62,14 +60,18 @@ public class IntegrationTestFixture : IAsyncLifetime
         Client?.Dispose();
         NonRedirectingClient?.Dispose();
         await _factory.DisposeAsync();
+        _browsingContext.Dispose();
     }
 
     public async Task RebuildSearchIndex()
     {
-        IndexBuilder.IndexBuiltSuccessfully = false;
+        var indexBuilder = _factory.Services.GetServices<IHostedService>()
+            .OfType<StartupIndexBuilder>()
+            .Single();
+        indexBuilder.IndexBuiltSuccessfully = false;
         var startTime = DateTime.UtcNow.TimeOfDay;
-        await IndexBuilder.StartAsync(CancellationToken.None);
-        while (!IndexBuilder.IndexBuiltSuccessfully)
+        await indexBuilder.StartAsync(CancellationToken.None);
+        while (!indexBuilder.IndexBuiltSuccessfully)
         {
             if (DateTime.UtcNow.TimeOfDay - startTime > SearchIndexTimeout)
             {

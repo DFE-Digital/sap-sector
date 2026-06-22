@@ -1,11 +1,11 @@
-﻿using System.Net;
-using FluentAssertions;
-using SAPSec.Integration.Tests.Infrastructure;
+﻿using FluentAssertions;
+using SAPSec.Test.Integration.Setup;
+using System.Net;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
 [Collection("IntegrationTestsCollection")]
-public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture fixture)
+public class StaticContentControllerIntegrationTests(IntegrationTestFixture fixture)
 {
     [Fact]
     public async Task GetAccessibility_ReturnsSuccess()
@@ -15,7 +15,7 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
-        content.Should().Contain($"{SAPSec.Web.Constants.PageTitles.AccessibilityStatement} - {SAPSec.Web.Constants.LayoutConstants.ServiceName} - GOV.UK");
+        content.Should().Contain($"{Web.Constants.PageTitles.AccessibilityStatement} - {Web.Constants.LayoutConstants.ServiceName} - GOV.UK");
         content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
         content.Should().Contain("<a href=\"https://mcmw.abilitynet.org.uk/\" class=\"govuk-link\" target=\"_blank\" rel=\"noopener noreferrer\">AbilityNet</a>");
         content.Should().Contain("<a class=\"govuk-link\" rel=\"noopener noreferrer\" href=\"https://www.equalityadvisoryservice.com/\" target=\"_blank\">contact the Equality Advisory and Support Service");
@@ -29,7 +29,7 @@ public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture 
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
-        content.Should().Contain($"{SAPSec.Web.Constants.PageTitles.TermsAndConditions} - {SAPSec.Web.Constants.LayoutConstants.ServiceName} - GOV.UK");
+        content.Should().Contain($"{Web.Constants.PageTitles.TermsAndConditions} - {Web.Constants.LayoutConstants.ServiceName} - GOV.UK");
         content.Should().Contain("<a class=\"govuk-breadcrumbs__link\" href=\"/find-a-school\">Home</a>");
     }
 

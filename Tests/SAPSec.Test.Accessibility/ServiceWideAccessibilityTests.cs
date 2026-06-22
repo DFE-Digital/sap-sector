@@ -43,7 +43,6 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         count.Should().Be(1, "Main landmark should have id='main-content' for skip link");
     }
 
-
     [Theory]
     [MemberData(nameof(AllPages))]
     public async Task AllPages_HasSkipLink(string path)
