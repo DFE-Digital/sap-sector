@@ -38,7 +38,7 @@ public static class CspHelper
             "default-src 'self';",
             "frame-ancestors 'none';",
             "form-action 'self' https://test-oidc.signin.education.gov.uk https://pp-oidc.signin.education.gov.uk;",
-            "connect-src 'self' *.google-analytics.com *.analytics.google.com https://*.clarity.ms https://c.bing.com https://*.visualstudio.com/ ws://localhost:* http://localhost:*;",
+            "connect-src 'self' *.google-analytics.com *.analytics.google.com https://*.clarity.ms https://c.bing.com https://*.visualstudio.com/ ws://localhost:* wss://localhost:* http://localhost:*;",
             "img-src 'self' data: https://www.googletagmanager.com/ https://*.google-analytics.com https://*.clarity.ms https://c.bing.com https://*.tile.openstreetmap.org;",
             "style-src 'self';",
             "font-src 'self' data:;",
@@ -49,5 +49,6 @@ public static class CspHelper
         //https://c.bing.com is required by Clarity
         //https://*.visualstudio.com/ used for live share in Visual Studio
         //ws://localhost:* http://localhost:* used by https://browsersync.io/
+        //wss://localhost:* used by hot reload in Visual Studio
     }
 }
