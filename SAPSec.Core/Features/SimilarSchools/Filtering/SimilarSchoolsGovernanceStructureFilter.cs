@@ -22,18 +22,16 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         {
             return items;
         }
+        var temp = items.Where(i =>
+                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5")
+              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3")
+              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id == "1" || i.TrustSchoolFlag?.Id == "2"))
+              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id == "0" || i.EstablishmentTypeGroup?.Id == "4"))
+              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && ((i.TrustSchoolFlag?.Id == "0" || i.TrustSchoolFlag?.Id == "") && (i.EstablishmentTypeGroup?.Id == "0" || i.EstablishmentTypeGroup?.Id == ""))));
 
-        return items.Where(i =>
-            (values.Contains("R", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "Resourced provision")
-            || (values.Contains("RS", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "Resourced provision and SEN unit")
-            || (values.Contains("S", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "SEN unit")
-            || (values.Contains("N", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name != "Resourced provision"
-                && i.ResourcedProvision?.Name != "Resourced provision and SEN unit"
-                && i.ResourcedProvision?.Name != "SEN unit"));
+        var count = temp.Count();
+
+        return temp;
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
@@ -77,29 +75,12 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
             return new("MS", "Maintained scool - local authority controlled");
         }
 
-        if ((i.TrustSchoolFlag?.Id == "0" || i.TrustSchoolFlag?.Id == " ") && (i.EstablishmentTypeGroup?.Id == "0" || i.EstablishmentTypeGroup?.Id == " "))
+        if ((i.TrustSchoolFlag?.Id == "0" || i.TrustSchoolFlag?.Id == "") && (i.EstablishmentTypeGroup?.Id == "0" || i.EstablishmentTypeGroup?.Id == ""))
         {
             return new("N", "No known group");
         }
 
         return new("N", "No known group");
-
-        //if (i.ResourcedProvision?.Name == "Resourced provision")
-        //{
-        //    return new("R", "Resourced provision");
-        //}
-
-        //if (i.ResourcedProvision?.Name == "Resourced provision and SEN unit")
-        //{
-        //    return new("RS", "Resourced provision and SEN unit");
-        //}
-
-        //if (i.ResourcedProvision?.Name == "SEN unit")
-        //{
-        //    return new("S", "SEN unit");
-        //}
-
-        //return new("N", "No known specialist provision");
     }
 
     private record Group(string Key, string Name);
