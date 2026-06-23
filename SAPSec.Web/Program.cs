@@ -49,6 +49,10 @@ public class Program
             });
 
         builder.Services.AddRazorPages();
+        builder.Services.AddAntiforgery(options =>
+        {
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
         builder.Services.AddFeatureManagement();
         builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
         builder.Services.Configure<CustomEventLocations>(builder.Configuration.GetSection("CustomEventLocations"));
@@ -125,7 +129,7 @@ public class Program
             options.IdleTimeout = TimeSpan.FromHours(1);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.Name = ".SAPSec.Session";
         });
@@ -133,8 +137,7 @@ public class Program
         builder.Services.Configure<CookiePolicyOptions>(options =>
         {
             options.CheckConsentNeeded = _ => false;
-            options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            options.Secure = CookieSecurePolicy.SameAsRequest;
+            options.Secure = CookieSecurePolicy.Always;
         });
 
         builder.Services.AddLogging(logging =>
@@ -234,6 +237,7 @@ public class Program
         });
 
         app.UseRouting();
+        app.UseCookiePolicy();
 
         app.UseSession();
 
