@@ -14,8 +14,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.Home, false),
         new(Routes.Accessibility, false),
         new(Routes.FindASchool(), false),
-        new(Routes.School("138858"), false),
-        new(Routes.SchoolDetails("138858"), false),
+        new(Routes.Secondary.School("100182"), false),
+        new(Routes.Secondary.SchoolDetails("100182"), false),
         // TODO: Fill out with all pages from service
     ];
 
@@ -249,10 +249,12 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     {
         await NavigateTo(path);
 
-        var firstLink = Page.Locator("main a").First;
-        await firstLink.FocusAsync();
+        var links = await Page.Locator("main a").AllAsync();
+        foreach (var link in links)
+        {
+            await link.FocusAsync();
 
-        var hasVisibleFocus = await firstLink.EvaluateAsync<bool>(@"
+            var hasVisibleFocus = await link.EvaluateAsync<bool>(@"
             el => {
                 const styles = window.getComputedStyle(el);
                 const outline = styles.outline;
@@ -262,7 +264,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
             }
         ");
 
-        hasVisibleFocus.Should().BeTrue("Focused elements should have visible focus indicator");
+            hasVisibleFocus.Should().BeTrue("Focused elements should have visible focus indicator");
+        }
     }
 
     [Theory]
@@ -317,15 +320,12 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     {
         await NavigateTo(path);
 
-        var linkColor = await Page.EvaluateAsync<string>(@"
-            () => {
-                const link = document.querySelector('main a.govuk-link');
-                if (!link) return 'none';
-                return window.getComputedStyle(link).color;
-            }
+        var linkColors = await Page.EvaluateAsync<string[]>(@"
+            () => Array.from(document.querySelectorAll('main a')).map(link =>
+                    window.getComputedStyle(link).color)
         ");
 
-        linkColor.Should().NotBe("none", "Links should have distinct styling");
+        linkColors.Should().NotContain("none", "Links should have distinct styling");
     }
 
     [Theory]

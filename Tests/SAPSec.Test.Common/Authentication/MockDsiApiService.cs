@@ -1,5 +1,4 @@
-﻿using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Authentication;
 
 namespace SAPSec.Test.Common.Authentication;
 
@@ -22,7 +21,7 @@ public class MockDsiApiService : IDsiClient
                 Ukprn = "10012345",
                 EstablishmentNumber = "1234",
                 Category = new Category { Id = "001", Name = "Establishment" },
-                Type = new Core.Model.Type { Id = "34", Name = "Academy Converter" },
+                Type = new Core.Authentication.Type { Id = "34", Name = "Academy Converter" },
                 Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
                 Address = "123 Test Street, Test Town, TS1 1TT",
                 Telephone = "01onal234567890",
@@ -45,7 +44,7 @@ public class MockDsiApiService : IDsiClient
                 Urn = "654321",
                 Ukprn = "10054321",
                 Category = new Category { Id = "001", Name = "Establishment" },
-                Type = new Core.Model.Type { Id = "34", Name = "Academy Converter" },
+                Type = new Core.Authentication.Type { Id = "34", Name = "Academy Converter" },
                 Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
                 PhaseOfEducation = new PhaseOfEducation { Id = 4, Name = "Secondary" },
                 StatutoryLowAge = 11,

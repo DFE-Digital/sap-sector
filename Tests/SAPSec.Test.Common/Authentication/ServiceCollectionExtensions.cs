@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Authentication;
 
 namespace SAPSec.Test.Common.Authentication;
 

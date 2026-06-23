@@ -1,7 +1,6 @@
-﻿using SAPSec.Core.Model;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
-namespace SAPSec.Core.Interfaces.Services;
+namespace SAPSec.Core.Authentication;
 
 public interface IUserService
 {

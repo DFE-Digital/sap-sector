@@ -1,11 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SAPSec.Core.Model;
+namespace SAPSec.Core.Authentication;
 
-public class Region
+public class PhaseOfEducation
 {
     [JsonPropertyName("id")]
-    public string Id { get; set; } = string.Empty;
+    public int Id { get; set; }
 
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;

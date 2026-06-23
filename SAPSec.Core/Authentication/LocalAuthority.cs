@@ -1,7 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-
-namespace SAPSec.Core.Model;
+namespace SAPSec.Core.Authentication;
 
 public class LocalAuthority
 {

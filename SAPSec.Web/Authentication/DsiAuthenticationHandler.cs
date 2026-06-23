@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using SAPSec.Core.Configuration;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Authentication;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Authentication;

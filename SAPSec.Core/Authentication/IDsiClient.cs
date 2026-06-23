@@ -1,6 +1,4 @@
-﻿using SAPSec.Core.Model;
-
-namespace SAPSec.Core.Interfaces.Services;
+﻿namespace SAPSec.Core.Authentication;
 
 public interface IDsiClient
 {

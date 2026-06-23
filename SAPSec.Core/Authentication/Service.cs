@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace SAPSec.Core.Model;
+namespace SAPSec.Core.Authentication;
 
-public class Type
+public class Service
 {
     [JsonPropertyName("id")]
     public string Id { get; set; } = string.Empty;
@@ -10,4 +10,3 @@ public class Type
     [JsonPropertyName("name")]
     public string Name { get; set; } = string.Empty;
 }
-

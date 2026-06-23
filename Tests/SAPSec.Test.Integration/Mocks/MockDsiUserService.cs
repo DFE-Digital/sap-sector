@@ -1,8 +1,7 @@
-﻿using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Authentication;
 using System.Security.Claims;
 
-namespace SAPSec.Integration.Tests.Mocks;
+namespace SAPSec.Test.Integration.Mocks;
 
 public class MockDsiUserService : IUserService
 {
@@ -25,7 +24,7 @@ public class MockDsiUserService : IUserService
                 Urn = "123456",
                 Ukprn = "10012345",
                 Category = new Category { Id = "001", Name = "Establishment" },
-                Type = new Core.Model.Type { Id = "34", Name = "Academy Converter" },
+                Type = new Core.Authentication.Type { Id = "34", Name = "Academy Converter" },
                 Status = new Status { Id = 1, Name = "Open", TagColor = "green" },
                 Address = "123 Test Street, Test Town, TS1 1TT",
                 PhaseOfEducation = new PhaseOfEducation { Id = 2, Name = "Primary" }

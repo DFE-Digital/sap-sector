@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Test.Common.Authentication;
 using SAPSec.Web;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Test.EndToEnd.Setup;
 
@@ -40,6 +42,7 @@ public class EndToEndTestsWebApplicationFactory : WebApplicationFactory<Program>
             {
                 services.AddTestDsiDependencies();
                 services.AddJsonDependencies();
+                services.AddScoped<ICustomEventService, NoOpCustomEventService>();
             });
     }
 

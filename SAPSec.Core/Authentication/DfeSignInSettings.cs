@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Configuration;
+﻿namespace SAPSec.Core.Authentication;
 
 public class DfeSignInSettings
 {

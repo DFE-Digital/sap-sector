@@ -19,13 +19,12 @@
     @if (hasResults)
     {
         @await Html.PartialAsync("_SchoolSearchFilter", new SchoolSearchFilterViewModel
-   {
-       Query = Model.Query,
-       LocalAuthorities = Model.LocalAuthorities,
-       SelectedLocalAuthorities = Model.SelectedLocalAuthorities
-   })
+        {
+            Query = Model.Query,
+            LocalAuthorities = Model.LocalAuthorities,
+            SelectedLocalAuthorities = Model.SelectedLocalAuthorities
+        })
     }
-
     <div class="govuk-grid-column-two-thirds app-filter__results-column">
         @if (hasResults)
         {

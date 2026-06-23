@@ -5,9 +5,11 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Test.Common.Authentication;
 using SAPSec.Web;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Test.Accessibility.Setup;
 
@@ -19,7 +21,7 @@ public class AccessibilityTestsWebApplicationFactory : WebApplicationFactory<Pro
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseUrls("http://127.0.0.1:0", "https://127.0.0.1:0");
-        builder.UseEnvironment("EndToEndTests");
+        builder.UseEnvironment("AccessibilityTests");
 
         // Set content root to web project so static files (wwwroot) are found
         var webProjectPath = GetWebProjectPath();
@@ -40,6 +42,7 @@ public class AccessibilityTestsWebApplicationFactory : WebApplicationFactory<Pro
             {
                 services.AddTestDsiDependencies();
                 services.AddJsonDependencies();
+                services.AddScoped<ICustomEventService, NoOpCustomEventService>();
             });
     }
 
