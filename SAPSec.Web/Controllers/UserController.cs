@@ -68,7 +68,7 @@ public class UserController(
                 org.Name,
                 org.Category?.Name,
                 org.Urn);
-            return Redirect(Routes.FindASchool);
+            return Redirect(Routes.FindASchool());
         }
 
         _logger.LogInformation(

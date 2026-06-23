@@ -1,12 +1,12 @@
 ﻿using FluentAssertions;
-using SAPSec.Integration.Tests.Infrastructure;
+using SAPSec.Test.Integration.Setup;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
 [Collection("IntegrationTestsCollection")]
-public class CustomEventControllerTests(WebApplicationSetupFixture fixture)
+public class CustomEventControllerTests(IntegrationTestFixture fixture)
 {
     #region POST /custom-event-tracking Tests
 

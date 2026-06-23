@@ -507,3 +507,5 @@ wwwroot/**/*.min.js
 **/wwwroot/*
 /coveragereport
 
+# Copilot files
+.github/copilot-instructions.md

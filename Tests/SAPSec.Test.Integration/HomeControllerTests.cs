@@ -1,12 +1,12 @@
 ﻿using System.Net;
 using FluentAssertions;
-using SAPSec.Integration.Tests.Infrastructure;
+using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Integration.Tests;
 
 [Collection("IntegrationTestsCollection")]
-public class HomeControllerTests(WebApplicationSetupFixture fixture)
+public class HomeControllerTests(IntegrationTestFixture fixture)
 {
     [Fact]
     public async Task HomePage_ReturnsHtmlWithCorrectTitle()

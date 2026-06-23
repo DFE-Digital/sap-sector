@@ -1,13 +1,13 @@
 ﻿using FluentAssertions;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Integration.Tests.Infrastructure;
+using SAPSec.Test.Integration.Setup;
 using System.Net;
 using System.Text.Json;
 
 namespace SAPSec.Integration.Tests;
 
 [Collection("IntegrationTestsCollection")]
-public class SchoolSearchControllerTests(WebApplicationSetupFixture fixture)
+public class SchoolSearchControllerTests(IntegrationTestFixture fixture)
 {
     #region GET /find-a-school (Index) Tests
 

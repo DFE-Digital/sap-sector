@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using FluentAssertions;
-using SAPSec.Integration.Tests.Infrastructure;
+using SAPSec.Test.Integration.Setup;
 
 namespace SAPSec.Integration.Tests;
 
 [Collection("IntegrationTestsCollection")]
-public class StaticContentControllerIntegrationTests(WebApplicationSetupFixture fixture)
+public class StaticContentControllerIntegrationTests(IntegrationTestFixture fixture)
 {
     [Fact]
     public async Task GetAccessibility_ReturnsSuccess()

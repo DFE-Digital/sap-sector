@@ -1,12 +1,12 @@
 ﻿using System.Net;
 using System.Net.Http.Json;
-using SAPSec.Integration.Tests.Infrastructure;
+using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Domain;
 
 namespace SAPSec.Integration.Tests;
 
 [Collection("IntegrationTestsCollection")]
-public class HealthEndpointTests(WebApplicationSetupFixture fixture)
+public class HealthEndpointTests(IntegrationTestFixture fixture)
 {
     [Fact]
     public async Task HealthEndpoint_ReturnsSuccess()

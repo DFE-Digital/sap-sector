@@ -75,7 +75,7 @@ public class AuthController(
     {
         var properties = new AuthenticationProperties
         {
-            RedirectUri = returnUrl ?? Constants.Routes.FindASchool
+            RedirectUri = returnUrl ?? Constants.Routes.FindASchool()
         };
 
         return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);

@@ -1,10 +1,10 @@
 ﻿using FluentAssertions;
-using SAPSec.Integration.Tests.Infrastructure;
+using SAPSec.Test.Integration.Setup;
 using System.Net;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-public class AuthControllerIntegrationTests(WebApplicationSetupFixture fixture) : IClassFixture<WebApplicationSetupFixture>
+public class AuthControllerIntegrationTests(IntegrationTestFixture fixture) : IClassFixture<IntegrationTestFixture>
 {
     private static class ExpectedRoutes
     {
