@@ -15,6 +15,8 @@ namespace SAPSec.Core.Model.Generated
         public string RegionName { get; set; } = string.Empty;
         public string EstablishmentName { get; set; } = string.Empty;
         public string EstablishmentNumber { get; set; } = string.Empty;
+        public string EstablishmentStatusId { get; set; } = string.Empty;
+        public string EstablishmentStatusName { get; set; } = string.Empty;
         public string LAESTAB { get; set; } = string.Empty;
         public string TrustId { get; set; } = string.Empty;
         public string TrustName { get; set; } = string.Empty;
