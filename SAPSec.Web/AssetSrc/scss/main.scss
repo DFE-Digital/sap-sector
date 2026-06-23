@@ -1140,14 +1140,14 @@ $app-ks4-color-track: #f3f2f1;
   transform: translateX(-50%);
 }
 
-.app-ks4-message-panel {
+.app-message-panel {
   border-left: 5px solid $app-ks4-color-border;
   padding-left: 14px;
   max-width: 660px;
   margin-top: 4px;
 }
 
-.app-ks4-school-page {
+.app-school-page {
   --chart-color-school: #ca357c;
   --chart-color-similar-schools: #2a1950;
   --chart-color-local-authority: #5694ca;
@@ -1160,7 +1160,7 @@ $app-ks4-color-track: #f3f2f1;
   padding-bottom: 0.1rem;
 }
 
-.app-ks4-progress {
+.app-progress {
   background: $app-ks4-color-panel-bg;
   padding: 16px;
 }
