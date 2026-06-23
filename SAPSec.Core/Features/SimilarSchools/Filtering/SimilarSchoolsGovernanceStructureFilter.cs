@@ -3,7 +3,7 @@ using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsGoveranceStructureFilter(string key,
+public class SimilarSchoolsGovernanceStructureFilter(string key,
     string name,
     IDictionary<string, IEnumerable<string>> filterValues,
     SimilarSchool currentSchool)
@@ -47,31 +47,59 @@ public class SimilarSchoolsGoveranceStructureFilter(string key,
                 values.Contains(g.Key.Key, StringComparer.OrdinalIgnoreCase)))
             .OrderBy(fo => fo.Key switch
             {
-                "R" => 0,
-                "S" => 1,
-                "RS" => 2,
+                "S" => 0,
+                "M" => 1,
+                "MS" => 2,
                 _ => 3
             });
     }
 
     private Group FindGroup(SimilarSchool i)
     {
-        if (i.ResourcedProvision?.Name == "Resourced provision")
+
+        if (i.TrustSchoolFlag?.Id == "5")
         {
-            return new("R", "Resourced provision");
+            return new("S", "Single-academy trust (SAT)");
         }
 
-        if (i.ResourcedProvision?.Name == "Resourced provision and SEN unit")
+        if (i.TrustSchoolFlag?.Id == "3")
         {
-            return new("RS", "Resourced provision and SEN unit");
+            return new("M", "Multi-academy trust (MAT)");
         }
 
-        if (i.ResourcedProvision?.Name == "SEN unit")
+        if (i.TrustSchoolFlag?.Id == "1" || i.TrustSchoolFlag?.Id == "2")
         {
-            return new("S", "SEN unit");
+            return new("MS", "Maintained scool - local authority controlled");
         }
 
-        return new("N", "No known specialist provision");
+        if (i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
+        {
+            return new("MS", "Maintained scool - local authority controlled");
+        }
+
+        if ((i.TrustSchoolFlag?.Id == "0" || i.TrustSchoolFlag?.Id == " ") && (i.EstablishmentTypeGroup?.Id == "0" || i.EstablishmentTypeGroup?.Id == " "))
+        {
+            return new("N", "No known group");
+        }
+
+        return new("N", "No known group");
+
+        //if (i.ResourcedProvision?.Name == "Resourced provision")
+        //{
+        //    return new("R", "Resourced provision");
+        //}
+
+        //if (i.ResourcedProvision?.Name == "Resourced provision and SEN unit")
+        //{
+        //    return new("RS", "Resourced provision and SEN unit");
+        //}
+
+        //if (i.ResourcedProvision?.Name == "SEN unit")
+        //{
+        //    return new("S", "SEN unit");
+        //}
+
+        //return new("N", "No known specialist provision");
     }
 
     private record Group(string Key, string Name);
