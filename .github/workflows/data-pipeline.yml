@@ -73,6 +73,23 @@ jobs:
         with:
           persist-credentials: true
 
+      - name: Initialise pipeline report directories
+        shell: bash
+        run: |
+          set -euo pipefail
+          report_dir="${RUNNER_TEMP}/data-pipeline-report"
+          log_dir="${report_dir}/logs"
+          mkdir -p "${report_dir}" "${log_dir}"
+          cat <<EOF > "${log_dir}/README.txt"
+          Data pipeline logs for ${GITHUB_WORKFLOW}
+          Run ID: ${GITHUB_RUN_ID}
+          Run attempt: ${GITHUB_RUN_ATTEMPT}
+          Environment: ${DEPLOY_ENV}
+          Logs are added here by later workflow steps.
+          EOF
+          echo "PIPELINE_REPORT_DIR=${report_dir}" >> "$GITHUB_ENV"
+          echo "PIPELINE_LOG_DIR=${log_dir}" >> "$GITHUB_ENV"
+
       # ==============================
       # 2. Install dependencies
       # ==============================
@@ -528,6 +545,50 @@ jobs:
           path: SAPData/Work/Versioning/step6_report.json
           if-no-files-found: warn
 
+      - name: Summarise source versioning
+        if: always()
+        shell: pwsh
+        env:
+          LATEST_FILES: ${{ steps.version.outputs.latest_files }}
+        run: |
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $reportPath = "SAPData/Work/Versioning/step6_report.json"
+          if (-not (Test-Path $reportPath)) {
+            $summary = [pscustomobject]@{
+              stage = "06-source-versioning"
+              status = "failed"
+              utcTime = [DateTime]::UtcNow.ToString("o")
+              summary = "Step 6 report artifact was not created."
+              metadata = [pscustomobject]@{}
+            }
+            $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-06-source-versioning.json")
+            exit 0
+          }
+
+          $entries = Get-Content $reportPath -Raw | ConvertFrom-Json
+          if ($entries -isnot [System.Array]) { $entries = @($entries) }
+          $latestFiles = @{}
+          if (-not [string]::IsNullOrWhiteSpace($env:LATEST_FILES)) {
+            $latestFiles = $env:LATEST_FILES | ConvertFrom-Json -AsHashtable
+          }
+
+          $grouped = $entries | Group-Object status | ForEach-Object { @{ key = $_.Name; count = $_.Count } }
+          $metadata = [ordered]@{
+            totalSources = @($entries).Count
+            statusCounts = $grouped
+            latestFileCount = $latestFiles.Keys.Count
+            updatedKeys = @($entries | Where-Object status -eq "updated" | Select-Object -ExpandProperty key)
+            failedKeys = @($entries | Where-Object status -eq "failed" | Select-Object -ExpandProperty key)
+          }
+          $summary = [pscustomobject]@{
+            stage = "06-source-versioning"
+            status = if (($metadata.failedKeys).Count -gt 0) { "failed" } elseif (($metadata.updatedKeys).Count -gt 0) { "changed" } else { "completed" }
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = "Versioned source datasets and recorded changed or unchanged inputs."
+            metadata = $metadata
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-06-source-versioning.json")
+
       # ==============================
       # 7. Download generator inputs from Blob Storage
       #    - Downloads:
@@ -598,6 +659,35 @@ jobs:
           $files = Get-ChildItem -Path $rawDir -File | Sort-Object Name
           $files | Select-Object Name, Length | Format-Table -AutoSize
 
+      - name: Summarise generator input download
+        if: always()
+        shell: pwsh
+        env:
+          LATEST_FILES: ${{ steps.version.outputs.latest_files }}
+        run: |
+          $rawDir = "SAPData/DataMap/SourceFiles"
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $files = @(Get-ChildItem -Path $rawDir -File -ErrorAction SilentlyContinue)
+          $latestFiles = @{}
+          if (-not [string]::IsNullOrWhiteSpace($env:LATEST_FILES)) {
+            $latestFiles = $env:LATEST_FILES | ConvertFrom-Json -AsHashtable
+          }
+          $manualCount = @($files | Where-Object { $_.Name.ToLowerInvariant().StartsWith("manual_") }).Count
+          $metadata = [ordered]@{
+            downloadedCount = $files.Count
+            manualFileCount = $manualCount
+            latestManagedFileCount = $latestFiles.Keys.Count
+            sampleFiles = @($files | Select-Object -First 10 -ExpandProperty Name)
+          }
+          $summary = [pscustomobject]@{
+            stage = "07-download-generator-inputs"
+            status = if ($files.Count -gt 0) { "completed" } else { "failed" }
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = "Downloaded manual blobs and the latest managed datasets for SQL generation."
+            metadata = $metadata
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-07-download-generator-inputs.json")
+
       # ==============================
       # 8. Build + Run SQL generator
       # ==============================
@@ -612,6 +702,41 @@ jobs:
         run: |
           dotnet run --configuration Release --project SAPData/SAPData.csproj
           echo "Generated SQL scripts."
+
+      - name: Summarise SQL generation
+        if: always()
+        shell: pwsh
+        env:
+          REBUILD_ALL_RAW_TABLES: ${{ github.event_name == 'workflow_dispatch' && inputs.rebuild-all-raw-tables || 'false' }}
+          RAW_TABLES_TO_REBUILD_PATH: ${{ github.event_name == 'workflow_dispatch' && inputs.raw-tables-to-rebuild-path || env.DEFAULT_RAW_TABLES_TO_REBUILD_PATH }}
+        run: |
+          $sqlDir = "SAPData/Sql"
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $sqlFiles = @(Get-ChildItem -Path $sqlDir -Filter *.sql -File -ErrorAction SilentlyContinue)
+          $metadata = [ordered]@{
+            sqlFileCount = $sqlFiles.Count
+            rebuildAllRawTables = $env:REBUILD_ALL_RAW_TABLES
+            rawTablesToRebuildPath = $env:RAW_TABLES_TO_REBUILD_PATH
+            keyFiles = @(
+              "00_cleanup.sql",
+              "run_all.sql",
+              "03_v_establishment.sql",
+              "04_v_establishment_email.sql"
+            ) | ForEach-Object {
+              [pscustomobject]@{
+                name = $_
+                exists = Test-Path (Join-Path $sqlDir $_)
+              }
+            }
+          }
+          $summary = [pscustomobject]@{
+            stage = "08-generate-sql"
+            status = if ($sqlFiles.Count -gt 0) { "completed" } else { "failed" }
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = "Generated SQL scripts for cleanup, raw tables, views, and ETL execution."
+            metadata = $metadata
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-08-generate-sql.json")
 
       - name: Set deployment variables
         shell: bash
@@ -629,7 +754,53 @@ jobs:
           echo "BACKUP_FILE=${BACKUP_FILE}" >> $GITHUB_ENV
           echo "KEYVAULT_NAME=${AZURE_RESOURCE_PREFIX}-${SERVICE_SHORT}-${CONFIG_SHORT}-inf-kv" >> $GITHUB_ENV
 
+      - name: Capture pipeline execution context
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          context_file="${PIPELINE_LOG_DIR}/pipeline-context.txt"
+          {
+            echo "workflow=${GITHUB_WORKFLOW}"
+            echo "run_id=${GITHUB_RUN_ID}"
+            echo "run_attempt=${GITHUB_RUN_ATTEMPT}"
+            echo "job=${GITHUB_JOB}"
+            echo "trigger=${GITHUB_EVENT_NAME}"
+            echo "target_environment=${DEPLOY_ENV}"
+            echo "aks_resource_group=${AKS_RESOURCE_GROUP}"
+            echo "aks_cluster_name=${AKS_CLUSTER_NAME}"
+            echo "aks_namespace=${AKS_NAMESPACE}"
+            echo "app_namespace=${NAMESPACE}"
+            echo "konduit_app_name=${KONDUIT_APP_NAME}"
+            echo "cluster=${CLUSTER}"
+            echo "backup_file=${BACKUP_FILE}"
+            echo "runner_os=${RUNNER_OS}"
+            echo "runner_temp=${RUNNER_TEMP}"
+            echo "workspace=${GITHUB_WORKSPACE}"
+            echo "utc_time=$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+            echo
+            echo "[tool-versions]"
+            kubectl version --client=true 2>&1 || true
+            az version 2>&1 || true
+            dotnet --info 2>&1 || true
+            pwsh --version 2>&1 || true
+          } > "${context_file}"
+
+      - name: Capture baseline cluster snapshot
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          snapshot_dir="${PIPELINE_LOG_DIR}/cluster"
+          mkdir -p "${snapshot_dir}"
+          kubectl config current-context > "${snapshot_dir}/current-context.txt" 2>&1 || true
+          kubectl -n "${AKS_NAMESPACE}" get pods -o wide > "${snapshot_dir}/aks-namespace-pods.txt" 2>&1 || true
+          kubectl -n "${AKS_NAMESPACE}" get jobs > "${snapshot_dir}/aks-namespace-jobs.txt" 2>&1 || true
+          kubectl -n "${NAMESPACE}" get svc > "${snapshot_dir}/app-namespace-services.txt" 2>&1 || true
+          kubectl -n "${NAMESPACE}" get ingress -o wide > "${snapshot_dir}/app-namespace-ingress.txt" 2>&1 || true
+
       - name: Enable maintenance page
+        id: enable_maintenance
         if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
         shell: bash
         run: |
@@ -741,14 +912,49 @@ jobs:
               ' "${current_file}" | kubectl apply -f -
           done <<< "${matching_ingresses}"
 
+          ingress_count="$(printf '%s\n' "${matching_ingresses}" | sed '/^$/d' | wc -l | xargs)"
+          echo "maintenance_service=${maintenance_service}" >> "$GITHUB_OUTPUT"
+          echo "ingress_count=${ingress_count}" >> "$GITHUB_OUTPUT"
+          echo "backup_file=${backup_file}" >> "$GITHUB_OUTPUT"
+
+      - name: Summarise maintenance enable
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+        shell: pwsh
+        run: |
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $summary = [pscustomobject]@{
+            stage = "maintenance-enable"
+            status = "${{ steps.enable_maintenance.outcome }}"
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = "Switched matching ingress routes to the maintenance service before ETL."
+            metadata = [ordered]@{
+              namespace = $env:NAMESPACE
+              service = "${{ steps.enable_maintenance.outputs.maintenance_service }}"
+              ingressCount = "${{ steps.enable_maintenance.outputs.ingress_count }}"
+              backupFile = "${{ steps.enable_maintenance.outputs.backup_file }}"
+            }
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-08b-maintenance-enable.json")
+
       # ==============================
       # 9. Run ETL via konduit (private DB) WITH RETRY on transient disconnects
       # ==============================
       - name: Run ETL pipeline via konduit (retry on transient DB disconnect)
+        id: etl
         working-directory: SAPData/Sql
         shell: bash
         run: |
           set -euo pipefail
+          extract_reason() {
+            local file="$1"
+            grep -Eim1 "error|fatal|failed|exception|unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected" "$file" 2>/dev/null || true
+          }
+
+          extract_excerpt() {
+            local file="$1"
+            tail -n 20 "$file" 2>/dev/null || true
+          }
+
           echo "Running ETL via konduit (psql) with retry on transient disconnects"
           ls -la "$GITHUB_WORKSPACE/SAPData/Sql" || true
 
@@ -758,6 +964,9 @@ jobs:
           max_attempts=5
           delay=20
           log_file="$GITHUB_WORKSPACE/SAPData/Sql/psql.log"
+          report_file="${PIPELINE_REPORT_DIR}/stage-09-etl.json"
+          retry_count=0
+          last_classification="none"
           attempt=1
 
           while [ $attempt -le $max_attempts ]; do
@@ -776,6 +985,32 @@ jobs:
 
             if [ $exit_code -eq 0 ]; then
               echo "ETL succeeded on attempt $attempt"
+              cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
+              jq -n \
+                --arg stage "09-etl" \
+                --arg status "completed" \
+                --arg summary "ETL completed successfully." \
+                --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+                --arg logFile "${PIPELINE_LOG_DIR}/psql.log" \
+                --argjson attempts "$attempt" \
+                --argjson retryCount "$retry_count" \
+                --arg classification "$last_classification" \
+                '{
+                  stage: $stage,
+                  status: $status,
+                  utcTime: $utcTime,
+                  summary: $summary,
+                  metadata: {
+                    attempts: $attempts,
+                    retryCount: $retryCount,
+                    retryClassification: $classification,
+                    logFile: $logFile
+                  }
+                }' > "$report_file"
+              echo "attempts=$attempt" >> "$GITHUB_OUTPUT"
+              echo "retry_count=$retry_count" >> "$GITHUB_OUTPUT"
+              echo "retry_classification=$last_classification" >> "$GITHUB_OUTPUT"
+              echo "log_file=$log_file" >> "$GITHUB_OUTPUT"
               exit 0
             fi
 
@@ -783,6 +1018,8 @@ jobs:
               "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|terminating connection due to administrator command|EOF detected|Container does not exist or connection cannot be established|failed to exec in container|no running task found|task .* not found|Internal error occurred: error executing command in container" \
               "$log_file"; then
               echo "Detected transient ETL connection issue. Retrying after ${delay}s..."
+              retry_count=$((retry_count + 1))
+              last_classification="transient_etl_connection_issue"
               sleep $delay
               delay=$((delay * 2))
               if [ $delay -gt 180 ]; then delay=180; fi
@@ -791,13 +1028,77 @@ jobs:
             fi
 
             echo "ETL failed with exit code $exit_code (not classified as transient)."
+            last_classification="non_retryable"
+            cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "$log_file")"
+            log_excerpt="$(extract_excerpt "$log_file")"
+            jq -n \
+              --arg stage "09-etl" \
+              --arg status "failed" \
+              --arg summary "ETL failed without matching retry classification." \
+              --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --arg logFile "${PIPELINE_LOG_DIR}/psql.log" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
+              --argjson attempts "$attempt" \
+              --argjson retryCount "$retry_count" \
+              --arg classification "$last_classification" \
+              --argjson exitCode "$exit_code" \
+              '{
+                stage: $stage,
+                status: $status,
+                utcTime: $utcTime,
+                summary: $summary,
+                metadata: {
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retryClassification: $classification,
+                  exitCode: $exitCode,
+                  logFile: $logFile,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt
+                }
+              }' > "$report_file"
             exit $exit_code
           done
-
-          echo "ETL failed after $max_attempts attempts."
-          exit 2
+          if [ $exit_code -ne 0 ]; then
+            echo "ETL failed after $max_attempts attempts."
+            last_classification="transient_etl_connection_issue"
+            cp "$log_file" "${PIPELINE_LOG_DIR}/psql.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "$log_file")"
+            log_excerpt="$(extract_excerpt "$log_file")"
+            jq -n \
+              --arg stage "09-etl" \
+              --arg status "failed" \
+              --arg summary "ETL exhausted all retry attempts." \
+              --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --arg logFile "${PIPELINE_LOG_DIR}/psql.log" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
+              --argjson attempts "$attempt" \
+              --argjson retryCount "$retry_count" \
+              --arg classification "$last_classification" \
+              --argjson maxAttempts "$max_attempts" \
+              '{
+                stage: $stage,
+                status: $status,
+                utcTime: $utcTime,
+                summary: $summary,
+                metadata: {
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retryClassification: $classification,
+                  maxAttempts: $maxAttempts,
+                  logFile: $logFile,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt
+                }
+              }' > "$report_file"
+            exit 2
+          fi
 
       - name: Disable maintenance page
+        id: disable_maintenance
         if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
         shell: bash
         run: |
@@ -805,28 +1106,65 @@ jobs:
           backup_file="${RUNNER_TEMP}/maintenance/${DEPLOY_ENV}-ingresses.json"
           if [ ! -f "${backup_file}" ]; then
             echo "No ingress backup found for ${DEPLOY_ENV}; skipping maintenance restore."
+            echo "restore_status=skipped" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           jq -c '.items[]' "${backup_file}" | while IFS= read -r ingress_spec; do
             printf '%s\n' "${ingress_spec}" | kubectl apply -f -
           done
+          echo "restore_status=completed" >> "$GITHUB_OUTPUT"
+
+      - name: Summarise maintenance restore
+        if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+        shell: pwsh
+        run: |
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $status = if ("${{ steps.disable_maintenance.outputs.restore_status }}") {
+            "${{ steps.disable_maintenance.outputs.restore_status }}"
+          } else {
+            "${{ steps.disable_maintenance.outcome }}"
+          }
+          $summary = [pscustomobject]@{
+            stage = "maintenance-disable"
+            status = $status
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = "Restored ingress configuration after ETL."
+            metadata = [ordered]@{
+              environment = $env:DEPLOY_ENV
+              restoreStatus = "${{ steps.disable_maintenance.outputs.restore_status }}"
+            }
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-09b-maintenance-disable.json")
 
       # ==============================
       # 10. Create & upload DB backup (used to restore db in review app env)
       # ==============================
       - name: Create + upload review seed DB backup
+        id: review_seed_backup
         if: ${{ env.DEPLOY_ENV == 'test' }}
         shell: bash
         run: |
           set -euo pipefail
+          extract_reason() {
+            local file="$1"
+            grep -Eim1 "error|fatal|failed|exception|server closed the connection unexpectedly|permission denied|forbidden|unauthorized|timed out|conflict|SSL" "$file" 2>/dev/null || true
+          }
 
+          extract_excerpt() {
+            local file="$1"
+            tail -n 20 "$file" 2>/dev/null || true
+          }
           TODAY=$(TZ=Europe/London date +"%F")
           LOCAL_FILE="sapsec_review_seed_${TODAY}.sql.gz"
+          report_file="${PIPELINE_REPORT_DIR}/stage-10-review-seed-backup.json"
+          upload_log="${PIPELINE_LOG_DIR}/review_seed_upload.log"
           LATEST_BLOB="db-backups/sapsec_review_seed_${{ case(github.event.inputs.review-app-number == '', 'test', github.event.inputs.review-app-number) }}.sql.gz"
           LOG_FILE="konduit_pg_dump.log"
 
           echo "Creating DB dump -> ${LOCAL_FILE}"
+          echo "AKS_NAMESPACE=${AKS_NAMESPACE}"
+          echo "KONDUIT_APP_NAME=${KONDUIT_APP_NAME}"
 
           # Keep connection alive through tunnel
           export PGOPTIONS='-c tcp_keepalives_idle=60 -c tcp_keepalives_interval=30 -c tcp_keepalives_count=10'
@@ -834,6 +1172,9 @@ jobs:
           max_attempts=5
           delay=20
           attempt=1
+          retry_count=0
+          last_classification="none"
+          dump_rc=0
 
           while [ $attempt -le $max_attempts ]; do
             echo "Backup dump attempt $attempt/$max_attempts"
@@ -859,6 +1200,8 @@ jobs:
               "SSL error: unexpected eof|connection to server was lost|server closed the connection unexpectedly|could not receive data from server|EOF detected|connection reset|failed to exec in container|no running task found|Internal error occurred: error executing command in container" \
               "${LOG_FILE}"; then
               echo "Transient dump connection issue detected. Retrying after ${delay}s..."
+              retry_count=$((retry_count + 1))
+              last_classification="transient_dump_connection_issue"
               tail -n 80 "${LOG_FILE}" || true
               sleep $delay
               delay=$((delay * 2))
@@ -868,34 +1211,183 @@ jobs:
             fi
 
             echo "pg_dump failed with non-transient error (exit ${dump_rc})"
+            last_classification="non_retryable"
             tail -n 200 "${LOG_FILE}" || true
+            cp "${LOG_FILE}" "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "${LOG_FILE}")"
+            log_excerpt="$(extract_excerpt "${LOG_FILE}")"
+            jq -n \
+              --arg stage "10-review-seed-backup" \
+              --arg status "failed" \
+              --arg summary "Review seed backup failed during pg_dump." \
+              --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --arg localFile "$LOCAL_FILE" \
+              --arg blobName "$LATEST_BLOB" \
+              --arg logFile "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" \
+              --arg failurePhase "pg_dump" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
+              --arg classification "$last_classification" \
+              --argjson exitCode "$dump_rc" \
+              --argjson attempts "$attempt" \
+              --argjson retryCount "$retry_count" \
+              '{
+                stage: $stage,
+                status: $status,
+                utcTime: $utcTime,
+                summary: $summary,
+                metadata: {
+                  localFile: $localFile,
+                  blobName: $blobName,
+                  exitCode: $exitCode,
+                  logFile: $logFile,
+                  failurePhase: $failurePhase,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt,
+                  retryClassification: $classification,
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retried: ($retryCount > 0)
+                }
+              }' > "$report_file"
             exit ${dump_rc}
-          fi
+          done
 
           if [ ! -s "${LOCAL_FILE}" ]; then
             echo "DB dump failed after ${max_attempts} attempts or output file is empty."
+            last_classification="transient_dump_connection_issue"
             tail -n 200 "${LOG_FILE}" || true
+            cp "${LOG_FILE}" "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
+            failure_reason="$(extract_reason "${LOG_FILE}")"
+            log_excerpt="$(extract_excerpt "${LOG_FILE}")"
+            jq -n \
+              --arg stage "10-review-seed-backup" \
+              --arg status "failed" \
+              --arg summary "Review seed backup exhausted all retry attempts." \
+              --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --arg localFile "$LOCAL_FILE" \
+              --arg blobName "$LATEST_BLOB" \
+              --arg logFile "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" \
+              --arg failurePhase "pg_dump" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
+              --arg classification "$last_classification" \
+              --argjson exitCode "$dump_rc" \
+              --argjson attempts "$max_attempts" \
+              --argjson retryCount "$retry_count" \
+              '{
+                stage: $stage,
+                status: $status,
+                utcTime: $utcTime,
+                summary: $summary,
+                metadata: {
+                  localFile: $localFile,
+                  blobName: $blobName,
+                  exitCode: $exitCode,
+                  logFile: $logFile,
+                  failurePhase: $failurePhase,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt,
+                  retryClassification: $classification,
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retried: ($retryCount > 0)
+                }
+              }' > "$report_file"
             exit 1
           fi
 
+          cp "${LOG_FILE}" "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" 2>/dev/null || true
           ls -lh "${LOCAL_FILE}"
 
           echo "Uploading (overwriting) ${LATEST_BLOB} in container ${AZURE_STORAGE_CONTAINER}"
+          set +e
           az storage blob upload \
             --container-name "${AZURE_STORAGE_CONTAINER}" \
             --name "${LATEST_BLOB}" \
             --file "${LOCAL_FILE}" \
             --connection-string "${AZURE_STORAGE_CONNECTION_STRING}" \
-            --overwrite true \
-            --only-show-errors
+            --overwrite true > /dev/null 2> "${upload_log}"
+          exit_code=$?
+          set -e
+          if [ $exit_code -ne 0 ]; then
+            echo "Seed backup upload failed with exit code ${exit_code}"
+            failure_reason="$(extract_reason "${upload_log}")"
+            log_excerpt="$(extract_excerpt "${upload_log}")"
+            jq -n \
+              --arg stage "10-review-seed-backup" \
+              --arg status "failed" \
+              --arg summary "Review seed backup failed during blob upload." \
+              --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --arg localFile "$LOCAL_FILE" \
+              --arg blobName "$LATEST_BLOB" \
+              --arg logFile "${upload_log}" \
+              --arg failurePhase "upload" \
+              --arg failureReason "$failure_reason" \
+              --arg logExcerpt "$log_excerpt" \
+              --argjson exitCode "$exit_code" \
+              --argjson attempts "$attempt" \
+              --argjson retryCount "$retry_count" \
+              '{
+                stage: $stage,
+                status: $status,
+                utcTime: $utcTime,
+                summary: $summary,
+                metadata: {
+                  localFile: $localFile,
+                  blobName: $blobName,
+                  exitCode: $exitCode,
+                  logFile: $logFile,
+                  failurePhase: $failurePhase,
+                  failureReason: $failureReason,
+                  logExcerpt: $logExcerpt,
+                  attempts: $attempts,
+                  retryCount: $retryCount,
+                  retried: ($retryCount > 0)
+                }
+              }' > "$report_file"
+            exit $exit_code
+          fi
 
           echo "Seed backup uploaded:"
           echo "  ${AZURE_STORAGE_CONTAINER}/${LATEST_BLOB}"
+          file_size_bytes="$(wc -c < "${LOCAL_FILE}" | xargs)"
+          jq -n \
+            --arg stage "10-review-seed-backup" \
+            --arg status "completed" \
+            --arg summary "Created and uploaded the review seed backup." \
+            --arg utcTime "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+            --arg localFile "$LOCAL_FILE" \
+            --arg blobName "$LATEST_BLOB" \
+            --arg containerName "$AZURE_STORAGE_CONTAINER" \
+            --arg logFile "${PIPELINE_LOG_DIR}/konduit_pg_dump.log" \
+            --argjson fileSizeBytes "$file_size_bytes" \
+            --argjson attempts "$attempt" \
+            --argjson retryCount "$retry_count" \
+            --arg classification "$last_classification" \
+            '{
+              stage: $stage,
+              status: $status,
+              utcTime: $utcTime,
+              summary: $summary,
+              metadata: {
+                localFile: $localFile,
+                blobName: $blobName,
+                containerName: $containerName,
+                fileSizeBytes: $fileSizeBytes,
+                logFile: $logFile,
+                attempts: $attempts,
+                retryCount: $retryCount,
+                retryClassification: $classification,
+                retried: ($retryCount > 0)
+              }
+            }' > "$report_file"
       
       # ==============================
       # 11. Backup target DB (if pipeline was run normally)
       # ==============================
       - name: Backup ${{ env.DEPLOY_ENV }} postgres (if pipeline was run normally)
+        id: backup_target_db
         if: ${{ env.DEPLOY_ENV == 'test' && inputs.review-app-number == '' }}
         uses: DFE-Digital/github-actions/backup-postgres@master
         with:
@@ -910,11 +1402,40 @@ jobs:
           backup-file: ${{ env.BACKUP_FILE }}.sql
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+
+      - name: Summarise environment backup
+        if: always()
+        shell: pwsh
+        env:
+          REVIEW_APP_NUMBER: ${{ inputs.review-app-number }}
+        run: |
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $shouldRun = $env:DEPLOY_ENV -eq "test" -and [string]::IsNullOrWhiteSpace($env:REVIEW_APP_NUMBER)
+          $status = if ($shouldRun) { "${{ steps.backup_target_db.outcome }}" } else { "skipped" }
+          $summaryText = if ($shouldRun) {
+            "Backed up the target environment after a normal test pipeline run."
+          } else {
+            "Skipped target environment backup for this run mode."
+          }
+          $summary = [pscustomobject]@{
+            stage = "11-environment-backup"
+            status = $status
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = $summaryText
+            metadata = [ordered]@{
+              environment = $env:DEPLOY_ENV
+              reviewAppNumber = $env:REVIEW_APP_NUMBER
+              backupFile = "${env:BACKUP_FILE}.sql"
+              shouldRun = $shouldRun
+            }
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-11-environment-backup.json")
       
       # ==============================
       # 12. Restore DB backup (if pipeline was run to to create a backup for a review app)
       # ==============================
       - name: Restore ${{ env.DEPLOY_ENV }} postgres (if pipeline was run to to create a backup for a review app)
+        id: restore_target_db
         if: ${{ env.DEPLOY_ENV == 'test' && inputs.review-app-number != '' }}
         uses: DFE-Digital/github-actions/restore-postgres-backup@master
         with:
@@ -927,3 +1448,171 @@ jobs:
           azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           backup-file: ${{ env.BACKUP_FILE }}.sql.gz
+
+      - name: Summarise review seed backup
+        if: always()
+        shell: pwsh
+        env:
+          REVIEW_APP_NUMBER: ${{ inputs.review-app-number }}
+        run: |
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $reportPath = Join-Path $reportDir "stage-10-review-seed-backup.json"
+          if (Test-Path $reportPath) {
+            exit 0
+          }
+
+          $shouldRun = $env:DEPLOY_ENV -eq "test"
+          $status = if ($shouldRun) { "${{ steps.review_seed_backup.outcome }}" } else { "skipped" }
+          $summaryText = if ($shouldRun) {
+            "Review seed backup step did not emit a structured report."
+          } else {
+            "Skipped review seed backup outside the test environment."
+          }
+          $summary = [pscustomobject]@{
+            stage = "10-review-seed-backup"
+            status = $status
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = $summaryText
+            metadata = [ordered]@{
+              environment = $env:DEPLOY_ENV
+              reviewAppNumber = $env:REVIEW_APP_NUMBER
+              shouldRun = $shouldRun
+            }
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path $reportPath
+
+      - name: Summarise review restore
+        if: always()
+        shell: pwsh
+        env:
+          REVIEW_APP_NUMBER: ${{ inputs.review-app-number }}
+        run: |
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $shouldRun = $env:DEPLOY_ENV -eq "test" -and -not [string]::IsNullOrWhiteSpace($env:REVIEW_APP_NUMBER)
+          $status = if ($shouldRun) { "${{ steps.restore_target_db.outcome }}" } else { "skipped" }
+          $summaryText = if ($shouldRun) {
+            "Restored the test database from the generated backup for a review app."
+          } else {
+            "Skipped review restore because no review app number was supplied."
+          }
+          $summary = [pscustomobject]@{
+            stage = "12-review-restore"
+            status = $status
+            utcTime = [DateTime]::UtcNow.ToString("o")
+            summary = $summaryText
+            metadata = [ordered]@{
+              environment = $env:DEPLOY_ENV
+              reviewAppNumber = $env:REVIEW_APP_NUMBER
+              backupFile = "${env:BACKUP_FILE}.sql.gz"
+              shouldRun = $shouldRun
+            }
+          }
+          $summary | ConvertTo-Json -Depth 10 | Set-Content -Path (Join-Path $reportDir "stage-12-review-restore.json")
+
+      - name: Capture failure diagnostics
+        if: failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          diagnostics_dir="${PIPELINE_LOG_DIR}/failure-diagnostics"
+          mkdir -p "${diagnostics_dir}"
+
+          kubectl -n "${AKS_NAMESPACE}" get events --sort-by=.lastTimestamp > "${diagnostics_dir}/aks-namespace-events.txt" 2>&1 || true
+          kubectl -n "${NAMESPACE}" get events --sort-by=.lastTimestamp > "${diagnostics_dir}/app-namespace-events.txt" 2>&1 || true
+          kubectl -n "${AKS_NAMESPACE}" get pods -o wide > "${diagnostics_dir}/aks-namespace-pods.txt" 2>&1 || true
+
+          pod_list="$(kubectl -n "${AKS_NAMESPACE}" get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null | grep "${KONDUIT_APP_NAME}" || true)"
+          if [ -z "${pod_list}" ]; then
+            pod_list="$(kubectl -n "${AKS_NAMESPACE}" get pods -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' 2>/dev/null | head -n 5 || true)"
+          fi
+
+          while IFS= read -r pod_name; do
+            if [ -z "${pod_name}" ]; then
+              continue
+            fi
+            safe_name="$(printf '%s' "${pod_name}" | tr '/:' '__')"
+            kubectl -n "${AKS_NAMESPACE}" describe pod "${pod_name}" > "${diagnostics_dir}/${safe_name}-describe.txt" 2>&1 || true
+            kubectl -n "${AKS_NAMESPACE}" logs "${pod_name}" --all-containers --tail=200 > "${diagnostics_dir}/${safe_name}-logs.txt" 2>&1 || true
+          done <<< "${pod_list}"
+
+      - name: Publish pipeline stage summary
+        if: always()
+        shell: pwsh
+        run: |
+          $reportDir = $env:PIPELINE_REPORT_DIR
+          $stageFiles = @(Get-ChildItem -Path $reportDir -Filter "stage-*.json" -File -ErrorAction SilentlyContinue | Sort-Object Name)
+          if ($stageFiles.Count -eq 0) {
+            "## Data pipeline stage summary" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+            "" | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+            "No structured stage reports were created." | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+            exit 0
+          }
+
+          $reports = foreach ($file in $stageFiles) {
+            $report = Get-Content $file.FullName -Raw | ConvertFrom-Json
+            [pscustomobject]@{
+              stage = [string]$report.stage
+              status = [string]$report.status
+              summary = [string]$report.summary
+              retryCount = if ($null -ne $report.metadata.retryCount) { [int]$report.metadata.retryCount } else { 0 }
+            }
+          }
+
+          $changedStages = @($reports | Where-Object status -eq "changed" | Select-Object -ExpandProperty stage)
+          $skippedStages = @($reports | Where-Object status -eq "skipped" | Select-Object -ExpandProperty stage)
+          $failedStages = @($reports | Where-Object { $_.status -in @("failed", "failure") } | Select-Object -ExpandProperty stage)
+          $retriedStages = @($reports | Where-Object retryCount -gt 0 | ForEach-Object { "$($_.stage) ($($_.retryCount))" })
+
+          $lines = New-Object System.Collections.Generic.List[string]
+          $lines.Add("## Data pipeline stage summary")
+          $lines.Add("")
+          $lines.Add("| Stage | Status | Retries | Summary |")
+          $lines.Add("| --- | --- | ---: | --- |")
+          foreach ($report in $reports) {
+            $lines.Add("| $($report.stage) | $($report.status) | $($report.retryCount) | $($report.summary) |")
+          }
+          $lines.Add("")
+          $lines.Add("Changed: " + ($(if ($changedStages.Count -gt 0) { $changedStages -join ", " } else { "none" })))
+          $lines.Add("Skipped: " + ($(if ($skippedStages.Count -gt 0) { $skippedStages -join ", " } else { "none" })))
+          $lines.Add("Failed: " + ($(if ($failedStages.Count -gt 0) { $failedStages -join ", " } else { "none" })))
+          $lines.Add("Retried: " + ($(if ($retriedStages.Count -gt 0) { $retriedStages -join ", " } else { "none" })))
+          $lines | Add-Content -Path $env:GITHUB_STEP_SUMMARY
+
+      - name: Prepare pipeline log artifact manifest
+        if: always()
+        shell: pwsh
+        run: |
+          $logDir = $env:PIPELINE_LOG_DIR
+          New-Item -ItemType Directory -Force -Path $logDir | Out-Null
+          $manifestPath = Join-Path $logDir "artifact-manifest.txt"
+          $files = @(Get-ChildItem -Path $logDir -Recurse -File -ErrorAction SilentlyContinue | Sort-Object FullName)
+          $lines = New-Object System.Collections.Generic.List[string]
+          $lines.Add("Data pipeline log artifact")
+          $lines.Add("Workflow: $env:GITHUB_WORKFLOW")
+          $lines.Add("Run ID: $env:GITHUB_RUN_ID")
+          $lines.Add("Run attempt: $env:GITHUB_RUN_ATTEMPT")
+          $lines.Add("Environment: $env:DEPLOY_ENV")
+          $lines.Add("UTC generated: $([DateTime]::UtcNow.ToString('o'))")
+          $lines.Add("")
+          $lines.Add("Files:")
+          foreach ($file in $files) {
+            $relativePath = $file.FullName.Substring($logDir.Length).TrimStart('\', '/')
+            $lines.Add("- $relativePath ($($file.Length) bytes)")
+          }
+          $lines | Set-Content -Path $manifestPath
+
+      - name: Upload pipeline log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-pipeline-logs-${{ matrix.target_env }}
+          path: ${{ env.PIPELINE_LOG_DIR }}
+          if-no-files-found: error
+
+      - name: Upload pipeline stage report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: data-pipeline-stage-report-${{ matrix.target_env }}
+          path: ${{ env.PIPELINE_REPORT_DIR }}
+          if-no-files-found: warn
