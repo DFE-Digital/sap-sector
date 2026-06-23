@@ -6,6 +6,15 @@
 /// </summary>
 public static class PhaseOfEducationValues
 {
+    public const string NotApplicableId = "0";
+    public const string NurseryId = "1";
+    public const string PrimaryId = "2";
+    public const string MiddleDeemedPrimaryId = "3";
+    public const string SecondaryId = "4";
+    public const string MiddleDeemedSecondaryId = "5";
+    public const string SixteenPlusId = "6";
+    public const string AllThroughId = "7";
+
     public const string Primary = "Primary";
     public const string Secondary = "Secondary";
     public const string AllThrough = "All-through";
@@ -111,6 +120,25 @@ public static class PhaseOfEducationValues
             return false;
 
         return string.Equals(phase.Trim(), Secondary, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool IsSearchableIndexPhaseId(string? phaseId)
+    {
+        var trimmedPhaseId = phaseId?.Trim();
+
+        return trimmedPhaseId is PrimaryId or SecondaryId or AllThroughId;
+    }
+
+    public static bool IsSearchableSearchPhaseId(string? phaseId, bool primarySchoolsEnabled)
+    {
+        var trimmedPhaseId = phaseId?.Trim();
+
+        return trimmedPhaseId switch
+        {
+            SecondaryId => true,
+            PrimaryId or AllThroughId => primarySchoolsEnabled,
+            _ => false
+        };
     }
 
     #endregion
