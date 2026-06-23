@@ -6,49 +6,6 @@ namespace SAPSec.Core.Tests.Features.SchoolSearch.Extensions;
 public class EstablishmentExtensionsTests
 {
     [Theory]
-    [InlineData("2", "Primary")]
-    [InlineData("4", "Secondary")]
-    [InlineData("7", "All-through")]
-    public void CanIndexForSearch_WithSupportedPhaseIds_ReturnsTrue(string phaseId, string phaseName)
-    {
-        var result = new Establishment
-        {
-            PhaseOfEducationId = phaseId,
-            PhaseOfEducationName = phaseName
-        }.CanIndexForSearch();
-
-        result.Should().BeTrue();
-    }
-
-    [Theory]
-    [InlineData("0", "Not applicable")]
-    [InlineData("1", "Nursery")]
-    [InlineData("3", "Middle deemed primary")]
-    [InlineData("5", "Middle deemed secondary")]
-    [InlineData("6", "16 plus")]
-    public void CanIndexForSearch_WithUnsupportedPhaseIds_ReturnsFalse(string phaseId, string phaseName)
-    {
-        var result = new Establishment
-        {
-            PhaseOfEducationId = phaseId,
-            PhaseOfEducationName = phaseName
-        }.CanIndexForSearch();
-
-        result.Should().BeFalse();
-    }
-
-    [Fact]
-    public void CanIndexForSearch_WithLegacyAllThroughName_ReturnsTrue()
-    {
-        var result = new Establishment
-        {
-            PhaseOfEducationName = "All-through"
-        }.CanIndexForSearch();
-
-        result.Should().BeTrue();
-    }
-
-    [Theory]
     [InlineData("0", true, false)]
     [InlineData("2", true, true)]
     [InlineData("2", false, false)]
@@ -56,13 +13,13 @@ public class EstablishmentExtensionsTests
     [InlineData("4", false, true)]
     [InlineData("7", true, true)]
     [InlineData("7", false, false)]
-    public void CanSearch_UsesPhaseIdAndFeatureFlag(string phaseId, bool primarySchoolsEnabled, bool expected)
+    public void IsSearchable_UsesPhaseIdAndFeatureFlag(string phaseId, bool primarySchoolsEnabled, bool expected)
     {
         var result = new Establishment
         {
             PhaseOfEducationId = phaseId,
             EstablishmentStatusId = expected ? "1" : string.Empty
-        }.CanSearch(primarySchoolsEnabled);
+        }.IsSearchable(primarySchoolsEnabled);
 
         result.Should().Be(expected);
     }
@@ -72,10 +29,10 @@ public class EstablishmentExtensionsTests
     [InlineData("3", true)]
     [InlineData("2", false)]
     [InlineData("4", false)]
-    public void CanSearch_UsesStatusId(string statusId, bool expected)
+    public void IsSearchable_UsesStatusId(string statusId, bool expected)
     {
         var result = new Establishment { PhaseOfEducationId = "4", EstablishmentStatusId = statusId }
-            .CanSearch(primarySchoolsEnabled: false);
+            .IsSearchable(primarySchoolsEnabled: false);
 
         result.Should().Be(expected);
     }
@@ -85,10 +42,10 @@ public class EstablishmentExtensionsTests
     [InlineData("Open, but proposed to close", true)]
     [InlineData("Closed", false)]
     [InlineData("Proposed to open", false)]
-    public void CanSearch_FallsBackToStatusName(string statusName, bool expected)
+    public void IsSearchable_FallsBackToStatusName(string statusName, bool expected)
     {
         var result = new Establishment { PhaseOfEducationName = "Secondary", EstablishmentStatusName = statusName }
-            .CanSearch(primarySchoolsEnabled: false);
+            .IsSearchable(primarySchoolsEnabled: false);
 
         result.Should().Be(expected);
     }
@@ -99,41 +56,76 @@ public class EstablishmentExtensionsTests
     [InlineData("All-through", false, false)]
     [InlineData("All-through", true, true)]
     [InlineData("Secondary", false, true)]
-    public void CanSearch_FallsBackToPhaseName(string phaseName, bool primarySchoolsEnabled, bool expected)
+    public void IsSearchable_FallsBackToPhaseName(string phaseName, bool primarySchoolsEnabled, bool expected)
     {
         var result = new Establishment { PhaseOfEducationName = phaseName, EstablishmentStatusId = "1" }
-            .CanSearch(primarySchoolsEnabled);
+            .IsSearchable(primarySchoolsEnabled);
 
         result.Should().Be(expected);
     }
 
     [Fact]
-    public void CanSearch_WithSecondarySchoolAndMissingStatus_ReturnsTrue()
+    public void IsSearchable_WhenMissingStatus_AndSecondarySchool_ReturnsFalse()
     {
         var result = new Establishment { PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" }
-            .CanSearch(primarySchoolsEnabled: false);
-
-        result.Should().BeTrue();
-    }
-
-    [Fact]
-    public void CanSearch_WithPrimarySchoolAndMissingStatus_ReturnsFalse()
-    {
-        var result = new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" }
-            .CanSearch(primarySchoolsEnabled: true);
+            .IsSearchable(primarySchoolsEnabled: false);
 
         result.Should().BeFalse();
     }
 
     [Fact]
-    public void CanSearch_WithPrimarySchoolAndEstablishmentStatus_ReturnsTrue()
+    public void IsSearchable_WhenMissingStatus_AndPrimarySchool_AndFeatureFlagDisabled_ReturnsFalse()
+    {
+        var result = new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" }
+            .IsSearchable(primarySchoolsEnabled: false);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsSearchable_WhenMissingStatus_AndPrimarySchool_AndPrimarySchoolsFeatureFlagEnabled_ReturnsFalse()
+    {
+        var result = new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" }
+            .IsSearchable(primarySchoolsEnabled: true);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsSearchable_WhenClosedSchool_ReturnsFalse()
     {
         var result = new Establishment
         {
-            PhaseOfEducationId = "2",
-            PhaseOfEducationName = "Primary",
-            EstablishmentStatusId = "1"
-        }.CanSearch(primarySchoolsEnabled: true);
+            PhaseOfEducationId = "4",
+            PhaseOfEducationName = "Secondary",
+            EstablishmentStatusId = "2"
+        }.IsSearchable(primarySchoolsEnabled: false);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsSearchable_WhenClosedSchool_FallingBackToStatusName_ReturnsFalse()
+    {
+        var result = new Establishment
+        {
+            PhaseOfEducationId = "4",
+            PhaseOfEducationName = "Secondary",
+            EstablishmentStatusName = " Closed "
+        }.IsSearchable(primarySchoolsEnabled: false);
+
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void IsSearchable_WhenOpenSchool_FallingBackToStatusName_ReturnsTrue()
+    {
+        var result = new Establishment
+        {
+            PhaseOfEducationId = "4",
+            PhaseOfEducationName = "Secondary",
+            EstablishmentStatusName = "  Open "
+        }.IsSearchable(primarySchoolsEnabled: false);
 
         result.Should().BeTrue();
     }

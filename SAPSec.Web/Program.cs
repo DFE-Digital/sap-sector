@@ -1,7 +1,4 @@
-﻿using Dfe.Analytics;
-using Dfe.Analytics.AspNetCore;
-using Dfe.Analytics.Events;
-using GovUk.Frontend.AspNetCore;
+﻿using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -54,7 +51,7 @@ public class Program
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         });
         builder.Services.AddFeatureManagement();
-        builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.AddSingleton<IFeatureFlagService, FeatureFlagService>();
         builder.Services.Configure<CustomEventLocations>(builder.Configuration.GetSection("CustomEventLocations"));
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
 

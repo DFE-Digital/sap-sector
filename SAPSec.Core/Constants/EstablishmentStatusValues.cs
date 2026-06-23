@@ -12,15 +12,24 @@ public static class EstablishmentStatusValues
     public const string OpenButProposedToClose = "Open, but proposed to close";
     public const string ProposedToOpen = "Proposed to open";
 
-    public static bool IsIncludedInSearch(string? statusId, string? statusName)
+    public static bool IsSearchable(string? statusId, string? statusName)
     {
+        if (string.IsNullOrWhiteSpace(statusId) && string.IsNullOrWhiteSpace(statusName))
+        {
+            return false;
+        }
+
         var trimmedStatusId = statusId?.Trim();
 
         if (trimmedStatusId is OpenId or OpenButProposedToCloseId)
+        {
             return true;
+        }
 
         if (trimmedStatusId is ClosedId or ProposedToOpenId)
+        {
             return false;
+        }
 
         var trimmedStatusName = statusName?.Trim();
 

@@ -129,7 +129,7 @@ public static class PhaseOfEducationValues
         return trimmedPhaseId is PrimaryId or SecondaryId or AllThroughId;
     }
 
-    public static bool IsSearchableSearchPhaseId(string? phaseId, bool primarySchoolsEnabled)
+    public static bool IsSearchable(string? phaseId, string? phaseName, bool primarySchoolsEnabled)
     {
         var trimmedPhaseId = phaseId?.Trim();
 
@@ -137,7 +137,8 @@ public static class PhaseOfEducationValues
         {
             SecondaryId => true,
             PrimaryId or AllThroughId => primarySchoolsEnabled,
-            _ => false
+            _ => IsSecondary(phaseName)
+                || (primarySchoolsEnabled && IsPrimaryOrAllThrough(phaseName))
         };
     }
 

@@ -1,6 +1,5 @@
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model.Generated;
@@ -38,9 +37,7 @@ public class SchoolSearchService(
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return school.CanSearch(primarySchoolsEnabled)
-            ? school
-            : null;
+        return school;
     }
 
     private async Task<IReadOnlyList<SchoolSearchResult>> SearchInternalAsync(string query, int maxResults, bool includeCoordinates)
@@ -48,7 +45,7 @@ public class SchoolSearchService(
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var searchResults = await _indexReader.SearchAsync(query, maxResults);
 
-         var results = new List<SchoolSearchResult>();
+        var results = new List<SchoolSearchResult>();
 
         if (!searchResults.Any())
         {
@@ -64,11 +61,6 @@ public class SchoolSearchService(
             (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
         {
             if (r.School == null)
-            {
-                continue;
-            }
-
-            if (!r.School.CanSearch(primarySchoolsEnabled))
             {
                 continue;
             }
