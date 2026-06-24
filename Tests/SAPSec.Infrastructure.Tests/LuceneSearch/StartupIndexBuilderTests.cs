@@ -139,14 +139,14 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     }
 
     [Fact]
-    public async Task StartAsync_ShouldIndexOnlyPrimaryAndSecondaryEstablishments()
+    public async Task StartAsync_ShouldIndexOnlySearchableEstablishments()
     {
         logger.LogInformation("Start test");
         establishmentRepo.SetupEstablishments(
-            new() { URN = "100001", EstablishmentName = "Test Primary 1", PhaseOfEducationName = "Primary" },
-            new() { URN = "100002", EstablishmentName = "Test Secondary 2", PhaseOfEducationName = "Secondary" },
-            new() { URN = "100003", EstablishmentName = "Test Nursery 3", PhaseOfEducationName = "Nursery" },
-            new() { URN = "100004", EstablishmentName = "Test All Through 4", PhaseOfEducationName = "All-through" }
+            new() { URN = "100001", EstablishmentName = "Test Primary 1", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2" },
+            new() { URN = "100002", EstablishmentName = "Test Secondary 2", PhaseOfEducationName = "Secondary", PhaseOfEducationId = "4" },
+            new() { URN = "100003", EstablishmentName = "Test Nursery 3", PhaseOfEducationName = "Nursery", PhaseOfEducationId = "1" },
+            new() { URN = "100004", EstablishmentName = "Test All Through 4", PhaseOfEducationName = "All-through", PhaseOfEducationId = "7" }
         );
 
         using var ctx = new LuceneIndexContext();
@@ -178,7 +178,8 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
         var results = await reader.SearchAsync("test");
         results.Should().BeEquivalentTo([
             (100001, "*Test* Primary 1"),
-            (100002, "*Test* Secondary 2")
+            (100002, "*Test* Secondary 2"),
+            (100004, "*Test* All Through 4")
         ]);
     }
 }

@@ -49,7 +49,7 @@ public class StartupIndexBuilder(
             cancellationToken.ThrowIfCancellationRequested();
 
             var schools = (await establishmentRepository.GetAllEstablishmentsAsync())
-                .Where(school => school.IsSearchable())
+                .Where(s => s.CanIndexForSearch())
                 .ToList();
 
             if (!schools.Any())
