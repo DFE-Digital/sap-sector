@@ -13,6 +13,7 @@ public class NoOpCustomEventService : ICustomEventService
     {
         return Task.CompletedTask;
     }
+
     public Task IgnoreWebRequestEvent()
     {
         return Task.CompletedTask;

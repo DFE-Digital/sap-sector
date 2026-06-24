@@ -97,7 +97,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                 <span class="govuk-service-navigation__service-name">
                     @Html.TrackedAnchor(
                         TrackedLinks.ServiceBanner,
-                                        "/find-a-school",
+                        "/find-a-school",
                         LayoutConstants.ServiceName,
                         classes: new[] { "govuk-service-navigation__link" })
                 </span>
@@ -113,7 +113,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                         <ul class="govuk-service-navigation__list" id="navigation">
                             <li class="govuk-service-navigation__item @(currentController == "SchoolSearch" ? "govuk-service-navigation__item--active" : "")">
                                 <a class="govuk-service-navigation__link"
-                                    aria-current=@(currentController == "SchoolSearch")
+                                    aria-current=@(currentController == "SchoolSearch" ? "page" : null)
                                     href="@Url.Action("Index", "SchoolSearch")">
                                     @if (currentController == "SchoolSearch")
                                     {

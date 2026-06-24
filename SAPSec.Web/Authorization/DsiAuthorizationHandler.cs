@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Authentication;
 
 namespace SAPSec.Web.Authorization;
 
