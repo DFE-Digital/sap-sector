@@ -81,6 +81,24 @@ public class EstablishmentExtensionsTests
     }
 
     [Theory]
+    [InlineData(true, "2")]
+    [InlineData(true, "4")]
+    [InlineData(false, "2")]
+    [InlineData(false, "4")]
+    public void CanSearch_WithSecondaryPhaseNameAndExcludedStatusId_ReturnsFalse(
+        bool primarySchoolsEnabled,
+        string statusId)
+    {
+        var result = new Establishment
+        {
+            PhaseOfEducationName = "Secondary",
+            EstablishmentStatusId = statusId
+        }.CanSearch(primarySchoolsEnabled);
+
+        result.Should().BeFalse();
+    }
+
+    [Theory]
     [InlineData("Open", true)]
     [InlineData("Open, but proposed to close", true)]
     [InlineData("Closed", false)]
