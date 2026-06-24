@@ -44,7 +44,7 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
             .ToHaveAttributeAsync("href", "/school/145327/what-is-a-similar-school");
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToBeVisibleAsync();
         await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-show-no-data-labels", "true");
-        await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-colors", "[\"#D53780\",\"#2a1950\",\"#2a1950\",\"#2a1950\"]");
+        await Expect(Page.Locator("#school-attendance-three-year-chart")).ToHaveAttributeAsync("data-colors", "[\"#D53780\",\"#2a1950\",\"#2a1950\"]");
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-charts']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']")).ToBeVisibleAsync();
         await Expect(Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-top-performers']")).ToBeVisibleAsync();
@@ -130,6 +130,7 @@ public class SchoolAttendancePageTests(WebApplicationSetupFixture fixture) : Bas
         var tableTab = Page.Locator(".app-attendance-tabs .govuk-tabs__tab[href='#attendance-table']");
         await tableTab.ClickAsync();
         await Expect(Page.Locator("#attendance-table .govuk-table")).ToBeVisibleAsync();
-        await Expect(Page.Locator("#attendance-table .govuk-table")).ToContainTextAsync("Similar schools average");
+        await Expect(Page.Locator("#attendance-table .govuk-table")).ToContainTextAsync("Local authority average");
+        await Expect(Page.Locator("#attendance-table .govuk-table")).Not.ToContainTextAsync("Similar schools average");
     }
 }

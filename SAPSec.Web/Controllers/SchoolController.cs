@@ -108,9 +108,6 @@ public class SchoolController : Controller
         var selectedSchoolSeries = isPersistentAbsence
             ? response.PersistentAbsenceYearByYear.School
             : response.OverallAbsenceYearByYear.School;
-        var similarSchoolsSeries = isPersistentAbsence
-            ? response.PersistentAbsenceYearByYear.SimilarSchools
-            : response.OverallAbsenceYearByYear.SimilarSchools;
         var localAuthoritySeries = isPersistentAbsence
             ? response.PersistentAbsenceYearByYear.LocalAuthority
             : response.OverallAbsenceYearByYear.LocalAuthority;
@@ -121,9 +118,6 @@ public class SchoolController : Controller
         var selectedSchoolThreeYearAverage = isPersistentAbsence
             ? response.PersistentAbsenceThreeYearAverage.SchoolValue
             : response.OverallAbsenceThreeYearAverage.SchoolValue;
-        var similarSchoolsThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.SimilarSchoolsValue
-            : response.OverallAbsenceThreeYearAverage.SimilarSchoolsValue;
         var localAuthorityThreeYearAverage = isPersistentAbsence
             ? response.PersistentAbsenceThreeYearAverage.LocalAuthorityValue
             : response.OverallAbsenceThreeYearAverage.LocalAuthorityValue;
@@ -141,14 +135,12 @@ public class SchoolController : Controller
             bar = new decimal?[]
             {
                 selectedSchoolThreeYearAverage,
-                similarSchoolsThreeYearAverage,
                 localAuthorityThreeYearAverage,
                 englandThreeYearAverage
             },
             line = new
             {
                 school = new decimal?[] { selectedSchoolSeries.Previous2, selectedSchoolSeries.Previous, selectedSchoolSeries.Current },
-                similarSchools = new decimal?[] { similarSchoolsSeries.Previous2, similarSchoolsSeries.Previous, similarSchoolsSeries.Current },
                 localAuthority = new decimal?[] { localAuthoritySeries.Previous2, localAuthoritySeries.Previous, localAuthoritySeries.Current },
                 england = new decimal?[] { englandSeries.Previous2, englandSeries.Previous, englandSeries.Current }
             },
@@ -160,13 +152,6 @@ public class SchoolController : Controller
                     DisplayPercentNullable(selectedSchoolSeries.Previous),
                     DisplayPercentNullable(selectedSchoolSeries.Current),
                     DisplayPercentNullable(selectedSchoolThreeYearAverage)
-                },
-                similarSchools = new[]
-                {
-                    DisplayPercentNullable(similarSchoolsSeries.Previous2),
-                    DisplayPercentNullable(similarSchoolsSeries.Previous),
-                    DisplayPercentNullable(similarSchoolsSeries.Current),
-                    DisplayPercentNullable(similarSchoolsThreeYearAverage)
                 },
                 localAuthority = new[]
                 {
