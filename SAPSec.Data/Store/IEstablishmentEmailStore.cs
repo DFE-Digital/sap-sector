@@ -1,8 +1,8 @@
 ﻿using SAPSec.Data.Dto;
 
-namespace SAPSec.Data.Repositories;
+namespace SAPSec.Data.Store;
 
-public interface IEstablishmentEmailRepository
+public interface IEstablishmentEmailStore
 {
     Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn);
 }

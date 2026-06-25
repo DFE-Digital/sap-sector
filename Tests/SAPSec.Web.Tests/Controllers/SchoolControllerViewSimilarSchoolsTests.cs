@@ -8,7 +8,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
@@ -18,10 +18,10 @@ namespace SAPSec.Web.Tests.Deprecated.Controllers;
 public class SimilarSchoolsControllerTests
 {
     private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock = new();
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepoMock = new();
-    private readonly Mock<IEstablishmentRepository> _establishmentRepoMock = new();
-    private readonly Mock<IKs4PerformanceRepository> _performanceRepoMock = new();
-    private readonly Mock<IAbsenceRepository> _absenceRepoMock = new();
+    private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsRepoMock = new();
+    private readonly Mock<IEstablishmentStore> _establishmentRepoMock = new();
+    private readonly Mock<IKs4PerformanceStore> _performanceRepoMock = new();
+    private readonly Mock<IAbsenceStore> _absenceRepoMock = new();
     private readonly Mock<ILogger<SimilarSchoolsController>> _loggerMock = new();
     private readonly SimilarSchoolsController _sut;
 
@@ -241,7 +241,7 @@ public class SimilarSchoolsControllerTests
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([currentSchool, .. similarSchools]);
         _similarSchoolsRepoMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .Setup(x => x.GetGroupAsync(urn))
             .ReturnsAsync(similarSchools.Select(s => new SimilarSchoolsSecondaryGroupsEntry { URN = urn, NeighbourURN = s.URN }).ToList());
         _absenceRepoMock
             .Setup(r => r.GetByUrnAsync(It.IsAny<string>()))

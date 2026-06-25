@@ -1,9 +1,9 @@
 ﻿using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
-namespace SAPSec.Test.Common.Repositories.InMemory;
+namespace SAPSec.Test.Common.InMemory;
 
-public class InMemorySimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
+public class InMemorySimilarSchoolsSecondaryStore : ISimilarSchoolsSecondaryStore
 {
     private List<SimilarSchoolsSecondaryGroupsEntry> _groups = new();
     private List<SimilarSchoolsSecondaryValuesEntry> _values = new();
@@ -24,13 +24,13 @@ public class InMemorySimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         _standardDeviations = [standardDeviations];
     }
 
-    public Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)
+    public Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn)
         => Task.FromResult((IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>)_groups.Where(x => x.URN == urn).ToList());
 
-    public Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetSecondaryValuesByUrnsAsync(IEnumerable<string> urns)
+    public Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns)
         => Task.FromResult((IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>)_values.Where(x => urns.Contains(x.URN)).ToList());
 
-    public Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
+    public Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetStandardDeviationsAsync()
         => Task.FromResult(_standardDeviations.FirstOrDefault());
 
     public Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()

@@ -1,10 +1,10 @@
 using Dapper;
 using SAPSec.Data.Dto.Absence;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Infrastructure.Postgres;
 
-public class PostgresAbsenceRepository(NpgsqlDataSourceFactory factory) : IAbsenceRepository
+public class PostgresAbsenceStore(NpgsqlDataSourceFactory factory) : IAbsenceStore
 {
     private readonly NpgsqlDataSourceFactory _factory = factory;
 

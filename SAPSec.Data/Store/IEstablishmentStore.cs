@@ -1,8 +1,8 @@
 ﻿using SAPSec.Data.Dto;
 
-namespace SAPSec.Data.Repositories;
+namespace SAPSec.Data.Store;
 
-public interface IEstablishmentRepository
+public interface IEstablishmentStore
 {
     Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync();
     Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns);

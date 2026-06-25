@@ -1,19 +1,19 @@
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
 public class GetKs4HeadlineMeasures(
-    IKs4PerformanceRepository performanceRepository,
-    IKs4DestinationsRepository destinationsRepository,
+    IKs4PerformanceStore performanceStore,
+    IKs4DestinationsStore destinationsStore,
     ISchoolDetailsService schoolDetailsService)
 {
     public async Task<GetKs4HeadlineMeasuresResponse> Execute(GetKs4HeadlineMeasuresRequest request)
     {
         var schoolDetails = await schoolDetailsService.GetByUrnAsync(request.Urn);
-        var performanceData = await performanceRepository.GetByUrnAsync(request.Urn);
-        var destinationsData = await destinationsRepository.GetByUrnAsync(request.Urn);
+        var performanceData = await performanceStore.GetByUrnAsync(request.Urn);
+        var destinationsData = await destinationsStore.GetByUrnAsync(request.Urn);
 
         return new GetKs4HeadlineMeasuresResponse(
             schoolDetails,

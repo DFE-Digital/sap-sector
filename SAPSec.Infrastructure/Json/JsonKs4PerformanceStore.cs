@@ -1,18 +1,18 @@
 using SAPSec.Data.Dto.KS4.Performance;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonKs4PerformanceRepository(
-    IEstablishmentRepository establishmentRepository,
-    IJsonFile<EstablishmentPerformance> establishmentPerformanceRepository,
-    IJsonFile<LAPerformance> localAuthorityPerformanceRepository,
-    IJsonFile<EnglandPerformance> englandPerformanceRepository) : IKs4PerformanceRepository
+public class JsonKs4PerformanceStore(
+    IEstablishmentStore establishmentFile,
+    IJsonFile<EstablishmentPerformance> establishmentPerformanceFile,
+    IJsonFile<LAPerformance> laPerformanceFile,
+    IJsonFile<EnglandPerformance> englandPerformanceFile) : IKs4PerformanceStore
 {
     public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.FirstOrDefault(x => string.Equals(x.URN, urn, StringComparison.Ordinal));
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal));
     }
 
     public async Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)
@@ -27,10 +27,10 @@ public class JsonKs4PerformanceRepository(
             return [];
         }
 
-        var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
+        var establishments = (await establishmentFile.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
-        var performanceByUrn = (await establishmentPerformanceRepository.ReadAllAsync())
+        var performanceByUrn = (await establishmentPerformanceFile.ReadAllAsync())
             .Where(x => establishments.ContainsKey(x.Id))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
@@ -39,11 +39,11 @@ public class JsonKs4PerformanceRepository(
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var localAuthorityPerformanceByLaId = (await localAuthorityPerformanceRepository.ReadAllAsync())
+        var localAuthorityPerformanceByLaId = (await laPerformanceFile.ReadAllAsync())
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandPerformance = (await englandPerformanceRepository.ReadAllAsync()).FirstOrDefault();
+        var englandPerformance = (await englandPerformanceFile.ReadAllAsync()).FirstOrDefault();
 
         var results = new List<Ks4PerformanceData>(requestedUrns.Length);
 

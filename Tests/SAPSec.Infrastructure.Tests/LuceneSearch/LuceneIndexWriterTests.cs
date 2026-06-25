@@ -8,7 +8,7 @@ namespace SAPSec.Infrastructure.Tests.LuceneSearch;
 public class LuceneIndexWriterTests
 {
     [Fact]
-    public void BuildIndex_Writes_All_Repository_Items()
+    public void BuildIndex_Writes_All_Store_Items()
     {
         using var ctx = new LuceneIndexContext();
         var sut = new LuceneIndexWriter(ctx);
