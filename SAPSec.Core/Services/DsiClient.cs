@@ -1,9 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using SAPSec.Core.Configuration;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Authentication;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Security.Cryptography;

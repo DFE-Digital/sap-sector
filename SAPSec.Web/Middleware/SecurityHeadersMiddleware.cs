@@ -4,7 +4,7 @@ using SAPSec.Web.Helpers;
 namespace SAPSec.Web.Middleware;
 
 [ExcludeFromCodeCoverage]
-public class SecurityHeadersMiddleware(RequestDelegate next)
+public class SecurityHeadersMiddleware(RequestDelegate next, IWebHostEnvironment environment)
 {
     public async Task InvokeAsync(HttpContext context, IWebHostEnvironment environment)
     {
