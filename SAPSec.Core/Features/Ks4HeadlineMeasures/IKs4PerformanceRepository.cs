@@ -1,4 +1,4 @@
-using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.KS4.Performance;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures;
 

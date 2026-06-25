@@ -1,4 +1,4 @@
-using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.Absence;
 
 namespace SAPSec.Core.Features.Attendance;
 

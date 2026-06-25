@@ -13,11 +13,15 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.Absence;
+using SAPSec.Core.Model.Generated.KS4.Destinations;
+using SAPSec.Core.Model.Generated.KS4.Performance;
+using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
 
-namespace SAPSec.UI.Tests.Infrastructure;
+namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {

@@ -12,6 +12,8 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.Absence;
+using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
 using SAPSec.Core.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
@@ -19,7 +21,7 @@ using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Text.Json;
 
-namespace SAPSec.Web.Tests.Controllers;
+namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class SimilarSchoolsComparisonControllerTests
 {

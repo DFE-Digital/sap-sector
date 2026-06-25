@@ -1,6 +1,6 @@
 using Dapper;
 using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.Absence;
 
 namespace SAPSec.Infrastructure.Postgres;
 

@@ -4,6 +4,8 @@ using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.Absence;
+using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
 
 namespace SAPSec.Core.Tests.Features.Attendance.UseCases;
 

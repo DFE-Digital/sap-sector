@@ -6,6 +6,8 @@ using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.KS4.Performance;
+using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
 using SAPSec.Core.Services;
 
 namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;

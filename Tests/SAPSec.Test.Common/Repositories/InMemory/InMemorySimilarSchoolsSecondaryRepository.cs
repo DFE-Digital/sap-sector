@@ -1,5 +1,5 @@
 ﻿using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
 
 namespace SAPSec.Test.Common.Repositories.InMemory;
 

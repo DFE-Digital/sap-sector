@@ -5,6 +5,10 @@ using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model.Generated;
+using SAPSec.Core.Model.Generated.Absence;
+using SAPSec.Core.Model.Generated.KS4.Destinations;
+using SAPSec.Core.Model.Generated.KS4.Performance;
+using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
 
 namespace SAPSec.Infrastructure.Json;
 
