@@ -32,7 +32,7 @@ public static class EstablishmentExtensions
             return false;
         }
 
-        if (IsSecondaryWithExcludedStatus(establishment))
+        if (IsSecondaryExcluded(establishment))
         {
             return false;
         }
@@ -88,7 +88,7 @@ public static class EstablishmentExtensions
             && string.IsNullOrWhiteSpace(establishment.EstablishmentStatusName);
     }
 
-    private static bool IsSecondaryWithExcludedStatus(Establishment establishment)
+    private static bool IsSecondaryExcluded(Establishment establishment)
     {
         if (!PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
         {
