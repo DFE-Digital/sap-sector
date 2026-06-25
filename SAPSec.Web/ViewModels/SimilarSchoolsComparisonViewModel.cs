@@ -59,27 +59,27 @@ public class SimilarSchoolsComparisonViewModel
     public decimal? ThisSchoolAttainment8ThreeYearAverage { get; set; }
     public decimal? SelectedSchoolAttainment8ThreeYearAverage { get; set; }
     public decimal? EnglandAttainment8ThreeYearAverage { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolAttainment8YearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolAttainment8YearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandAttainment8YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? ThisSchoolAttainment8YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? SelectedSchoolAttainment8YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? EnglandAttainment8YearByYear { get; set; }
     public decimal? ThisSchoolEngMaths49ThreeYearAverage { get; set; }
     public decimal? SelectedSchoolEngMaths49ThreeYearAverage { get; set; }
     public decimal? EnglandEngMaths49ThreeYearAverage { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolEngMaths49YearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths49YearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandEngMaths49YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? ThisSchoolEngMaths49YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths49YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? EnglandEngMaths49YearByYear { get; set; }
     public decimal? ThisSchoolEngMaths59ThreeYearAverage { get; set; }
     public decimal? SelectedSchoolEngMaths59ThreeYearAverage { get; set; }
     public decimal? EnglandEngMaths59ThreeYearAverage { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolEngMaths59YearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths59YearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandEngMaths59YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? ThisSchoolEngMaths59YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? SelectedSchoolEngMaths59YearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? EnglandEngMaths59YearByYear { get; set; }
     public decimal? ThisSchoolDestinationsThreeYearAverage { get; set; }
     public decimal? SelectedSchoolDestinationsThreeYearAverage { get; set; }
     public decimal? EnglandDestinationsThreeYearAverage { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? ThisSchoolDestinationsYearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? SelectedSchoolDestinationsYearByYear { get; set; }
-    public SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries? EnglandDestinationsYearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? ThisSchoolDestinationsYearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? SelectedSchoolDestinationsYearByYear { get; set; }
+    public Ks4HeadlineMeasureSeries? EnglandDestinationsYearByYear { get; set; }
     public CoreSubjectSection? EnglishLanguage { get; set; }
     public CoreSubjectSection? EnglishLiterature { get; set; }
     public CoreSubjectSection? Biology { get; set; }

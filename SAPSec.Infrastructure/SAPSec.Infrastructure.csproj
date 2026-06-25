@@ -126,11 +126,21 @@
     <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\Files\PrimarySchools\EnglandPerformance.json" />
-    <Content Include="Data\Files\PrimarySchools\EstablishmentPerformance.json" />
-    <Content Include="Data\Files\PrimarySchools\EstablishmentSubjectEntries.json" />
-    <Content Include="Data\Files\PrimarySchools\LAPerformance.json" />
-    <Content Include="Data\Files\PrimarySchools\LASubjectEntries.json" />
+    <Content Include="Data\Files\PrimarySchools\EnglandPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\PrimarySchools\EstablishmentPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\PrimarySchools\EstablishmentSubjectEntries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\PrimarySchools\LAPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\PrimarySchools\LASubjectEntries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
