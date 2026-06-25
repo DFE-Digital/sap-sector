@@ -1,6 +1,6 @@
 using SAPSec.Data.Dto.Absence;
 
-namespace SAPSec.Core.Features.Attendance;
+namespace SAPSec.Data.Repositories;
 
 public interface IAbsenceRepository
 {

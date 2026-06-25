@@ -1,8 +1,8 @@
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 

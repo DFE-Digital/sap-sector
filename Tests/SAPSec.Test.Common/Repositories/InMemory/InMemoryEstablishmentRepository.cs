@@ -1,5 +1,5 @@
-﻿using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Data.Dto;
+﻿using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.Repositories.InMemory;
 

@@ -1,6 +1,6 @@
 using SAPSec.Data.Dto.KS4.Destinations;
 
-namespace SAPSec.Core.Features.Ks4HeadlineMeasures;
+namespace SAPSec.Data.Repositories;
 
 public interface IKs4DestinationsRepository
 {

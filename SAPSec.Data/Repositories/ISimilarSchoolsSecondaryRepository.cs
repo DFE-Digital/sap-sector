@@ -1,6 +1,6 @@
 ﻿using SAPSec.Data.Dto.SimilarSchools.Secondary;
 
-namespace SAPSec.Core.Features.SimilarSchools;
+namespace SAPSec.Data.Repositories;
 
 public interface ISimilarSchoolsSecondaryRepository
 {

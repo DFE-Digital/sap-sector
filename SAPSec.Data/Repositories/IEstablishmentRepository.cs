@@ -1,6 +1,6 @@
 ﻿using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Interfaces.Repositories;
+namespace SAPSec.Data.Repositories;
 
 public interface IEstablishmentRepository
 {

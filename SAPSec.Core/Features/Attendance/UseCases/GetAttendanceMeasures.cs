@@ -1,6 +1,5 @@
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 using System.Globalization;
 
 namespace SAPSec.Core.Features.Attendance.UseCases;

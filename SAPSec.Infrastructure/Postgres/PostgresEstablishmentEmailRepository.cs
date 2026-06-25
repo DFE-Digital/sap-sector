@@ -1,7 +1,7 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Postgres;
 

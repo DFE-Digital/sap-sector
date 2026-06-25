@@ -1,5 +1,5 @@
-﻿using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Data.Dto.KS4.Performance;
+﻿using SAPSec.Data.Dto.KS4.Performance;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.Repositories.InMemory;
 
