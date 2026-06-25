@@ -1,11 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Primary;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.UseCases;
+using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -18,8 +22,9 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
 public class SchoolController(
-    IFeatureFlagService featureFlagService,
-    IRequestSchoolAccessor requestSchoolAccessor) : Controller
+    IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
+    IFeatureFlagService featureFlagService) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
@@ -29,9 +34,29 @@ public class SchoolController(
 
     [HttpGet]
     [Route("ks2")]
-    public async Task<IActionResult> Ks2(string urn)
+    public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+        {
+            return NotFound();
+        }
+
+        var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn));
+
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(response.School);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
+            Url,
+            response.School.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
+
+        var model = new Ks2MeasuresPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School)
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -44,6 +69,13 @@ public class SchoolController(
     [HttpGet]
     [Route("view-similar-schools")]
     public async Task<IActionResult> ViewSimilarSchools(string urn)
+    {
+        return await RenderPrimarySchoolViewAsync(urn);
+    }
+
+    [HttpGet]
+    [Route("view-similar-schools/{similarSchoolUrn}")]
+    public async Task<IActionResult> SimilarSchoolComparison(string urn, string similarSchoolUrn)
     {
         return await RenderPrimarySchoolViewAsync(urn);
     }
@@ -69,17 +101,15 @@ public class SchoolController(
             return NotFound();
         }
 
-        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData["SchoolDetails"] = school;
-        if (Url is not null)
-        {
-            ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreatePrimary(
-                Url,
-                school?.Urn ?? urn,
-                ControllerContext.ActionDescriptor.ActionName);
-        }
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
 
-        return View(school);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(response.School);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
+            Url,
+            response.School.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 }

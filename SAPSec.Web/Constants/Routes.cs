@@ -30,6 +30,8 @@ public static class Routes
     {
         public static string School(string urn) => $"/school/primary/{urn}";
         public static string SchoolDetails(string urn) => $"/school/primary/{urn}/school-details";
+        public static string SimilarSchools(string urn) => $"/school/primary/{urn}/view-similar-schools";
+        public static string SimilarSchoolComparison(string urn, string similarSchoolUrn) => $"/school/primary/{urn}/view-similar-schools/{similarSchoolUrn}";
     }
 
     public static class Secondary
