@@ -1,4 +1,4 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Development"
-FeatureManagement__EnablePrimarySchools: "true"
+FeatureManagement__EnablePrimarySchools: "false"
 reset_review_db: "true"
