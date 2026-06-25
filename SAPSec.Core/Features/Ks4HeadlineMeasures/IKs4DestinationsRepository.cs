@@ -1,4 +1,4 @@
-using SAPSec.Core.Model.Generated.KS4.Destinations;
+using SAPSec.Data.Dto.KS4.Destinations;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures;
 

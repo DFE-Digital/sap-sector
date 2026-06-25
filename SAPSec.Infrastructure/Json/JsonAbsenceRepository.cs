@@ -1,6 +1,6 @@
 using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated.Absence;
+using SAPSec.Data.Dto.Absence;
 
 namespace SAPSec.Infrastructure.Json;
 

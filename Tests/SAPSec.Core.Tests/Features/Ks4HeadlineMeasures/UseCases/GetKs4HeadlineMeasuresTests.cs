@@ -3,8 +3,8 @@ using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated.KS4.Destinations;
-using SAPSec.Core.Model.Generated.KS4.Performance;
+using SAPSec.Data.Dto.KS4.Destinations;
+using SAPSec.Data.Dto.KS4.Performance;
 
 namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
 

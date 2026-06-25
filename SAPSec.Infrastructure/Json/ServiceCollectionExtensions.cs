@@ -4,11 +4,11 @@ using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Core.Model.Generated.Absence;
-using SAPSec.Core.Model.Generated.KS4.Destinations;
-using SAPSec.Core.Model.Generated.KS4.Performance;
-using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.KS4.Destinations;
+using SAPSec.Data.Dto.KS4.Performance;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
 
 namespace SAPSec.Infrastructure.Json;
 

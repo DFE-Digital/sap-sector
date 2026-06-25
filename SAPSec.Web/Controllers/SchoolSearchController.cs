@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using System.Text.RegularExpressions;

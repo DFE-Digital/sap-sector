@@ -1,8 +1,8 @@
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Core.Model.Generated.Absence;
-using SAPSec.Core.Model.Generated.KS4.Performance;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.KS4.Performance;
 
 namespace SAPSec.Core.Features.SimilarSchools;
 

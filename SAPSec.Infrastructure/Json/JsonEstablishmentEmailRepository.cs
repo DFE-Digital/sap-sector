@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Infrastructure.Json;
 

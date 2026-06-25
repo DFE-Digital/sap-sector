@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.SchoolSearch.Extensions;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch.Extensions;
 

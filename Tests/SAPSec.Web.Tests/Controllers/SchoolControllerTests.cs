@@ -11,10 +11,10 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Core.Model.Generated.Absence;
-using SAPSec.Core.Model.Generated.KS4.Performance;
-using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.KS4.Performance;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Web.Controllers;
 using System.Text.Json;
 

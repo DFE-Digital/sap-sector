@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
 
 namespace SAPSec.Infrastructure.Json;
 

@@ -5,10 +5,10 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Core.Model.Generated.KS4.Destinations;
-using SAPSec.Core.Model.Generated.KS4.Performance;
-using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.KS4.Destinations;
+using SAPSec.Data.Dto.KS4.Performance;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
 
 namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
 

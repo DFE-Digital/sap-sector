@@ -2,8 +2,8 @@
 using Moq;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Services;
 

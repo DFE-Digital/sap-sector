@@ -10,9 +10,9 @@ using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
-using SAPSec.Core.Model.Generated.SimilarSchools.Secondary;
 using SAPSec.Core.Services;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
