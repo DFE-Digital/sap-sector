@@ -4,7 +4,7 @@ using SAPSec.Web.Helpers;
 namespace SAPSec.Web.Middleware;
 
 [ExcludeFromCodeCoverage]
-public class SecurityHeadersMiddleware(RequestDelegate next)
+public class SecurityHeadersMiddleware(RequestDelegate next, IWebHostEnvironment environment)
 {
     public async Task InvokeAsync(HttpContext context)
     {
@@ -32,7 +32,7 @@ public class SecurityHeadersMiddleware(RequestDelegate next)
         context.Response.Headers.Append("X-Permitted-Cross-Domain-Policies", "none");
         context.Response.Headers.Append("X-XSS-Protection", "0");
         context.Response.Headers.Append("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload");
-        context.Response.Headers.Append("Content-Security-Policy", CspHelper.BuildPolicy(nonce));
+        context.Response.Headers.Append("Content-Security-Policy", CspHelper.BuildPolicy(nonce, environment));
 
         await next(context);
     }

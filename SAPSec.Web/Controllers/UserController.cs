@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Authentication;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Controllers;
@@ -68,7 +68,7 @@ public class UserController(
                 org.Name,
                 org.Category?.Name,
                 org.Urn);
-            return Redirect(Routes.FindASchool);
+            return Redirect(Routes.FindASchool());
         }
 
         _logger.LogInformation(

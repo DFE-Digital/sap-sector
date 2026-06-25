@@ -1,5 +1,4 @@
-﻿using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Authentication;
 using System.Security.Claims;
 
 namespace SAPSec.UI.Tests.TestData;

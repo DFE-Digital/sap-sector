@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SAPSec.Core.Configuration;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
