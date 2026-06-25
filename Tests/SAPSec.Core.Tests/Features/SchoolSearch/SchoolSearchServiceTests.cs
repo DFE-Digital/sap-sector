@@ -2,7 +2,7 @@ using Moq;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 
@@ -10,7 +10,7 @@ public class SchoolSearchServiceTests
 {
     private const string EnablePrimarySchoolsFeature = "EnablePrimarySchools";
     private readonly Mock<ISchoolSearchIndexReader> _indexReaderMock = new();
-    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
+    private readonly Mock<IEstablishmentStore> _establishmentStoreMock = new();
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
     private readonly SchoolSearchService _sut;
 
@@ -22,7 +22,7 @@ public class SchoolSearchServiceTests
 
         _sut = new SchoolSearchService(
             _indexReaderMock.Object,
-            _establishmentRepositoryMock.Object,
+            _establishmentStoreMock.Object,
             _featureFlagServiceMock.Object);
     }
 
@@ -32,32 +32,32 @@ public class SchoolSearchServiceTests
     [InlineData("123/456", "123456")]
     [InlineData(@"123\456", "123456")]
     [InlineData(" 123456 ", "123456")]
-    public async Task SearchByNumberAsync_WithSupportedNumberFormat_SearchesRepository(string input, string expectedNumber)
+    public async Task SearchByNumberAsync_WithSupportedNumberFormat_SearchesStore(string input, string expectedNumber)
     {
         var establishment = new Establishment { URN = "123456", PhaseOfEducationName = "Secondary" };
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync(expectedNumber))
             .ReturnsAsync(establishment);
 
         var result = await _sut.SearchByNumberAsync(input);
 
         result.Should().Be(establishment);
-        _establishmentRepositoryMock.Verify(x => x.GetEstablishmentByAnyNumberAsync(expectedNumber), Times.Once);
+        _establishmentStoreMock.Verify(x => x.GetEstablishmentByAnyNumberAsync(expectedNumber), Times.Once);
     }
 
     [Fact]
-    public async Task SearchByNumberAsync_WithSchoolName_DoesNotSearchRepository()
+    public async Task SearchByNumberAsync_WithSchoolName_DoesNotSearchStore()
     {
         var result = await _sut.SearchByNumberAsync("Test school");
 
         result.Should().BeNull();
-        _establishmentRepositoryMock.Verify(x => x.GetEstablishmentByAnyNumberAsync(It.IsAny<string>()), Times.Never);
+        _establishmentStoreMock.Verify(x => x.GetEstablishmentByAnyNumberAsync(It.IsAny<string>()), Times.Never);
     }
 
     [Fact]
     public async Task SearchByNumberAsync_WithPrimarySchoolAndFeatureDisabled_ReturnsNull()
     {
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Primary" });
 
@@ -69,7 +69,7 @@ public class SchoolSearchServiceTests
     [Fact]
     public async Task SearchByNumberAsync_WithNonPrimaryOrSecondarySchool_ReturnsNull()
     {
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Nursery" });
 
@@ -90,7 +90,7 @@ public class SchoolSearchServiceTests
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
             .ReturnsAsync(true);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -103,7 +103,7 @@ public class SchoolSearchServiceTests
     public async Task SearchByNumberAsync_WithSecondarySchoolAndMissingStatus_ReturnsSchool()
     {
         var establishment = new Establishment { URN = "123456", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" };
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -125,7 +125,7 @@ public class SchoolSearchServiceTests
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
             .ReturnsAsync(true);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -139,7 +139,7 @@ public class SchoolSearchServiceTests
     [InlineData("4")]
     public async Task SearchByNumberAsync_WithExcludedStatus_ReturnsNull(string statusId)
     {
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Secondary", EstablishmentStatusId = statusId });
 
@@ -154,7 +154,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "Primary School"), (2, "Secondary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", EstablishmentStatusId = "1" },
@@ -176,7 +176,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "All-through School"), (2, "Secondary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "All-through School", PhaseOfEducationName = "All-through", EstablishmentStatusId = "1" },
@@ -198,7 +198,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "Primary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment
@@ -222,7 +222,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "Primary School"), (2, "Secondary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", EstablishmentStatusId = "1" },
@@ -244,7 +244,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "Primary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationId = "2", PhaseOfEducationName = "Primary", EstablishmentStatusId = "2" }
@@ -261,7 +261,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(2, "Secondary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" }
@@ -284,7 +284,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "Primary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = statusId }
@@ -306,7 +306,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "Primary School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = statusId }
@@ -331,7 +331,7 @@ public class SchoolSearchServiceTests
         _indexReaderMock
             .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
             .ReturnsAsync([(1, "Excluded School")]);
-        _establishmentRepositoryMock
+        _establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "Excluded School", PhaseOfEducationName = phaseName, PhaseOfEducationId = phaseId, EstablishmentStatusId = "1" }

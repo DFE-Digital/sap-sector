@@ -1,9 +1,9 @@
 ﻿using SAPSec.Data.Dto;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
-namespace SAPSec.Test.Common.Repositories.InMemory;
+namespace SAPSec.Test.Common.InMemory;
 
-public class InMemoryEstablishmentRepository : IEstablishmentRepository
+public class InMemoryEstablishmentStore : IEstablishmentStore
 {
     private List<Establishment> _establishments = new();
     private List<EstablishmentEmail> _establishmentEmails = new();

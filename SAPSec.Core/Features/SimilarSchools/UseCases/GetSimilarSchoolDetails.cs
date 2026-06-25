@@ -1,29 +1,29 @@
 ﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class GetSimilarSchoolDetails(
-    IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    IEstablishmentStore establishmentStore,
+    ISimilarSchoolsSecondaryStore similarSchoolsStore,
     ISchoolDetailsService schoolDetailsService,
-    IKs4PerformanceRepository performanceRepository,
-    IAbsenceRepository absenceRepository)
+    IKs4PerformanceStore performanceStore,
+    IAbsenceStore absenceStore)
 {
     public async Task<GetSimilarSchoolDetailsResponse> Execute(GetSimilarSchoolDetailsRequest request)
     {
         // TODO: Validate SimilarSchoolUrn actually belongs in similar schools group for current school
-        var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var groups = await similarSchoolsStore.GetGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
-        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-        var performance = await performanceRepository.GetByUrnsAsync(urns);
-        var absence = await absenceRepository.GetByUrnsAsync(urns);
+        var establishments = await establishmentStore.GetEstablishmentsAsync(urns);
+        var performance = await performanceStore.GetByUrnsAsync(urns);
+        var absence = await absenceStore.GetByUrnsAsync(urns);
 
         var schools =
             from e in establishments
-            join p in performance on e.URN equals p.URN into perf
+            join p in performance on e.URN equals p.Urn into perf
             join a in absence on e.URN equals a.URN into abs
             select SimilarSchool.FromData(e, perf.FirstOrDefault()?.EstablishmentPerformance, abs.FirstOrDefault()?.EstablishmentAbsence);
 

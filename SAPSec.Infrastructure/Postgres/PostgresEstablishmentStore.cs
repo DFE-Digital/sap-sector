@@ -1,16 +1,16 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Infrastructure.Postgres;
 
-public class PostgresEstablishmentRepository : IEstablishmentRepository
+public class PostgresEstablishmentStore : IEstablishmentStore
 {
-    private readonly ILogger<PostgresEstablishmentRepository> _logger;
+    private readonly ILogger<PostgresEstablishmentStore> _logger;
     private readonly NpgsqlDataSourceFactory _factory;
 
-    public PostgresEstablishmentRepository(ILogger<PostgresEstablishmentRepository> logger, NpgsqlDataSourceFactory factory)
+    public PostgresEstablishmentStore(ILogger<PostgresEstablishmentStore> logger, NpgsqlDataSourceFactory factory)
     {
         _logger = logger;
         _factory = factory;

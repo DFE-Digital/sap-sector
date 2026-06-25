@@ -1,8 +1,8 @@
 using SAPSec.Data.Dto.Absence;
 
-namespace SAPSec.Data.Repositories;
+namespace SAPSec.Data.Store;
 
-public interface IAbsenceRepository
+public interface IAbsenceStore
 {
     Task<AbsenceData?> GetByUrnAsync(string urn);
     Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns);

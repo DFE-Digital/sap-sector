@@ -5,7 +5,7 @@ using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.KS4.Destinations;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Infrastructure.Json;
 
@@ -14,11 +14,11 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddJsonDependencies(this IServiceCollection services)
     {
         // JSON files
-        services.RemoveAll<IEstablishmentRepository>();
-        services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
-        services.RemoveAll<IKs4PerformanceRepository>();
-        services.RemoveAll<IKs4DestinationsRepository>();
-        services.RemoveAll<IAbsenceRepository>();
+        services.RemoveAll<IEstablishmentStore>();
+        services.RemoveAll<ISimilarSchoolsSecondaryStore>();
+        services.RemoveAll<IKs4PerformanceStore>();
+        services.RemoveAll<IKs4DestinationsStore>();
+        services.RemoveAll<IAbsenceStore>();
 
         services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
         services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
@@ -35,11 +35,11 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IJsonFile<EnglandAbsence>, JsonFile<EnglandAbsence>>();
         services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
 
-        services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
-        services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-        services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
-        services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
-        services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
+        services.AddSingleton<IEstablishmentStore, JsonEstablishmentStore>();
+        services.AddSingleton<ISimilarSchoolsSecondaryStore, JsonSimilarSchoolsSecondaryStore>();
+        services.AddSingleton<IKs4PerformanceStore, JsonKs4PerformanceStore>();
+        services.AddSingleton<IKs4DestinationsStore, JsonKs4DestinationsStore>();
+        services.AddSingleton<IAbsenceStore, JsonAbsenceStore>();
 
         return services;
     }

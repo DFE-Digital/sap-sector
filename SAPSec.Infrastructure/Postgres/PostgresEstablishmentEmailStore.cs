@@ -1,16 +1,16 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Infrastructure.Postgres;
 
-public class PostgresEstablishmentEmailRepository : IEstablishmentEmailRepository
+public class PostgresEstablishmentEmailStore : IEstablishmentEmailStore
 {
-    private readonly ILogger<PostgresEstablishmentEmailRepository> _logger;
+    private readonly ILogger<PostgresEstablishmentEmailStore> _logger;
     private readonly NpgsqlDataSourceFactory _factory;
 
-    public PostgresEstablishmentEmailRepository(ILogger<PostgresEstablishmentEmailRepository> logger, NpgsqlDataSourceFactory factory)
+    public PostgresEstablishmentEmailStore(ILogger<PostgresEstablishmentEmailStore> logger, NpgsqlDataSourceFactory factory)
     {
         _logger = logger;
         _factory = factory;

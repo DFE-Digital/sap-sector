@@ -4,7 +4,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto.KS4.Destinations;
 using SAPSec.Data.Dto.KS4.Performance;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
 
@@ -14,14 +14,14 @@ public class GetKs4HeadlineMeasuresTests
     public async Task Execute_WhenDataExists_ReturnsThreeYearAverages()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
+        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
-        performanceRepositoryMock
+        performanceStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4PerformanceData(
                 "123456",
@@ -44,7 +44,7 @@ public class GetKs4HeadlineMeasuresTests
                     Attainment8_Tot_Eng_Previous2_Num = "46.4"
                 }));
 
-        destinationsRepositoryMock
+        destinationsStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
                 "123456",
@@ -52,7 +52,7 @@ public class GetKs4HeadlineMeasuresTests
                 null,
                 null));
 
-        var sut = new GetKs4HeadlineMeasures(performanceRepositoryMock.Object, destinationsRepositoryMock.Object, schoolDetailsServiceMock.Object);
+        var sut = new GetKs4HeadlineMeasures(performanceStoreMock.Object, destinationsStoreMock.Object, schoolDetailsServiceMock.Object);
 
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
@@ -66,14 +66,14 @@ public class GetKs4HeadlineMeasuresTests
     public async Task Execute_WhenSchoolMissing_ThrowsNotFoundException()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
+        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("999999"))
             .ThrowsAsync(new NotFoundException("999999"));
 
-        var sut = new GetKs4HeadlineMeasures(performanceRepositoryMock.Object, destinationsRepositoryMock.Object, schoolDetailsServiceMock.Object);
+        var sut = new GetKs4HeadlineMeasures(performanceStoreMock.Object, destinationsStoreMock.Object, schoolDetailsServiceMock.Object);
 
         var act = async () => await sut.Execute(new GetKs4HeadlineMeasuresRequest("999999"));
 
@@ -84,14 +84,14 @@ public class GetKs4HeadlineMeasuresTests
     public async Task Execute_WhenLaAndEnglandContainNonNumericValues_TreatsValuesAsMissing()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
+        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
-        performanceRepositoryMock
+        performanceStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4PerformanceData(
                 "123456",
@@ -113,7 +113,7 @@ public class GetKs4HeadlineMeasuresTests
                     Attainment8_Tot_Eng_Previous_Num = "s",
                     Attainment8_Tot_Eng_Previous2_Num = "x"
                 }));
-        destinationsRepositoryMock
+        destinationsStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
                 "123456",
@@ -121,7 +121,7 @@ public class GetKs4HeadlineMeasuresTests
                 null,
                 null));
 
-        var sut = new GetKs4HeadlineMeasures(performanceRepositoryMock.Object, destinationsRepositoryMock.Object, schoolDetailsServiceMock.Object);
+        var sut = new GetKs4HeadlineMeasures(performanceStoreMock.Object, destinationsStoreMock.Object, schoolDetailsServiceMock.Object);
 
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
@@ -132,24 +132,24 @@ public class GetKs4HeadlineMeasuresTests
     }
 
     [Fact]
-    public async Task Execute_WhenRepositoryReturnsNullData_ReturnsResponseWithNullMeasures()
+    public async Task Execute_WhenStoreReturnsNullData_ReturnsResponseWithNullMeasures()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
+        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
-        performanceRepositoryMock
+        performanceStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync((Ks4PerformanceData?)null);
-        destinationsRepositoryMock
+        destinationsStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync((Ks4DestinationsData?)null);
 
-        var sut = new GetKs4HeadlineMeasures(performanceRepositoryMock.Object, destinationsRepositoryMock.Object, schoolDetailsServiceMock.Object);
+        var sut = new GetKs4HeadlineMeasures(performanceStoreMock.Object, destinationsStoreMock.Object, schoolDetailsServiceMock.Object);
 
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
@@ -184,21 +184,21 @@ public class GetKs4HeadlineMeasuresTests
     public async Task Execute_WhenDestinationsDataExists_ReturnsDestinationMeasures()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
+        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
-        performanceRepositoryMock
+        performanceStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4PerformanceData(
                 "123456",
                 null,
                 null,
                 null));
-        destinationsRepositoryMock
+        destinationsStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
                 "123456",
@@ -239,7 +239,7 @@ public class GetKs4HeadlineMeasuresTests
                     Employment_Tot_Eng_Previous2_Pct = "25.0"
                 }));
 
-        var sut = new GetKs4HeadlineMeasures(performanceRepositoryMock.Object, destinationsRepositoryMock.Object, schoolDetailsServiceMock.Object);
+        var sut = new GetKs4HeadlineMeasures(performanceStoreMock.Object, destinationsStoreMock.Object, schoolDetailsServiceMock.Object);
 
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
@@ -264,21 +264,21 @@ public class GetKs4HeadlineMeasuresTests
     public async Task Execute_WhenDestinationsContainNullAndNonNumericValues_TreatsValuesAsMissing()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
+        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
-        performanceRepositoryMock
+        performanceStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4PerformanceData(
                 "123456",
                 null,
                 null,
                 null));
-        destinationsRepositoryMock
+        destinationsStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
                 "123456",
@@ -319,7 +319,7 @@ public class GetKs4HeadlineMeasuresTests
                     Employment_Tot_Eng_Previous2_Pct = "25.0"
                 }));
 
-        var sut = new GetKs4HeadlineMeasures(performanceRepositoryMock.Object, destinationsRepositoryMock.Object, schoolDetailsServiceMock.Object);
+        var sut = new GetKs4HeadlineMeasures(performanceStoreMock.Object, destinationsStoreMock.Object, schoolDetailsServiceMock.Object);
 
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
@@ -344,14 +344,14 @@ public class GetKs4HeadlineMeasuresTests
     public async Task Execute_WhenDataContainsMixedNumericAndStringValues_MapsAllResponseProperties()
     {
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
-        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
+        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(CreateSchoolDetails("123456"));
 
-        performanceRepositoryMock
+        performanceStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4PerformanceData(
                 "123456",
@@ -391,7 +391,7 @@ public class GetKs4HeadlineMeasuresTests
                     EngMaths59_Tot_Eng_Previous_Pct = "47.0",
                     EngMaths59_Tot_Eng_Previous2_Pct = "x"
                 }));
-        destinationsRepositoryMock
+        destinationsStoreMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync(new Ks4DestinationsData(
                 "123456",
@@ -399,7 +399,7 @@ public class GetKs4HeadlineMeasuresTests
                 null,
                 null));
 
-        var sut = new GetKs4HeadlineMeasures(performanceRepositoryMock.Object, destinationsRepositoryMock.Object, schoolDetailsServiceMock.Object);
+        var sut = new GetKs4HeadlineMeasures(performanceStoreMock.Object, destinationsStoreMock.Object, schoolDetailsServiceMock.Object);
 
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 

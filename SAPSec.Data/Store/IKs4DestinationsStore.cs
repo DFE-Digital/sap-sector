@@ -1,8 +1,8 @@
 using SAPSec.Data.Dto.KS4.Destinations;
 
-namespace SAPSec.Data.Repositories;
+namespace SAPSec.Data.Store;
 
-public interface IKs4DestinationsRepository
+public interface IKs4DestinationsStore
 {
     Task<Ks4DestinationsData?> GetByUrnAsync(string urn);
     Task<IReadOnlyCollection<Ks4DestinationsData>> GetByUrnsAsync(IEnumerable<string> urns);

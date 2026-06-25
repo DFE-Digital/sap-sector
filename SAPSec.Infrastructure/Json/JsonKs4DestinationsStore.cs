@@ -1,13 +1,13 @@
 using SAPSec.Data.Dto.KS4.Destinations;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonKs4DestinationsRepository(
-    IEstablishmentRepository establishmentRepository,
-    IJsonFile<EstablishmentDestinations> establishmentDestinationsRepository,
-    IJsonFile<LADestinations> localAuthorityDestinationsRepository,
-    IJsonFile<EnglandDestinations> englandDestinationsRepository) : IKs4DestinationsRepository
+public class JsonKs4DestinationsStore(
+    IEstablishmentStore establishmentFile,
+    IJsonFile<EstablishmentDestinations> establishmentDestinationsFile,
+    IJsonFile<LADestinations> laDestinationsFile,
+    IJsonFile<EnglandDestinations> englandDestinationsFile) : IKs4DestinationsStore
 {
     public async Task<Ks4DestinationsData?> GetByUrnAsync(string urn)
     {
@@ -27,10 +27,10 @@ public class JsonKs4DestinationsRepository(
             return [];
         }
 
-        var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
+        var establishments = (await establishmentFile.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
-        var destinationsByUrn = (await establishmentDestinationsRepository.ReadAllAsync())
+        var destinationsByUrn = (await establishmentDestinationsFile.ReadAllAsync())
             .Where(x => establishments.ContainsKey(x.Id))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
@@ -39,11 +39,11 @@ public class JsonKs4DestinationsRepository(
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var localAuthorityDestinationsByLaId = (await localAuthorityDestinationsRepository.ReadAllAsync())
+        var localAuthorityDestinationsByLaId = (await laDestinationsFile.ReadAllAsync())
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandDestinations = (await englandDestinationsRepository.ReadAllAsync()).FirstOrDefault();
+        var englandDestinations = (await englandDestinationsFile.ReadAllAsync()).FirstOrDefault();
 
         var results = new List<Ks4DestinationsData>(requestedUrns.Length);
 

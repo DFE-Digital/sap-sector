@@ -1,24 +1,24 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
-using SAPSec.Data.Dto.KS4.Performance;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Dto.KS4.Destinations;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Infrastructure.Postgres;
 
-public class PostgresKs4PerformanceRepository(
-    ILogger<PostgresKs4PerformanceRepository> logger,
-    NpgsqlDataSourceFactory factory) : IKs4PerformanceRepository
+public class PostgresKs4DestinationsStore(
+    ILogger<PostgresKs4DestinationsStore> logger,
+    NpgsqlDataSourceFactory factory) : IKs4DestinationsStore
 {
-    private readonly ILogger<PostgresKs4PerformanceRepository> _logger = logger;
+    private readonly ILogger<PostgresKs4DestinationsStore> _logger = logger;
     private readonly NpgsqlDataSourceFactory _factory = factory;
 
-    public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
+    public async Task<Ks4DestinationsData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.FirstOrDefault(x => string.Equals(x.URN, urn, StringComparison.Ordinal));
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal));
     }
 
-    public async Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)
+    public async Task<IReadOnlyCollection<Ks4DestinationsData>> GetByUrnsAsync(IEnumerable<string> urns)
     {
         var requestedUrns = urns
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
@@ -27,7 +27,7 @@ public class PostgresKs4PerformanceRepository(
 
         if (requestedUrns.Length == 0)
         {
-            return Array.Empty<Ks4PerformanceData>();
+            return Array.Empty<Ks4DestinationsData>();
         }
 
         using var conn = await _factory.Create().OpenConnectionAsync();
@@ -38,11 +38,11 @@ public class PostgresKs4PerformanceRepository(
             WHERE "URN" = ANY(@urns);
         
             SELECT *
-            FROM public.v_establishment_performance
+            FROM public.v_establishment_destinations
             WHERE "Id" = ANY(@urns);
         
             SELECT *
-            FROM public.v_la_performance
+            FROM public.v_la_destinations
             WHERE "Id" IN (
                 SELECT DISTINCT "LAId" 
                 FROM public.v_establishment 
@@ -50,7 +50,7 @@ public class PostgresKs4PerformanceRepository(
             );
             
             SELECT *
-            FROM public.v_england_performance
+            FROM public.v_england_destinations
             WHERE "Id" = 'National';
         """;
 
@@ -59,15 +59,15 @@ public class PostgresKs4PerformanceRepository(
         var laIds = (await results.ReadAsync<(string, string)>())
             .ToDictionary(x => x.Item1, x => x.Item2, StringComparer.Ordinal);
 
-        var establishmentPerformance = (await results.ReadAsync<EstablishmentPerformance>())
+        var establishmentDestinations = (await results.ReadAsync<EstablishmentDestinations>())
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var localAuthorityPerformance = (await results.ReadAsync<LAPerformance>())
+        var localAuthorityDestinations = (await results.ReadAsync<LADestinations>())
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandPerformance = await results.ReadSingleOrDefaultAsync<EnglandPerformance>();
+        var englandDestinations = await results.ReadSingleOrDefaultAsync<EnglandDestinations>();
 
-        var output = new List<Ks4PerformanceData>(requestedUrns.Length);
+        var output = new List<Ks4DestinationsData>(requestedUrns.Length);
 
         foreach (var urn in requestedUrns)
         {
@@ -76,14 +76,14 @@ public class PostgresKs4PerformanceRepository(
                 continue;
             }
 
-            establishmentPerformance.TryGetValue(urn, out var schoolPerformance);
-            localAuthorityPerformance.TryGetValue(laId, out var laPerformance);
+            establishmentDestinations.TryGetValue(urn, out var schoolPerformance);
+            localAuthorityDestinations.TryGetValue(laId, out var laPerformance);
 
-            output.Add(new Ks4PerformanceData(
+            output.Add(new Ks4DestinationsData(
                 urn,
                 schoolPerformance,
                 laPerformance,
-                englandPerformance));
+                englandDestinations));
         }
 
         return output;

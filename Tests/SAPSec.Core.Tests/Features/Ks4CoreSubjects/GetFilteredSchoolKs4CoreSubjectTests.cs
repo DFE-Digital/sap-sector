@@ -6,7 +6,7 @@ using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;
 
@@ -56,32 +56,32 @@ public class GetFilteredSchoolKs4CoreSubjectTests
 
     private sealed class TestContext
     {
-        private readonly Mock<IKs4PerformanceRepository> _repositoryMock = new();
-        private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
-        private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
+        private readonly Mock<IKs4PerformanceStore> _repositoryMock = new();
+        private readonly Mock<IEstablishmentStore> _establishmentStoreMock = new();
+        private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsStoreMock = new();
 
         public TestContext()
         {
-            _similarSchoolsRepositoryMock
-                .Setup(x => x.GetSimilarSchoolsGroupAsync("100001"))
+            _similarSchoolsStoreMock
+                .Setup(x => x.GetGroupAsync("100001"))
                 .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
             var school = CreateSchool("100001", "Current school");
             _repositoryMock
                 .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(Array.Empty<Ks4PerformanceData>());
-            _establishmentRepositoryMock
+            _establishmentStoreMock
                 .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(new[] { school });
-            _establishmentRepositoryMock
+            _establishmentStoreMock
                 .Setup(x => x.GetEstablishmentAsync("100001"))
                 .ReturnsAsync(school);
         }
 
         public GetFilteredSchoolKs4CoreSubject Sut => new(
             _repositoryMock.Object,
-            new SchoolDetailsService(_establishmentRepositoryMock.Object, new Mock<ILogger<SchoolDetailsService>>().Object),
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
+            new SchoolDetailsService(_establishmentStoreMock.Object, new Mock<ILogger<SchoolDetailsService>>().Object),
+            _establishmentStoreMock.Object,
+            _similarSchoolsStoreMock.Object);
 
         public void SetupCurrentSchoolData(Action<EstablishmentPerformance>? establishment = null)
         {
