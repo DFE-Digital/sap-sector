@@ -1,0 +1,85 @@
+﻿using System.Net;
+using FluentAssertions;
+using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Constants;
+
+namespace SAPSec.Integration.Tests;
+
+[Collection("IntegrationTestsCollection")]
+public class HomeControllerTests(IntegrationTestFixture fixture)
+{
+    [Fact]
+    public async Task HomePage_ReturnsHtmlWithCorrectTitle()
+    {
+        var response = await fixture.Client.GetAsync("/");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+
+        var content = await response.Content.ReadAsStringAsync();
+        content.Should().Contain($"{PageTitles.ServiceHome} - {LayoutConstants.ServiceName} - GOV.UK");
+    }
+
+    [Fact]
+    public async Task HomePage_HasFooterLinks()
+    {
+        var response = await fixture.Client.GetAsync("/");
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/cookies\">Cookies</a>");
+        content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/accessibility\">Accessibility</a>");
+        content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/terms-and-conditions\">Terms and conditions</a>");
+        content.Should().Contain("https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers");
+        content.Should().Contain("Report a problem with this site to:");
+        content.Should().Contain($"href=\"mailto:{LayoutConstants.SupportEmail}\"");
+        content.Should().Contain($">{LayoutConstants.SupportEmail}</a>");
+    }
+
+    [Fact]
+    public async Task HomePage_HasSkipLink()
+    {
+        var response = await fixture.Client.GetAsync("/");
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("<a href=\"#main-content\" class=\"govuk-skip-link\"");
+    }
+
+    [Fact]
+    public async Task HomePage_HasCrownCopyright()
+    {
+        var response = await fixture.Client.GetAsync("/");
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("© Crown copyright");
+        content.Should().Contain("Open Government Licence v3.0");
+    }
+
+    [Fact]
+    public async Task HomePage_WithoutAnalyticsConsent_DoesNotRenderAnalyticsTags()
+    {
+        var response = await fixture.Client.GetAsync("/");
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().NotContain("googletagmanager.com/gtm.js");
+        content.Should().NotContain("googletagmanager.com/ns.html");
+        content.Should().NotContain("clarity.ms/tag/");
+    }
+
+    [Fact]
+    public async Task HomePage_WithAnalyticsConsent_RendersAnalyticsTags()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "/");
+        request.Headers.Add("Cookie", "cookie_policy=enabled");
+
+        var response = await fixture.Client.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+
+        content.Should().Contain("googletagmanager.com/gtm.js?id='+i+dl+'");
+        content.Should().Contain("GTM-M3BPJWJD");
+        content.Should().Contain("googletagmanager.com/ns.html?id=GTM-M3BPJWJD");
+        content.Should().Contain("clarity.ms/tag/");
+        content.Should().Contain("gtm_auth=");
+        content.Should().Contain("gtm_preview=");
+        content.Should().Contain("gtm_cookies_win=x");
+    }
+}
