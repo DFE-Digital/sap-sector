@@ -1,7 +1,6 @@
-﻿using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Authentication;
 
-namespace SAPSec.UI.Tests.Mocks;
+namespace SAPSec.UI.Tests.TestData;
 
 /// <summary>
 /// Mock implementation of IDsiClient for UI testing.
