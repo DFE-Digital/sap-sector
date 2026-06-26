@@ -1579,6 +1579,101 @@ public class FindSimilarSchoolsTests
     }
 
     [Theory]
+    [InlineData("gs", new[] { "S" }, new[] { "100002" })]
+    [InlineData("gs", new[] { "M" }, new[] { "100003" })]
+    [InlineData("gs", new[] { "MS" }, new[] { "100004", "100005", "100006" })]
+    [InlineData("gs", new[] { "N" }, new[] { "100007" })]
+    [InlineData("gs", new[] { "S", "M" , "MS", "N" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007"     })] 
+    // Filter key is case insensitive
+    [InlineData("GS", new[] { "S", "M" }, new[] { "100002", "100003" })]
+    // Filter values are case insensitive
+    [InlineData("gs", new[] { "s", "m" }, new[] { "100002", "100003" })]
+    // Invalid filter values are ignored
+    [InlineData("gs", new[] { "xxx", "M" }, new[] { "100003" })]
+    // Duplicate filter values are ignored
+    [InlineData("gs", new[] { "M", "M" }, new[] { "100003" })]
+    // Empty filter values returns all results
+    [InlineData("gs", new string[0], new[] { "100002", "100003", "100004", "100005", "100006", "100007" })]
+    // All filter values returns all results
+    [InlineData("gs", new[] { "N", "S", "M", "MS" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007" })]
+    public async Task FilterBy_GovernanceStructure(string filterKey, string[] filterValues, string[] expectedUrns)
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002", TrustSchoolFlagId = "5" },
+            new() { URN = "100003", TrustSchoolFlagId = "3" },
+            new() { URN = "100004", TrustSchoolFlagId = "1" },
+            new() { URN = "100005", TrustSchoolFlagId = "2", EstablishmentTypeGroupId = "2"},
+            new() { URN = "100006", TrustSchoolFlagId = "0", EstablishmentTypeGroupId = "4"},
+            new() { URN = "100007", TrustSchoolFlagId = "0", EstablishmentTypeGroupId = "3" }
+
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" },
+            new() { URN = "100001", NeighbourURN = "100007" }
+
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [filterKey] = filterValues
+        }));
+
+        response.AllResults.Select(r => r.SimilarSchool.URN)
+            .Should().BeEquivalentTo(expectedUrns);
+    }
+
+    [Fact]
+    public async Task FilterBy_GovernanceStructure_FilterOptions()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001", TrustSchoolFlagId = "5" },
+            new() { URN = "100002", TrustSchoolFlagId = "5" },
+            new() { URN = "100003", TrustSchoolFlagId = "3" },
+            new() { URN = "100004", TrustSchoolFlagId = "3" },
+            new() { URN = "100005", TrustSchoolFlagId = "1" },
+            new() { URN = "100006", TrustSchoolFlagId = "2" },
+            new() { URN = "100007", TrustSchoolFlagId = "0", EstablishmentTypeGroupId = "4" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" },
+            new() { URN = "100001", NeighbourURN = "100005" },
+            new() { URN = "100001", NeighbourURN = "100006" }
+        );
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            ["np"] = ["Has Nursery Classes", "No Nursery Classes"]
+        }));
+
+        response.FilterOptions.Should().SatisfyRespectively(
+            // Numeric range filters are always included
+            f => f.Key.Should().Be("sciu"),
+            f => f.Should().BeEquivalentTo(new
+            {
+                Key = "np",
+                Name = "Nursery provision",
+                Options = new[]
+                {
+                    new { Key = "Has Nursery Classes", Name = "Has Nursery Classes", Selected = true, Count = 2 },
+                    new { Key = "No Nursery Classes", Name = "No Nursery Classes", Selected = true, Count = 2 },
+                    new { Key = "Not applicable", Name = "Not applicable", Selected = false, Count = 1 }
+                },
+                CurrentSchoolValue = DataWithAvailability.Available("Has Nursery Classes")
+            }),
+            // Numeric range filters are always included
+            f => f.Key.Should().Be("oar"),
+            f => f.Key.Should().Be("par")
+        );
+    }
+
+    [Theory]
     [InlineData("np", new[] { "Has Nursery Classes" }, new[] { "100002" })]
     [InlineData("np", new[] { "No Nursery Classes" }, new[] { "100003" })]
     [InlineData("np", new[] { "Not applicable" }, new[] { "100004" })]
