@@ -22,15 +22,12 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         {
             return items;
         }
-        var temp = items.Where(i =>
+
+        return items.Where(i =>
                  (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5") // Single-academy trust (SAT)
               || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3") // Multi-academy trust (MAT) 
               || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")) // Maintained school - local authority controlled
               || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id != "4")); // No known group
-
-        var count = temp.Count();
-
-        return temp;
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
