@@ -1,7 +1,4 @@
-﻿using Dfe.Analytics;
-using Dfe.Analytics.AspNetCore;
-using Dfe.Analytics.Events;
-using GovUk.Frontend.AspNetCore;
+﻿using GovUk.Frontend.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -98,7 +95,7 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -204,7 +201,7 @@ public class Program
             app.UseHsts();
         }
         app.UseForwardedHeaders();
-        app.UseMiddleware<SecurityHeadersMiddleware>();
+        app.UseMiddleware<SecurityHeadersMiddleware>(app.Environment);
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider
