@@ -1583,7 +1583,7 @@ public class FindSimilarSchoolsTests
     [InlineData("gs", new[] { "M" }, new[] { "100003" })]
     [InlineData("gs", new[] { "MS" }, new[] { "100004", "100005", "100006" })]
     [InlineData("gs", new[] { "N" }, new[] { "100007" })]
-    [InlineData("gs", new[] { "S", "M" , "MS", "N" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007"     })] 
+    [InlineData("gs", new[] { "S", "M" , "MS", "N" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007" })] 
     // Filter key is case insensitive
     [InlineData("GS", new[] { "S", "M" }, new[] { "100002", "100003" })]
     // Filter values are case insensitive
@@ -1773,7 +1773,6 @@ public class FindSimilarSchoolsTests
             f => f.Key.Should().Be("par")
         );
     }
-
 
     [Theory]
     [InlineData("5", "", "Single-academy trust (SAT)")]

@@ -23,13 +23,10 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
             return items;
         }
         var temp = items.Where(i =>
-                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5")
-              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3")
-              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id is ("1" or "2"))
-              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0"
-                                                                  && i.EstablishmentTypeGroup?.Id == "4")
-              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0"
-                                                                  && i.EstablishmentTypeGroup?.Id != "4"));
+                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5") // Single-academy trust (SAT)
+              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3") // Multi-academy trust (MAT) 
+              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id is "1" or "2" || (i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4"))) // Maintained school - local authority controlled
+              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id != "4")); // No known group
 
         var count = temp.Count();
 
@@ -67,21 +64,10 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
             return new("M", "Multi-academy trust (MAT)");
         }
 
-        if (i.TrustSchoolFlag?.Id is ( "1" or "2" ) || (i.TrustSchoolFlag?.Id == "0" 
-                                 && i.EstablishmentTypeGroup?.Id == "4"))
+        if (i.TrustSchoolFlag?.Id is ( "1" or "2" ) || (i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4"))
         {
             return new("MS", "Maintained school - local authority controlled");
         }
-
-        //if (i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
-        //{
-        //    return new("MS", "Maintained scool - local authority controlled");
-        //}
-
-        //if ((i.TrustSchoolFlag?.Id == "0" || i.TrustSchoolFlag?.Id == ""))
-        //{
-        //    return new("N", "No known group");
-        //}
 
         return new("N", "No known group");
     }
