@@ -22,10 +22,13 @@
 @section Scripts {
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }
 
 <section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
@@ -392,7 +395,7 @@
     <h2 class="govuk-heading-m" id="destinations-heading">Staying in education or entering employment</h2>
     <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
         <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Information about staying in education or entering employment data</span>
+            <span class="govuk-details__summary-text">Information about meeting the expected standard</span>
         </summary>
         <div class="govuk-details__text">
             <p class="govuk-body-s govuk-!-margin-bottom-2">
@@ -403,7 +406,6 @@
             </p>
         </div>
     </details>
-
 
     <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
         <div class="govuk-form-group">

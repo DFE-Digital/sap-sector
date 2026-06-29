@@ -1,0 +1,62 @@
+@using SAPSec.Core.Model
+@using SAPSec.Web.ViewModels
+
+@model SAPSec.Web.Areas.Primary.ViewModels.Ks2MeasuresPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "KS2 performance measures";
+}
+
+<div class="app-school-page">
+    <span class="govuk-caption-xl">@Model.School.Name</span>
+    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+    <p class="govuk-body">
+        Compare this school's KS2 performance measures with:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li><b>50</b> similar primary phase schools (including all-throughs)</li>
+        <li>the local authority average</li>
+        <li>the national average</li>
+    </ul>
+
+    <p class="govuk-body">
+        Find out <a href="/school/primary/@Model.School.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+    </p>
+
+    <partial name="_Ks2ProgressRWMInfo" />
+
+    <form action="" method="get">
+        <section class="govuk-!-margin-bottom-7 govuk-!-margin-top-9 app-progress" aria-labelledby="expected-rwm-heading">
+            <h2 class="govuk-heading-m" id="expected-rwm-heading">Meeting expected standard in reading, writing and maths</h2>
+
+            <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Information about staying in education or entering employment data</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        Pupils achieve the expected standard when they achieve a scaled score of 100 or more
+                        in reading and maths tests, and are assessed by their teacher in writing as &lsquo;working at
+                        the expected standard&rsquo; or &lsquo;working at greater depth&rsquo;.
+                    </p>
+                </div>
+            </details>
+            
+            <partial name="Measures/_Measure" model=@Model.MeetingExpectedStandardRwm />
+        </section>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
+}

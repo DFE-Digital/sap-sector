@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Test.Common;
-using SAPSec.Test.Common.Repositories.InMemory;
+using SAPSec.Test.Common.InMemory;
 using Xunit.Abstractions;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;
@@ -14,7 +14,7 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     private const int PopulateEstablishmentDataOnAttempt = 2;
 
     private TestOutputLogger<StartupIndexBuilder> logger = new(output);
-    private InMemoryEstablishmentRepository establishmentRepo = new();
+    private InMemoryEstablishmentStore establishmentRepo = new();
 
     [Fact]
     public async Task StartAsync_PopulatesIndexWithEstablishments_And_Completes()

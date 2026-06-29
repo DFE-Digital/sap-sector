@@ -5,13 +5,13 @@ using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
 
-public class JsonSimilarSchoolsSecondaryRepositoryTests
+public class JsonSimilarSchoolsSecondaryStoreTests
 {
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>> _groupsRepo = new();
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesEntry>> _valuesRepo = new();
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>> _standardDeviationsRepo = new();
 
-    private JsonSimilarSchoolsSecondaryRepository CreateSut() =>
+    private JsonSimilarSchoolsSecondaryStore CreateSut() =>
         new(
             _groupsRepo.Object,
             _valuesRepo.Object,
@@ -30,7 +30,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         var sut = CreateSut();
 
-        var result = await sut.GetSimilarSchoolsGroupAsync("123456");
+        var result = await sut.GetGroupAsync("123456");
 
         Assert.Equal(2, result.Count);
         Assert.Contains("654321", result.Select(r => r.NeighbourURN));
@@ -62,7 +62,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         var sut = CreateSut();
 
-        var group = await sut.GetSimilarSchoolsGroupAsync("123456");
+        var group = await sut.GetGroupAsync("123456");
 
         Assert.Single(group);
         Assert.Equal("654321", group.First().NeighbourURN);
@@ -91,7 +91,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         var sut = CreateSut();
 
-        var result = await sut.GetSecondaryValuesByUrnsAsync(new[] { "123456", "654321" });
+        var result = await sut.GetValuesByUrnsAsync(new[] { "123456", "654321" });
 
         Assert.Single(result);
         Assert.Contains(result, v => v.URN == "123456");
@@ -124,7 +124,7 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 
         var sut = CreateSut();
 
-        var result = await sut.GetSimilarSchoolsSecondaryStandardDeviationsAsync();
+        var result = await sut.GetStandardDeviationsAsync();
 
         Assert.Equal(2.45m, result.KS2MRP);
     }

@@ -3,7 +3,7 @@ using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Repositories;
+using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Tests.Features.Attendance.UseCases;
 
@@ -12,18 +12,18 @@ public class GetAttendanceMeasuresTests
     [Fact]
     public async Task Execute_WhenSchoolMissing_ThrowsNotFoundException()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentStoreMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
-        establishmentRepositoryMock
+        establishmentStoreMock
             .Setup(x => x.GetEstablishmentAsync("999999"))
             .ReturnsAsync((Establishment?)null);
-        similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+        similarSchoolsStoreMock
+            .Setup(x => x.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentStoreMock.Object, similarSchoolsStoreMock.Object);
 
         var act = async () => await sut.Execute(new GetAttendanceMeasuresRequest("999999"));
 
@@ -34,11 +34,11 @@ public class GetAttendanceMeasuresTests
     [Fact]
     public async Task Execute_WhenDataExists_MapsOverallAndPersistentValues()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentStoreMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
-        establishmentRepositoryMock
+        establishmentStoreMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", LAId = "373", EstablishmentName = "Current School" });
 
@@ -73,8 +73,8 @@ public class GetAttendanceMeasuresTests
                     Abs_Persistent_Eng_Previous_Pct = "15.8",
                     Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
-        similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync("123456"))
+        similarSchoolsStoreMock
+            .Setup(x => x.GetGroupAsync("123456"))
             .ReturnsAsync(
             [
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "123456", NeighbourURN = "200001" },
@@ -111,7 +111,7 @@ public class GetAttendanceMeasuresTests
                     null,
                     null)
             ]);
-        establishmentRepositoryMock
+        establishmentStoreMock
             .Setup(x => x.GetEstablishmentsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200001", "200002" }))))
             .ReturnsAsync(
             [
@@ -119,7 +119,7 @@ public class GetAttendanceMeasuresTests
                 new Establishment { URN = "200002", EstablishmentName = "Alpha School" }
             ]);
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentStoreMock.Object, similarSchoolsStoreMock.Object);
 
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
@@ -149,24 +149,24 @@ public class GetAttendanceMeasuresTests
     }
 
     [Fact]
-    public async Task Execute_WhenRepositoryReturnsNull_ReturnsNullMeasures()
+    public async Task Execute_WhenStoreReturnsNull_ReturnsNullMeasures()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentStoreMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
-        establishmentRepositoryMock
+        establishmentStoreMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456" });
-        similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+        similarSchoolsStoreMock
+            .Setup(x => x.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         repositoryMock
             .Setup(x => x.GetByUrnAsync("123456"))
             .ReturnsAsync((AbsenceData?)null);
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentStoreMock.Object, similarSchoolsStoreMock.Object);
 
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
@@ -187,15 +187,15 @@ public class GetAttendanceMeasuresTests
     [Fact]
     public async Task Execute_WhenAnyYearMissing_ThreeYearAverageIsNull()
     {
-        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
-        var repositoryMock = new Mock<IAbsenceRepository>();
-        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        var establishmentStoreMock = new Mock<IEstablishmentStore>();
+        var repositoryMock = new Mock<IAbsenceStore>();
+        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
 
-        establishmentRepositoryMock
+        establishmentStoreMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", LAId = "373" });
-        similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+        similarSchoolsStoreMock
+            .Setup(x => x.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         repositoryMock
@@ -230,7 +230,7 @@ public class GetAttendanceMeasuresTests
                     Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
 
-        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
+        var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentStoreMock.Object, similarSchoolsStoreMock.Object);
 
         var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 

@@ -1,4 +1,5 @@
 using System.Globalization;
+using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Model;
 using SAPSec.Web.Helpers;
 
@@ -16,30 +17,30 @@ public class Ks4HeadlineMeasuresPageViewModel
     public required decimal? LocalAuthorityAttainment8ThreeYearAverage { get; set; }
     public required decimal? EnglandAttainment8ThreeYearAverage { get; set; }
     public required IReadOnlyList<TopPerformerRow> Attainment8TopPerformers { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolAttainment8YearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsAttainment8YearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityAttainment8YearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries EnglandAttainment8YearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries SchoolAttainment8YearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries SimilarSchoolsAttainment8YearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries LocalAuthorityAttainment8YearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries EnglandAttainment8YearByYear { get; set; }
 
     public required decimal? SchoolEngMathsThreeYearAverage { get; set; }
     public required decimal? SimilarSchoolsEngMathsThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityEngMathsThreeYearAverage { get; set; }
     public required decimal? EnglandEngMathsThreeYearAverage { get; set; }
     public required IReadOnlyList<TopPerformerRow> EngMathsTopPerformers { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolEngMathsYearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsEngMathsYearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityEngMathsYearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries EnglandEngMathsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries SchoolEngMathsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries SimilarSchoolsEngMathsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries LocalAuthorityEngMathsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries EnglandEngMathsYearByYear { get; set; }
 
     public required decimal? SchoolDestinationsThreeYearAverage { get; set; }
     public required decimal? SimilarSchoolsDestinationsThreeYearAverage { get; set; }
     public required decimal? LocalAuthorityDestinationsThreeYearAverage { get; set; }
     public required decimal? EnglandDestinationsThreeYearAverage { get; set; }
     public required IReadOnlyList<TopPerformerRow> DestinationsTopPerformers { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SchoolDestinationsYearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries SimilarSchoolsDestinationsYearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries LocalAuthorityDestinationsYearByYear { get; set; }
-    public required SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4HeadlineMeasureSeries EnglandDestinationsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries SchoolDestinationsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries SimilarSchoolsDestinationsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries LocalAuthorityDestinationsYearByYear { get; set; }
+    public required Ks4HeadlineMeasureSeries EnglandDestinationsYearByYear { get; set; }
 
     public string SchoolAttainment8Display => DisplayValue(SchoolAttainment8ThreeYearAverage);
     public string SimilarSchoolsAttainment8Display => DisplayValue(SimilarSchoolsAttainment8ThreeYearAverage);

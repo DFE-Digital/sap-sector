@@ -489,7 +489,7 @@ public class SchoolController : Controller
     }
 
     private static IReadOnlyList<TopPerformerRow> MapTopPerformers(
-        IReadOnlyList<SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases.Ks4TopPerformer> topPerformers,
+        IReadOnlyList<Ks4TopPerformer> topPerformers,
         Func<decimal?, string> formatter) =>
         topPerformers
             .Select(x => new TopPerformerRow(x.Rank, x.Urn, x.Name, x.Value, formatter(x.Value), x.IsCurrentSchool))
