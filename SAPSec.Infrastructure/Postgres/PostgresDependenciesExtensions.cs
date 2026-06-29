@@ -1,8 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Postgres;
 

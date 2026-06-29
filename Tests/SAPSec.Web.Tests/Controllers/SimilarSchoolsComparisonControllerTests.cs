@@ -2,24 +2,24 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Model.Generated;
 using SAPSec.Core.Services;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
+using SAPSec.Data.Repositories;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Text.Json;
 
-namespace SAPSec.Web.Tests.Controllers;
+namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class SimilarSchoolsComparisonControllerTests
 {

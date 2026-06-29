@@ -2,21 +2,20 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.KS4.Performance;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
+using SAPSec.Data.Repositories;
 using SAPSec.Web.Controllers;
-using SAPSec.Web.Services;
 using System.Text.Json;
 
-namespace SAPSec.Web.Tests.Controllers;
+namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class SchoolControllerTests
 {
@@ -176,7 +175,7 @@ public class SchoolControllerTests
         var result = await _sut.Ks4HeadlineMeasures(urn);
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
-        viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel>();
+        viewResult.Model.Should().BeOfType<ViewModels.Ks4HeadlineMeasuresPageViewModel>();
     }
 
     #endregion
@@ -203,7 +202,7 @@ public class SchoolControllerTests
         var result = await _sut.Ks4CoreSubjects(urn);
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
-        viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel>();
+        viewResult.Model.Should().BeOfType<ViewModels.Ks4CoreSubjectsPageViewModel>();
     }
 
     [Fact]
@@ -286,7 +285,7 @@ public class SchoolControllerTests
         var result = await _sut.Attendance(urn);
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
-        var model = viewResult.Model.Should().BeOfType<SAPSec.Web.ViewModels.SchoolAttendancePageViewModel>().Subject;
+        var model = viewResult.Model.Should().BeOfType<ViewModels.SchoolAttendancePageViewModel>().Subject;
         model.SchoolDetails.Urn.Should().Be(urn);
         model.SchoolDetails.Name.Should().Be("Test Academy");
     }

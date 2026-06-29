@@ -1,5 +1,6 @@
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 

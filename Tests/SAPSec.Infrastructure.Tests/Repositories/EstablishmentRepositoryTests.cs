@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
