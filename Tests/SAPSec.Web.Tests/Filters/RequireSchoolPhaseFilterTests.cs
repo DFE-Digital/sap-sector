@@ -16,7 +16,7 @@ public class RequireSchoolPhaseFilterTests
     private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
 
     [Fact]
-    public async Task SecondaryFilter_WithPrimarySchoolIndex_RedirectsToPrimaryCanonicalRoute()
+    public async Task SecondaryFilter_WithPrimarySchoolIndex_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "Primary");
         _schoolDetailsServiceMock
@@ -29,12 +29,11 @@ public class RequireSchoolPhaseFilterTests
             action: "Index",
             routeValues: [("urn", "123456")]);
 
-        var redirect = result.Should().BeOfType<RedirectResult>().Subject;
-        redirect.Url.Should().Be("/school/primary/123456");
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]
-    public async Task PrimaryFilter_WithSecondarySchoolIndex_RedirectsToSecondaryCanonicalRoute()
+    public async Task PrimaryFilter_WithSecondarySchoolIndex_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "Secondary");
         _schoolDetailsServiceMock
@@ -48,8 +47,7 @@ public class RequireSchoolPhaseFilterTests
             area: "Primary",
             routeValues: [("urn", "123456")]);
 
-        var redirect = result.Should().BeOfType<RedirectResult>().Subject;
-        redirect.Url.Should().Be("/school/123456");
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]

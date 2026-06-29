@@ -43,10 +43,7 @@ public sealed class RequireSchoolPhaseFilter(
             var school = await GetOrLoadSchoolAsync(context.HttpContext, urn, schoolDetailsService);
             if (!MatchesExpectedPhase(school, expectedPhase))
             {
-                var canonicalPath = GetCanonicalPath(context, school);
-                context.Result = canonicalPath is null
-                    ? new NotFoundResult()
-                    : new RedirectResult(canonicalPath + context.HttpContext.Request.QueryString, false);
+                context.Result = new NotFoundResult();
                 return;
             }
         }
@@ -74,43 +71,6 @@ public sealed class RequireSchoolPhaseFilter(
             ExpectedSchoolPhase.Secondary => school.IsSecondarySchool(),
             _ => false
         };
-
-    private static string? GetCanonicalPath(ActionExecutingContext context, SchoolDetails school)
-    {
-        var area = context.RouteData.Values["area"]?.ToString();
-        var controller = context.RouteData.Values["controller"]?.ToString();
-        var action = context.RouteData.Values["action"]?.ToString();
-        var isPrimarySchool = school.IsPrimarySchool();
-        var isSecondarySchool = school.IsSecondarySchool();
-
-        if (!isPrimarySchool && !isSecondarySchool)
-        {
-            return null;
-        }
-
-        return (area, controller, action, isPrimarySchool) switch
-        {
-            ("Primary", "School", "Index", false) => $"/school/{school.Urn}",
-            ("Primary", "School", "Attendance", false) => $"/school/{school.Urn}/attendance",
-            ("Primary", "School", "SchoolDetails", false) => $"/school/{school.Urn}/school-details",
-            ("Primary", "School", "WhatIsASimilarSchool", false) => $"/school/{school.Urn}/what-is-a-similar-school",
-            ("Primary", "School", "ViewSimilarSchools", false) => $"/school/{school.Urn}/view-similar-schools",
-            ("Primary", "School", "Ks2", false) => null,
-            (null, "School", "Index", true) => $"/school/primary/{school.Urn}",
-            (null, "School", "Attendance", true) => $"/school/primary/{school.Urn}/attendance",
-            (null, "School", "SchoolDetails", true) => $"/school/primary/{school.Urn}/school-details",
-            (null, "School", "WhatIsASimilarSchool", true) => $"/school/primary/{school.Urn}/what-is-a-similar-school",
-            (null, "School", "Ks4HeadlineMeasures", true) => null,
-            (null, "School", "Ks4HeadlineMeasuresData", true) => null,
-            (null, "School", "Ks4DestinationsData", true) => null,
-            (null, "School", "Ks4CoreSubjects", true) => null,
-            (null, "School", "Ks4CoreSubjectsData", true) => null,
-            (null, "School", "AttendanceData", true) => null,
-            (null, "SimilarSchools", "ViewSimilarSchools", true) => $"/school/primary/{school.Urn}/view-similar-schools",
-            (null, "SimilarSchools", "Index", true) => $"/school/primary/{school.Urn}/view-similar-schools",
-            _ => null
-        };
-    }
 
     private static async Task<SchoolDetails> GetOrLoadSchoolAsync(
         HttpContext httpContext,
