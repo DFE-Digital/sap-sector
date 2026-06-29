@@ -6,19 +6,19 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
+using SAPSec.Data.Dto.KS4.Destinations;
+using SAPSec.Data.Dto.KS4.Performance;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
+using SAPSec.Data.Repositories;
 using SAPSec.Infrastructure.Json;
-using SAPSec.UI.Tests.Mocks;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
 
-namespace SAPSec.UI.Tests.Infrastructure;
+namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {

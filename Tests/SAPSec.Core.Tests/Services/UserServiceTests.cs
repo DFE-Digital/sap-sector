@@ -1,4 +1,4 @@
-using SAPSec.Core.Model;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Services.Helper;
 
 namespace SAPSec.Core.Tests.Services;

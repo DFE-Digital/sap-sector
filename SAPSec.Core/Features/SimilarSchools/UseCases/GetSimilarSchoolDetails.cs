@@ -1,9 +1,7 @@
-﻿using SAPSec.Core.Features.Attendance;
-using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
-using SAPSec.Core.Interfaces.Repositories;
+﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 

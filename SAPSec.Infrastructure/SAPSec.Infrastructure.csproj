@@ -25,6 +25,33 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Data\Files\Generated\EnglandAbsence.json" />
+    <None Remove="Data\Files\Generated\EnglandDestinations.json" />
+    <None Remove="Data\Files\Generated\EnglandPerformance.json" />
+    <None Remove="Data\Files\Generated\Establishment.json" />
+    <None Remove="Data\Files\Generated\EstablishmentAbsence.json" />
+    <None Remove="Data\Files\Generated\EstablishmentDestinations.json" />
+    <None Remove="Data\Files\Generated\EstablishmentEmail.json" />
+    <None Remove="Data\Files\Generated\EstablishmentGroupLinks.json" />
+    <None Remove="Data\Files\Generated\EstablishmentLinks.json" />
+    <None Remove="Data\Files\Generated\EstablishmentPerformance.json" />
+    <None Remove="Data\Files\Generated\EstablishmentSubjectEntries.json" />
+    <None Remove="Data\Files\Generated\EstablishmentWorkforce.json" />
+    <None Remove="Data\Files\Generated\LAAbsence.json" />
+    <None Remove="Data\Files\Generated\LADestinations.json" />
+    <None Remove="Data\Files\Generated\LAPerformance.json" />
+    <None Remove="Data\Files\Generated\LASubjectEntries.json" />
+    <None Remove="Data\Files\Generated\placeholder.txt" />
+    <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryGroupsEntry.json" />
+    <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryValuesEntry.json" />
+    <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json" />
+    <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json" />
+    <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json" />
+    <None Remove="Data\Files\PrimarySchools\EnglandPerformance.json" />
+    <None Remove="Data\Files\PrimarySchools\EstablishmentPerformance.json" />
+    <None Remove="Data\Files\PrimarySchools\EstablishmentSubjectEntries.json" />
+    <None Remove="Data\Files\PrimarySchools\LAPerformance.json" />
+    <None Remove="Data\Files\PrimarySchools\LASubjectEntries.json" />
     <None Remove="Data\Schools.csv" />
   </ItemGroup>
 
@@ -33,70 +60,81 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
+    <Content Include="Data\Files\Generated\EnglandAbsence.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EnglandDestinations.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EnglandPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\Establishment.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentAbsence.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentDestinations.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentEmail.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentGroupLinks.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentLinks.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentSubjectEntries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\EstablishmentWorkforce.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\LAAbsence.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\LADestinations.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\LAPerformance.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\LASubjectEntries.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\placeholder.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\SimilarSchoolsPrimaryGroupsEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\SimilarSchoolsPrimaryValuesEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Data\Files\PrimarySchools\EnglandPerformance.json" />
+    <Content Include="Data\Files\PrimarySchools\EstablishmentPerformance.json" />
+    <Content Include="Data\Files\PrimarySchools\EstablishmentSubjectEntries.json" />
+    <Content Include="Data\Files\PrimarySchools\LAPerformance.json" />
+    <Content Include="Data\Files\PrimarySchools\LASubjectEntries.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Data\Files\Generated\EnglandAbsence.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EnglandDestinations.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EnglandPerformance.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\Establishment.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EstablishmentAbsence.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EstablishmentDestinations.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EstablishmentGroupLinks.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EstablishmentLinks.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EstablishmentPerformance.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EstablishmentSubjectEntries.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\EstablishmentWorkforce.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\LADestinations.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\LAPerformance.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\LASubjectEntries.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\placeholder.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\SimilarSchoolsPrimaryGroupsEntry.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\SimilarSchoolsPrimaryValuesEntry.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <ProjectReference Include="..\SAPSec.Core\SAPSec.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

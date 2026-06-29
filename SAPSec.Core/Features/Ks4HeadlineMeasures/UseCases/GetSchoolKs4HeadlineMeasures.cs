@@ -1,7 +1,7 @@
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
@@ -27,7 +27,7 @@ public class GetSchoolKs4HeadlineMeasures(
         var similarSchoolDestinationsData = ((await destinationsRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
+                ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
 

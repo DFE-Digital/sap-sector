@@ -22,7 +22,7 @@ public static class DfeAnalyticsExtensions
             services.AddScoped<ICustomEventService, CustomEventService>();
         }
 
-        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests") && !isLocalDevelopment)
+        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests") && !isLocalDevelopment)
         {
             services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -34,7 +34,7 @@ public static class DfeAnalyticsExtensions
 
     public static void UseAnalytics(this WebApplication app, IWebHostEnvironment environment)
     {
-        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests") && !isLocalDevelopment)
+        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests") && !isLocalDevelopment)
         {
             app.UseDfeAnalytics();
         }

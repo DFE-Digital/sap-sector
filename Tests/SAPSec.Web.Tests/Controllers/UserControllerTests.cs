@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;

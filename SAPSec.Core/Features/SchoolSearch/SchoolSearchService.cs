@@ -1,9 +1,9 @@
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;
@@ -18,78 +18,10 @@ public class SchoolSearchService(
     private static readonly Regex Numeric = new Regex(@"^\d+$", RegexOptions.Compiled);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SearchAsync(string query)
-    {
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-        var searchResults = await _indexReader.SearchAsync(query, MaxResults);
-
-        var results = new List<SchoolSearchResult>();
-
-        if (!searchResults.Any())
-        {
-            return results;
-        }
-
-        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
-
-        foreach (var r in searchResults.GroupJoin(schools,
-            r => r.urn.ToString(),
-            s => s.URN,
-            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
-        {
-            if (r.School == null)
-            {
-                continue;
-            }
-
-            if (!r.School.IsSearchable(primarySchoolsEnabled))
-            {
-                continue;
-            }
-
-            var latLong = BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
-                ? CoordinateConverter.Convert(coords)
-                : null;
-
-            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
-        }
-
-        return results.OrderBy(r => r.EstablishmentName).ToList();
-    }
+        => await SearchInternalAsync(query, MaxResults, includeCoordinates: true);
 
     public async Task<IReadOnlyList<SchoolSearchResult>> SuggestAsync(string queryPart)
-    {
-        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-        var searchResults = await _indexReader.SearchAsync(queryPart, MaxSuggestions);
-
-        var results = new List<SchoolSearchResult>();
-
-        if (!searchResults.Any())
-        {
-            return results;
-        }
-
-        var schools = await _establishmentRepository.GetEstablishmentsAsync(searchResults.Select(r => r.urn.ToString()));
-
-        foreach (var r in searchResults.GroupJoin(schools,
-            r => r.urn.ToString(),
-            s => s.URN,
-            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
-        {
-            if (r.School == null)
-            {
-                continue;
-            }
-
-            if (!r.School.IsSearchable(primarySchoolsEnabled))
-            {
-                continue;
-            }
-
-            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, null));
-        }
-
-        return results.OrderBy(r => r.EstablishmentName).ToList();
-    }
+        => await SearchInternalAsync(queryPart, MaxSuggestions, includeCoordinates: false);
 
     public async Task<Establishment?> SearchByNumberAsync(string schoolNumber)
     {
@@ -106,8 +38,49 @@ public class SchoolSearchService(
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return school.IsSearchable(primarySchoolsEnabled)
+        return school.CanSearch(primarySchoolsEnabled)
             ? school
             : null;
+    }
+
+    private async Task<IReadOnlyList<SchoolSearchResult>> SearchInternalAsync(string query, int maxResults, bool includeCoordinates)
+    {
+        var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+        var searchResults = await _indexReader.SearchAsync(query, maxResults);
+
+        var results = new List<SchoolSearchResult>();
+
+        if (!searchResults.Any())
+        {
+            return results;
+        }
+
+        var urns = searchResults.Select(r => r.urn.ToString()).ToArray();
+        var schools = await _establishmentRepository.GetEstablishmentsAsync(urns);
+
+        foreach (var r in searchResults.GroupJoin(schools,
+            r => r.urn.ToString(),
+            s => s.URN,
+            (r, schools) => new { SchoolName = r.resultText, School = schools.FirstOrDefault() }))
+        {
+            if (r.School == null)
+            {
+                continue;
+            }
+
+            if (!r.School.CanSearch(primarySchoolsEnabled))
+            {
+                continue;
+            }
+
+            var latLong = includeCoordinates
+                && BNGCoordinates.TryParse(r.School.Easting, r.School.Northing, out var coords)
+                    ? CoordinateConverter.Convert(coords)
+                    : null;
+
+            results.Add(SchoolSearchResult.FromNameAndEstablishment(r.SchoolName, r.School, latLong));
+        }
+
+        return results.OrderBy(r => r.EstablishmentName).ToList();
     }
 }

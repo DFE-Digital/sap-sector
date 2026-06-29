@@ -1,0 +1,61 @@
+using System.Net;
+using FluentAssertions;
+using SAPSec.Test.Integration.Setup;
+
+namespace SAPSec.Integration.Tests;
+
+[Collection("IntegrationTestsCollection")]
+public class SimilarSchoolsComparisonIntegrationTests(IntegrationTestFixture fixture)
+{
+    [Fact]
+    public async Task GetSimilarity_ReturnsSuccess()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Similarity");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+    }
+
+    [Fact]
+    public async Task GetSimilarity_ContainsComparisonHeadingAndTable()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Similarity");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("How these schools compare");
+        content.Should().Contain("govuk-table");
+        content.Should().Contain("Characteristic");
+    }
+
+    [Fact]
+    public async Task GetSchoolDetails_HomeBreadcrumb_LinksToSchoolSearch()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("href=\"/find-a-school\">Home</a>");
+    }
+
+    [Fact]
+    public async Task GetSchoolDetails_ReturnsSuccess()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
+    }
+
+    [Fact]
+    public async Task GetSchoolDetails_ContainsExpectedSections()
+    {
+        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("School Details");
+        content.Should().Contain("Location");
+        content.Should().Contain("Further information");
+    }
+}

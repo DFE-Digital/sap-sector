@@ -1,28 +1,85 @@
 using SAPSec.Core.Constants;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Features.SchoolSearch.Extensions;
 
 public static class EstablishmentExtensions
 {
-    private static readonly string[] SearchablePhases = ["Primary", "Secondary"];
+    public static bool CanIndexForSearch(this Establishment? establishment)
+    {
+        if (establishment == null)
+        {
+            return false;
+        }
+
+        if (PhaseOfEducationValues.IsSearchableIndexPhaseId(establishment.PhaseOfEducationId))
+        {
+            return true;
+        }
+
+        return HasLegacySearchablePhaseName(establishment.PhaseOfEducationName);
+    }
+
+    public static bool CanSearch(this Establishment? establishment, bool primarySchoolsEnabled)
+    {
+        if (establishment == null)
+        {
+            return false;
+        }
+
+        if (!HasSearchablePhase(establishment, primarySchoolsEnabled))
+        {
+            return false;
+        }
+
+        if (HasMissingStatus(establishment))
+        {
+            return HasSecondaryPhase(establishment);
+        }
+
+        return EstablishmentStatusValues.IsIncludedInSearch(
+            establishment.EstablishmentStatusId,
+            establishment.EstablishmentStatusName);
+    }
 
     public static bool IsSearchable(this Establishment? establishment)
     {
-        var phase = establishment?.PhaseOfEducationName?.Trim();
-
-        if (string.IsNullOrWhiteSpace(phase))
-            return false;
-
-        return SearchablePhases.Any(allowedPhase =>
-            phase.Contains(allowedPhase, StringComparison.OrdinalIgnoreCase));
+        return establishment.CanIndexForSearch();
     }
 
     public static bool IsSearchable(this Establishment? establishment, bool primarySchoolsEnabled)
     {
-        var phase = establishment?.PhaseOfEducationName;
+        return establishment.CanSearch(primarySchoolsEnabled);
+    }
+
+    private static bool HasSearchablePhase(Establishment establishment, bool primarySchoolsEnabled)
+    {
+        if (PhaseOfEducationValues.IsSearchableSearchPhaseId(establishment.PhaseOfEducationId, primarySchoolsEnabled))
+        {
+            return true;
+        }
+
+        var phase = establishment.PhaseOfEducationName;
 
         return PhaseOfEducationValues.IsSecondary(phase)
             || (primarySchoolsEnabled && PhaseOfEducationValues.IsPrimaryOrAllThrough(phase));
+    }
+
+    private static bool HasLegacySearchablePhaseName(string? phaseOfEducationName)
+    {
+        return PhaseOfEducationValues.IsSecondary(phaseOfEducationName)
+            || PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName);
+    }
+
+    private static bool HasSecondaryPhase(Establishment establishment)
+    {
+        return PhaseOfEducationValues.IsSearchableSearchPhaseId(establishment.PhaseOfEducationId, primarySchoolsEnabled: false)
+            || PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName);
+    }
+
+    private static bool HasMissingStatus(Establishment establishment)
+    {
+        return string.IsNullOrWhiteSpace(establishment.EstablishmentStatusId)
+            && string.IsNullOrWhiteSpace(establishment.EstablishmentStatusName);
     }
 }

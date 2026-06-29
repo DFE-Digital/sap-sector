@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 

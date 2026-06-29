@@ -4,8 +4,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using SAPSec.Core.Configuration;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Services;
 using SAPSec.Web.Authorization;
 using SAPSec.Web.Constants;
@@ -78,7 +77,7 @@ public static class DsiAuthenticationExtensions
     {
         options.Cookie.Name = CookieSettings.Name;
         options.Cookie.HttpOnly = true;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.ExpireTimeSpan = TimeSpan.FromMinutes(config.TokenExpiryMinutes);
         options.SlidingExpiration = true;
@@ -123,6 +122,8 @@ public static class DsiAuthenticationExtensions
         options.SignedOutCallbackPath = new PathString(config.SignedOutCallbackPath);
         options.RequireHttpsMetadata = config.RequireHttpsMetadata;
         options.MetadataAddress = config.MetadataAddress;
+        options.NonceCookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
     }
 
     private static void ConfigureOpenIdConnectScopes(OpenIdConnectOptions options)
