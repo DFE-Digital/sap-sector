@@ -58,7 +58,7 @@
         <h3 class="govuk-tabs__title">Attendance views</h3>
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
-                <a class="govuk-tabs__tab" href="#attendance-three-year-average">3-year average</a>
+                <a class="govuk-tabs__tab" href="#attendance-three-year-average">Current year</a>
             </li>
             <li class="govuk-tabs__list-item">
                 <a class="govuk-tabs__tab" href="#attendance-year-by-year">Year by year</a>
@@ -76,6 +76,7 @@
                         data-axis-mode="auto"
                         data-bar-label-align="start"
                         data-axis-suffix="%"
+                        data-label-decimals="2"
                         data-bar-thickness="50"
                         data-category-percentage="0.7"
                         data-bar-percentage="1"
@@ -112,7 +113,6 @@
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -121,21 +121,18 @@
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev2">No available data</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-prev">No available data</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-current">No available data</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="this-avg">No available data</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev2">No available data</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev">No available data</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-current">No available data</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-avg">No available data</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">Schools in England average</th>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev2">No available data</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev">No available data</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-current">No available data</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-avg">No available data</td>
                 </tr>
                 </tbody>
             </table>

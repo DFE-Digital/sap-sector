@@ -43,7 +43,7 @@
 
         <div class="govuk-tabs__panel" id="charts">
             <content-toggle>
-                <toggle-content id="three-year-average" name="3-year average" active="true">
+                <toggle-content id="three-year-average" name="Current year" active="true">
                     @{
                         var chartData = new
                         {
@@ -168,7 +168,6 @@
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -177,21 +176,18 @@
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.ThisSchoolAttainment8YearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.ThisSchoolAttainment8YearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.ThisSchoolAttainment8YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.ThisSchoolAttainment8Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.SelectedSchoolAttainment8YearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.SelectedSchoolAttainment8YearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.SelectedSchoolAttainment8YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.SelectedSchoolAttainment8Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Schools in England average</th>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.EnglandAttainment8YearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.EnglandAttainment8YearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayValue(Model.EnglandAttainment8YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@Model.EnglandAttainment8Display</td>
                     </tr>
                 </tbody>
             </table>
@@ -235,7 +231,7 @@
 
         <div class="govuk-tabs__panel" id="eng-maths-charts">
             <content-toggle>
-                <toggle-content id="eng-maths-three-year-average" name="3-year average" active="true">
+                <toggle-content id="eng-maths-three-year-average" name="Current year" active="true">
                     @{
                         var engMathsChartData = new
                         {
@@ -356,7 +352,6 @@
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -365,21 +360,18 @@
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolEngMaths49YearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolEngMaths49YearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolEngMaths49YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="this-avg">@Model.ThisSchoolEngMaths49Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolEngMaths49YearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolEngMaths49YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="similar-avg">@Model.SelectedSchoolEngMaths49Display</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Schools in England average</th>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandEngMaths49YearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandEngMaths49YearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandEngMaths49YearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="england-avg">@Model.EnglandEngMaths49Display</td>
                     </tr>
                 </tbody>
             </table>
@@ -399,7 +391,7 @@
                 This data shows the number of pupils who either stayed in education, started an apprenticeship, or entered employment for at least 2 terms after completing KS4.
             </p>
             <p class="govuk-body-s govuk-!-margin-bottom-2">
-                The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021,2022 and 2023.
+                The most recent data covers pupils who finished year 11 in 2023. The comparison values use the most recent year available.
             </p>
         </div>
     </details>
@@ -438,7 +430,7 @@
 
         <div class="govuk-tabs__panel" id="destinations-charts">
             <content-toggle>
-                <toggle-content id="destinations-three-year-average" name="3-year average" active="true">
+                <toggle-content id="destinations-three-year-average" name="Current year" active="true">
                     @{
                         var destinationsChartData = new
                         {
@@ -559,7 +551,6 @@
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
                         <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -568,21 +559,18 @@
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.ThisSchoolDestinationsYearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="this-avg">@Model.ThisSchoolDestinationsDisplay</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.SelectedSchoolDestinationsYearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="similar-avg">@Model.SelectedSchoolDestinationsDisplay</td>
                     </tr>
                     <tr class="govuk-table__row">
                         <th scope="row" class="govuk-table__header">Schools in England average</th>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev2">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-prev">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-current">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(Model.EnglandDestinationsYearByYear?.Current)</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="england-avg">@Model.EnglandDestinationsDisplay</td>
                     </tr>
                 </tbody>
             </table>

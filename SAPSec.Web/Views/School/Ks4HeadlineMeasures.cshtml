@@ -65,7 +65,7 @@
 
         <div class="govuk-tabs__panel" id="charts">
             <content-toggle>
-                <toggle-content id="three-year-average" name="3-year average" active="true">
+                <toggle-content id="three-year-average" name="Current year" active="true">
                     <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                         @{
                             var attainmentBarData = new decimal?[] { Model.SchoolAttainment8ThreeYearAverage, Model.SimilarSchoolsAttainment8ThreeYearAverage, Model.LocalAuthorityAttainment8ThreeYearAverage, Model.EnglandAttainment8ThreeYearAverage };
@@ -120,7 +120,7 @@
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">Rank</th>
                         <th scope="col" class="govuk-table__header">School</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -149,7 +149,7 @@
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="table-view">
             <table class="govuk-table">
                 <thead class="govuk-table__head">
-                    <tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th></tr>
+                    <tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr>
                 </thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in attainmentRows)
@@ -159,7 +159,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric">@row.Item3</td>
                         </tr>
                     }
                 </tbody>
@@ -199,7 +198,7 @@
         </ul>
         <div class="govuk-tabs__panel" id="eng-maths-charts">
             <content-toggle>
-                <toggle-content id="eng-maths-three-year-average" name="3-year average" active="true">
+                <toggle-content id="eng-maths-three-year-average" name="Current year" active="true">
                     <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                         @{
                             var engMathsBarData = new decimal?[] { Model.SchoolEngMathsThreeYearAverage, Model.SimilarSchoolsEngMathsThreeYearAverage, Model.LocalAuthorityEngMathsThreeYearAverage, Model.EnglandEngMathsThreeYearAverage };
@@ -228,7 +227,7 @@
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">Rank</th>
                         <th scope="col" class="govuk-table__header">School</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -255,7 +254,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in engMathsRows)
                     {
@@ -264,7 +263,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
@@ -284,7 +282,7 @@
                 This data shows the number of pupils who either stayed in education, started an apprenticeship, or entered employment for at least 2 terms after completing KS4.
             </p>
             <p class="govuk-body-s govuk-!-margin-bottom-2">
-                The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021, 2022 and 2023.
+                The most recent data covers pupils who finished year 11 in 2023. The comparison values use the most recent year available.
             </p>
         </div>
     </details>
@@ -318,7 +316,7 @@
         </ul>
         <div class="govuk-tabs__panel" id="destinations-charts">
             <content-toggle>
-                <toggle-content id="destinations-three-year-average" name="3-year average" active="true">
+                <toggle-content id="destinations-three-year-average" name="Current year" active="true">
                     <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
                         @{
                             var destinationsBarData = new decimal?[] { Model.SchoolDestinationsThreeYearAverage, Model.SimilarSchoolsDestinationsThreeYearAverage, Model.LocalAuthorityDestinationsThreeYearAverage, Model.EnglandDestinationsThreeYearAverage };
@@ -347,7 +345,7 @@
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">Rank</th>
                         <th scope="col" class="govuk-table__header">School</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -374,7 +372,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in destinationsRows)
                     {
@@ -383,7 +381,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
