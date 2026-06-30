@@ -13,14 +13,14 @@ namespace SAPSec.Web.Tests.Filters;
 
 public class RequireSchoolPhaseFilterTests
 {
-    private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock = new();
+    private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock = new();
 
     [Fact]
     public async Task SecondaryFilter_WithPrimarySchoolIndex_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "Primary");
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
 
         var result = await ExecuteFilterAsync(
@@ -36,8 +36,8 @@ public class RequireSchoolPhaseFilterTests
     public async Task PrimaryFilter_WithSecondarySchoolIndex_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "Secondary");
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
 
         var result = await ExecuteFilterAsync(
@@ -54,8 +54,8 @@ public class RequireSchoolPhaseFilterTests
     public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_ReturnsNotFound()
     {
         var school = CreateSchoolDetails("123456", "Primary");
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(school);
 
         var result = await ExecuteFilterAsync(
@@ -70,11 +70,11 @@ public class RequireSchoolPhaseFilterTests
     [Fact]
     public async Task SecondaryFilter_WithTwoSecondaryRouteValues_AllowsExecution()
     {
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync("123456"))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
             .ReturnsAsync(CreateSchoolDetails("123456", "Secondary"));
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync("654321"))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "654321"))
             .ReturnsAsync(CreateSchoolDetails("654321", "Secondary"));
 
         var result = await ExecuteFilterAsync(
@@ -113,7 +113,7 @@ public class RequireSchoolPhaseFilterTests
 
         var context = new ActionExecutingContext(actionContext, filters, actionArguments, controller: new object());
         var filter = new RequireSchoolPhaseFilter(
-            _schoolDetailsServiceMock.Object,
+            _requestSchoolAccessorMock.Object,
             expectedSchoolPhase,
             routeValues.Select(x => x.Key).ToArray());
 
