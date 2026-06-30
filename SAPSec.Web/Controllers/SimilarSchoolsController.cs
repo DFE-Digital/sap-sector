@@ -14,16 +14,16 @@ namespace SAPSec.Web.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SimilarSchoolsController : Controller
 {
-    private readonly ISchoolDetailsService _schoolDetailsService;
+    private readonly IRequestSchoolAccessor _requestSchoolAccessor;
     private readonly FindSimilarSchools _findSimilarSchools;
     private readonly ILogger<SimilarSchoolsController> _logger;
 
     public SimilarSchoolsController(
-        ISchoolDetailsService schoolDetailsService,
+        IRequestSchoolAccessor requestSchoolAccessor,
         FindSimilarSchools findSimilarSchools,
         ILogger<SimilarSchoolsController> logger)
     {
-        _schoolDetailsService = schoolDetailsService;
+        _requestSchoolAccessor = requestSchoolAccessor;
         _findSimilarSchools = findSimilarSchools;
         _logger = logger;
     }
@@ -35,7 +35,7 @@ public class SimilarSchoolsController : Controller
         [FromQuery] string? sortBy = null,
         [FromQuery] string? page = null)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData["SchoolDetails"] = school;

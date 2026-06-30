@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
-using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
@@ -17,7 +17,7 @@ namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class SimilarSchoolsControllerTests
 {
-    //private readonly Mock<ISchoolDetailsService> _schoolDetailsServiceMock;
+    private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock = new();
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepoMock = new();
     private readonly Mock<IEstablishmentRepository> _establishmentRepoMock = new();
     private readonly Mock<IKs4PerformanceRepository> _performanceRepoMock = new();
@@ -27,10 +27,7 @@ public class SimilarSchoolsControllerTests
 
     public SimilarSchoolsControllerTests()
     {
-        //_schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var logger = new Mock<ILogger<SchoolDetailsService>>();
-        var schoolDetailsService = new SchoolDetailsService(_establishmentRepoMock.Object, logger.Object);
-        _sut = new SimilarSchoolsController(schoolDetailsService,
+        _sut = new SimilarSchoolsController(_requestSchoolAccessorMock.Object,
             new FindSimilarSchools(
                 _establishmentRepoMock.Object,
                 _similarSchoolsRepoMock.Object,
@@ -219,6 +216,10 @@ public class SimilarSchoolsControllerTests
 
     private void SetupSimilarSchoolsRepo(string urn, Establishment currentSchool)
     {
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), urn))
+            .ReturnsAsync(MapSchoolDetails(currentSchool));
+
         //var currentSchool = CreateSimilarSchool(urn, "Current School", "UR1", "Urban");
         var similarSchools = new List<Establishment>();
         for (var i = 0; i < 12; i++)
@@ -255,6 +256,42 @@ public class SimilarSchoolsControllerTests
             .Setup(r => r.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new List<Ks4PerformanceData>());
     }
+
+    private static SchoolDetails MapSchoolDetails(Establishment establishment) =>
+        new()
+        {
+            Name = establishment.EstablishmentName,
+            Urn = establishment.URN,
+            DfENumber = DataWithAvailability.Available(establishment.LAESTAB),
+            Ukprn = DataWithAvailability.Available(establishment.UKPRN),
+            Address = DataWithAvailability.Available($"{establishment.Street}, {establishment.Town}, {establishment.Postcode}"),
+            LocalAuthorityName = DataWithAvailability.Available(establishment.LAName),
+            LocalAuthorityCode = DataWithAvailability.Available(establishment.LAId),
+            Region = DataWithAvailability.Available(establishment.RegionName),
+            UrbanRuralDescription = DataWithAvailability.Available(establishment.UrbanRuralName),
+            AgeRangeLow = DataWithAvailability.Available(establishment.AgeRangeLow ?? 0),
+            AgeRangeHigh = DataWithAvailability.Available(establishment.AgeRangeHigh ?? 0),
+            GenderOfEntry = DataWithAvailability.Available(establishment.GenderName),
+            PhaseOfEducation = DataWithAvailability.Available(establishment.PhaseOfEducationName),
+            SchoolType = DataWithAvailability.Available(establishment.TypeOfEstablishmentName),
+            AdmissionsPolicy = DataWithAvailability.Available(establishment.AdmissionsPolicyName),
+            ReligiousCharacter = DataWithAvailability.Available(establishment.ReligiousCharacterName),
+            GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceType>(),
+            AcademyTrustName = DataWithAvailability.Available(establishment.TrustName),
+            AcademyTrustId = DataWithAvailability.Available(establishment.TrustId),
+            HasNurseryProvision = DataWithAvailability.Available(string.Equals(establishment.NurseryProvisionName, "Yes", StringComparison.OrdinalIgnoreCase)),
+            HasSixthForm = DataWithAvailability.Available(string.Equals(establishment.OfficialSixthFormName, "Has sixth form", StringComparison.OrdinalIgnoreCase)),
+            HasSenUnit = DataWithAvailability.NotAvailable<bool>(),
+            HasResourcedProvision = DataWithAvailability.Available(!string.Equals(establishment.ResourcedProvisionName, "No", StringComparison.OrdinalIgnoreCase)),
+            HeadteacherName = DataWithAvailability.Available($"{establishment.HeadTitle} {establishment.HeadFirstName} {establishment.HeadLastName}".Trim()),
+            Website = string.IsNullOrWhiteSpace(establishment.Website)
+                ? DataWithAvailability.NotAvailable<string>()
+                : DataWithAvailability.Available(establishment.Website),
+            Telephone = string.IsNullOrWhiteSpace(establishment.TelephoneNum)
+                ? DataWithAvailability.NotAvailable<string>()
+                : DataWithAvailability.Available(establishment.TelephoneNum),
+            Email = DataWithAvailability.NotAvailable<string>()
+        };
 
     private static Mock<IUrlHelper> CreateUrlHelperMock(string urn)
     {
