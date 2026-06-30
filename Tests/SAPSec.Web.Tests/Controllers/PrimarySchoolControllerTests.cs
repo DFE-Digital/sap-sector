@@ -5,7 +5,6 @@ using Moq;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Areas.Primary.Controllers;
-using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Tests.Controllers;
 
