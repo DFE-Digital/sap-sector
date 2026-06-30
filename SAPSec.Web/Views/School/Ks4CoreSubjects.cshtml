@@ -169,7 +169,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-language-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in englishLanguageRows)
                     {
@@ -178,7 +178,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-language-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
@@ -272,7 +271,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-literature-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in englishLiteratureRows)
                     {
@@ -281,7 +280,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-english-literature-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
@@ -375,7 +373,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="maths-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in mathsRows)
                     {
@@ -384,7 +382,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-maths-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
@@ -478,7 +475,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="combined-science-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in combinedScienceRows)
                     {
@@ -487,7 +484,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-combined-science-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
@@ -581,7 +577,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="biology-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in biologyRows)
                     {
@@ -590,7 +586,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-biology-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
@@ -684,7 +679,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="chemistry-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in chemistryRows)
                     {
@@ -693,7 +688,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-chemistry-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>
@@ -787,7 +781,7 @@
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="physics-table-view">
             <table class="govuk-table">
-                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th></tr></thead>
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
                 <tbody class="govuk-table__body">
                     @foreach (var row in physicsRows)
                     {
@@ -796,7 +790,6 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4CoreSubjectsPageViewModel.DisplayWholePercent(row.Series.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-physics-cell="@($"{row.Key}-avg")">@row.Display</td>
                         </tr>
                     }
                 </tbody>

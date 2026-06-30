@@ -252,7 +252,6 @@
                             <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
                             <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
                             <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
-                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th>
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
@@ -261,21 +260,18 @@
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-this-avg")">@coreSubjectSection.ThisSchoolDisplay</td>
                         </tr>
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-similar-avg")">@coreSubjectSection.SimilarSchoolDisplay</td>
                         </tr>
                         <tr class="govuk-table__row">
                             <th scope="row" class="govuk-table__header">Schools in England average</th>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev2")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Previous2)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-prev")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Previous)</td>
                             <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-current")">@SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel.DisplayWholePercent(coreSubjectSection.EnglandYearByYear?.Current)</td>
-                            <td class="govuk-table__cell govuk-table__cell--numeric" data-view-cell="@($"{item.CellPrefix}-england-avg")">@coreSubjectSection.EnglandDisplay</td>
                         </tr>
                     </tbody>
                 </table>

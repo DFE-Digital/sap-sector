@@ -57,9 +57,9 @@ public class GetKs4HeadlineMeasuresTests
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
         result.Should().NotBeNull();
-        result!.Attainment8ThreeYearAverage.SchoolValue.Should().Be(46.3m);
-        result.Attainment8ThreeYearAverage.LocalAuthorityValue.Should().Be(45.0m);
-        result.Attainment8ThreeYearAverage.EnglandValue.Should().Be(46.1m);
+        result!.Attainment8ThreeYearAverage.SchoolValue.Should().Be(45.0m);
+        result.Attainment8ThreeYearAverage.LocalAuthorityValue.Should().Be(44.0m);
+        result.Attainment8ThreeYearAverage.EnglandValue.Should().Be(45.9m);
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class GetKs4HeadlineMeasuresTests
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
         result.Should().NotBeNull();
-        result!.Attainment8ThreeYearAverage.SchoolValue.Should().Be(46.3m);
+        result!.Attainment8ThreeYearAverage.SchoolValue.Should().Be(45.0m);
         result.Attainment8ThreeYearAverage.LocalAuthorityValue.Should().BeNull();
         result.Attainment8ThreeYearAverage.EnglandValue.Should().BeNull();
     }
@@ -244,17 +244,17 @@ public class GetKs4HeadlineMeasuresTests
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
         result.Should().NotBeNull();
-        result.DestinationsThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(93.4m, 90.0m, 87.5m));
+        result.DestinationsThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(94.4m, 91.0m, 88.5m));
         result.DestinationsYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(94.4m, 93.4m, 92.4m));
         result.DestinationsYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(91.0m, 90.0m, 89.0m));
         result.DestinationsYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(88.5m, 87.5m, 86.5m));
 
-        result.DestinationsEducationThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(71.2m, 67.0m, 63.5m));
+        result.DestinationsEducationThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(72.2m, 68.0m, 64.5m));
         result.DestinationsEducationYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(72.2m, 71.2m, 70.2m));
         result.DestinationsEducationYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(68.0m, 67.0m, 66.0m));
         result.DestinationsEducationYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(64.5m, 63.5m, 62.5m));
 
-        result.DestinationsEmploymentThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(22.2m, 23.0m, 24.5m));
+        result.DestinationsEmploymentThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(22.2m, 23.0m, 24.0m));
         result.DestinationsEmploymentYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(22.2m, 22.2m, 22.2m));
         result.DestinationsEmploymentYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(23.0m, 23.0m, 23.0m));
         result.DestinationsEmploymentYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(24.0m, 24.5m, 25.0m));
@@ -324,17 +324,17 @@ public class GetKs4HeadlineMeasuresTests
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
         result.Should().NotBeNull();
-        result.DestinationsThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(94.4m, 89.5m, 88.5m));
+        result.DestinationsThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(94.4m, null, 88.5m));
         result.DestinationsYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(94.4m, null, null));
         result.DestinationsYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(null, 90.0m, 89.0m));
         result.DestinationsYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(88.5m, null, null));
 
-        result.DestinationsEducationThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(71.2m, 67.0m, 63.0m));
+        result.DestinationsEducationThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(null, 68.0m, null));
         result.DestinationsEducationYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(null, 71.2m, null));
         result.DestinationsEducationYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(68.0m, null, 66.0m));
         result.DestinationsEducationYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(null, 63.5m, 62.5m));
 
-        result.DestinationsEmploymentThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(21.0m, 23.0m, 25.0m));
+        result.DestinationsEmploymentThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(22.0m, null, null));
         result.DestinationsEmploymentYearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(22.0m, null, 20.0m));
         result.DestinationsEmploymentYearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(null, 23.0m, null));
         result.DestinationsEmploymentYearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(null, null, 25.0m));
@@ -404,17 +404,17 @@ public class GetKs4HeadlineMeasuresTests
         var result = await sut.Execute(new GetKs4HeadlineMeasuresRequest("123456"));
 
         result.Should().NotBeNull();
-        result.Attainment8ThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(46.0m, 45.0m, 46.1m));
+        result.Attainment8ThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(45.0m, 44.0m, 46.0m));
         result.Attainment8YearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(45.0m, null, 47.0m));
         result.Attainment8YearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(44.0m, 45.0m, 46.0m));
         result.Attainment8YearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(46.0m, 46.2m, null));
 
-        result.EngMaths49ThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(66.6m, 65.0m, 68.5m));
+        result.EngMaths49ThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(66.2m, 64.0m, 68.0m));
         result.EngMaths49YearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(66.2m, null, 67.0m));
         result.EngMaths49YearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(64.0m, 65.0m, 66.0m));
         result.EngMaths49YearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(68.0m, 69.0m, null));
 
-        result.EngMaths59ThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(44.7m, 43.0m, 46.5m));
+        result.EngMaths59ThreeYearAverage.Should().Be(new Ks4HeadlineMeasureAverage(44.1m, 42.0m, 46.0m));
         result.EngMaths59YearByYear.School.Should().Be(new Ks4HeadlineMeasureSeries(44.1m, 45.2m, null));
         result.EngMaths59YearByYear.LocalAuthority.Should().Be(new Ks4HeadlineMeasureSeries(42.0m, 43.0m, 44.0m));
         result.EngMaths59YearByYear.England.Should().Be(new Ks4HeadlineMeasureSeries(46.0m, 47.0m, null));

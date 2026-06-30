@@ -140,7 +140,6 @@
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.AcademicYears[0]</th>
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.AcademicYears[1]</th>
                     <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.AcademicYears[2]</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th>
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">
@@ -149,28 +148,24 @@
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous2)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Current)</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-avg">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.SelectedSchoolOverallAbsenceThreeYearAverage)</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">@Model.SimilarSchoolsLabel</th>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Previous2)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Previous)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Current)</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-avg">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.SimilarSchoolsOverallAbsenceThreeYearAverage)</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">@Model.LocalAuthorityLabel</th>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="la-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous2)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="la-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="la-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Current)</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="la-avg">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.LocalAuthorityOverallAbsenceThreeYearAverage)</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">@Model.EnglandLabel</th>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous2)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Current)</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-avg">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.EnglandOverallAbsenceThreeYearAverage)</td>
                 </tr>
                 </tbody>
             </table>
