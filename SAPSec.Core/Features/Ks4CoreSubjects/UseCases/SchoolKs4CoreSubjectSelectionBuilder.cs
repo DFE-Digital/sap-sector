@@ -343,10 +343,7 @@ internal static class SchoolKs4CoreSubjectSelectionBuilder
     }
 
     private static decimal? MeasureValue(string? current, string? previous, string? previous2) =>
-        Ks4HeadlineMeasuresCalculator.Average(
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(current),
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous),
-            Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous2));
+        Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(current);
 
     private static Ks4HeadlineMeasureSeries SeriesFrom(string? current, string? previous, string? previous2) =>
         new(

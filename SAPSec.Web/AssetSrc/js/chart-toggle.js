@@ -49,7 +49,7 @@
 
         var title = document.createElement("h3");
         title.className = "govuk-heading-m app-content-toggle__title";
-        title.textContent = "3-year average";
+        title.textContent = "Current year";
 
         var button = document.createElement("button");
         button.type = "button";
@@ -133,7 +133,7 @@
         var averagePanel = document.createElement("div");
         averagePanel.className = "app-content-toggle__panel app-content-toggle__panel--active";
         averagePanel.setAttribute("data-content-toggle-panel", "true");
-        averagePanel.setAttribute("data-content-toggle-name", "3-year average");
+        averagePanel.setAttribute("data-content-toggle-name", "Current year");
         averagePanel.id = firstTabTarget.slice(1);
         moveChartBlock(averageChart, averagePanel);
 
@@ -161,8 +161,8 @@
             setHidden(averagePanel, showingYearly);
             setHidden(yearlyPanel, !showingYearly);
 
-            toggle.title.textContent = showingYearly ? "Year by year" : "3-year average";
-            toggle.button.textContent = showingYearly ? "Show 3-year average" : "Show year by year";
+            toggle.title.textContent = showingYearly ? "Year by year" : "Current year";
+            toggle.button.textContent = showingYearly ? "Show current year" : "Show year by year";
             toggle.button.setAttribute("aria-pressed", showingYearly ? "true" : "false");
 
             resizeCharts(showingYearly ? yearlyPanel : averagePanel);

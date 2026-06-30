@@ -197,7 +197,7 @@
 
             <div class="govuk-tabs__panel" id="@($"{item.Key}-charts")">
                 <content-toggle>
-                    <toggle-content id="@($"{item.Key}-three-year-average")" name="3-year average" active="true">
+                    <toggle-content id="@($"{item.Key}-three-year-average")" name="Current year" active="true">
                         <div class="app-ks4-chart-container">
                             @if (HasAnyData(chartData.data))
                             {
@@ -252,7 +252,7 @@
                             <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
                             <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
                             <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
-                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+                            <th scope="col" class="govuk-table__header govuk-table__header--numeric">Current year</th>
                         </tr>
                     </thead>
                     <tbody class="govuk-table__body">
