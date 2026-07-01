@@ -439,7 +439,7 @@ public class GetKs4HeadlineMeasuresTests
             SchoolType = DataWithAvailability.Available("Academy"),
             AdmissionsPolicy = DataWithAvailability.Available("Not selective"),
             ReligiousCharacter = DataWithAvailability.Available("None"),
-            GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
+            GovernanceStructure = DataWithAvailability.Available(new GovernanceStructure("M", "Multi-academy trust (MAT)")),
             AcademyTrustName = DataWithAvailability.Available("Test Trust"),
             AcademyTrustId = DataWithAvailability.Available("5000"),
             HasNurseryProvision = DataWithAvailability.Available(false),

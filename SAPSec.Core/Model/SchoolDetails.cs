@@ -31,7 +31,7 @@ public  class SchoolDetails
     public required DataWithAvailability<string> ReligiousCharacter { get; init; }
 
     // Governance
-    public required DataWithAvailability<GovernanceType> GovernanceStructure { get; init; }
+    public required DataWithAvailability<GovernanceStructure> GovernanceStructure { get; init; }
     public required DataWithAvailability<string> AcademyTrustName { get; init; }
     public required DataWithAvailability<string> AcademyTrustId { get; init; }
 

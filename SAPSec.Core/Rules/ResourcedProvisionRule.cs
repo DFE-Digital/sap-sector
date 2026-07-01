@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -13,6 +14,9 @@ public sealed class ResourcedProvisionRule : IBusinessRule<bool>
 {
     public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
+
+        //pass in just the resource provision name and not the whole establishment
+
         var provision = establishment.ResourcedProvisionName;
 
         // Empty or explicitly no provision
@@ -29,4 +33,31 @@ public sealed class ResourcedProvisionRule : IBusinessRule<bool>
 
         return DataWithAvailability.Available(false);
     }
+
+    public DataWithAvailability<bool> Evaluate(SimilarSchool similarSchool)
+    {
+        throw new NotImplementedException();
+    }
+
+    //public DataWithAvailability<bool> Evaluate(string resourcedProvisionId)
+    // {
+
+    //pass in just the resource provision name and not the whole establishment
+
+    //var provision = establishment.ResourcedProvisionName;
+
+    // Empty or explicitly no provision
+    //if (ResourcedProvisionValues.IsNoProvision(provision))
+    //{
+    //    return DataWithAvailability.Available(false);
+    //}
+
+    //// Check for resourced provision
+    //if (ResourcedProvisionValues.HasResourcedProvision(provision))
+    //{
+    //    return DataWithAvailability.Available(true);
+    //}
+
+    //return DataWithAvailability.Available(false);
+    //}
 }

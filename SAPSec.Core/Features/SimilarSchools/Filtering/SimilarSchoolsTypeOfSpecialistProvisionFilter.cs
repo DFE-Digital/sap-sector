@@ -56,6 +56,10 @@ public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
 
     private Group FindGroup(SimilarSchool i)
     {
+
+        //pass this resourceprovision.name value to the business rule
+        //if(_resourcedProvisionRule.Evaluate(i.ResourcedProvision?Name)
+
         if (i.ResourcedProvision?.Name == "Resourced provision")
         {
             return new("R", "Resourced provision");

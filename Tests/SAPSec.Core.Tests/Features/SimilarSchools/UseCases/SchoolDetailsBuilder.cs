@@ -32,7 +32,7 @@ public class SchoolDetailsBuilder(string urn)
             SchoolType = DataWithAvailability.NotAvailable<string>(),
             AdmissionsPolicy = DataWithAvailability.NotAvailable<string>(),
             ReligiousCharacter = DataWithAvailability.NotAvailable<string>(),
-            GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceType>(),
+            GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceStructure>(),
             AcademyTrustName = DataWithAvailability.NotAvailable<string>(),
             AcademyTrustId = DataWithAvailability.NotAvailable<string>(),
             HasNurseryProvision = DataWithAvailability.NotAvailable<bool>(),

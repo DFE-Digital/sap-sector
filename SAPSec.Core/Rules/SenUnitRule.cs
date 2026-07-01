@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -29,5 +30,10 @@ public sealed class SenUnitRule : IBusinessRule<bool>
 
         // Has some provision data but no SEN unit mentioned
         return DataWithAvailability.Available(false);
+    }
+
+    public DataWithAvailability<bool> Evaluate(SimilarSchool similarSchool)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -413,7 +413,7 @@ public class SchoolControllerTests
             SchoolType = DataWithAvailability.Available("Academy converter"),
             AdmissionsPolicy = DataWithAvailability.Available("Non-selective"),
             ReligiousCharacter = DataWithAvailability.Available("None"),
-            GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),
+            GovernanceStructure = DataWithAvailability.Available(new GovernanceStructure("M", "Multi-academy trust (MAT)")),
             AcademyTrustName = DataWithAvailability.Available("Test Trust"),
             AcademyTrustId = DataWithAvailability.Available("5001"),
             HasNurseryProvision = DataWithAvailability.Available(false),

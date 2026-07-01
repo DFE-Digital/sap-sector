@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -39,5 +40,10 @@ public sealed class NurseryProvisionRule : IBusinessRule<bool>
         }
 
         return DataWithAvailability.NotAvailable<bool>();
+    }
+
+    public DataWithAvailability<bool> Evaluate(SimilarSchool similarSchool)
+    {
+        throw new NotImplementedException();
     }
 }

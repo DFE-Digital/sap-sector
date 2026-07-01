@@ -1,5 +1,6 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
+using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -13,8 +14,9 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         filterValues,
         currentSchool)
 {
+    private readonly GovernanceRule _governanceRule = new();
     protected override DataWithAvailability<string>? CurrentSchoolValue
-        => DataWithAvailability.Available(FindGroup(CurrentSchool).Name);
+        => DataWithAvailability.Available(FindGroup(CurrentSchool).Type);
 
     protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
     {
@@ -35,10 +37,10 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         return items
             .GroupBy(FindGroup)
             .Select(g => new FilterOption(
-                g.Key!.Key,
-                g.Key.Name,
+                g.Key!.Id,
+                g.Key.Type,
                 g.Count(),
-                values.Contains(g.Key.Key, StringComparer.OrdinalIgnoreCase)))
+                values.Contains(g.Key.Id, StringComparer.OrdinalIgnoreCase)))
             .OrderBy(fo => fo.Key switch
             {
                 "S" => 0,
@@ -48,26 +50,40 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
             });
     }
 
-    private Group FindGroup(SimilarSchool i)
+    private GovernanceStructure FindGroup(SimilarSchool similarSchool)
     {
+        var governanceStructure = _governanceRule.Evaluate(similarSchool).Value;
 
-        if (i.TrustSchoolFlag?.Id == "5")
-        {
-            return new("S", "Single-academy trust (SAT)");
-        }
+        return governanceStructure;
 
-        if (i.TrustSchoolFlag?.Id == "3")
-        {
-            return new("M", "Multi-academy trust (MAT)");
-        }
+        //switch (governanceStructure.Id)
+        //{
+        //    case "5":
+        //      return new("S", governanceStructure.Type);
+        //}
 
-        if (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
-        {
-            return new("MS", "Maintained school - local authority controlled");
-        }
+        //if (i.TrustSchoolFlag?.Id == "5")
+        //{
+        //    return new("S", "Single-academy trust (SAT)");
+        //}
 
-        return new("N", "No known group");
+        //if (i.TrustSchoolFlag?.Id == "5")
+        //{
+        //    return new("S", "Single-academy trust (SAT)");
+        //}
+
+        //if (i.TrustSchoolFlag?.Id == "3")
+        //{
+        //    return new("M", "Multi-academy trust (MAT)");
+        //}
+
+        //if (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
+        //{
+        //    return new("MS", "Maintained school - local authority controlled");
+        //}
+
+        //return new("N", "No known group");
     }
 
-    private record Group(string Key, string Name);
+    //private record Group(string Key, string Name);
 }

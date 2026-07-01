@@ -116,7 +116,7 @@ public class PrimarySchoolControllerTests
             SchoolType = DataWithAvailability.Available("Community school"),
             AdmissionsPolicy = DataWithAvailability.Available("Not applicable"),
             ReligiousCharacter = DataWithAvailability.Available("None"),
-            GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceType>(),
+            GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceStructure>(),
             AcademyTrustName = DataWithAvailability.NotAvailable<string>(),
             AcademyTrustId = DataWithAvailability.NotAvailable<string>(),
             HasNurseryProvision = DataWithAvailability.Available(false),

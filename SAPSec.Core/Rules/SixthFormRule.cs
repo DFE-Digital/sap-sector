@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -20,5 +21,10 @@ public sealed class SixthFormRule : IBusinessRule<bool>
             SixthFormCodes.NotApplicable => DataWithAvailability.NotApplicable<bool>(),
             _ => DataWithAvailability.NotAvailable<bool>()
         };
+    }
+
+    public DataWithAvailability<bool> Evaluate(SimilarSchool similarSchool)
+    {
+        throw new NotImplementedException();
     }
 }

@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Constants;
+﻿using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -7,62 +7,107 @@ using SAPSec.Data.Dto;
 /// Business rule: Determines governance structure based on establishment type and trust membership.
 /// Single Responsibility: Only handles governance determination logic.
 /// </summary>
-public sealed class GovernanceRule : IBusinessRule<GovernanceType>
+public sealed class GovernanceRule : IBusinessRule<GovernanceStructure>
 {
-    public DataWithAvailability<GovernanceType> Evaluate(Establishment establishment)
+
+    //for the frontend
+    //return the text required by the FE property
+    //including the not available
+    public DataWithAvailability<GovernanceStructure> Evaluate(Establishment establishment)
     {
-        var typeId = establishment.TypeOfEstablishmentId;
-        var typeName = establishment.TypeOfEstablishmentName;
-        var hasTrust = !string.IsNullOrWhiteSpace(establishment.TrustId);
+        return GetGovernanceStructure(establishment.TrustSchoolFlagId, establishment.EstablishmentTypeGroupId);
 
-        // Academy/Free school types
-        if (IsAcademyType(typeId, typeName))
-        {
-            return hasTrust
-                ? DataWithAvailability.Available(GovernanceType.MultiAcademyTrust)
-                : DataWithAvailability.Available(GovernanceType.SingleAcademyTrust);
-        }
+        //would jsut return a string to the FE
+        //what about data not available - there is no data not available only no known group
+        // return 
+        //DataWithAvailability
 
-        // Local Authority maintained
-        if (EstablishmentTypeClassification.IsLocalAuthorityMaintained(typeId))
-        {
-            return DataWithAvailability.Available(GovernanceType.LocalAuthorityMaintained);
-        }
+        //var typeId = establishment.TypeOfEstablishmentId;
+        //var typeName = establishment.TypeOfEstablishmentName;
+        //var hasTrust = !string.IsNullOrWhiteSpace(establishment.TrustId);
 
-        // Non-maintained special school
-        if (EstablishmentTypeClassification.IsNonMaintainedSpecialSchool(typeId))
-        {
-            return DataWithAvailability.Available(GovernanceType.NonMaintainedSpecialSchool);
-        }
+        //// Academy/Free school types
+        //if (IsAcademyType(typeId, typeName))
+        //{
+        //    return hasTrust
+        //        ? DataWithAvailability.Available(GovernanceType.MultiAcademyTrust)
+        //        : DataWithAvailability.Available(GovernanceType.SingleAcademyTrust);
+        //}
 
-        // Independent
-        if (EstablishmentTypeClassification.IsIndependent(typeId))
-        {
-            return DataWithAvailability.Available(GovernanceType.Independent);
-        }
+        //// Local Authority maintained
+        //if (EstablishmentTypeClassification.IsLocalAuthorityMaintained(typeId))
+        //{
+        //    return DataWithAvailability.Available(GovernanceType.LocalAuthorityMaintained);
+        //}
 
-        // Further/Higher education
-        if (EstablishmentTypeClassification.IsFurtherEducation(typeId))
-        {
-            return DataWithAvailability.Available(GovernanceType.FurtherHigherEducation);
-        }
+        //// Non-maintained special school
+        //if (EstablishmentTypeClassification.IsNonMaintainedSpecialSchool(typeId))
+        //{
+        //    return DataWithAvailability.Available(GovernanceType.NonMaintainedSpecialSchool);
+        //}
 
-        // Has a type but doesn't match known categories
-        if (!string.IsNullOrWhiteSpace(typeId))
-        {
-            return DataWithAvailability.Available(GovernanceType.Other);
-        }
+        //// Independent
+        //if (EstablishmentTypeClassification.IsIndependent(typeId))
+        //{
+        //    return DataWithAvailability.Available(GovernanceType.Independent);
+        //}
 
-        return DataWithAvailability.NotAvailable<GovernanceType>();
+        //// Further/Higher education
+        //if (EstablishmentTypeClassification.IsFurtherEducation(typeId))
+        //{
+        //    return DataWithAvailability.Available(GovernanceType.FurtherHigherEducation);
+        //}
+
+        //// Has a type but doesn't match known categories
+        //if (!string.IsNullOrWhiteSpace(typeId))
+        //{
+        //    return DataWithAvailability.Available(GovernanceType.Other);
+        //}
+
+        //return DataWithAvailability.NotAvailable<GovernanceType>();
+        //}
     }
 
-    private static bool IsAcademyType(string? typeId, string? typeName)
+    //this just returns the governance structure
+    public DataWithAvailability<GovernanceStructure> Evaluate(SimilarSchool similarSchool)
     {
-        // First check by ID (preferred)
-        if (EstablishmentTypeClassification.IsAcademy(typeId))
-            return true;
-
-        // Fallback to name-based detection (case-insensitive)
-        return EstablishmentTypeClassification.IsAcademyByName(typeName);
+        return GetGovernanceStructure(similarSchool.TrustSchoolFlag.Id, similarSchool.EstablishmentTypeGroup.Id);
     }
+
+
+    private static DataWithAvailability<GovernanceStructure> GetGovernanceStructure(string trustSchoolFlagId, string establishmentGroupTypeId)
+    {
+        if (string.IsNullOrEmpty(trustSchoolFlagId) || string.IsNullOrEmpty(establishmentGroupTypeId))
+        {
+            return DataWithAvailability.NotAvailable<GovernanceStructure>();
+        }
+
+        if (trustSchoolFlagId == "5")
+        {
+            return DataWithAvailability.Available(new GovernanceStructure("S", "Single-academy trust (SAT)"));
+        }
+
+        if (trustSchoolFlagId == "3")
+        {
+            return DataWithAvailability.Available(new GovernanceStructure("M", "Multi-academy trust (SAT)"));
+        }
+
+        if (trustSchoolFlagId is "1" or "2" || trustSchoolFlagId == "0" && establishmentGroupTypeId == "4")
+        {
+            return DataWithAvailability.Available(new GovernanceStructure("MS", "Maintained school - local authority controlled"));
+        }
+
+        return DataWithAvailability.Available(new GovernanceStructure("N", "No known group"));
+    }
+
+
+    //private static bool IsAcademyType(string? typeId, string? typeName)
+    //{
+    //    // First check by ID (preferred)
+    //    if (EstablishmentTypeClassification.IsAcademy(typeId))
+    //        return true;
+
+    //    // Fallback to name-based detection (case-insensitive)
+    //    return EstablishmentTypeClassification.IsAcademyByName(typeName);
+    //}
 }
