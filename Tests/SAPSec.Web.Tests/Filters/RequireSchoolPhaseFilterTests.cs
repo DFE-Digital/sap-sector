@@ -5,9 +5,9 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Tests.Filters;
 
@@ -53,7 +53,7 @@ public class RequireSchoolPhaseFilterTests
     }
 
     [Fact]
-    public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_RedirectsToPrimaryPath()
+    public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_RedirectsToPrimaryOverview()
     {
         var school = CreateSchoolDetails("123456", "Primary");
         _requestSchoolAccessorMock
@@ -105,6 +105,24 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task SecondaryFilter_WithPrimarySchoolOnAttendanceRoute_RedirectsToPrimaryAttendance()
+    {
+        var school = CreateSchoolDetails("123456", "Primary");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Secondary,
+            controller: "School",
+            action: "Attendance",
+            routeValues: [("urn", "123456")]);
+
+        result.Should().BeOfType<RedirectResult>()
+            .Which.Url.Should().Be("/school/primary/123456/attendance");
     }
 
     [Fact]

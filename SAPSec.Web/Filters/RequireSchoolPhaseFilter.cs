@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using SAPSec.Core.Extensions;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Helpers;
+using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Filters;
 
@@ -61,7 +61,9 @@ public sealed class RequireSchoolPhaseFilter(
             return new NotFoundResult();
         }
 
-        if (!SchoolRouteHelper.TryGetPhaseOverviewPath(
+        if (!SchoolRouteHelper.TryGetPhaseRedirectPath(
+                context.RouteData.Values["controller"]?.ToString(),
+                context.RouteData.Values["action"]?.ToString(),
                 school,
                 context.HttpContext.Request.PathBase,
                 out var canonicalPath))

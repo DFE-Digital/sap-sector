@@ -6,6 +6,7 @@ using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
 using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
