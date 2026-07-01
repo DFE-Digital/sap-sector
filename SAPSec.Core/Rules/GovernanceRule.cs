@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
+using SAPSec.Core.Constants;
 using SAPSec.Data.Dto;
 
 /// <summary>
@@ -65,7 +66,6 @@ public sealed class GovernanceRule : IBusinessRule<GovernanceStructure>
         //}
 
         //return DataWithAvailability.NotAvailable<GovernanceType>();
-        //}
     }
 
     //this just returns the governance structure
@@ -82,20 +82,30 @@ public sealed class GovernanceRule : IBusinessRule<GovernanceStructure>
             return DataWithAvailability.NotAvailable<GovernanceStructure>();
         }
 
-        if (trustSchoolFlagId == "5")
+        //IsSuportedBySingleAcademyTrust(trustSchoolFlagId)
+        if (TrustSchoolFlagValues.IsSupportedBySingleAcademyTrust(trustSchoolFlagId))
         {
             return DataWithAvailability.Available(new GovernanceStructure("S", "Single-academy trust (SAT)"));
         }
-
-        if (trustSchoolFlagId == "3")
+        //IsSupportedByMultiAcademyTrust(trustSchoolFlagId)
+        if (TrustSchoolFlagValues.IsSupportedByMultiAcademyTrust(trustSchoolFlagId))
         {
             return DataWithAvailability.Available(new GovernanceStructure("M", "Multi-academy trust (SAT)"));
         }
 
-        if (trustSchoolFlagId is "1" or "2" || trustSchoolFlagId == "0" && establishmentGroupTypeId == "4")
+        //IsSupportedByTrust
+        //IsNotSupportedByTrust
+        //IsNotApplicable
+        //IsLaMaintainedSchool
+        if ((TrustSchoolFlagValues.IsSupportedByTrust(trustSchoolFlagId) || TrustSchoolFlagValues.IsNotSupportedByTrust(trustSchoolFlagId)) || 
+            (TrustSchoolFlagValues.IsNotApplicable(trustSchoolFlagId) && EstablishmentGroupTypeValues.IsLaMaintainedSchool(establishmentGroupTypeId)))
         {
             return DataWithAvailability.Available(new GovernanceStructure("MS", "Maintained school - local authority controlled"));
         }
+        //if (trustSchoolFlagId is "1" or "2" || trustSchoolFlagId == "0" && establishmentGroupTypeId == "4")
+        //{
+        //    return DataWithAvailability.Available(new GovernanceStructure("MS", "Maintained school - local authority controlled"));
+        //}
 
         return DataWithAvailability.Available(new GovernanceStructure("N", "No known group"));
     }
