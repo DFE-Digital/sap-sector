@@ -55,35 +55,5 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         var governanceStructure = _governanceRule.Evaluate(similarSchool).Value;
 
         return governanceStructure;
-
-        //switch (governanceStructure.Id)
-        //{
-        //    case "5":
-        //      return new("S", governanceStructure.Type);
-        //}
-
-        //if (i.TrustSchoolFlag?.Id == "5")
-        //{
-        //    return new("S", "Single-academy trust (SAT)");
-        //}
-
-        //if (i.TrustSchoolFlag?.Id == "5")
-        //{
-        //    return new("S", "Single-academy trust (SAT)");
-        //}
-
-        //if (i.TrustSchoolFlag?.Id == "3")
-        //{
-        //    return new("M", "Multi-academy trust (MAT)");
-        //}
-
-        //if (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
-        //{
-        //    return new("MS", "Maintained school - local authority controlled");
-        //}
-
-        //return new("N", "No known group");
     }
-
-    //private record Group(string Key, string Name);
 }

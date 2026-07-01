@@ -36,10 +36,10 @@ public  class SchoolDetails
     public required DataWithAvailability<string> AcademyTrustId { get; init; }
 
     // Provisions
-    public required DataWithAvailability<bool> HasNurseryProvision { get; init; }
-    public required DataWithAvailability<bool> HasSixthForm { get; init; }
-    public required DataWithAvailability<bool> HasSenUnit { get; init; }
-    public required DataWithAvailability<bool> HasResourcedProvision { get; init; }
+    public required DataWithAvailability<string> NurseryProvision { get; init; }
+    public required DataWithAvailability<string> SixthForm { get; init; }
+    public required DataWithAvailability<string> SenUnit { get; init; }
+    public required DataWithAvailability<string> ResourcedProvision { get; init; }
 
     // Contact
     public required DataWithAvailability<string> HeadteacherName { get; init; }

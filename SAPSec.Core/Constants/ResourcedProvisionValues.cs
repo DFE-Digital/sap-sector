@@ -8,17 +8,17 @@ public static class ResourcedProvisionValues
 {
     #region Provision Patterns
 
-    /// <summary>Pattern indicating SEN unit</summary>
-    private const string SenUnitPattern = "SEN unit";
-
-    /// <summary>Pattern indicating resourced provision</summary>
-    private const string ResourcedProvisionPattern = "resourced provision";
-
     /// <summary>Values indicating no provision</summary>
-    private static readonly string[] NoProvisionValues =
+    private static readonly string[] HasResourcedProvisionValues =
     {
+        "resourced provision",
+        "resourced provision and SEN unit"
+    };
+
+    private static readonly string[] NoResourcedProvisionValues =
+{
         "Not applicable",
-        "None"
+        "SEN unit"
     };
 
     #endregion
@@ -26,19 +26,7 @@ public static class ResourcedProvisionValues
     #region Helper Methods
 
     /// <summary>
-    /// Checks if the provision field indicates a SEN unit.
-    /// Uses case-insensitive comparison.
-    /// </summary>
-    public static bool HasSenUnit(string? provision)
-    {
-        if (string.IsNullOrWhiteSpace(provision))
-            return false;
-
-        return provision.Contains(SenUnitPattern, StringComparison.OrdinalIgnoreCase);
-    }
-
-    /// <summary>
-    /// Checks if the provision field indicates resourced provision.
+    /// Checks if the TypeOfResourcedProvision field indicates a resourced provision.
     /// Uses case-insensitive comparison.
     /// </summary>
     public static bool HasResourcedProvision(string? provision)
@@ -46,19 +34,25 @@ public static class ResourcedProvisionValues
         if (string.IsNullOrWhiteSpace(provision))
             return false;
 
-        return provision.Contains(ResourcedProvisionPattern, StringComparison.OrdinalIgnoreCase);
+        foreach (var value in HasResourcedProvisionValues)
+        {
+            if (provision.Contains(value, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+
+        return false;
     }
 
     /// <summary>
-    /// Checks if the provision field indicates no provision.
+    /// Checks if the TypeOfResourcedProvision field indicates no resourced provision.
     /// Uses case-insensitive comparison.
     /// </summary>
-    public static bool IsNoProvision(string? provision)
+    public static bool NoResourcedProvision(string? provision)
     {
         if (string.IsNullOrWhiteSpace(provision))
-            return true;
+            return false;
 
-        foreach (var value in NoProvisionValues)
+        foreach (var value in NoResourcedProvisionValues)
         {
             if (provision.Contains(value, StringComparison.OrdinalIgnoreCase))
                 return true;

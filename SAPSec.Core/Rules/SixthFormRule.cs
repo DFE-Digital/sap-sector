@@ -10,20 +10,25 @@ namespace SAPSec.Core.Rules;
 /// Business rule: Determines if school has sixth form based on OfficialSixthFormId.
 /// Single Responsibility: Only handles sixth form logic.
 /// </summary>
-public sealed class SixthFormRule : IBusinessRule<bool>
+public sealed class SixthFormRule : IBusinessRule<string>
 {
-    public DataWithAvailability<bool> Evaluate(Establishment establishment)
+    public DataWithAvailability<string> Evaluate(Establishment establishment)
     {
-        return establishment.OfficialSixthFormId switch
+        return GetSixthForm(establishment.OfficialSixthFormId);
+    }
+
+    public DataWithAvailability<string> GetSixthForm(string officialSixthFormId)
+    {
+        return officialSixthFormId switch
         {
-            SixthFormCodes.HasSixthForm => DataWithAvailability.Available(true),
-            SixthFormCodes.NoSixthForm => DataWithAvailability.Available(false),
-            SixthFormCodes.NotApplicable => DataWithAvailability.NotApplicable<bool>(),
-            _ => DataWithAvailability.NotAvailable<bool>()
+            SixthFormCodes.HasSixthForm => DataWithAvailability.Available("Has a sixth form"),
+            SixthFormCodes.NoSixthForm => DataWithAvailability.Available("Does not have a sixth form"),
+            SixthFormCodes.NotApplicable => DataWithAvailability.NotApplicable<string>(),
+            _ => DataWithAvailability.NotAvailable<string>()
         };
     }
 
-    public DataWithAvailability<bool> Evaluate(SimilarSchool similarSchool)
+    public DataWithAvailability<string> Evaluate(SimilarSchool similarSchool)
     {
         throw new NotImplementedException();
     }

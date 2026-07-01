@@ -7,33 +7,34 @@ using SAPSec.Data.Dto;
 namespace SAPSec.Core.Rules;
 
 /// <summary>
-/// Business rule: Determines if school has SEN unit based on ResourcedProvision field.
+/// Business rule: Determines if school has SEN unit based on TypeOfResourcedProvision field.
 /// Single Responsibility: Only handles SEN unit logic.
 /// </summary>
-public sealed class SenUnitRule : IBusinessRule<bool>
+public sealed class SenUnitRule : IBusinessRule<string>
 {
-    public DataWithAvailability<bool> Evaluate(Establishment establishment)
+    public DataWithAvailability<string> Evaluate(Establishment establishment)
     {
-        var provision = establishment.ResourcedProvisionName;
-
-        // Empty or explicitly no provision
-        if (ResourcedProvisionValues.IsNoProvision(provision))
-        {
-            return DataWithAvailability.Available(false);
-        }
-
-        // Check for SEN unit
-        if (ResourcedProvisionValues.HasSenUnit(provision))
-        {
-            return DataWithAvailability.Available(true);
-        }
-
-        // Has some provision data but no SEN unit mentioned
-        return DataWithAvailability.Available(false);
+        return GetSenUnit(establishment.ResourcedProvisionName);
     }
 
-    public DataWithAvailability<bool> Evaluate(SimilarSchool similarSchool)
+    private DataWithAvailability<string> GetSenUnit(string resourcedProvisionName)
+    {
+        if (SenUnitValues.NoSenUnit(resourcedProvisionName))
+        {
+            return DataWithAvailability.Available("Does not have a SEN unit");
+        }
+
+        if (SenUnitValues.HasSenUnit(resourcedProvisionName))
+        {
+            return DataWithAvailability.Available("Has a SEN unit");
+        }
+
+        return DataWithAvailability.Available("No data available");
+    }
+
+    public DataWithAvailability<string> Evaluate(SimilarSchool similarSchool)
     {
         throw new NotImplementedException();
     }
+
 }

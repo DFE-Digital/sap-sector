@@ -10,54 +10,28 @@ namespace SAPSec.Core.Rules;
 /// Business rule: Determines if school has resourced provision.
 /// Single Responsibility: Only handles resourced provision logic.
 /// </summary>
-public sealed class ResourcedProvisionRule : IBusinessRule<bool>
+public sealed class ResourcedProvisionRule : IBusinessRule<string>
 {
-    public DataWithAvailability<bool> Evaluate(Establishment establishment)
+    public DataWithAvailability<string> Evaluate(Establishment establishment)
     {
-
-        //pass in just the resource provision name and not the whole establishment
-
-        var provision = establishment.ResourcedProvisionName;
-
-        // Empty or explicitly no provision
-        if (ResourcedProvisionValues.IsNoProvision(provision))
-        {
-            return DataWithAvailability.Available(false);
-        }
-
-        // Check for resourced provision
-        if (ResourcedProvisionValues.HasResourcedProvision(provision))
-        {
-            return DataWithAvailability.Available(true);
-        }
-
-        return DataWithAvailability.Available(false);
+        return GetResourcedProvision(establishment.ResourcedProvisionName);
     }
 
-    public DataWithAvailability<bool> Evaluate(SimilarSchool similarSchool)
+    public DataWithAvailability<string> Evaluate(SimilarSchool similarSchool)
     {
         throw new NotImplementedException();
     }
 
-    //public DataWithAvailability<bool> Evaluate(string resourcedProvisionId)
-    // {
-
-    //pass in just the resource provision name and not the whole establishment
-
-    //var provision = establishment.ResourcedProvisionName;
-
-    // Empty or explicitly no provision
-    //if (ResourcedProvisionValues.IsNoProvision(provision))
-    //{
-    //    return DataWithAvailability.Available(false);
-    //}
-
-    //// Check for resourced provision
-    //if (ResourcedProvisionValues.HasResourcedProvision(provision))
-    //{
-    //    return DataWithAvailability.Available(true);
-    //}
-
-    //return DataWithAvailability.Available(false);
-    //}
+    public DataWithAvailability<string> GetResourcedProvision(string resourcedProvisionName)
+    {
+        if (ResourcedProvisionValues.NoResourcedProvision(resourcedProvisionName))
+        {
+            return DataWithAvailability.Available("Does not have a resourced provision");
+        }
+        if (ResourcedProvisionValues.HasResourcedProvision(resourcedProvisionName))
+        {
+            return DataWithAvailability.Available("Has a resourced provision");
+        }
+        return DataWithAvailability.Available("No data available");
+    }
 }

@@ -84,25 +84,25 @@
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Nursery provision</dt>
         <dd class="govuk-summary-list__value">
-            @Model.HasNurseryProvision.DisplayAs("Has nursery classes", "Does not have nursery classes")
+            @Model.NurseryProvision.Display()
         </dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Sixth form</dt>
         <dd class="govuk-summary-list__value">
-            @Model.HasSixthForm.DisplayAs("Has a sixth form", "Does not have a sixth form")
+            @Model.SixthForm.Display()
         </dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">SEN unit</dt>
         <dd class="govuk-summary-list__value">
-            @Model.HasSenUnit.DisplayAs("Has a SEN unit", "Does not have a SEN unit")
+            @Model.SenUnit.Display()
         </dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Resourced provision</dt>
         <dd class="govuk-summary-list__value">
-            @Model.HasResourcedProvision.DisplayAs("Has a resourced provision", "Does not have a resourced provision")
+            @Model.ResourcedProvision.Display()
         </dd>
     </div>
 </dl>

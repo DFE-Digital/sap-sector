@@ -78,13 +78,13 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             AcademyTrustId = DataMapper.MapTrustId(establishment.TrustId),
 
             // Provisions - business rules
-            HasNurseryProvision = _nurseryProvisionRule.Evaluate(establishment),
-            HasSixthForm = _sixthFormRule.Evaluate(establishment),
-            HasSenUnit = _senUnitRule.Evaluate(establishment),
+            NurseryProvision = _nurseryProvisionRule.Evaluate(establishment),
+            SixthForm = _sixthFormRule.Evaluate(establishment),
+            SenUnit = _senUnitRule.Evaluate(establishment),
 
             //This return true/false and FE will decide what to display based on that.
             //Just return the actual value
-            HasResourcedProvision = _resourcedProvisionRule.Evaluate(establishment),
+            ResourcedProvision = _resourcedProvisionRule.Evaluate(establishment),
 
             // Contact
             HeadteacherName = DataMapper.MapHeadteacher(establishment),
