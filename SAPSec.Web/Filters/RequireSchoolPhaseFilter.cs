@@ -62,8 +62,7 @@ public sealed class RequireSchoolPhaseFilter(
         }
 
         if (!SchoolRouteHelper.TryGetPhaseRedirectPath(
-                context.RouteData.Values["controller"]?.ToString(),
-                context.RouteData.Values["action"]?.ToString(),
+                context.HttpContext.Request.Path,
                 school,
                 context.HttpContext.Request.PathBase,
                 out var canonicalPath))

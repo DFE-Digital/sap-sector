@@ -7,8 +7,7 @@ namespace SAPSec.Web.Helpers;
 public static class SchoolRouteHelper
 {
     public static bool TryGetPhaseRedirectPath(
-        string? controller,
-        string? action,
+        PathString requestPath,
         SchoolDetails school,
         PathString pathBase,
         out string redirectPath)
@@ -17,8 +16,8 @@ public static class SchoolRouteHelper
 
         var relativePath = school switch
         {
-            _ when school.IsPrimarySchool() => GetPrimaryPath(controller, action, school.Urn),
-            _ when school.IsSecondarySchool() => GetSecondaryPath(controller, action, school.Urn),
+            _ when school.IsPrimarySchool() => GetPrimaryPath(requestPath, school.Urn),
+            _ when school.IsSecondarySchool() => GetSecondaryPath(requestPath, school.Urn),
             _ => null
         };
 
@@ -32,27 +31,33 @@ public static class SchoolRouteHelper
         return true;
     }
 
-    private static string GetPrimaryPath(string? controller, string? action, string urn) =>
-        (controller, action) switch
+    private static string GetPrimaryPath(PathString requestPath, string urn)
+    {
+        var path = requestPath.Value ?? string.Empty;
+
+        return path.ToLowerInvariant() switch
         {
-            ("School", "Attendance") => $"/school/primary/{urn}/attendance",
-            ("School", "SchoolDetails") => $"/school/primary/{urn}/school-details",
-            ("School", "WhatIsASimilarSchool") => $"/school/primary/{urn}/what-is-a-similar-school",
-            ("School", "ViewSimilarSchools") => $"/school/primary/{urn}/view-similar-schools",
-            ("SimilarSchools", "ViewSimilarSchools") => $"/school/primary/{urn}/view-similar-schools",
-            ("SimilarSchools", "Index") => $"/school/primary/{urn}/view-similar-schools",
+            var p when p.EndsWith("/attendance") => $"/school/primary/{urn}/attendance",
+            var p when p.EndsWith("/school-details") => $"/school/primary/{urn}/school-details",
+            var p when p.EndsWith("/what-is-a-similar-school") => $"/school/primary/{urn}/what-is-a-similar-school",
+            var p when p.EndsWith("/view-similar-schools") => $"/school/primary/{urn}/view-similar-schools",
+            var p when p.EndsWith("/similar-schools") => $"/school/primary/{urn}/view-similar-schools",
             _ => $"/school/primary/{urn}"
         };
+    }
 
-    private static string GetSecondaryPath(string? controller, string? action, string urn) =>
-        (controller, action) switch
+    private static string GetSecondaryPath(PathString requestPath, string urn)
+    {
+        var path = requestPath.Value ?? string.Empty;
+
+        return path.ToLowerInvariant() switch
         {
-            ("School", "Attendance") => $"/school/{urn}/attendance",
-            ("School", "SchoolDetails") => $"/school/{urn}/school-details",
-            ("School", "WhatIsASimilarSchool") => $"/school/{urn}/what-is-a-similar-school",
-            ("School", "ViewSimilarSchools") => $"/school/{urn}/view-similar-schools",
-            ("SimilarSchools", "ViewSimilarSchools") => $"/school/{urn}/view-similar-schools",
-            ("SimilarSchools", "Index") => $"/school/{urn}/view-similar-schools",
+            var p when p.EndsWith("/attendance") => $"/school/{urn}/attendance",
+            var p when p.EndsWith("/school-details") => $"/school/{urn}/school-details",
+            var p when p.EndsWith("/what-is-a-similar-school") => $"/school/{urn}/what-is-a-similar-school",
+            var p when p.EndsWith("/view-similar-schools") => $"/school/{urn}/view-similar-schools",
+            var p when p.EndsWith("/similar-schools") => $"/school/{urn}/view-similar-schools",
             _ => $"/school/{urn}"
         };
+    }
 }

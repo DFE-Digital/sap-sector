@@ -194,6 +194,7 @@ public class RequireSchoolPhaseFilterTests
         {
             httpContext.Request.PathBase = new PathString(pathBase);
         }
+        httpContext.Request.Path = BuildRequestPath(area, routeValues, action);
 
         var routeData = new RouteData();
         routeData.Values["controller"] = controller;
@@ -223,6 +224,35 @@ public class RequireSchoolPhaseFilterTests
             () => Task.FromResult(new ActionExecutedContext(actionContext, filters, new object())));
 
         return context.Result;
+    }
+
+    private static PathString BuildRequestPath(string? area, (string Key, string Value)[] routeValues, string action)
+    {
+        var urn = routeValues.FirstOrDefault(x => x.Key == "urn").Value;
+
+        if (string.Equals(area, "Primary", StringComparison.OrdinalIgnoreCase))
+        {
+            return action switch
+            {
+                "Ks2" => $"/school/primary/{urn}/ks2",
+                "Attendance" => $"/school/primary/{urn}/attendance",
+                "SchoolDetails" => $"/school/primary/{urn}/school-details",
+                "WhatIsASimilarSchool" => $"/school/primary/{urn}/what-is-a-similar-school",
+                "ViewSimilarSchools" => $"/school/primary/{urn}/view-similar-schools",
+                _ => $"/school/primary/{urn}"
+            };
+        }
+
+        return action switch
+        {
+            "Attendance" => $"/school/{urn}/attendance",
+            "AttendanceData" => $"/school/{urn}/attendance-data",
+            "SchoolDetails" => $"/school/{urn}/school-details",
+            "WhatIsASimilarSchool" => $"/school/{urn}/what-is-a-similar-school",
+            "ViewSimilarSchools" => $"/school/{urn}/view-similar-schools",
+            "Ks4HeadlineMeasures" => $"/school/{urn}/ks4-headline-measures",
+            _ => $"/school/{urn}"
+        };
     }
 
     private static SchoolDetails CreateSchoolDetails(string urn, string phaseOfEducation) =>
