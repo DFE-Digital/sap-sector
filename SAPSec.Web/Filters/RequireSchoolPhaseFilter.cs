@@ -24,7 +24,7 @@ public sealed class RequireSchoolPhaseFilter(
             var school = await requestSchoolAccessor.GetAsync(context.HttpContext, urn);
             if (!MatchesExpectedPhase(school, expectedPhase))
             {
-                context.Result = new NotFoundResult();
+                context.Result = TryBuildRedirectResult(context, school);
                 return;
             }
         }
@@ -52,4 +52,62 @@ public sealed class RequireSchoolPhaseFilter(
             ExpectedSchoolPhase.Secondary => school.IsSecondarySchool(),
             _ => false
         };
+
+    private IActionResult TryBuildRedirectResult(ActionExecutingContext context, SchoolDetails school)
+    {
+        if (routeParameterNames.Length != 1)
+        {
+            return new NotFoundResult();
+        }
+
+        var request = context.HttpContext.Request;
+        var canonicalPath = school.IsPrimarySchool()
+            ? BuildPrimaryPath(context, school.Urn)
+            : BuildSecondaryPath(context, school.Urn);
+
+        return new RedirectResult(canonicalPath + request.QueryString, permanent: false);
+    }
+
+    private static string BuildPrimaryPath(ActionExecutingContext context, string urn)
+    {
+        var controller = context.RouteData.Values["controller"]?.ToString();
+        var action = context.RouteData.Values["action"]?.ToString();
+
+        if (string.Equals(controller, "SimilarSchools", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(action, "ViewSimilarSchools", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"/school/primary/{urn}/view-similar-schools";
+        }
+
+        return action switch
+        {
+            "Ks2" => $"/school/primary/{urn}/ks2",
+            "Attendance" => $"/school/primary/{urn}/attendance",
+            "SchoolDetails" => $"/school/primary/{urn}/school-details",
+            "WhatIsASimilarSchool" => $"/school/primary/{urn}/what-is-a-similar-school",
+            _ => $"/school/primary/{urn}"
+        };
+    }
+
+    private static string BuildSecondaryPath(ActionExecutingContext context, string urn)
+    {
+        var controller = context.RouteData.Values["controller"]?.ToString();
+        var action = context.RouteData.Values["action"]?.ToString();
+
+        if (string.Equals(controller, "SimilarSchools", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(action, "ViewSimilarSchools", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"/school/{urn}/view-similar-schools";
+        }
+
+        return action switch
+        {
+            "Attendance" => $"/school/{urn}/attendance",
+            "SchoolDetails" => $"/school/{urn}/school-details",
+            "WhatIsASimilarSchool" => $"/school/{urn}/what-is-a-similar-school",
+            "Ks4HeadlineMeasures" => $"/school/{urn}/ks4-headline-measures",
+            "Ks4CoreSubjects" => $"/school/{urn}/ks4-core-subjects",
+            _ => $"/school/{urn}"
+        };
+    }
 }

@@ -16,7 +16,7 @@ public class RequireSchoolPhaseFilterTests
     private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock = new();
 
     [Fact]
-    public async Task SecondaryFilter_WithPrimarySchoolIndex_ReturnsNotFound()
+    public async Task SecondaryFilter_WithPrimarySchoolIndex_RedirectsToPrimaryPath()
     {
         var school = CreateSchoolDetails("123456", "Primary");
         _requestSchoolAccessorMock
@@ -29,11 +29,12 @@ public class RequireSchoolPhaseFilterTests
             action: "Index",
             routeValues: [("urn", "123456")]);
 
-        result.Should().BeOfType<NotFoundResult>();
+        result.Should().BeOfType<RedirectResult>()
+            .Which.Url.Should().Be("/school/primary/123456");
     }
 
     [Fact]
-    public async Task PrimaryFilter_WithSecondarySchoolIndex_ReturnsNotFound()
+    public async Task PrimaryFilter_WithSecondarySchoolIndex_RedirectsToSecondaryPath()
     {
         var school = CreateSchoolDetails("123456", "Secondary");
         _requestSchoolAccessorMock
@@ -47,11 +48,12 @@ public class RequireSchoolPhaseFilterTests
             area: "Primary",
             routeValues: [("urn", "123456")]);
 
-        result.Should().BeOfType<NotFoundResult>();
+        result.Should().BeOfType<RedirectResult>()
+            .Which.Url.Should().Be("/school/123456");
     }
 
     [Fact]
-    public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_ReturnsNotFound()
+    public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_RedirectsToPrimaryPath()
     {
         var school = CreateSchoolDetails("123456", "Primary");
         _requestSchoolAccessorMock
@@ -64,7 +66,8 @@ public class RequireSchoolPhaseFilterTests
             action: "Ks4HeadlineMeasures",
             routeValues: [("urn", "123456")]);
 
-        result.Should().BeOfType<NotFoundResult>();
+        result.Should().BeOfType<RedirectResult>()
+            .Which.Url.Should().Be("/school/primary/123456");
     }
 
     [Fact]
@@ -84,6 +87,25 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456"), ("similarSchoolUrn", "654321")]);
 
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task SecondaryFilter_WithTwoRouteValuesAndPrimaryMismatch_ReturnsNotFound()
+    {
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(CreateSchoolDetails("123456", "Secondary"));
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "654321"))
+            .ReturnsAsync(CreateSchoolDetails("654321", "Primary"));
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Secondary,
+            controller: "SimilarSchoolsComparison",
+            action: "Similarity",
+            routeValues: [("urn", "123456"), ("similarSchoolUrn", "654321")]);
+
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     private async Task<IActionResult?> ExecuteFilterAsync(
