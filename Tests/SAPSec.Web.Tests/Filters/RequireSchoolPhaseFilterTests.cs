@@ -71,6 +71,61 @@ public class RequireSchoolPhaseFilterTests
     }
 
     [Fact]
+    public async Task PrimaryFilter_WithSecondarySchoolAndPathBase_PreservesPathBaseInRedirect()
+    {
+        var school = CreateSchoolDetails("123456", "Secondary");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Primary,
+            controller: "School",
+            action: "Index",
+            area: "Primary",
+            routeValues: [("urn", "123456")],
+            pathBase: "/app");
+
+        result.Should().BeOfType<RedirectResult>()
+            .Which.Url.Should().Be("/app/school/123456");
+    }
+
+    [Fact]
+    public async Task SecondaryFilter_WithUnsupportedSchoolPhase_ReturnsNotFound()
+    {
+        var school = CreateSchoolDetails("123456", "Special");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Secondary,
+            controller: "School",
+            action: "Index",
+            routeValues: [("urn", "123456")]);
+
+        result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task SecondaryFilter_WithPrimarySchoolOnDataRoute_RedirectsToPrimaryOverview()
+    {
+        var school = CreateSchoolDetails("123456", "Primary");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Secondary,
+            controller: "School",
+            action: "AttendanceData",
+            routeValues: [("urn", "123456")]);
+
+        result.Should().BeOfType<RedirectResult>()
+            .Which.Url.Should().Be("/school/primary/123456");
+    }
+
+    [Fact]
     public async Task SecondaryFilter_WithTwoSecondaryRouteValues_AllowsExecution()
     {
         _requestSchoolAccessorMock
@@ -113,9 +168,15 @@ public class RequireSchoolPhaseFilterTests
         string controller,
         string action,
         (string Key, string Value)[] routeValues,
-        string? area = null)
+        string? area = null,
+        string? pathBase = null)
     {
         var httpContext = new DefaultHttpContext();
+        if (!string.IsNullOrWhiteSpace(pathBase))
+        {
+            httpContext.Request.PathBase = new PathString(pathBase);
+        }
+
         var routeData = new RouteData();
         routeData.Values["controller"] = controller;
         routeData.Values["action"] = action;
