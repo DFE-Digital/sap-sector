@@ -1,5 +1,4 @@
 ﻿using SAPSec.Core.Constants;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -10,28 +9,23 @@ namespace SAPSec.Core.Rules;
 /// Business rule: Determines if school has nursery classes
 /// Single Responsibility: Only handles nursery classes logic.
 /// </summary>
-public sealed class NurseryProvisionRule : IBusinessRule<NurseryProvision>
+public sealed class NurseryProvisionRule : IBusinessRule<string>
 {
-    public DataWithAvailability<NurseryProvision> Evaluate(Establishment establishment)
-    {
-        return GetNurseryProvision(establishment.NurseryProvisionName);
-    }
+    public static readonly string HasNurseryClasses = "Has nursery classes";
+    public static readonly string NoNurseryClasses = "Does not have nursery classes";
 
-    public DataWithAvailability<NurseryProvision> Evaluate(SimilarSchool similarSchool)
+    public DataWithAvailability<string> Evaluate(Establishment establishment)
     {
-        return GetNurseryProvision(similarSchool.NurseryProvisionName);
-    }
+        var nurseryProvisionName = establishment.NurseryProvisionName;
 
-    private DataWithAvailability<NurseryProvision> GetNurseryProvision(string nurseryProvisionName)
-    {
-        if (PhaseOfEducationValues.IndicatesNursery(nurseryProvisionName))
+        if (NurseryProvisionValues.HasNurseryClasses(nurseryProvisionName))
         {
-            return DataWithAvailability.Available(new NurseryProvision("H", "Has nursery classes"));
+            return DataWithAvailability.Available(HasNurseryClasses);
         }
-        if (PhaseOfEducationValues.IndicatesNoNursery(nurseryProvisionName))
+        if (NurseryProvisionValues.NoNurseryClasses(nurseryProvisionName))
         {
-            return DataWithAvailability.Available(new NurseryProvision("N", "Does not have nursery classes"));
+            return DataWithAvailability.Available(NoNurseryClasses);
         }
-        return DataWithAvailability.NotAvailable<NurseryProvision>();
+        return DataWithAvailability.NotAvailable<string>();
     }
 }

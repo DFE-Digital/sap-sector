@@ -22,7 +22,6 @@ public static class TrustSchoolFlagValues
             return true;
 
         return false;
-
     }
 
     public static bool IsSupportedByMultiAcademyTrust(string trustSchoolFlagId)
@@ -33,7 +32,6 @@ public static class TrustSchoolFlagValues
             return true;
 
         return false;
-
     }
 
     public static bool IsSupportedByTrust(string trustSchoolFlagId)
@@ -44,7 +42,6 @@ public static class TrustSchoolFlagValues
             return true;
 
         return false;
-
     }
 
     public static bool IsNotSupportedByTrust(string trustSchoolFlagId)
@@ -55,7 +52,6 @@ public static class TrustSchoolFlagValues
             return true;
 
         return false;
-
     }
 
     public static bool IsNotApplicable(string trustSchoolFlagId)
@@ -66,6 +62,5 @@ public static class TrustSchoolFlagValues
             return true;
 
         return false;
-
     }
 }

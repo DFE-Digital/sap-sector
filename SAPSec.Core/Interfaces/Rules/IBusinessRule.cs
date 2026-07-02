@@ -18,5 +18,5 @@ public interface IBusinessRule<T>
     /// <returns>The result with availability information</returns>
     DataWithAvailability<T> Evaluate(Establishment establishment);
 
-    DataWithAvailability<T> Evaluate(SimilarSchool similarSchool);
+   // DataWithAvailability<T> Evaluate(SimilarSchool similarSchool);
 }

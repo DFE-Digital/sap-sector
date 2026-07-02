@@ -1,6 +1,5 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
-using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -14,7 +13,6 @@ public class SimilarSchoolsNurseryProvisionFilter(string key,
         filterValues,
         currentSchool)
 {
-    private readonly NurseryProvisionRule _nurseryProvisionRule = new();
     protected override DataWithAvailability<string>? CurrentSchoolValue
         => DataWithAvailability.FromStringWithoutCodes(CurrentSchool.NurseryProvisionName);
 
@@ -29,24 +27,17 @@ public class SimilarSchoolsNurseryProvisionFilter(string key,
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
-        items.GroupBy(FindGroup)
+        items.GroupBy(i => i.NurseryProvisionName)
+            .Where(f => !string.IsNullOrWhiteSpace(f.Key))
             .Select(g => new FilterOption(
-                g.Key!.SortId,
-                g.Key.Type,
+                g.Key,
+                g.Key,
                 g.Count(),
-                values.Contains(g.Key.SortId, StringComparer.OrdinalIgnoreCase)))
+                values.Contains(g.Key, StringComparer.OrdinalIgnoreCase)))
             .OrderBy(fo => fo.Key switch
             {
-                "H" => 0,
-                "N" => 1,
+                "Has Nursery Classes" => 0,
+                "No Nursery Classes" => 1,
                 _ => 3
             });
-
-    private NurseryProvision FindGroup(SimilarSchool similarSchool)
-    {
-        var nurseryProvision = _nurseryProvisionRule.Evaluate(similarSchool).Value;
-
-        return nurseryProvision;
-
-    }
 }

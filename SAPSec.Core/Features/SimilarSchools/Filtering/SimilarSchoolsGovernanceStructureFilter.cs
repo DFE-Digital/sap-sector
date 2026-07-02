@@ -1,6 +1,5 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
-using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -14,9 +13,8 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         filterValues,
         currentSchool)
 {
-    private readonly GovernanceRule _governanceRule = new();
     protected override DataWithAvailability<string>? CurrentSchoolValue
-        => DataWithAvailability.Available(FindGroup(CurrentSchool).Type);
+        => DataWithAvailability.Available(FindGroup(CurrentSchool).Name);
 
     protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
     {
@@ -37,10 +35,10 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         return items
             .GroupBy(FindGroup)
             .Select(g => new FilterOption(
-                g.Key!.Id,
-                g.Key.Type,
+                g.Key!.Key,
+                g.Key.Name,
                 g.Count(),
-                values.Contains(g.Key.Id, StringComparer.OrdinalIgnoreCase)))
+                values.Contains(g.Key.Key, StringComparer.OrdinalIgnoreCase)))
             .OrderBy(fo => fo.Key switch
             {
                 "S" => 0,
@@ -50,10 +48,26 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
             });
     }
 
-    private GovernanceStructure FindGroup(SimilarSchool similarSchool)
+    private Group FindGroup(SimilarSchool i)
     {
-        var governanceStructure = _governanceRule.Evaluate(similarSchool).Value;
 
-        return governanceStructure;
+        if (i.TrustSchoolFlag?.Id == "5")
+        {
+            return new("S", "Single-academy trust (SAT)");
+        }
+
+        if (i.TrustSchoolFlag?.Id == "3")
+        {
+            return new("M", "Multi-academy trust (MAT)");
+        }
+
+        if (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
+        {
+            return new("MS", "Maintained school - local authority controlled");
+        }
+
+        return new("N", "No known group");
     }
+
+    private record Group(string Key, string Name);
 }

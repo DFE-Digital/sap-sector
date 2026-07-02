@@ -70,25 +70,14 @@ public static class DisplayHelpers
     /// Renders governance structure enum as display text.
     /// Content editors can modify the display strings here.
     /// </summary>
-    public static string Display(this DataWithAvailability<GovernanceStructure> data)
+    public static string Display(this DataWithAvailability<string> data)
     {
         if (data.Availability != DataAvailabilityStatus.Available)
         {
             return NotAvailableText;
         }
 
-        return data.Value.Type;
-        //return data.Value switch
-        //{
-        //    GovernanceType.MultiAcademyTrust => "Multi-academy trust (MAT)",
-        //    GovernanceType.SingleAcademyTrust => "Single-academy trust (SAT)",
-        //    GovernanceType.LocalAuthorityMaintained => "Local authority maintained",
-        //    GovernanceType.NonMaintainedSpecialSchool => "Non-maintained special school",
-        //    GovernanceType.Independent => "Independent",
-        //    GovernanceType.FurtherHigherEducation => "Further/Higher education",
-        //    GovernanceType.Other => "Other",
-        //    _ => NotAvailableText
-        //};
+        return data.Value;
     }
 
     /// <summary>
