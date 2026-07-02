@@ -310,7 +310,6 @@ public class SchoolDetailsServiceTests
         var result = await _sut.GetByUrnAsync("123456");
 
         // Assert
-      //  result.HasSenUnit.Value.Should().BeTrue();
         result.HasResourcedProvision.Value.Should().BeFalse();
     }
 
