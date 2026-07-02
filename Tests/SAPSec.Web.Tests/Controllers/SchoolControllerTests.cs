@@ -382,9 +382,9 @@ public class SchoolControllerTests
         using var document = JsonDocument.Parse(payload);
         var root = document.RootElement;
 
-        root.GetProperty("bar").GetArrayLength().Should().Be(4);
-        root.GetProperty("line").GetProperty("similarSchools").GetArrayLength().Should().Be(3);
-        root.GetProperty("table").GetProperty("similarSchools").GetArrayLength().Should().Be(4);
+        root.GetProperty("bar").GetArrayLength().Should().Be(3);
+        root.GetProperty("line").TryGetProperty("similarSchools", out _).Should().BeFalse();
+        root.GetProperty("table").TryGetProperty("similarSchools", out _).Should().BeFalse();
         root.GetProperty("topPerformers").GetArrayLength().Should().Be(3);
         root.GetProperty("topPerformers")[0].GetProperty("Name").GetString().Should().Be("Test Academy");
     }

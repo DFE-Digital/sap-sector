@@ -8,14 +8,12 @@
         labels = new[]
         {
             Model.SchoolName,
-            Model.SimilarSchoolsLabel,
             Model.LocalAuthorityLabel,
             Model.EnglandLabel
         },
         data = new decimal?[]
         {
             Model.SelectedSchoolOverallAbsenceThreeYearAverage,
-            Model.SimilarSchoolsOverallAbsenceThreeYearAverage,
             Model.LocalAuthorityOverallAbsenceThreeYearAverage,
             Model.EnglandOverallAbsenceThreeYearAverage
         }
@@ -26,13 +24,12 @@
         datasets = new object[]
         {
             new { label = Model.SchoolName, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
-            new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
             new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
             new { label = Model.EnglandLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
         }
     };
-    var chartColors = new[] { "#D53780", "#2a1950", "#2a1950", "#2a1950" };
-    var lineChartColors = new[] { "#D53780", "#2a1950", "#5694CA", "#28A197" };
+    var chartColors = new[] { "#D53780", "#2a1950", "#2a1950" };
+    var lineChartColors = new[] { "#D53780", "#5694CA", "#28A197" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
     string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
     string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
@@ -69,8 +66,8 @@
                     data-bar-chart-id="school-attendance-three-year-chart"
                     data-line-chart-id="school-attendance-year-by-year-chart"
                     data-cell-attribute="data-attendance-cell"
-                    data-cell-prefixes='{"school":"school","similarSchools":"similar","localAuthority":"la","england":"england"}'
-                    data-series-keys='["school","similarSchools","localAuthority","england"]'
+                    data-cell-prefixes='{"school":"school","localAuthority":"la","england":"england"}'
+                    data-series-keys='["school","localAuthority","england"]'
                     data-top-performers-table-id="attendance-top-performers-table"
                     data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
                 <option value="overall" selected>Overall absence</option>
@@ -150,13 +147,6 @@
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Current)</td>
                     <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-avg">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.SelectedSchoolOverallAbsenceThreeYearAverage)</td>
-                </tr>
-                <tr class="govuk-table__row">
-                    <th scope="row" class="govuk-table__header">@Model.SimilarSchoolsLabel</th>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Previous2)</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Previous)</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.SimilarSchools.Current)</td>
-                    <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="similar-avg">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.SimilarSchoolsOverallAbsenceThreeYearAverage)</td>
                 </tr>
                 <tr class="govuk-table__row">
                     <th scope="row" class="govuk-table__header">@Model.LocalAuthorityLabel</th>
