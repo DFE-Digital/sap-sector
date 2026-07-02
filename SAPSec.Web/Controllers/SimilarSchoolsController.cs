@@ -127,7 +127,7 @@ public class SimilarSchoolsController : Controller
         var categoryKeys = new List<(string Heading, List<string> Keys)>
         {
             ("Location", new List<string> { "dist", "reg", "ur" }),
-            ("School characteristics", new List<string> { "poe", "sciu", "np", "sf", "ap", "sp", "goe" }),
+            ("School characteristics", new List<string> { "st", "poe", "sciu", "np", "sf", "ap", "sp", "goe" }),
             ("Attendance", new List<string> { "oar", "par" })
         };
 

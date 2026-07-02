@@ -9,6 +9,7 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
         new SimilarSchoolsDistanceFilter("dist", "Distance", filterValues, currentSchool),
         new SimilarSchoolsReferenceDataFilter("reg", "Region", filterValues, currentSchool, s => s.Region),
         new SimilarSchoolsReferenceDataFilter("ur", "Urban or rural", filterValues, currentSchool, s => s.UrbanRural),
+        new SimilarSchoolsReferenceDataFilter("st", "School type", filterValues, currentSchool, s => s.TypeOfEstablishment),
         new SimilarSchoolsReferenceDataFilter("poe", "Phase of education", filterValues, currentSchool, s => s.PhaseOfEducation),
         new SimilarSchoolsSchoolCapacityInUseFilter("sciu", "School capacity in use", filterValues, currentSchool),
         new SimilarSchoolsNurseryProvisionFilter("np", "Nursery provision", filterValues, currentSchool),
