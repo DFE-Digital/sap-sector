@@ -1,5 +1,5 @@
 using SAPSec.Core.Constants;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Features.SchoolSearch.Extensions;
 

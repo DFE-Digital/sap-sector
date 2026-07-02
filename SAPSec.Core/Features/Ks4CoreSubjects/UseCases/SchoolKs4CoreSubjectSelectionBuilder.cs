@@ -1,6 +1,6 @@
-using SAPSec.Core.Features.Ks4HeadlineMeasures;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Model;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 

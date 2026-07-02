@@ -1,5 +1,5 @@
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 using System.Globalization;
 
 namespace SAPSec.Core.Features.Attendance.UseCases;
@@ -30,9 +30,9 @@ public class GetAttendanceMeasures(
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var similarSchoolDetails = similarSchoolUrns.Length == 0
-            ? Array.Empty<SAPSec.Core.Model.Generated.Establishment>()
+            ? Array.Empty<Establishment>()
             : (await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>();
+                ?? Array.Empty<Establishment>();
         var similarSchoolDetailsByUrn = similarSchoolDetails
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
@@ -159,7 +159,7 @@ public class GetAttendanceMeasures(
     }
 
     private static IReadOnlyList<AttendanceTopPerformer> BuildTopPerformers(
-        SAPSec.Core.Model.Generated.Establishment currentSchool,
+        Establishment currentSchool,
         decimal? currentSchoolValue,
         IEnumerable<SimilarSchoolAttendanceMeasure> similarSchools,
         Func<SimilarSchoolAttendanceMeasure, decimal?> selector)

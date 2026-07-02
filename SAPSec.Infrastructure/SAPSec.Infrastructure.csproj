@@ -47,18 +47,11 @@
     <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json" />
-    <None Remove="Data\Files\PrimarySchools\EnglandAbsence.json" />
     <None Remove="Data\Files\PrimarySchools\EnglandPerformance.json" />
-    <None Remove="Data\Files\PrimarySchools\EstablishmentAbsence.json" />
-    <None Remove="Data\Files\PrimarySchools\EstablishmentGroupLinks.json" />
     <None Remove="Data\Files\PrimarySchools\EstablishmentPerformance.json" />
     <None Remove="Data\Files\PrimarySchools\EstablishmentSubjectEntries.json" />
-    <None Remove="Data\Files\PrimarySchools\EstablishmentWorkforce.json" />
-    <None Remove="Data\Files\PrimarySchools\LAAbsence.json" />
     <None Remove="Data\Files\PrimarySchools\LAPerformance.json" />
     <None Remove="Data\Files\PrimarySchools\LASubjectEntries.json" />
-    <None Remove="Data\Files\PrimarySchools\SimilarSchoolsPrimaryGroupsEntry.json" />
-    <None Remove="Data\Files\PrimarySchools\SimilarSchoolsPrimaryValuesEntry.json" />
     <None Remove="Data\Schools.csv" />
   </ItemGroup>
 
@@ -133,18 +126,11 @@
     <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Data\Files\PrimarySchools\EnglandAbsence.json" />
     <Content Include="Data\Files\PrimarySchools\EnglandPerformance.json" />
-    <Content Include="Data\Files\PrimarySchools\EstablishmentAbsence.json" />
-    <Content Include="Data\Files\PrimarySchools\EstablishmentGroupLinks.json" />
     <Content Include="Data\Files\PrimarySchools\EstablishmentPerformance.json" />
     <Content Include="Data\Files\PrimarySchools\EstablishmentSubjectEntries.json" />
-    <Content Include="Data\Files\PrimarySchools\EstablishmentWorkforce.json" />
-    <Content Include="Data\Files\PrimarySchools\LAAbsence.json" />
     <Content Include="Data\Files\PrimarySchools\LAPerformance.json" />
     <Content Include="Data\Files\PrimarySchools\LASubjectEntries.json" />
-    <Content Include="Data\Files\PrimarySchools\SimilarSchoolsPrimaryGroupsEntry.json" />
-    <Content Include="Data\Files\PrimarySchools\SimilarSchoolsPrimaryValuesEntry.json" />
   </ItemGroup>
 
   <ItemGroup>
