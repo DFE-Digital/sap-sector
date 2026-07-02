@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Web.Helpers;
 
@@ -79,13 +80,13 @@ public static class DisplayHelpers
 
         return data.Value switch
         {
-            GovernanceType.MultiAcademyTrust => "Multi-academy trust (MAT)",
-            GovernanceType.SingleAcademyTrust => "Single-academy trust (SAT)",
-            GovernanceType.LocalAuthorityMaintained => "Local authority maintained",
-            GovernanceType.NonMaintainedSpecialSchool => "Non-maintained special school",
-            GovernanceType.Independent => "Independent",
-            GovernanceType.FurtherHigherEducation => "Further/Higher education",
-            GovernanceType.Other => "Other",
+            GovernanceType.MultiAcademyTrust => TrustSchoolFlagValues.MultiAcademyTrust,
+            GovernanceType.SingleAcademyTrust => TrustSchoolFlagValues.SingleAcademyTrust,
+            GovernanceType.LocalAuthorityMaintained => TrustSchoolFlagValues.LaMaintainedSchool,
+            //GovernanceType.NonMaintainedSpecialSchool => "Non-maintained special school",
+            //GovernanceType.Independent => "Independent",
+            //GovernanceType.FurtherHigherEducation => "Further/Higher education",
+            //GovernanceType.Other => "Other",
             _ => NotAvailableText
         };
     }

@@ -13,20 +13,17 @@ public sealed class ResourcedProvisionRule : IBusinessRule<bool>
 {
     public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
-        var provision = establishment.ResourcedProvisionName;
+        var resourcedProvisionName = establishment.ResourcedProvisionName;
 
-        // Empty or explicitly no provision
-        if (ResourcedProvisionValues.IsNoProvision(provision))
+        if (ResourcedProvisionValues.NoResourcedProvision(resourcedProvisionName))
         {
             return DataWithAvailability.Available(false);
         }
-
-        // Check for resourced provision
-        if (ResourcedProvisionValues.HasResourcedProvision(provision))
+        if (ResourcedProvisionValues.HasResourcedProvision(resourcedProvisionName))
         {
             return DataWithAvailability.Available(true);
         }
 
-        return DataWithAvailability.Available(false);
+        return DataWithAvailability.NotAvailable<bool>();
     }
 }
