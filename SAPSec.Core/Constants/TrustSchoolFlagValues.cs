@@ -6,8 +6,8 @@
 /// </summary>
 public static class TrustSchoolFlagValues
 {
-    public static readonly string SingleAcademyTrust = "Single-academy Trust";
-    public static readonly string MultiAcademyTrust = "Multi-academy Trust";
+    public static readonly string SingleAcademyTrust = "Single-academy trust (SAT)";
+    public static readonly string MultiAcademyTrust = "Multi-academy trust (MAT)";
     public static readonly string LaMaintainedSchool = "Maintained school - local authority controlled";
     public static readonly string NoKnownGroup = "No known group";
 

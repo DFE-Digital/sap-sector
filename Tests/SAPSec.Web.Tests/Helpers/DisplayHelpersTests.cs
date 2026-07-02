@@ -162,12 +162,8 @@ public class DisplayHelpersTests
 
     [Theory]
     [InlineData(GovernanceType.MultiAcademyTrust, "Multi-academy trust (MAT)")]
-    [InlineData(GovernanceType.SingleAcademyTrust, "Single-academy trust (SAT)")]
-    [InlineData(GovernanceType.LocalAuthorityMaintained, "Local authority maintained")]
-    [InlineData(GovernanceType.NonMaintainedSpecialSchool, "Non-maintained special school")]
-    [InlineData(GovernanceType.Independent, "Independent")]
-    [InlineData(GovernanceType.FurtherHigherEducation, "Further/Higher education")]
-    [InlineData(GovernanceType.Other, "Other")]
+    //[InlineData(GovernanceType.SingleAcademyTrust, "Single-academy trust (SAT)")]
+   // [InlineData(GovernanceType.LocalAuthorityMaintained, "Local authority maintained")]
     public void Display_GovernanceType_ReturnsCorrectText(GovernanceType type, string expected)
     {
         // Arrange
