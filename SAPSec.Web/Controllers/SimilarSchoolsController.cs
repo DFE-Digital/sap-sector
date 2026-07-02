@@ -1,27 +1,29 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Filters;
 using SAPSec.Web.Helpers;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
 [Route("school/{urn}")]
 [Authorize]
+[RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SimilarSchoolsController : Controller
 {
-    private readonly ISchoolDetailsService _schoolDetailsService;
+    private readonly IRequestSchoolAccessor _requestSchoolAccessor;
     private readonly FindSimilarSchools _findSimilarSchools;
     private readonly ILogger<SimilarSchoolsController> _logger;
 
     public SimilarSchoolsController(
-        ISchoolDetailsService schoolDetailsService,
+        IRequestSchoolAccessor requestSchoolAccessor,
         FindSimilarSchools findSimilarSchools,
         ILogger<SimilarSchoolsController> logger)
     {
-        _schoolDetailsService = schoolDetailsService;
+        _requestSchoolAccessor = requestSchoolAccessor;
         _findSimilarSchools = findSimilarSchools;
         _logger = logger;
     }
@@ -33,7 +35,7 @@ public class SimilarSchoolsController : Controller
         [FromQuery] string? sortBy = null,
         [FromQuery] string? page = null)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData["SchoolDetails"] = school;
