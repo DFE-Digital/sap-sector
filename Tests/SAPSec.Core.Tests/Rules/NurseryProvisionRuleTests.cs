@@ -28,7 +28,7 @@ public class NurseryProvisionRuleTests
 
     [Theory]
     [InlineData("No Nursery Classes", false)]
-    public void Evaluate_NoNurseryProvision_ReturnsExpected(string? nurseryProvisionName, bool expected)
+    public void Evaluate_NoNurseryProvision_ReturnsExpected(string nurseryProvisionName, bool expected)
     {
         // Arrange
         var establishment = new Establishment
@@ -46,7 +46,7 @@ public class NurseryProvisionRuleTests
 
     [Theory]
     [InlineData("")]
-    public void Evaluate_Blanks_ReturnsNotAvailable(string? nurseryProvisionName)
+    public void Evaluate_Blanks_ReturnsNotAvailable(string nurseryProvisionName)
     {
         // Arrange
         var establishment = new Establishment

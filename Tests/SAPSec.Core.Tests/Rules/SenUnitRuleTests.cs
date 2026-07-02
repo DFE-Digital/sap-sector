@@ -12,7 +12,7 @@ public class SenUnitRuleTests
     [Theory]
     [InlineData("Resourced provision and SEN unit")]
     [InlineData("SEN unit")]
-    public void Evaluate_HasSENUnit_ReturnsExpected(string? resourceProvision)
+    public void Evaluate_HasSENUnit_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
@@ -31,7 +31,7 @@ public class SenUnitRuleTests
     [Theory]
     [InlineData("Resourced provision")]
     [InlineData("Not applicable")]
-    public void Evaluate_NoSENUnit_ReturnsExpected(string? resourceProvision)
+    public void Evaluate_NoSENUnit_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
@@ -49,8 +49,7 @@ public class SenUnitRuleTests
 
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
-    public void Evaluate_NotAvailable_ReturnsExpected(string? resourceProvision)
+    public void Evaluate_NotAvailable_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment

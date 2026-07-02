@@ -11,7 +11,7 @@ public class ResourcedProvisionRuleTests
     [Theory]
     [InlineData("Resourced provision")]
     [InlineData("Resourced provision and SEN unit")]
-    public void Evaluate_HasResourcedProvision_ReturnsExpected(string? resourceProvision)
+    public void Evaluate_HasResourcedProvision_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
@@ -30,7 +30,7 @@ public class ResourcedProvisionRuleTests
     [Theory]
     [InlineData("Not applicable")]
     [InlineData("SEN unit")]
-    public void Evaluate_NoResourcedProvision_ReturnsExpected(string? resourceProvision)
+    public void Evaluate_NoResourcedProvision_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
@@ -48,8 +48,7 @@ public class ResourcedProvisionRuleTests
 
     [Theory]
     [InlineData("")]
-    [InlineData(null)]
-    public void Evaluate_NotAvailable_ReturnsExpected(string? resourceProvision)
+    public void Evaluate_NotAvailable_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
