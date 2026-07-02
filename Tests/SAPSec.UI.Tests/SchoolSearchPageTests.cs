@@ -11,13 +11,12 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
     private const string SchoolSearchPath = "/find-a-school";
-    private const string SchoolSearchResultsPath = "/find-a-school/search";
     private const string SchoolSuggestPath = "/find-a-school/suggest";
 
     #region Index Page Tests
 
     [Fact]
-    public async Task SchoolSearchIndex_LoadsSuccessfully()
+    public async Task SchoolSearch_LoadsSuccessfully()
     {
         var response = await Page.GotoAsync(SchoolSearchPath);
 
@@ -27,7 +26,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_DisplaysQueryInputField()
+    public async Task SchoolSearch_DisplaysQueryInputField()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await WaitForSearchInputsAsync();
@@ -51,7 +50,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region Form Validation Tests
 
     [Fact]
-    public async Task SchoolSearchIndex_SubmitEmptyForm_ShowsValidationError()
+    public async Task SchoolSearch_SubmitEmptyForm_ShowsValidationError()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -67,7 +66,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_SubmitShortQuery_ShowsValidationError()
+    public async Task SchoolSearch_SubmitShortQuery_ShowsValidationError()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -84,22 +83,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_SubmitValidQuery_RedirectsToSearchResults()
-    {
-        await Page.GotoAsync(SchoolSearchPath);
-
-        await Page.Locator("input[name='__Query']").FillAsync("Test School");
-        await Page.Locator("button[name='Search']").ClickAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        await Page.WaitForURLAsync("**/find-a-school/search**");
-
-        Page.Url.Should().Contain("/find-a-school/search");
-        Page.Url.Should().Contain("query=Test");
-    }
-
-    [Fact]
-    public async Task SchoolSearchIndex_ErrorInputField_HasErrorStyling()
+    public async Task SchoolSearch_ErrorInputField_HasErrorStyling()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -112,7 +96,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_NumericSearch_NoResults_ShowsErrorMessage()
+    public async Task SchoolSearch_NumericSearch_NoResults_ShowsErrorMessage()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -131,9 +115,10 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_NumericSearch_ValidResults_RedirectsToSchoolDetailPage()
+    public async Task SchoolSearch_NumericSearch_ValidResults_RedirectsToSchoolPage()
     {
         await Page.GotoAsync(SchoolSearchPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("input[name='__Query']").FillAsync("105574");
         await Page.WaitForTimeoutAsync(600);
@@ -141,16 +126,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.ClickAsync("text=School details");
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        Page.Url.Should().Contain("school/105574/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Loreto High School Chorlton");
+        Page.Url.Should().Contain("/school/105574");
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Search_SingleResult_RedirectsToSchoolDetailPage()
+    public async Task SchoolSearch_SingleResult_RedirectsToSchoolPage()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -160,12 +140,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.ClickAsync("text=School details");
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        Page.Url.Should().Contain("school/105574");
-        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Loreto High School Chorlton");
+        Page.Url.Should().Contain("/school/105574");
     }
 
     #endregion
@@ -173,7 +148,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region Autocomplete/Suggester Tests
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_CreatesHiddenFields()
+    public async Task SchoolSearch_Autocomplete_CreatesHiddenFields()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -186,7 +161,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_SyncsVisibleInputWithHiddenInput()
+    public async Task SchoolSearch_Autocomplete_SyncsVisibleInputWithHiddenInput()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -199,7 +174,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_RendersSuggestion()
+    public async Task SchoolSearch_Autocomplete_RendersSuggestion()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.Locator("input[name='__Query']").FillAsync("School");
@@ -212,7 +187,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_Suggestion_SelectsFirstSuggestion_And_Submit_RedirectsToSchoolDetailPage()
+    public async Task SchoolSearch_Autocomplete_Suggestion_SelectsFirstSuggestion_And_Submit_RedirectsToSchoolPage()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.Locator("input[name='__Query']").FillAsync("School");
@@ -224,16 +199,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.ClickAsync("text=School details");
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        Page.Url.Should().Contain("/school/").And.Contain("/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().NotBeNullOrWhiteSpace("School details page should show a caption");
+        Page.Url.Should().Contain("/school/");
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_NumericInput_SetsHiddenUrnField()
+    public async Task SchoolSearch_Autocomplete_NumericInput_SetsHiddenUrnField()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -246,7 +216,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_TextInput_SetsHiddenUrnFieldToEmpty()
+    public async Task SchoolSearch_Autocomplete_TextInput_SetsHiddenUrnFieldToEmpty()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -262,7 +232,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_NumericWithSlash_SetsHiddenUrnField()
+    public async Task SchoolSearch_Autocomplete_NumericWithSlash_SetsHiddenUrnField()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -275,7 +245,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_NumericWithBackslash_SetsHiddenUrnField()
+    public async Task SchoolSearch_Autocomplete_NumericWithBackslash_SetsHiddenUrnField()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -288,7 +258,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_NumericWithBackslash_SetsHiddenUrnField_And_RedirectsToSchoolDetailPage()
+    public async Task SchoolSearch_Autocomplete_NumericWithBackslash_SetsHiddenUrnField_And_RedirectsToSchoolPage()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -299,16 +269,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.ClickAsync("text=School details");
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        Page.Url.Should().Contain("school/105574/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Loreto High School Chorlton");
+        Page.Url.Should().Contain("school/105574");
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_EnterKey_SubmitsForm()
+    public async Task SchoolSearch_Autocomplete_EnterKey_SubmitsForm()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -317,11 +282,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("input[name='__Query']").PressAsync("Enter");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("/find-a-school/search", "Pressing Enter should submit the form");
+        Page.Url.Should().Contain("/find-a-school", "Pressing Enter should submit the form");
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_ClearsUrnFieldOnInput()
+    public async Task SchoolSearch_Autocomplete_ClearsUrnFieldOnInput()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await WaitForSearchInputsAsync();
@@ -350,7 +315,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_Autocomplete_MinLength3Characters_Required()
+    public async Task SchoolSearch_Autocomplete_MinLength3Characters_Required()
     {
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -368,19 +333,10 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region Search Results Page Tests
 
     [Fact]
-    public async Task SchoolSearchResults_LoadsSuccessfully()
-    {
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        response.Should().NotBeNull();
-        response.Status.Should().Be(200);
-    }
-
-    [Fact]
-    public async Task SchoolSearchResults_FormHasPreviousQuery()
+    public async Task SchoolSearch_FormHasPreviousQuery()
     {
         var query = "Test School";
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query={query}");
+        await Page.GotoAsync($"{SchoolSearchPath}?query={query}");
 
         var input = Page.Locator("input[name='__Query']");
         var inputValue = await input.InputValueAsync();
@@ -389,9 +345,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_CanSearchAgain()
+    public async Task SchoolSearch_CanSearchAgain()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=School");
 
         await Page.Locator("input[name='__Query']").FillAsync("Another School");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
@@ -403,9 +359,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NumericWithSlash_SetsHiddenUrnField()
+    public async Task SchoolSearch_NumericWithSlash_SetsHiddenUrnField()
     {
-        await Page.GotoAsync(SchoolSearchResultsPath);
+        await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("input[name='__Query']").FillAsync("123/456");
@@ -416,9 +372,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NumericWithBackslash_SetsHiddenUrnField()
+    public async Task SchoolSearch_NumericWithBackslash_SetsHiddenUrnField()
     {
-        await Page.GotoAsync(SchoolSearchResultsPath);
+        await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("input[name='__Query']").FillAsync("123\\456");
@@ -429,29 +385,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NumericSearch_ValidResults_RedirectsToSchoolDetailPage()
+    public async Task SchoolSearch_EmptyQuery_ShowsMessage()
     {
-        await Page.GotoAsync(SchoolSearchResultsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        await Page.Locator("input[name='__Query']").FillAsync("105574");
-        await Page.WaitForTimeoutAsync(600);
-
-        await Page.Locator("button[name='Search']").ClickAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        await Page.ClickAsync("text=School details");
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        Page.Url.Should().Contain("school/105574/school-details");
-        var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Loreto High School Chorlton");
-    }
-
-    [Fact]
-    public async Task SchoolSearchResults_EmptyQuery_ShowsMessage()
-    {
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}?query=");
+        var response = await Page.GotoAsync($"{SchoolSearchPath}?query=");
 
         response!.Status.Should().Be(200);
         var content = await Page.ContentAsync();
@@ -459,9 +395,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_WithResultsCount_DisplaysCorrectly()
+    public async Task SchoolSearch_WithResultsCount_DisplaysCorrectly()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=School");
 
         _ = Page.Locator(".govuk-table, .search-results, [data-testid='search-results']").First;
 
@@ -470,9 +406,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_WithResults_DisplaysSchoolLinks()
+    public async Task SchoolSearch_WithResults_DisplaysSchoolLinks()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=School");
 
         var resultLinks = Page.Locator(".app-school-results a");
         var count = await resultLinks.CountAsync();
@@ -486,9 +422,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_ResultLink_HasCorrectStructure()
+    public async Task SchoolSearch_ResultLink_HasCorrectStructure()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=School");
 
         var resultItems = Page.Locator(".app-school-results li");
         var count = await resultItems.CountAsync();
@@ -510,9 +446,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region No Results Error State Tests
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_ShowsErrorSummary()
+    public async Task SchoolSearch_NoResults_ShowsErrorSummary()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var errorSummary = Page.Locator(".govuk-error-summary");
@@ -522,9 +458,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_ErrorSummaryHasCorrectTitle()
+    public async Task SchoolSearch_NoResults_ErrorSummaryHasCorrectTitle()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var errorTitle = Page.Locator(".govuk-error-summary__title");
@@ -534,9 +470,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_ErrorSummaryHasCorrectMessage()
+    public async Task SchoolSearch_NoResults_ErrorSummaryHasCorrectMessage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var errorMessage = Page.Locator(".govuk-error-summary__list li");
@@ -547,9 +483,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_ErrorSummaryLinkPointsToInput()
+    public async Task SchoolSearch_NoResults_ErrorSummaryLinkPointsToInput()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var errorLink = Page.Locator(".govuk-error-summary__list a");
@@ -559,9 +495,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_InputHasErrorStyling()
+    public async Task SchoolSearch_NoResults_InputHasErrorStyling()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var inputWrapper = Page.Locator(".govuk-form-group--error");
@@ -571,9 +507,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_InlineErrorMessageDisplayed()
+    public async Task SchoolSearch_NoResults_InlineErrorMessageDisplayed()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var inlineError = Page.Locator(".govuk-error-message");
@@ -587,9 +523,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_InputHasErrorClass()
+    public async Task SchoolSearch_NoResults_InputHasErrorClass()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var input = Page.Locator("input.govuk-input--error");
@@ -599,9 +535,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_DoesNotShowResultsList()
+    public async Task SchoolSearch_NoResults_DoesNotShowResultsList()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var resultsList = Page.Locator(".app-school-results li");
@@ -611,9 +547,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_DoesNotShowResultsCount()
+    public async Task SchoolSearch_NoResults_DoesNotShowResultsCount()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var resultsCount = Page.Locator(".app-school-results-count");
@@ -623,9 +559,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_DoesNotShowFilter()
+    public async Task SchoolSearch_NoResults_DoesNotShowFilter()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var filterPanel = Page.Locator(".moj-filter");
@@ -635,10 +571,10 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_PreservesSearchQuery()
+    public async Task SchoolSearch_NoResults_PreservesSearchQuery()
     {
         var searchQuery = "XYZNonExistentSchool999";
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query={searchQuery}");
+        await Page.GotoAsync($"{SchoolSearchPath}?query={searchQuery}");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var input = Page.Locator("input[name='__Query']");
@@ -648,9 +584,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NumericSearch_NoResults_ShowsErrorSummary()
+    public async Task SchoolSearch_NumericSearch_NoResults_ShowsErrorSummary()
     {
-        await Page.GotoAsync(SchoolSearchResultsPath);
+        await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("input[name='__Query']").FillAsync("999999");
@@ -669,9 +605,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_WithResults_DoesNotShowErrorSummary()
+    public async Task SchoolSearch_WithResults_DoesNotShowErrorSummary()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=School");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var errorSummary = Page.Locator(".govuk-error-summary");
@@ -685,7 +621,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region Edge Cases and Special Characters
 
     [Fact]
-    public async Task SchoolSearchIndex_SpecialCharacters_HandledCorrectly()
+    public async Task SchoolSearch_SpecialCharacters_HandledCorrectly()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -694,11 +630,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/search?query=wibbly%20wobbly%20primary%20%26%20daycare%20(primary)");
+        Page.Url.Should().Contain("school?query=wibbly%20wobbly%20primary%20%26%20daycare%20(primary)");
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_NumericQuery_ProcessedCorrectly()
+    public async Task SchoolSearch_NumericQuery_ProcessedCorrectly()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -706,11 +642,11 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("/find-a-school/search?query=123456");
+        Page.Url.Should().Contain("/find-a-school?query=123456");
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_LongQuery_HandledCorrectly()
+    public async Task SchoolSearch_LongQuery_HandledCorrectly()
     {
         await Page.GotoAsync(SchoolSearchPath);
         var longQuery = new string('A', 200);
@@ -720,15 +656,15 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var response = Page.Url;
-        response.Should().Contain($"school/search?query={longQuery}");
+        response.Should().Contain($"school?query={longQuery}");
     }
 
     [Fact]
-    public async Task SchoolSearchResults_QueryWithWhitespace_HandledCorrectly()
+    public async Task SchoolSearch_QueryWithWhitespace_HandledCorrectly()
     {
         var query = "  School   Name  ";
 
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}?query={Uri.EscapeDataString(query)}");
+        var response = await Page.GotoAsync($"{SchoolSearchPath}?query={Uri.EscapeDataString(query)}");
 
         response!.Status.Should().Be(200);
     }
@@ -771,7 +707,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region Accessibility Tests
 
     [Fact]
-    public async Task SchoolSearchIndex_ErrorSummaryIsVisible()
+    public async Task SchoolSearch_ErrorSummaryIsVisible()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -791,7 +727,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_ErrorSummaryLinksToField()
+    public async Task SchoolSearch_ErrorSummaryLinksToField()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -804,7 +740,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_InputHasAriaDescribedBy()
+    public async Task SchoolSearch_InputHasAriaDescribedBy()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -815,7 +751,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_ErrorInput_HasAriaDescribedByError()
+    public async Task SchoolSearch_ErrorInput_HasAriaDescribedByError()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -829,7 +765,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_FormHasSearchRole()
+    public async Task SchoolSearch_FormHasSearchRole()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -840,9 +776,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_NoResults_ErrorSummaryHasAlertRole()
+    public async Task SchoolSearch_NoResults_ErrorSummaryHasAlertRole()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=XYZNonExistentSchool999");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var alertRole = Page.Locator(".govuk-error-summary [role='alert']");
@@ -856,15 +792,15 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region Error Scenarios
 
     [Fact]
-    public async Task SchoolSearchResults_WithNullQuery_HandlesGracefully()
+    public async Task SchoolSearch_WithNullQuery_HandlesGracefully()
     {
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}");
+        var response = await Page.GotoAsync($"{SchoolSearchPath}");
 
         response!.Status.Should().Be(200);
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_FormWithJavascriptDisabled_StillWorks()
+    public async Task SchoolSearch_FormWithJavascriptDisabled_StillWorks()
     {
         await Page.CloseAsync();
 
@@ -882,39 +818,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await jsDisabledPage.Locator("button[name='Search']").ClickAsync();
         await jsDisabledPage.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        jsDisabledPage.Url.Should().Contain("/find-a-school/search");
+        jsDisabledPage.Url.Should().Contain("/find-a-school");
 
         await jsDisabledPage.CloseAsync();
-    }
-
-    #endregion
-
-    #region POST Action Tests
-
-    [Fact]
-    public async Task SchoolSearchResults_PostWithUrn_RedirectsToSchoolProfile()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-        var searchForm = Page.Locator("form[role='search']");
-        var isVisible = await searchForm.IsVisibleAsync();
-        isVisible.Should().BeTrue("Search form should be present for posting school ID");
-    }
-
-    [Fact]
-    public async Task SchoolSearchResults_PostEmptyQuery_ShowsValidationError()
-    {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
-
-        await Page.Locator("input[name='__Query']").ClearAsync();
-        await Page.Locator("button[name='Search']").ClickAsync();
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var errorSummary = Page.Locator(".govuk-error-summary");
-        var isVisible = await errorSummary.IsVisibleAsync();
-        isVisible.Should().BeTrue();
-
-        var content = await Page.ContentAsync();
-        content.Should().NotBeNullOrWhiteSpace();
     }
 
     #endregion
@@ -922,7 +828,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     #region View Rendering Tests
 
     [Fact]
-    public async Task SchoolSearchIndex_RendersCorrectPageTitle()
+    public async Task SchoolSearch_RendersCorrectPageTitle()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -934,7 +840,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_RendersHintText()
+    public async Task SchoolSearch_RendersHintText()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -947,7 +853,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_RendersSearchButton()
+    public async Task SchoolSearch_RendersSearchButton()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -958,7 +864,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchIndex_SearchButton_ContainsMagnifyIcon()
+    public async Task SchoolSearch_SearchButton_ContainsMagnifyIcon()
     {
         await Page.GotoAsync(SchoolSearchPath);
 
@@ -969,9 +875,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_WithResults_RendersResultsList()
+    public async Task SchoolSearch_WithResults_RendersResultsList()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=School");
 
         var resultsList = Page.Locator(".app-school-results");
         var count = await resultsList.CountAsync();
@@ -980,9 +886,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     }
 
     [Fact]
-    public async Task SchoolSearchResults_PageStructure_HasGridLayout()
+    public async Task SchoolSearch_PageStructure_HasGridLayout()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync($"{SchoolSearchPath}?query=School");
 
         var gridRow = Page.Locator(".govuk-grid-row");
         var gridColumn = Page.Locator(".govuk-grid-column-two-thirds");
