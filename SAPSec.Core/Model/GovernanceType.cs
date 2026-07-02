@@ -25,7 +25,5 @@ public enum GovernanceType
     FurtherHigherEducation,
 
     /// <summary>Other governance type</summary>
-    Other,
-
-    NoKnownGroup
+    Other
 }
