@@ -81,9 +81,6 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             NurseryProvision = _nurseryProvisionRule.Evaluate(establishment),
             SixthForm = _sixthFormRule.Evaluate(establishment),
             SenUnit = _senUnitRule.Evaluate(establishment),
-
-            //This return true/false and FE will decide what to display based on that.
-            //Just return the actual value
             ResourcedProvision = _resourcedProvisionRule.Evaluate(establishment),
 
             // Contact

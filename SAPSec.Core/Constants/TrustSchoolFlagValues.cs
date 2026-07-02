@@ -13,7 +13,10 @@ public static class TrustSchoolFlagValues
     public const string SupportedByMultiAcademyTrust = "3";
     public const string SupportedBySingleAcademyTrust = "5";
 
-
+    /// <summary>
+    /// Checks if the school is supported by a single academy trust.
+    /// Uses case-insensitive comparison.
+    /// </summary>
     public static bool IsSupportedBySingleAcademyTrust(string trustSchoolFlagId)
     {
         var trimmedTrustSchoolFlagId = trustSchoolFlagId?.Trim();
@@ -24,6 +27,10 @@ public static class TrustSchoolFlagValues
         return false;
     }
 
+    /// <summary>
+    /// Checks if the school is supported by a multi-academy trust.
+    /// Uses case-insensitive comparison.
+    /// </summary>
     public static bool IsSupportedByMultiAcademyTrust(string trustSchoolFlagId)
     {
         var trimmedTrustSchoolFlagId = trustSchoolFlagId?.Trim();
@@ -34,6 +41,10 @@ public static class TrustSchoolFlagValues
         return false;
     }
 
+    /// <summary>
+    /// Checks if the school is supported by a trust.
+    /// Uses case-insensitive comparison.
+    /// </summary>
     public static bool IsSupportedByTrust(string trustSchoolFlagId)
     {
         var trimmedTrustSchoolFlagId = trustSchoolFlagId?.Trim();
@@ -44,6 +55,10 @@ public static class TrustSchoolFlagValues
         return false;
     }
 
+    /// <summary>
+    /// Checks if the school is not supported by a trust.
+    /// Uses case-insensitive comparison.
+    /// </summary>
     public static bool IsNotSupportedByTrust(string trustSchoolFlagId)
     {
         var trimmedTrustSchoolFlagId = trustSchoolFlagId?.Trim();
@@ -54,6 +69,10 @@ public static class TrustSchoolFlagValues
         return false;
     }
 
+    /// <summary>
+    /// Checks if the school is not applicable.
+    /// Uses case-insensitive comparison.
+    /// </summary>
     public static bool IsNotApplicable(string trustSchoolFlagId)
     {
         var trimmedTrustSchoolFlagId = trustSchoolFlagId?.Trim();
