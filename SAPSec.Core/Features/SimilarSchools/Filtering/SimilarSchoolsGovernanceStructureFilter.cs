@@ -1,5 +1,7 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
+using System.Reflection;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -53,20 +55,20 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
 
         if (i.TrustSchoolFlag?.Id == "5")
         {
-            return new("S", "Single-academy trust (SAT)");
+            return new("S", TrustSchoolFlagValues.SingleAcademyTrust);
         }
 
         if (i.TrustSchoolFlag?.Id == "3")
         {
-            return new("M", "Multi-academy trust (MAT)");
+            return new("M", TrustSchoolFlagValues.MultiAcademyTrust);
         }
 
         if (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
         {
-            return new("MS", "Maintained school - local authority controlled");
+            return new("MS", TrustSchoolFlagValues.LaMaintainedSchool);
         }
 
-        return new("N", "No known group");
+        return new("N", TrustSchoolFlagValues.NoKnownGroup);
     }
 
     private record Group(string Key, string Name);
