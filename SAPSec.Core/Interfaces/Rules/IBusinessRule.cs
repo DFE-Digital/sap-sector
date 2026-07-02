@@ -17,6 +17,4 @@ public interface IBusinessRule<T>
     /// <param name="establishment">The establishment to evaluate</param>
     /// <returns>The result with availability information</returns>
     DataWithAvailability<T> Evaluate(Establishment establishment);
-
-   // DataWithAvailability<T> Evaluate(SimilarSchool similarSchool);
 }

@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Constants;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Web.Helpers;
 
@@ -70,14 +71,24 @@ public static class DisplayHelpers
     /// Renders governance structure enum as display text.
     /// Content editors can modify the display strings here.
     /// </summary>
-    public static string Display(this DataWithAvailability<string> data)
+    public static string Display(this DataWithAvailability<GovernanceType> data)
     {
         if (data.Availability != DataAvailabilityStatus.Available)
         {
             return NotAvailableText;
         }
 
-        return data.Value;
+        return data.Value switch
+        {
+            GovernanceType.MultiAcademyTrust => TrustSchoolFlagValues.MultiAcademyTrust,
+            GovernanceType.SingleAcademyTrust => TrustSchoolFlagValues.SingleAcademyTrust,
+            GovernanceType.LocalAuthorityMaintained => TrustSchoolFlagValues.LaMaintainedSchool,
+            //GovernanceType.NonMaintainedSpecialSchool => "Non-maintained special school",
+            //GovernanceType.Independent => "Independent",
+            //GovernanceType.FurtherHigherEducation => "Further/Higher education",
+            //GovernanceType.Other => "Other",
+            _ => NotAvailableText
+        };
     }
 
     /// <summary>

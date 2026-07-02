@@ -6,6 +6,10 @@
 /// </summary>
 public static class SenUnitValues
 {
+    public static readonly string NoSenUnitText = "Does not have a SEN unit";
+    public static readonly string HasSenUnitText = "Has a SEN unit";
+    public static readonly string NoDataAvailableText = "No data available";
+
     /// <summary>Values indicating no provision</summary>
     private static readonly string[] NoSenUnitValues =
     {

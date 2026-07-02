@@ -9,26 +9,22 @@ namespace SAPSec.Core.Rules;
 /// Business rule: Determines if school has SEN unit based on TypeOfResourcedProvision field.
 /// Single Responsibility: Only handles SEN unit logic.
 /// </summary>
-public sealed class SenUnitRule : IBusinessRule<string>
+public sealed class SenUnitRule : IBusinessRule<bool>
 {
-    public static readonly string NoSenUnitText = "Does not have a SEN unit";
-    public static readonly string HasSenUnitText = "Has a SEN unit";
-    public static readonly string NoDataAvailableText = "No data available";
-
-    public DataWithAvailability<string> Evaluate(Establishment establishment)
+    public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
         var resourcedProvisionName = establishment.ResourcedProvisionName;
 
         if (SenUnitValues.NoSenUnit(resourcedProvisionName))
         {
-            return DataWithAvailability.Available(NoSenUnitText);
+            return DataWithAvailability.Available(false);
         }
 
         if (SenUnitValues.HasSenUnit(resourcedProvisionName))
         {
-            return DataWithAvailability.Available(HasSenUnitText);
+            return DataWithAvailability.Available(true);
         }
 
-        return DataWithAvailability.Available(NoDataAvailableText);
+        return DataWithAvailability.Available(false);
     }
 }

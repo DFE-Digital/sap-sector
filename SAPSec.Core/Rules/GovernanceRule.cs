@@ -9,14 +9,9 @@ namespace SAPSec.Core.Rules;
 /// Business rule: Determines governance structure based on establishment group type and trust membership.
 /// Single Responsibility: Only handles governance determination logic.
 /// </summary>
-public sealed class GovernanceRule : IBusinessRule<string>
+public sealed class GovernanceRule : IBusinessRule<GovernanceType>
 {
-    public static readonly string SingleAcademyTrust = "Single-academy Trust";
-    public static readonly string MultiAcademyTrust = "Multi-academy Trust";
-    public static readonly string MaintainedSchool = "Maintained school - local authority controlled";
-    public static readonly string NoKnownGroup = "No known group";
-
-    public DataWithAvailability<string> Evaluate(Establishment establishment)
+    public DataWithAvailability<GovernanceType> Evaluate(Establishment establishment)
     {
 
         var trustSchoolFlagId = establishment.TrustSchoolFlagId;
@@ -24,25 +19,25 @@ public sealed class GovernanceRule : IBusinessRule<string>
 
         if (string.IsNullOrEmpty(trustSchoolFlagId) || string.IsNullOrEmpty(establishmentGroupTypeId))
         {
-            return DataWithAvailability.NotAvailable<string>();
+            return DataWithAvailability.NotAvailable<GovernanceType>();
         }
 
         if (TrustSchoolFlagValues.IsSupportedBySingleAcademyTrust(trustSchoolFlagId))
         {
-            return DataWithAvailability.Available(SingleAcademyTrust);
+            return DataWithAvailability.Available(GovernanceType.SingleAcademyTrust);
         }
 
         if (TrustSchoolFlagValues.IsSupportedByMultiAcademyTrust(trustSchoolFlagId))
         {
-            return DataWithAvailability.Available(MultiAcademyTrust);
+            return DataWithAvailability.Available(GovernanceType.MultiAcademyTrust);
         }
 
         if ((TrustSchoolFlagValues.IsSupportedByTrust(trustSchoolFlagId) || TrustSchoolFlagValues.IsNotSupportedByTrust(trustSchoolFlagId)) ||
             (TrustSchoolFlagValues.IsNotApplicable(trustSchoolFlagId) && EstablishmentGroupTypeValues.IsLaMaintainedSchool(establishmentGroupTypeId)))
         {
-            return DataWithAvailability.Available(MaintainedSchool);
+            return DataWithAvailability.Available(GovernanceType.LocalAuthorityMaintained);
         }
 
-        return DataWithAvailability.Available(NoKnownGroup);
+        return DataWithAvailability.NotAvailable<GovernanceType>();
     }
 }

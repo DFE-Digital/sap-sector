@@ -9,24 +9,20 @@ namespace SAPSec.Core.Rules;
 /// Business rule: Determines if school has resourced provision.
 /// Single Responsibility: Only handles resourced provision logic.
 /// </summary>
-public sealed class ResourcedProvisionRule : IBusinessRule<string>
+public sealed class ResourcedProvisionRule : IBusinessRule<bool>
 {
-    public static readonly string NoResourcedProvisionText = "Does not have a resourced provision";
-    public static readonly string HasResourcedProvisionText = "Has a resourced provision";
-    public static readonly string NoDataAvailableText = "No data available";
-
-    public DataWithAvailability<string> Evaluate(Establishment establishment)
+    public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
         var resourcedProvisionName = establishment.ResourcedProvisionName;
 
         if (ResourcedProvisionValues.NoResourcedProvision(resourcedProvisionName))
         {
-            return DataWithAvailability.Available(NoResourcedProvisionText);
+            return DataWithAvailability.Available(false);
         }
         if (ResourcedProvisionValues.HasResourcedProvision(resourcedProvisionName))
         {
-            return DataWithAvailability.Available(HasResourcedProvisionText);
+            return DataWithAvailability.Available(true);
         }
-        return DataWithAvailability.Available(NoDataAvailableText);
+        return DataWithAvailability.Available(false);
     }
 }

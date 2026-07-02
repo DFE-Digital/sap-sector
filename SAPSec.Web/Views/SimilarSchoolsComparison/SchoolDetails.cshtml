@@ -1,6 +1,7 @@
 @using System.Globalization
 @using System.Text.Encodings.Web
 @using System.Text.Json
+@using SAPSec.Core.Constants
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
@@ -234,25 +235,25 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Nursery provision</dt>
             <dd class="govuk-summary-list__value">
-                @Model.SimilarSchoolDetails.NurseryProvision
+                @Model.SimilarSchoolDetails.HasNurseryProvision.DisplayAs(NurseryProvisionValues.HasNurseryClassesText, NurseryProvisionValues.NoNurseryClassesText)    
             </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Sixth form</dt>
             <dd class="govuk-summary-list__value">
-                @Model.SimilarSchoolDetails.SixthForm
+                @Model.SimilarSchoolDetails.HasSixthForm.DisplayAs(SixthFormValues.HasSixthFormText, SixthFormValues.NoSixthFormText)
             </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">SEN unit</dt>
             <dd class="govuk-summary-list__value">
-                @Model.SimilarSchoolDetails.SenUnit
+                @Model.SimilarSchoolDetails.HasSenUnit.DisplayAs(SenUnitValues.HasSenUnitText, SenUnitValues.NoSenUnitText)
             </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Resourced provision</dt>
             <dd class="govuk-summary-list__value">
-                @Model.SimilarSchoolDetails.ResourcedProvision
+                @Model.SimilarSchoolDetails.HasResourcedProvision.DisplayAs(ResourcedProvisionValues.HasResourcedProvisionText, ResourcedProvisionValues.NoResourcedProvisionText)
             </dd>
         </div>
     </dl>

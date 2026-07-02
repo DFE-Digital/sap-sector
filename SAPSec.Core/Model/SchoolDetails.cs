@@ -31,15 +31,15 @@ public  class SchoolDetails
     public required DataWithAvailability<string> ReligiousCharacter { get; init; }
 
     // Governance
-    public required DataWithAvailability<string> GovernanceStructure { get; init; }
+    public required DataWithAvailability<bool> GovernanceStructure { get; init; }
     public required DataWithAvailability<string> AcademyTrustName { get; init; }
     public required DataWithAvailability<string> AcademyTrustId { get; init; }
 
     // Provisions
-    public required DataWithAvailability<string> NurseryProvision { get; init; }
-    public required DataWithAvailability<string> SixthForm { get; init; }
-    public required DataWithAvailability<string> SenUnit { get; init; }
-    public required DataWithAvailability<string> ResourcedProvision { get; init; }
+    public required DataWithAvailability<bool> HasNurseryProvision { get; init; }
+    public required DataWithAvailability<bool> HasSixthForm { get; init; }
+    public required DataWithAvailability<bool> HasSenUnit { get; init; }
+    public required DataWithAvailability<bool> HasResourcedProvision { get; init; }
 
     // Contact
     public required DataWithAvailability<string> HeadteacherName { get; init; }

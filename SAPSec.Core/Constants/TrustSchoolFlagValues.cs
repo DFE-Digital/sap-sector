@@ -6,6 +6,10 @@
 /// </summary>
 public static class TrustSchoolFlagValues
 {
+    public static readonly string SingleAcademyTrust = "Single-academy Trust";
+    public static readonly string MultiAcademyTrust = "Multi-academy Trust";
+    public static readonly string LaMaintainedSchool = "Maintained school - local authority controlled";
+    public static readonly string NoKnownGroup = "No known group";
 
     public const string NotApplicable = "0";
     public const string SupportedByTrust = "1";

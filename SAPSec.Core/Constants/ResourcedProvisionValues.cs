@@ -6,6 +6,10 @@
 /// </summary>
 public static class ResourcedProvisionValues
 {
+    public static readonly string NoResourcedProvisionText = "Does not have a resourced provision";
+    public static readonly string HasResourcedProvisionText = "Has a resourced provision";
+    public static readonly string NoDataAvailableText = "No data available";
+
     #region Provision Patterns
 
     /// <summary>Values indicating no provision</summary>

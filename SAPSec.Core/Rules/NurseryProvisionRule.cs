@@ -9,23 +9,20 @@ namespace SAPSec.Core.Rules;
 /// Business rule: Determines if school has nursery classes
 /// Single Responsibility: Only handles nursery classes logic.
 /// </summary>
-public sealed class NurseryProvisionRule : IBusinessRule<string>
+public sealed class NurseryProvisionRule : IBusinessRule<bool>
 {
-    public static readonly string HasNurseryClasses = "Has nursery classes";
-    public static readonly string NoNurseryClasses = "Does not have nursery classes";
-
-    public DataWithAvailability<string> Evaluate(Establishment establishment)
+    public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
         var nurseryProvisionName = establishment.NurseryProvisionName;
 
         if (NurseryProvisionValues.HasNurseryClasses(nurseryProvisionName))
         {
-            return DataWithAvailability.Available(HasNurseryClasses);
+            return DataWithAvailability.Available(true);
         }
         if (NurseryProvisionValues.NoNurseryClasses(nurseryProvisionName))
         {
-            return DataWithAvailability.Available(NoNurseryClasses);
+            return DataWithAvailability.Available(false);
         }
-        return DataWithAvailability.NotAvailable<string>();
+        return DataWithAvailability.NotAvailable<bool>();
     }
 }

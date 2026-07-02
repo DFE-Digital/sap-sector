@@ -6,6 +6,9 @@
 /// </summary>
 public static class NurseryProvisionValues
 {
+    public static readonly string HasNurseryClassesText = "Has nursery classes";
+    public static readonly string NoNurseryClassesText = "Does not have nursery classes";
+
     #region Nursery Classes Patterns
 
     public const string SchoolHasNurseryClasses = "Has Nursery Classes";
