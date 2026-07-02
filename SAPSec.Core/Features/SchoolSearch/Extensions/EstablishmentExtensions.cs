@@ -32,6 +32,11 @@ public static class EstablishmentExtensions
             return false;
         }
 
+        if (IsSecondaryExcluded(establishment))
+        {
+            return false;
+        }
+
         if (HasMissingStatus(establishment))
         {
             return HasSecondaryPhase(establishment);
@@ -81,5 +86,18 @@ public static class EstablishmentExtensions
     {
         return string.IsNullOrWhiteSpace(establishment.EstablishmentStatusId)
             && string.IsNullOrWhiteSpace(establishment.EstablishmentStatusName);
+    }
+
+    private static bool IsSecondaryExcluded(Establishment establishment)
+    {
+        if (!PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
+        {
+            return false;
+        }
+
+        var establishmentStatusId = establishment.EstablishmentStatusId?.Trim();
+
+        return establishmentStatusId is EstablishmentStatusValues.ClosedId
+            or EstablishmentStatusValues.ProposedToOpenId;
     }
 }
