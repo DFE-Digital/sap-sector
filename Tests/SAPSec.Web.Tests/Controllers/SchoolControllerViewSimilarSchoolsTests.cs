@@ -324,6 +324,12 @@ public class SimilarSchoolsControllerTests
             LAName = "Authority",
             UrbanRuralId = urbanId,
             UrbanRuralName = urbanName,
+            TypeOfEstablishmentId = urn.EndsWith("1") || urn.EndsWith("4") || urn.EndsWith("7") || urn.EndsWith("0")
+                ? "34"
+                : "28",
+            TypeOfEstablishmentName = urn.EndsWith("1") || urn.EndsWith("4") || urn.EndsWith("7") || urn.EndsWith("0")
+                ? "Academy converter"
+                : "Academy sponsor led",
             //Attainment8Score = DataWithAvailability.Available(50m),
             //BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
             //ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.Available(60m),
