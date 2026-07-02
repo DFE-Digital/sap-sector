@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Rules;
+﻿using SAPSec.Core.Model;
+using SAPSec.Core.Rules;
 using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Rules;
@@ -7,13 +8,16 @@ public class SenUnitRuleTests
 {
     private readonly SenUnitRule _sut = new();
 
-    [Fact]
-    public void Evaluate_ContainsSenUnit_ReturnsTrue()
+
+    [Theory]
+    [InlineData("Resourced provision and SEN unit")]
+    [InlineData("SEN unit")]
+    public void Evaluate_HasSENUnit_ReturnsExpected(string? resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvisionName = "Has SEN unit"
+            ResourcedProvisionName = resourceProvision
         };
 
         // Act
@@ -25,16 +29,14 @@ public class SenUnitRuleTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
+    [InlineData("Resourced provision")]
     [InlineData("Not applicable")]
-    [InlineData("None")]
-    public void Evaluate_NoProvision_ReturnsFalse(string? provision)
+    public void Evaluate_NoSENUnit_ReturnsExpected(string? resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvisionName = provision
+            ResourcedProvisionName = resourceProvision
         };
 
         // Act
@@ -45,37 +47,21 @@ public class SenUnitRuleTests
         result.Value.Should().BeFalse();
     }
 
-    [Fact]
-    public void Evaluate_OnlyResourcedProvision_ReturnsFalse()
+    [Theory]
+    [InlineData("")]
+    [InlineData(null)]
+    public void Evaluate_NotAvailable_ReturnsExpected(string? resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvisionName = "Has resourced provision"
+            ResourcedProvisionName = resourceProvision
         };
 
         // Act
         var result = _sut.Evaluate(establishment);
 
         // Assert
-        result.IsAvailable.Should().BeTrue();
-        result.Value.Should().BeFalse();
-    }
-
-    [Fact]
-    public void Evaluate_BothSenAndResourced_ReturnsTrue()
-    {
-        // Arrange
-        var establishment = new Establishment
-        {
-            ResourcedProvisionName = "Has SEN unit and resourced provision"
-        };
-
-        // Act
-        var result = _sut.Evaluate(establishment);
-
-        // Assert
-        result.IsAvailable.Should().BeTrue();
-        result.Value.Should().BeTrue();
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 }

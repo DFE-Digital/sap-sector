@@ -15,8 +15,8 @@ public static class ResourcedProvisionValues
     /// <summary>Values indicating no provision</summary>
     private static readonly string[] HasResourcedProvisionValues =
     {
-        "resourced provision",
-        "resourced provision and SEN unit"
+        "Resourced provision",
+        "Resourced provision and SEN unit"
     };
 
     private static readonly string[] NoResourcedProvisionValues =
@@ -58,7 +58,7 @@ public static class ResourcedProvisionValues
 
         foreach (var value in NoResourcedProvisionValues)
         {
-            if (provision.Contains(value, StringComparison.OrdinalIgnoreCase))
+            if (provision.Equals(value, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
 

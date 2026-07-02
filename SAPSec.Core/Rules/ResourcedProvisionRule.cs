@@ -23,6 +23,7 @@ public sealed class ResourcedProvisionRule : IBusinessRule<bool>
         {
             return DataWithAvailability.Available(true);
         }
-        return DataWithAvailability.Available(false);
+
+        return DataWithAvailability.NotAvailable<bool>();
     }
 }

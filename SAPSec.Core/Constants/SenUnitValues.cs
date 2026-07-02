@@ -14,12 +14,12 @@ public static class SenUnitValues
     private static readonly string[] NoSenUnitValues =
     {
         "Not applicable",
-        "resourced provision"
+        "Resourced provision"
     };
 
     private static readonly string[] HasSenUnitValues =
 {
-        "resourced provision and SEN unit",
+        "Resourced provision and SEN unit",
         "SEN unit"
     };
 
@@ -34,7 +34,7 @@ public static class SenUnitValues
 
         foreach (var value in HasSenUnitValues)
         {
-            if (provision.Contains(value, StringComparison.OrdinalIgnoreCase))
+            if (provision.Equals(value, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
 
@@ -48,7 +48,7 @@ public static class SenUnitValues
 
         foreach (var value in NoSenUnitValues)
         {
-            if (provision.Contains(value, StringComparison.OrdinalIgnoreCase))
+            if (provision.Equals(value, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
 

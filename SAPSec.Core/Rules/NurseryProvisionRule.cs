@@ -23,6 +23,7 @@ public sealed class NurseryProvisionRule : IBusinessRule<bool>
         {
             return DataWithAvailability.Available(false);
         }
+
         return DataWithAvailability.NotAvailable<bool>();
     }
 }
