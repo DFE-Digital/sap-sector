@@ -951,7 +951,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     concurrency: deploy_domains_infra
-    needs: [deploy-to-production]
+    needs: [deploy-to-test]
     environment:
       name: production
     permissions:
