@@ -81,42 +81,32 @@ public class GetAttendanceMeasures(
 
         return new(
             new AttendanceMeasureAverage(
-                Average(overallSchoolSeries.Current, overallSchoolSeries.Previous, overallSchoolSeries.Previous2),
-                AverageAvailable(similarSchoolData.Select(x => Average(
-                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct),
-                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Tot_Est_Previous_Pct),
-                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Tot_Est_Previous2_Pct)))),
-                Average(overallLocalAuthoritySeries.Current, overallLocalAuthoritySeries.Previous, overallLocalAuthoritySeries.Previous2),
-                Average(overallEnglandSeries.Current, overallEnglandSeries.Previous, overallEnglandSeries.Previous2)),
+                overallSchoolSeries.Current,
+                AverageAvailable(similarSchoolData.Select(x =>
+                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct))),
+                overallLocalAuthoritySeries.Current,
+                overallEnglandSeries.Current),
             BuildTopPerformers(
                 establishment,
-                Average(overallSchoolSeries.Current, overallSchoolSeries.Previous, overallSchoolSeries.Previous2),
+                overallSchoolSeries.Current,
                 similarSchoolMeasures,
-                x => Average(
-                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct),
-                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Tot_Est_Previous_Pct),
-                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Tot_Est_Previous2_Pct))),
+                x => ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct)),
             new AttendanceMeasureYearByYear(
                 overallSchoolSeries,
                 overallSimilarSchoolsSeries,
                 overallLocalAuthoritySeries,
                 overallEnglandSeries),
             new AttendanceMeasureAverage(
-                Average(persistentSchoolSeries.Current, persistentSchoolSeries.Previous, persistentSchoolSeries.Previous2),
-                AverageAvailable(similarSchoolData.Select(x => Average(
-                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct),
-                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct),
-                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct)))),
-                Average(persistentLocalAuthoritySeries.Current, persistentLocalAuthoritySeries.Previous, persistentLocalAuthoritySeries.Previous2),
-                Average(persistentEnglandSeries.Current, persistentEnglandSeries.Previous, persistentEnglandSeries.Previous2)),
+                persistentSchoolSeries.Current,
+                AverageAvailable(similarSchoolData.Select(x =>
+                    ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct))),
+                persistentLocalAuthoritySeries.Current,
+                persistentEnglandSeries.Current),
             BuildTopPerformers(
                 establishment,
-                Average(persistentSchoolSeries.Current, persistentSchoolSeries.Previous, persistentSchoolSeries.Previous2),
+                persistentSchoolSeries.Current,
                 similarSchoolMeasures,
-                x => Average(
-                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct),
-                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct),
-                    ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct))),
+                x => ParseNullableDecimal(x.AbsenceData?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct)),
             new AttendanceMeasureYearByYear(
                 persistentSchoolSeries,
                 persistentSimilarSchoolsSeries,

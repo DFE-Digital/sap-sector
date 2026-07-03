@@ -15,9 +15,9 @@ internal static class Ks4HeadlineMeasuresCalculator
         decimal? englandPrevious,
         decimal? englandPrevious2) =>
         new(
-            Average(schoolCurrent, schoolPrevious, schoolPrevious2),
-            Average(localAuthorityCurrent, localAuthorityPrevious, localAuthorityPrevious2),
-            Average(englandCurrent, englandPrevious, englandPrevious2));
+            schoolCurrent,
+            localAuthorityCurrent,
+            englandCurrent);
 
     internal static Ks4HeadlineMeasureYearByYear BuildYearByYear(
         decimal? schoolCurrent,
