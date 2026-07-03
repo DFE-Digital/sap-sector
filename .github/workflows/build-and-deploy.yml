@@ -479,11 +479,11 @@ jobs:
           exit 2
 
 
-  deploy:
-    name: Deploy environments
+  deploy-to-test:
+    name: Deploy to test
     if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
     environment:
-      name: ${{ matrix.environment }}
+      name: test
       url: ${{ steps.deploy_app.outputs.environment_url }}
     needs: [build, test]
     runs-on: ubuntu-latest
@@ -491,10 +491,6 @@ jobs:
       id-token: write
       pull-requests: write
       contents: read
-    strategy:
-      max-parallel: 1
-      matrix:
-        environment: [test, production]
     env:
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
       AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
@@ -519,14 +515,14 @@ jobs:
           echo "config_reset_review_db=${config_reset_review_db}" >> "$GITHUB_OUTPUT"
           echo "effective_reset_review_db=${effective_reset_review_db}" >> "$GITHUB_OUTPUT"
 
-      - name: Deploy app to ${{ matrix.environment }}
+      - name: Deploy app to test
         id: deploy_app
         uses: DFE-Digital/github-actions/deploy-to-aks@master
         with:
           azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
           azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          environment: ${{ matrix.environment }}
+          environment: test
           sha: ${{ needs.build.outputs.docker-image-tag }}
           terraform-base: ${{ env.TERRAFORM_BASE }}
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
@@ -569,13 +565,111 @@ jobs:
           az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
           kubelogin convert-kubeconfig -l azurecli
 
-      - name: Deploy maintenance service to ${{ matrix.environment }}
+      - name: Deploy maintenance service to test
         env:
           MAINTENANCE_IMAGE_TAG: ${{ needs.build.outputs.maintenance-image-tag }}
         shell: bash
         run: |
           set -euo pipefail
-          namespace="$(jq -r '.namespace' "terraform/application/config/${{ matrix.environment }}.tfvars.json")"
+          namespace="$(jq -r '.namespace' "terraform/application/config/test.tfvars.json")"
+          maintenance_image="${MAINTENANCE_DOCKER_REPOSITORY}:${MAINTENANCE_IMAGE_TAG}"
+          kubectl -n "${namespace}" apply -f maintenance_page/manifests/
+          kubectl -n "${namespace}" set image deployment/get-school-improvement-insights-maintenance maintenance-page="${maintenance_image}"
+          kubectl -n "${namespace}" rollout status deployment/get-school-improvement-insights-maintenance --timeout=180s
+
+  deploy-to-production:
+    name: Deploy to production
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
+    environment:
+      name: production
+      url: ${{ steps.deploy_app.outputs.environment_url }}
+    needs: [build, test, deploy-to-test]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      pull-requests: write
+      contents: read
+    env:
+      AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
+      AKS_CLUSTER_NAME: ${{ secrets.AKS_CLUSTER_NAME }}
+      MAINTENANCE_DOCKER_REPOSITORY: ghcr.io/dfe-digital/sap-sector-maintenance
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve review DB config
+        id: review_db_config
+        if: ${{ inputs.environment == 'review' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          config_reset_review_db="$(ruby -e "require 'yaml'; config = YAML.load_file('terraform/application/config/review.yml') || {}; value = config.fetch('reset_review_db', true); normalized = case value when true then true when false then false else value.to_s.strip.downcase == 'true' end; puts(normalized ? 'true' : 'false')")"
+          if [ "${config_reset_review_db}" = "true" ] && [ "${{ inputs.refresh-review-db }}" = "true" ]; then
+            effective_reset_review_db="true"
+          else
+            effective_reset_review_db="false"
+          fi
+          echo "config_reset_review_db=${config_reset_review_db}" >> "$GITHUB_OUTPUT"
+          echo "effective_reset_review_db=${effective_reset_review_db}" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy app to production
+        id: deploy_app
+        uses: DFE-Digital/github-actions/deploy-to-aks@master
+        with:
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          environment: production
+          sha: ${{ needs.build.outputs.docker-image-tag }}
+          terraform-base: ${{ env.TERRAFORM_BASE }}
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+          smoke-test: false
+          gcp-wip: ${{ vars.GCP_WIP }}
+          gcp-project-id: ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install kubectl (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBECTL_VERSION="v1.29.8"
+          curl -fsSLo kubectl "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl"
+          sudo install -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client=true
+
+      - name: Install kubelogin (pinned)
+        shell: bash
+        run: |
+          set -euo pipefail
+          KUBELOGIN_VERSION="v0.1.6"
+          curl -fsSLo kubelogin.zip "https://github.com/Azure/kubelogin/releases/download/${KUBELOGIN_VERSION}/kubelogin-linux-amd64.zip"
+          unzip -q kubelogin.zip
+          sudo install -m 0755 bin/linux_amd64/kubelogin /usr/local/bin/kubelogin
+          kubelogin --version
+
+      - name: Configure AKS credentials
+        shell: bash
+        run: |
+          set -euo pipefail
+          az aks get-credentials --overwrite-existing -g "${AKS_RESOURCE_GROUP}" -n "${AKS_CLUSTER_NAME}"
+          kubelogin convert-kubeconfig -l azurecli
+
+      - name: Deploy maintenance service to production
+        env:
+          MAINTENANCE_IMAGE_TAG: ${{ needs.build.outputs.maintenance-image-tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          namespace="$(jq -r '.namespace' "terraform/application/config/production.tfvars.json")"
           maintenance_image="${MAINTENANCE_DOCKER_REPOSITORY}:${MAINTENANCE_IMAGE_TAG}"
           kubectl -n "${namespace}" apply -f maintenance_page/manifests/
           kubectl -n "${namespace}" set image deployment/get-school-improvement-insights-maintenance maintenance-page="${maintenance_image}"
@@ -857,7 +951,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     concurrency: deploy_domains_infra
-    needs: [deploy]
+    needs: [deploy-to-test]
     environment:
       name: production
     permissions:
@@ -873,16 +967,35 @@ jobs:
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
 
-  deploy_domains_env:
-    name: Deploy Domains to ${{ matrix.domain_environment }} environment
+  deploy_domains_env_test:
+    name: Deploy Domains to test environment
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    concurrency: deploy_domains_${{ matrix.domain_environment }}
+    concurrency: deploy_domains_test
     needs: [deploy_domains_infra]
-    strategy:
-      max-parallel: 1
-      matrix:
-        domain_environment: [test, production]
+    environment:
+      name: test
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Deploy Domains Environment
+        uses: DFE-Digital/github-actions/deploy-domains-env@master
+        with:
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
+          azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
+          azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
+          environment: test
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+
+  deploy_domains_env_production:
+    name: Deploy Domains to production environment
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    concurrency: deploy_domains_production
+    needs: [deploy_domains_infra, deploy_domains_env_test, deploy-to-production]
     environment:
       name: production
     permissions:
@@ -895,7 +1008,7 @@ jobs:
           azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
           azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
           azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-          environment: ${{ matrix.domain_environment }}
+          environment: production
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
