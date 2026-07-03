@@ -3,8 +3,11 @@
 /// <summary>
 /// Constants for OfficialSixthFormId codes.
 /// </summary>
-public static class SixthFormCodes
+public static class SixthFormValues
 {
+    public static readonly string HasSixthFormText = "Has a sixth form";
+    public static readonly string NoSixthFormText = "Does not have a sixth form";
+
     /// <summary>School has a sixth form</summary>
     public const string HasSixthForm = "1";
 

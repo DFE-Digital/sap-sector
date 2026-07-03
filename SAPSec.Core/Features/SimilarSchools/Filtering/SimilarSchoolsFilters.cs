@@ -14,7 +14,7 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
         new SimilarSchoolsNurseryProvisionFilter("np", "Nursery provision", filterValues, currentSchool),
         new SimilarSchoolsReferenceDataFilter("sf", "Sixth form", filterValues, currentSchool, s => s.OfficialSixthForm),
         new SimilarSchoolsReferenceDataFilter("ap", "Admissions policy", filterValues, currentSchool, s => s.AdmissionsPolicy),
-        // TODO: Governance structure
+        new SimilarSchoolsGovernanceStructureFilter("gs", "Governance structure", filterValues, currentSchool),
         new SimilarSchoolsTypeOfSpecialistProvisionFilter("sp", "Type of specialist provision", filterValues, currentSchool),
         new SimilarSchoolsReferenceDataFilter("goe", "Gender of entry", filterValues, currentSchool, s => s.Gender),
         new SimilarSchoolsOverallAbsenceRateFilter("oar", "Overall absence rate", filterValues, currentSchool),
