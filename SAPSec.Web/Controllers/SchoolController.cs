@@ -102,7 +102,7 @@ public class SchoolController : Controller
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
         var response = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
-        var yearLabels = Ks4YearLabelConfig.YearByYear;
+        var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
 
         var selectedSchoolSeries = isPersistentAbsence
@@ -118,18 +118,6 @@ public class SchoolController : Controller
             ? response.PersistentAbsenceYearByYear.England
             : response.OverallAbsenceYearByYear.England;
 
-        var selectedSchoolThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.SchoolValue
-            : response.OverallAbsenceThreeYearAverage.SchoolValue;
-        var similarSchoolsThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.SimilarSchoolsValue
-            : response.OverallAbsenceThreeYearAverage.SimilarSchoolsValue;
-        var localAuthorityThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.LocalAuthorityValue
-            : response.OverallAbsenceThreeYearAverage.LocalAuthorityValue;
-        var englandThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.EnglandValue
-            : response.OverallAbsenceThreeYearAverage.EnglandValue;
         var topPerformers = isPersistentAbsence
             ? response.PersistentAbsenceTopPerformers
             : response.OverallAbsenceTopPerformers;
@@ -140,10 +128,10 @@ public class SchoolController : Controller
             years = yearLabels,
             bar = new decimal?[]
             {
-                selectedSchoolThreeYearAverage,
-                similarSchoolsThreeYearAverage,
-                localAuthorityThreeYearAverage,
-                englandThreeYearAverage
+                selectedSchoolSeries.Current,
+                similarSchoolsSeries.Current,
+                localAuthoritySeries.Current,
+                englandSeries.Current
             },
             line = new
             {
@@ -158,29 +146,25 @@ public class SchoolController : Controller
                 {
                     DisplayPercentNullable(selectedSchoolSeries.Previous2),
                     DisplayPercentNullable(selectedSchoolSeries.Previous),
-                    DisplayPercentNullable(selectedSchoolSeries.Current),
-                    DisplayPercentNullable(selectedSchoolThreeYearAverage)
+                    DisplayPercentNullable(selectedSchoolSeries.Current)
                 },
                 similarSchools = new[]
                 {
                     DisplayPercentNullable(similarSchoolsSeries.Previous2),
                     DisplayPercentNullable(similarSchoolsSeries.Previous),
-                    DisplayPercentNullable(similarSchoolsSeries.Current),
-                    DisplayPercentNullable(similarSchoolsThreeYearAverage)
+                    DisplayPercentNullable(similarSchoolsSeries.Current)
                 },
                 localAuthority = new[]
                 {
                     DisplayPercentNullable(localAuthoritySeries.Previous2),
                     DisplayPercentNullable(localAuthoritySeries.Previous),
-                    DisplayPercentNullable(localAuthoritySeries.Current),
-                    DisplayPercentNullable(localAuthorityThreeYearAverage)
+                    DisplayPercentNullable(localAuthoritySeries.Current)
                 },
                 england = new[]
                 {
                     DisplayPercentNullable(englandSeries.Previous2),
                     DisplayPercentNullable(englandSeries.Previous),
-                    DisplayPercentNullable(englandSeries.Current),
-                    DisplayPercentNullable(englandThreeYearAverage)
+                    DisplayPercentNullable(englandSeries.Current)
                 }
             },
             topPerformers = topPerformers.Select(x => new
@@ -219,10 +203,10 @@ public class SchoolController : Controller
             grade = SchoolKs4EngMathsSelection.ToFilterValue(gradeFilter),
             bar = new decimal?[]
             {
-                selectedEngMaths.ThreeYearAverage.SchoolValue,
-                selectedEngMaths.ThreeYearAverage.SimilarSchoolsValue,
-                selectedEngMaths.ThreeYearAverage.LocalAuthorityValue,
-                selectedEngMaths.ThreeYearAverage.EnglandValue
+                selectedEngMaths.YearByYear.School.Current,
+                selectedEngMaths.YearByYear.SimilarSchools.Current,
+                selectedEngMaths.YearByYear.LocalAuthority.Current,
+                selectedEngMaths.YearByYear.England.Current
             },
             line = new
             {
@@ -237,29 +221,25 @@ public class SchoolController : Controller
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.SchoolValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Current)
                 },
                 similarSchools = new[]
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.SimilarSchoolsValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Current)
                 },
                 localAuthority = new[]
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.LocalAuthorityValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Current)
                 },
                 england = new[]
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.ThreeYearAverage.EnglandValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Current)
                 }
             },
             topPerformers = selectedEngMaths.TopPerformers
@@ -288,10 +268,10 @@ public class SchoolController : Controller
             destination = SchoolKs4DestinationsSelection.ToFilterValue(destinationFilter),
             bar = new decimal?[]
             {
-                selectedDestinations.ThreeYearAverage.SchoolValue,
-                selectedDestinations.ThreeYearAverage.SimilarSchoolsValue,
-                selectedDestinations.ThreeYearAverage.LocalAuthorityValue,
-                selectedDestinations.ThreeYearAverage.EnglandValue
+                selectedDestinations.YearByYear.School.Current,
+                selectedDestinations.YearByYear.SimilarSchools.Current,
+                selectedDestinations.YearByYear.LocalAuthority.Current,
+                selectedDestinations.YearByYear.England.Current
             },
             line = new
             {
@@ -306,29 +286,25 @@ public class SchoolController : Controller
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.School.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.School.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.School.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.ThreeYearAverage.SchoolValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.School.Current)
                 },
                 similarSchools = new[]
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.SimilarSchools.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.SimilarSchools.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.SimilarSchools.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.ThreeYearAverage.SimilarSchoolsValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.SimilarSchools.Current)
                 },
                 localAuthority = new[]
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.LocalAuthority.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.LocalAuthority.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.LocalAuthority.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.ThreeYearAverage.LocalAuthorityValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.LocalAuthority.Current)
                 },
                 england = new[]
                 {
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.England.Previous2),
                     Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.England.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.England.Current),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.ThreeYearAverage.EnglandValue)
+                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.England.Current)
                 }
             },
             topPerformers = selectedDestinations.TopPerformers
@@ -375,10 +351,10 @@ public class SchoolController : Controller
             grade = filteredSubject.Grade.ToFilterValue(),
             bar = new decimal?[]
             {
-                selectedSubject.ThreeYearAverage.SchoolValue,
-                selectedSubject.ThreeYearAverage.SimilarSchoolsValue,
-                selectedSubject.ThreeYearAverage.LocalAuthorityValue,
-                selectedSubject.ThreeYearAverage.EnglandValue
+                selectedSubject.YearByYear.School.Current,
+                selectedSubject.YearByYear.SimilarSchools.Current,
+                selectedSubject.YearByYear.LocalAuthority.Current,
+                selectedSubject.YearByYear.England.Current
             },
             line = new
             {
@@ -393,29 +369,25 @@ public class SchoolController : Controller
                 {
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Previous2),
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.SchoolValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Current)
                 },
                 similarSchools = new[]
                 {
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Previous2),
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.SimilarSchoolsValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Current)
                 },
                 localAuthority = new[]
                 {
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Previous2),
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.LocalAuthorityValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Current)
                 },
                 england = new[]
                 {
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Previous2),
                     Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Current),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.ThreeYearAverage.EnglandValue)
+                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Current)
                 }
             },
             topPerformers = selectedSubject.TopPerformers

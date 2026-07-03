@@ -43,18 +43,18 @@
         return /^#.+year-by-year$/i.test(target) || target === "#year-by-year";
     }
 
-    function buildToggleHeader() {
+    function buildToggleHeader(primaryLabel, yearlyLabel) {
         var header = document.createElement("div");
         header.className = "app-content-toggle__header";
 
         var title = document.createElement("h3");
         title.className = "govuk-heading-m app-content-toggle__title";
-        title.textContent = "Current year";
+        title.textContent = primaryLabel;
 
         var button = document.createElement("button");
         button.type = "button";
         button.className = "govuk-button govuk-button--secondary";
-        button.textContent = "Show year by year";
+        button.textContent = "Show " + yearlyLabel.toLowerCase();
         button.setAttribute("aria-pressed", "false");
         button.setAttribute("data-module", "govuk-button");
 
@@ -104,6 +104,8 @@
 
         var firstTabTarget = getTabTarget(firstTab);
         var secondTabTarget = getTabTarget(secondTab);
+        var primaryLabel = (firstTab.textContent || "").trim() || "Current year";
+        var yearlyLabel = (secondTab.textContent || "").trim() || "Year by year";
 
         if (!isAverageTabTarget(firstTabTarget) || !isYearByYearTabTarget(secondTabTarget)) {
             return;
@@ -127,20 +129,20 @@
         toggleContainer.className = "app-content-toggle";
         toggleContainer.setAttribute("data-module", "app-content-toggle");
 
-        var toggle = buildToggleHeader();
+        var toggle = buildToggleHeader(primaryLabel, yearlyLabel);
         toggleContainer.appendChild(toggle.header);
 
         var averagePanel = document.createElement("div");
         averagePanel.className = "app-content-toggle__panel app-content-toggle__panel--active";
         averagePanel.setAttribute("data-content-toggle-panel", "true");
-        averagePanel.setAttribute("data-content-toggle-name", "Current year");
+        averagePanel.setAttribute("data-content-toggle-name", primaryLabel);
         averagePanel.id = firstTabTarget.slice(1);
         moveChartBlock(averageChart, averagePanel);
 
         var yearlyPanel = document.createElement("div");
         yearlyPanel.className = "app-content-toggle__panel";
         yearlyPanel.setAttribute("data-content-toggle-panel", "true");
-        yearlyPanel.setAttribute("data-content-toggle-name", "Year by year");
+        yearlyPanel.setAttribute("data-content-toggle-name", yearlyLabel);
         yearlyPanel.id = secondTabTarget.slice(1);
         yearlyPanel.setAttribute("hidden", "hidden");
         moveChartBlock(yearlyChart, yearlyPanel);
@@ -161,8 +163,10 @@
             setHidden(averagePanel, showingYearly);
             setHidden(yearlyPanel, !showingYearly);
 
-            toggle.title.textContent = showingYearly ? "Year by year" : "Current year";
-            toggle.button.textContent = showingYearly ? "Show current year" : "Show year by year";
+            toggle.title.textContent = showingYearly ? yearlyLabel : primaryLabel;
+            toggle.button.textContent = showingYearly
+                ? "Show " + primaryLabel.toLowerCase()
+                : "Show " + yearlyLabel.toLowerCase();
             toggle.button.setAttribute("aria-pressed", showingYearly ? "true" : "false");
 
             resizeCharts(showingYearly ? yearlyPanel : averagePanel);

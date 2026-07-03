@@ -4,7 +4,10 @@
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = $"KS4 headline performance measures compared to {Model.SimilarSchoolName}";
-    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var ks4YearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear;
+    var ks4CurrentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4;
+    var destinationsYearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.DestinationsYearByYear;
+    var destinationsCurrentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentDestinations;
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
     var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
     bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
@@ -43,7 +46,7 @@
 
         <div class="govuk-tabs__panel" id="charts">
             <content-toggle>
-                <toggle-content id="three-year-average" name="Current year" active="true">
+                <toggle-content id="three-year-average" name="@ks4CurrentYear" active="true">
                     @{
                         var chartData = new
                         {
@@ -55,9 +58,9 @@
                             },
                             data = new decimal?[]
                             {
-                                Model.ThisSchoolAttainment8ThreeYearAverage,
-                                Model.SelectedSchoolAttainment8ThreeYearAverage,
-                                Model.EnglandAttainment8ThreeYearAverage
+                                Model.ThisSchoolAttainment8YearByYear?.Current,
+                                Model.SelectedSchoolAttainment8YearByYear?.Current,
+                                Model.EnglandAttainment8YearByYear?.Current
                             }
                         };
                     }
@@ -231,7 +234,7 @@
 
         <div class="govuk-tabs__panel" id="eng-maths-charts">
             <content-toggle>
-                <toggle-content id="eng-maths-three-year-average" name="Current year" active="true">
+                <toggle-content id="eng-maths-three-year-average" name="@ks4CurrentYear" active="true">
                     @{
                         var engMathsChartData = new
                         {
@@ -243,9 +246,9 @@
                             },
                             data = new decimal?[]
                             {
-                                Model.ThisSchoolEngMaths49ThreeYearAverage,
-                                Model.SelectedSchoolEngMaths49ThreeYearAverage,
-                                Model.EnglandEngMaths49ThreeYearAverage
+                                Model.ThisSchoolEngMaths49YearByYear?.Current,
+                                Model.SelectedSchoolEngMaths49YearByYear?.Current,
+                                Model.EnglandEngMaths49YearByYear?.Current
                             }
                         };
                     }
@@ -391,7 +394,7 @@
                 This data shows the number of pupils who either stayed in education, started an apprenticeship, or entered employment for at least 2 terms after completing KS4.
             </p>
             <p class="govuk-body-s govuk-!-margin-bottom-2">
-                The most recent data covers pupils who finished year 11 in 2023. The comparison values use the most recent year available.
+                The most recent data covers pupils who finished year 11 in 2023. Results are shown for @destinationsCurrentYear.
             </p>
         </div>
     </details>
@@ -430,7 +433,7 @@
 
         <div class="govuk-tabs__panel" id="destinations-charts">
             <content-toggle>
-                <toggle-content id="destinations-three-year-average" name="Current year" active="true">
+                <toggle-content id="destinations-three-year-average" name="@destinationsCurrentYear" active="true">
                     @{
                         var destinationsChartData = new
                         {
@@ -442,9 +445,9 @@
                             },
                             data = new decimal?[]
                             {
-                                Model.ThisSchoolDestinationsThreeYearAverage,
-                                Model.SelectedSchoolDestinationsThreeYearAverage,
-                                Model.EnglandDestinationsThreeYearAverage
+                                Model.ThisSchoolDestinationsYearByYear?.Current,
+                                Model.SelectedSchoolDestinationsYearByYear?.Current,
+                                Model.EnglandDestinationsYearByYear?.Current
                             }
                         };
                     }
@@ -476,7 +479,7 @@
                     @{
                         var destinationsYearByYearData = new
                         {
-                            labels = ks4YearLabels,
+                            labels = destinationsYearLabels,
                             datasets = new object[]
                             {
                                 new
@@ -548,9 +551,9 @@
                 <thead class="govuk-table__head">
                     <tr class="govuk-table__row">
                         <th scope="col" class="govuk-table__header">School(s)</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
-                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@destinationsYearLabels[0]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@destinationsYearLabels[1]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@destinationsYearLabels[2]</th>
                     </tr>
                 </thead>
                 <tbody class="govuk-table__body">

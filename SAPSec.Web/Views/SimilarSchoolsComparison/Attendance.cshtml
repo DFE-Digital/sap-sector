@@ -4,7 +4,8 @@
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = $"Attendance compared to {Model.SimilarSchoolName}";
-    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var attendanceYearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear;
+    var currentAttendanceYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentAttendance;
     var initialBarData = new
     {
         labels = new[] { Model.Name, Model.SimilarSchoolName, "Schools in England average" },
@@ -12,7 +13,7 @@
     };
     var initialLineData = new
     {
-        labels = ks4YearLabels,
+            labels = attendanceYearLabels,
         datasets = new object[]
         {
             new { label = Model.Name, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
@@ -58,7 +59,7 @@
         <h3 class="govuk-tabs__title">Attendance views</h3>
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
-                <a class="govuk-tabs__tab" href="#attendance-three-year-average">Current year</a>
+                <a class="govuk-tabs__tab" href="#attendance-three-year-average">@currentAttendanceYear</a>
             </li>
             <li class="govuk-tabs__list-item">
                 <a class="govuk-tabs__tab" href="#attendance-year-by-year">Year by year</a>
@@ -110,9 +111,9 @@
                 <thead class="govuk-table__head">
                 <tr class="govuk-table__row">
                     <th scope="col" class="govuk-table__header">School(s)</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@attendanceYearLabels[0]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@attendanceYearLabels[1]</th>
+                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@attendanceYearLabels[2]</th>
                 </tr>
                 </thead>
                 <tbody class="govuk-table__body">

@@ -267,9 +267,9 @@ public class SimilarSchoolsComparisonControllerTests
         root.GetProperty("years").GetArrayLength().Should().Be(3);
 
         var table = root.GetProperty("table");
-        table.GetProperty("thisSchool").GetArrayLength().Should().Be(4);
-        table.GetProperty("similarSchool").GetArrayLength().Should().Be(4);
-        table.GetProperty("england").GetArrayLength().Should().Be(4);
+        table.GetProperty("thisSchool").GetArrayLength().Should().Be(3);
+        table.GetProperty("similarSchool").GetArrayLength().Should().Be(3);
+        table.GetProperty("england").GetArrayLength().Should().Be(3);
     }
 
     private void SetupBaseDependencies(

@@ -4,7 +4,8 @@
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = $"KS4 core subject GCSE results compared to {Model.SimilarSchoolName}";
-    var ks4YearLabels = SAPSec.Web.ViewModels.Ks4YearLabelConfig.YearByYear;
+    var ks4YearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear;
+    var ks4CurrentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4;
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
     var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
     bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
@@ -106,9 +107,9 @@
         },
         data = new decimal?[]
         {
-            RoundWholePercent(coreSubjectSection.ThisSchoolThreeYearAverage),
-            RoundWholePercent(coreSubjectSection.SimilarSchoolThreeYearAverage),
-            RoundWholePercent(coreSubjectSection.EnglandThreeYearAverage)
+            RoundWholePercent(coreSubjectSection.ThisSchoolYearByYear?.Current),
+            RoundWholePercent(coreSubjectSection.SimilarSchoolYearByYear?.Current),
+            RoundWholePercent(coreSubjectSection.EnglandYearByYear?.Current)
         }
     };
     var yearByYearData = new
@@ -197,7 +198,7 @@
 
             <div class="govuk-tabs__panel" id="@($"{item.Key}-charts")">
                 <content-toggle>
-                    <toggle-content id="@($"{item.Key}-three-year-average")" name="Current year" active="true">
+                    <toggle-content id="@($"{item.Key}-three-year-average")" name="@ks4CurrentYear" active="true">
                         <div class="app-ks4-chart-container">
                             @if (HasAnyData(chartData.data))
                             {
