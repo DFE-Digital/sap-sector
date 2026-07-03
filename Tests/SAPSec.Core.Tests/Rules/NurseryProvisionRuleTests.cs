@@ -9,19 +9,13 @@ public class NurseryProvisionRuleTests
     private readonly NurseryProvisionRule _sut = new();
 
     [Theory]
-    [InlineData("Nursery", true)]
-    [InlineData("nursery school", true)]
-    [InlineData("Primary", false)]
-    [InlineData("Secondary", false)]
-    [InlineData("16 plus", false)]
-    [InlineData("Post-16", false)]
-    [InlineData("16-19", false)]
-    public void Evaluate_KnownPhases_ReturnsExpected(string phase, bool expected)
+    [InlineData("Has Nursery Classes", true)]
+    public void Evaluate_HasNurseryProvision_ReturnsExpected(string nurseryProvisionName, bool expected)
     {
         // Arrange
         var establishment = new Establishment
         {
-            PhaseOfEducationName = phase
+            NurseryProvisionName = nurseryProvisionName
         };
 
         // Act
@@ -33,31 +27,31 @@ public class NurseryProvisionRuleTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("  ")]
-    public void Evaluate_NoPhase_ReturnsNotAvailable(string? phase)
+    [InlineData("No Nursery Classes", false)]
+    public void Evaluate_NoNurseryProvision_ReturnsExpected(string nurseryProvisionName, bool expected)
     {
         // Arrange
         var establishment = new Establishment
         {
-            PhaseOfEducationName = phase
+            NurseryProvisionName = nurseryProvisionName
         };
 
         // Act
         var result = _sut.Evaluate(establishment);
 
         // Assert
-        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
+        result.IsAvailable.Should().BeTrue();
+        result.Value.Should().Be(expected);
     }
 
-    [Fact]
-    public void Evaluate_AllThrough_ReturnsNotAvailable()
+    [Theory]
+    [InlineData("")]
+    public void Evaluate_Blanks_ReturnsNotAvailable(string nurseryProvisionName)
     {
         // Arrange
         var establishment = new Establishment
         {
-            PhaseOfEducationName = "All-through"
+            NurseryProvisionName = nurseryProvisionName
         };
 
         // Act
