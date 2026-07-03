@@ -6,7 +6,7 @@ namespace SAPSec.Web.Middleware;
 [ExcludeFromCodeCoverage]
 public class SecurityHeadersMiddleware(RequestDelegate next, IWebHostEnvironment environment)
 {
-    public async Task InvokeAsync(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, IWebHostEnvironment environment)
     {
         var path = context.Request.Path.Value?.ToLowerInvariant() ?? string.Empty;
 
