@@ -480,7 +480,7 @@ jobs:
 
 
   deploy-to-test:
-    name: Deploy environments
+    name: Deploy to test
     if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
     environment:
       name: test
@@ -578,7 +578,7 @@ jobs:
           kubectl -n "${namespace}" rollout status deployment/get-school-improvement-insights-maintenance --timeout=180s
 
   deploy-to-production:
-    name: Deploy environments
+    name: Deploy to production
     if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' }}
     environment:
       name: production
@@ -951,7 +951,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     concurrency: deploy_domains_infra
-    needs: [deploy-to-production]
+    needs: [deploy-to-test]
     environment:
       name: production
     permissions:
@@ -967,16 +967,35 @@ jobs:
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
 
-  deploy_domains_env:
-    name: Deploy Domains to ${{ matrix.domain_environment }} environment
+  deploy_domains_env_test:
+    name: Deploy Domains to test environment
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    concurrency: deploy_domains_${{ matrix.domain_environment }}
+    concurrency: deploy_domains_test
     needs: [deploy_domains_infra]
-    strategy:
-      max-parallel: 1
-      matrix:
-        domain_environment: [test, production]
+    environment:
+      name: test
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Deploy Domains Environment
+        uses: DFE-Digital/github-actions/deploy-domains-env@master
+        with:
+          azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
+          azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
+          azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
+          environment: test
+          healthcheck: ${{ env.HEALTHCHECK_CMD }}
+          teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
+          service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
+
+  deploy_domains_env_production:
+    name: Deploy Domains to production environment
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    concurrency: deploy_domains_production
+    needs: [deploy_domains_infra, deploy_domains_env_test, deploy-to-production]
     environment:
       name: production
     permissions:
@@ -989,7 +1008,7 @@ jobs:
           azure-client-id:  ${{ secrets.AZURE_CLIENT_ID  }}
           azure-tenant-id:  ${{ secrets.AZURE_TENANT_ID   }}
           azure-subscription-id:  ${{ secrets.AZURE_SUBSCRIPTION_ID   }}
-          environment: ${{ matrix.domain_environment }}
+          environment: production
           healthcheck: ${{ env.HEALTHCHECK_CMD }}
           teams-webhook-url: ${{ secrets.TEAMS_WEBHOOK_URL }}
           service: ${{ vars.TEAMS_MSG_SERVICE_NAME }}
