@@ -1,11 +1,13 @@
 ﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Helpers
 @model SchoolDetails
 @{
     Layout = "_Layout";
     ViewData["Title"] = Model.Name;
 }
 
-<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-1">@ViewData["Title"]</h1>
+<p class="govuk-caption-xl govuk-!-margin-bottom-8">@Model.Address.Display()</p>
 <p class="govuk-body">
     We've identified <strong>50</strong> similar secondary phase schools (including all-throughs) to help you:
 </p>
