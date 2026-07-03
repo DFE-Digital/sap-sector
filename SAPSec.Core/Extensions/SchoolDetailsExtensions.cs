@@ -12,4 +12,12 @@ public static class SchoolDetailsExtensions
         return school.PhaseOfEducation.HasValue
             && PhaseOfEducationValues.IsPrimaryOrAllThrough(school.PhaseOfEducation.Value);
     }
+
+    public static bool IsSecondarySchool(this SchoolDetails school)
+    {
+        ArgumentNullException.ThrowIfNull(school);
+
+        return school.PhaseOfEducation.HasValue
+            && PhaseOfEducationValues.IsSecondary(school.PhaseOfEducation.Value);
+    }
 }
