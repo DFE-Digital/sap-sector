@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
 using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
@@ -18,38 +19,39 @@ namespace SAPSec.Web.Controllers;
 /// </summary>
 [Route("school/{urn}")]
 [Authorize]
+[RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SchoolController : Controller
 {
-    private readonly ISchoolDetailsService _schoolDetailsService;
     private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
     private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly IFeatureFlagService _featureFlagService;
+    private readonly IRequestSchoolAccessor _requestSchoolAccessor;
     private readonly ILogger<SchoolController> _logger;
 
     public SchoolController(
-        ISchoolDetailsService schoolDetailsService,
         GetSchoolKs4HeadlineMeasures getSchoolKs4HeadlineMeasures,
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
         GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetAttendanceMeasures getAttendanceMeasures,
         IFeatureFlagService featureFlagService,
+        IRequestSchoolAccessor requestSchoolAccessor,
         ILogger<SchoolController> logger)
     {
-        _schoolDetailsService = schoolDetailsService;
         _getSchoolKs4HeadlineMeasures = getSchoolKs4HeadlineMeasures;
         _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects;
         _getFilteredSchoolKs4CoreSubject = getFilteredSchoolKs4CoreSubject;
         _getAttendanceMeasures = getAttendanceMeasures;
         _featureFlagService = featureFlagService;
+        _requestSchoolAccessor = requestSchoolAccessor;
         _logger = logger;
     }
 
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
@@ -60,7 +62,7 @@ public class SchoolController : Controller
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
         return View(school);
@@ -70,7 +72,7 @@ public class SchoolController : Controller
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
         return View(school);
@@ -80,7 +82,7 @@ public class SchoolController : Controller
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var school = await _schoolDetailsService.GetByUrnAsync(urn);
+        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
         var attendanceMeasures = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);

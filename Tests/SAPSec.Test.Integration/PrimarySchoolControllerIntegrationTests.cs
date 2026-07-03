@@ -7,12 +7,13 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixture)
 {
-    private const string PrimarySchoolOverviewPath = "/school/primary/105574";
-    private const string PrimarySchoolKs2Path = "/school/primary/105574/ks2";
-    private const string PrimarySchoolAttendancePath = "/school/primary/105574/attendance";
-    private const string PrimarySchoolViewSimilarSchoolsPath = "/school/primary/105574/view-similar-schools";
-    private const string PrimarySchoolDetailsPath = "/school/primary/105574/school-details";
-    private const string PrimaryWhatIsASimilarSchoolPath = "/school/primary/105574/what-is-a-similar-school";
+    private const string PrimarySchoolUrn = "100134";
+    private const string PrimarySchoolOverviewPath = $"/school/primary/{PrimarySchoolUrn}";
+    private const string PrimarySchoolKs2Path = $"/school/primary/{PrimarySchoolUrn}/ks2";
+    private const string PrimarySchoolAttendancePath = $"/school/primary/{PrimarySchoolUrn}/attendance";
+    private const string PrimarySchoolViewSimilarSchoolsPath = $"/school/primary/{PrimarySchoolUrn}/view-similar-schools";
+    private const string PrimarySchoolDetailsPath = $"/school/primary/{PrimarySchoolUrn}/school-details";
+    private const string PrimaryWhatIsASimilarSchoolPath = $"/school/primary/{PrimarySchoolUrn}/what-is-a-similar-school";
 
     [Fact]
     public async Task GetPrimarySchoolOverview_ReturnsSuccess()
@@ -29,7 +30,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
         var response = await fixture.Client.GetAsync(PrimarySchoolOverviewPath);
         var content = await response.Content.ReadAsStringAsync();
 
-        content.Should().Contain("href=\"/school/primary/105574/what-is-a-similar-school\"");
+        content.Should().Contain($"href=\"/school/primary/{PrimarySchoolUrn}/what-is-a-similar-school\"");
     }
 
     [Fact]
@@ -96,7 +97,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().NotContain("href=\"\"");
-        content.Should().Contain("href=\"/school/primary/105574/view-similar-schools\"");
+        content.Should().Contain($"href=\"/school/primary/{PrimarySchoolUrn}/view-similar-schools\"");
         content.Should().Contain("view all the schools most similar to this one");
     }
 

@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -13,6 +14,7 @@ using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Controllers;
+using SAPSec.Web.Services;
 using System.Text.Json;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
@@ -28,6 +30,7 @@ public class SchoolControllerTests
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
     private readonly Mock<IFeatureFlagService> _featureFlagServiceMock;
+    private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
 
@@ -44,6 +47,7 @@ public class SchoolControllerTests
         _ks4DestinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
         _featureFlagServiceMock = new Mock<IFeatureFlagService>();
+        _requestSchoolAccessorMock = new Mock<IRequestSchoolAccessor>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
         _featureFlagServiceMock.Setup(x => x.IsEnabledAsync("EnablePrimarySchools")).ReturnsAsync(false);
 
@@ -69,12 +73,12 @@ public class SchoolControllerTests
             _similarSchoolsRepositoryMock.Object);
 
         _sut = new SchoolController(
-            _schoolDetailsServiceMock.Object,
             getSchoolKs4HeadlineMeasures,
             getSchoolKs4CoreSubjects,
             getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,
             _featureFlagServiceMock.Object,
+            _requestSchoolAccessorMock.Object,
             _loggerMock.Object);
     }
 
@@ -88,6 +92,9 @@ public class SchoolControllerTests
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
+            .ReturnsAsync(schoolDetails);
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
@@ -106,8 +113,8 @@ public class SchoolControllerTests
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
             .ReturnsAsync(schoolDetails);
 
         await _sut.Index(urn);
@@ -121,13 +128,13 @@ public class SchoolControllerTests
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
             .ReturnsAsync(schoolDetails);
 
         await _sut.Index(urn);
 
-        _schoolDetailsServiceMock.Verify(x => x.GetByUrnAsync(urn), Times.Once);
+        _requestSchoolAccessorMock.Verify(x => x.GetAsync(It.IsAny<HttpContext>(), urn), Times.Once);
     }
 
     [Fact]
@@ -136,8 +143,8 @@ public class SchoolControllerTests
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
             .ReturnsAsync(schoolDetails);
 
         var result = await _sut.Index(urn);
@@ -156,6 +163,9 @@ public class SchoolControllerTests
         var urn = "123456";
         var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
 
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
+            .ReturnsAsync(schoolDetails);
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
@@ -268,6 +278,9 @@ public class SchoolControllerTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(urn))
             .ReturnsAsync(new Establishment { URN = urn, LAId = "373", EstablishmentName = "Test Academy" });
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
+            .ReturnsAsync(schoolDetails);
         _schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
