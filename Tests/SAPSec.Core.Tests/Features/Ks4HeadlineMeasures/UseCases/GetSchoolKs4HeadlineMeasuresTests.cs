@@ -208,7 +208,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
         result.Attainment8ThreeYearAverage.SimilarSchoolsValue.Should().Be(46.0m);
         result.EngMaths49ThreeYearAverage.SimilarSchoolsValue.Should().Be(66.0m);
         result.DestinationsThreeYearAverage.SimilarSchoolsValue.Should().Be(90.0m);
-        result.Attainment8TopPerformers.Select(x => x.Name).Should().ContainInOrder("Beta school", "Alpha school");
+        result.Attainment8TopPerformers.Select(x => x.Name).Should().ContainInOrder("Current school", "Alpha school");
 
         performanceRepositoryMock.Verify(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()), Times.Once);
         destinationsRepositoryMock.Verify(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()), Times.Once);
@@ -357,6 +357,73 @@ public class GetSchoolKs4HeadlineMeasuresTests
             "Alpha school",
             "Beta school",
             "Charlie school");
+    }
+
+    [Fact]
+    public async Task Execute_WhenCurrentYearAndAverageWouldProduceDifferentTopPerformer_UsesCurrentYearValue()
+    {
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
+        var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+
+        schoolDetailsServiceMock
+            .Setup(x => x.GetByUrnAsync("100"))
+            .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
+
+        performanceRepositoryMock
+            .Setup(x => x.GetByUrnAsync("100"))
+            .ReturnsAsync(CreateMeasures("100", "45.0", "46.0", "47.0", "66.0", "67.0", "68.0"));
+
+        destinationsRepositoryMock
+            .Setup(x => x.GetByUrnAsync("100"))
+            .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
+
+        similarSchoolsRepositoryMock
+            .Setup(x => x.GetSimilarSchoolsGroupAsync("100"))
+            .ReturnsAsync([
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
+                new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" }
+            ]);
+
+        performanceRepositoryMock
+            .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[]
+            {
+                CreateMeasures("200", "55.4", "55.9", "55.9", "70.0", "71.0", "72.0"),
+                CreateMeasures("300", "55.1", "54.0", "54.0", "69.0", "68.0", "67.0")
+            });
+
+        destinationsRepositoryMock
+            .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[]
+            {
+                CreateDestinations("200", "84", "85", "86"),
+                CreateDestinations("300", "94", "95", "96")
+            });
+
+        establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new[]
+            {
+                new Establishment { URN = "200", EstablishmentName = "Winton Academy" },
+                new Establishment { URN = "300", EstablishmentName = "St Oscar Romero Catholic School" }
+            });
+
+        var sut = new GetSchoolKs4HeadlineMeasures(
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
+            schoolDetailsServiceMock.Object,
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
+
+        var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
+
+        result.Attainment8TopPerformers.Select(x => (x.Name, x.Value)).Should().Equal(
+            ("Winton Academy", 55.4m),
+            ("St Oscar Romero Catholic School", 55.1m),
+            ("Current school", 45.0m));
     }
 
     [Fact]
@@ -509,7 +576,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
         result.EngMaths49YearByYear.SimilarSchools.Should().Be(new Ks4HeadlineMeasureSeries(60.0m, 71.0m, 72.0m));
         result.DestinationsThreeYearAverage.SimilarSchoolsValue.Should().Be(89.8m);
         result.DestinationsYearByYear.SimilarSchools.Should().Be(new Ks4HeadlineMeasureSeries(84m, 95m, 96m));
-        result.Attainment8TopPerformers.Select(x => x.Name).Should().ContainInOrder("Beta school", "Alpha school");
+        result.Attainment8TopPerformers.Select(x => x.Name).Should().ContainInOrder("Current school", "Alpha school");
     }
 
     [Fact]
