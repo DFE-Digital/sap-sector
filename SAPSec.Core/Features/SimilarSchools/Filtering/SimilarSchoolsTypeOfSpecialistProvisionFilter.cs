@@ -1,5 +1,6 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
+using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -13,6 +14,7 @@ public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
         filterValues,
         currentSchool)
 {
+    private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
     protected override DataWithAvailability<string>? CurrentSchoolValue
         => DataWithAvailability.Available(FindGroup(CurrentSchool).Name);
 

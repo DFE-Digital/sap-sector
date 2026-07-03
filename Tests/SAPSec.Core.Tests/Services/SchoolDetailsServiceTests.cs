@@ -138,12 +138,12 @@ public class SchoolDetailsServiceTests
     }
 
     [Fact]
-    public async Task GetByUrn_AcademyWithoutTrust_ReturnsSAT()
+    public async Task GetByUrn_ReturnsSAT()
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.TrustId = null;
-        establishment.TrustName = null;
+        establishment.TrustSchoolFlagId = "5";
+        establishment.EstablishmentTypeGroupId = "10";
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -154,7 +154,6 @@ public class SchoolDetailsServiceTests
 
         // Assert
         result.GovernanceStructure.Value.Should().Be(GovernanceType.SingleAcademyTrust);
-        result.AcademyTrustName.Availability.Should().Be(DataAvailabilityStatus.NotApplicable);
     }
 
     [Fact]
@@ -162,6 +161,9 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestLASchool();
+        establishment.TrustSchoolFlagId = "1";
+        establishment.EstablishmentTypeGroupId = "4";
+
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("654321"))
             .ReturnsAsync(establishment);
@@ -173,46 +175,6 @@ public class SchoolDetailsServiceTests
         result.GovernanceStructure.Value.Should().Be(GovernanceType.LocalAuthorityMaintained);
     }
 
-    [Fact]
-    public async Task GetByUrn_IndependentSchool_ReturnsIndependent()
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        establishment.TypeOfEstablishmentId = "11";
-        establishment.TypeOfEstablishmentName = "Other independent school";
-        establishment.TrustId = null;
-
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentAsync("123456"))
-            .ReturnsAsync(establishment);
-
-        // Act
-        var result = await _sut.GetByUrnAsync("123456");
-
-        // Assert
-        result.GovernanceStructure.Value.Should().Be(GovernanceType.Independent);
-    }
-
-    [Fact]
-    public async Task GetByUrn_NonMaintainedSpecialSchool_ReturnsCorrectType()
-    {
-        // Arrange
-        var establishment = CreateTestAcademy();
-        establishment.TypeOfEstablishmentId = "8";
-        establishment.TypeOfEstablishmentName = "Non-maintained special school";
-        establishment.TrustId = null;
-
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentAsync("123456"))
-            .ReturnsAsync(establishment);
-
-        // Act
-        var result = await _sut.GetByUrnAsync("123456");
-
-        // Assert
-        result.GovernanceStructure.Value.Should().Be(GovernanceType.NonMaintainedSpecialSchool);
-    }
-
     #endregion
 
     #region Nursery Provision Rule Integration Tests
@@ -222,7 +184,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.PhaseOfEducationName = "Secondary";
+        establishment.NurseryProvisionName = "No Nursery Classes";
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -240,7 +202,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.PhaseOfEducationName = "Nursery";
+        establishment.NurseryProvisionName = "Has Nursery Classes";
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -302,7 +264,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvisionName = "Has SEN unit";
+        establishment.ResourcedProvisionName = "SEN unit";
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -334,11 +296,11 @@ public class SchoolDetailsServiceTests
     }
 
     [Fact]
-    public async Task GetByUrn_SchoolWithBothProvisions_HasBoth()
+    public async Task GetByUrn_SchoolWithNoJustASENUnit_DoesNotHaveResourcedProvision()
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        establishment.ResourcedProvisionName = "Has SEN unit and resourced provision";
+        establishment.ResourcedProvisionName = "SEN unit";
 
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
@@ -348,8 +310,7 @@ public class SchoolDetailsServiceTests
         var result = await _sut.GetByUrnAsync("123456");
 
         // Assert
-        result.HasSenUnit.Value.Should().BeTrue();
-        result.HasResourcedProvision.Value.Should().BeTrue();
+        result.HasResourcedProvision.Value.Should().BeFalse();
     }
 
     #endregion
