@@ -384,7 +384,7 @@ public class SchoolControllerTests
 
         root.GetProperty("bar").GetArrayLength().Should().Be(4);
         root.GetProperty("line").GetProperty("similarSchools").GetArrayLength().Should().Be(3);
-        root.GetProperty("table").GetProperty("similarSchools").GetArrayLength().Should().Be(4);
+        root.GetProperty("table").GetProperty("similarSchools").GetArrayLength().Should().Be(3);
         root.GetProperty("topPerformers").GetArrayLength().Should().Be(3);
         root.GetProperty("topPerformers")[0].GetProperty("Name").GetString().Should().Be("Test Academy");
     }

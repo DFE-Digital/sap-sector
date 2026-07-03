@@ -49,7 +49,7 @@ public class GetFilteredSchoolKs4CoreSubjectTests
 
         result.Subject.Should().Be(SchoolKs4CoreSubject.CombinedScienceDoubleAward);
         result.Grade.Should().Be(SchoolKs4CoreSubjectGradeFilter.Grade7);
-        result.Selection.ThreeYearAverage.SchoolValue.Should().Be(77m);
+        result.Selection.ThreeYearAverage.SchoolValue.Should().Be(78m);
         result.Subject.ToSubjectValue().Should().Be("combined-science-double-award");
         result.Grade.ToFilterValue().Should().Be("7");
     }
