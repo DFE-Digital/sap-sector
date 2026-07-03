@@ -494,7 +494,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        #environment: [test, production] //Commented out should we wish to reinstate auto deployment with the matrix.
+        #environment: [test, production] //  Commented out should we wish to reinstate auto deployment with the matrix.
         environment: [test]
     env:
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
