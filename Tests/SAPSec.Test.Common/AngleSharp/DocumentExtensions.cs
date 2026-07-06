@@ -30,6 +30,22 @@ public static class DocumentExtensions
             .Subject;
     }
 
+    public static IHtmlAnchorElement LinkWithTextShouldExist(this IDocument doc, string text)
+    {
+        return doc.QuerySelectorAll("a")
+            .Where(e => e.TrimmedTextContent() == text)
+            .First()
+            .Should().NotBeNull().And.BeAssignableTo<IHtmlAnchorElement>()
+            .Subject;
+    }
+
+    public static IHtmlTableElement TableShouldExist(this IDocument doc, string selector)
+    {
+        return doc.QuerySelector(selector)
+            .Should().NotBeNull().And.BeAssignableTo<IHtmlTableElement>()
+            .Subject;
+    }
+
     public static async Task<IDocument> SubmitContainingFormAsync(this IDocument doc, IHtmlButtonElement button, params HttpStatusCode[] expectedStatusCodes)
     {
         if (!expectedStatusCodes.Any())

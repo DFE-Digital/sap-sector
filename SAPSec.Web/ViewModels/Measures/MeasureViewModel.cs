@@ -51,7 +51,7 @@ public record MeasureViewModel(
             t.Rank,
             t.Urn,
             t.Name,
-            Routes.Primary.SimilarSchoolComparison(schoolInfo.Urn, t.Urn),
+            Routes.PrimarySchool(schoolInfo.Urn).SimilarSchoolComparison(t.Urn),
             t.Value,
             t.IsCurrentSchool);
 
@@ -61,7 +61,7 @@ public record MeasureViewModel(
             topPerformers = new TopPerformersViewModel(
                 measureInfo,
                 measure.TopPerformers.Select(MapTopPerformer),
-                Routes.Primary.SimilarSchools(schoolInfo.Urn));
+                Routes.PrimarySchool(schoolInfo.Urn).SimilarSchools);
         }
 
         return new(

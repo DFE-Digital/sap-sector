@@ -24,6 +24,13 @@ public class InMemoryAbsenceStore : IAbsenceStore
         _england = england.ToList();
     }
 
+    public void ClearDown()
+    {
+        _establishment = [];
+        _la = [];
+        _england = [];
+    }
+
     public Task<AbsenceData?> GetByUrnAsync(string urn)
         => Task.FromResult(GetByUrn(urn));
 

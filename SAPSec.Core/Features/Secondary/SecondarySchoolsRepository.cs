@@ -18,7 +18,7 @@ public class SecondarySchoolsRepository(
             .ToArray();
 
         var schools = (await establishmentStore.GetEstablishmentsAsync([urn, .. similarSchoolUrns]))
-            .Select(e => new SchoolInfo.SchoolInfo(e.URN, e.EstablishmentName, SchoolInfo.Address.FromEstablishment(e)))
+            .Select(SchoolInfo.SchoolInfo.FromEstablishment)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         if (!schools.ContainsKey(urn))
@@ -54,7 +54,7 @@ public class SecondarySchoolsRepository(
             .ToArray();
 
         var schools = (await establishmentStore.GetEstablishmentsAsync([urn, .. similarSchoolUrns]))
-            .Select(e => new SchoolInfo.SchoolInfo(e.URN, e.EstablishmentName, SchoolInfo.Address.FromEstablishment(e)))
+            .Select(SchoolInfo.SchoolInfo.FromEstablishment)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         if (!schools.ContainsKey(urn))

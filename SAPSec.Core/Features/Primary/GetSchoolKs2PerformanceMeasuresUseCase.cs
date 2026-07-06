@@ -16,7 +16,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
         return new(
             currentSchoolPerformance.SchoolInfo,
             similarSchoolsPerformance.Count,
-            Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSecondarySchool(
+            Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
                 filterBy));

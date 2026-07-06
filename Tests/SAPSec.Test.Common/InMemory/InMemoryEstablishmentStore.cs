@@ -18,6 +18,11 @@ public class InMemoryEstablishmentStore : IEstablishmentStore
         _establishmentEmails = establishmentEmails.ToList();
     }
 
+    public void ClearDown()
+    {
+        _establishments = [];
+    }
+
     public Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
         => Task.FromResult((IReadOnlyCollection<Establishment>)_establishments);
 

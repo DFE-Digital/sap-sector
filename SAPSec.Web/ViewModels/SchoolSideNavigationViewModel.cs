@@ -12,7 +12,7 @@ public sealed class SchoolSideNavigationViewModel
             Items =
             [
                 new() { Text = "Overview", Href = url.Action("Index", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "Index" },
-                new() { Text = "KS2", Href = url.Action("Ks2", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "Ks2" },
+                new() { Text = "KS2", Href = url.Action("Ks2PerformanceMeasures", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "Ks2PerformanceMeasures" },
                 new() { Text = "Attendance", Href = url.Action("Attendance", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "Attendance" },
                 new() { Text = "View similar schools", Href = url.Action("ViewSimilarSchools", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "ViewSimilarSchools" },
                 new() { Text = "School details", Href = url.Action("SchoolDetails", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "SchoolDetails" },

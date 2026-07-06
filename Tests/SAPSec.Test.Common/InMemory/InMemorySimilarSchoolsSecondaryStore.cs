@@ -24,6 +24,13 @@ public class InMemorySimilarSchoolsSecondaryStore : ISimilarSchoolsSecondaryStor
         _standardDeviations = [standardDeviations];
     }
 
+    public void ClearDown()
+    {
+        _groups = [];
+        _values = [];
+        _standardDeviations = [];
+    }
+
     public Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn)
         => Task.FromResult((IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>)_groups.Where(x => x.URN == urn).ToList());
 

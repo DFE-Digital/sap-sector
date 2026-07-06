@@ -16,7 +16,7 @@ public class PrimarySchoolsRepository(
             .ToArray();
 
         var schools = (await establishmentStore.GetEstablishmentsAsync([urn, .. similarSchoolUrns]))
-            .Select(e => new SchoolInfo.SchoolInfo(e.URN, e.EstablishmentName, SchoolInfo.Address.FromEstablishment(e)))
+            .Select(SchoolInfo.SchoolInfo.FromEstablishment)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         if (!schools.ContainsKey(urn))
@@ -26,6 +26,23 @@ public class PrimarySchoolsRepository(
 
         var performances = (await performanceStore.GetByUrnsAsync([urn, .. similarSchoolUrns]))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
+
+        //var establishmentPerformances = (await performanceStore.GetEstablishmentByUrnsAsync(schools.Keys))
+        //    .ToDictionary(x => x.Id, StringComparer.Ordinal);
+        //var laIds = schools.Select(s => s.Value.LocalAuthority.Id);
+        //var laPerformances = (await performanceStore.GetLAByIdsAsync(laIds))
+        //    .ToDictionary(x => x.Id, StringComparer.Ordinal);
+        //var englandPerformance = await performanceStore.GetEnglandAsync();
+
+        //var performances = schools
+        //    .ToDictionary(
+        //    x => x.Key,
+        //    x => new Ks2PerformanceData(
+        //        x.Key,
+        //        establishmentPerformances.TryGetValue(x.Key, out var p) ? p : null,
+        //        laPerformances.TryGetValue(x.Value.LocalAuthority.Id, out var la) ? la : null,
+        //        englandPerformance),
+        //    StringComparer.Ordinal);
 
         var currentSchool = new SchoolData<Ks2PerformanceData>(
             schools[urn],

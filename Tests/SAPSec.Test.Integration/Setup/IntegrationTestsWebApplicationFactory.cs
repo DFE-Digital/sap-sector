@@ -4,14 +4,13 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Json;
 using SAPSec.Test.Common.Authentication;
 using SAPSec.Web;
 using SAPSec.Web.Services;
 
 namespace SAPSec.Test.Integration.Setup;
 
-public class IntegrationTestsWebApplicationFactory : WebApplicationFactory<Program>
+public abstract class IntegrationTestsWebApplicationFactory : WebApplicationFactory<Program>
 {
     public IntegrationTestsWebApplicationFactory()
     {
@@ -41,8 +40,10 @@ public class IntegrationTestsWebApplicationFactory : WebApplicationFactory<Progr
             {
                 // Add or replace any services that the application needs during testing.
                 services.AddTestDsiDependencies();
-                services.AddJsonDependencies();
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();
+                ConfigureServices(services);
             });
     }
+
+    protected abstract IServiceCollection ConfigureServices(IServiceCollection services);
 }

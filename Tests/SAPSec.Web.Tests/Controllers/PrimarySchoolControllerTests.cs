@@ -32,7 +32,7 @@ public class PrimarySchoolControllerTests
     [Fact]
     public async Task Index_WhenFeatureEnabled_ReturnsViewWithSchoolDetails()
     {
-        var school = new SchoolInfo("123456", "Test Primary School", new Address("1 Test Street"));
+        var school = new SchoolInfo("123456", "Test Primary School", new LocalAuthority("001", "Test LA"), new Address("1 Test Street"));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
             .ReturnsAsync(true);
@@ -53,7 +53,7 @@ public class PrimarySchoolControllerTests
     [Fact]
     public async Task WhatIsASimilarSchool_WhenFeatureEnabled_ReturnsViewWithSchoolDetails()
     {
-        var school = new SchoolInfo("123456", "Test Primary School", new Address("1 Test Street"));
+        var school = new SchoolInfo("123456", "Test Primary School", new LocalAuthority("001", "Test LA"), new Address("1 Test Street"));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
             .ReturnsAsync(true);
@@ -76,7 +76,7 @@ public class PrimarySchoolControllerTests
     [InlineData("SchoolDetails", "123456")]
     public async Task PrimaryPages_WhenFeatureEnabled_ReturnViewWithSchoolDetails(string actionName, string urn)
     {
-        var school = new SchoolInfo(urn, "Test Primary School", new Address("1 Test Street"));
+        var school = new SchoolInfo(urn, "Test Primary School", new LocalAuthority("001", "Test LA"), new Address("1 Test Street"));
         _featureFlagServiceMock
             .Setup(x => x.IsEnabledAsync("EnablePrimarySchools"))
             .ReturnsAsync(true);

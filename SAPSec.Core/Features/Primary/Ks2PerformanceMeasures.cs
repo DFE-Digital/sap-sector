@@ -7,7 +7,7 @@ internal static class Ks2PerformanceMeasures
 {
     public static class MeetingExpectedStandardRwm
     {
-        public static Measure ForSecondarySchool(SchoolData<Ks2PerformanceData> currentSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
+        public static Measure ForSchool(SchoolData<Ks2PerformanceData> currentSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
         {
             return Measure.ForSecondarySchool(
                 "expected-rwm",
@@ -28,7 +28,7 @@ internal static class Ks2PerformanceMeasures
                     x => x?.EnglandPerformance?.RwmExpected_Tot_Cohort_Eng_Previous2_Num));
         }
 
-        public static Measure ForSecondarySchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
         {
             return Measure.ForSecondarySchoolComparison(
                 "expected-rwm",

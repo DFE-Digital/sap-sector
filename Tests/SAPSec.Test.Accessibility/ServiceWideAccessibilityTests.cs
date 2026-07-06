@@ -14,8 +14,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.Home, false),
         new(Routes.Accessibility, false),
         new(Routes.FindASchool(), false),
-        new(Routes.Secondary.School("100182"), false),
-        new(Routes.Secondary.SchoolDetails("100182"), false),
+        new(Routes.SecondarySchool("100182").Home, false),
+        new(Routes.SecondarySchool("100182").Details, false),
         // TODO: Fill out with all pages from service
     ];
 

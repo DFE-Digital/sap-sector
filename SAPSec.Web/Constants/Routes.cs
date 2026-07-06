@@ -23,22 +23,26 @@ public static class Routes
 
     public static string School(string urn, string? phaseOfEducationName) =>
         PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
-            ? Primary.School(urn)
-            : Secondary.School(urn);
+            ? PrimarySchool(urn).Home
+            : SecondarySchool(urn).Home;
 
-    public static class Primary
+    public static Primary PrimarySchool(string urn) => new Primary(urn);
+    public static Secondary SecondarySchool(string urn) => new Secondary(urn);
+
+    public class Primary(string urn)
     {
-        public static string School(string urn) => $"/school/primary/{urn}";
-        public static string SchoolDetails(string urn) => $"/school/primary/{urn}/school-details";
-        public static string SimilarSchools(string urn) => $"/school/primary/{urn}/view-similar-schools";
-        public static string SimilarSchoolComparison(string urn, string similarSchoolUrn) => $"/school/primary/{urn}/view-similar-schools/{similarSchoolUrn}";
+        public string Home => $"/school/primary/{urn}";
+        public string Ks2 => $"/school/primary/{urn}/ks2";
+        public string Details => $"/school/primary/{urn}/school-details";
+        public string SimilarSchools => $"/school/primary/{urn}/view-similar-schools";
+        public string SimilarSchoolComparison(string similarSchoolUrn) => $"/school/primary/{urn}/view-similar-schools/{similarSchoolUrn}";
     }
 
-    public static class Secondary
+    public class Secondary(string urn)
     {
-        public static string School(string urn) => $"/school/{urn}";
-        public static string SchoolDetails(string urn) => $"/school/{urn}/school-details";
-        public static string SimilarSchools(string urn) => $"/school/{urn}/view-similar-schools";
-        public static string SimilarSchoolComparison(string urn, string similarSchoolUrn) => $"/school/{urn}/view-similar-schools/{similarSchoolUrn}";
+        public string Home => $"/school/{urn}";
+        public string Details => $"/school/{urn}/school-details";
+        public string SimilarSchools => $"/school/{urn}/view-similar-schools";
+        public string SimilarSchoolComparison(string similarSchoolUrn) => $"/school/{urn}/view-similar-schools/{similarSchoolUrn}";
     }
 }

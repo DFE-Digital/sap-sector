@@ -24,6 +24,13 @@ public class InMemoryKs4PerformanceStore : IKs4PerformanceStore
         _england = england.ToList();
     }
 
+    public void ClearDown()
+    {
+        _establishment = [];
+        _la = [];
+        _england = [];
+    }
+
     public Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
         => Task.FromResult(GetByUrn(urn));
 
