@@ -12,6 +12,7 @@
     var gtmAdditional = analytics.GoogleTagManagerAdditional;
     var clarityId = analytics.ClarityId;
     var loadAnalytics = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
+    var canonicalUrl = Context.Request.GetCanonicalUrl();
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
@@ -30,6 +31,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0b0c0c">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="canonical" href="@canonicalUrl">
     <link rel="icon" sizes="48x48" href="/assets/rebrand/images/favicon.ico">
     <link rel="stylesheet" href="/css/moj-frontend.min.css" asp-append-version="true">
     <link rel="icon" sizes="any" href="/assets/rebrand/images/favicon.svg" type="image/svg+xml">

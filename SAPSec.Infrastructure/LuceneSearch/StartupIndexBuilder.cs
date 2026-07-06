@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
-using SAPSec.Core.Interfaces.Repositories;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 

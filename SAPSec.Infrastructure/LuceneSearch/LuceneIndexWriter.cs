@@ -1,6 +1,6 @@
 ﻿using Lucene.Net.Documents;
 using Lucene.Net.Util;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 

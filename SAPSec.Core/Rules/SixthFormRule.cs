@@ -1,7 +1,7 @@
 ﻿using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Rules;
 
@@ -13,11 +13,13 @@ public sealed class SixthFormRule : IBusinessRule<bool>
 {
     public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
-        return establishment.OfficialSixthFormId switch
+        var officialSixthFormId = establishment.OfficialSixthFormId;
+
+        return officialSixthFormId switch
         {
-            SixthFormCodes.HasSixthForm => DataWithAvailability.Available(true),
-            SixthFormCodes.NoSixthForm => DataWithAvailability.Available(false),
-            SixthFormCodes.NotApplicable => DataWithAvailability.NotApplicable<bool>(),
+            SixthFormValues.HasSixthForm => DataWithAvailability.Available(true),
+            SixthFormValues.NoSixthForm => DataWithAvailability.Available(false),
+            SixthFormValues.NotApplicable => DataWithAvailability.NotApplicable<bool>(),
             _ => DataWithAvailability.NotAvailable<bool>()
         };
     }

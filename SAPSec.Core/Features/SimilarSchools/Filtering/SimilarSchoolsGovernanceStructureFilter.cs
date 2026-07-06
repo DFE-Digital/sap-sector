@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
@@ -24,10 +25,10 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         }
 
         return items.Where(i =>
-                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5") // Single-academy trust (SAT)
-              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3") // Multi-academy trust (MAT) 
-              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")) // Maintained school - local authority controlled
-              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id != "4")); // No known group
+                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5")
+              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3")
+              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4"))
+              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id != "4"));
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
@@ -50,23 +51,22 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
 
     private Group FindGroup(SimilarSchool i)
     {
-
         if (i.TrustSchoolFlag?.Id == "5")
         {
-            return new("S", "Single-academy trust (SAT)");
+            return new("S", TrustSchoolFlagValues.SingleAcademyTrust);
         }
 
         if (i.TrustSchoolFlag?.Id == "3")
         {
-            return new("M", "Multi-academy trust (MAT)");
+            return new("M", TrustSchoolFlagValues.MultiAcademyTrust);
         }
 
         if (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
         {
-            return new("MS", "Maintained school - local authority controlled");
+            return new("MS", TrustSchoolFlagValues.LaMaintainedSchool);
         }
 
-        return new("N", "No known group");
+        return new("N", TrustSchoolFlagValues.NoKnownGroup);
     }
 
     private record Group(string Key, string Name);

@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.SchoolSearch.Extensions;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch.Extensions;
 
@@ -78,6 +78,24 @@ public class EstablishmentExtensionsTests
             .CanSearch(primarySchoolsEnabled: false);
 
         result.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(true, "2")]
+    [InlineData(true, "4")]
+    [InlineData(false, "2")]
+    [InlineData(false, "4")]
+    public void CanSearch_WithSecondaryPhaseNameAndExcludedStatusId_ReturnsFalse(
+        bool primarySchoolsEnabled,
+        string statusId)
+    {
+        var result = new Establishment
+        {
+            PhaseOfEducationName = "Secondary",
+            EstablishmentStatusId = statusId
+        }.CanSearch(primarySchoolsEnabled);
+
+        result.Should().BeFalse();
     }
 
     [Theory]

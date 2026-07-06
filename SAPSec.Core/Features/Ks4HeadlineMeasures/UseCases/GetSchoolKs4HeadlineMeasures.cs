@@ -1,7 +1,7 @@
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 
@@ -27,7 +27,7 @@ public class GetSchoolKs4HeadlineMeasures(
         var similarSchoolDestinationsData = ((await destinationsRepository.GetByUrnsAsync(similarSchoolUrns)) ?? [])
             .ToDictionary(x => x.Urn, x => x, StringComparer.Ordinal);
         var similarSchoolDetails = ((await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
-                ?? Array.Empty<SAPSec.Core.Model.Generated.Establishment>())
+                ?? Array.Empty<Establishment>())
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
 
@@ -51,12 +51,10 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num))),
             BuildTopPerformers(
                 schoolResponse.SchoolDetails,
-                schoolResponse.Attainment8ThreeYearAverage.SchoolValue,
+                schoolResponse.Attainment8YearByYear.School.Current,
                 similarSchools,
-                x => MeasureValue(
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous_Num,
-                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Previous2_Num),
+                x => Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(
+                    x.PerformanceData?.EstablishmentPerformance?.Attainment8_Tot_Est_Current_Num),
                 displayDecimalPlaces: 1),
             BuildComparisonYearByYear(
                 schoolResponse.Attainment8YearByYear,
@@ -72,12 +70,10 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
                 schoolResponse.SchoolDetails,
-                schoolResponse.EngMaths49ThreeYearAverage.SchoolValue,
+                schoolResponse.EngMaths49YearByYear.School.Current,
                 similarSchools,
-                x => MeasureValue(
-                    x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct,
-                    x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous_Pct,
-                    x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Previous2_Pct),
+                x => Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(
+                    x.PerformanceData?.EstablishmentPerformance?.EngMaths49_Tot_Est_Current_Pct),
                 displayDecimalPlaces: 0),
             BuildComparisonYearByYear(
                 schoolResponse.EngMaths49YearByYear,
@@ -93,12 +89,10 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
                 schoolResponse.SchoolDetails,
-                schoolResponse.EngMaths59ThreeYearAverage.SchoolValue,
+                schoolResponse.EngMaths59YearByYear.School.Current,
                 similarSchools,
-                x => MeasureValue(
-                    x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
-                    x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
-                    x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct),
+                x => Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(
+                    x.PerformanceData?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct),
                 displayDecimalPlaces: 0),
             BuildComparisonYearByYear(
                 schoolResponse.EngMaths59YearByYear,
@@ -114,12 +108,10 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
                 schoolResponse.SchoolDetails,
-                schoolResponse.DestinationsThreeYearAverage.SchoolValue,
+                schoolResponse.DestinationsYearByYear.School.Current,
                 similarSchools,
-                x => MeasureValue(
-                    x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct,
-                    x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous_Pct,
-                    x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Previous2_Pct),
+                x => Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(
+                    x.DestinationsData?.EstablishmentDestinations?.AllDest_Tot_Est_Current_Pct),
                 displayDecimalPlaces: 0),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsYearByYear,
@@ -135,12 +127,10 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
                 schoolResponse.SchoolDetails,
-                schoolResponse.DestinationsEducationThreeYearAverage.SchoolValue,
+                schoolResponse.DestinationsEducationYearByYear.School.Current,
                 similarSchools,
-                x => MeasureValue(
-                    x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
-                    x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
-                    x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct),
+                x => Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(
+                    x.DestinationsData?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct),
                 displayDecimalPlaces: 0),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsEducationYearByYear,
@@ -156,12 +146,10 @@ public class GetSchoolKs4HeadlineMeasures(
                     x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct))),
             BuildTopPerformers(
                 schoolResponse.SchoolDetails,
-                schoolResponse.DestinationsEmploymentThreeYearAverage.SchoolValue,
+                schoolResponse.DestinationsEmploymentYearByYear.School.Current,
                 similarSchools,
-                x => MeasureValue(
-                    x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
-                    x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
-                    x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct),
+                x => Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(
+                    x.DestinationsData?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct),
                 displayDecimalPlaces: 0),
             BuildComparisonYearByYear(
                 schoolResponse.DestinationsEmploymentYearByYear,
@@ -323,14 +311,14 @@ public class GetSchoolKs4HeadlineMeasures(
             current.England);
     }
 
-    private static decimal? MeasureValue(string? current, string? previous, string? previous2) =>
-        Ks4HeadlineMeasuresCalculator.Average(
+    private static Ks4HeadlineMeasureSeries SeriesFrom(string? current, string? previous, string? previous2) =>
+        new(
             Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(current),
             Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous),
             Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous2));
 
-    private static Ks4HeadlineMeasureSeries SeriesFrom(string? current, string? previous, string? previous2) =>
-        new(
+    private static decimal? MeasureValue(string? current, string? previous, string? previous2) =>
+        Ks4HeadlineMeasuresCalculator.Average(
             Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(current),
             Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous),
             Ks4HeadlineMeasuresCalculator.ParseNullableDecimal(previous2));

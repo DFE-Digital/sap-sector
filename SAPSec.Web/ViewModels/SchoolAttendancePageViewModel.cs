@@ -17,7 +17,8 @@ public class SchoolAttendancePageViewModel
     public string LocalAuthorityName => SchoolDetails.LocalAuthorityName.Display();
     public string LocalAuthorityLabel => "Local authority schools average";
     public string EnglandLabel => "Schools in England average";
-    public string[] AcademicYears => Ks4YearLabelConfig.YearByYear;
+    public string[] AcademicYears => AcademicYearLabelConfig.AttendanceYearByYear;
+    public string CurrentAcademicYear => AcademicYearLabelConfig.CurrentAttendance;
 
     public decimal? SelectedSchoolOverallAbsenceThreeYearAverage => AttendanceMeasures.OverallAbsenceThreeYearAverage.SchoolValue;
     public decimal? SimilarSchoolsOverallAbsenceThreeYearAverage => AttendanceMeasures.OverallAbsenceThreeYearAverage.SimilarSchoolsValue;
