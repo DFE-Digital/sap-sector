@@ -5,6 +5,7 @@ using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Filters;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
@@ -13,6 +14,7 @@ namespace SAPSec.Web.Controllers;
 
 [Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
 [Authorize]
+[RequireSchoolPhase(ExpectedSchoolPhase.Secondary, "urn", "similarSchoolUrn")]
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
