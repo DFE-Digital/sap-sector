@@ -1,5 +1,5 @@
 using SAPSec.Core.Constants;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Features.SchoolSearch.Extensions;
 
@@ -28,6 +28,11 @@ public static class EstablishmentExtensions
         }
 
         if (!HasSearchablePhase(establishment, primarySchoolsEnabled))
+        {
+            return false;
+        }
+
+        if (IsSecondaryExcluded(establishment))
         {
             return false;
         }
@@ -81,5 +86,18 @@ public static class EstablishmentExtensions
     {
         return string.IsNullOrWhiteSpace(establishment.EstablishmentStatusId)
             && string.IsNullOrWhiteSpace(establishment.EstablishmentStatusName);
+    }
+
+    private static bool IsSecondaryExcluded(Establishment establishment)
+    {
+        if (!PhaseOfEducationValues.IsSecondary(establishment.PhaseOfEducationName))
+        {
+            return false;
+        }
+
+        var establishmentStatusId = establishment.EstablishmentStatusId?.Trim();
+
+        return establishmentStatusId is EstablishmentStatusValues.ClosedId
+            or EstablishmentStatusValues.ProposedToOpenId;
     }
 }

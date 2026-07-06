@@ -1,8 +1,8 @@
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model.Generated;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch;
 
@@ -142,6 +142,28 @@ public class SchoolSearchServiceTests
         _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", PhaseOfEducationName = "Secondary", EstablishmentStatusId = statusId });
+
+        var result = await _sut.SearchByNumberAsync("123456");
+
+        result.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("2")]
+    [InlineData("4")]
+    public async Task SearchByNumberAsync_WithSecondarySchoolAndExcludedStatus_WhenPrimaryFeatureEnabled_ReturnsNull(string statusId)
+    {
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(true);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentByAnyNumberAsync("123456"))
+            .ReturnsAsync(new Establishment
+            {
+                URN = "123456",
+                PhaseOfEducationName = "Secondary",
+                EstablishmentStatusId = statusId
+            });
 
         var result = await _sut.SearchByNumberAsync("123456");
 
@@ -310,6 +332,34 @@ public class SchoolSearchServiceTests
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([
                 new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = statusId }
+            ]);
+
+        var results = await _sut.SearchAsync("school");
+
+        results.Should().BeEmpty();
+    }
+
+    [Theory]
+    [InlineData("2")]
+    [InlineData("4")]
+    public async Task SearchAsync_ExcludesSecondarySchools_WithExcludedStatusIds_WhenPrimaryFeatureEnabled(string statusId)
+    {
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(true);
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(1, "Secondary School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment
+                {
+                    URN = "1",
+                    EstablishmentName = "Secondary School",
+                    PhaseOfEducationName = "Secondary",
+                    EstablishmentStatusId = statusId
+                }
             ]);
 
         var results = await _sut.SearchAsync("school");

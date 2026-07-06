@@ -5,6 +5,7 @@ using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Filters;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
@@ -13,6 +14,7 @@ namespace SAPSec.Web.Controllers;
 
 [Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
 [Authorize]
+[RequireSchoolPhase(ExpectedSchoolPhase.Secondary, "urn", "similarSchoolUrn")]
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
@@ -146,16 +148,6 @@ public class SimilarSchoolsComparisonController : Controller
 
         var isGrade5 = normalizedGrade == "5";
 
-        var thisSchoolThreeYear = isGrade5
-            ? thisSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue
-            : thisSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
-        var selectedSchoolThreeYear = isGrade5
-            ? selectedSchoolKs4?.EngMaths59ThreeYearAverage.SchoolValue
-            : selectedSchoolKs4?.EngMaths49ThreeYearAverage.SchoolValue;
-        var englandThreeYear = isGrade5
-            ? (thisSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue ?? selectedSchoolKs4?.EngMaths59ThreeYearAverage.EnglandValue)
-            : (thisSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue ?? selectedSchoolKs4?.EngMaths49ThreeYearAverage.EnglandValue);
-
         var thisSchoolSeries = isGrade5
             ? thisSchoolKs4?.EngMaths59YearByYear.School
             : thisSchoolKs4?.EngMaths49YearByYear.School;
@@ -171,9 +163,9 @@ public class SimilarSchoolsComparisonController : Controller
             grade = normalizedGrade,
             bar = new decimal?[]
             {
-                thisSchoolThreeYear,
-                selectedSchoolThreeYear,
-                englandThreeYear
+                thisSchoolSeries?.Current,
+                selectedSchoolSeries?.Current,
+                englandSeries?.Current
             },
             line = new
             {
@@ -202,22 +194,19 @@ public class SimilarSchoolsComparisonController : Controller
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Current)
                 },
                 similarSchool = new[]
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Current)
                 },
                 england = new[]
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Current)
                 }
             }
         });
@@ -236,12 +225,6 @@ public class SimilarSchoolsComparisonController : Controller
         var thisSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(urn));
         var selectedSchoolKs4 = await _getKs4HeadlineMeasures.Execute(new GetKs4HeadlineMeasuresRequest(similarSchoolUrn));
 
-        var thisSchoolThreeYear = SelectDestinationsAverage(thisSchoolKs4, normalizedDestination)?.SchoolValue;
-        var selectedSchoolThreeYear = SelectDestinationsAverage(selectedSchoolKs4, normalizedDestination)?.SchoolValue;
-        var englandThreeYear =
-            SelectDestinationsAverage(thisSchoolKs4, normalizedDestination)?.EnglandValue
-            ?? SelectDestinationsAverage(selectedSchoolKs4, normalizedDestination)?.EnglandValue;
-
         var thisSchoolSeries = SelectDestinationsYearByYear(thisSchoolKs4, normalizedDestination)?.School;
         var selectedSchoolSeries = SelectDestinationsYearByYear(selectedSchoolKs4, normalizedDestination)?.School;
         var englandSeries =
@@ -253,9 +236,9 @@ public class SimilarSchoolsComparisonController : Controller
             destination = normalizedDestination,
             bar = new decimal?[]
             {
-                thisSchoolThreeYear,
-                selectedSchoolThreeYear,
-                englandThreeYear
+                thisSchoolSeries?.Current,
+                selectedSchoolSeries?.Current,
+                englandSeries?.Current
             },
             line = new
             {
@@ -284,22 +267,19 @@ public class SimilarSchoolsComparisonController : Controller
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSeries?.Current)
                 },
                 similarSchool = new[]
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSeries?.Current)
                 },
                 england = new[]
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandThreeYear)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries?.Current)
                 }
             }
         });
@@ -362,9 +342,9 @@ public class SimilarSchoolsComparisonController : Controller
             grade = thisSchoolFilteredSubject.Grade.ToFilterValue(),
             bar = new decimal?[]
             {
-                RoundWholePercentValue(thisSchoolSubject.ThreeYearAverage.SchoolValue),
-                RoundWholePercentValue(selectedSchoolSubject.ThreeYearAverage.SchoolValue),
-                RoundWholePercentValue(thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue)
+                RoundWholePercentValue(thisSchoolSubject.YearByYear.School.Current),
+                RoundWholePercentValue(selectedSchoolSubject.YearByYear.School.Current),
+                RoundWholePercentValue((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Current)
             },
             line = new
             {
@@ -393,22 +373,19 @@ public class SimilarSchoolsComparisonController : Controller
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.ThreeYearAverage.SchoolValue)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.YearByYear.School.Current)
                 },
                 similarSchool = new[]
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.ThreeYearAverage.SchoolValue)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(selectedSchoolSubject.YearByYear.School.Current)
                 },
                 england = new[]
                 {
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous2),
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Previous),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Current),
-                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolSubject.ThreeYearAverage.EnglandValue ?? selectedSchoolSubject.ThreeYearAverage.EnglandValue)
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent((thisSchoolSubject.YearByYear.England ?? selectedSchoolSubject.YearByYear.England)?.Current)
                 }
             }
         });
@@ -452,7 +429,7 @@ public class SimilarSchoolsComparisonController : Controller
         var similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
 
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
-        var yearLabels = Ks4YearLabelConfig.YearByYear;
+        var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
 
         var thisSchoolSeries = isPersistentAbsence
             ? thisSchoolAttendance.PersistentAbsenceYearByYear.School
@@ -464,25 +441,15 @@ public class SimilarSchoolsComparisonController : Controller
             ? (thisSchoolAttendance.PersistentAbsenceYearByYear.England ?? similarSchoolAttendance.PersistentAbsenceYearByYear.England)
             : (thisSchoolAttendance.OverallAbsenceYearByYear.England ?? similarSchoolAttendance.OverallAbsenceYearByYear.England);
 
-        var thisSchoolThreeYearAverage = isPersistentAbsence
-            ? thisSchoolAttendance.PersistentAbsenceThreeYearAverage.SchoolValue
-            : thisSchoolAttendance.OverallAbsenceThreeYearAverage.SchoolValue;
-        var similarSchoolThreeYearAverage = isPersistentAbsence
-            ? similarSchoolAttendance.PersistentAbsenceThreeYearAverage.SchoolValue
-            : similarSchoolAttendance.OverallAbsenceThreeYearAverage.SchoolValue;
-        var englandThreeYearAverage = isPersistentAbsence
-            ? (thisSchoolAttendance.PersistentAbsenceThreeYearAverage.EnglandValue ?? similarSchoolAttendance.PersistentAbsenceThreeYearAverage.EnglandValue)
-            : (thisSchoolAttendance.OverallAbsenceThreeYearAverage.EnglandValue ?? similarSchoolAttendance.OverallAbsenceThreeYearAverage.EnglandValue);
-
         return Json(new
         {
             absenceType = normalizedAbsenceType,
             years = yearLabels,
             bar = new decimal?[]
             {
-                thisSchoolThreeYearAverage,
-                similarSchoolThreeYearAverage,
-                englandThreeYearAverage
+                thisSchoolSeries.Current,
+                similarSchoolSeries.Current,
+                englandSeries?.Current
             },
             line = new
             {
@@ -496,22 +463,19 @@ public class SimilarSchoolsComparisonController : Controller
                 {
                     DisplayPercentNullable(thisSchoolSeries.Previous2),
                     DisplayPercentNullable(thisSchoolSeries.Previous),
-                    DisplayPercentNullable(thisSchoolSeries.Current),
-                    DisplayPercentNullable(thisSchoolThreeYearAverage)
+                    DisplayPercentNullable(thisSchoolSeries.Current)
                 },
                 similarSchool = new[]
                 {
                     DisplayPercentNullable(similarSchoolSeries.Previous2),
                     DisplayPercentNullable(similarSchoolSeries.Previous),
-                    DisplayPercentNullable(similarSchoolSeries.Current),
-                    DisplayPercentNullable(similarSchoolThreeYearAverage)
+                    DisplayPercentNullable(similarSchoolSeries.Current)
                 },
                 england = new[]
                 {
                     DisplayPercentNullable(englandSeries?.Previous2),
                     DisplayPercentNullable(englandSeries?.Previous),
-                    DisplayPercentNullable(englandSeries?.Current),
-                    DisplayPercentNullable(englandThreeYearAverage)
+                    DisplayPercentNullable(englandSeries?.Current)
                 }
             }
         });

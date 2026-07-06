@@ -26,18 +26,18 @@ public class Ks4HeadlineMeasuresIntegrationTests(IntegrationTestFixture fixture)
         content.Should().Contain("KS4 headline performance measures");
         content.Should().Contain("Progress 8");
         content.Should().Contain("Attainment 8");
-        content.Should().Contain("3-year average");
+        content.Should().Contain("2024 to 2025");
     }
 
     [Fact]
-    public async Task Ks4HeadlineMeasures_DestinationsDetails_UsesNumericThreeYearAverageWording()
+    public async Task Ks4HeadlineMeasures_DestinationsDetails_UsesCurrentYearWording()
     {
         var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().Contain("Information about staying in education or entering employment data");
-        content.Should().Contain("The most recent data covers pupils who finished year 11 in 2023. The 3-year average is the average of pupils completed year 11 in 2021, 2022 and 2023.");
-        content.Should().NotContain("The most recent data covers pupils who finished year 11 in 2023. The three-year average is the average of pupils completed year 11 in 2021, 2022 and 2023.");
+        content.Should().Contain("The most recent data covers pupils who finished year 11 in 2023. Results are shown for 2022 to 2023.");
+        content.Should().NotContain("The 3-year average is the average of pupils completed year 11 in 2021, 2022 and 2023.");
     }
 
     [Fact]

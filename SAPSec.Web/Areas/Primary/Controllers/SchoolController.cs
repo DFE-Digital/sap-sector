@@ -2,8 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
+using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
@@ -15,9 +16,10 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Area("Primary")]
 [Route("school/primary/{urn}")]
 [Authorize]
+[RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
 public class SchoolController(
-    ISchoolDetailsService schoolDetailsService,
-    IFeatureFlagService featureFlagService) : Controller
+    IFeatureFlagService featureFlagService,
+    IRequestSchoolAccessor requestSchoolAccessor) : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
@@ -67,7 +69,7 @@ public class SchoolController(
             return NotFound();
         }
 
-        var school = await schoolDetailsService.GetByUrnAsync(urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData["SchoolDetails"] = school;
         if (Url is not null)
