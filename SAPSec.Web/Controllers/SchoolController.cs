@@ -116,15 +116,9 @@ public class SchoolController : Controller
         var englandSeries = isPersistentAbsence
             ? response.PersistentAbsenceYearByYear.England
             : response.OverallAbsenceYearByYear.England;
-        var selectedSchoolThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.SchoolValue
-            : response.OverallAbsenceThreeYearAverage.SchoolValue;
-        var localAuthorityThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.LocalAuthorityValue
-            : response.OverallAbsenceThreeYearAverage.LocalAuthorityValue;
-        var englandThreeYearAverage = isPersistentAbsence
-            ? response.PersistentAbsenceThreeYearAverage.EnglandValue
-            : response.OverallAbsenceThreeYearAverage.EnglandValue;
+        var selectedSchoolCurrentValue = selectedSchoolSeries.Current;
+        var localAuthorityCurrentValue = localAuthoritySeries.Current;
+        var englandCurrentValue = englandSeries.Current;
         var topPerformers = isPersistentAbsence
             ? response.PersistentAbsenceTopPerformers
             : response.OverallAbsenceTopPerformers;
@@ -135,9 +129,9 @@ public class SchoolController : Controller
             years = yearLabels,
             bar = new decimal?[]
             {
-                selectedSchoolThreeYearAverage,
-                localAuthorityThreeYearAverage,
-                englandThreeYearAverage
+                selectedSchoolCurrentValue,
+                localAuthorityCurrentValue,
+                englandCurrentValue
             },
             line = new
             {

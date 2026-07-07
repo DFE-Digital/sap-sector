@@ -396,6 +396,9 @@ public class SchoolControllerTests
         var root = document.RootElement;
 
         root.GetProperty("bar").GetArrayLength().Should().Be(3);
+        root.GetProperty("bar")[0].GetDecimal().Should().Be(5.1m);
+        root.GetProperty("bar")[1].GetDecimal().Should().Be(4.8m);
+        root.GetProperty("bar")[2].GetDecimal().Should().Be(4.7m);
         root.GetProperty("line").TryGetProperty("similarSchools", out _).Should().BeFalse();
         root.GetProperty("table").TryGetProperty("similarSchools", out _).Should().BeFalse();
         root.GetProperty("topPerformers").GetArrayLength().Should().Be(3);
