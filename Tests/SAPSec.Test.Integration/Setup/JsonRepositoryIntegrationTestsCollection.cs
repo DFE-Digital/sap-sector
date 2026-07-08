@@ -1,6 +1,6 @@
 ﻿namespace SAPSec.Test.Integration.Setup;
 
-[CollectionDefinition("IntegrationTestsCollection")]
+[CollectionDefinition("JsonRepositoryIntegrationTestsCollection")]
 public class JsonRepositoryIntegrationTestsCollection : ICollectionFixture<JsonRepositoryIntegrationTestFixture>
 {
     // This class is intentionally empty. 

@@ -4,10 +4,10 @@ using SAPSec.Test.Integration.Setup;
 using System.Net;
 using System.Text.Json;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class SchoolSearchControllerTests(IntegrationTestFixture fixture)
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     #region GET /find-a-school (Index) Tests
 

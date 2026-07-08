@@ -5,8 +5,8 @@ using System.Net.Http.Json;
 
 namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class CustomEventControllerTests(IntegrationTestFixture fixture)
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class CustomEventControllerTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     #region POST /custom-event-tracking Tests
 

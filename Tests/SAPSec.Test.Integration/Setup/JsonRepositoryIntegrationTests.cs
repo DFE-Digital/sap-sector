@@ -1,7 +1,6 @@
-﻿using SAPSec.Test.Integration.Setup;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
-namespace SAPSec.Test.Integration;
+namespace SAPSec.Test.Integration.Setup;
 
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public abstract class JsonRepositoryIntegrationTests(

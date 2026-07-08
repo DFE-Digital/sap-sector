@@ -2,10 +2,10 @@ using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using System.Text.RegularExpressions;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class Ks4HeadlineMeasuresIntegrationTests(IntegrationTestFixture fixture)
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class Ks4HeadlineMeasuresIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     private const string Ks4HeadlineMeasuresPath = "/school/105574/ks4-headline-measures";
 

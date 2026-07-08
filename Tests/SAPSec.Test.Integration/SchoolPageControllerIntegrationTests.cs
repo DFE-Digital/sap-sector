@@ -2,10 +2,10 @@
 using SAPSec.Test.Integration.Setup;
 using System.Net;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class SchoolPageControllerIntegrationTests(IntegrationTestFixture fixture) : IClassFixture<IntegrationTestFixture>
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class SchoolPageControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture) : IClassFixture<JsonRepositoryIntegrationTestFixture>
 {
     private const string SchoolPagePath = "/school/108088";
 

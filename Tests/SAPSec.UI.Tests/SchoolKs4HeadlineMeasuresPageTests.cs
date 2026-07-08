@@ -1,11 +1,10 @@
 using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Infrastructure;
-using System.Linq;
 using System.Text.Json;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)

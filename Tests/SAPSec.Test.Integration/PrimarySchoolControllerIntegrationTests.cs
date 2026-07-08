@@ -1,24 +1,29 @@
-using System.Net;
 using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Constants;
+using System.Net;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixture)
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class PrimarySchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     private const string PrimarySchoolUrn = "100134";
-    private const string PrimarySchoolOverviewPath = $"/school/primary/{PrimarySchoolUrn}";
-    private const string PrimarySchoolKs2Path = $"/school/primary/{PrimarySchoolUrn}/ks2";
-    private const string PrimarySchoolAttendancePath = $"/school/primary/{PrimarySchoolUrn}/attendance";
-    private const string PrimarySchoolViewSimilarSchoolsPath = $"/school/primary/{PrimarySchoolUrn}/view-similar-schools";
-    private const string PrimarySchoolDetailsPath = $"/school/primary/{PrimarySchoolUrn}/school-details";
-    private const string PrimaryWhatIsASimilarSchoolPath = $"/school/primary/{PrimarySchoolUrn}/what-is-a-similar-school";
+
+    private static readonly PageTestCase[] AllPagePaths = [
+        new(Routes.PrimarySchool(PrimarySchoolUrn).Overview, "Overview"),
+        new(Routes.PrimarySchool(PrimarySchoolUrn).KS2, "KS2"),
+        new(Routes.PrimarySchool(PrimarySchoolUrn).Attendance, "Attendance"),
+        new(Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools, "View similar schools"),
+        new(Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100134"), null),
+        new(Routes.PrimarySchool(PrimarySchoolUrn).SchoolDetails, "School details"),
+        new(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool, "What is a similar school?")
+    ];
 
     [Fact]
     public async Task GetPrimarySchoolOverview_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync(PrimarySchoolOverviewPath);
+        var response = await fixture.Client.GetAsync(Routes.PrimarySchool(PrimarySchoolUrn).Overview);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -27,7 +32,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
     [Fact]
     public async Task GetPrimarySchoolOverview_UsesCurrentSchoolUrnInSimilarSchoolLink()
     {
-        var response = await fixture.Client.GetAsync(PrimarySchoolOverviewPath);
+        var response = await fixture.Client.GetAsync(Routes.PrimarySchool(PrimarySchoolUrn).Overview);
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().Contain($"href=\"/school/primary/{PrimarySchoolUrn}/what-is-a-similar-school\"");
@@ -36,7 +41,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
     [Fact]
     public async Task GetPrimarySchoolOverview_ContainsPrimaryNavigation()
     {
-        var response = await fixture.Client.GetAsync(PrimarySchoolOverviewPath);
+        var response = await fixture.Client.GetAsync(Routes.PrimarySchool(PrimarySchoolUrn).Overview);
         var content = await response.Content.ReadAsStringAsync();
 
         AssertInOrder(content,
@@ -50,12 +55,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
     }
 
     [Theory]
-    [InlineData(PrimarySchoolOverviewPath)]
-    [InlineData(PrimarySchoolKs2Path)]
-    [InlineData(PrimarySchoolAttendancePath)]
-    [InlineData(PrimarySchoolViewSimilarSchoolsPath)]
-    [InlineData(PrimarySchoolDetailsPath)]
-    [InlineData(PrimaryWhatIsASimilarSchoolPath)]
+    [MemberData(nameof(AllPages))]
     public async Task PrimaryNavigationPages_ReturnSuccess(string path)
     {
         var response = await fixture.Client.GetAsync(path);
@@ -64,12 +64,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
     }
 
     [Theory]
-    [InlineData(PrimarySchoolOverviewPath, "Overview")]
-    [InlineData(PrimarySchoolKs2Path, "KS2")]
-    [InlineData(PrimarySchoolAttendancePath, "Attendance")]
-    [InlineData(PrimarySchoolViewSimilarSchoolsPath, "View similar schools")]
-    [InlineData(PrimarySchoolDetailsPath, "School details")]
-    [InlineData(PrimaryWhatIsASimilarSchoolPath, "What is a similar school?")]
+    [MemberData(nameof(AllPagesWithSelectedTabText))]
     public async Task PrimaryNavigation_ShowsSelectedTabAsActive(string path, string selectedTabText)
     {
         var response = await fixture.Client.GetAsync(path);
@@ -84,7 +79,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
     [Fact]
     public async Task GetPrimaryWhatIsASimilarSchool_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync(PrimaryWhatIsASimilarSchoolPath);
+        var response = await fixture.Client.GetAsync(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -93,7 +88,7 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
     [Fact]
     public async Task GetPrimaryWhatIsASimilarSchool_DoesNotContainBrokenSimilarSchoolsLink()
     {
-        var response = await fixture.Client.GetAsync(PrimaryWhatIsASimilarSchoolPath);
+        var response = await fixture.Client.GetAsync(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool);
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().NotContain("href=\"\"");
@@ -112,4 +107,31 @@ public class PrimarySchoolControllerIntegrationTests(IntegrationTestFixture fixt
             currentIndex = nextIndex;
         }
     }
+
+    public static TheoryData<string> AllPages()
+    {
+        var data = new TheoryData<string>();
+        foreach (var (path, _) in AllPagePaths)
+        {
+            data.Add(path);
+        }
+
+        return data;
+    }
+
+    public static TheoryData<string, string> AllPagesWithSelectedTabText()
+    {
+        var data = new TheoryData<string, string>();
+        foreach (var (path, selectedTabText) in AllPagePaths)
+        {
+            if (selectedTabText is not null)
+            {
+                data.Add(path, selectedTabText);
+            }
+        }
+
+        return data;
+    }
+
+    private record PageTestCase(string Path, string? SelectedTabText);
 }

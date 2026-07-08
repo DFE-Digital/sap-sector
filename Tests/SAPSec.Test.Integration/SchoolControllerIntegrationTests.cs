@@ -1,11 +1,11 @@
-using System.Net;
 using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
+using System.Net;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class SchoolControllerIntegrationTests(IntegrationTestFixture fixture)
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     private const string SchoolOverviewPath = "/school/105574";
     private const string SchoolDetailsPath = "/school/105574/school-details";

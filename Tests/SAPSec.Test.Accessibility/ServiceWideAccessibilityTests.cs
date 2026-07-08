@@ -15,7 +15,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.Accessibility),
         new(Routes.FindASchool()),
 
-        new(Routes.PrimarySchool("100749").Home),
+        new(Routes.PrimarySchool("100749").Overview),
         new(Routes.PrimarySchool("100749").KS2, HasH3Headings: true),
         new(Routes.PrimarySchool("100749").Attendance),
         new(Routes.PrimarySchool("100749").ViewSimilarSchools),
@@ -23,7 +23,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.PrimarySchool("100749").SchoolDetails),
         new(Routes.PrimarySchool("100749").WhatIsASimilarSchool),
 
-        new(Routes.SecondarySchool("100182").Home),
+        new(Routes.SecondarySchool("100182").Overview),
         new(Routes.SecondarySchool("100182").KS4HeadlineMeasures, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").KS4CoreSubjects, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),

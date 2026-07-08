@@ -1,7 +1,6 @@
-﻿using SAPSec.Test.Integration.Setup;
-using Xunit.Abstractions;
+﻿using Xunit.Abstractions;
 
-namespace SAPSec.Test.Integration;
+namespace SAPSec.Test.Integration.Setup;
 
 [Collection("InMemoryRepositoryIntegrationTestsCollection")]
 public abstract class InMemoryRepositoryIntegrationTests(

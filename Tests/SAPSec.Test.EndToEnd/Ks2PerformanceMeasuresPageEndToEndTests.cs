@@ -19,7 +19,7 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await NavigateTo(PrimarySchoolRoute.Home);
+        await NavigateTo(PrimarySchoolRoute.Overview);
         await Page.GetByText("KS2", new() { Exact = true }).ClickAsync();
 
         await Expect(Page).ToHaveURLAsync(PrimarySchoolRoute.KS2);

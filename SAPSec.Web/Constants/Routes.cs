@@ -23,15 +23,15 @@ public static class Routes
 
     public static string School(string urn, string? phaseOfEducationName) =>
         PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
-            ? PrimarySchool(urn).Home
-            : SecondarySchool(urn).Home;
+            ? PrimarySchool(urn).Overview
+            : SecondarySchool(urn).Overview;
 
     public static Primary PrimarySchool(string urn) => new Primary(urn);
     public static Secondary SecondarySchool(string urn) => new Secondary(urn);
 
     public class Primary(string urn)
     {
-        public string Home => $"/school/primary/{urn}";
+        public string Overview => $"/school/primary/{urn}";
         public string KS2 => $"/school/primary/{urn}/ks2";
         public string Attendance => $"/school/primary/{urn}/attendance";
         public string ViewSimilarSchools => $"/school/primary/{urn}/view-similar-schools";
@@ -43,7 +43,7 @@ public static class Routes
 
     public class Secondary(string urn)
     {
-        public string Home => $"/school/{urn}";
+        public string Overview => $"/school/{urn}";
         public string KS4HeadlineMeasures => $"/school/{urn}/ks4-headline-measures";
         public string KS4CoreSubjects => $"/school/{urn}/ks4-core-subjects";
         public string Attendance => $"/school/{urn}/attendance";

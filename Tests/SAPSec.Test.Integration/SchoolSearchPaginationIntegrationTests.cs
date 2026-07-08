@@ -1,16 +1,11 @@
 ﻿using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class SchoolSearchPaginationIntegrationTests(IntegrationTestFixture fixture)
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     #region Pagination Parameter Tests
 

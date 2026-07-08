@@ -4,7 +4,7 @@ using System.Net;
 
 namespace SAPSec.Test.Integration;
 
-public class AuthControllerIntegrationTests(IntegrationTestFixture fixture) : IClassFixture<IntegrationTestFixture>
+public class AuthControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture) : IClassFixture<JsonRepositoryIntegrationTestFixture>
 {
     private static class ExpectedRoutes
     {

@@ -1,11 +1,11 @@
-using System.Net;
 using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
+using System.Net;
 
-namespace SAPSec.Integration.Tests;
+namespace SAPSec.Test.Integration;
 
-[Collection("IntegrationTestsCollection")]
-public class SimilarSchoolsComparisonIntegrationTests(IntegrationTestFixture fixture)
+[Collection("JsonRepositoryIntegrationTestsCollection")]
+public class SimilarSchoolsComparisonIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     [Fact]
     public async Task GetSimilarity_ReturnsSuccess()

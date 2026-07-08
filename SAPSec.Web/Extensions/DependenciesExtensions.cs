@@ -40,6 +40,7 @@ public static class DependenciesExtensions
         services.AddSingleton<IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>, GetSchoolInfoUseCase>();
         services.AddSingleton<IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>, GetSchoolKs2PerformanceMeasuresUseCase>();
 
+        services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
         services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<LAPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<EnglandPerformance>(JsonDataSource.PrimarySchools);
