@@ -9,11 +9,6 @@ public class JsonFile<T> : IJsonFile<T> where T : class
     private readonly ILogger<JsonFile<T>> _logger;
     private readonly Lazy<List<T>> _cache;
 
-    public JsonFile(ILogger<JsonFile<T>> logger)
-        : this(logger, JsonDataSource.Generated)
-    {
-    }
-
     public JsonFile(ILogger<JsonFile<T>> logger, JsonDataSource dataSource)
     {
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

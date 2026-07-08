@@ -42,7 +42,6 @@ public static class DependenciesExtensions
         services.AddSingleton<ISecondarySchoolsRepository, SecondarySchoolsRepository>();
         services.AddSingleton<IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>, GetSchoolKs2PerformanceMeasuresUseCase>();
 
-        services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
         services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<LAPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<EnglandPerformance>(JsonDataSource.PrimarySchools);
@@ -50,12 +49,5 @@ public static class DependenciesExtensions
 
         // Formatters
         services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
-    }
-
-    private static IServiceCollection AddJsonFile<T>(this IServiceCollection services, JsonDataSource source) where T : class
-    {
-        services.AddSingleton(services => services.GetRequiredService<IJsonFileFactory>().Create<T>(source));
-
-        return services;
     }
 }

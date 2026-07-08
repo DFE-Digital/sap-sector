@@ -14,6 +14,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddJsonDependencies(this IServiceCollection services)
     {
+        services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
+
         // JSON files
         services.RemoveAll<IEstablishmentStore>();
         services.RemoveAll<ISimilarSchoolsPrimaryStore>();
@@ -23,30 +25,30 @@ public static class ServiceCollectionExtensions
         services.RemoveAll<IKs4DestinationsStore>();
         services.RemoveAll<IAbsenceStore>();
 
-        services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
-        services.AddSingleton<IJsonFile<EstablishmentEmail>, JsonFile<EstablishmentEmail>>();
+        services.AddJsonFile<Establishment>(JsonDataSource.Generated);
+        services.AddJsonFile<EstablishmentEmail>(JsonDataSource.Generated);
 
-        services.AddSingleton<IJsonFile<SimilarSchoolsPrimaryGroupsEntry>, JsonFile<SimilarSchoolsPrimaryGroupsEntry>>();
-        services.AddSingleton<IJsonFile<SimilarSchoolsPrimaryValuesEntry>, JsonFile<SimilarSchoolsPrimaryValuesEntry>>();
-        services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
-        services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
-        services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>, JsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>>();
+        services.AddJsonFile<SimilarSchoolsPrimaryGroupsEntry>(JsonDataSource.Generated);
+        services.AddJsonFile<SimilarSchoolsPrimaryValuesEntry>(JsonDataSource.Generated);
+        services.AddJsonFile<SimilarSchoolsSecondaryGroupsEntry>(JsonDataSource.Generated);
+        services.AddJsonFile<SimilarSchoolsSecondaryValuesEntry>(JsonDataSource.Generated);
+        services.AddJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>(JsonDataSource.Generated);
 
-        services.AddSingleton<IJsonFile<KS2.Performance.EstablishmentPerformance>, JsonFile<KS2.Performance.EstablishmentPerformance>>();
-        services.AddSingleton<IJsonFile<KS2.Performance.LAPerformance>, JsonFile<KS2.Performance.LAPerformance>>();
-        services.AddSingleton<IJsonFile<KS2.Performance.EnglandPerformance>, JsonFile<KS2.Performance.EnglandPerformance>>();
+        services.AddJsonFile<KS2.Performance.EstablishmentPerformance>(JsonDataSource.PrimarySchools);
+        services.AddJsonFile<KS2.Performance.LAPerformance>(JsonDataSource.PrimarySchools);
+        services.AddJsonFile<KS2.Performance.EnglandPerformance>(JsonDataSource.PrimarySchools);
 
-        services.AddSingleton<IJsonFile<KS4.Performance.EstablishmentPerformance>, JsonFile<KS4.Performance.EstablishmentPerformance>>();
-        services.AddSingleton<IJsonFile<KS4.Performance.LAPerformance>, JsonFile<KS4.Performance.LAPerformance>>();
-        services.AddSingleton<IJsonFile<KS4.Performance.EnglandPerformance>, JsonFile<KS4.Performance.EnglandPerformance>>();
+        services.AddJsonFile<KS4.Performance.EstablishmentPerformance>(JsonDataSource.Generated);
+        services.AddJsonFile<KS4.Performance.LAPerformance>(JsonDataSource.Generated);
+        services.AddJsonFile<KS4.Performance.EnglandPerformance>(JsonDataSource.Generated);
 
-        services.AddSingleton<IJsonFile<KS4.Destinations.EstablishmentDestinations>, JsonFile<KS4.Destinations.EstablishmentDestinations>>();
-        services.AddSingleton<IJsonFile<KS4.Destinations.LADestinations>, JsonFile<KS4.Destinations.LADestinations>>();
-        services.AddSingleton<IJsonFile<KS4.Destinations.EnglandDestinations>, JsonFile<KS4.Destinations.EnglandDestinations>>();
+        services.AddJsonFile<KS4.Destinations.EstablishmentDestinations>(JsonDataSource.Generated);
+        services.AddJsonFile<KS4.Destinations.LADestinations>(JsonDataSource.Generated);
+        services.AddJsonFile<KS4.Destinations.EnglandDestinations>(JsonDataSource.Generated);
 
-        services.AddSingleton<IJsonFile<EstablishmentAbsence>, JsonFile<EstablishmentAbsence>>();
-        services.AddSingleton<IJsonFile<LAAbsence>, JsonFile<LAAbsence>>();
-        services.AddSingleton<IJsonFile<EnglandAbsence>, JsonFile<EnglandAbsence>>();
+        services.AddJsonFile<EstablishmentAbsence>(JsonDataSource.Generated);
+        services.AddJsonFile<LAAbsence>(JsonDataSource.Generated);
+        services.AddJsonFile<EnglandAbsence>(JsonDataSource.Generated);
 
         services.AddSingleton<IEstablishmentStore, JsonEstablishmentStore>();
         services.AddSingleton<ISimilarSchoolsPrimaryStore, JsonSimilarSchoolsPrimaryStore>();
@@ -55,6 +57,13 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IKs4PerformanceStore, JsonKs4PerformanceStore>();
         services.AddSingleton<IKs4DestinationsStore, JsonKs4DestinationsStore>();
         services.AddSingleton<IAbsenceStore, JsonAbsenceStore>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddJsonFile<T>(this IServiceCollection services, JsonDataSource source) where T : class
+    {
+        services.AddSingleton(services => services.GetRequiredService<IJsonFileFactory>().Create<T>(source));
 
         return services;
     }

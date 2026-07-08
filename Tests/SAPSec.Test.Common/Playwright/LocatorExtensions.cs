@@ -11,16 +11,23 @@ public static class LocatorExtensions
 
         return text?.Trim();
     }
-
-    public static async Task ShouldBeVisibleAsync(this ILocator locator)
+    public static async Task<IReadOnlyList<string>> AllTrimmedTextContentsAsync(this ILocator locator)
     {
-        var isVisible = await locator.IsVisibleAsync();
-        isVisible.Should().BeTrue();
+        var allText = await locator.AllTextContentsAsync();
+
+        return allText.Select(t => t.Trim()).ToList();
     }
 
-    public static async Task ShouldBeHiddenAsync(this ILocator locator)
+    public static async Task<ILocator> GetTableColumnAsync(this ILocator locator, string columnHeader)
     {
-        var isHidden = await locator.IsHiddenAsync();
-        isHidden.Should().BeTrue();
+        var headers = await locator.Locator("thead tr th").AllTrimmedTextContentsAsync();
+        headers.Should().Contain(columnHeader);
+
+        var rows = locator.Locator("tbody tr");
+
+        var columnIndex = headers.ToList().IndexOf(columnHeader);
+        var cells = rows.Locator($"td:nth-child({columnIndex + 1}),th:nth-child({columnIndex + 1})");
+
+        return cells;
     }
 }

@@ -13,9 +13,9 @@ public abstract class EndToEndTests : PageTest
     {
         _fixture = fixture;
 
-        // Run in headed mode when debugging
         if (System.Diagnostics.Debugger.IsAttached)
         {
+            // Run in headed mode when debugging
             Environment.SetEnvironmentVariable("HEADED", "1");
         }
     }
@@ -37,8 +37,17 @@ public abstract class EndToEndTests : PageTest
     {
         await base.InitializeAsync();
 
-        Page.SetDefaultTimeout((float)TimeSpan.FromSeconds(10).TotalMilliseconds);
-        Page.SetDefaultNavigationTimeout((float)TimeSpan.FromSeconds(30).TotalMilliseconds);
+        if (System.Diagnostics.Debugger.IsAttached)
+        {
+            // Increase timeouts when debugging so tests don't time out when stepping through code
+            Page.SetDefaultTimeout((float)TimeSpan.FromMinutes(5).TotalMilliseconds);
+            Page.SetDefaultNavigationTimeout((float)TimeSpan.FromMinutes(5).TotalMilliseconds);
+        }
+        else
+        {
+            Page.SetDefaultTimeout((float)TimeSpan.FromSeconds(10).TotalMilliseconds);
+            Page.SetDefaultNavigationTimeout((float)TimeSpan.FromSeconds(30).TotalMilliseconds);
+        }
     }
 
     protected async Task NavigateTo(string path)
@@ -47,11 +56,6 @@ public abstract class EndToEndTests : PageTest
 
         response.Should().NotBeNull();
         response.Status.Should().Be(200);
-    }
-
-    protected async Task CurrentPageShouldNowBe(string path)
-    {
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-        await Page.WaitForURLAsync($"**{path}");
     }
 }

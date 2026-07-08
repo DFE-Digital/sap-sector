@@ -60,7 +60,7 @@ public class JsonFileTests : IDisposable
         File.WriteAllText(filePath, JsonConvert.SerializeObject(items));
 
         var logger = new Mock<ILogger<JsonFile<TestEntity>>>();
-        var repo = new JsonFile<TestEntity>(logger.Object);
+        var repo = new JsonFile<TestEntity>(logger.Object, JsonDataSource.Generated);
 
         // Act
         var result = await repo.ReadAllAsync();
@@ -81,7 +81,7 @@ public class JsonFileTests : IDisposable
         if (File.Exists(filePath)) File.Delete(filePath);
 
         var logger = new Mock<ILogger<JsonFile<TestEntity>>>();
-        var repo = new JsonFile<TestEntity>(logger.Object);
+        var repo = new JsonFile<TestEntity>(logger.Object, JsonDataSource.Generated);
 
         // Act
         var result = await repo.ReadAllAsync();
@@ -99,7 +99,7 @@ public class JsonFileTests : IDisposable
         File.WriteAllText(filePath, "{ invalid-json ");
 
         var logger = new Mock<ILogger<JsonFile<TestEntity>>>();
-        var repo = new JsonFile<TestEntity>(logger.Object);
+        var repo = new JsonFile<TestEntity>(logger.Object, JsonDataSource.Generated);
 
         // Act
         var result = await repo.ReadAllAsync();
@@ -113,7 +113,7 @@ public class JsonFileTests : IDisposable
     public void Ctor_ThrowsArgumentNullException_WhenLoggerIsNull()
     {
         // Arrange & Act & Assert
-        Assert.Throws<ArgumentNullException>(() => new JsonFile<TestEntity>(null!));
+        Assert.Throws<ArgumentNullException>(() => new JsonFile<TestEntity>(null!, JsonDataSource.Generated));
     }
 
     [Fact]
