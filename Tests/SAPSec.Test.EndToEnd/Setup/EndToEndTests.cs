@@ -55,6 +55,13 @@ public abstract class EndToEndTests : PageTest
         var response = await Page.GotoAsync(path);
 
         response.Should().NotBeNull();
+
+        if (System.Diagnostics.Debugger.IsAttached && response.Status != 200)
+        {
+            // Break on error when debugging to see the error message
+            System.Diagnostics.Debugger.Break();
+        }
+
         response.Status.Should().Be(200);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
     }

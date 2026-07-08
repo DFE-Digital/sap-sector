@@ -4,7 +4,7 @@ using SAPSec.Data.Repositories;
 namespace SAPSec.Infrastructure.Json;
 
 public class JsonKs4DestinationsRepository(
-    IEstablishmentRepository establishmentFile,
+    IEstablishmentRepository establishmentRepository,
     IJsonFile<EstablishmentDestinations> establishmentDestinationsFile,
     IJsonFile<LADestinations> laDestinationsFile,
     IJsonFile<EnglandDestinations> englandDestinationsFile) : IKs4DestinationsRepository
@@ -27,7 +27,7 @@ public class JsonKs4DestinationsRepository(
             return [];
         }
 
-        var establishments = (await establishmentFile.GetEstablishmentsAsync(requestedUrns))
+        var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var destinationsByUrn = (await establishmentDestinationsFile.ReadAllAsync())

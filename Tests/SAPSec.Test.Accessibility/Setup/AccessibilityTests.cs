@@ -52,6 +52,7 @@ public abstract class AccessibilityTests : PageTest
 
         if (System.Diagnostics.Debugger.IsAttached && response.Status != 200)
         {
+            // Break on error when debugging to see the error message
             System.Diagnostics.Debugger.Break();
         }
 

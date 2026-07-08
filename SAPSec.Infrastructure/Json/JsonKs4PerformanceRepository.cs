@@ -4,7 +4,7 @@ using SAPSec.Data.Repositories;
 namespace SAPSec.Infrastructure.Json;
 
 public class JsonKs4PerformanceRepository(
-    IEstablishmentRepository establishmentFile,
+    IEstablishmentRepository establishmentRepository,
     IJsonFile<EstablishmentPerformance> establishmentPerformanceFile,
     IJsonFile<LAPerformance> laPerformanceFile,
     IJsonFile<EnglandPerformance> englandPerformanceFile) : IKs4PerformanceRepository
@@ -27,7 +27,7 @@ public class JsonKs4PerformanceRepository(
             return [];
         }
 
-        var establishments = (await establishmentFile.GetEstablishmentsAsync(requestedUrns))
+        var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var performanceByUrn = (await establishmentPerformanceFile.ReadAllAsync())

@@ -4,7 +4,7 @@ using SAPSec.Data.Repositories;
 namespace SAPSec.Infrastructure.Json;
 
 public class JsonAbsenceRepository(
-    IEstablishmentRepository establishmentFile,
+    IEstablishmentRepository establishmentRepository,
     IJsonFile<EstablishmentAbsence> establishmentAbsenceFile,
     IJsonFile<LAAbsence> laAbsenceFile,
     IJsonFile<EnglandAbsence> englandAbsenceFile) : IAbsenceRepository
@@ -12,7 +12,7 @@ public class JsonAbsenceRepository(
     public async Task<AbsenceData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.FirstOrDefault(x => string.Equals(x.URN, urn, StringComparison.Ordinal));
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal));
     }
 
     public async Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)
@@ -27,7 +27,7 @@ public class JsonAbsenceRepository(
             return [];
         }
 
-        var establishments = (await establishmentFile.GetEstablishmentsAsync(requestedUrns))
+        var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var absenceByUrn = (await establishmentAbsenceFile.ReadAllAsync())

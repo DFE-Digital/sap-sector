@@ -27,8 +27,8 @@ public class GetAttendanceMeasures(
             ? Array.Empty<AbsenceData>()
             : await repository.GetByUrnsAsync(similarSchoolUrns);
         var similarSchoolDataByUrn = similarSchoolData
-            .Where(x => !string.IsNullOrWhiteSpace(x.URN))
-            .ToDictionary(x => x.URN, StringComparer.Ordinal);
+            .Where(x => !string.IsNullOrWhiteSpace(x.Urn))
+            .ToDictionary(x => x.Urn, StringComparer.Ordinal);
         var similarSchoolDetails = similarSchoolUrns.Length == 0
             ? Array.Empty<Establishment>()
             : (await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))

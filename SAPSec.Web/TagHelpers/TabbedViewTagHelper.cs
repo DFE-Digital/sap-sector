@@ -20,7 +20,6 @@ public class TabbedViewTagHelper : TagHelper
         context.Items.Add(typeof(TabbedViewTagHelper), tabContext);
 
         output.TagName = "div";
-        //output.Attributes.SetAttribute("id", HtmlPrefix);
         output.Attributes.SetAttribute("class", "govuk-tabs govuk-!-margin-bottom-3 govuk-!-margin-top-6 app-ks4-tabs");
         output.Attributes.SetAttribute("data-module", "govuk-tabs");
 

@@ -9,7 +9,7 @@ public interface IAbsenceRepository
 }
 
 public record AbsenceData(
-    string URN,
+    string Urn,
     EstablishmentAbsence? EstablishmentAbsence,
     LAAbsence? LocalAuthorityAbsence,
     EnglandAbsence? EnglandAbsence);
