@@ -6,7 +6,7 @@ using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS4.Destinations;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Tests.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 
@@ -140,27 +140,27 @@ public class GetSchoolKs4HeadlineMeasuresTests
     }
 
     [Fact]
-    public async Task Execute_UsesBatchStoreCallForSimilarSchoolsAndBuildsComparisonData()
+    public async Task Execute_UsesBatchRepositoryCallForSimilarSchoolsAndBuildsComparisonData()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateMeasures("100", "45.0", "46.0", "47.0", "66.0", "67.0", "68.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
@@ -168,7 +168,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "400" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200", "300", "400" }))))
             .ReturnsAsync(new[]
             {
@@ -177,7 +177,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("400", null, null, null, null, null, null)
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200", "300", "400" }))))
             .ReturnsAsync(new[]
             {
@@ -186,7 +186,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("400", null, null, null)
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.Is<IEnumerable<string>>(urns => urns.SequenceEqual(new[] { "200", "300", "400" }))))
             .ReturnsAsync(new[]
             {
@@ -196,11 +196,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
 
@@ -210,39 +210,39 @@ public class GetSchoolKs4HeadlineMeasuresTests
         result.DestinationsThreeYearAverage.SimilarSchoolsValue.Should().Be(90.0m);
         result.Attainment8TopPerformers.Select(x => x.Name).Should().ContainInOrder("Current school", "Alpha school");
 
-        performanceStoreMock.Verify(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()), Times.Once);
-        destinationsStoreMock.Verify(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()), Times.Once);
+        performanceRepositoryMock.Verify(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()), Times.Once);
+        destinationsRepositoryMock.Verify(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()), Times.Once);
     }
 
     [Fact]
     public async Task Execute_IgnoresSimilarSchoolsWithoutEstablishmentDetails()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateMeasures("100", "45.0", "46.0", "47.0", "66.0", "67.0", "68.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -250,7 +250,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("300", "50.0", "51.0", "52.0", "70.0", "71.0", "72.0")
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -258,7 +258,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("300", "94", "95", "96")
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -266,11 +266,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
 
@@ -283,25 +283,25 @@ public class GetSchoolKs4HeadlineMeasuresTests
     [Fact]
     public async Task Execute_WhenTopPerformersHaveSameValue_OrdersBySchoolName()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100001"))
             .ReturnsAsync(CreateSchoolDetails("100001", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100001"))
             .ReturnsAsync(CreateMeasures("100001", "45.0", "46.0", "47.0", "66.0", "67.0", "68.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100001"))
             .ReturnsAsync(CreateDestinations("100001", "90", "91", "92"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100001"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = "200003" },
@@ -309,7 +309,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = "200002" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -318,7 +318,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("200002", "55.0", "55.0", "55.0", "70.0", "70.0", "70.0")
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -327,7 +327,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("200002", "95", "95", "95")
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -337,11 +337,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100001"));
 
@@ -362,32 +362,32 @@ public class GetSchoolKs4HeadlineMeasuresTests
     [Fact]
     public async Task Execute_WhenCurrentYearAndAverageWouldProduceDifferentTopPerformer_UsesCurrentYearValue()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateMeasures("100", "45.0", "46.0", "47.0", "66.0", "67.0", "68.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -395,7 +395,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("300", "55.1", "54.0", "54.0", "69.0", "68.0", "67.0")
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -403,7 +403,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("300", "94", "95", "96")
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -412,11 +412,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
 
@@ -429,25 +429,25 @@ public class GetSchoolKs4HeadlineMeasuresTests
     [Fact]
     public async Task Execute_WhenTopPerformerDisplayedValuesTie_OrdersBySchoolName()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100001"))
             .ReturnsAsync(CreateSchoolDetails("100001", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100001"))
             .ReturnsAsync(CreateMeasures("100001", "40.0", "40.0", "40.0", "40.0", "40.0", "40.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100001"))
             .ReturnsAsync(CreateDestinations("100001", "40", "40", "40"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100001"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = "200002" },
@@ -455,7 +455,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = "200003" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -464,7 +464,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("200003", "43.0", "43.0", "43.0", "43.0", "43.0", "43.0")
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -473,7 +473,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("200003", "43.0", "43.0", "43.0")
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -483,11 +483,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100001"));
 
@@ -508,25 +508,25 @@ public class GetSchoolKs4HeadlineMeasuresTests
     [Fact]
     public async Task Execute_WhenSimilarSchoolSourceDataContainsNullsNonNumericValuesAndMarkers_TreatsThemAsMissing()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateMeasures("100", "45.0", "46.0", "47.0", "66.0", "67.0", "68.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
@@ -534,7 +534,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "400" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -543,7 +543,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("400", null, "x", "c", null, "z", "n/a")
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -552,7 +552,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("400", null, "x", "c")
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -562,11 +562,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
 
@@ -582,32 +582,32 @@ public class GetSchoolKs4HeadlineMeasuresTests
     [Fact]
     public async Task Execute_WhenAllSimilarSchoolSourceDataIsUnavailable_ReturnsNullComparisonValuesAndCurrentSchoolTopPerformers()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateMeasures("100", "45.0", "46.0", "47.0", "66.0", "67.0", "68.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateDestinations("100", "90", "91", "92"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "200" },
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -615,7 +615,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("300", "", "s", "u", "", "bad", "t")
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -623,7 +623,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("300", "", "w", "q")
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -632,11 +632,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
 
@@ -654,25 +654,25 @@ public class GetSchoolKs4HeadlineMeasuresTests
     [Fact]
     public async Task Execute_WhenCurrentSchoolAppearsInSimilarSchools_DoesNotDuplicateCurrentSchoolTopPerformer()
     {
-        var performanceStoreMock = new Mock<IKs4PerformanceStore>();
-        var destinationsStoreMock = new Mock<IKs4DestinationsStore>();
+        var performanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
+        var destinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         var schoolDetailsServiceMock = new Mock<ISchoolDetailsService>();
-        var establishmentStoreMock = new Mock<IEstablishmentStore>();
-        var similarSchoolsStoreMock = new Mock<ISimilarSchoolsSecondaryStore>();
+        var establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
+        var similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
 
         schoolDetailsServiceMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateSchoolDetails("100", "Current school"));
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateMeasures("100", "80.0", "80.0", "80.0", "80.0", "80.0", "80.0"));
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnAsync("100"))
             .ReturnsAsync(CreateDestinations("100", "80", "80", "80"));
 
-        similarSchoolsStoreMock
+        similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("100"))
             .ReturnsAsync([
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "100" },
@@ -680,7 +680,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "100", NeighbourURN = "300" }
             ]);
 
-        performanceStoreMock
+        performanceRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -689,7 +689,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateMeasures("300", "60.0", "60.0", "60.0", "60.0", "60.0", "60.0")
             });
 
-        destinationsStoreMock
+        destinationsRepositoryMock
             .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -698,7 +698,7 @@ public class GetSchoolKs4HeadlineMeasuresTests
                 CreateDestinations("300", "60", "60", "60")
             });
 
-        establishmentStoreMock
+        establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new[]
             {
@@ -708,11 +708,11 @@ public class GetSchoolKs4HeadlineMeasuresTests
             });
 
         var sut = new GetSchoolKs4HeadlineMeasures(
-            performanceStoreMock.Object,
-            destinationsStoreMock.Object,
+            performanceRepositoryMock.Object,
+            destinationsRepositoryMock.Object,
             schoolDetailsServiceMock.Object,
-            establishmentStoreMock.Object,
-            similarSchoolsStoreMock.Object);
+            establishmentRepositoryMock.Object,
+            similarSchoolsRepositoryMock.Object);
 
         var result = await sut.Execute(new GetSchoolKs4HeadlineMeasuresRequest("100"));
 

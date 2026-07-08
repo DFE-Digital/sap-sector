@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 
 public class StartupIndexBuilder(
     ILogger<StartupIndexBuilder> logger,
     LuceneIndexWriter writer,
-    IEstablishmentStore establishmentStore,
+    IEstablishmentRepository establishmentRepository,
     int retryIntervalMilliseconds = 10000)
     : BackgroundService
 {
@@ -48,7 +48,7 @@ public class StartupIndexBuilder(
 
             cancellationToken.ThrowIfCancellationRequested();
 
-            var schools = (await establishmentStore.GetAllEstablishmentsAsync())
+            var schools = (await establishmentRepository.GetAllEstablishmentsAsync())
                 .Where(s => s.CanIndexForSearch())
                 .ToList();
 

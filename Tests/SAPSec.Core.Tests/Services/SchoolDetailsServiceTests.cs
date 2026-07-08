@@ -3,7 +3,7 @@ using Moq;
 using SAPSec.Core.Model;
 using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Tests.Services;
 
@@ -13,17 +13,17 @@ namespace SAPSec.Core.Tests.Services;
 /// </summary>
 public class SchoolDetailsServiceTests
 {
-    private readonly Mock<IEstablishmentStore> _establishmentStoreMock;
+    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock;
     private readonly Mock<ILogger<SchoolDetailsService>> _loggerMock;
     private readonly SchoolDetailsService _sut;
 
     public SchoolDetailsServiceTests()
     {
-        _establishmentStoreMock = new Mock<IEstablishmentStore>();
+        _establishmentRepositoryMock = new Mock<IEstablishmentRepository>();
         _loggerMock = new Mock<ILogger<SchoolDetailsService>>();
 
         _sut = new SchoolDetailsService(
-            _establishmentStoreMock.Object,
+            _establishmentRepositoryMock.Object,
             _loggerMock.Object);
     }
 
@@ -34,7 +34,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -52,7 +52,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -69,7 +69,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -86,7 +86,7 @@ public class SchoolDetailsServiceTests
     public async Task GetByUrn_SchoolDoesNotExist_ThrowsNotFoundException()
     {
         // Arrange
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("999999"))
             .ReturnsAsync((Establishment?)null);
 
@@ -103,7 +103,7 @@ public class SchoolDetailsServiceTests
         // Arrange
         var establishment = CreateTestAcademy();
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -124,7 +124,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -145,7 +145,7 @@ public class SchoolDetailsServiceTests
         establishment.TrustSchoolFlagId = "5";
         establishment.EstablishmentTypeGroupId = "10";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -164,7 +164,7 @@ public class SchoolDetailsServiceTests
         establishment.TrustSchoolFlagId = "1";
         establishment.EstablishmentTypeGroupId = "4";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("654321"))
             .ReturnsAsync(establishment);
 
@@ -186,7 +186,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.NurseryProvisionName = "No Nursery Classes";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -204,7 +204,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.NurseryProvisionName = "Has Nursery Classes";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -226,7 +226,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.OfficialSixthFormId = "1";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -244,7 +244,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.OfficialSixthFormId = "2";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -266,7 +266,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.ResourcedProvisionName = "SEN unit";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -284,7 +284,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.ResourcedProvisionName = "Has resourced provision";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -302,7 +302,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.ResourcedProvisionName = "SEN unit";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -324,7 +324,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.GenderName = "c";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -342,7 +342,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.ReligiousCharacterName = "z";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -362,7 +362,7 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -382,7 +382,7 @@ public class SchoolDetailsServiceTests
         var establishment = CreateTestAcademy();
         establishment.Website = "www.testacademy.org.uk";
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
 
@@ -398,10 +398,10 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentEmailAsync("123456"))
             .ReturnsAsync(new EstablishmentEmail { URN = "123456", MainEmail = "establishment@email.com" });
 
@@ -417,10 +417,10 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentEmailAsync("123456"))
             .ReturnsAsync((EstablishmentEmail?)null);
 
@@ -436,10 +436,10 @@ public class SchoolDetailsServiceTests
     {
         // Arrange
         var establishment = CreateTestAcademy();
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(establishment);
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentEmailAsync("123456"))
             .ReturnsAsync(new EstablishmentEmail { URN = "123456", MainEmail = "" });
 

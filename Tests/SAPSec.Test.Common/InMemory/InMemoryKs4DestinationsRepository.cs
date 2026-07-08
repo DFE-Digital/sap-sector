@@ -1,9 +1,9 @@
 ﻿using SAPSec.Data.Dto.KS4.Destinations;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
 
-public class InMemoryKs4DestinationsStore : IKs4DestinationsStore
+public class InMemoryKs4DestinationsRepository : IKs4DestinationsRepository
 {
     private List<EstablishmentDestinations> _establishment = new();
     private List<LADestinations> _la = new();

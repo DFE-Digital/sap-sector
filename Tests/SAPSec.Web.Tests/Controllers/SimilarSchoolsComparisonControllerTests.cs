@@ -12,7 +12,7 @@ using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
@@ -23,42 +23,42 @@ namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class SimilarSchoolsComparisonControllerTests
 {
-    private readonly Mock<IEstablishmentStore> _establishmentStoreMock = new();
-    private readonly Mock<ISimilarSchoolsSecondaryStore> _repoMock = new();
-    private readonly Mock<IAbsenceStore> _absenceStoreMock = new();
-    private readonly Mock<IKs4PerformanceStore> _ks4PerformanceStoreMock = new();
-    private readonly Mock<IKs4DestinationsStore> _ks4DestinationsStoreMock = new();
+    private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
+    private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
+    private readonly Mock<IAbsenceRepository> _absenceRepositoryMock = new();
+    private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
+    private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock = new();
     private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
     private readonly SimilarSchoolsComparisonController _sut;
 
     public SimilarSchoolsComparisonControllerTests()
     {
         var schoolDetailsService = new SchoolDetailsService(
-            _establishmentStoreMock.Object,
+            _establishmentRepositoryMock.Object,
             new Mock<ILogger<SchoolDetailsService>>().Object);
         var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
-            _establishmentStoreMock.Object,
+            _establishmentRepositoryMock.Object,
             _repoMock.Object,
             schoolDetailsService,
-            _ks4PerformanceStoreMock.Object,
-            _absenceStoreMock.Object);
+            _ks4PerformanceRepositoryMock.Object,
+            _absenceRepositoryMock.Object);
         var ks4UseCase = new GetKs4HeadlineMeasures(
-            _ks4PerformanceStoreMock.Object,
-            _ks4DestinationsStoreMock.Object,
+            _ks4PerformanceRepositoryMock.Object,
+            _ks4DestinationsRepositoryMock.Object,
             schoolDetailsService);
         var ks4CoreSubjectsUseCase = new GetSchoolKs4CoreSubjects(
-            _ks4PerformanceStoreMock.Object,
+            _ks4PerformanceRepositoryMock.Object,
             schoolDetailsService,
-            _establishmentStoreMock.Object,
+            _establishmentRepositoryMock.Object,
             _repoMock.Object);
         var filteredKs4CoreSubjectsUseCase = new GetFilteredSchoolKs4CoreSubject(
-            _ks4PerformanceStoreMock.Object,
+            _ks4PerformanceRepositoryMock.Object,
             schoolDetailsService,
-            _establishmentStoreMock.Object,
+            _establishmentRepositoryMock.Object,
             _repoMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
-            _absenceStoreMock.Object,
-            _establishmentStoreMock.Object,
+            _absenceRepositoryMock.Object,
+            _establishmentRepositoryMock.Object,
             _repoMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
@@ -227,11 +227,11 @@ public class SimilarSchoolsComparisonControllerTests
     [Fact]
     public async Task AttendanceData_ReturnsDefaultPayloadShape()
     {
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
             .ReturnsAsync(new Establishment { URN = "145327", LAId = "373" });
 
-        _absenceStoreMock
+        _absenceRepositoryMock
             .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
             .ReturnsAsync(new AbsenceData(
                 "145327",
@@ -283,16 +283,16 @@ public class SimilarSchoolsComparisonControllerTests
 
         var group = new List<Establishment> { similarSchool }.AsReadOnly();
 
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(r => r.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new List<Establishment> {
                 currentSchool,
                 similarSchool
             });
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(r => r.GetEstablishmentAsync(currentUrn))
             .ReturnsAsync(currentSchool);
-        _establishmentStoreMock
+        _establishmentRepositoryMock
             .Setup(r => r.GetEstablishmentAsync(similarUrn))
             .ReturnsAsync(similarSchool);
         _repoMock
@@ -388,20 +388,20 @@ public class SimilarSchoolsComparisonControllerTests
 
     private void SetupAbsence()
     {
-        _absenceStoreMock
+        _absenceRepositoryMock
             .Setup(r => r.GetByUrnAsync(It.IsAny<string>()))
             .ReturnsAsync((AbsenceData?)null);
-        _absenceStoreMock
+        _absenceRepositoryMock
             .Setup(r => r.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new List<AbsenceData>());
     }
 
     private void SetupPerfomance()
     {
-        _ks4PerformanceStoreMock
+        _ks4PerformanceRepositoryMock
             .Setup(r => r.GetByUrnAsync(It.IsAny<string>()))
             .ReturnsAsync((Ks4PerformanceData?)null);
-        _ks4PerformanceStoreMock
+        _ks4PerformanceRepositoryMock
             .Setup(r => r.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync(new List<Ks4PerformanceData>());
     }

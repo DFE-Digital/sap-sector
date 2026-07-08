@@ -5,26 +5,26 @@ using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.Model;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class FindSimilarSchools(
-    IEstablishmentStore establishmentStore,
-    ISimilarSchoolsSecondaryStore similarSchoolsStore,
-    IKs4PerformanceStore performanceStore,
-    IAbsenceStore absenceStore)
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    IKs4PerformanceRepository performanceRepository,
+    IAbsenceRepository absenceRepository)
 {
     public async Task<FindSimilarSchoolsResponse> Execute(FindSimilarSchoolsRequest request)
     {
         // TODO: Validate request
 
-        var groups = await similarSchoolsStore.GetGroupAsync(request.CurrentSchoolUrn);
+        var groups = await similarSchoolsRepository.GetGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
 
-        var establishments = await establishmentStore.GetEstablishmentsAsync(urns);
-        var performance = await performanceStore.GetByUrnsAsync(urns);
-        var absence = await absenceStore.GetByUrnsAsync(urns);
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
+        var performance = await performanceRepository.GetByUrnsAsync(urns);
+        var absence = await absenceRepository.GetByUrnsAsync(urns);
 
         var schools =
             from e in establishments

@@ -1,14 +1,14 @@
 using SAPSec.Data.Dto.SimilarSchools.Primary;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonSimilarSchoolsPrimaryStore : ISimilarSchoolsPrimaryStore
+public class JsonSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRepository
 {
     private readonly IJsonFile<SimilarSchoolsPrimaryGroupsEntry> _groupsFile;
     private readonly IJsonFile<SimilarSchoolsPrimaryValuesEntry> _valuesFile;
 
-    public JsonSimilarSchoolsPrimaryStore(
+    public JsonSimilarSchoolsPrimaryRepository(
         IJsonFile<SimilarSchoolsPrimaryGroupsEntry> groupsFile,
         IJsonFile<SimilarSchoolsPrimaryValuesEntry> valuesFile)
     {

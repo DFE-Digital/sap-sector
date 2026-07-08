@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Secondary;
 

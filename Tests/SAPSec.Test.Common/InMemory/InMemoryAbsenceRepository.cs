@@ -1,9 +1,9 @@
 ﻿using SAPSec.Data.Dto.Absence;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
 
-public class InMemoryAbsenceStore : IAbsenceStore
+public class InMemoryAbsenceRepository : IAbsenceRepository
 {
     private List<EstablishmentAbsence> _establishment = new();
     private List<LAAbsence> _la = new();

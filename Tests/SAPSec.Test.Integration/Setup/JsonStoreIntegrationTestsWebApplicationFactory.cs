@@ -3,7 +3,7 @@ using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Test.Integration.Setup;
 
-public class JsonStoreIntegrationTestsWebApplicationFactory : IntegrationTestsWebApplicationFactory
+public class JsonRepositoryIntegrationTestsWebApplicationFactory : IntegrationTestsWebApplicationFactory
 {
     protected override IServiceCollection ConfigureServices(IServiceCollection services)
     {

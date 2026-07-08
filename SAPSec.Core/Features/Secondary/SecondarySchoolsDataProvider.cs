@@ -1,23 +1,23 @@
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Secondary;
 
 public class SecondarySchoolsDataProvider(
-    IEstablishmentStore establishmentStore,
-    ISimilarSchoolsSecondaryStore similarSchoolsStore,
-    IKs4PerformanceStore performanceStore,
-    IKs4DestinationsStore destinationsStore) : ISecondarySchoolsDataProvider
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    IKs4PerformanceRepository performanceRepository,
+    IKs4DestinationsRepository destinationsRepository) : ISecondarySchoolsDataProvider
 {
     public async Task<SimilarSchoolsData<Ks4PerformanceData>> GetSimilarSchoolsPerformance(string urn)
     {
-        var similarSchoolUrns = (await similarSchoolsStore.GetGroupAsync(urn))
+        var similarSchoolUrns = (await similarSchoolsRepository.GetGroupAsync(urn))
             .Select(g => g.NeighbourURN)
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
 
-        var schools = (await establishmentStore.GetEstablishmentsAsync([urn, .. similarSchoolUrns]))
+        var schools = (await establishmentRepository.GetEstablishmentsAsync([urn, .. similarSchoolUrns]))
             .Select(SchoolInfo.SchoolInfo.FromEstablishment)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
@@ -26,7 +26,7 @@ public class SecondarySchoolsDataProvider(
             throw new NotFoundException($"School not found with URN: {urn}");
         }
 
-        var performances = (await performanceStore.GetByUrnsAsync([urn, .. similarSchoolUrns]))
+        var performances = (await performanceRepository.GetByUrnsAsync([urn, .. similarSchoolUrns]))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         var currentSchool = new SchoolData<Ks4PerformanceData>(
@@ -47,13 +47,13 @@ public class SecondarySchoolsDataProvider(
 
     public async Task<SimilarSchoolsData<Ks4DestinationsData>> GetSimilarSchoolsDestinations(string urn)
     {
-        var similarSchoolUrns = (await similarSchoolsStore.GetGroupAsync(urn))
+        var similarSchoolUrns = (await similarSchoolsRepository.GetGroupAsync(urn))
             .Select(g => g.NeighbourURN)
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
 
-        var schools = (await establishmentStore.GetEstablishmentsAsync([urn, .. similarSchoolUrns]))
+        var schools = (await establishmentRepository.GetEstablishmentsAsync([urn, .. similarSchoolUrns]))
             .Select(SchoolInfo.SchoolInfo.FromEstablishment)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
@@ -62,7 +62,7 @@ public class SecondarySchoolsDataProvider(
             throw new NotFoundException($"School not found with URN: {urn}");
         }
 
-        var destinations = (await destinationsStore.GetByUrnsAsync([urn, .. similarSchoolUrns]))
+        var destinations = (await destinationsRepository.GetByUrnsAsync([urn, .. similarSchoolUrns]))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         var currentSchool = new SchoolData<Ks4DestinationsData>(

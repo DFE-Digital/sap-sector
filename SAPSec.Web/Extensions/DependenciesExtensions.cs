@@ -9,7 +9,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Dto.KS2.Performance;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Formatters;
@@ -43,7 +43,7 @@ public static class DependenciesExtensions
         services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<LAPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<EnglandPerformance>(JsonDataSource.PrimarySchools);
-        services.AddSingleton<IKs2PerformanceStore, JsonKs2PerformanceStore>();
+        services.AddSingleton<IKs2PerformanceRepository, JsonKs2PerformanceRepository>();
 
         // Formatters
         services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();

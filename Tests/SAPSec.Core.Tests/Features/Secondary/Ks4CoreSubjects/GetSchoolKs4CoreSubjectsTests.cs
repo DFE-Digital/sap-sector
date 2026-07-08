@@ -7,7 +7,7 @@ using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Tests.Features.Secondary.Ks4CoreSubjects;
 
@@ -611,23 +611,23 @@ public class GetSchoolKs4CoreSubjectsTests
 
     private sealed class TestContext
     {
-        private readonly Mock<IKs4PerformanceStore> _storeMock = new();
-        private readonly Mock<IEstablishmentStore> _establishmentStoreMock = new();
-        private readonly Mock<ISimilarSchoolsSecondaryStore> _similarSchoolsStoreMock = new();
+        private readonly Mock<IKs4PerformanceRepository> _repositoryMock = new();
+        private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
+        private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
         private Ks4PerformanceData _currentSchoolData = CreateMeasures("100001");
 
         public TestContext()
         {
-            _establishmentStoreMock
+            _establishmentRepositoryMock
                 .Setup(x => x.GetEstablishmentAsync("100001"))
                 .ReturnsAsync(CreateSchool("100001", "Current school"));
         }
 
         public GetSchoolKs4CoreSubjects Sut => new(
-            _storeMock.Object,
-            new SchoolDetailsService(_establishmentStoreMock.Object, new Mock<ILogger<SchoolDetailsService>>().Object),
-            _establishmentStoreMock.Object,
-            _similarSchoolsStoreMock.Object);
+            _repositoryMock.Object,
+            new SchoolDetailsService(_establishmentRepositoryMock.Object, new Mock<ILogger<SchoolDetailsService>>().Object),
+            _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object);
 
         public void SetupCurrentSchoolData(
             Action<EstablishmentPerformance>? establishment = null,
@@ -636,7 +636,7 @@ public class GetSchoolKs4CoreSubjectsTests
         {
             _currentSchoolData = CreateMeasures("100001", establishment, localAuthority, england);
 
-            _storeMock
+            _repositoryMock
                 .Setup(x => x.GetByUrnAsync("100001"))
                 .ReturnsAsync(_currentSchoolData);
         }
@@ -648,18 +648,18 @@ public class GetSchoolKs4CoreSubjectsTests
         {
             var similarSchoolsArray = similarSchools.ToArray();
 
-            _similarSchoolsStoreMock
+            _similarSchoolsRepositoryMock
                 .Setup(x => x.GetGroupAsync("100001"))
                 .ReturnsAsync(similarSchoolsArray.Select(x => new SimilarSchoolsSecondaryGroupsEntry { URN = "100001", NeighbourURN = x.Urn }).ToArray());
 
-            _storeMock
+            _repositoryMock
                 .Setup(x => x.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(similarSchoolsArray
                     .GroupBy(x => x.Urn, StringComparer.Ordinal)
                     .Select(x => x.First().Data)
                     .ToArray());
 
-            _establishmentStoreMock
+            _establishmentRepositoryMock
                 .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(similarSchoolsArray
                     .GroupBy(x => x.Urn, StringComparer.Ordinal)

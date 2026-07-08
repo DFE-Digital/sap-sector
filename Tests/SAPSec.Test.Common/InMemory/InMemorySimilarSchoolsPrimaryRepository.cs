@@ -1,9 +1,9 @@
 ﻿using SAPSec.Data.Dto.SimilarSchools.Primary;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
 
-public class InMemorySimilarSchoolsPrimaryStore : ISimilarSchoolsPrimaryStore
+public class InMemorySimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRepository
 {
     private List<SimilarSchoolsPrimaryGroupsEntry> _groups = new();
     private List<SimilarSchoolsPrimaryValuesEntry> _values = new();

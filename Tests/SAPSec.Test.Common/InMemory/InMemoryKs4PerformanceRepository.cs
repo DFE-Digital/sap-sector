@@ -1,9 +1,9 @@
 ﻿using SAPSec.Data.Dto.KS4.Performance;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
 
-public class InMemoryKs4PerformanceStore : IKs4PerformanceStore
+public class InMemoryKs4PerformanceRepository : IKs4PerformanceRepository
 {
     private List<EstablishmentPerformance> _establishment = new();
     private List<LAPerformance> _la = new();

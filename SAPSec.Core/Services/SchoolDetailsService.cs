@@ -4,7 +4,7 @@ using SAPSec.Core.Mappers;
 using SAPSec.Core.Model;
 using SAPSec.Core.Rules;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Services;
 
@@ -14,7 +14,7 @@ namespace SAPSec.Core.Services;
 /// </summary>
 public sealed class SchoolDetailsService : ISchoolDetailsService
 {
-    private readonly IEstablishmentStore _establishmentStore;
+    private readonly IEstablishmentRepository _establishmentRepository;
     private readonly ILogger<SchoolDetailsService> _logger;
 
     // Rules instantiated directly - they are stateless pure functions
@@ -25,23 +25,23 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
     private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
 
     public SchoolDetailsService(
-        IEstablishmentStore establishmentStore,
+        IEstablishmentRepository establishmentRepository,
         ILogger<SchoolDetailsService> logger)
     {
-        _establishmentStore = establishmentStore;
+        _establishmentRepository = establishmentRepository;
         _logger = logger;
     }
 
     public async Task<SchoolDetails> GetByUrnAsync(string urn)
     {
-        var establishment = await _establishmentStore.GetEstablishmentAsync(urn);
+        var establishment = await _establishmentRepository.GetEstablishmentAsync(urn);
 
         if (establishment is null)
         {
             throw new NotFoundException($"School not found with URN: {urn}");
         }
 
-        var establishmentEmail = await _establishmentStore.GetEstablishmentEmailAsync(urn);
+        var establishmentEmail = await _establishmentRepository.GetEstablishmentEmailAsync(urn);
 
         return MapToSchoolDetails(establishment, establishmentEmail);
     }

@@ -7,7 +7,7 @@ namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
 public class GetCharacteristicsComparisonTests
 {
-    private readonly InMemorySimilarSchoolsSecondaryStore _repo = new();
+    private readonly InMemorySimilarSchoolsSecondaryRepository _repo = new();
 
     private GetCharacteristicsComparison CreateSut() => new(_repo);
 

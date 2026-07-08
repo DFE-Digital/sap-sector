@@ -1,13 +1,13 @@
 using SAPSec.Data.Dto.Absence;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonAbsenceStore(
-    IEstablishmentStore establishmentFile,
+public class JsonAbsenceRepository(
+    IEstablishmentRepository establishmentFile,
     IJsonFile<EstablishmentAbsence> establishmentAbsenceFile,
     IJsonFile<LAAbsence> laAbsenceFile,
-    IJsonFile<EnglandAbsence> englandAbsenceFile) : IAbsenceStore
+    IJsonFile<EnglandAbsence> englandAbsenceFile) : IAbsenceRepository
 {
     public async Task<AbsenceData?> GetByUrnAsync(string urn)
     {

@@ -1,21 +1,21 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.UseCases;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Primary;
 
 public class GetSchoolKs2PerformanceMeasuresUseCase(
-    IEstablishmentStore establishmentStore,
-    ISimilarSchoolsPrimaryStore similarSchoolsStore,
-    IKs2PerformanceStore performanceStore)
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
+    IKs2PerformanceRepository performanceRepository)
     : IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>
 {
     public async Task<GetSchoolKs2PerformanceMeasuresResponse> Execute(GetSchoolKs2PerformanceMeasuresRequest request)
     {
         var dataProvider = new PrimarySimilarSchoolsPerformanceDataProvider(
-            establishmentStore,
-            similarSchoolsStore,
-            performanceStore);
+            establishmentRepository,
+            similarSchoolsRepository,
+            performanceRepository);
 
         var (currentSchoolPerformance, similarSchoolsPerformance) = await dataProvider.GetSimilarSchoolsPerformance(request.Urn);
 

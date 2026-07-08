@@ -1,7 +1,7 @@
 ﻿namespace SAPSec.Test.Integration.Setup;
 
-public class JsonStoreIntegrationTestFixture : IntegrationTestFixture
+public class JsonRepositoryIntegrationTestFixture : IntegrationTestFixture
 {
     protected override IntegrationTestsWebApplicationFactory CreateWebApplicationFactory() =>
-        new JsonStoreIntegrationTestsWebApplicationFactory();
+        new JsonRepositoryIntegrationTestsWebApplicationFactory();
 }

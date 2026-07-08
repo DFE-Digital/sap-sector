@@ -1,16 +1,16 @@
 using Dapper;
 using Microsoft.Extensions.Logging;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Postgres;
 
-public class PostgresSimilarSchoolsSecondaryStore : ISimilarSchoolsSecondaryStore
+public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
 {
-    private readonly ILogger<PostgresSimilarSchoolsSecondaryStore> _logger;
+    private readonly ILogger<PostgresSimilarSchoolsSecondaryRepository> _logger;
     private readonly NpgsqlDataSourceFactory _factory;
 
-    public PostgresSimilarSchoolsSecondaryStore(ILogger<PostgresSimilarSchoolsSecondaryStore> logger, NpgsqlDataSourceFactory factory)
+    public PostgresSimilarSchoolsSecondaryRepository(ILogger<PostgresSimilarSchoolsSecondaryRepository> logger, NpgsqlDataSourceFactory factory)
     {
         _logger = logger;
         _factory = factory;

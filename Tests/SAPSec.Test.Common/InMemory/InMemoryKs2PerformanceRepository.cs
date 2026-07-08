@@ -1,9 +1,9 @@
 ﻿using SAPSec.Data.Dto.KS2.Performance;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
 
-public class InMemoryKs2PerformanceStore(IEstablishmentStore establishmentStore) : IKs2PerformanceStore
+public class InMemoryKs2PerformanceRepository(IEstablishmentRepository establishmentRepository) : IKs2PerformanceRepository
 {
     private List<EstablishmentPerformance> _establishment = new();
     private List<LAPerformance> _la = new();
@@ -33,7 +33,7 @@ public class InMemoryKs2PerformanceStore(IEstablishmentStore establishmentStore)
 
     public async Task<Ks2PerformanceData?> GetByUrnAsync(string urn)
     {
-        var establishment = await establishmentStore.GetEstablishmentAsync(urn);
+        var establishment = await establishmentRepository.GetEstablishmentAsync(urn);
         var ep = _establishment.FirstOrDefault(x => x.Id == urn);
         var la = _la.FirstOrDefault(x => x.Id == establishment?.LAId);
         var england = _england.FirstOrDefault(x => x.Id == "National");
@@ -49,7 +49,7 @@ public class InMemoryKs2PerformanceStore(IEstablishmentStore establishmentStore)
 
     public async Task<IReadOnlyCollection<Ks2PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)
     {
-        var establishments = await establishmentStore.GetEstablishmentsAsync(urns);
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
 
         return establishments.Select(e => new Ks2PerformanceData(
                 e.URN,

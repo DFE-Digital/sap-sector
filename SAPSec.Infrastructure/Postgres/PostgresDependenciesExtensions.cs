@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Postgres;
 
@@ -11,12 +11,12 @@ public static class PostgresDependenciesExtensions
         services.AddSingleton<NpgsqlDataSourceFactory>();
 
         // Always default to Postgres in the app
-        services.AddSingleton<IEstablishmentStore, PostgresEstablishmentStore>();
-        services.AddSingleton<ISimilarSchoolsSecondaryStore, PostgresSimilarSchoolsSecondaryStore>();
-        services.AddSingleton<ISimilarSchoolsPrimaryStore, PostgresSimilarSchoolsPrimaryStore>();
-        services.AddSingleton<IKs4PerformanceStore, PostgresKs4PerformanceStore>();
-        services.AddSingleton<IKs4DestinationsStore, PostgresKs4DestinationsStore>();
-        services.AddSingleton<IAbsenceStore, PostgresAbsenceStore>();
+        services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
+        services.AddSingleton<ISimilarSchoolsSecondaryRepository, PostgresSimilarSchoolsSecondaryRepository>();
+        services.AddSingleton<ISimilarSchoolsPrimaryRepository, PostgresSimilarSchoolsPrimaryRepository>();
+        services.AddSingleton<IKs4PerformanceRepository, PostgresKs4PerformanceRepository>();
+        services.AddSingleton<IKs4DestinationsRepository, PostgresKs4DestinationsRepository>();
+        services.AddSingleton<IAbsenceRepository, PostgresAbsenceRepository>();
 
         return services;
     }

@@ -3,14 +3,14 @@ using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SchoolSearch.Extensions;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.Features.SchoolSearch;
 
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,
-    IEstablishmentStore _establishmentStore,
+    IEstablishmentRepository _establishmentRepository,
     IFeatureFlagService _featureFlagService) : ISchoolSearchService
 {
     private const int MaxResults = 1000;
@@ -36,7 +36,7 @@ public class SchoolSearchService(
         }
 
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
-        var school = await _establishmentStore.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
+        var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
         return school.CanSearch(primarySchoolsEnabled)
             ? school
@@ -56,7 +56,7 @@ public class SchoolSearchService(
         }
 
         var urns = searchResults.Select(r => r.urn.ToString()).ToArray();
-        var schools = await _establishmentStore.GetEstablishmentsAsync(urns);
+        var schools = await _establishmentRepository.GetEstablishmentsAsync(urns);
 
         foreach (var r in searchResults.GroupJoin(schools,
             r => r.urn.ToString(),

@@ -1,13 +1,13 @@
 using SAPSec.Data.Dto.KS2.Performance;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonKs2PerformanceStore(
-    IEstablishmentStore establishmentStore,
+public class JsonKs2PerformanceRepository(
+    IEstablishmentRepository establishmentRepository,
     IJsonFile<EstablishmentPerformance> establishmentPerformanceFile,
     IJsonFile<LAPerformance> laPerformanceFile,
-    IJsonFile<EnglandPerformance> englandPerformanceFile) : IKs2PerformanceStore
+    IJsonFile<EnglandPerformance> englandPerformanceFile) : IKs2PerformanceRepository
 {
     public async Task<Ks2PerformanceData?> GetByUrnAsync(string urn)
     {
@@ -27,7 +27,7 @@ public class JsonKs2PerformanceStore(
             return [];
         }
 
-        var establishments = (await establishmentStore.GetEstablishmentsAsync(requestedUrns))
+        var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var performanceByUrn = (await establishmentPerformanceFile.ReadAllAsync())

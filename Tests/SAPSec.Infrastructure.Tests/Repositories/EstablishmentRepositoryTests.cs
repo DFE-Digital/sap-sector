@@ -5,23 +5,23 @@ using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
 
-public class EstablishmentStoreTests
+public class EstablishmentRepositoryTests
 {
     private readonly Mock<IJsonFile<Establishment>> _mockEstablishmentJsonFile;
     private readonly Mock<IJsonFile<EstablishmentEmail>> _mockEstablishmentEmailJsonFile;
-    private readonly Mock<ILogger<JsonEstablishmentStore>> _mockLogger;
-    private readonly JsonEstablishmentStore _sut;
+    private readonly Mock<ILogger<JsonEstablishmentRepository>> _mockLogger;
+    private readonly JsonEstablishmentRepository _sut;
 
-    public EstablishmentStoreTests()
+    public EstablishmentRepositoryTests()
     {
         _mockEstablishmentJsonFile = new Mock<IJsonFile<Establishment>>();
         _mockEstablishmentEmailJsonFile = new Mock<IJsonFile<EstablishmentEmail>>();
-        _mockLogger = new Mock<ILogger<JsonEstablishmentStore>>();
-        _sut = new JsonEstablishmentStore(_mockEstablishmentJsonFile.Object, _mockEstablishmentEmailJsonFile.Object, _mockLogger.Object);
+        _mockLogger = new Mock<ILogger<JsonEstablishmentRepository>>();
+        _sut = new JsonEstablishmentRepository(_mockEstablishmentJsonFile.Object, _mockEstablishmentEmailJsonFile.Object, _mockLogger.Object);
     }
 
     [Fact]
-    public async Task GetAllEstablishments_ReturnsAllItemsFromGenericStore()
+    public async Task GetAllEstablishments_ReturnsAllItemsFromGenericRepository()
     {
         // Arrange
         var expected = new List<Establishment>
@@ -43,7 +43,7 @@ public class EstablishmentStoreTests
     }
 
     [Fact]
-    public async Task GetAllEstablishments_ReturnsEmptyWhenGenericStoreReturnsEmpty()
+    public async Task GetAllEstablishments_ReturnsEmptyWhenGenericRepositoryReturnsEmpty()
     {
         // Arrange
         _mockEstablishmentJsonFile.Setup(r => r.ReadAllAsync()).ReturnsAsync([]);
@@ -58,7 +58,7 @@ public class EstablishmentStoreTests
     }
 
     [Fact]
-    public async Task GetEstablishments_ReturnsSubsetOfItemsFromGenericStore()
+    public async Task GetEstablishments_ReturnsSubsetOfItemsFromGenericRepository()
     {
         // Arrange
         var expected = new List<Establishment>
@@ -80,7 +80,7 @@ public class EstablishmentStoreTests
     }
 
     [Fact]
-    public async Task GetEstablishments_ReturnsEmptyWhenGenericStoreIsEmpty()
+    public async Task GetEstablishments_ReturnsEmptyWhenGenericRepositoryIsEmpty()
     {
         // Arrange
         _mockEstablishmentJsonFile.Setup(r => r.ReadAllAsync()).ReturnsAsync([]);

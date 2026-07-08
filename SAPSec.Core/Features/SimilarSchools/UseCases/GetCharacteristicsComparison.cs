@@ -1,18 +1,18 @@
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryStore store)
+public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository repository)
 {
     public async Task<GetCharacteristicsComparisonResponse> Execute(GetCharacteristicsComparisonRequest request)
     {
         var urns = new[] { request.CurrentSchoolUrn, request.SimilarSchoolUrn };
 
-        var values = SimilarSchoolsSecondaryValues.FromData(await store.GetValuesByUrnsAsync(urns));
+        var values = SimilarSchoolsSecondaryValues.FromData(await repository.GetValuesByUrnsAsync(urns));
 
         var standardDeviations = request.SimilarityCalculationMethod == SimilarityCalculationMethod.Group
             ? await BuildGroupStandardDeviationsAsync(request.CurrentSchoolUrn)
-            : SimilarSchoolsSecondaryStandardDeviations.FromData(await store.GetStandardDeviationsAsync());
+            : SimilarSchoolsSecondaryStandardDeviations.FromData(await repository.GetStandardDeviationsAsync());
 
         var current = values.FirstOrDefault(v => v.Urn == request.CurrentSchoolUrn);
         if (current is null)
@@ -67,10 +67,10 @@ public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryStore store)
 
     private async Task<SimilarSchoolsSecondaryStandardDeviations> BuildGroupStandardDeviationsAsync(string currentSchoolUrn)
     {
-        var groupUrns = await store.GetGroupAsync(currentSchoolUrn);
+        var groupUrns = await repository.GetGroupAsync(currentSchoolUrn);
 
         // TODO: Test standard deviation calculations include current school
-        var groupValues = SimilarSchoolsSecondaryValues.FromData(await store.GetValuesByUrnsAsync(groupUrns.Select(g => g.NeighbourURN).Concat([currentSchoolUrn])));
+        var groupValues = SimilarSchoolsSecondaryValues.FromData(await repository.GetValuesByUrnsAsync(groupUrns.Select(g => g.NeighbourURN).Concat([currentSchoolUrn])));
 
         return new SimilarSchoolsSecondaryStandardDeviations
         {

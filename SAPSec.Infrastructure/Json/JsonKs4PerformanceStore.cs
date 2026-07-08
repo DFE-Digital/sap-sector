@@ -1,13 +1,13 @@
 using SAPSec.Data.Dto.KS4.Performance;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonKs4PerformanceStore(
-    IEstablishmentStore establishmentFile,
+public class JsonKs4PerformanceRepository(
+    IEstablishmentRepository establishmentFile,
     IJsonFile<EstablishmentPerformance> establishmentPerformanceFile,
     IJsonFile<LAPerformance> laPerformanceFile,
-    IJsonFile<EnglandPerformance> englandPerformanceFile) : IKs4PerformanceStore
+    IJsonFile<EnglandPerformance> englandPerformanceFile) : IKs4PerformanceRepository
 {
     public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
     {

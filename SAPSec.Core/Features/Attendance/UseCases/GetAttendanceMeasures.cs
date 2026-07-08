@@ -1,37 +1,37 @@
 using SAPSec.Data.Dto;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 using System.Globalization;
 
 namespace SAPSec.Core.Features.Attendance.UseCases;
 
 public class GetAttendanceMeasures(
-    IAbsenceStore store,
-    IEstablishmentStore establishmentStore,
-    ISimilarSchoolsSecondaryStore similarSchoolsStore)
+    IAbsenceRepository repository,
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
 {
     public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
     {
-        var establishment = await establishmentStore.GetEstablishmentAsync(request.Urn);
+        var establishment = await establishmentRepository.GetEstablishmentAsync(request.Urn);
         if (establishment is null)
         {
             throw new NotFoundException($"School with URN {request.Urn} was not found");
         }
 
-        var data = await store.GetByUrnAsync(request.Urn);
-        var similarSchoolUrns = (await similarSchoolsStore.GetGroupAsync(request.Urn))
+        var data = await repository.GetByUrnAsync(request.Urn);
+        var similarSchoolUrns = (await similarSchoolsRepository.GetGroupAsync(request.Urn))
             .Select(x => x.NeighbourURN)
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
         var similarSchoolData = similarSchoolUrns.Length == 0
             ? Array.Empty<AbsenceData>()
-            : await store.GetByUrnsAsync(similarSchoolUrns);
+            : await repository.GetByUrnsAsync(similarSchoolUrns);
         var similarSchoolDataByUrn = similarSchoolData
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
         var similarSchoolDetails = similarSchoolUrns.Length == 0
             ? Array.Empty<Establishment>()
-            : (await establishmentStore.GetEstablishmentsAsync(similarSchoolUrns))
+            : (await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
                 ?? Array.Empty<Establishment>();
         var similarSchoolDetailsByUrn = similarSchoolDetails
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))

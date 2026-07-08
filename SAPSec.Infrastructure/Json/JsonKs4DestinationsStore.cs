@@ -1,13 +1,13 @@
 using SAPSec.Data.Dto.KS4.Destinations;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonKs4DestinationsStore(
-    IEstablishmentStore establishmentFile,
+public class JsonKs4DestinationsRepository(
+    IEstablishmentRepository establishmentFile,
     IJsonFile<EstablishmentDestinations> establishmentDestinationsFile,
     IJsonFile<LADestinations> laDestinationsFile,
-    IJsonFile<EnglandDestinations> englandDestinationsFile) : IKs4DestinationsStore
+    IJsonFile<EnglandDestinations> englandDestinationsFile) : IKs4DestinationsRepository
 {
     public async Task<Ks4DestinationsData?> GetByUrnAsync(string urn)
     {

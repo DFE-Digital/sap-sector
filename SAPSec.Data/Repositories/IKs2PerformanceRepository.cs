@@ -1,8 +1,8 @@
 using SAPSec.Data.Dto.KS2.Performance;
 
-namespace SAPSec.Data.Store;
+namespace SAPSec.Data.Repositories;
 
-public interface IKs2PerformanceStore
+public interface IKs2PerformanceRepository
 {
     Task<Ks2PerformanceData?> GetByUrnAsync(string urn);
     Task<IReadOnlyCollection<Ks2PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns);

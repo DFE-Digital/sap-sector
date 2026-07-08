@@ -1,15 +1,15 @@
 ﻿using SAPSec.Core.UseCases;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SchoolInfo;
 
 public class GetSchoolInfoUseCase(
-    IEstablishmentStore establishmentStore)
+    IEstablishmentRepository establishmentRepository)
     : IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>
 {
     public async Task<GetSchoolInfoResponse> Execute(GetSchoolInfoRequest request)
     {
-        var establishment = await establishmentStore.GetEstablishmentAsync(request.Urn);
+        var establishment = await establishmentRepository.GetEstablishmentAsync(request.Urn);
 
         if (establishment is null)
         {

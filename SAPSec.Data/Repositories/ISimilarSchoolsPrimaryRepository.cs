@@ -1,8 +1,8 @@
 ﻿using SAPSec.Data.Dto.SimilarSchools.Primary;
 
-namespace SAPSec.Data.Store;
+namespace SAPSec.Data.Repositories;
 
-public interface ISimilarSchoolsPrimaryStore
+public interface ISimilarSchoolsPrimaryRepository
 {
     Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetGroupAsync(string urn);
     Task<IReadOnlyCollection<SimilarSchoolsPrimaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns);

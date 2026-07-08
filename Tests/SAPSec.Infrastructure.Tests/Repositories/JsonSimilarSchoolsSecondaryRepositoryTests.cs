@@ -5,13 +5,13 @@ using SAPSec.Infrastructure.Json;
 
 namespace SAPSec.Infrastructure.Tests.Repositories;
 
-public class JsonSimilarSchoolsSecondaryStoreTests
+public class JsonSimilarSchoolsSecondaryRepositoryTests
 {
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>> _groupsRepo = new();
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesEntry>> _valuesRepo = new();
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>> _standardDeviationsRepo = new();
 
-    private JsonSimilarSchoolsSecondaryStore CreateSut() =>
+    private JsonSimilarSchoolsSecondaryRepository CreateSut() =>
         new(
             _groupsRepo.Object,
             _valuesRepo.Object,

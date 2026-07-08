@@ -1,22 +1,22 @@
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Primary;
 
 public class PrimarySimilarSchoolsPerformanceDataProvider(
-    IEstablishmentStore establishmentStore,
-    ISimilarSchoolsPrimaryStore similarSchoolsStore,
-    IKs2PerformanceStore performanceStore)
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
+    IKs2PerformanceRepository performanceRepository)
 {
     public async Task<SimilarSchoolsData<Ks2PerformanceData>> GetSimilarSchoolsPerformance(string currentSchoolUrn)
     {
-        var similarSchoolUrns = (await similarSchoolsStore.GetGroupAsync(currentSchoolUrn))
+        var similarSchoolUrns = (await similarSchoolsRepository.GetGroupAsync(currentSchoolUrn))
             .Select(g => g.NeighbourURN)
             .Where(urn => !string.IsNullOrWhiteSpace(urn))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
 
-        var schools = (await establishmentStore.GetEstablishmentsAsync([currentSchoolUrn, .. similarSchoolUrns]))
+        var schools = (await establishmentRepository.GetEstablishmentsAsync([currentSchoolUrn, .. similarSchoolUrns]))
             .Select(SchoolInfo.SchoolInfo.FromEstablishment)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
@@ -27,7 +27,7 @@ public class PrimarySimilarSchoolsPerformanceDataProvider(
 
         var currentSchool = schools[currentSchoolUrn];
 
-        var performances = (await performanceStore.GetByUrnsAsync(schools.Keys))
+        var performances = (await performanceRepository.GetByUrnsAsync(schools.Keys))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         var currentSchoolData = new SchoolData<Ks2PerformanceData>(

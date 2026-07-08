@@ -1,18 +1,18 @@
 ﻿using Microsoft.Extensions.Logging;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Json;
 
-public class JsonEstablishmentEmailStore : IEstablishmentEmailStore
+public class JsonEstablishmentEmailRepository : IEstablishmentEmailRepository
 {
     private readonly IJsonFile<EstablishmentEmail> _establishmentEmailFile;
 
-    private ILogger<JsonEstablishmentEmailStore> _logger;
+    private ILogger<JsonEstablishmentEmailRepository> _logger;
 
-    public JsonEstablishmentEmailStore(
+    public JsonEstablishmentEmailRepository(
         IJsonFile<EstablishmentEmail> establishmentEmailFile,
-        ILogger<JsonEstablishmentEmailStore> logger)
+        ILogger<JsonEstablishmentEmailRepository> logger)
     {
         _establishmentEmailFile = establishmentEmailFile;
         _logger = logger;

@@ -1,44 +1,44 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Data.Store;
+using SAPSec.Data.Repositories;
 using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Test.Integration.Setup;
 
-public class InMemoryStoreIntegrationTestFixture : IntegrationTestFixture
+public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
 {
-    public InMemoryEstablishmentStore EstablishmentStore =>
-        (InMemoryEstablishmentStore)_factory.Services.GetRequiredService<IEstablishmentStore>();
+    public InMemoryEstablishmentRepository EstablishmentRepository =>
+        (InMemoryEstablishmentRepository)_factory.Services.GetRequiredService<IEstablishmentRepository>();
 
-    public InMemorySimilarSchoolsSecondaryStore SimilarSchoolsSecondaryStore =>
-        (InMemorySimilarSchoolsSecondaryStore)_factory.Services.GetRequiredService<ISimilarSchoolsSecondaryStore>();
+    public InMemorySimilarSchoolsSecondaryRepository SimilarSchoolsSecondaryRepository =>
+        (InMemorySimilarSchoolsSecondaryRepository)_factory.Services.GetRequiredService<ISimilarSchoolsSecondaryRepository>();
 
-    public InMemorySimilarSchoolsPrimaryStore SimilarSchoolsPrimaryStore =>
-        (InMemorySimilarSchoolsPrimaryStore)_factory.Services.GetRequiredService<ISimilarSchoolsPrimaryStore>();
+    public InMemorySimilarSchoolsPrimaryRepository SimilarSchoolsPrimaryRepository =>
+        (InMemorySimilarSchoolsPrimaryRepository)_factory.Services.GetRequiredService<ISimilarSchoolsPrimaryRepository>();
 
-    public InMemoryKs2PerformanceStore Ks2PerformanceStore =>
-        (InMemoryKs2PerformanceStore)_factory.Services.GetRequiredService<IKs2PerformanceStore>();
+    public InMemoryKs2PerformanceRepository Ks2PerformanceRepository =>
+        (InMemoryKs2PerformanceRepository)_factory.Services.GetRequiredService<IKs2PerformanceRepository>();
 
-    public InMemoryKs4PerformanceStore Ks4PerformanceStore =>
-        (InMemoryKs4PerformanceStore)_factory.Services.GetRequiredService<IKs4PerformanceStore>();
+    public InMemoryKs4PerformanceRepository Ks4PerformanceRepository =>
+        (InMemoryKs4PerformanceRepository)_factory.Services.GetRequiredService<IKs4PerformanceRepository>();
 
-    public InMemoryKs4DestinationsStore Ks4DestinationsStore =>
-        (InMemoryKs4DestinationsStore)_factory.Services.GetRequiredService<IKs4DestinationsStore>();
+    public InMemoryKs4DestinationsRepository Ks4DestinationsRepository =>
+        (InMemoryKs4DestinationsRepository)_factory.Services.GetRequiredService<IKs4DestinationsRepository>();
 
-    public InMemoryAbsenceStore AbsenceStore =>
-        (InMemoryAbsenceStore)_factory.Services.GetRequiredService<IAbsenceStore>();
+    public InMemoryAbsenceRepository AbsenceRepository =>
+        (InMemoryAbsenceRepository)_factory.Services.GetRequiredService<IAbsenceRepository>();
 
     protected override IntegrationTestsWebApplicationFactory CreateWebApplicationFactory() =>
-        new InMemoryStoreIntegrationTestsWebApplicationFactory();
+        new InMemoryRepositoryIntegrationTestsWebApplicationFactory();
 
     public override async Task DisposeAsync()
     {
-        EstablishmentStore.ClearDown();
-        SimilarSchoolsSecondaryStore.ClearDown();
-        SimilarSchoolsPrimaryStore.ClearDown();
-        Ks2PerformanceStore.ClearDown();
-        Ks4PerformanceStore.ClearDown();
-        Ks4DestinationsStore.ClearDown();
-        AbsenceStore.ClearDown();
+        EstablishmentRepository.ClearDown();
+        SimilarSchoolsSecondaryRepository.ClearDown();
+        SimilarSchoolsPrimaryRepository.ClearDown();
+        Ks2PerformanceRepository.ClearDown();
+        Ks4PerformanceRepository.ClearDown();
+        Ks4DestinationsRepository.ClearDown();
+        AbsenceRepository.ClearDown();
 
         await base.DisposeAsync();
     }
