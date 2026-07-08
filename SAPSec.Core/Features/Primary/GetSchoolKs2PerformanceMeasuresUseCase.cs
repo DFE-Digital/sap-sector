@@ -12,12 +12,12 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
 {
     public async Task<GetSchoolKs2PerformanceMeasuresResponse> Execute(GetSchoolKs2PerformanceMeasuresRequest request)
     {
-        var repository = new PrimarySimilarSchoolsPerformanceRepository(
+        var dataProvider = new PrimarySimilarSchoolsPerformanceDataProvider(
             establishmentStore,
             similarSchoolsStore,
             performanceStore);
 
-        var (currentSchoolPerformance, similarSchoolsPerformance) = await repository.GetSimilarSchoolsPerformance(request.Urn);
+        var (currentSchoolPerformance, similarSchoolsPerformance) = await dataProvider.GetSimilarSchoolsPerformance(request.Urn);
 
         var filterBy = request.FilterBy ?? new Dictionary<string, string>();
 

@@ -3,11 +3,11 @@ using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Secondary;
 
-public class SecondarySchoolsRepository(
+public class SecondarySchoolsDataProvider(
     IEstablishmentStore establishmentStore,
     ISimilarSchoolsSecondaryStore similarSchoolsStore,
     IKs4PerformanceStore performanceStore,
-    IKs4DestinationsStore destinationsStore) : ISecondarySchoolsRepository
+    IKs4DestinationsStore destinationsStore) : ISecondarySchoolsDataProvider
 {
     public async Task<SimilarSchoolsData<Ks4PerformanceData>> GetSimilarSchoolsPerformance(string urn)
     {

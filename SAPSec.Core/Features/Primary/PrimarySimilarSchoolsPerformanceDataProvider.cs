@@ -3,7 +3,7 @@ using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Primary;
 
-public class PrimarySimilarSchoolsPerformanceRepository(
+public class PrimarySimilarSchoolsPerformanceDataProvider(
     IEstablishmentStore establishmentStore,
     ISimilarSchoolsPrimaryStore similarSchoolsStore,
     IKs2PerformanceStore performanceStore)

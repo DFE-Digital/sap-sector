@@ -3,7 +3,7 @@ using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Secondary;
 
-public interface ISecondarySchoolsRepository
+public interface ISecondarySchoolsDataProvider
 {
     Task<SimilarSchoolsData<Ks4PerformanceData>> GetSimilarSchoolsPerformance(string urn);
     Task<SimilarSchoolsData<Ks4DestinationsData>> GetSimilarSchoolsDestinations(string urn);
