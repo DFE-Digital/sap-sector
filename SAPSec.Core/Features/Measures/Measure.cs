@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.Primary;
+using SAPSec.Core.Features.SimilarSchools;
 
 namespace SAPSec.Core.Features.Measures;
 
@@ -7,9 +7,9 @@ public record Measure(
     string Key,
     string Name,
     MeasureDataType DataType,
-    IEnumerable<MeasureAvailableFilter> Filters,
-    IEnumerable<MeasureSeries> Series,
-    IEnumerable<TopPerformer>? TopPerformers = null)
+    IReadOnlyCollection<MeasureAvailableFilter> Filters,
+    IReadOnlyCollection<MeasureSeries> Series,
+    IReadOnlyCollection<TopPerformer>? TopPerformers = null)
 {
     internal static Measure ForSecondarySchool<T>(
         string key,
@@ -25,8 +25,8 @@ public record Measure(
             name,
             dataType,
             availableFilters.ToList(),
-            MeasureSeries.ForSecondarySchool(currentSchool, similarSchools, fieldSelector),
-            TopPerformer.ForSecondarySchool(currentSchool, similarSchools, fieldSelector));
+            MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
+            TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
     }
 
     internal static Measure ForSecondarySchoolComparison<T>(
@@ -44,7 +44,7 @@ public record Measure(
             name,
             dataType,
             availableFilters.ToList(),
-            MeasureSeries.ForSecondarySchoolComparison(currentSchool, similarSchool, fieldSelector));
+            MeasureSeries.ForSchoolComparison(currentSchool, similarSchool, fieldSelector));
     }
 }
 

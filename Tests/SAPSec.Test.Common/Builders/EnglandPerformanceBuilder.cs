@@ -8,11 +8,11 @@ public class EnglandPerformanceBuilder()
     string RwmExpected_Tot_Cohort_Eng_Previous_Num = string.Empty;
     string RwmExpected_Tot_Cohort_Eng_Previous2_Num = string.Empty;
 
-    public EnglandPerformanceBuilder WithRwmExpected(string current, string previous, string previous2)
+    public EnglandPerformanceBuilder WithRwmExpected(string current, string prev, string prev2)
     {
         RwmExpected_Tot_Cohort_Eng_Current_Num = current;
-        RwmExpected_Tot_Cohort_Eng_Previous_Num = previous;
-        RwmExpected_Tot_Cohort_Eng_Previous2_Num = previous2;
+        RwmExpected_Tot_Cohort_Eng_Previous_Num = prev;
+        RwmExpected_Tot_Cohort_Eng_Previous2_Num = prev2;
 
         return this;
     }

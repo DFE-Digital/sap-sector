@@ -11,11 +11,27 @@ namespace SAPSec.Test.Accessibility;
 public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : AccessibilityTests(fixture)
 {
     private static readonly PageTestCase[] AllPagePaths = [
-        new(Routes.Home, false),
-        new(Routes.Accessibility, false),
-        new(Routes.FindASchool(), false),
-        new(Routes.SecondarySchool("100182").Home, false),
-        new(Routes.SecondarySchool("100182").Details, false),
+        new(Routes.Home),
+        new(Routes.Accessibility),
+        new(Routes.FindASchool()),
+
+        new(Routes.PrimarySchool("100749").Home),
+        new(Routes.PrimarySchool("100749").KS2, HasH3Headings: true),
+        new(Routes.PrimarySchool("100749").Attendance),
+        new(Routes.PrimarySchool("100749").ViewSimilarSchools),
+        new(Routes.PrimarySchool("100749").SimilarSchoolComparison("100134")),
+        new(Routes.PrimarySchool("100749").SchoolDetails),
+        new(Routes.PrimarySchool("100749").WhatIsASimilarSchool),
+
+        new(Routes.SecondarySchool("100182").Home),
+        new(Routes.SecondarySchool("100182").KS4HeadlineMeasures, HasH3Headings: true),
+        new(Routes.SecondarySchool("100182").KS4CoreSubjects, HasH3Headings: true),
+        new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),
+        new(Routes.SecondarySchool("100182").ViewSimilarSchools),
+        new(Routes.SecondarySchool("100182").SimilarSchoolComparison("136555"), AllowHorizontalScroll: true),
+        new(Routes.SecondarySchool("100182").SchoolDetails),
+        new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),
+        
         // TODO: Fill out with all pages from service
     ];
 
@@ -171,7 +187,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     }
 
     [Theory]
-    [MemberData(nameof(AllPagesWithHasH3Headings))]
+    [MemberData(nameof(AllPagesWithH3Headings))]
     public async Task AllPages_HaveSemanticHTMLStructure(string path, bool hasH3Headings)
     {
         await NavigateTo(path);
@@ -508,7 +524,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     }
 
     [Theory]
-    [MemberData(nameof(AllPages))]
+    [MemberData(nameof(AllPagesWithNoHorizontalScroll))]
     public async Task AllPages_NoHorizontalScroll_OnMobile(string path)
     {
         await Page.SetViewportSizeAsync(375, 667);
@@ -540,7 +556,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     public static TheoryData<string> AllPages()
     {
         var data = new TheoryData<string>();
-        foreach (var (path, hasH3Headings) in AllPagePaths)
+        foreach (var (path, _, _) in AllPagePaths)
         {
             data.Add(path);
         }
@@ -548,10 +564,10 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         return data;
     }
 
-    public static TheoryData<string, bool> AllPagesWithHasH3Headings()
+    public static TheoryData<string, bool> AllPagesWithH3Headings()
     {
         var data = new TheoryData<string, bool>();
-        foreach (var (path, hasH3Headings) in AllPagePaths)
+        foreach (var (path, hasH3Headings, _) in AllPagePaths)
         {
             data.Add(path, hasH3Headings);
         }
@@ -559,5 +575,19 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         return data;
     }
 
-    private record PageTestCase(string Path, bool HasH3Headings);
+    public static TheoryData<string> AllPagesWithNoHorizontalScroll()
+    {
+        var data = new TheoryData<string>();
+        foreach (var (path, _, allowHorizontalScroll) in AllPagePaths)
+        {
+            if (!allowHorizontalScroll)
+            {
+                data.Add(path);
+            }
+        }
+
+        return data;
+    }
+
+    private record PageTestCase(string Path, bool HasH3Headings = false, bool AllowHorizontalScroll = false);
 }

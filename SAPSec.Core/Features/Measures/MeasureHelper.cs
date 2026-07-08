@@ -1,20 +1,13 @@
-using SAPSec.Core.Features.Measures;
 using System.Globalization;
 
-namespace SAPSec.Core.Measures;
+namespace SAPSec.Core.Features.Measures;
 
 public class MeasureHelper
 {
-    public static decimal? AverageFrom(IEnumerable<string?> stringValues) =>
+    public static decimal? Average(IEnumerable<string?> stringValues) =>
         Average(stringValues.Select(ParseNullableDecimal));
 
-    public static decimal? AverageFrom(params string?[] values) => AverageFrom((IEnumerable<string?>)values);
-
-    public static YearByYearSeries SeriesFrom(string? current, string? previous, string? previous2) =>
-        new(
-            ParseNullableDecimal(current),
-            ParseNullableDecimal(previous),
-            ParseNullableDecimal(previous2));
+    public static decimal? Average(params string?[] values) => Average((IEnumerable<string?>)values);
 
     public static decimal? Average(IEnumerable<decimal?> values)
     {

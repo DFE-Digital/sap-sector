@@ -77,7 +77,22 @@ public class SchoolController(
     [Route("view-similar-schools/{similarSchoolUrn}")]
     public async Task<IActionResult> SimilarSchoolComparison(string urn, string similarSchoolUrn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+        {
+            return NotFound();
+        }
+
+        var currentSchool = (await getSchoolInfoUseCase.Execute(new(urn))).School;
+        var similarSchool = (await getSchoolInfoUseCase.Execute(new(similarSchoolUrn))).School;
+
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
+            Url,
+            currentSchool.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
+
+        return View((SchoolInfoViewModel.FromSchoolInfo(currentSchool), SchoolInfoViewModel.FromSchoolInfo(similarSchool)));
     }
 
     [HttpGet]

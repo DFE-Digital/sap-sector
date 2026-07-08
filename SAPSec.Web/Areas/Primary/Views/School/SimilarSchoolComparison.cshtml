@@ -1,0 +1,24 @@
+@using SAPSec.Core.Model
+@using SAPSec.Web.ViewModels
+
+@model (SchoolInfoViewModel, SchoolInfoViewModel)
+@{
+    Layout = "_Layout";
+}
+
+<span class="govuk-caption-xl">
+    @Model.Item1!.Name
+</span>
+
+<span
+    class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-padding-top-1 govuk-!-padding-bottom-1">
+        Comparing to
+    </span>
+
+<h1 class="govuk-heading-xl">
+    @Model.Item2.Name
+</h1>
+
+<p class="govuk-body">
+    Comparison tabs for this school will appear here.
+</p>

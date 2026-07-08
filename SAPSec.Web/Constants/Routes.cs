@@ -32,17 +32,25 @@ public static class Routes
     public class Primary(string urn)
     {
         public string Home => $"/school/primary/{urn}";
-        public string Ks2 => $"/school/primary/{urn}/ks2";
-        public string Details => $"/school/primary/{urn}/school-details";
-        public string SimilarSchools => $"/school/primary/{urn}/view-similar-schools";
-        public string SimilarSchoolComparison(string similarSchoolUrn) => $"/school/primary/{urn}/view-similar-schools/{similarSchoolUrn}";
+        public string KS2 => $"/school/primary/{urn}/ks2";
+        public string Attendance => $"/school/primary/{urn}/attendance";
+        public string ViewSimilarSchools => $"/school/primary/{urn}/view-similar-schools";
+        public string SimilarSchoolComparison(string similarSchoolUrn)
+            => $"/school/primary/{urn}/view-similar-schools/{similarSchoolUrn}";
+        public string SchoolDetails => $"/school/primary/{urn}/school-details";
+        public string WhatIsASimilarSchool => $"/school/primary/{urn}/what-is-a-similar-school";
     }
 
     public class Secondary(string urn)
     {
         public string Home => $"/school/{urn}";
-        public string Details => $"/school/{urn}/school-details";
-        public string SimilarSchools => $"/school/{urn}/view-similar-schools";
-        public string SimilarSchoolComparison(string similarSchoolUrn) => $"/school/{urn}/view-similar-schools/{similarSchoolUrn}";
+        public string KS4HeadlineMeasures => $"/school/{urn}/ks4-headline-measures";
+        public string KS4CoreSubjects => $"/school/{urn}/ks4-core-subjects";
+        public string Attendance => $"/school/{urn}/attendance";
+        public string ViewSimilarSchools => $"/school/{urn}/view-similar-schools";
+        public string SimilarSchoolComparison(string similarSchoolUrn)
+            => $"/school/{urn}/view-similar-schools/{similarSchoolUrn}";
+        public string SchoolDetails => $"/school/{urn}/school-details";
+        public string WhatIsASimilarSchool => $"/school/{urn}/what-is-a-similar-school";
     }
 }

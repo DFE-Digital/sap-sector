@@ -1,6 +1,5 @@
 ﻿@using System.Text.Json
 @using SAPSec.Core.Features.Measures
-@using SAPSec.Core.Measures
 @using SAPSec.Web.Constants
 @using SAPSec.Web.ViewModels.Measures
 
@@ -13,6 +12,12 @@
         data = Model.Averages.ToArray()
     };
     var hasAnyData = Model.Averages.Any();
+    var decimals = Model.MeasureInfo.DataType switch
+    {
+        MeasureDataType.Score => 1,
+        MeasureDataType.AbsencePercentage => 2,
+        _ => 0
+    };
 }
 
 <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
@@ -24,12 +29,10 @@
                 data-show-no-data-labels="true"
                 data-axis-step="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 30 : 25)"
                 data-axis-max="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 90 : 100)"
-                data-label-decimals="@(Model.MeasureInfo.DataType switch
-                {
-                    MeasureDataType.Score => 1,
-                    MeasureDataType.AbsencePercentage => 2,
-                    _ => 0
-                })"
+                data-label-decimals="@decimals"
+                data-tooltip-decimals="@decimals"
+                data-category-percentage="0.6"
+                data-bar-percentage="1"
                 data-bar-thickness="50"
                 data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.AbsencePercentage? "%" : "")"
                 data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'

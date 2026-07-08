@@ -1,5 +1,4 @@
-using SAPSec.Core.Features.Primary;
-using SAPSec.Core.Measures;
+using SAPSec.Core.Features.SimilarSchools;
 
 namespace SAPSec.Core.Features.Measures;
 
@@ -10,28 +9,22 @@ public record TopPerformer(
     decimal? Value,
     bool IsCurrentSchool = false)
 {
-    internal static IEnumerable<TopPerformer> ForSecondarySchool<T>(
-    SchoolData<T> currentSchool,
-    IEnumerable<SchoolData<T>> similarSchools,
-    MeasureFieldSelector<T> fieldSelector)
+    internal static IReadOnlyCollection<TopPerformer> BuildTopPerformers<T>(
+        SchoolData<T> currentSchool,
+        IEnumerable<SchoolData<T>> similarSchools,
+        MeasureFieldSelector<T> fieldSelector)
     {
         var currentSchoolCandidate = new TopPerformerCandidate(
             currentSchool.SchoolInfo.Urn,
             currentSchool.SchoolInfo.Name,
-            MeasureHelper.AverageFrom(
-                fieldSelector.SchoolCurrent(currentSchool.Data),
-                fieldSelector.SchoolPrevious(currentSchool.Data),
-                fieldSelector.SchoolPrevious2(currentSchool.Data)),
+            MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),
             IsCurrentSchool: true);
 
         return similarSchools
             .Select(x => new TopPerformerCandidate(
                 x.SchoolInfo.Urn,
                 x.SchoolInfo.Name,
-                MeasureHelper.AverageFrom(
-                    fieldSelector.SchoolCurrent(x.Data),
-                    fieldSelector.SchoolPrevious(x.Data),
-                    fieldSelector.SchoolPrevious2(x.Data)),
+                MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(x.Data)),
                 IsCurrentSchool: false))
             .Append(currentSchoolCandidate)
             .Where(x => x.Value.HasValue)

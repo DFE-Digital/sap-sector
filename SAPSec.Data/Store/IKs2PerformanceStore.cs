@@ -6,13 +6,6 @@ public interface IKs2PerformanceStore
 {
     Task<Ks2PerformanceData?> GetByUrnAsync(string urn);
     Task<IReadOnlyCollection<Ks2PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns);
-
-    //Task<EstablishmentPerformance?> GetEstablishmentByUrnAsync(string urn);
-    //Task<IReadOnlyCollection<EstablishmentPerformance>> GetEstablishmentByUrnsAsync(IEnumerable<string> urns);
-    //Task<LAPerformance?> GetLAByIdAsync(string laId);
-    //Task<IReadOnlyCollection<LAPerformance>> GetLAByIdsAsync(IEnumerable<string> laId);
-    //Task<EnglandPerformance?> GetEnglandAsync();
-
 }
 
 public record Ks2PerformanceData(
@@ -20,4 +13,3 @@ public record Ks2PerformanceData(
     EstablishmentPerformance? EstablishmentPerformance,
     LAPerformance? LocalAuthorityPerformance,
     EnglandPerformance? EnglandPerformance);
-

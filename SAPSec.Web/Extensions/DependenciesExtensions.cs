@@ -40,7 +40,6 @@ public static class DependenciesExtensions
         services.AddSingleton<GetCharacteristicsComparison>();
         services.AddSingleton<IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>, GetSchoolInfoUseCase>();
         services.AddSingleton<ISecondarySchoolsRepository, SecondarySchoolsRepository>();
-        services.AddSingleton<IPrimarySchoolsRepository, PrimarySchoolsRepository>();
         services.AddSingleton<IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>, GetSchoolKs2PerformanceMeasuresUseCase>();
 
         services.AddSingleton<IJsonFileFactory, JsonFileFactory>();

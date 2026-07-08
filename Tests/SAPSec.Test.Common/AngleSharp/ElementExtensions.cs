@@ -21,4 +21,9 @@ public static class ElementExtensions
         var rows = table.QuerySelectorAll("tr").Select(r => r.QuerySelectorAll("th, td").Select(TrimmedTextContent));
         rows.Should().BeEquivalentTo(expectedRows);
     }
+
+    public static string RelativeHref(this IHtmlAnchorElement el)
+    {
+        return el.Href.Replace("https://127.0.0.1:0", "");
+    }
 }

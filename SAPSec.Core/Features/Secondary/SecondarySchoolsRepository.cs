@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Primary;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Secondary;

@@ -6,7 +6,7 @@ using SAPSec.Data.Dto.KS4.Destinations;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Store;
 
-namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
+namespace SAPSec.Core.Tests.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 
 public class GetKs4HeadlineMeasuresTests
 {

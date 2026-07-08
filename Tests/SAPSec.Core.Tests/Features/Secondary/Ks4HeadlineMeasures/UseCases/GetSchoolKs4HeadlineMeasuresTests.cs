@@ -8,7 +8,7 @@ using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Store;
 
-namespace SAPSec.Core.Tests.Features.Ks4HeadlineMeasures.UseCases;
+namespace SAPSec.Core.Tests.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 
 public class GetSchoolKs4HeadlineMeasuresTests
 {

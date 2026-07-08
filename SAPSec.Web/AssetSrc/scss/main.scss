@@ -1454,6 +1454,19 @@ $app-ks4-color-track: #f3f2f1;
   display: none !important;
 }
 
+.app-ks4-tabs [id$="table-view"] table {
+  .govuk-table__header.govuk-table__header--numeric {
+    width: 7rem;
+  }
+  
+  .govuk-table__row:last-of-type {
+    .govuk-table__cell, .govuk-table__header {
+      border-bottom: none;
+    }
+  }
+}
+
+
 .school-comparison-breadcrumb {
   margin-bottom: 5px !important;
 }

@@ -1,6 +1,5 @@
 ﻿@using System.Text.Json
 @using SAPSec.Core.Features.Measures
-@using SAPSec.Core.Measures
 @using SAPSec.Web.Constants
 @using SAPSec.Web.ViewModels.Measures
 
@@ -21,6 +20,12 @@
             })
             .ToArray()
     };
+    var decimals = Model.MeasureInfo.DataType switch
+    {
+        MeasureDataType.Score => 1,
+        MeasureDataType.AbsencePercentage => 2,
+        _ => 0
+    };
 }
 
 <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
@@ -35,6 +40,8 @@
             data-show-x-grid="true"
             data-show-legend="true"
             data-show-datalabels="false"
+            data-label-decimals="@decimals"
+            data-tooltip-decimals="@decimals"
             data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
             @if (Model.MeasureInfo.YearByYearColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.YearByYearColors))'</text> }>
     </canvas>

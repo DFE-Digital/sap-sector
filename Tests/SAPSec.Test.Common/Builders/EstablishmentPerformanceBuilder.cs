@@ -8,11 +8,11 @@ public class EstablishmentPerformanceBuilder(string urn)
     string RwmExpected_Tot_Cohort_Est_Previous_Num = string.Empty;
     string RwmExpected_Tot_Cohort_Est_Previous2_Num = string.Empty;
 
-    public EstablishmentPerformanceBuilder WithRwmExpected(string current, string previous, string previous2)
+    public EstablishmentPerformanceBuilder WithRwmExpected(string? current, string? prev, string? prev2)
     {
-        RwmExpected_Tot_Cohort_Est_Current_Num = current;
-        RwmExpected_Tot_Cohort_Est_Previous_Num = previous;
-        RwmExpected_Tot_Cohort_Est_Previous2_Num = previous2;
+        RwmExpected_Tot_Cohort_Est_Current_Num = current ?? string.Empty;
+        RwmExpected_Tot_Cohort_Est_Previous_Num = prev ?? string.Empty;
+        RwmExpected_Tot_Cohort_Est_Previous2_Num = prev2 ?? string.Empty;
 
         return this;
     }

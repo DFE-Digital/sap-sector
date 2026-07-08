@@ -11,6 +11,18 @@ public record MeasureViewModel(
     TableViewModel Table,
     TopPerformersViewModel? TopPerformers)
 {
+    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
+        seriesType switch
+        {
+            MeasureSeriesType.CurrentSchool => currentSchool.Name,
+            MeasureSeriesType.SimilarSchool => similarSchool?.Name ??
+                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
+            MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
+            MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
+            MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
+            _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
+        };
+
     public static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
@@ -22,7 +34,7 @@ public record MeasureViewModel(
             measure.Name,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => s.Label),
+            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo)),
             chartColors,
             yearByYearColors);
 
@@ -61,7 +73,7 @@ public record MeasureViewModel(
             topPerformers = new TopPerformersViewModel(
                 measureInfo,
                 measure.TopPerformers.Select(MapTopPerformer),
-                Routes.PrimarySchool(schoolInfo.Urn).SimilarSchools);
+                Routes.PrimarySchool(schoolInfo.Urn).ViewSimilarSchools);
         }
 
         return new(

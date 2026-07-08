@@ -9,7 +9,7 @@ using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Store;
 
-namespace SAPSec.Core.Tests.Features.Ks4CoreSubjects;
+namespace SAPSec.Core.Tests.Features.Secondary.Ks4CoreSubjects;
 
 public class GetSchoolKs4CoreSubjectsTests
 {

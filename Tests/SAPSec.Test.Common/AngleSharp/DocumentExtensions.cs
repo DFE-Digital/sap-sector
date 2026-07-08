@@ -16,6 +16,16 @@ public static class DocumentExtensions
         return element;
     }
 
+    public static IElement ElementWithTextContentShouldExist(this IDocument doc, string selector, string text)
+    {
+        var element = doc.QuerySelectorAll(selector)
+            .Where(e => e.TrimmedTextContent() == text)
+            .FirstOrDefault();
+        element.Should().NotBeNull();
+
+        return element;
+    }
+
     public static IHtmlInputElement InputWithNameShouldExist(this IDocument doc, string name)
     {
         return doc.QuerySelector($@"input[name=""{name}""]")
@@ -30,11 +40,11 @@ public static class DocumentExtensions
             .Subject;
     }
 
-    public static IHtmlAnchorElement LinkWithTextShouldExist(this IDocument doc, string text)
+    public static IHtmlAnchorElement LinkWithTextContentShouldExist(this IDocument doc, string text)
     {
         return doc.QuerySelectorAll("a")
             .Where(e => e.TrimmedTextContent() == text)
-            .First()
+            .FirstOrDefault()
             .Should().NotBeNull().And.BeAssignableTo<IHtmlAnchorElement>()
             .Subject;
     }

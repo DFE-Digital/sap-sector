@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.Primary;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Secondary;
@@ -9,7 +9,7 @@ internal static class Ks4PerformanceMeasures
 {
     public static class Attainment8
     {
-        public static Measure ForSecondarySchool(SchoolData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolData<Ks4PerformanceData>> similarSchools, IDictionary<string, string> filters)
+        public static Measure ForSchool(SchoolData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolData<Ks4PerformanceData>> similarSchools, IDictionary<string, string> filters)
         {
             return Measure.ForSecondarySchool(
                 "attainment8",
@@ -30,7 +30,7 @@ internal static class Ks4PerformanceMeasures
                     x => x?.EnglandPerformance?.Attainment8_Tot_Eng_Previous2_Num));
         }
 
-        public static Measure ForSecondarySchoolComparison(SchoolData<Ks4PerformanceData> currentSchool, SchoolData<Ks4PerformanceData> similarSchool, IEnumerable<SchoolData<Ks4PerformanceData>> similarSchools, IDictionary<string, string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks4PerformanceData> currentSchool, SchoolData<Ks4PerformanceData> similarSchool, IEnumerable<SchoolData<Ks4PerformanceData>> similarSchools, IDictionary<string, string> filters)
         {
             return Measure.ForSecondarySchoolComparison(
                 "attainment8",

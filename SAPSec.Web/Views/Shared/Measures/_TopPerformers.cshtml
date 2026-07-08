@@ -10,7 +10,7 @@
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Rank</th>
             <th scope="col" class="govuk-table__header">School</th>
-            <th scope="col" class="govuk-table__header govuk-table__header--numeric">3-year average</th>
+            <th scope="col" class="govuk-table__header govuk-table__header--numeric">2024 to 2025</th>
         </tr>
     </thead>
     <tbody class="govuk-table__body">
@@ -28,7 +28,7 @@
                         <a href="@row.Link" class="govuk-link">@row.Name</a>
                     }
                 </th>
-                <td class="govuk-table__cell govuk-table__cell--numeric">@row.Rank</td>
+                <td class="govuk-table__cell govuk-table__cell--numeric">@Model.DisplayNumber(row.Value)</td>
             </tr>
         }
     </tbody>

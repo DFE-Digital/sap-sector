@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Store;
 
 namespace SAPSec.Core.Features.Primary;
@@ -12,7 +13,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSecondarySchool(
                 "expected-rwm",
                 "Meeting expected standard in reading, writing and maths",
-                MeasureDataType.Score,
+                MeasureDataType.GradePercentage,
                 [],
                 currentSchool,
                 similarSchools,
@@ -33,7 +34,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSecondarySchoolComparison(
                 "expected-rwm",
                 "Meeting expected standard in reading, writing and maths",
-                MeasureDataType.Score,
+                MeasureDataType.GradePercentage,
                 [],
                 currentSchool,
                 similarSchool,

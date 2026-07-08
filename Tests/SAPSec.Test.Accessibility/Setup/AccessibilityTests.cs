@@ -49,6 +49,12 @@ public abstract class AccessibilityTests : PageTest
         var response = await Page.GotoAsync(path);
 
         response.Should().NotBeNull();
+
+        if (System.Diagnostics.Debugger.IsAttached && response.Status != 200)
+        {
+            System.Diagnostics.Debugger.Break();
+        }
+
         response.Status.Should().Be(200);
         await Page.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
         await Page.WaitForSelectorAsync("main");
