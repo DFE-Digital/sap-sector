@@ -52,11 +52,6 @@
     <None Remove="Data\Files\PrimarySchools\EstablishmentSubjectEntries.json" />
     <None Remove="Data\Files\PrimarySchools\LAPerformance.json" />
     <None Remove="Data\Files\PrimarySchools\LASubjectEntries.json" />
-    <None Remove="Data\Schools.csv" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="Data\Establishments.csv" />
   </ItemGroup>
 
   <ItemGroup>

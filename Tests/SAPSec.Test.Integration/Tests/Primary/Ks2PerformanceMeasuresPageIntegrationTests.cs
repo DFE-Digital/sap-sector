@@ -7,7 +7,7 @@ using SAPSec.Web.Constants;
 using System.Net;
 using Xunit.Abstractions;
 
-namespace SAPSec.Test.Integration;
+namespace SAPSec.Test.Integration.Tests.Primary;
 
 public class Ks2PerformanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
@@ -159,11 +159,11 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
         OutputHelper.WriteLine(page.DocumentElement.OuterHtml);
 
         var similarSchoolsLink = page.LinkWithTextContentShouldExist("See all similar schools");
-        similarSchoolsLink.RelativeHref().Should().Be(Routes.PrimarySchool("100001").ViewSimilarSchools);
+        similarSchoolsLink.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").ViewSimilarSchools);
 
         var topPerfomersLinks = page.QuerySelectorAll("#expected-rwm-top-performers table a");
         var hrefs = topPerfomersLinks.Should().AllBeAssignableTo<IHtmlAnchorElement>()
-            .Subject.Select(l => l.RelativeHref());
+            .Subject.Select(l => l.GetAttribute("href"));
 
         hrefs.Should().BeEquivalentTo([
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100004"),

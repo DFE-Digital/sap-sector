@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
@@ -28,18 +27,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
-        var testDataFilePath = GetTestDataFilePath();
-        var configurationValues = CreateConfigurationValues(testDataFilePath);
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(configurationValues)
-            .Build();
-
         builder
-            .UseConfiguration(configuration)
-            .ConfigureAppConfiguration(configurationBuilder =>
-            {
-                configurationBuilder.AddInMemoryCollection(configurationValues);
-            })
             .ConfigureServices(services =>
             {
                 services.RemoveAll<IUserService>();
@@ -132,34 +120,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 $"Could not find SAPSec.Web. Searched: {string.Join(", ", possiblePaths)}");
 
         return _cachedWebProjectPath;
-    }
-
-    private static string GetTestDataFilePath()
-    {
-        // First try test project's TestData folder
-        var testProjectPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(testProjectPath))
-        {
-            return testProjectPath;
-        }
-
-        // Try web project's TestData folder
-        var webProjectPath = Path.Combine(
-            GetWebProjectPath(),
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(webProjectPath))
-        {
-            return webProjectPath;
-        }
-
-        throw new FileNotFoundException(
-            $"Test data file not found. Searched:\n- {testProjectPath}\n- {webProjectPath}");
     }
 
     #endregion

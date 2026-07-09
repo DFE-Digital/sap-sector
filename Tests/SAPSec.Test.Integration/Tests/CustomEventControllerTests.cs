@@ -3,7 +3,7 @@ using SAPSec.Test.Integration.Setup;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace SAPSec.Test.Integration;
+namespace SAPSec.Test.Integration.Tests;
 
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public class CustomEventControllerTests(JsonRepositoryIntegrationTestFixture fixture)

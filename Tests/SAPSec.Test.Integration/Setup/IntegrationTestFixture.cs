@@ -5,7 +5,9 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Infrastructure.LuceneSearch;
+using SAPSec.Test.Common.FeatureFlags;
 using System.Net;
 
 namespace SAPSec.Test.Integration.Setup;
@@ -21,6 +23,9 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
     public HttpClient Client { get; private set; } = null!;
 
     public HttpClient NonRedirectingClient { get; private set; } = null!;
+
+    public MockFeatureFlagService FeatureFlagService =>
+        (MockFeatureFlagService)_factory.Services.GetRequiredService<IFeatureFlagService>();
 
     public Task InitializeAsync()
     {

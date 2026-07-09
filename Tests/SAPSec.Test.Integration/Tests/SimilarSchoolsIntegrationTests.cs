@@ -3,7 +3,7 @@ using SAPSec.Test.Integration.Setup;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace SAPSec.Test.Integration;
+namespace SAPSec.Test.Integration.Tests;
 
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)

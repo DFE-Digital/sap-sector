@@ -3,7 +3,7 @@ using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
 
-namespace SAPSec.Test.Integration;
+namespace SAPSec.Test.Integration.Tests;
 
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public class HomeControllerTests(JsonRepositoryIntegrationTestFixture fixture)

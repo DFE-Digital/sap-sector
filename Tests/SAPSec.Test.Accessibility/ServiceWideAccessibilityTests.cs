@@ -1,6 +1,7 @@
 ﻿using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using SAPSec.Test.Accessibility.Setup;
+using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
 using Xunit;
@@ -223,20 +224,32 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
 
         var links = Page.Locator("main a");
         var count = await links.CountAsync();
-        var linkTexts = new List<string>();
 
         for (var i = 0; i < count; i++)
         {
-            var text = await links.Nth(i).TextContentAsync();
-            if (!string.IsNullOrWhiteSpace(text))
-            {
-                linkTexts.Add(text.Trim());
-            }
-        }
+            var text = await links.Nth(i).TrimmedTextContentAsync();
 
-        linkTexts.Should().NotContain("click here", "Links should not use 'click here' text");
-        linkTexts.Should().NotContain("here", "Links should not use 'here' text alone");
-        linkTexts.Should().NotContain("read more", "Links should not use 'read more' text alone");
+            text.Should().NotContain("click here", "Links should not use 'click here' text");
+            text.Should().NotContain("here", "Links should not use 'here' text alone");
+            text.Should().NotContain("read more", "Links should not use 'read more' text alone");
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(AllPages))]
+    public async Task AllPages_Links_ShouldNotHaveMissingOrEmptyHref(string path)
+    {
+        await NavigateTo(path);
+
+        var links = Page.Locator("main a");
+        var count = await links.CountAsync();
+
+        for (var i = 0; i < count; i++)
+        {
+            var href = await links.Nth(i).GetAttributeAsync("href");
+
+            href.Should().NotBeNullOrWhiteSpace();
+        }
     }
 
     [Theory]

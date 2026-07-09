@@ -22,8 +22,9 @@ public static class ElementExtensions
         rows.Should().BeEquivalentTo(expectedRows);
     }
 
-    public static string RelativeHref(this IHtmlAnchorElement el)
+    public static void ShouldLinkTo(this IElement el, string text, string path)
     {
-        return el.Href.Replace("https://127.0.0.1:0", "");
+        el.TrimmedTextContent().Should().Be(text);
+        el.GetAttribute("href").Should().Be(path);
     }
 }

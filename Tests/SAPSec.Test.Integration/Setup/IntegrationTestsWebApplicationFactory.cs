@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using J2N.Collections.Generic.Extensions;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Test.Common.Authentication;
+using SAPSec.Test.Common.FeatureFlags;
 using SAPSec.Web;
 using SAPSec.Web.Services;
 
@@ -41,6 +44,11 @@ public abstract class IntegrationTestsWebApplicationFactory : WebApplicationFact
                 // Add or replace any services that the application needs during testing.
                 services.AddTestDsiDependencies();
                 services.AddScoped<ICustomEventService, NoOpCustomEventService>();
+                services.RemoveAll<IFeatureFlagService>();
+                services.AddSingleton<FeatureFlagService>();
+                services.AddSingleton<IFeatureFlagService>(provider =>
+                    new MockFeatureFlagService(provider.GetRequiredService<FeatureFlagService>()));
+
                 ConfigureServices(services);
             });
     }

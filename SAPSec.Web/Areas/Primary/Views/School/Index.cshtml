@@ -10,7 +10,7 @@
 
 <div class="app-overview">
     <header class="app-overview__header">
-        <h1 class="govuk-heading-xl app-overview__title">@Model.Name</h1>
+        <h1 class="govuk-heading-xl app-overview__title">@ViewData["Title"]</h1>
         <p class="govuk-body-l app-overview__address">@Model.Address</p>
     </header>
 
@@ -29,7 +29,7 @@
             match every characteristic but they will be similar across a large number of them.
         </p>
         <p class="govuk-body">
-            Find out more about <a href="/school/primary/@Model.Urn/what-is-a-similar-school" class="govuk-link">how the DfE defines what a similar school is</a>.
+            Find out more about <a href="@Routes.PrimarySchool(Model.Urn).WhatIsASimilarSchool" class="govuk-link">how the DfE defines what a similar school is</a>.
         </p>
     </section>
 

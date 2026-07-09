@@ -2,7 +2,7 @@
 using SAPSec.Test.Integration.Setup;
 using System.Net;
 
-namespace SAPSec.Test.Integration;
+namespace SAPSec.Test.Integration.Tests;
 
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public class SchoolSearchPaginationIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
