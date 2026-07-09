@@ -1,5 +1,6 @@
 ﻿using Codeuctivity.SkiaSharpCompare;
 using FluentAssertions;
+using FluentAssertions.Execution;
 using Microsoft.Playwright;
 
 namespace SAPSec.Test.Common.Playwright;
@@ -7,18 +8,45 @@ namespace SAPSec.Test.Common.Playwright;
 public static class LocatorAssertionsExtensions
 {
     private const double PixelErrorPercentageThreshold = 10;
+    private const string PercentageValuePattern = @"\d\d%";
 
     public static async Task ToMatchScreenshotAsync(this ILocatorAssertions assertions, string screenshotName)
     {
+        var actualPath = Path.Combine("Screenshots", $@"{screenshotName}-actual.png");
+        var expectedPath = Path.Combine("Screenshots", $@"{screenshotName}.png");
+
         var locator = assertions.GetActualLocator();
-
-        var actualPath = $@"Screenshots\{screenshotName}-actual.png";
-        var expectedPath = $@"Screenshots\{screenshotName}.png";
         await locator.ScreenshotAsync(new() { Path = actualPath });
-        var result = Compare.CalcDiff(actualPath, expectedPath, ResizeOption.Resize);
 
-        result.Should().NotBeNull();
-        result!.PixelErrorPercentage.Should().BeLessThan(PixelErrorPercentageThreshold);
+        try
+        {
+            var result = Compare.CalcDiff(actualPath, expectedPath, ResizeOption.Resize);
+
+            result.Should().NotBeNull();
+            result!.PixelErrorPercentage.Should().BeLessThan(PixelErrorPercentageThreshold);
+        }
+        catch (ArgumentNullException ex)
+        {
+            if (ex.Message.Contains("'actual'"))
+            {
+                Execute.Assertion.FailWith($"Missing screenshot file: {actualPath}");
+            }
+
+            if (ex.Message.Contains("'expected'"))
+            {
+                Execute.Assertion.FailWith($"Missing screenshot file: {expectedPath}");
+            }
+
+            throw;
+        }
+    }
+
+    public static async Task ToBePercentageValuesHavingCount(this ILocatorAssertions assertions, int count)
+    {
+        await assertions.ToHaveCountAsync(count);
+        var locator = assertions.GetActualLocator();
+        var previous2Values = await locator.AllTrimmedTextContentsAsync();
+        previous2Values.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
     }
 
     private static ILocator GetActualLocator(this ILocatorAssertions assertions)
@@ -31,9 +59,9 @@ public static class LocatorAssertionsExtensions
 
         if (locator is null)
         {
-            throw new InvalidOperationException("Could not determine underlying ILocator for expectation.");
+            Execute.Assertion.FailWith("Could not determine underlying ILocator for expectation.");
         }
 
-        return locator;
+        return locator!;
     }
 }

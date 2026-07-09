@@ -11,7 +11,7 @@ public record Measure(
     IReadOnlyCollection<MeasureSeries> Series,
     IReadOnlyCollection<TopPerformer>? TopPerformers = null)
 {
-    internal static Measure ForSecondarySchool<T>(
+    internal static Measure ForSchool<T>(
         string key,
         string name,
         MeasureDataType dataType,
@@ -29,7 +29,7 @@ public record Measure(
             TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
     }
 
-    internal static Measure ForSecondarySchoolComparison<T>(
+    internal static Measure ForSchoolComparison<T>(
         string key,
         string name,
         MeasureDataType dataType,

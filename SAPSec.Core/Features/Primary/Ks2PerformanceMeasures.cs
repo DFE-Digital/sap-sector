@@ -10,7 +10,7 @@ internal static class Ks2PerformanceMeasures
     {
         public static Measure ForSchool(SchoolData<Ks2PerformanceData> currentSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
         {
-            return Measure.ForSecondarySchool(
+            return Measure.ForSchool(
                 "expected-rwm",
                 "Meeting expected standard in reading, writing and maths",
                 MeasureDataType.GradePercentage,
@@ -31,7 +31,7 @@ internal static class Ks2PerformanceMeasures
 
         public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
         {
-            return Measure.ForSecondarySchoolComparison(
+            return Measure.ForSchoolComparison(
                 "expected-rwm",
                 "Meeting expected standard in reading, writing and maths",
                 MeasureDataType.GradePercentage,

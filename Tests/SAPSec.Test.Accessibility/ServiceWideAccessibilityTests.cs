@@ -29,6 +29,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.SecondarySchool("100182").KS4CoreSubjects, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
+        // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
         new(Routes.SecondarySchool("100182").SimilarSchoolComparison("136555"), AllowHorizontalScroll: true),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),

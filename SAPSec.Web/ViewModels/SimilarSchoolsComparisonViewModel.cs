@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using System.Globalization;

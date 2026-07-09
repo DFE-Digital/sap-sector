@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Constants;
@@ -21,34 +20,29 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Route("school/primary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
+[RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
-    IFeatureFlagService featureFlagService) : Controller
+    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase)
+    : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("ks2")]
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
-        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
-        {
-            return NotFound();
-        }
-
         var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn));
 
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(response.School);
-        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
-            Url,
-            response.School.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+        PopulateViewData(response.School);
 
         var model = new Ks2MeasuresPageViewModel
         {
@@ -63,34 +57,32 @@ public class SchoolController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("view-similar-schools")]
     public async Task<IActionResult> ViewSimilarSchools(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("view-similar-schools/{similarSchoolUrn}")]
     public async Task<IActionResult> SimilarSchoolComparison(string urn, string similarSchoolUrn)
     {
-        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
-        {
-            return NotFound();
-        }
-
         var currentSchool = (await getSchoolInfoUseCase.Execute(new(urn))).School;
         var similarSchool = (await getSchoolInfoUseCase.Execute(new(similarSchoolUrn))).School;
 
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
-        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
-            Url,
-            currentSchool.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+        PopulateViewData(currentSchool);
 
         return View((SchoolInfoViewModel.FromSchoolInfo(currentSchool), SchoolInfoViewModel.FromSchoolInfo(similarSchool)));
     }
@@ -99,32 +91,31 @@ public class SchoolController(
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
-    }
-
-    private async Task<IActionResult> RenderPrimarySchoolViewAsync(string urn)
-    {
-        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
-        {
-            return NotFound();
-        }
-
         var response = await getSchoolInfoUseCase.Execute(new(urn));
 
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(response.School);
-        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
-            Url,
-            response.School.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+        PopulateViewData(response.School);
 
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+    }
+
+    private void PopulateViewData(SchoolInfo currentSchool)
+    {
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
+            Url,
+            currentSchool.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
     }
 }

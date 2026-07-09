@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS4.Performance;

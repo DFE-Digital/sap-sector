@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Microsoft.Playwright;
+﻿using Microsoft.Playwright;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
@@ -13,7 +12,8 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     : EndToEndTests(fixture)
 {
     private const string UrlPattern = @"\d{6}";
-    private const string PercentageValuePattern = @"\d\d%";
+    private const string MeetingExpectedStandardHeaderText = "Meeting expected standard in reading, writing and maths";
+
     private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool("145140");
 
     public override async Task InitializeAsync()
@@ -28,13 +28,12 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     [Fact]
     public async Task MeetingExpectedStandardRwm_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = Page.GetByLabel("Meeting expected standard in reading, writing and maths");
-        await Expect(section).ToBeVisibleAsync();
+        var section = await GetSection(MeetingExpectedStandardHeaderText);
+        var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await Expect(section).ToMatchScreenshotAsync("meeting-expected-standard-rwm-current-year");
+        await Expect(panel).ToMatchScreenshotAsync("meeting-expected-standard-rwm-current-year");
 
-        var charts = section.GetByRole(AriaRole.Tab, new() { Name = "Charts" });
-        await charts.ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
@@ -50,9 +49,9 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
 
         await showYearByYearButton.ClickAsync();
         // Click away to clear focus state on button
-        await section.ClickAsync();
+        await panel.ClickAsync();
 
-        await Expect(section).ToMatchScreenshotAsync("meeting-expected-standard-rwm-year-by-year");
+        await Expect(panel).ToMatchScreenshotAsync("meeting-expected-standard-rwm-year-by-year");
 
         await Expect(currentYearHeader).ToBeHiddenAsync();
         await Expect(yearByYearHeader).ToBeVisibleAsync();
@@ -72,19 +71,15 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     [Fact]
     public async Task MeetingExpectedStandardRwm_ViewAndNavigateToTopPerfomers()
     {
-        var section = Page.GetByLabel("Meeting expected standard in reading, writing and maths");
-        await Expect(section).ToBeVisibleAsync();
-
-        var topPerfomers = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomers.ClickAsync();
+        var section = await GetSection(MeetingExpectedStandardHeaderText);
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
         var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToHaveCountAsync(3);
-        var text = await values.AllTrimmedTextContentsAsync();
-        text.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
+        await Expect(values).ToBePercentageValuesHavingCount(3);
 
         var schools = await table.GetTableColumnAsync("School");
         await Expect(schools).ToHaveCountAsync(3);
@@ -97,11 +92,10 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
         await Page.GoBackAsync();
 
         await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomers).ToBeVisibleAsync();
-        await topPerfomers.ClickAsync();
+        await Expect(topPerfomersTab).ToBeVisibleAsync();
+        await topPerfomersTab.ClickAsync();
 
-        var similarSchoolsLink = section.GetByText("See all similar schools");
-        await similarSchoolsLink.ClickAsync();
+        await section.GetByText("See all similar schools").ClickAsync();
 
         await Expect(Page).ToHaveURLAsync(PrimarySchoolRoute.ViewSimilarSchools);
     }
@@ -109,28 +103,27 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     [Fact]
     public async Task MeetingExpectedStandardRwm_ViewTableView()
     {
-        var section = Page.GetByLabel("Meeting expected standard in reading, writing and maths");
-        await Expect(section).ToBeVisibleAsync();
-
-        var tableView = section.GetByRole(AriaRole.Tab, new() { Name = "Table" });
-        await tableView.ClickAsync();
+        var section = await GetSection(MeetingExpectedStandardHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToHaveCountAsync(4);
-        var previous2Values = await previous2.AllTrimmedTextContentsAsync();
-        previous2Values.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
+        await Expect(previous2).ToBePercentageValuesHavingCount(4);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToHaveCountAsync(4);
-        var previousValues = await previous.AllTrimmedTextContentsAsync();
-        previousValues.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
+        await Expect(previous).ToBePercentageValuesHavingCount(4);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToHaveCountAsync(4);
-        var currentValues = await current.AllTrimmedTextContentsAsync();
-        currentValues.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
+        await Expect(current).ToBePercentageValuesHavingCount(4);
+    }
+
+    private async Task<ILocator> GetSection(string headerText)
+    {
+        var section = Page.GetByLabel(MeetingExpectedStandardHeaderText);
+        await Expect(section).ToBeVisibleAsync();
+
+        return section;
     }
 }

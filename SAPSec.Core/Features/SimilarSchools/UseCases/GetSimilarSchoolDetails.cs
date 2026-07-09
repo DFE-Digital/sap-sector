@@ -64,4 +64,4 @@ public record GetSimilarSchoolDetailsResponse(
     GeographicCoordinates? CurrentSchoolCoordinates,
     GeographicCoordinates? SimilarSchoolCoordinates,
     double? DistanceMiles,
-    SchoolDetails SimilarSchoolDetails);
+    Model.SchoolDetails SimilarSchoolDetails);

@@ -14,22 +14,24 @@ public record TopPerformer(
         IEnumerable<SchoolData<T>> similarSchools,
         MeasureFieldSelector<T> fieldSelector)
     {
-        var currentSchoolCandidate = new TopPerformerCandidate(
-            currentSchool.SchoolInfo.Urn,
-            currentSchool.SchoolInfo.Name,
-            MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),
-            IsCurrentSchool: true);
-
         return similarSchools
+            // Include current school in list
+            .Append(currentSchool)
             .Select(x => new TopPerformerCandidate(
                 x.SchoolInfo.Urn,
                 x.SchoolInfo.Name,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(x.Data)),
-                IsCurrentSchool: false))
-            .Append(currentSchoolCandidate)
+                IsCurrentSchool: x == currentSchool))
+
+            // Exclude missing data
             .Where(x => x.Value.HasValue)
+
+            // Remove duplicates if school with the same URN already appears in the list,
+            // prioritising current school
+            // TODO: not sure this will ever happen?
             .GroupBy(x => x.Urn, StringComparer.Ordinal)
             .Select(x => x.OrderByDescending(candidate => candidate.IsCurrentSchool).First())
+
             .OrderByDescending(x => x.Value)
             .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
             .Take(3)

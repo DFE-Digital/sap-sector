@@ -91,6 +91,7 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
         }
 
         var document = await _browsingContext.OpenAsync($"https://127.0.0.1:0{path}");
+
         document.StatusCode.Should().BeOneOf(expectedStatusCodes);
 
         return document;

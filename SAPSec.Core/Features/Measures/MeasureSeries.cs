@@ -2,15 +2,9 @@ using SAPSec.Core.Features.SimilarSchools;
 
 namespace SAPSec.Core.Features.Measures;
 
-public enum MeasureSeriesType
-{
-    CurrentSchool,
-    SimilarSchool,
-    SimilarSchoolsAverage,
-    LASchoolsAverage,
-    EnglandSchoolsAverage
-}
-
+/// <summary>
+/// Represents a series of data for the current, previous and previous 2 years, and average over the 3 years
+/// </summary>
 public record MeasureSeries(MeasureSeriesType SeriesType, YearByYearSeries YearByYear, decimal? ThreeYearAverage)
 {
     internal static IReadOnlyCollection<MeasureSeries> ForSchool<T>(
@@ -94,4 +88,13 @@ public record MeasureSeries(MeasureSeriesType SeriesType, YearByYearSeries YearB
                     fieldSelector.EnglandPrevious(currentSchool.Data),
                     fieldSelector.EnglandPrevious2(currentSchool.Data)))
         ];
+}
+
+public enum MeasureSeriesType
+{
+    CurrentSchool,
+    SimilarSchool,
+    SimilarSchoolsAverage,
+    LASchoolsAverage,
+    EnglandSchoolsAverage
 }
