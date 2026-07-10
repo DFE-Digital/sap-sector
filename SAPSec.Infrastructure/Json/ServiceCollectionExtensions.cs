@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.RemoveAll<IKs4PerformanceRepository>();
         services.RemoveAll<IKs4DestinationsRepository>();
         services.RemoveAll<IAbsenceRepository>();
+        services.RemoveAll<IPrimaryKs2Repository>();
 
         services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
         services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
@@ -40,6 +41,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
         services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
+        services.AddSingleton<IPrimaryKs2Repository, JsonPrimaryKs2Repository>();
 
         return services;
     }
