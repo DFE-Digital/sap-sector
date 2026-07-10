@@ -8,6 +8,7 @@ namespace SAPSec.Integration.Tests;
 public class SchoolControllerIntegrationTests(IntegrationTestFixture fixture)
 {
     private const string SchoolOverviewPath = "/school/105574";
+    private const string SchoolAttendancePath = "/school/105574/attendance";
     private const string SchoolDetailsPath = "/school/105574/school-details";
     private const string WhatIsASimilarSchoolPath = "/school/105574/what-is-a-similar-school";
 
@@ -79,6 +80,25 @@ public class SchoolControllerIntegrationTests(IntegrationTestFixture fixture)
         content.Should().Contain("Location");
         content.Should().Contain("Contact details");
         content.Should().Contain("Further information");
+    }
+
+    [Fact]
+    public async Task GetSchoolAttendance_ContainsUpdatedInsetContentAndLinks()
+    {
+        var response = await fixture.Client.GetAsync(SchoolAttendancePath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("Compare this school's attendance measures with:");
+        content.Should().Contain("<li>the local authority average</li>");
+        content.Should().Contain("<li>the national average</li>");
+        content.Should().NotContain("similar secondary phase schools");
+        content.Should().Contain("To compare this school with similar schools using up-to-date attendance data, use the Monitor your school attendance service.");
+        content.Should().Contain("href=\"https://viewyourdata.education.gov.uk/\"");
+        content.Should().Contain(">View your education data (VYED) (opens in new tab)</a>");
+        content.Should().Contain("href=\"https://viewyourdata.education.gov.uk/Account/Help\"");
+        content.Should().Contain(">get help on accessing VYED (opens in new tab)</a>");
+        content.Should().Contain("target=\"_blank\" rel=\"noopener noreferrer\"");
     }
 
     [Fact]
