@@ -1,0 +1,546 @@
+$app-measure-color-school: #d53880;
+$app-measure-color-authority: #1d70b8;
+$app-measure-color-england: #003078;
+$app-measure-color-panel-bg: #f4f8fb;
+$app-measure-color-panel-tab: #e7ecf0;
+$app-measure-color-border: #b1b4b6;
+$app-measure-color-white: #ffffff;
+$app-measure-color-axis: #505a5f;
+$app-measure-color-grid: #d8d8d8;
+$app-measure-color-track: #f3f2f1;
+
+.app-school-page {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
+}
+
+.app-measure-section {
+  background: $app-measure-color-panel-bg;
+  padding: 16px;
+  margin-top: 60px !important;
+
+  & + & {
+    margin-top: 40px !important;
+  }
+}
+
+.app-measure-message-panel {
+  border-left: 5px solid $app-measure-color-border;
+  padding-left: 14px;
+  max-width: 660px;
+  margin-top: 4px;
+}
+
+.app-measure-details {
+  background: $app-measure-color-panel-bg;
+  margin-bottom: 20px !important;
+  max-width: 660px;
+  line-height: 1.45;
+
+  .govuk-details__summary {
+    background: $app-measure-color-panel-bg;
+  }
+
+  .govuk-details__summary-text {
+    text-decoration: none;
+  }
+
+  .app-measure-copy-list li {
+    margin-bottom: 4px;
+  }
+
+  @supports not (-ms-ime-align: auto) {
+    .govuk-details__summary:focus {
+      outline: 3px solid transparent;
+      color: #0b0c0c;
+      background-color: #fd0 !important;
+    }
+  }
+}
+
+.app-measure-filter-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 30px !important;
+}
+
+.app-measure-filter-row .govuk-form-group {
+  margin-bottom: 0;
+}
+
+.app-measure-filter-row .govuk-select {
+  min-width: 260px;
+}
+
+@media (max-width: 40.0625em) {
+  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link {
+    padding-left: 14px;
+    margin-left: 0;
+    color: #1d70b8;
+  }
+
+  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link:visited,
+  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link:hover {
+    color: #1d70b8;
+  }
+}
+
+/**************** TABS *****************/
+
+.app-measure-tabs {
+  margin-bottom: 0 !important;
+
+  .govuk-tabs__list {
+    background: $app-measure-color-panel-bg;
+    border-bottom: none;
+  }
+
+  .govuk-tabs__list-item {
+    background: $app-measure-color-panel-tab;
+  }
+
+  .govuk-tabs__list-item--selected {
+    background: $app-measure-color-white;
+    border: 1px solid $app-measure-color-border;
+    border-bottom: none;
+  }
+
+  .govuk-tabs__panel {
+    background: $app-measure-color-white;
+    padding: 16px;
+    padding-top: 20px;
+    border: 1px solid $app-measure-color-border;
+    margin-bottom: 0 !important;
+  }
+
+  .govuk-tabs__panel--hidden {
+    display: none !important;
+  }
+
+  [id$="table-view"] table {
+    .govuk-table__header.govuk-table__header--numeric {
+      width: 7rem;
+    }
+
+    .govuk-table__row:last-of-type {
+      .govuk-table__cell, .govuk-table__header {
+        border-bottom: none;
+      }
+    }
+  }
+
+  @media (max-width: 40.0625em) {
+    .govuk-tabs__list-item {
+      background: transparent !important;
+    }
+
+    .govuk-tabs__list-item--selected {
+      background: transparent !important;
+      border: 0 !important;
+      border-bottom: 0 !important;
+    }
+
+    .govuk-tabs__panel {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .govuk-table {
+      min-width: 40rem;
+    }
+  }
+}
+
+/**************** CHARTS *****************/
+
+.app-measure-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 760px;
+}
+
+.app-measure-scale {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) 1fr minmax(56px, auto);
+  gap: 12px;
+  align-items: end;
+  max-width: 760px;
+  margin-bottom: 6px;
+}
+
+.app-measure-scale__ticks {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  color: $app-measure-color-axis;
+  font-size: 12px;
+}
+
+.app-measure-scale__ticks span {
+  transform: translateX(-50%);
+}
+
+.app-measure-scale__ticks span:first-child {
+  transform: none;
+}
+
+.app-measure-scale__ticks span:last-child {
+  transform: translateX(-100%);
+  justify-self: end;
+}
+
+.app-measure-bar-row {
+  display: grid;
+  grid-template-columns: minmax(150px, 220px) 1fr minmax(56px, auto);
+  gap: 12px;
+  align-items: center;
+}
+
+.app-measure-bar-label {
+  font-size: 14px;
+}
+
+.app-measure-bar-track {
+  background: $app-measure-color-track;
+  min-height: 24px;
+  position: relative;
+  overflow: visible;
+}
+
+.app-measure-gridline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: $app-measure-color-border;
+  z-index: 1;
+}
+
+.app-measure-gridline--0 {
+  left: 0;
+}
+
+.app-measure-gridline--30 {
+  left: 33.333%;
+}
+
+.app-measure-gridline--60 {
+  left: 66.666%;
+}
+
+.app-measure-gridline--90 {
+  right: 0;
+}
+
+.app-measure-column-chart {
+  max-width: 760px;
+  border: 1px solid $app-measure-color-border;
+  padding: 16px 16px 10px;
+  background: $app-measure-color-white;
+}
+
+.app-measure-column-chart__plot {
+  position: relative;
+  height: 280px;
+}
+
+.app-measure-column-chart__grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid $app-measure-color-grid;
+}
+
+.app-measure-column-chart__grid--0 {
+  bottom: 0;
+}
+
+.app-measure-column-chart__grid--30 {
+  bottom: 33.333%;
+}
+
+.app-measure-column-chart__grid--60 {
+  bottom: 66.666%;
+}
+
+.app-measure-column-chart__grid--90 {
+  bottom: 100%;
+}
+
+.app-measure-column-chart__bars {
+  position: absolute;
+  left: 0;
+  right: 40px;
+  bottom: 0;
+  top: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.app-measure-column {
+  width: 120px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.app-measure-column__bar {
+  width: 100%;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-sizing: border-box;
+}
+
+.app-measure-column__label {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.app-measure-column-chart__axis {
+  margin-top: 8px;
+  margin-left: 0;
+  margin-right: 40px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  font-size: 12px;
+  color: $app-measure-color-axis;
+}
+
+.app-measure-column-chart__labels {
+  margin-top: 8px;
+  margin-right: 40px;
+  display: flex;
+  justify-content: space-around;
+  gap: 20px;
+}
+
+.app-measure-column-chart__labels .app-measure-column__label {
+  width: 120px;
+}
+
+.app-measure-bar {
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  position: relative;
+  z-index: 2;
+}
+
+.app-measure-bar--school {
+  background: $app-measure-color-school;
+}
+
+.app-measure-bar--la {
+  background: $app-measure-color-authority;
+}
+
+.app-measure-bar--england {
+  background: $app-measure-color-england;
+}
+
+.app-measure-bar--selected-school {
+  background: $app-measure-color-school;
+}
+
+.app-measure-bar--this-school {
+  background: $app-measure-color-authority;
+}
+
+.app-measure-bar--england-overall {
+  background: $app-measure-color-england;
+}
+
+.app-measure-bar-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.app-measure-bar-number {
+  color: $app-measure-color-white;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.app-measure-chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 260px;
+  max-width: 760px;
+  position: relative;
+}
+
+.app-measure-chart-container--school-headline {
+  height: 330px;
+}
+
+.app-measure-chart-container .js-chart {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.chart-legend--top {
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+}
+
+.app-chart-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.app-chart-legend__item {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.app-chart-legend__item:last-child {
+  margin-bottom: 0;
+}
+
+.app-chart-legend__label {
+  color: #0b0c0c;
+}
+
+.app-chart-legend__box {
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 14px;
+  height: 14px;
+  width: 14px;
+}
+
+.app-chart-tooltip {
+  background: #ffffff;
+  border: 1px solid #b1b4b6;
+  border-radius: 5px;
+  color: #0b0c0c;
+  display: none;
+  left: 0;
+  max-width: 280px;
+  padding: 10px 12px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: translate(0, -50%);
+  z-index: 20;
+}
+
+.app-chart-tooltip--visible {
+  display: block;
+}
+
+.app-chart-tooltip__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.app-chart-tooltip__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.app-chart-tooltip__row {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 14px 1fr auto;
+}
+
+.app-chart-tooltip__marker {
+  border-radius: 50%;
+  display: block;
+  height: 14px;
+  width: 14px;
+}
+
+.app-chart-tooltip__label,
+.app-chart-tooltip__value {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.app-chart-tooltip__value {
+  font-weight: 700;
+}
+
+.js-chart {
+  --gds-font-family: "GDS Transport", Arial, sans-serif;
+  --gds-font-size: 14;
+  --gds-text: #0b0c0c;
+  --gds-grey: #b1b4b6;
+  --gds-grid-major: #0b0c0c;
+  --gds-grid-minor: #b1b4b6;
+  --gds-grid-x: #d8d8d8;
+  --gds-on-bar-label: #ffffff;
+  --gds-label-bg: #ffffff;
+  --gds-label-border: #b1b4b6;
+  --gds-label-padding: 4;
+  --chart-color-school: #de6b24;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-comparator: #27a0cc;
+  --chart-color-england: #003c56;
+  --chart-color-fallback: #6f777b;
+}
+
+.js-chart--school-measure-bar {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #2a1950;
+  --chart-color-england: #2a1950;
+}
+
+.js-chart--school-measure-line {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
+}
+
+@media (max-width: 40.0625em) {
+  .app-measure-bar-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .app-measure-scale {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .app-measure-scale > div:first-child,
+  .app-measure-scale > div:last-child {
+    display: none;
+  }
+
+  .app-measure-bar-label,
+  .app-measure-bar-value {
+    font-size: 14px;
+  }
+}
