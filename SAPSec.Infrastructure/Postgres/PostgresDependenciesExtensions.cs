@@ -12,6 +12,7 @@ public static class PostgresDependenciesExtensions
 
         // Always default to Postgres in the app
         services.AddSingleton<IEstablishmentRepository, PostgresEstablishmentRepository>();
+        services.AddSingleton<ISimilarSchoolsPrimaryRepository, PostgresSimilarSchoolsPrimaryRepository>();
         services.AddSingleton<ISimilarSchoolsSecondaryRepository, PostgresSimilarSchoolsSecondaryRepository>();
         services.AddSingleton<IKs4PerformanceRepository, PostgresKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, PostgresKs4DestinationsRepository>();

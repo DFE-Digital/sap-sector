@@ -4,6 +4,7 @@ using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.KS4.Destinations;
 using SAPSec.Data.Dto.KS4.Performance;
+using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 
@@ -15,11 +16,14 @@ public static class ServiceCollectionExtensions
     {
         // JSON files
         services.RemoveAll<IEstablishmentRepository>();
+        services.RemoveAll<ISimilarSchoolsPrimaryRepository>();
         services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
         services.RemoveAll<IKs4PerformanceRepository>();
         services.RemoveAll<IKs4DestinationsRepository>();
         services.RemoveAll<IAbsenceRepository>();
 
+        services.AddSingleton<IJsonFile<SimilarSchoolsPrimaryGroupsEntry>, JsonFile<SimilarSchoolsPrimaryGroupsEntry>>();
+        services.AddSingleton<IJsonFile<SimilarSchoolsPrimaryValuesEntry>, JsonFile<SimilarSchoolsPrimaryValuesEntry>>();
         services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
         services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
         services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>, JsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>>();
@@ -36,6 +40,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
 
         services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
+        services.AddSingleton<ISimilarSchoolsPrimaryRepository, JsonSimilarSchoolsPrimaryRepository>();
         services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
         services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
