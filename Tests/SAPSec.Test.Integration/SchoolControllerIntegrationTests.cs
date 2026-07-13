@@ -1,4 +1,6 @@
 using System.Net;
+using System.Text.Json;
+using AngleSharp.Dom;
 using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 
@@ -99,6 +101,50 @@ public class SchoolControllerIntegrationTests(IntegrationTestFixture fixture)
         content.Should().Contain("href=\"https://viewyourdata.education.gov.uk/Account/Help\"");
         content.Should().Contain(">get help on accessing VYED (opens in new tab)</a>");
         content.Should().Contain("target=\"_blank\" rel=\"noopener noreferrer\"");
+    }
+
+    [Fact]
+    public async Task GetSchoolAttendance_OffersBothAbsenceTypes_AndDoesNotRenderTopPerformersTab()
+    {
+        var document = await fixture.RequestPageAsync(SchoolAttendancePath);
+
+        document.QuerySelector("h1")?.TextContent.Trim().Should().Be("Attendance measures");
+
+        var absenceOptions = document.QuerySelectorAll("#attendanceAbsenceType option")
+            .Select(option => (
+                Value: option.GetAttribute("value"),
+                Text: option.TextContent.Trim()))
+            .ToArray();
+
+        absenceOptions.Should().BeEquivalentTo(
+            [("overall", "Overall absence"), ("persistent", "Persistent absence")],
+            options => options.WithStrictOrdering());
+
+        var tabTexts = document.QuerySelectorAll(".app-attendance-tabs .govuk-tabs__tab")
+            .Select(tab => tab.TextContent.Trim())
+            .ToArray();
+
+        tabTexts.Should().NotContain("Top performers");
+        tabTexts.Should().Contain("Year by year");
+        tabTexts.Should().Contain("Table");
+    }
+
+    [Fact]
+    public async Task GetSchoolAttendanceData_PersistentAbsence_ReturnsPersistentDataset()
+    {
+        var response = await fixture.Client.GetAsync("/school/105574/attendance-data?absenceType=persistent");
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        using var json = JsonDocument.Parse(content);
+        var root = json.RootElement;
+
+        root.GetProperty("absenceType").GetString().Should().Be("persistent");
+        root.GetProperty("bar").GetArrayLength().Should().Be(3);
+        root.GetProperty("line").GetProperty("school").GetArrayLength().Should().Be(3);
+        root.GetProperty("table").GetProperty("school").GetArrayLength().Should().Be(3);
+        root.GetProperty("topPerformers").ValueKind.Should().Be(JsonValueKind.Array);
     }
 
     [Fact]
