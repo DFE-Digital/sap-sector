@@ -20,11 +20,11 @@
     };
 }
 
-<div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+<div class="app-measure-chart-container app-measure-chart-container--school-headline">
     @if (hasAnyData)
     {
         <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
-                class="js-chart js-chart--school-ks4-bar"
+                class="js-chart js-chart--school-measure-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
                 data-axis-step="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 30 : 25)"

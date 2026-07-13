@@ -339,7 +339,7 @@ function formatTooltipValue(value, axisSuffix, decimals) {
 }
 
 function getTooltipContainer(chart) {
-    return chart.canvas.closest('.app-ks4-chart-container') || chart.canvas.parentElement;
+    return chart.canvas.closest('.app-measure-chart-container') || chart.canvas.parentElement;
 }
 
 function getOrCreateHtmlTooltip(chart) {

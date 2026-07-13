@@ -20,7 +20,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
 
     private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
     {
-        var chartTabs = Page.Locator(".app-ks4-tabs").Nth(chartGroupIndex);
+        var chartTabs = Page.Locator(".app-measure-tabs").Nth(chartGroupIndex);
         await chartTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
     }
 

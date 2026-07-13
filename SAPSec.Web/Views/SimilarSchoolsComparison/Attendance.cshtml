@@ -32,10 +32,10 @@
     How @Model.Name compares with @Model.SimilarSchoolName based on attendance measures.
 </p>
 
-<section aria-labelledby="attendance-heading" class="govuk-!-margin-top-9 app-ks4-attainment">
+<section aria-labelledby="attendance-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="attendance-heading">Attendance</h2>
 
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-label--s" for="attendanceAbsenceType">Type of absence</label>
             <select class="govuk-select"
@@ -55,7 +55,7 @@
         </div>
     </div>
 
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs app-attendance-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs app-attendance-tabs" data-module="govuk-tabs">
         <h3 class="govuk-tabs__title">Attendance views</h3>
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
@@ -70,7 +70,7 @@
         </ul>
 
         <div class="govuk-tabs__panel" id="attendance-three-year-average">
-            <div class="app-ks4-chart-container">
+            <div class="app-measure-chart-container">
                 <canvas id="attendance-comparison-three-year-chart"
                         class="js-chart"
                         data-type="bar"
@@ -89,7 +89,7 @@
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-year-by-year">
-            <div class="app-ks4-chart-container">
+            <div class="app-measure-chart-container">
                 <canvas id="attendance-comparison-year-by-year-chart"
                         class="js-chart"
                         data-type="line"
