@@ -86,11 +86,31 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.CurrentSchool, new YearByYearSeries(null, null, null), null));
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null));
     }
 
     [Fact]
-    public async Task MeetingExpectedStandardRwm_CurrentSchool_CalculatesYearByYearAndThreeYearAverageValues()
+    public async Task MeetingExpectedStandardRwm_CurrentSchool_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithRwmExpected(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.School.Name.Should().Be("Test School");
+        var series = response.MeetingExpectedStandardRwm.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_CurrentSchool_ContainsYearByYearValues()
     {
         _establishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School", x => x.Primary()));
@@ -106,27 +126,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.CurrentSchool, new YearByYearSeries(81, 80, 79), 80));
-    }
-
-    [Fact]
-    public async Task MeetingExpectedStandardRwm_CurrentSchool_WhenEmptyValuesPresent_CalculatesAveragesOfNonEmptyValues()
-    {
-        _establishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School", x => x.Primary()));
-
-        _performanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment("100001", x => x.WithRwmExpected(current: "", prev: "80", prev2: "79")));
-
-        var response = await _sut.Execute(Request("100001"));
-
-        response.School.Name.Should().Be("Test School");
-        var series = response.MeetingExpectedStandardRwm.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
-
-        series.Should().NotBeNull();
-        series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.CurrentSchool, new YearByYearSeries(null, 80, 79), 79.5m));
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, 81, 80, 79));
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, new YearByYearSeries(null, null, null), null));
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, null, null, null));
     }
 
     [Fact]
@@ -163,11 +163,37 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, new YearByYearSeries(null, null, null), null));
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, null, null, null));
     }
 
     [Fact]
-    public async Task MeetingExpectedStandardRwm_SimilarSchoolsAverage_CalculatesYearByYearAndThreeYearAverageValues()
+    public async Task MeetingExpectedStandardRwm_SimilarSchoolsAverage_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected(current: "", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithRwmExpected(current: "", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithRwmExpected(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.MeetingExpectedStandardRwm.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_SimilarSchoolsAverage_ContainsYearByYearValues()
     {
         _establishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Primary()),
@@ -187,11 +213,11 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, new YearByYearSeries(70, 65, 82.5m), 72.5m));
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 70, 65, 82.5m));
     }
 
     [Fact]
-    public async Task MeetingExpectedStandardRwm_SimilarSchoolsAverage_WhenEmptyValuesPresent_CalculatesAveragesOfNonEmptyValues()
+    public async Task MeetingExpectedStandardRwm_SimilarSchoolsAverage_WhenEmptyValuesPresent_CalculatesAverageOfRemainingValues()
     {
         _establishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Primary()),
@@ -213,7 +239,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, new YearByYearSeries(70, 65, null), 70));
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 70, 65, null));
     }
 
     [Fact]
@@ -228,11 +254,29 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, new YearByYearSeries(null, null, null), null));
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
     }
 
     [Fact]
-    public async Task MeetingExpectedStandardRwm_LASchoolsAverage_CalculatesYearByYearAndThreeYearAverageValues()
+    public async Task MeetingExpectedStandardRwm_LASchoolsAverage_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _performanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithRwmExpected(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.MeetingExpectedStandardRwm.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_LASchoolsAverage_ContainsYearByYearValues()
     {
         _establishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
@@ -246,25 +290,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, new YearByYearSeries(71, 70, 69), 70));
-    }
-
-    [Fact]
-    public async Task MeetingExpectedStandardRwm_LASchoolsAverage_WhenEmptyValuesPresent_CalculatesAveragesOfNonEmptyValues()
-    {
-        _establishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
-
-        _performanceRepository.SetupLAPerformance(
-            Build.Ks2Performance.LA("001", x => x.WithRwmExpected(current: "71", prev: "", prev2: "69")));
-
-        var response = await _sut.Execute(Request("100001"));
-        var series = response.MeetingExpectedStandardRwm.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage);
-
-        series.Should().NotBeNull();
-        series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, new YearByYearSeries(71, null, 69), 70));
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, 71, 70, 69));
     }
 
     [Fact]
@@ -279,11 +305,29 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, new YearByYearSeries(null, null, null), null));
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
     }
 
     [Fact]
-    public async Task MeetingExpectedStandardRwm_EnglandSchoolsAverage_CalculatesYearByYearAndThreeYearAverageValues()
+    public async Task MeetingExpectedStandardRwm_EnglandSchoolsAverage_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()));
+
+        _performanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmExpected(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.MeetingExpectedStandardRwm.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_EnglandSchoolsAverage_ContainsYearByYearValues()
     {
         _establishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Primary()));
@@ -297,25 +341,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         series.Should().NotBeNull();
         series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, new YearByYearSeries(71, 70, 69), 70));
-    }
-
-    [Fact]
-    public async Task MeetingExpectedStandardRwm_EnglandSchoolsAverage_WhenEmptyValuesPresent_CalculatesAveragesOfNonEmptyValues()
-    {
-        _establishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()));
-
-        _performanceRepository.SetupEnglandPerformance(
-            Build.Ks2Performance.England(x => x.WithRwmExpected(current: "71", prev: "", prev2: "")));
-
-        var response = await _sut.Execute(Request("100001"));
-        var series = response.MeetingExpectedStandardRwm.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
-
-        series.Should().NotBeNull();
-        series.Should().Be(
-            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, new YearByYearSeries(71, null, null), 71));
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, 71, 70, 69));
     }
 
     [Fact]
@@ -372,7 +398,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
 
         _performanceRepository.SetupEstablishmentPerformance(
             Build.Ks2Performance.Establishment("100001", x => x.WithRwmExpected(current: "20", prev: "70", prev2: "50")),
-            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected(current: null, prev: "69", prev2: "51")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected(current: "", prev: "69", prev2: "51")),
             Build.Ks2Performance.Establishment("100003", x => x.WithRwmExpected(current: "22", prev: "68", prev2: "49")));
 
         var response = await _sut.Execute(Request("100001"));

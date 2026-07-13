@@ -16,15 +16,20 @@ public static class ElementExtensions
         return el.Children.Select(c => c.TextContent.Trim());
     }
 
-    public static void ShouldHaveRows(this IHtmlTableElement table, params string[][] expectedRows)
+    public static void ShouldHaveTextContent(this IElement el, string text)
     {
-        var rows = table.QuerySelectorAll("tr").Select(r => r.QuerySelectorAll("th, td").Select(TrimmedTextContent));
-        rows.Should().BeEquivalentTo(expectedRows);
+        el.TrimmedTextContent().Should().Be(text.Trim());
     }
 
     public static void ShouldLinkTo(this IElement el, string text, string path)
     {
-        el.TrimmedTextContent().Should().Be(text);
-        el.GetAttribute("href").Should().Be(path);
+        el.TrimmedTextContent().Should().Be(text.Trim());
+        el.GetAttribute("href").Should().Be(path.Trim());
+    }
+
+    public static void ShouldHaveRows(this IHtmlTableElement table, params string[][] expectedRows)
+    {
+        var rows = table.QuerySelectorAll("tr").Select(r => r.QuerySelectorAll("th, td").Select(TrimmedTextContent));
+        rows.Should().BeEquivalentTo(expectedRows);
     }
 }

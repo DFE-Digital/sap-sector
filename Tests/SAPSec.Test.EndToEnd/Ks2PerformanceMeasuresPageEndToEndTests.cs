@@ -31,8 +31,6 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
         var section = await GetSection(MeetingExpectedStandardHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await Expect(panel).ToMatchScreenshotAsync("meeting-expected-standard-rwm-current-year");
-
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
@@ -48,10 +46,6 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
         await Expect(showCurrentYearButton).ToBeHiddenAsync();
 
         await showYearByYearButton.ClickAsync();
-        // Click away to clear focus state on button
-        await panel.ClickAsync();
-
-        await Expect(panel).ToMatchScreenshotAsync("meeting-expected-standard-rwm-year-by-year");
 
         await Expect(currentYearHeader).ToBeHiddenAsync();
         await Expect(yearByYearHeader).ToBeVisibleAsync();

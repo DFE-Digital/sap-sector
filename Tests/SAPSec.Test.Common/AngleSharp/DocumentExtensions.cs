@@ -8,52 +8,20 @@ namespace SAPSec.Test.Common.AngleSharp;
 
 public static class DocumentExtensions
 {
-    public static IElement ElementShouldExist(this IDocument doc, string selector)
+    public static IElement ElementWithTestIdShouldExist(this IDocument doc, string testId)
     {
-        var element = doc.QuerySelector(selector);
-        element.Should().NotBeNull();
+        var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
+        el.Should().NotBeNull();
 
-        return element;
+        return el;
     }
 
-    public static IElement ElementWithTextContentShouldExist(this IDocument doc, string selector, string text)
+    public static T ElementWithTestIdShouldExist<T>(this IDocument doc, string testId)
+        where T : IElement
     {
-        var element = doc.QuerySelectorAll(selector)
-            .Where(e => e.TrimmedTextContent() == text)
-            .FirstOrDefault();
-        element.Should().NotBeNull();
-
-        return element;
-    }
-
-    public static IHtmlInputElement InputWithNameShouldExist(this IDocument doc, string name)
-    {
-        return doc.QuerySelector($@"input[name=""{name}""]")
-            .Should().NotBeNull().And.BeAssignableTo<IHtmlInputElement>()
-            .Subject;
-    }
-
-    public static IHtmlButtonElement ButtonWithNameShouldExist(this IDocument doc, string name)
-    {
-        return doc.QuerySelector($@"button[name=""{name}""]")
-            .Should().NotBeNull().And.BeAssignableTo<IHtmlButtonElement>()
-            .Subject;
-    }
-
-    public static IHtmlAnchorElement LinkWithTextContentShouldExist(this IDocument doc, string text)
-    {
-        return doc.QuerySelectorAll("a")
-            .Where(e => e.TrimmedTextContent() == text)
-            .FirstOrDefault()
-            .Should().NotBeNull().And.BeAssignableTo<IHtmlAnchorElement>()
-            .Subject;
-    }
-
-    public static IHtmlTableElement TableShouldExist(this IDocument doc, string selector)
-    {
-        return doc.QuerySelector(selector)
-            .Should().NotBeNull().And.BeAssignableTo<IHtmlTableElement>()
-            .Subject;
+        var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
+        el.Should().NotBeNull();
+        return el.Should().BeAssignableTo<T>().Subject;
     }
 
     public static async Task<IDocument> SubmitContainingFormAsync(this IDocument doc, IHtmlButtonElement button, params HttpStatusCode[] expectedStatusCodes)

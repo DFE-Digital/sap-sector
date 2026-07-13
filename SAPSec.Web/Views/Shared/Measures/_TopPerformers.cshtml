@@ -5,7 +5,7 @@
 @model TopPerformersViewModel
 
 <p class="govuk-body">These are the top performing schools for this measure.</p>
-<table class="govuk-table" id="@Model.MeasureInfo.HtmlPrefix-top-performers-table">
+<table class="govuk-table" id="@Model.MeasureInfo.HtmlPrefix-top-performers-table" data-testid="@Model.MeasureInfo.HtmlPrefix-top-performers-table">
     <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Rank</th>
@@ -33,4 +33,4 @@
         }
     </tbody>
 </table>
-<p class="govuk-body govuk-!-margin-bottom-1"><a href="@Model.SimilarSchoolsLink" class="govuk-link">See all similar schools</a></p>
+<p class="govuk-body govuk-!-margin-bottom-1"><a href="@Model.SimilarSchoolsLink" class="govuk-link" data-testid="@Model.MeasureInfo.HtmlPrefix-top-performers-similar-schools-link">See all similar schools</a></p>

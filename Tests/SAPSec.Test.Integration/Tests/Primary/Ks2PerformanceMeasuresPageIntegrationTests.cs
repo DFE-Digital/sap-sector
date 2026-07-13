@@ -21,7 +21,8 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
-        page.ElementWithTextContentShouldExist("h2", "Progress score in reading, writing and maths");
+        var heading = page.ElementWithTestIdShouldExist("progress-rwm-heading");
+        heading.ShouldHaveTextContent("Progress score in reading, writing and maths");
     }
 
     [Fact]
@@ -32,7 +33,8 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
-        page.ElementWithTextContentShouldExist("h2", "Meeting expected standard in reading, writing and maths");
+        var heading = page.ElementWithTestIdShouldExist("expected-rwm-heading");
+        heading.ShouldHaveTextContent("Meeting expected standard in reading, writing and maths");
     }
 
     [Fact]
@@ -59,7 +61,7 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
-        var table = page.TableShouldExist("#expected-rwm-table-view table");
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
@@ -93,7 +95,7 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
-        var table = page.TableShouldExist("#expected-rwm-table-view table");
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
@@ -125,7 +127,7 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
-        var table = page.TableShouldExist("#expected-rwm-top-performers table");
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-top-performers-table");
 
         table.ShouldHaveRows(
             ["Rank", "School", "2024 to 2025"],
@@ -156,16 +158,14 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
-        OutputHelper.WriteLine(page.DocumentElement.OuterHtml);
-
-        var similarSchoolsLink = page.LinkWithTextContentShouldExist("See all similar schools");
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("expected-rwm-top-performers-similar-schools-link");
         similarSchoolsLink.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").ViewSimilarSchools);
 
-        var topPerfomersLinks = page.QuerySelectorAll("#expected-rwm-top-performers table a");
-        var hrefs = topPerfomersLinks.Should().AllBeAssignableTo<IHtmlAnchorElement>()
-            .Subject.Select(l => l.GetAttribute("href"));
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-top-performers-table");
+        var topPerfomersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
 
-        hrefs.Should().BeEquivalentTo([
+        topPerfomersLinks.Should().BeEquivalentTo([
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100004"),
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100003"),
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100002")

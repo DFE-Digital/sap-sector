@@ -6,7 +6,7 @@ namespace SAPSec.Web.ViewModels.Measures;
 
 public record MeasureViewModel(
     MeasureInfoViewModel MeasureInfo,
-    ThreeYearAverageChartViewModel ThreeYearAverage,
+    CurrentYearChartViewModel CurrentYear,
     YearByYearChartViewModel YearByYear,
     TableViewModel Table,
     TopPerformersViewModel? TopPerformers)
@@ -23,6 +23,14 @@ public record MeasureViewModel(
             _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
         };
 
+    private static string ResolveMeasureLabel(string measureKey) =>
+        measureKey switch
+        {
+            Core.Constants.Measures.Primary.Ks2ExpectedRwm =>
+                "Meeting expected standard in reading, writing and maths",
+            _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
+        };
+
     public static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
@@ -31,29 +39,29 @@ public record MeasureViewModel(
     {
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
-            measure.Name,
+            ResolveMeasureLabel(measure.Key),
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
             measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo)),
             chartColors,
             yearByYearColors);
 
-        decimal? MapThreeYearAverage(MeasureSeries series) =>
-            series.ThreeYearAverage;
+        decimal? MapCurrentYear(MeasureSeries series) =>
+            series.Current;
 
-        var threeYearAverage = new ThreeYearAverageChartViewModel(
+        var currentYear = new CurrentYearChartViewModel(
             measureInfo,
-            measure.Series.Select(MapThreeYearAverage));
+            measure.Series.Select(MapCurrentYear));
 
         YearByYearSeriesViewModel MapYearByYear(MeasureSeries series) =>
-            new(series.YearByYear.Current, series.YearByYear.Previous, series.YearByYear.Previous2);
+            new(series.Current, series.Previous, series.Previous2);
 
         var yearByYear = new YearByYearChartViewModel(
             measureInfo,
             measure.Series.Select(MapYearByYear));
 
         TableRowViewModel MapTableRow(MeasureSeries series) =>
-            new(MapYearByYear(series), MapThreeYearAverage(series));
+            new(MapYearByYear(series), MapCurrentYear(series));
 
         var table = new TableViewModel(
             measureInfo,
@@ -78,7 +86,7 @@ public record MeasureViewModel(
 
         return new(
             measureInfo,
-            threeYearAverage,
+            currentYear,
             yearByYear,
             table,
             topPerformers);

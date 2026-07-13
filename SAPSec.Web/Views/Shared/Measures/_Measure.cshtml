@@ -10,8 +10,8 @@
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts">
             <content-toggle>
-                <toggle-content id="three-year-average" name="2024 to 2025" active="true">
-                    <partial name="Measures/_ThreeYearAverageChart" model=@Model.ThreeYearAverage />
+                <toggle-content id="current-year" name="2024 to 2025" active="true">
+                    <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year">
                     <partial name="Measures/_YearByYearChart" model=@Model.YearByYear />
@@ -19,12 +19,12 @@
             </content-toggle>
         </tab-content>
 
-        <tab-content id="top-performers" name="Top performers">
-            <partial name="Measures/_TopPerformers" model=@Model.TopPerformers />
-        </tab-content>
-
         <tab-content id="table-view" name="Table">
             <partial name="Measures/_Table" model=@Model.Table />
+        </tab-content>
+
+        <tab-content id="top-performers" name="Top performers">
+            <partial name="Measures/_TopPerformers" model=@Model.TopPerformers />
         </tab-content>
     </tabbed-view>
 </div>
