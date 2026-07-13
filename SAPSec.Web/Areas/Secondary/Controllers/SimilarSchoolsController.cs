@@ -7,8 +7,10 @@ using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
-namespace SAPSec.Web.Controllers;
+namespace SAPSec.Web.Areas.Secondary.Controllers;
 
+[Area("Secondary")]
+[Route("school/secondary/{urn}")]
 [Route("school/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
@@ -167,8 +169,8 @@ public class SimilarSchoolsController : Controller
     {
         var tags = new List<SimilarSchoolsSelectedFilterTagViewModel>();
         var baseUrl = Url is null
-            ? $"/school/{urn}/view-similar-schools"
-            : Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn }) ?? $"/school/{urn}/view-similar-schools";
+            ? Routes.Secondary.SimilarSchools(urn)
+            : Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn }) ?? Routes.Secondary.SimilarSchools(urn);
 
         foreach (var filter in filterOptions)
         {

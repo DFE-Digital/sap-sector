@@ -11,7 +11,7 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SimilarSchoolComparisonPath = "/school/108088/view-similar-schools/137621/SchoolDetails";
+    private const string SimilarSchoolComparisonPath = "/school/secondary/108088/view-similar-schools/137621/SchoolDetails";
 
     #region Page Load Tests
 

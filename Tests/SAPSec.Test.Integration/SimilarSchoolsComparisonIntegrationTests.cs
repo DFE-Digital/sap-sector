@@ -10,7 +10,7 @@ public class SimilarSchoolsComparisonIntegrationTests(IntegrationTestFixture fix
     [Fact]
     public async Task GetSimilarity_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Similarity");
+        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/Similarity");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -19,7 +19,7 @@ public class SimilarSchoolsComparisonIntegrationTests(IntegrationTestFixture fix
     [Fact]
     public async Task GetSimilarity_ContainsComparisonHeadingAndTable()
     {
-        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/Similarity");
+        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/Similarity");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -31,7 +31,7 @@ public class SimilarSchoolsComparisonIntegrationTests(IntegrationTestFixture fix
     [Fact]
     public async Task GetSchoolDetails_HomeBreadcrumb_LinksToSchoolSearch()
     {
-        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
+        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/SchoolDetails");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -41,7 +41,7 @@ public class SimilarSchoolsComparisonIntegrationTests(IntegrationTestFixture fix
     [Fact]
     public async Task GetSchoolDetails_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
+        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/SchoolDetails");
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -50,7 +50,7 @@ public class SimilarSchoolsComparisonIntegrationTests(IntegrationTestFixture fix
     [Fact]
     public async Task GetSchoolDetails_ContainsExpectedSections()
     {
-        var response = await fixture.Client.GetAsync("/school/108088/view-similar-schools/137621/SchoolDetails");
+        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/SchoolDetails");
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

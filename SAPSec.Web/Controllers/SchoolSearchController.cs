@@ -251,5 +251,5 @@ public class SchoolSearchController(
     private static string BuildSchoolUrl(string urn, string? phaseOfEducationName) =>
         PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
             ? $"/school/primary/{urn}"
-            : $"/school/{urn}";
+            : Routes.Secondary.School(urn);
 }

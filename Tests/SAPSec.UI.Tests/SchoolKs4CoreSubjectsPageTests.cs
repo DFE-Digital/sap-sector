@@ -8,7 +8,7 @@ namespace SAPSec.UI.Tests;
 [Collection("UITestsCollection")]
 public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string PagePath = "/school/105574/ks4-core-subjects";
+    private const string PagePath = "/school/secondary/105574/ks4-core-subjects";
 
     [Fact]
     public async Task Ks4CoreSubjects_LoadsEnglishLanguagePage()

@@ -7,9 +7,9 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class SchoolControllerIntegrationTests(IntegrationTestFixture fixture)
 {
-    private const string SchoolOverviewPath = "/school/105574";
-    private const string SchoolDetailsPath = "/school/105574/school-details";
-    private const string WhatIsASimilarSchoolPath = "/school/105574/what-is-a-similar-school";
+    private const string SchoolOverviewPath = "/school/secondary/105574";
+    private const string SchoolDetailsPath = "/school/secondary/105574/school-details";
+    private const string WhatIsASimilarSchoolPath = "/school/secondary/105574/what-is-a-similar-school";
 
     [Fact]
     public async Task GetSchoolOverview_ReturnsSuccess()

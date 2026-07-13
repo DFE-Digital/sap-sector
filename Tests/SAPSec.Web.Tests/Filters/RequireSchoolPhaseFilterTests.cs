@@ -49,7 +49,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/school/123456");
+            .Which.Url.Should().Be("/school/secondary/123456");
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class RequireSchoolPhaseFilterTests
             pathBase: "/app");
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/app/school/123456");
+            .Which.Url.Should().Be("/app/school/secondary/123456");
     }
 
     [Fact]
@@ -245,13 +245,13 @@ public class RequireSchoolPhaseFilterTests
 
         return action switch
         {
-            "Attendance" => $"/school/{urn}/attendance",
-            "AttendanceData" => $"/school/{urn}/attendance-data",
-            "SchoolDetails" => $"/school/{urn}/school-details",
-            "WhatIsASimilarSchool" => $"/school/{urn}/what-is-a-similar-school",
-            "ViewSimilarSchools" => $"/school/{urn}/view-similar-schools",
-            "Ks4HeadlineMeasures" => $"/school/{urn}/ks4-headline-measures",
-            _ => $"/school/{urn}"
+            "Attendance" => $"/school/secondary/{urn}/attendance",
+            "AttendanceData" => $"/school/secondary/{urn}/attendance-data",
+            "SchoolDetails" => $"/school/secondary/{urn}/school-details",
+            "WhatIsASimilarSchool" => $"/school/secondary/{urn}/what-is-a-similar-school",
+            "ViewSimilarSchools" => $"/school/secondary/{urn}/view-similar-schools",
+            "Ks4HeadlineMeasures" => $"/school/secondary/{urn}/ks4-headline-measures",
+            _ => $"/school/secondary/{urn}"
         };
     }
 

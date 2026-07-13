@@ -8,7 +8,7 @@ namespace SAPSec.UI.Tests;
 [Collection("UITestsCollection")]
 public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string Path = "/school/108088/view-similar-schools/137621/Ks4CoreSubjects";
+    private const string Path = "/school/secondary/108088/view-similar-schools/137621/Ks4CoreSubjects";
 
     private async Task ToggleFirstChartGroupToYearByYearAsync()
     {

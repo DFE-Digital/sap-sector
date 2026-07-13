@@ -83,6 +83,6 @@ public class UserControllerTests
         var result = await _controller.Index();
 
         var redirect = result.Should().BeOfType<RedirectResult>().Subject;
-        redirect.Url.Should().Be("/school/654321");
+        redirect.Url.Should().Be("/school/secondary/654321");
     }
 }

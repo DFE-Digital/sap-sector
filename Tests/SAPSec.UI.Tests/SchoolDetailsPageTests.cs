@@ -10,7 +10,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SchoolDetailsPath = "/school/108088/school-details";
+    private const string SchoolDetailsPath = "/school/secondary/108088/school-details";
 
     #region Page Load Tests
 
@@ -588,7 +588,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
     [Fact]
     public async Task SchoolDetails_NonExistentUrn_Shows404()
     {
-        var response = await Page.GotoAsync("/school/999999");
+        var response = await Page.GotoAsync("/school/secondary/999999");
 
         response!.Status.Should().Be(404);
     }

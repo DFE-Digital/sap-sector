@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Model;
+using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Helpers;
 
@@ -52,12 +53,12 @@ public static class SchoolRouteHelper
 
         return path.ToLowerInvariant() switch
         {
-            var p when p.EndsWith("/attendance") => $"/school/{urn}/attendance",
-            var p when p.EndsWith("/school-details") => $"/school/{urn}/school-details",
-            var p when p.EndsWith("/what-is-a-similar-school") => $"/school/{urn}/what-is-a-similar-school",
-            var p when p.EndsWith("/view-similar-schools") => $"/school/{urn}/view-similar-schools",
-            var p when p.EndsWith("/similar-schools") => $"/school/{urn}/view-similar-schools",
-            _ => $"/school/{urn}"
+            var p when p.EndsWith("/attendance") => $"{Routes.Secondary.School(urn)}/attendance",
+            var p when p.EndsWith("/school-details") => Routes.Secondary.SchoolDetails(urn),
+            var p when p.EndsWith("/what-is-a-similar-school") => $"{Routes.Secondary.School(urn)}/what-is-a-similar-school",
+            var p when p.EndsWith("/view-similar-schools") => Routes.Secondary.SimilarSchools(urn),
+            var p when p.EndsWith("/similar-schools") => Routes.Secondary.SimilarSchools(urn),
+            _ => Routes.Secondary.School(urn)
         };
     }
 }

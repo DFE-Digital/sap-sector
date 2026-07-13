@@ -10,7 +10,7 @@ namespace SAPSec.UI.Tests;
 [Collection("UITestsCollection")]
 public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string Path = "/school/105574/ks4-headline-measures";
+    private const string Path = "/school/secondary/105574/ks4-headline-measures";
 
     private async Task NavigateAsync()
     {

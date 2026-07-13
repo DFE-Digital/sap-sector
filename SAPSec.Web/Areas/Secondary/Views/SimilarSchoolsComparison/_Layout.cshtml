@@ -2,7 +2,7 @@
 @using System.Linq
 
 @{
-    Layout = "Views/Shared/_Layout";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 
     var comparisonModel = ViewData["ComparisonSchool"] as SimilarSchoolsComparisonViewModel;
 
@@ -10,6 +10,7 @@
 
     var routeValues = new Dictionary<string, object>
     {
+        ["area"] = "Secondary",
         ["urn"] = comparisonModel!.Urn,
         ["similarSchoolUrn"] = comparisonModel.SimilarSchoolUrn
     };
@@ -26,7 +27,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = comparisonModel!.Urn })">
+                   href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = comparisonModel!.Urn })">
                     View similar schools
                 </a>
             </li>
@@ -39,7 +40,7 @@
     @* LEFT: back link *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = comparisonModel!.Urn })">
+           href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = comparisonModel!.Urn })">
             Back
         </a>
     </div>

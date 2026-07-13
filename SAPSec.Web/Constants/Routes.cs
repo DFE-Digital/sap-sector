@@ -34,9 +34,9 @@ public static class Routes
 
     public static class Secondary
     {
-        public static string School(string urn) => $"/school/{urn}";
-        public static string SchoolDetails(string urn) => $"/school/{urn}/school-details";
-        public static string SimilarSchools(string urn) => $"/school/{urn}/view-similar-schools";
-        public static string SimilarSchoolComparison(string urn, string similarSchoolUrn) => $"/school/{urn}/view-similar-schools/{similarSchoolUrn}";
+        public static string School(string urn) => $"/school/secondary/{urn}";
+        public static string SchoolDetails(string urn) => $"/school/secondary/{urn}/school-details";
+        public static string SimilarSchools(string urn) => $"/school/secondary/{urn}/view-similar-schools";
+        public static string SimilarSchoolComparison(string urn, string similarSchoolUrn) => $"/school/secondary/{urn}/view-similar-schools/{similarSchoolUrn}";
     }
 }

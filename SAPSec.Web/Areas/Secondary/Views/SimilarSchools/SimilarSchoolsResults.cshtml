@@ -34,7 +34,7 @@
         {
             <li class="app-school-result" id="similar-school-@school.Urn">
                 <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
-                   href="@Url.Action("Index", "SimilarSchoolsComparison", new { urn = currentSchoolUrn, similarSchoolUrn = string.IsNullOrWhiteSpace(school.UrnRaw) ? school.Urn.ToString() : school.UrnRaw })">
+                   href="@Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = currentSchoolUrn, similarSchoolUrn = string.IsNullOrWhiteSpace(school.UrnRaw) ? school.Urn.ToString() : school.UrnRaw })">
                     @school.EstablishmentName
                 </a>
                 <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">

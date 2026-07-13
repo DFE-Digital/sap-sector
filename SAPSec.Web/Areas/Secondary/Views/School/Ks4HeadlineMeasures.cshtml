@@ -34,8 +34,9 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandDestinationsYearByYear, Display: Model.EnglandDestinationsDisplay)
     };
 
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
+    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.Secondary.SimilarSchools(Model.SchoolDetails.Urn);
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.Secondary.SimilarSchoolComparison(Model.SchoolDetails.Urn, similarSchoolUrn);
+    string WhatIsSimilarSchoolUrl() => Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.Secondary.School(Model.SchoolDetails.Urn) + "/what-is-a-similar-school";
 }
 <div class="app-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -52,7 +53,7 @@
 </ul>
 
 <p class="govuk-body">
-    Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+    Find out <a href="@WhatIsSimilarSchoolUrl()" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
 
 <partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
@@ -187,7 +188,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="eng-maths-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
             </select>
@@ -304,7 +305,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="destinations-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="all" selected>All destinations</option>
                 <option value="education">Education</option>
                 <option value="employment">Employment and apprenticeships</option>

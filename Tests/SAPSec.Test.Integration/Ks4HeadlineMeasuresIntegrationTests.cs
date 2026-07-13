@@ -7,7 +7,7 @@ namespace SAPSec.Integration.Tests;
 [Collection("IntegrationTestsCollection")]
 public class Ks4HeadlineMeasuresIntegrationTests(IntegrationTestFixture fixture)
 {
-    private const string Ks4HeadlineMeasuresPath = "/school/105574/ks4-headline-measures";
+    private const string Ks4HeadlineMeasuresPath = "/school/secondary/105574/ks4-headline-measures";
 
     [Fact]
     public async Task Ks4HeadlineMeasures_ReturnsSuccess()
@@ -46,7 +46,7 @@ public class Ks4HeadlineMeasuresIntegrationTests(IntegrationTestFixture fixture)
         var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
         var content = await response.Content.ReadAsStringAsync();
 
-        content.Should().Contain("/school/105574/view-similar-schools/");
+        content.Should().Contain("/school/secondary/105574/view-similar-schools/");
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class Ks4HeadlineMeasuresIntegrationTests(IntegrationTestFixture fixture)
     [Fact]
     public async Task Ks4HeadlineMeasures_WithNonExistentUrn_ReturnsNotFound()
     {
-        var response = await fixture.Client.GetAsync("/school/999999/ks4-headline-measures");
+        var response = await fixture.Client.GetAsync("/school/secondary/999999/ks4-headline-measures");
 
         response.StatusCode.Should().Be(System.Net.HttpStatusCode.NotFound);
     }

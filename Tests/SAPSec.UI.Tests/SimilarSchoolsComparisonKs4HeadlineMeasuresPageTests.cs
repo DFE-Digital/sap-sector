@@ -10,7 +10,7 @@ namespace SAPSec.UI.Tests;
 [Collection("UITestsCollection")]
 public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string Path = "/school/108088/view-similar-schools/137621/Ks4HeadlineMeasures";
+    private const string Path = "/school/secondary/108088/view-similar-schools/137621/Ks4HeadlineMeasures";
 
     private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
     {

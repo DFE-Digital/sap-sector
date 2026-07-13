@@ -2,7 +2,7 @@
 @model SimilarSchoolsPageViewModel
 
 @{
-    var baseUrl = Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn });
+    var baseUrl = Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.Urn });
 }
 
 @if (Model.TotalPages > 1)

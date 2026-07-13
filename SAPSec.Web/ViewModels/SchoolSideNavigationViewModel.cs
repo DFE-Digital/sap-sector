@@ -25,13 +25,13 @@ public sealed class SchoolSideNavigationViewModel
         {
             Items =
             [
-                new() { Text = "Overview", Href = url.Action("Index", "School", new { urn })!, IsSelected = currentAction == "Index" },
-                new() { Text = "KS4 headline measures", Href = url.Action("Ks4HeadlineMeasures", "School", new { urn })!, IsSelected = currentAction == "Ks4HeadlineMeasures" },
-                new() { Text = "KS4 core subjects", Href = url.Action("Ks4CoreSubjects", "School", new { urn })!, IsSelected = currentAction == "Ks4CoreSubjects" },
-                new() { Text = "Attendance", Href = url.Action("Attendance", "School", new { urn })!, IsSelected = currentAction == "Attendance" },
-                new() { Text = "View similar schools", Href = url.Action("ViewSimilarSchools", "SimilarSchools", new { urn })!, IsSelected = currentAction == "ViewSimilarSchools" },
-                new() { Text = "School details", Href = url.Action("SchoolDetails", "School", new { urn })!, IsSelected = currentAction == "SchoolDetails" },
-                new() { Text = "What is a similar school?", Href = url.Action("WhatIsASimilarSchool", "School", new { urn })!, IsSelected = currentAction == "WhatIsASimilarSchool" }
+                new() { Text = "Overview", Href = url.Action("Index", "School", new { area = "Secondary", urn })!, IsSelected = currentAction == "Index" },
+                new() { Text = "KS4 headline measures", Href = url.Action("Ks4HeadlineMeasures", "School", new { area = "Secondary", urn })!, IsSelected = currentAction == "Ks4HeadlineMeasures" },
+                new() { Text = "KS4 core subjects", Href = url.Action("Ks4CoreSubjects", "School", new { area = "Secondary", urn })!, IsSelected = currentAction == "Ks4CoreSubjects" },
+                new() { Text = "Attendance", Href = url.Action("Attendance", "School", new { area = "Secondary", urn })!, IsSelected = currentAction == "Attendance" },
+                new() { Text = "View similar schools", Href = url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn })!, IsSelected = currentAction == "ViewSimilarSchools" },
+                new() { Text = "School details", Href = url.Action("SchoolDetails", "School", new { area = "Secondary", urn })!, IsSelected = currentAction == "SchoolDetails" },
+                new() { Text = "What is a similar school?", Href = url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn })!, IsSelected = currentAction == "WhatIsASimilarSchool" }
             ]
         };
 }

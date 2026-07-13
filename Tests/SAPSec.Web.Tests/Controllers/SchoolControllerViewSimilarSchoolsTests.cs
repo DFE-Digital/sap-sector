@@ -9,7 +9,7 @@ using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
-using SAPSec.Web.Controllers;
+using SAPSec.Web.Areas.Secondary.Controllers;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
@@ -86,7 +86,7 @@ public class SimilarSchoolsControllerTests
         navigation.Items.Should().Contain(item =>
             item.Text == "View similar schools" &&
             item.IsSelected &&
-            item.Href == $"/school/{urn}/view-similar-schools");
+            item.Href == $"/school/secondary/{urn}/view-similar-schools");
     }
 
     [Fact]
@@ -302,37 +302,37 @@ public class SimilarSchoolsControllerTests
             {
                 if (context.Action == "Index" && context.Controller == "School")
                 {
-                    return $"/school/{urn}";
+                    return $"/school/secondary/{urn}";
                 }
 
                 if (context.Action == "Ks4HeadlineMeasures" && context.Controller == "School")
                 {
-                    return $"/school/{urn}/ks4-headline-measures";
+                    return $"/school/secondary/{urn}/ks4-headline-measures";
                 }
 
                 if (context.Action == "Ks4CoreSubjects" && context.Controller == "School")
                 {
-                    return $"/school/{urn}/ks4-core-subjects";
+                    return $"/school/secondary/{urn}/ks4-core-subjects";
                 }
 
                 if (context.Action == "Attendance" && context.Controller == "School")
                 {
-                    return $"/school/{urn}/attendance";
+                    return $"/school/secondary/{urn}/attendance";
                 }
 
                 if (context.Action == "ViewSimilarSchools" && context.Controller == "SimilarSchools")
                 {
-                    return $"/school/{urn}/view-similar-schools";
+                    return $"/school/secondary/{urn}/view-similar-schools";
                 }
 
                 if (context.Action == "SchoolDetails" && context.Controller == "School")
                 {
-                    return $"/school/{urn}/school-details";
+                    return $"/school/secondary/{urn}/school-details";
                 }
 
                 if (context.Action == "WhatIsASimilarSchool" && context.Controller == "School")
                 {
-                    return $"/school/{urn}/what-is-a-similar-school";
+                    return $"/school/secondary/{urn}/what-is-a-similar-school";
                 }
 
                 return null;

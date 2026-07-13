@@ -152,7 +152,7 @@ public class SchoolSearchControllerTests(IntegrationTestFixture fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/138361");
+        response.Headers.Location!.ToString().Should().Contain("/school/secondary/138361");
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class SchoolSearchControllerTests(IntegrationTestFixture fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/138361");
+        response.Headers.Location!.ToString().Should().Contain("/school/secondary/138361");
     }
 
     #endregion
@@ -301,7 +301,7 @@ public class SchoolSearchControllerTests(IntegrationTestFixture fixture)
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/secondary/105574");
     }
 
     [Fact]
@@ -366,7 +366,7 @@ public class SchoolSearchControllerTests(IntegrationTestFixture fixture)
         var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/secondary/105574");
     }
 
     [Fact]
@@ -382,7 +382,7 @@ public class SchoolSearchControllerTests(IntegrationTestFixture fixture)
         var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
+        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/secondary/105574");
     }
 
     #endregion
