@@ -552,6 +552,10 @@
 
 .app-measure-tabs {
   margin-bottom: 0 !important;
+
+  .govuk-tabs__panel {
+    margin-bottom: 0 !important;
+  }
 }
 
 @media (max-width: 40.0625em) {
