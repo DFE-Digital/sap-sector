@@ -5,28 +5,28 @@ namespace SAPSec.Infrastructure.Json;
 
 public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
 {
-    private readonly IJsonFile<SimilarSchoolsSecondaryGroupsEntry> _similarSchoolsGroups;
-    private readonly IJsonFile<SimilarSchoolsSecondaryValuesEntry> _similarSchoolsValues;
-    private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> _standardDeviations;
+    private readonly IJsonFile<SimilarSchoolsSecondaryGroupsEntry> _groupsFile;
+    private readonly IJsonFile<SimilarSchoolsSecondaryValuesEntry> _valuesFile;
+    private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> _standardDeviationsFile;
 
     public JsonSimilarSchoolsSecondaryRepository(
-        IJsonFile<SimilarSchoolsSecondaryGroupsEntry> similarSchoolsGroupsRepository,
-        IJsonFile<SimilarSchoolsSecondaryValuesEntry> similarSchoolsValuesRepository,
-        IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> standardDeviationsRepository)
+        IJsonFile<SimilarSchoolsSecondaryGroupsEntry> groupsFile,
+        IJsonFile<SimilarSchoolsSecondaryValuesEntry> valuesFile,
+        IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> standardDeviationsFile)
     {
-        _similarSchoolsGroups = similarSchoolsGroupsRepository;
-        _similarSchoolsValues = similarSchoolsValuesRepository;
-        _standardDeviations = standardDeviationsRepository;
+        _groupsFile = groupsFile;
+        _valuesFile = valuesFile;
+        _standardDeviationsFile = standardDeviationsFile;
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn)
     {
-        var rows = await _similarSchoolsGroups.ReadAllAsync();
+        var rows = await _groupsFile.ReadAllAsync();
         var groupRows = rows.Where(r => r.URN == urn).ToList();
         return groupRows.AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetSecondaryValuesByUrnsAsync(
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetValuesByUrnsAsync(
         IEnumerable<string> urns)
     {
         if (urns is null)
@@ -40,7 +40,7 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             return Array.Empty<SimilarSchoolsSecondaryValuesEntry>();
         }
 
-        var rows = await _similarSchoolsValues.ReadAllAsync();
+        var rows = await _valuesFile.ReadAllAsync();
         var matched = rows.Where(r => urnList.Contains(r.URN)).ToList();
 
         return matched
@@ -48,15 +48,15 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
             .AsReadOnly();
     }
 
-    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
+    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetStandardDeviationsAsync()
     {
-        var list = await _standardDeviations.ReadAllAsync();
+        var list = await _standardDeviationsFile.ReadAllAsync();
         return list.FirstOrDefault();
     }
 
     public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
     {
-        var rows = await _similarSchoolsValues.ReadAllAsync();
+        var rows = await _valuesFile.ReadAllAsync();
         return rows.Select(r => r.URN).ToList();
     }
 }

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Test.Common;
-using SAPSec.Test.Common.Repositories.InMemory;
+using SAPSec.Test.Common.InMemory;
 using Xunit.Abstractions;
 
 namespace SAPSec.Infrastructure.Tests.LuceneSearch;

@@ -5,14 +5,14 @@ namespace SAPSec.Infrastructure.Json;
 
 public class JsonAbsenceRepository(
     IEstablishmentRepository establishmentRepository,
-    IJsonFile<EstablishmentAbsence> establishmentAbsenceRepository,
-    IJsonFile<LAAbsence> laAbsenceRepository,
-    IJsonFile<EnglandAbsence> englandAbsenceRepository) : IAbsenceRepository
+    IJsonFile<EstablishmentAbsence> establishmentAbsenceFile,
+    IJsonFile<LAAbsence> laAbsenceFile,
+    IJsonFile<EnglandAbsence> englandAbsenceFile) : IAbsenceRepository
 {
     public async Task<AbsenceData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.FirstOrDefault(x => string.Equals(x.URN, urn, StringComparison.Ordinal));
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal));
     }
 
     public async Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)
@@ -30,7 +30,7 @@ public class JsonAbsenceRepository(
         var establishments = (await establishmentRepository.GetEstablishmentsAsync(requestedUrns))
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))
             .ToDictionary(x => x.URN, StringComparer.Ordinal);
-        var absenceByUrn = (await establishmentAbsenceRepository.ReadAllAsync())
+        var absenceByUrn = (await establishmentAbsenceFile.ReadAllAsync())
             .Where(x => establishments.ContainsKey(x.Id))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
@@ -39,11 +39,11 @@ public class JsonAbsenceRepository(
             .Where(x => !string.IsNullOrWhiteSpace(x))
             .Distinct(StringComparer.Ordinal)
             .ToArray();
-        var localAuthorityAbsenceByLaId = (await laAbsenceRepository.ReadAllAsync())
+        var localAuthorityAbsenceByLaId = (await laAbsenceFile.ReadAllAsync())
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandAbsence = (await englandAbsenceRepository.ReadAllAsync()).FirstOrDefault();
+        var englandAbsence = (await englandAbsenceFile.ReadAllAsync()).FirstOrDefault();
 
         var results = new List<AbsenceData>(requestedUrns.Length);
 

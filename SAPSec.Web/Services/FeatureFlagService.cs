@@ -3,9 +3,9 @@ using SAPSec.Core.Interfaces.Services;
 
 namespace SAPSec.Web.Services;
 
-public class FeatureFlagService(IFeatureManagerSnapshot featureManager) : IFeatureFlagService
+public class FeatureFlagService(IFeatureManager featureManager) : IFeatureFlagService
 {
-    private readonly IFeatureManagerSnapshot _featureManager = featureManager ?? throw new ArgumentNullException(nameof(featureManager));
+    private readonly IFeatureManager _featureManager = featureManager ?? throw new ArgumentNullException(nameof(featureManager));
 
     public Task<bool> IsEnabledAsync(string featureName)
     {

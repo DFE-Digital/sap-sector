@@ -20,7 +20,7 @@ public class GetAttendanceMeasuresTests
             .Setup(x => x.GetEstablishmentAsync("999999"))
             .ReturnsAsync((Establishment?)null);
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+            .Setup(x => x.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
@@ -74,7 +74,7 @@ public class GetAttendanceMeasuresTests
                     Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync("123456"))
+            .Setup(x => x.GetGroupAsync("123456"))
             .ReturnsAsync(
             [
                 new SimilarSchoolsSecondaryGroupsEntry { URN = "123456", NeighbourURN = "200001" },
@@ -159,7 +159,7 @@ public class GetAttendanceMeasuresTests
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456" });
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+            .Setup(x => x.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         repositoryMock
@@ -195,7 +195,7 @@ public class GetAttendanceMeasuresTests
             .Setup(x => x.GetEstablishmentAsync("123456"))
             .ReturnsAsync(new Establishment { URN = "123456", LAId = "373", EstablishmentName = "Current School" });
         similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+            .Setup(x => x.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         repositoryMock

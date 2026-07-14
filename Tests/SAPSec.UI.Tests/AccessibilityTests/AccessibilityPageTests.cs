@@ -3,7 +3,7 @@ using SAPSec.UI.Tests.Infrastructure;
 using SAPSec.Web.Constants;
 using Xunit;
 
-namespace SAPSec.UI.Tests.AccessibilityTests;
+namespace SAPSec.UI.Tests.Deprecated.AccessibilityTests;
 
 [Collection("UITestsCollection")]
 public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
