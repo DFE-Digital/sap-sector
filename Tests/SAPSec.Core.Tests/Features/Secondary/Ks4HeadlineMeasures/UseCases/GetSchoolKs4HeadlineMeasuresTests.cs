@@ -1,5 +1,5 @@
 using Moq;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;

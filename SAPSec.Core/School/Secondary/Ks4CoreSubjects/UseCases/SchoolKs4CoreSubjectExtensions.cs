@@ -1,4 +1,4 @@
-namespace SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+namespace SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 
 public static class SchoolKs4CoreSubjectExtensions
 {

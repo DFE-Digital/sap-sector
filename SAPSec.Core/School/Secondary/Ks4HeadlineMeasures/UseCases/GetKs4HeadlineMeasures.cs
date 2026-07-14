@@ -2,7 +2,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+namespace SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 
 public class GetKs4HeadlineMeasures(
     IKs4PerformanceRepository performanceRepository,
@@ -158,7 +158,7 @@ public record Ks4HeadlineMeasureYearByYear(
     Ks4HeadlineMeasureSeries England);
 
 public record GetKs4HeadlineMeasuresResponse(
-    Model.SchoolDetails SchoolDetails,
+    SchoolDetails SchoolDetails,
     Ks4HeadlineMeasureAverage Attainment8ThreeYearAverage,
     Ks4HeadlineMeasureYearByYear Attainment8YearByYear,
     Ks4HeadlineMeasureAverage EngMaths49ThreeYearAverage,

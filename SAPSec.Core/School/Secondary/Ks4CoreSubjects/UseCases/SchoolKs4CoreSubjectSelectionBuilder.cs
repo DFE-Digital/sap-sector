@@ -1,14 +1,14 @@
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Model;
+using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+namespace SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 
 internal static class SchoolKs4CoreSubjectSelectionBuilder
 {
     public static SchoolKs4CoreSubjectSelection BuildSelection(
         Ks4PerformanceData? schoolData,
-        Model.SchoolDetails schoolDetails,
+        SchoolDetails schoolDetails,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SchoolKs4CoreSubject subject,
         SchoolKs4CoreSubjectGradeFilter grade) =>
@@ -16,7 +16,7 @@ internal static class SchoolKs4CoreSubjectSelectionBuilder
 
     public static SchoolKs4CoreSubjectSelection BuildSelection(
         Ks4PerformanceData? schoolData,
-        Model.SchoolDetails schoolDetails,
+        SchoolDetails schoolDetails,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors selectors)
     {
@@ -364,7 +364,7 @@ internal static class SchoolKs4CoreSubjectSelectionBuilder
     }
 
     private static IReadOnlyList<Ks4TopPerformer> BuildTopPerformers(
-        Model.SchoolDetails currentSchool,
+        SchoolDetails currentSchool,
         decimal? currentSchoolValue,
         IEnumerable<SimilarSchoolMeasure> similarSchoolResponses,
         Func<SimilarSchoolMeasure, decimal?> selector)
