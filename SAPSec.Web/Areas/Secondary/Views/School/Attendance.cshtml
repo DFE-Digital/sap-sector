@@ -33,8 +33,6 @@
     var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
     var whatIsSimilarSchoolUrl = Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn })
         ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).SimilarSchoolComparison(similarSchoolUrn);
 }
 
 <span class="govuk-caption-xl">@Model.SchoolName</span>
@@ -44,7 +42,6 @@
     Compare this school's attendance measures with:
 </p>
 <ul class="govuk-list govuk-list--bullet">
-    <li><b>50</b> similar secondary phase schools (including all-throughs)</li>
     <li>the local authority average</li>
     <li>the national average</li>
 </ul>
@@ -52,6 +49,15 @@
 <p class="govuk-body">
     Find out <a href="@whatIsSimilarSchoolUrl" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
+
+<div class="govuk-inset-text">
+    <p class="govuk-body">
+        To compare this school with similar schools using up-to-date attendance data, use the Monitor your school attendance service.
+    </p>
+    <p class="govuk-body govuk-!-margin-bottom-0">
+        You can access this service on <a href="https://viewyourdata.education.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">View your education data (VYED) (opens in new tab)</a>. If you do not have VYED access, <a href="https://viewyourdata.education.gov.uk/Account/Help" class="govuk-link" target="_blank" rel="noopener noreferrer">get help on accessing VYED (opens in new tab)</a>.
+    </p>
+</div>
 
 <section aria-labelledby="attendance-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="attendance-heading">Attendance</h2>
@@ -62,6 +68,7 @@
             <select class="govuk-select"
                     id="attendanceAbsenceType"
                     name="attendanceAbsenceType"
+                    data-testid="attendance-absence-type"
                     data-view-switcher="true"
                     data-endpoint="@attendanceDataEndpoint"
                     data-query-key="absenceType"
@@ -69,9 +76,7 @@
                     data-line-chart-id="school-attendance-year-by-year-chart"
                     data-cell-attribute="data-attendance-cell"
                     data-cell-prefixes='{"school":"school","localAuthority":"la","england":"england"}'
-                    data-series-keys='["school","localAuthority","england"]'
-                    data-top-performers-table-id="attendance-top-performers-table"
-                    data-top-performer-base-url="@SimilarSchoolsUrl()">
+                    data-series-keys='["school","localAuthority","england"]'>
                 <option value="overall" selected>Overall absence</option>
                 <option value="persistent">Persistent absence</option>
             </select>
@@ -80,7 +85,7 @@
 
     <div class="govuk-tabs app-measure-tabs app-attendance-tabs" data-module="govuk-tabs">
         <h3 class="govuk-tabs__title">Attendance views</h3>
-        <ul class="govuk-tabs__list">
+        <ul class="govuk-tabs__list" data-testid="attendance-tabs">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
                 <a class="govuk-tabs__tab" href="#attendance-three-year-average">@Model.CurrentAcademicYear</a>
             </li>
@@ -89,9 +94,6 @@
             </li>
             <li class="govuk-tabs__list-item">
                 <a class="govuk-tabs__tab" href="#attendance-table">Table</a>
-            </li>
-            <li class="govuk-tabs__list-item">
-                <a class="govuk-tabs__tab" href="#attendance-top-performers">Top performers</a>
             </li>
         </ul>
 
@@ -164,38 +166,6 @@
             </table>
         </div>
 
-        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-top-performers">
-            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
-            <table class="govuk-table" id="attendance-top-performers-table">
-                <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header">Rank</th>
-                    <th scope="col" class="govuk-table__header">School</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.CurrentAcademicYear</th>
-                </tr>
-                </thead>
-                <tbody class="govuk-table__body">
-                @foreach (var row in Model.OverallAbsenceTopPerformers)
-                {
-                    <tr class="govuk-table__row">
-                        <td class="govuk-table__cell">@row.Rank</td>
-                        <th scope="row" class="govuk-table__header">
-                            @if (row.IsCurrentSchool)
-                            {
-                                @row.Name
-                            }
-                            else
-                            {
-                                <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
-                            }
-                        </th>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@row.DisplayValue</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
-            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
-        </div>
     </div>
 </section>
 

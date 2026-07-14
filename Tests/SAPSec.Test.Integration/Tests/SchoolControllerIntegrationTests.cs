@@ -1,6 +1,9 @@
-using FluentAssertions;
-using SAPSec.Test.Integration.Setup;
 using System.Net;
+using System.Text.Json;
+using AngleSharp.Dom;
+using FluentAssertions;
+using SAPSec.Test.Common.AngleSharp;
+using SAPSec.Test.Integration.Setup;
 
 namespace SAPSec.Test.Integration.Tests;
 
@@ -8,6 +11,7 @@ namespace SAPSec.Test.Integration.Tests;
 public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     private const string SchoolOverviewPath = "/school/secondary/105574";
+    private const string SchoolAttendancePath = "/school/secondary/105574/attendance";
     private const string SchoolDetailsPath = "/school/secondary/105574/school-details";
     private const string WhatIsASimilarSchoolPath = "/school/secondary/105574/what-is-a-similar-school";
 
@@ -79,6 +83,32 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
         content.Should().Contain("Location");
         content.Should().Contain("Contact details");
         content.Should().Contain("Further information");
+    }
+
+    [Fact]
+    public async Task GetSchoolAttendance_OffersBothAbsenceTypes()
+    {
+        var document = await fixture.RequestPageAsync(SchoolAttendancePath);
+
+        var absenceTypeSelect = document.ElementWithTestIdShouldExist("attendance-absence-type");
+        var absenceOptions = absenceTypeSelect.ChildTrimmedTextContent().ToArray();
+
+        absenceOptions.Should().BeEquivalentTo(
+            ["Overall absence", "Persistent absence"],
+            options => options.WithStrictOrdering());
+    }
+
+    [Fact]
+    public async Task GetSchoolAttendance_DoesNotRenderTopPerformersTab()
+    {
+        var document = await fixture.RequestPageAsync(SchoolAttendancePath);
+
+        var attendanceTabs = document.ElementWithTestIdShouldExist("attendance-tabs");
+        var tabTexts = attendanceTabs.ChildTrimmedTextContent().ToArray();
+
+        tabTexts.Should().NotContain("Top performers");
+        tabTexts.Should().Contain("Year by year");
+        tabTexts.Should().Contain("Table");
     }
 
     [Fact]
