@@ -1,4 +1,4 @@
-using SAPSec.Core.School.Search;
+using SAPSec.Core.Search;
 using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Features.SchoolSearch.Extensions;

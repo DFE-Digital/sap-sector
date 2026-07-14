@@ -1,6 +1,6 @@
 using Moq;
 using SAPSec.Core.Features;
-using SAPSec.Core.School.Search;
+using SAPSec.Core.Search;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 

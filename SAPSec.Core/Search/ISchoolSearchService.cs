@@ -1,6 +1,6 @@
 ﻿using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.School.Search;
+namespace SAPSec.Core.Search;
 
 public interface ISchoolSearchService
 {

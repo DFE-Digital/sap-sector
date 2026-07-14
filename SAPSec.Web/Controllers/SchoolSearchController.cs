@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.School.Details;
-using SAPSec.Core.School.Search;
+using SAPSec.Core.Search;
 using SAPSec.Data.Dto;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;

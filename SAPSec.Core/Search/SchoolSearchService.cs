@@ -4,7 +4,7 @@ using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 using System.Text.RegularExpressions;
 
-namespace SAPSec.Core.School.Search;
+namespace SAPSec.Core.Search;
 
 public class SchoolSearchService(
     ISchoolSearchIndexReader _indexReader,

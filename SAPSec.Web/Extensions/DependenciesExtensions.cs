@@ -1,7 +1,6 @@
 using SAPSec.Core.School.Similarity.UseCases;
 using SAPSec.Core.School.Info;
 using SAPSec.Core.School.Primary;
-using SAPSec.Core.School.Search;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.UseCases;
@@ -14,6 +13,7 @@ using SAPSec.Web.Services;
 using System.Diagnostics.CodeAnalysis;
 using SAPSec.Core.School.Attendance;
 using SAPSec.Core.School.Details;
+using SAPSec.Core.Search;
 
 namespace SAPSec.Web.Extensions;
 

@@ -3,7 +3,7 @@ using SAPSec.Data.Dto;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace SAPSec.Core.School.Search;
+namespace SAPSec.Core.Search;
 
 [ExcludeFromCodeCoverage]
 public record SchoolSearchResult
