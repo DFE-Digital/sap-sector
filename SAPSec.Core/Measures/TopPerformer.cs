@@ -1,6 +1,6 @@
 using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.Measures;
+namespace SAPSec.Core.Measures;
 
 public record TopPerformer(
     int Rank,

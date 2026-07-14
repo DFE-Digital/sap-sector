@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 
-namespace SAPSec.Core.Features.Pagination;
+namespace SAPSec.Core.Pagination;
 
 public class PagedCollection<T> : IPagedCollection<T>
 {

@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.School.Attendance;
-using SAPSec.Core.Features.Geography;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.School.Similarity;
@@ -18,6 +17,7 @@ using SAPSec.Web.Controllers;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Text.Json;
+using SAPSec.Core.Geography;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
 

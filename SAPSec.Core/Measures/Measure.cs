@@ -1,7 +1,7 @@
-using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Filtering;
 using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.Measures;
+namespace SAPSec.Core.Measures;
 
 public record Measure(
     string Key,

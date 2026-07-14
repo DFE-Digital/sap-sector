@@ -2,7 +2,7 @@ using GeoUK.Coordinates;
 using GeoUK.Ellipsoids;
 using GeoUK.Projections;
 
-namespace SAPSec.Core.Features.Geography;
+namespace SAPSec.Core.Geography;
 
 public static class CoordinateConverter
 {

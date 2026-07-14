@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Geography;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Services;

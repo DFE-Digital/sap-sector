@@ -1,5 +1,5 @@
 using SAPSec.Core.Constants;
-using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Geography;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;

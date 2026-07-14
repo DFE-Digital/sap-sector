@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Measures;
 using SAPSec.Core.School.Info;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;

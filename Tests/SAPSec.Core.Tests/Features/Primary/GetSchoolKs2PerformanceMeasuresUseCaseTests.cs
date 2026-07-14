@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Measures;
+﻿using SAPSec.Core.Measures;
+using SAPSec.Core.Measures;
 using SAPSec.Core.School.Info;
 using SAPSec.Core.School.Primary;
 using SAPSec.Test.Common.Builders;

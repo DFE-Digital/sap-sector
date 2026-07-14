@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Features.Pagination;
+﻿namespace SAPSec.Core.Pagination;
 
 public interface IPagedCollection<T> : IReadOnlyCollection<T>
 {

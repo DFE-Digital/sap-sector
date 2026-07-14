@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.Geography;
+﻿using SAPSec.Core.Geography;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Core.School.Similarity;

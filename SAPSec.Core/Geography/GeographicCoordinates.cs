@@ -1,3 +1,3 @@
-namespace SAPSec.Core.Features.Geography;
+namespace SAPSec.Core.Geography;
 
 public record GeographicCoordinates(double Latitude, double Longitude);

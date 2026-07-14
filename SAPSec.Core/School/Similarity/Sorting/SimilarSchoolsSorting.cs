@@ -1,6 +1,6 @@
-﻿using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Model;
 using SAPSec.Core.School.Similarity;
+using SAPSec.Core.Sorting;
 
 namespace SAPSec.Core.School.Similarity.Sorting;
 

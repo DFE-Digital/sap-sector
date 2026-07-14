@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Filtering;
 using SAPSec.Core.Model;
 using SAPSec.Core.School.Similarity;
 

@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Geography;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;

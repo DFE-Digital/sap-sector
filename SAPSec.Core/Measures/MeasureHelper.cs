@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace SAPSec.Core.Features.Measures;
+namespace SAPSec.Core.Measures;
 
 public class MeasureHelper
 {

@@ -33,10 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\SchoolInfo\" />
-    <Folder Include="Features\SchoolSearch\Extensions\" />
-    <Folder Include="Features\SimilarSchools\" />
-    <Folder Include="School\Attendance\UseCases\" />
+    <Folder Include="Features\" />
     <Folder Include="School\X\" />
   </ItemGroup>
 

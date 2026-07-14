@@ -1,4 +1,4 @@
-namespace SAPSec.Core.Features.Filtering;
+namespace SAPSec.Core.Filtering;
 
 public record Filter(
     string Key,

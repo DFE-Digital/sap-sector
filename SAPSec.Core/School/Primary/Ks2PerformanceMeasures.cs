@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.Measures;
+﻿using SAPSec.Core.Measures;
 using SAPSec.Core.School.Similarity;
 using SAPSec.Data.Repositories;
 

@@ -1,6 +1,6 @@
 using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.Measures;
+namespace SAPSec.Core.Measures;
 
 /// <summary>
 /// Represents a series of data for a Measure for the current year and previous 2 years
