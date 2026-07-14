@@ -1,6 +1,6 @@
 using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Features.SchoolInfo;
+namespace SAPSec.Core.School.Info;
 
 public record Address(
     string? Street = null,

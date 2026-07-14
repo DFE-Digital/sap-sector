@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Features.SchoolSearch
+﻿namespace SAPSec.Core.School.Search
 {
     public interface ISchoolSearchIndexReader
     {

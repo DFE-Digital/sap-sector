@@ -1,7 +1,7 @@
 using SAPSec.Core.Constants;
 using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Features.SchoolSearch.Extensions;
+namespace SAPSec.Core.School.Search;
 
 public static class EstablishmentExtensions
 {
@@ -67,7 +67,7 @@ public static class EstablishmentExtensions
         var phase = establishment.PhaseOfEducationName;
 
         return PhaseOfEducationValues.IsSecondary(phase)
-            || (primarySchoolsEnabled && PhaseOfEducationValues.IsPrimaryOrAllThrough(phase));
+            || primarySchoolsEnabled && PhaseOfEducationValues.IsPrimaryOrAllThrough(phase);
     }
 
     private static bool HasLegacySearchablePhaseName(string? phaseOfEducationName)

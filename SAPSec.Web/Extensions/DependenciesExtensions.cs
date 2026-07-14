@@ -1,9 +1,9 @@
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.School.Info;
 using SAPSec.Core.School.Primary;
+using SAPSec.Core.School.Search;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Services;

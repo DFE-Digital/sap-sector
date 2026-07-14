@@ -1,6 +1,6 @@
 using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Features.SchoolInfo;
+namespace SAPSec.Core.School.Info;
 
 public record SchoolInfo(string Urn, string Name, LocalAuthority LocalAuthority, Address Address)
 {

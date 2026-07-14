@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.School.Info;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 

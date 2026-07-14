@@ -32,4 +32,9 @@
     <ProjectReference Include="..\SAPSec.Data\SAPSec.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\SchoolInfo\" />
+    <Folder Include="Features\SchoolSearch\Extensions\" />
+  </ItemGroup>
+
 </Project>

@@ -1,7 +1,7 @@
 ﻿using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.SchoolInfo;
+namespace SAPSec.Core.School.Info;
 
 public class GetSchoolInfoUseCase(
     IEstablishmentRepository establishmentRepository)
