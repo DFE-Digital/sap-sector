@@ -2,7 +2,7 @@
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Primary;
+namespace SAPSec.Core.School.Primary;
 
 internal static class Ks2PerformanceMeasures
 {

@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.School.Primary;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 

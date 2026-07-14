@@ -1,7 +1,8 @@
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Primary;
+namespace SAPSec.Core.School.Primary;
 
 public class PrimarySimilarSchoolsPerformanceDataProvider(
     IEstablishmentRepository establishmentRepository,
@@ -17,7 +18,7 @@ public class PrimarySimilarSchoolsPerformanceDataProvider(
             .ToArray();
 
         var schools = (await establishmentRepository.GetEstablishmentsAsync([currentSchoolUrn, .. similarSchoolUrns]))
-            .Select(SchoolInfo.SchoolInfo.FromEstablishment)
+            .Select(SchoolInfo.FromEstablishment)
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         if (!schools.ContainsKey(currentSchoolUrn))

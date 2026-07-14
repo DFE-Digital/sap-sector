@@ -1,8 +1,9 @@
 using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Primary;
+namespace SAPSec.Core.School.Primary;
 
 public class GetSchoolKs2PerformanceMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
@@ -36,6 +37,6 @@ public record GetSchoolKs2PerformanceMeasuresRequest(
     IDictionary<string, string>? FilterBy = null);
 
 public record GetSchoolKs2PerformanceMeasuresResponse(
-    SchoolInfo.SchoolInfo School,
+    SchoolInfo School,
     int SimilarSchoolsCount,
     Measure MeetingExpectedStandardRwm);
