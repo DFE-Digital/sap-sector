@@ -4,11 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Model;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;
 
-namespace SAPSec.Web.Tests.Controllers;
+namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class UserControllerTests
 {
