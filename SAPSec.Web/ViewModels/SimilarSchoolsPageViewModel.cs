@@ -1,6 +1,6 @@
-﻿using SAPSec.Core;
-using SAPSec.Core.School.Similarity.UseCases;
+﻿using SAPSec.Core.School.Similarity.UseCases;
 using SAPSec.Core.Sorting;
+using SAPSec.Core.Validation;
 
 namespace SAPSec.Web.ViewModels;
 

@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.School.Info;
 using SAPSec.Core.School.Similarity;
 using SAPSec.Data.Repositories;

@@ -1,6 +1,6 @@
-﻿using SAPSec.Core.Geography;
+﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.Geography;
 using SAPSec.Core.School.Details;
-using SAPSec.Core.School.Similarity;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.School.Similarity.UseCases;

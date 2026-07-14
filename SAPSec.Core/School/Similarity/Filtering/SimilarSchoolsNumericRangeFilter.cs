@@ -1,5 +1,6 @@
 ﻿using SAPSec.Core.School.Similarity;
 using SAPSec.Core.School.Similarity.UseCases;
+using SAPSec.Core.Validation;
 using System.Text.RegularExpressions;
 
 namespace SAPSec.Core.School.Similarity.Filtering;

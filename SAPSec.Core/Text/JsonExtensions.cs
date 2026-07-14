@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
-namespace SAPSec.Core.Services.Helper;
+namespace SAPSec.Core.Text;
 
 public static class JsonExtensions
 {

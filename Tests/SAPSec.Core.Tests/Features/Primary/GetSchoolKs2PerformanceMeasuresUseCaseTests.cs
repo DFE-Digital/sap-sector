@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Measures;
+﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.Measures;
 using SAPSec.Core.Measures;
 using SAPSec.Core.School.Info;
 using SAPSec.Core.School.Primary;

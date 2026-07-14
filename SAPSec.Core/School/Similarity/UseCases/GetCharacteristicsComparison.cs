@@ -1,4 +1,4 @@
-using SAPSec.Core.School.Similarity;
+using SAPSec.Core.Exceptions;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.School.Similarity.UseCases;

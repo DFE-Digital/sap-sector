@@ -4,7 +4,6 @@ using SAPSec.Core.School.Primary;
 using SAPSec.Core.School.Search;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Repositories;

@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.UseCases;
+﻿using SAPSec.Core.Exceptions;
+using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.School.Info;

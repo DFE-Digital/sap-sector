@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Logging;
 using SAPSec.Core.Data;
-using SAPSec.Core.Mappers;
-using SAPSec.Core.School.Details;
+using SAPSec.Core.Exceptions;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Services;
+namespace SAPSec.Core.School.Details;
 
 /// <summary>
 /// Service that maps establishment data to SchoolDetails.

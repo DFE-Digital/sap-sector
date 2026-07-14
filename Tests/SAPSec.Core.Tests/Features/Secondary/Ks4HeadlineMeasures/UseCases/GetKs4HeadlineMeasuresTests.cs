@@ -5,6 +5,7 @@ using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Repositories;
 using SAPSec.Core.School.Details;
 using SAPSec.Core.Data;
+using SAPSec.Core.Exceptions;
 
 namespace SAPSec.Core.Tests.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 

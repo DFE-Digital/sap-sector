@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.School.Similarity;
 using SAPSec.Core.School.Similarity.UseCases;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;

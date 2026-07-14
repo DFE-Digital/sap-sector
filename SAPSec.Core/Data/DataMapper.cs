@@ -1,7 +1,6 @@
-﻿using SAPSec.Core.Data;
-using SAPSec.Data.Dto;
+﻿using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Mappers;
+namespace SAPSec.Core.Data;
 
 /// <summary>
 /// Maps raw establishment data to DataWithAvailability values.

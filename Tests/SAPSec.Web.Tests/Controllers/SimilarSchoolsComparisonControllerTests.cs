@@ -7,7 +7,6 @@ using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.School.Similarity;
 using SAPSec.Core.School.Similarity.UseCases;
-using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
@@ -18,6 +17,7 @@ using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Text.Json;
 using SAPSec.Core.Geography;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
 

@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using SAPSec.Core.Authentication;
-using SAPSec.Core.Services.Helper;
+using SAPSec.Core.Text;
 using System.Security.Claims;
 using System.Text;
 
-namespace SAPSec.Core.Services;
+namespace SAPSec.Core.Authentication;
 
 public class UserService(
     IDsiClient dsiApiService,

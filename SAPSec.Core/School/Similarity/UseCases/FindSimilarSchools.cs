@@ -1,10 +1,12 @@
 using SAPSec.Core.Data;
+using SAPSec.Core.Exceptions;
 using SAPSec.Core.Filtering;
 using SAPSec.Core.Geography;
 using SAPSec.Core.Pagination;
 using SAPSec.Core.School.Similarity.Filtering;
 using SAPSec.Core.School.Similarity.Sorting;
 using SAPSec.Core.Sorting;
+using SAPSec.Core.Validation;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.School.Similarity.UseCases;

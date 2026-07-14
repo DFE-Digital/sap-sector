@@ -1,4 +1,6 @@
-﻿namespace SAPSec.Core.School.Details;
+﻿using SAPSec.Core.Exceptions;
+
+namespace SAPSec.Core.School.Details;
 
 /// <summary>
 /// Service for retrieving school details with business logic applied.

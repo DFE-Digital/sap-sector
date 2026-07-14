@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.School.Similarity.UseCases;
+using SAPSec.Core.Validation;
 
 namespace SAPSec.Core.School.Similarity.Filtering;
 

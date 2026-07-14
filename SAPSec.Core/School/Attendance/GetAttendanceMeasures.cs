@@ -1,3 +1,4 @@
+using SAPSec.Core.Exceptions;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 using System.Globalization;
