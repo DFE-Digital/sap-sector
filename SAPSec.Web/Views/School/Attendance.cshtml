@@ -66,6 +66,7 @@
             <select class="govuk-select"
                     id="attendanceAbsenceType"
                     name="attendanceAbsenceType"
+                    data-testid="attendance-absence-type"
                     data-view-switcher="true"
                     data-endpoint="@attendanceDataEndpoint"
                     data-query-key="absenceType"
@@ -82,7 +83,7 @@
 
     <div class="govuk-tabs app-measure-tabs app-attendance-tabs" data-module="govuk-tabs">
         <h3 class="govuk-tabs__title">Attendance views</h3>
-        <ul class="govuk-tabs__list">
+        <ul class="govuk-tabs__list" data-testid="attendance-tabs">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
                 <a class="govuk-tabs__tab" href="#attendance-three-year-average">@Model.CurrentAcademicYear</a>
             </li>

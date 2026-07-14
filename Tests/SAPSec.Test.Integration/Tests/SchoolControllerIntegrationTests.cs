@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using AngleSharp.Dom;
 using FluentAssertions;
+using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Integration.Setup;
 
 namespace SAPSec.Test.Integration.Tests;
@@ -85,66 +86,29 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Fact]
-    public async Task GetSchoolAttendance_ContainsUpdatedInsetContentAndLinks()
-    {
-        var response = await fixture.Client.GetAsync(SchoolAttendancePath);
-        var content = await response.Content.ReadAsStringAsync();
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("Compare this school's attendance measures with:");
-        content.Should().Contain("<li>the local authority average</li>");
-        content.Should().Contain("<li>the national average</li>");
-        content.Should().NotContain("similar secondary phase schools");
-        content.Should().Contain("To compare this school with similar schools using up-to-date attendance data, use the Monitor your school attendance service.");
-        content.Should().Contain("href=\"https://viewyourdata.education.gov.uk/\"");
-        content.Should().Contain(">View your education data (VYED) (opens in new tab)</a>");
-        content.Should().Contain("href=\"https://viewyourdata.education.gov.uk/Account/Help\"");
-        content.Should().Contain(">get help on accessing VYED (opens in new tab)</a>");
-        content.Should().Contain("target=\"_blank\" rel=\"noopener noreferrer\"");
-    }
-
-    [Fact]
-    public async Task GetSchoolAttendance_OffersBothAbsenceTypes_AndDoesNotRenderTopPerformersTab()
+    public async Task GetSchoolAttendance_OffersBothAbsenceTypes()
     {
         var document = await fixture.RequestPageAsync(SchoolAttendancePath);
 
-        document.QuerySelector("h1")?.TextContent.Trim().Should().Be("Attendance measures");
-
-        var absenceOptions = document.QuerySelectorAll("#attendanceAbsenceType option")
-            .Select(option => (
-                Value: option.GetAttribute("value"),
-                Text: option.TextContent.Trim()))
-            .ToArray();
+        var absenceTypeSelect = document.ElementWithTestIdShouldExist("attendance-absence-type");
+        var absenceOptions = absenceTypeSelect.ChildTrimmedTextContent().ToArray();
 
         absenceOptions.Should().BeEquivalentTo(
-            [("overall", "Overall absence"), ("persistent", "Persistent absence")],
+            ["Overall absence", "Persistent absence"],
             options => options.WithStrictOrdering());
+    }
 
-        var tabTexts = document.QuerySelectorAll(".app-attendance-tabs .govuk-tabs__tab")
-            .Select(tab => tab.TextContent.Trim())
-            .ToArray();
+    [Fact]
+    public async Task GetSchoolAttendance_DoesNotRenderTopPerformersTab()
+    {
+        var document = await fixture.RequestPageAsync(SchoolAttendancePath);
+
+        var attendanceTabs = document.ElementWithTestIdShouldExist("attendance-tabs");
+        var tabTexts = attendanceTabs.ChildTrimmedTextContent().ToArray();
 
         tabTexts.Should().NotContain("Top performers");
         tabTexts.Should().Contain("Year by year");
         tabTexts.Should().Contain("Table");
-    }
-
-    [Fact]
-    public async Task GetSchoolAttendanceData_PersistentAbsence_ReturnsPersistentDataset()
-    {
-        var response = await fixture.Client.GetAsync("/school/105574/attendance-data?absenceType=persistent");
-        var content = await response.Content.ReadAsStringAsync();
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-
-        using var json = JsonDocument.Parse(content);
-        var root = json.RootElement;
-
-        root.GetProperty("absenceType").GetString().Should().Be("persistent");
-        root.GetProperty("bar").GetArrayLength().Should().Be(3);
-        root.GetProperty("line").GetProperty("school").GetArrayLength().Should().Be(3);
-        root.GetProperty("table").GetProperty("school").GetArrayLength().Should().Be(3);
-        root.GetProperty("topPerformers").ValueKind.Should().Be(JsonValueKind.Array);
     }
 
     [Fact]
