@@ -1,7 +1,7 @@
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using System.Globalization;
 
-namespace SAPSec.Core.Features.SimilarSchools;
+namespace SAPSec.Core.School.Similarity;
 
 public class SimilarSchoolsSecondaryValues
 {

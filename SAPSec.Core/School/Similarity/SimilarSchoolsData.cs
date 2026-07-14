@@ -1,4 +1,4 @@
-namespace SAPSec.Core.Features.SimilarSchools;
+namespace SAPSec.Core.School.Similarity;
 
 public record SimilarSchoolsData<T>(
     SchoolData<T> CurrentSchool,

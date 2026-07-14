@@ -1,7 +1,8 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
+using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.SimilarSchools.Filtering;
+namespace SAPSec.Core.School.Similarity.Filtering;
 
 public class SimilarSchoolsDistanceFilter(
     string key,

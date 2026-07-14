@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.School.Similarity;
 
 namespace SAPSec.Core.Features.Measures;
 

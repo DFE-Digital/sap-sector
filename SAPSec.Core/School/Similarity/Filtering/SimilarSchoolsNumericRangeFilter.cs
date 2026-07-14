@@ -1,7 +1,8 @@
-﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
+﻿using SAPSec.Core.School.Similarity;
+using SAPSec.Core.School.Similarity.UseCases;
 using System.Text.RegularExpressions;
 
-namespace SAPSec.Core.Features.SimilarSchools.Filtering;
+namespace SAPSec.Core.School.Similarity.Filtering;
 
 public abstract class SimilarSchoolsNumericRangeFilter(
     string key,

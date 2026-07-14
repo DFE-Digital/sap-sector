@@ -1,13 +1,14 @@
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
-using SAPSec.Core.Features.SimilarSchools.Filtering;
-using SAPSec.Core.Features.SimilarSchools.Sorting;
+using SAPSec.Core.School.Similarity.Filtering;
+using SAPSec.Core.School.Similarity.Sorting;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.Model;
+using SAPSec.Core.School.Similarity;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.SimilarSchools.UseCases;
+namespace SAPSec.Core.School.Similarity.UseCases;
 
 public class FindSimilarSchools(
     IEstablishmentRepository establishmentRepository,

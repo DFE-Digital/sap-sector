@@ -1,6 +1,7 @@
+using SAPSec.Core.School.Similarity;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.SimilarSchools.UseCases;
+namespace SAPSec.Core.School.Similarity.UseCases;
 
 public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository repository)
 {

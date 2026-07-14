@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core;
+using SAPSec.Core.School.Similarity.UseCases;
 
 namespace SAPSec.Web.ViewModels;
 
@@ -15,7 +16,7 @@ public class SimilarSchoolsPageViewModel
     public string PhaseOfEducation { get; set; } = string.Empty;
     public List<SimilarSchoolViewModel> Schools { get; set; } = new();
     public List<SimilarSchoolViewModel> MapSchools { get; set; } = new();
-    public IReadOnlyCollection<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> FilterOptions { get; set; } = [];
+    public IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions { get; set; } = [];
     public IReadOnlyCollection<SAPSec.Core.Features.Sorting.SortOption> SortOptions { get; set; } = [];
     public Dictionary<string, List<string>> CurrentFilters { get; set; } = new(StringComparer.InvariantCultureIgnoreCase);
     public List<SimilarSchoolsFilterGroupViewModel> FilterGroups { get; set; } = new();
@@ -79,7 +80,7 @@ public class SimilarSchoolsPageViewModel
 
 public record SimilarSchoolsFilterGroupViewModel(
     string Heading,
-    List<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> Filters);
+    List<SimilarSchoolsAvailableFilter> Filters);
 
 public record SimilarSchoolsSelectedFilterTagViewModel(
     string Label,

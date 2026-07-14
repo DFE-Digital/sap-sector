@@ -1,7 +1,8 @@
 ﻿using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.Model;
+using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.SimilarSchools.Sorting;
+namespace SAPSec.Core.School.Similarity.Sorting;
 
 public class SimilarSchoolsSorting(string sortBy)
 {

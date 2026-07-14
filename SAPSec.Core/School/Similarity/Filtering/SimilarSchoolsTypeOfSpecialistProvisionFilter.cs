@@ -1,8 +1,9 @@
 ﻿using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
 using SAPSec.Core.Rules;
+using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.SimilarSchools.Filtering;
+namespace SAPSec.Core.School.Similarity.Filtering;
 
 public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
     string name,
@@ -26,16 +27,16 @@ public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
         }
 
         return items.Where(i =>
-            (values.Contains("R", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "Resourced provision")
-            || (values.Contains("RS", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "Resourced provision and SEN unit")
-            || (values.Contains("S", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "SEN unit")
-            || (values.Contains("N", StringComparer.OrdinalIgnoreCase)
+            values.Contains("R", StringComparer.OrdinalIgnoreCase)
+                && i.ResourcedProvision?.Name == "Resourced provision"
+            || values.Contains("RS", StringComparer.OrdinalIgnoreCase)
+                && i.ResourcedProvision?.Name == "Resourced provision and SEN unit"
+            || values.Contains("S", StringComparer.OrdinalIgnoreCase)
+                && i.ResourcedProvision?.Name == "SEN unit"
+            || values.Contains("N", StringComparer.OrdinalIgnoreCase)
                 && i.ResourcedProvision?.Name != "Resourced provision"
                 && i.ResourcedProvision?.Name != "Resourced provision and SEN unit"
-                && i.ResourcedProvision?.Name != "SEN unit"));
+                && i.ResourcedProvision?.Name != "SEN unit");
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)

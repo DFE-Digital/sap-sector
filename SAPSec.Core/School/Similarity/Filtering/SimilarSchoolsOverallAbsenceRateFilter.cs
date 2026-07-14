@@ -1,15 +1,16 @@
 ﻿using SAPSec.Core.Model;
+using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.SimilarSchools.Filtering;
+namespace SAPSec.Core.School.Similarity.Filtering;
 
-public class SimilarSchoolsPersistentAbsenceRateFilter(
+public class SimilarSchoolsOverallAbsenceRateFilter(
     string key,
     string name,
     IDictionary<string, IEnumerable<string>> filterValues,
     SimilarSchool currentSchool) : SimilarSchoolsNumericRangeFilter(key, name, filterValues, currentSchool)
 {
     protected override DataWithAvailability<string> CurrentSchoolValue
-        => CurrentSchool.PersistentAbsenceRate.Map(v => v.ToString("0.0\\%"));
+        => CurrentSchool.OverallAbsenceRate.Map(v => v.ToString("0.0\\%"));
 
     protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, decimal from, decimal to)
     {
@@ -17,6 +18,6 @@ public class SimilarSchoolsPersistentAbsenceRateFilter(
         var maxValue = DataWithAvailability.Available(to);
 
         return items
-            .Where(i => minValue <= i.PersistentAbsenceRate && i.PersistentAbsenceRate <= maxValue);
+            .Where(i => minValue <= i.OverallAbsenceRate && i.OverallAbsenceRate <= maxValue);
     }
 }

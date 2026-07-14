@@ -1,8 +1,9 @@
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
+using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.SimilarSchools.Filtering;
+namespace SAPSec.Core.School.Similarity.Filtering;
 
 public class SimilarSchoolsGovernanceStructureFilter(string key,
     string name,
@@ -25,10 +26,10 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         }
 
         return items.Where(i =>
-                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5")
-              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3")
-              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4"))
-              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id != "4"));
+                 values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5"
+              || values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3"
+              || values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4")
+              || values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id != "4");
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)

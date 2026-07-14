@@ -4,7 +4,7 @@ using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.KS4.Performance;
 
-namespace SAPSec.Core.Features.SimilarSchools;
+namespace SAPSec.Core.School.Similarity;
 
 public record SimilarSchool
 {

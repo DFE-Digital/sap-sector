@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
+﻿using SAPSec.Core.School.Similarity.UseCases;
 using SAPSec.Core.Model;
 using SAPSec.Test.Common.InMemory;
 

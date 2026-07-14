@@ -1,6 +1,6 @@
 using SAPSec.Core.School.Info;
 
-namespace SAPSec.Core.Features.SimilarSchools;
+namespace SAPSec.Core.School.Similarity;
 
 public record SchoolData<T>(
     SchoolInfo SchoolInfo,

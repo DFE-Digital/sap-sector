@@ -1,6 +1,7 @@
 ﻿using SAPSec.Core.Model;
+using SAPSec.Core.School.Similarity;
 
-namespace SAPSec.Core.Features.SimilarSchools.Filtering;
+namespace SAPSec.Core.School.Similarity.Filtering;
 
 public class SimilarSchoolsSchoolCapacityInUseFilter(
     string key,
@@ -27,6 +28,6 @@ public class SimilarSchoolsSchoolCapacityInUseFilter(
 
     private decimal? CalculateCapacityInUse(SimilarSchool school) =>
         school.TotalPupils is not null && school.TotalCapacity is not null
-            ? ((decimal)school.TotalPupils / (decimal)school.TotalCapacity) * 100.0M
+            ? (decimal)school.TotalPupils / (decimal)school.TotalCapacity * 100.0M
             : null;
 }
