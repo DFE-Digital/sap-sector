@@ -2,7 +2,7 @@ using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 using System.Globalization;
 
-namespace SAPSec.Core.Features.Attendance.UseCases;
+namespace SAPSec.Core.School.Attendance;
 
 public class GetAttendanceMeasures(
     IAbsenceRepository repository,
@@ -31,7 +31,7 @@ public class GetAttendanceMeasures(
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
         var similarSchoolDetails = similarSchoolUrns.Length == 0
             ? Array.Empty<Establishment>()
-            : (await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns))
+            : await establishmentRepository.GetEstablishmentsAsync(similarSchoolUrns)
                 ?? Array.Empty<Establishment>();
         var similarSchoolDetailsByUrn = similarSchoolDetails
             .Where(x => !string.IsNullOrWhiteSpace(x.URN))

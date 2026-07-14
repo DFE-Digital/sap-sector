@@ -1,5 +1,5 @@
-using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Model;
+using SAPSec.Core.School.Attendance;
 using SAPSec.Web.Helpers;
 using System.Globalization;
 
