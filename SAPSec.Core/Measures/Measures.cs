@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Constants;
+﻿namespace SAPSec.Core.Measures;
 
 public static class Measures
 {

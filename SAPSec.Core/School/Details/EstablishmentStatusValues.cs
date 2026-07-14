@@ -1,4 +1,4 @@
-namespace SAPSec.Core.Constants;
+namespace SAPSec.Core.School.Details;
 
 public static class EstablishmentStatusValues
 {

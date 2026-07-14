@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features;
 
 namespace SAPSec.Web.Filters;
 

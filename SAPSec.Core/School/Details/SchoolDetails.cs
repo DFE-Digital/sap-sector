@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Data;
 
 namespace SAPSec.Core.School.Details;
 

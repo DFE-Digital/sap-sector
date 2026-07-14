@@ -1,6 +1,4 @@
-﻿using SAPSec.Core.Constants;
-
-namespace SAPSec.Core.Model;
+﻿namespace SAPSec.Core.Data;
 
 /// <summary>
 /// Wraps a value with its availability status.
@@ -182,7 +180,7 @@ public static class DataWithAvailability
             : NotAvailable<decimal>();
     }
 
-    public static DataWithAvailability<T> FromNullable<T>(Nullable<T> value) where T : struct
+    public static DataWithAvailability<T> FromNullable<T>(T? value) where T : struct
     {
         return value.HasValue
             ? Available(value.Value)

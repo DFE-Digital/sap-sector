@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Analytics;
 using SAPSec.Web.Configuration;
 using System.Text.RegularExpressions;
 

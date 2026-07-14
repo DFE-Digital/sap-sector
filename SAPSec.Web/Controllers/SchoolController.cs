@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features;
 using SAPSec.Core.School.Attendance;
 using SAPSec.Core.School.Details;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;

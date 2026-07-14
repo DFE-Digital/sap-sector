@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Data;
 using SAPSec.Core.School.Details;
 using SAPSec.Data.Dto;
 

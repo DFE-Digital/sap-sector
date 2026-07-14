@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Constants;
+﻿namespace SAPSec.Core.School.Details;
 
 /// <summary>
 /// Trust school flag field values and helper methods.

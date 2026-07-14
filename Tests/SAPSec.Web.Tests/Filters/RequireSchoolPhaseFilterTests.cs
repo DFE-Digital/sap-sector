@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
-using SAPSec.Core.Model;
+using SAPSec.Core.Data;
 using SAPSec.Core.School.Details;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;

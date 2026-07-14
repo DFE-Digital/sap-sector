@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Model;
+using SAPSec.Core.Data;
 using SAPSec.Core.School.Details;
 using SAPSec.Core.Services;
 using SAPSec.Data.Dto;

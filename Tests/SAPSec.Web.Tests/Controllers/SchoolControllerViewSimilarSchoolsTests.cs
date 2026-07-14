@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.School.Similarity.UseCases;
-using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
@@ -13,6 +12,7 @@ using SAPSec.Web.Controllers;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SAPSec.Core.School.Details;
+using SAPSec.Core.Data;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
 

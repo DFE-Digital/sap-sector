@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
+using SAPSec.Core.School.Details;
 using SAPSec.Core.School.Search;
 using SAPSec.Data.Dto;
 using SAPSec.Web.Constants;

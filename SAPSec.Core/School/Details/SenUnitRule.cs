@@ -1,5 +1,4 @@
-﻿using SAPSec.Core.Constants;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Data;
 using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.School.Details;

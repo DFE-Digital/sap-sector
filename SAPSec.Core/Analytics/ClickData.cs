@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Model;
+﻿namespace SAPSec.Core.Analytics;
 
 public class ClickData
 {

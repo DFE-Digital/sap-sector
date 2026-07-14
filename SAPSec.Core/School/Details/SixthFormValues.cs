@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Constants;
+﻿namespace SAPSec.Core.School.Details;
 
 /// <summary>
 /// Constants for OfficialSixthFormId codes.

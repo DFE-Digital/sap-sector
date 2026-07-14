@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using SAPSec.Core.Data;
 using SAPSec.Core.Mappers;
-using SAPSec.Core.Model;
 using SAPSec.Core.School.Details;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;

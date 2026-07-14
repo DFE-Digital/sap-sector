@@ -6,8 +6,6 @@ using Moq;
 using SAPSec.Core.School.Attendance;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.KS4.Performance;
@@ -17,6 +15,8 @@ using SAPSec.Web.Controllers;
 using SAPSec.Web.Services;
 using System.Text.Json;
 using SAPSec.Core.School.Details;
+using SAPSec.Core.Data;
+using SAPSec.Core.Features;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
 

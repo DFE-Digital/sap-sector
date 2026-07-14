@@ -1,7 +1,6 @@
 using Dfe.Analytics.AspNetCore;
 using Dfe.Analytics.Events;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Analytics;
 
 namespace SAPSec.Web.Services;
 

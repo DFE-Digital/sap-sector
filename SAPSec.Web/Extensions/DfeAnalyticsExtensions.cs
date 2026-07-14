@@ -1,6 +1,6 @@
 using Dfe.Analytics;
 using Dfe.Analytics.AspNetCore;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Analytics;
 using SAPSec.Web.Services;
 using System.Diagnostics.CodeAnalysis;
 

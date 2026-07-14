@@ -1,6 +1,6 @@
+using SAPSec.Core.Data;
 using SAPSec.Core.Filtering;
 using SAPSec.Core.Geography;
-using SAPSec.Core.Model;
 using SAPSec.Core.Pagination;
 using SAPSec.Core.School.Similarity.Filtering;
 using SAPSec.Core.School.Similarity.Sorting;

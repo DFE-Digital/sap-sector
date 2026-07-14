@@ -33,8 +33,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\" />
-    <Folder Include="Interfaces\Rules\" />
+    <Folder Include="Model\" />
     <Folder Include="Rules\" />
     <Folder Include="School\X\" />
   </ItemGroup>

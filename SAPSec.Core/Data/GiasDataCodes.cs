@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Constants;
+﻿namespace SAPSec.Core.Data;
 
 /// <summary>
 /// GIAS special data codes indicating data availability/quality.

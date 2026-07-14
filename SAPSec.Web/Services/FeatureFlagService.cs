@@ -1,5 +1,5 @@
 using Microsoft.FeatureManagement;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features;
 
 namespace SAPSec.Web.Services;
 
