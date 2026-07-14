@@ -1,11 +1,10 @@
 using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Infrastructure;
-using System.Linq;
 using System.Text.Json;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
@@ -21,7 +20,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
 
     private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
     {
-        var chartTabs = Page.Locator(".app-ks4-tabs").Nth(chartGroupIndex);
+        var chartTabs = Page.Locator(".app-measure-tabs").Nth(chartGroupIndex);
         await chartTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
     }
 

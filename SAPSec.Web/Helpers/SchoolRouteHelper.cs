@@ -53,12 +53,12 @@ public static class SchoolRouteHelper
 
         return path.ToLowerInvariant() switch
         {
-            var p when p.EndsWith("/attendance") => $"{Routes.Secondary.School(urn)}/attendance",
-            var p when p.EndsWith("/school-details") => Routes.Secondary.SchoolDetails(urn),
-            var p when p.EndsWith("/what-is-a-similar-school") => $"{Routes.Secondary.School(urn)}/what-is-a-similar-school",
-            var p when p.EndsWith("/view-similar-schools") => Routes.Secondary.SimilarSchools(urn),
-            var p when p.EndsWith("/similar-schools") => Routes.Secondary.SimilarSchools(urn),
-            _ => Routes.Secondary.School(urn)
+            var p when p.EndsWith("/attendance") => Routes.SecondarySchool(urn).Attendance,
+            var p when p.EndsWith("/school-details") => Routes.SecondarySchool(urn).SchoolDetails,
+            var p when p.EndsWith("/what-is-a-similar-school") => Routes.SecondarySchool(urn).WhatIsASimilarSchool,
+            var p when p.EndsWith("/view-similar-schools") => Routes.SecondarySchool(urn).ViewSimilarSchools,
+            var p when p.EndsWith("/similar-schools") => Routes.SecondarySchool(urn).ViewSimilarSchools,
+            _ => Routes.SecondarySchool(urn).Overview
         };
     }
 }

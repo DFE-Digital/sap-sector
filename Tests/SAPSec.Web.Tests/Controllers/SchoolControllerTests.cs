@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -171,7 +171,7 @@ public class SchoolControllerTests
             .ReturnsAsync(schoolDetails);
 
         _similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .Setup(x => x.GetGroupAsync(urn))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         _ks4PerformanceRepositoryMock
@@ -202,7 +202,7 @@ public class SchoolControllerTests
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         _similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .Setup(x => x.GetGroupAsync(urn))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         _ks4PerformanceRepositoryMock
@@ -225,7 +225,7 @@ public class SchoolControllerTests
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(schoolDetails);
         _similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .Setup(x => x.GetGroupAsync(urn))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         _ks4PerformanceRepositoryMock
@@ -292,7 +292,7 @@ public class SchoolControllerTests
                 new LAAbsence(),
                 new EnglandAbsence()));
         _similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .Setup(x => x.GetGroupAsync(urn))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         var result = await _sut.Attendance(urn);
@@ -343,7 +343,7 @@ public class SchoolControllerTests
                     Abs_Persistent_Eng_Previous2_Pct = "14.7"
                 }));
         _similarSchoolsRepositoryMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .Setup(x => x.GetGroupAsync(urn))
             .ReturnsAsync(
             [
                 new SimilarSchoolsSecondaryGroupsEntry { URN = urn, NeighbourURN = "200001" },

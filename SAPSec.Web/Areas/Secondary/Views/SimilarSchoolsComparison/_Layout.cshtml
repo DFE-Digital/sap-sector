@@ -35,7 +35,7 @@
     </nav>
 }
 
-<div class="govuk-grid-row  @(isKs4HeadlineMeasures ? "app-ks4-headline-mobile-layout" : "")">
+<div class="govuk-grid-row  @(isKs4HeadlineMeasures ? "app-measure-headline-mobile-layout" : "")">
 
     @* LEFT: back link *@
     <div class="app-side-navigation-container">
@@ -68,7 +68,7 @@
                         <li class="govuk-service-navigation__item @active(currentAction == "Index")">
                             <a class="govuk-service-navigation__link"
                                href="@Url.Action("Index", "SimilarSchoolsComparison", routeValues)"
-                               aria-current="@(currentAction == "Index" ? "true" : null)">
+                               aria-current="@(currentAction == "Index" ? "page" : null)">
                                 Similarity
                             </a>
                         </li>
@@ -76,7 +76,7 @@
                         <li class="govuk-service-navigation__item @active(currentAction == "Ks4HeadlineMeasures")">
                             <a class="govuk-service-navigation__link"
                                href="@Url.Action("Ks4HeadlineMeasures", "SimilarSchoolsComparison", routeValues)"
-                               aria-current="@(currentAction == "Ks4HeadlineMeasures" ? "true" : null)">
+                               aria-current="@(currentAction == "Ks4HeadlineMeasures" ? "page" : null)">
                                 KS4 headline measures
                             </a>
                         </li>
@@ -84,7 +84,7 @@
                         <li class="govuk-service-navigation__item @active(currentAction == "Ks4CoreSubjects")">
                             <a class="govuk-service-navigation__link"
                                href="@Url.Action("Ks4CoreSubjects", "SimilarSchoolsComparison", routeValues)"
-                               aria-current="@(currentAction == "Ks4CoreSubjects" ? "true" : null)">
+                               aria-current="@(currentAction == "Ks4CoreSubjects" ? "page" : null)">
                                 KS4 core subjects
                             </a>
                         </li>
@@ -92,7 +92,7 @@
                         <li class="govuk-service-navigation__item @active(currentAction == "Attendance")">
                             <a class="govuk-service-navigation__link"
                                href="@Url.Action("Attendance", "SimilarSchoolsComparison", routeValues)"
-                               aria-current="@(currentAction == "Attendance" ? "true" : null)">
+                               aria-current="@(currentAction == "Attendance" ? "page" : null)">
                                 Attendance
                             </a>
                         </li>
@@ -100,7 +100,7 @@
                         <li class="govuk-service-navigation__item @active(currentAction == "SchoolDetails")">
                             <a class="govuk-service-navigation__link"
                                href="@Url.Action("SchoolDetails", "SimilarSchoolsComparison", routeValues)"
-                               aria-current="@(currentAction == "SchoolDetails" ? "true" : null)">
+                               aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
                                 School details
                             </a>
                         </li>

@@ -162,10 +162,10 @@
         }
     };
 
-    <section aria-labelledby="@($"{item.Key}-heading")" class="app-ks4-attainment @(item.Key == "english-language" ? "" : "govuk-!-margin-top-7")">
+    <section aria-labelledby="@($"{item.Key}-heading")" class="app-measure-section">
         <h2 class="govuk-heading-m" id="@($"{item.Key}-heading")">@item.Title</h2>
 
-        <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+        <div class="app-measure-filter-row">
             <div class="govuk-form-group">
                 <label class="govuk-label govuk-!-font-weight-bold" for="@item.GradeId">Grade</label>
                 <select class="govuk-select"
@@ -186,7 +186,7 @@
             </div>
         </div>
 
-        <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+        <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
             <ul class="govuk-tabs__list">
                 <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
                     <a class="govuk-tabs__tab" href="#@($"{item.Key}-charts")">Charts</a>
@@ -199,7 +199,7 @@
             <div class="govuk-tabs__panel" id="@($"{item.Key}-charts")">
                 <content-toggle>
                     <toggle-content id="@($"{item.Key}-three-year-average")" name="@ks4CurrentYear" active="true">
-                        <div class="app-ks4-chart-container">
+                        <div class="app-measure-chart-container">
                             @if (HasAnyData(chartData.data))
                             {
                                 <canvas id="@item.ChartId"
@@ -224,7 +224,7 @@
                         </div>
                     </toggle-content>
                     <toggle-content id="@($"{item.Key}-year-by-year")" name="Year by year">
-                        <div class="app-ks4-chart-container">
+                        <div class="app-measure-chart-container">
                             <canvas id="@item.LineChartId"
                                     class="js-chart"
                                     data-type="line"
@@ -284,8 +284,11 @@
 @section Scripts {
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }

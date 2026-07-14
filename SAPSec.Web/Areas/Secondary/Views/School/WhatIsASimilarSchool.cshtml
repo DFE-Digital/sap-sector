@@ -80,7 +80,7 @@
 </p>
 
 <p class="govuk-body">
-    You can <a href="@(Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.Urn }) ?? SAPSec.Web.Constants.Routes.Secondary.SimilarSchools(Model.Urn))" class="govuk-link">view all the schools most similar to
+    You can <a href="@(Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn).ViewSimilarSchools)" class="govuk-link">view all the schools most similar to
         this one</a> and select an individual school to see its similarity, performance and contact details.
 </p>
 

@@ -11,7 +11,7 @@ public class PostgresAbsenceRepository(NpgsqlDataSourceFactory factory) : IAbsen
     public async Task<AbsenceData?> GetByUrnAsync(string urn)
     {
         var results = await GetByUrnsAsync([urn]);
-        return results.FirstOrDefault(x => string.Equals(x.URN, urn, StringComparison.Ordinal));
+        return results.FirstOrDefault(x => string.Equals(x.Urn, urn, StringComparison.Ordinal));
     }
 
     public async Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)

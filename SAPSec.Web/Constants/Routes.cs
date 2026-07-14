@@ -23,20 +23,38 @@ public static class Routes
 
     public static string School(string urn, string? phaseOfEducationName) =>
         PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
-            ? Primary.School(urn)
-            : Secondary.School(urn);
+            ? PrimarySchool(urn).Overview
+            : SecondarySchool(urn).Overview;
 
-    public static class Primary
+    public static Primary PrimarySchool(string urn) => new Primary(urn);
+    public static Secondary SecondarySchool(string urn) => new Secondary(urn);
+
+    public class Primary(string urn)
     {
-        public static string School(string urn) => $"/school/primary/{urn}";
-        public static string SchoolDetails(string urn) => $"/school/primary/{urn}/school-details";
+        private string BasePath = $"/school/primary/{urn}";
+
+        public string Overview => BasePath;
+        public string KS2 => $"{BasePath}/ks2";
+        public string Attendance => $"{BasePath}/attendance";
+        public string ViewSimilarSchools => $"{BasePath}/view-similar-schools";
+        public string SimilarSchoolComparison(string similarSchoolUrn)
+            => $"{BasePath}/view-similar-schools/{similarSchoolUrn}";
+        public string SchoolDetails => $"{BasePath}/school-details";
+        public string WhatIsASimilarSchool => $"{BasePath}/what-is-a-similar-school";
     }
 
-    public static class Secondary
+    public class Secondary(string urn)
     {
-        public static string School(string urn) => $"/school/secondary/{urn}";
-        public static string SchoolDetails(string urn) => $"/school/secondary/{urn}/school-details";
-        public static string SimilarSchools(string urn) => $"/school/secondary/{urn}/view-similar-schools";
-        public static string SimilarSchoolComparison(string urn, string similarSchoolUrn) => $"/school/secondary/{urn}/view-similar-schools/{similarSchoolUrn}";
+        private string BasePath = $"/school/secondary/{urn}";
+
+        public string Overview => BasePath;
+        public string KS4HeadlineMeasures => $"{BasePath}/ks4-headline-measures";
+        public string KS4CoreSubjects => $"{BasePath}/ks4-core-subjects";
+        public string Attendance => $"{BasePath}/attendance";
+        public string ViewSimilarSchools => $"{BasePath}/view-similar-schools";
+        public string SimilarSchoolComparison(string similarSchoolUrn)
+            => $"{BasePath}/view-similar-schools/{similarSchoolUrn}";
+        public string SchoolDetails => $"{BasePath}/school-details";
+        public string WhatIsASimilarSchool => $"{BasePath}/what-is-a-similar-school";
     }
 }

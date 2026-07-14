@@ -1,10 +1,10 @@
+using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Infrastructure;
-using Deque.AxeCore.Playwright;
 using Xunit;
 
-namespace SAPSec.UI.Tests.AccessibilityTests;
+namespace SAPSec.UI.Tests.Deprecated.AccessibilityTests;
 
 [Collection("UITestsCollection")]
 public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)

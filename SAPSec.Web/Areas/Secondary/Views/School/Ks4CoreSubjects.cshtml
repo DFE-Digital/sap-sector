@@ -64,9 +64,9 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.Physics.EnglandYearByYear, Display: Model.Physics.EnglandDisplay)
     };
 
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.Secondary.SimilarSchools(Model.SchoolDetails.Urn);
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.Secondary.SimilarSchoolComparison(Model.SchoolDetails.Urn, similarSchoolUrn);
-    string WhatIsSimilarSchoolUrl() => Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.Secondary.School(Model.SchoolDetails.Urn) + "/what-is-a-similar-school";
+    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).SimilarSchoolComparison(similarSchoolUrn);
+    string WhatIsSimilarSchoolUrl() => Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
 }
 <div class="app-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -86,9 +86,9 @@
     Find out <a href="@WhatIsSimilarSchoolUrl()" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
 
-    <section aria-labelledby="english-language-heading" class="app-ks4-attainment govuk-!-margin-top-9">
+<section aria-labelledby="english-language-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="english-language-heading">English language</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="englishLanguageGrade">Grade</label>
             <select class="govuk-select"
@@ -110,7 +110,7 @@
             </select>
         </div>
     </div>
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#english-language-three-year-average">@ks4CurrentYear</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#english-language-year-by-year">Year by year</a></li>
@@ -118,13 +118,13 @@
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#english-language-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="english-language-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                 @{
                     var englishLanguageBarData = new decimal?[] { Model.EnglishLanguage.SchoolYearByYear.Current, Model.EnglishLanguage.SimilarSchoolsYearByYear.Current, Model.EnglishLanguage.LocalAuthorityYearByYear.Current, Model.EnglishLanguage.EnglandYearByYear.Current };
                 }
                 @if (HasAnyData(englishLanguageBarData))
                 {
-                    <canvas id="english-language-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = englishLanguageBarData }))'></canvas>
+                    <canvas id="english-language-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = englishLanguageBarData }))'></canvas>
                 }
                 else
                 {
@@ -133,8 +133,8 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-language-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="english-language-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.EnglishLanguage.SchoolYearByYear.Previous2, Model.EnglishLanguage.SchoolYearByYear.Previous, Model.EnglishLanguage.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.EnglishLanguage.SimilarSchoolsYearByYear.Previous2, Model.EnglishLanguage.SimilarSchoolsYearByYear.Previous, Model.EnglishLanguage.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.EnglishLanguage.LocalAuthorityYearByYear.Previous2, Model.EnglishLanguage.LocalAuthorityYearByYear.Previous, Model.EnglishLanguage.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglishLanguage.EnglandYearByYear.Previous2, Model.EnglishLanguage.EnglandYearByYear.Previous, Model.EnglishLanguage.EnglandYearByYear.Current } } } }))'></canvas>
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                <canvas id="english-language-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.EnglishLanguage.SchoolYearByYear.Previous2, Model.EnglishLanguage.SchoolYearByYear.Previous, Model.EnglishLanguage.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.EnglishLanguage.SimilarSchoolsYearByYear.Previous2, Model.EnglishLanguage.SimilarSchoolsYearByYear.Previous, Model.EnglishLanguage.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.EnglishLanguage.LocalAuthorityYearByYear.Previous2, Model.EnglishLanguage.LocalAuthorityYearByYear.Previous, Model.EnglishLanguage.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglishLanguage.EnglandYearByYear.Previous2, Model.EnglishLanguage.EnglandYearByYear.Previous, Model.EnglishLanguage.EnglandYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-language-top-performers">
@@ -188,9 +188,9 @@
     </div>
 </section>
 
-<section aria-labelledby="english-literature-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="english-literature-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="english-literature-heading">English literature</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="englishLiteratureGrade">Grade</label>
             <select class="govuk-select"
@@ -212,7 +212,7 @@
             </select>
         </div>
     </div>
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#english-literature-three-year-average">@ks4CurrentYear</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#english-literature-year-by-year">Year by year</a></li>
@@ -220,13 +220,13 @@
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#english-literature-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="english-literature-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                 @{
                     var englishLiteratureBarData = new decimal?[] { Model.EnglishLiterature.SchoolYearByYear.Current, Model.EnglishLiterature.SimilarSchoolsYearByYear.Current, Model.EnglishLiterature.LocalAuthorityYearByYear.Current, Model.EnglishLiterature.EnglandYearByYear.Current };
                 }
                 @if (HasAnyData(englishLiteratureBarData))
                 {
-                    <canvas id="english-literature-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = englishLiteratureBarData }))'></canvas>
+                    <canvas id="english-literature-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = englishLiteratureBarData }))'></canvas>
                 }
                 else
                 {
@@ -235,8 +235,8 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-literature-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="english-literature-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.EnglishLiterature.SchoolYearByYear.Previous2, Model.EnglishLiterature.SchoolYearByYear.Previous, Model.EnglishLiterature.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.EnglishLiterature.SimilarSchoolsYearByYear.Previous2, Model.EnglishLiterature.SimilarSchoolsYearByYear.Previous, Model.EnglishLiterature.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.EnglishLiterature.LocalAuthorityYearByYear.Previous2, Model.EnglishLiterature.LocalAuthorityYearByYear.Previous, Model.EnglishLiterature.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglishLiterature.EnglandYearByYear.Previous2, Model.EnglishLiterature.EnglandYearByYear.Previous, Model.EnglishLiterature.EnglandYearByYear.Current } } } }))'></canvas>
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                <canvas id="english-literature-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.EnglishLiterature.SchoolYearByYear.Previous2, Model.EnglishLiterature.SchoolYearByYear.Previous, Model.EnglishLiterature.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.EnglishLiterature.SimilarSchoolsYearByYear.Previous2, Model.EnglishLiterature.SimilarSchoolsYearByYear.Previous, Model.EnglishLiterature.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.EnglishLiterature.LocalAuthorityYearByYear.Previous2, Model.EnglishLiterature.LocalAuthorityYearByYear.Previous, Model.EnglishLiterature.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglishLiterature.EnglandYearByYear.Previous2, Model.EnglishLiterature.EnglandYearByYear.Previous, Model.EnglishLiterature.EnglandYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="english-literature-top-performers">
@@ -290,9 +290,9 @@
     </div>
 </section>
 
-<section aria-labelledby="maths-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="maths-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="maths-heading">Mathematics</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="mathsGrade">Grade</label>
             <select class="govuk-select"
@@ -314,7 +314,7 @@
             </select>
         </div>
     </div>
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#maths-three-year-average">@ks4CurrentYear</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#maths-year-by-year">Year by year</a></li>
@@ -322,13 +322,13 @@
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#maths-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="maths-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                 @{
                     var mathsBarData = new decimal?[] { Model.Maths.SchoolYearByYear.Current, Model.Maths.SimilarSchoolsYearByYear.Current, Model.Maths.LocalAuthorityYearByYear.Current, Model.Maths.EnglandYearByYear.Current };
                 }
                 @if (HasAnyData(mathsBarData))
                 {
-                    <canvas id="maths-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = mathsBarData }))'></canvas>
+                    <canvas id="maths-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = mathsBarData }))'></canvas>
                 }
                 else
                 {
@@ -337,8 +337,8 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="maths-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="maths-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Maths.SchoolYearByYear.Previous2, Model.Maths.SchoolYearByYear.Previous, Model.Maths.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Maths.SimilarSchoolsYearByYear.Previous2, Model.Maths.SimilarSchoolsYearByYear.Previous, Model.Maths.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Maths.LocalAuthorityYearByYear.Previous2, Model.Maths.LocalAuthorityYearByYear.Previous, Model.Maths.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Maths.EnglandYearByYear.Previous2, Model.Maths.EnglandYearByYear.Previous, Model.Maths.EnglandYearByYear.Current } } } }))'></canvas>
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                <canvas id="maths-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Maths.SchoolYearByYear.Previous2, Model.Maths.SchoolYearByYear.Previous, Model.Maths.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Maths.SimilarSchoolsYearByYear.Previous2, Model.Maths.SimilarSchoolsYearByYear.Previous, Model.Maths.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Maths.LocalAuthorityYearByYear.Previous2, Model.Maths.LocalAuthorityYearByYear.Previous, Model.Maths.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Maths.EnglandYearByYear.Previous2, Model.Maths.EnglandYearByYear.Previous, Model.Maths.EnglandYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="maths-top-performers">
@@ -392,9 +392,9 @@
     </div>
 </section>
 
-<section aria-labelledby="combined-science-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="combined-science-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="combined-science-heading">Combined science (double award)</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="combinedScienceGrade">Grade</label>
             <select class="govuk-select"
@@ -416,7 +416,7 @@
             </select>
         </div>
     </div>
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#combined-science-three-year-average">@ks4CurrentYear</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#combined-science-year-by-year">Year by year</a></li>
@@ -424,13 +424,13 @@
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#combined-science-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="combined-science-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                 @{
                     var combinedScienceBarData = new decimal?[] { Model.CombinedScienceDoubleAward.SchoolYearByYear.Current, Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Current, Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Current, Model.CombinedScienceDoubleAward.EnglandYearByYear.Current };
                 }
                 @if (HasAnyData(combinedScienceBarData))
                 {
-                    <canvas id="combined-science-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = combinedScienceBarData }))'></canvas>
+                    <canvas id="combined-science-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = combinedScienceBarData }))'></canvas>
                 }
                 else
                 {
@@ -439,8 +439,8 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="combined-science-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="combined-science-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.SchoolYearByYear.Previous2, Model.CombinedScienceDoubleAward.SchoolYearByYear.Previous, Model.CombinedScienceDoubleAward.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Previous2, Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Previous, Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Previous2, Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Previous, Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.EnglandYearByYear.Previous2, Model.CombinedScienceDoubleAward.EnglandYearByYear.Previous, Model.CombinedScienceDoubleAward.EnglandYearByYear.Current } } } }))'></canvas>
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                <canvas id="combined-science-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.SchoolYearByYear.Previous2, Model.CombinedScienceDoubleAward.SchoolYearByYear.Previous, Model.CombinedScienceDoubleAward.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Previous2, Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Previous, Model.CombinedScienceDoubleAward.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Previous2, Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Previous, Model.CombinedScienceDoubleAward.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.CombinedScienceDoubleAward.EnglandYearByYear.Previous2, Model.CombinedScienceDoubleAward.EnglandYearByYear.Previous, Model.CombinedScienceDoubleAward.EnglandYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="combined-science-top-performers">
@@ -494,9 +494,9 @@
     </div>
 </section>
 
-<section aria-labelledby="biology-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="biology-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="biology-heading">Biology</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="biologyGrade">Grade</label>
             <select class="govuk-select"
@@ -518,7 +518,7 @@
             </select>
         </div>
     </div>
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#biology-three-year-average">@ks4CurrentYear</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#biology-year-by-year">Year by year</a></li>
@@ -526,13 +526,13 @@
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#biology-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="biology-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                 @{
                     var biologyBarData = new decimal?[] { Model.Biology.SchoolYearByYear.Current, Model.Biology.SimilarSchoolsYearByYear.Current, Model.Biology.LocalAuthorityYearByYear.Current, Model.Biology.EnglandYearByYear.Current };
                 }
                 @if (HasAnyData(biologyBarData))
                 {
-                    <canvas id="biology-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = biologyBarData }))'></canvas>
+                    <canvas id="biology-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = biologyBarData }))'></canvas>
                 }
                 else
                 {
@@ -541,8 +541,8 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="biology-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="biology-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Biology.SchoolYearByYear.Previous2, Model.Biology.SchoolYearByYear.Previous, Model.Biology.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Biology.SimilarSchoolsYearByYear.Previous2, Model.Biology.SimilarSchoolsYearByYear.Previous, Model.Biology.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Biology.LocalAuthorityYearByYear.Previous2, Model.Biology.LocalAuthorityYearByYear.Previous, Model.Biology.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Biology.EnglandYearByYear.Previous2, Model.Biology.EnglandYearByYear.Previous, Model.Biology.EnglandYearByYear.Current } } } }))'></canvas>
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                <canvas id="biology-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Biology.SchoolYearByYear.Previous2, Model.Biology.SchoolYearByYear.Previous, Model.Biology.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Biology.SimilarSchoolsYearByYear.Previous2, Model.Biology.SimilarSchoolsYearByYear.Previous, Model.Biology.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Biology.LocalAuthorityYearByYear.Previous2, Model.Biology.LocalAuthorityYearByYear.Previous, Model.Biology.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Biology.EnglandYearByYear.Previous2, Model.Biology.EnglandYearByYear.Previous, Model.Biology.EnglandYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="biology-top-performers">
@@ -596,9 +596,9 @@
     </div>
 </section>
 
-<section aria-labelledby="chemistry-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="chemistry-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="chemistry-heading">Chemistry</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="chemistryGrade">Grade</label>
             <select class="govuk-select"
@@ -620,7 +620,7 @@
             </select>
         </div>
     </div>
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#chemistry-three-year-average">@ks4CurrentYear</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#chemistry-year-by-year">Year by year</a></li>
@@ -628,13 +628,13 @@
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#chemistry-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="chemistry-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                 @{
                     var chemistryBarData = new decimal?[] { Model.Chemistry.SchoolYearByYear.Current, Model.Chemistry.SimilarSchoolsYearByYear.Current, Model.Chemistry.LocalAuthorityYearByYear.Current, Model.Chemistry.EnglandYearByYear.Current };
                 }
                 @if (HasAnyData(chemistryBarData))
                 {
-                    <canvas id="chemistry-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = chemistryBarData }))'></canvas>
+                    <canvas id="chemistry-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = chemistryBarData }))'></canvas>
                 }
                 else
                 {
@@ -643,8 +643,8 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="chemistry-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="chemistry-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Chemistry.SchoolYearByYear.Previous2, Model.Chemistry.SchoolYearByYear.Previous, Model.Chemistry.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Chemistry.SimilarSchoolsYearByYear.Previous2, Model.Chemistry.SimilarSchoolsYearByYear.Previous, Model.Chemistry.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Chemistry.LocalAuthorityYearByYear.Previous2, Model.Chemistry.LocalAuthorityYearByYear.Previous, Model.Chemistry.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Chemistry.EnglandYearByYear.Previous2, Model.Chemistry.EnglandYearByYear.Previous, Model.Chemistry.EnglandYearByYear.Current } } } }))'></canvas>
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                <canvas id="chemistry-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Chemistry.SchoolYearByYear.Previous2, Model.Chemistry.SchoolYearByYear.Previous, Model.Chemistry.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Chemistry.SimilarSchoolsYearByYear.Previous2, Model.Chemistry.SimilarSchoolsYearByYear.Previous, Model.Chemistry.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Chemistry.LocalAuthorityYearByYear.Previous2, Model.Chemistry.LocalAuthorityYearByYear.Previous, Model.Chemistry.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Chemistry.EnglandYearByYear.Previous2, Model.Chemistry.EnglandYearByYear.Previous, Model.Chemistry.EnglandYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="chemistry-top-performers">
@@ -698,9 +698,9 @@
     </div>
 </section>
 
-<section aria-labelledby="physics-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="physics-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="physics-heading">Physics</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="physicsGrade">Grade</label>
             <select class="govuk-select"
@@ -722,7 +722,7 @@
             </select>
         </div>
     </div>
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#physics-three-year-average">@ks4CurrentYear</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#physics-year-by-year">Year by year</a></li>
@@ -730,13 +730,13 @@
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#physics-top-performers">Top performers</a></li>
         </ul>
         <div class="govuk-tabs__panel" id="physics-three-year-average">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                 @{
                     var physicsBarData = new decimal?[] { Model.Physics.SchoolYearByYear.Current, Model.Physics.SimilarSchoolsYearByYear.Current, Model.Physics.LocalAuthorityYearByYear.Current, Model.Physics.EnglandYearByYear.Current };
                 }
                 @if (HasAnyData(physicsBarData))
                 {
-                    <canvas id="physics-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = physicsBarData }))'></canvas>
+                    <canvas id="physics-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = physicsBarData }))'></canvas>
                 }
                 else
                 {
@@ -745,8 +745,8 @@
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="physics-year-by-year">
-            <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                <canvas id="physics-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Physics.SchoolYearByYear.Previous2, Model.Physics.SchoolYearByYear.Previous, Model.Physics.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Physics.SimilarSchoolsYearByYear.Previous2, Model.Physics.SimilarSchoolsYearByYear.Previous, Model.Physics.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Physics.LocalAuthorityYearByYear.Previous2, Model.Physics.LocalAuthorityYearByYear.Previous, Model.Physics.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Physics.EnglandYearByYear.Previous2, Model.Physics.EnglandYearByYear.Previous, Model.Physics.EnglandYearByYear.Current } } } }))'></canvas>
+            <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                <canvas id="physics-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.Physics.SchoolYearByYear.Previous2, Model.Physics.SchoolYearByYear.Previous, Model.Physics.SchoolYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.Physics.SimilarSchoolsYearByYear.Previous2, Model.Physics.SimilarSchoolsYearByYear.Previous, Model.Physics.SimilarSchoolsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.Physics.LocalAuthorityYearByYear.Previous2, Model.Physics.LocalAuthorityYearByYear.Previous, Model.Physics.LocalAuthorityYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.Physics.EnglandYearByYear.Previous2, Model.Physics.EnglandYearByYear.Previous, Model.Physics.EnglandYearByYear.Current } } } }))'></canvas>
             </div>
         </div>
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="physics-top-performers">
@@ -818,8 +818,11 @@
 @section Scripts {
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-toggle.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }

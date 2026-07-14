@@ -32,9 +32,9 @@
     var lineChartColors = new[] { "#D53780", "#5694CA", "#28A197" };
     var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
     var whatIsSimilarSchoolUrl = Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn })
-        ?? SAPSec.Web.Constants.Routes.Secondary.School(Model.SchoolDetails.Urn) + "/what-is-a-similar-school";
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.Secondary.SimilarSchools(Model.SchoolDetails.Urn);
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.Secondary.SimilarSchoolComparison(Model.SchoolDetails.Urn, similarSchoolUrn);
+        ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
+    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).SimilarSchoolComparison(similarSchoolUrn);
 }
 
 <span class="govuk-caption-xl">@Model.SchoolName</span>
@@ -53,10 +53,10 @@
     Find out <a href="@whatIsSimilarSchoolUrl" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
 
-<section aria-labelledby="attendance-heading" class="govuk-!-margin-top-9 app-ks4-attainment">
+<section aria-labelledby="attendance-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="attendance-heading">Attendance</h2>
 
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-label--s" for="attendanceAbsenceType">Type of absence</label>
             <select class="govuk-select"
@@ -78,7 +78,7 @@
         </div>
     </div>
 
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs app-attendance-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs app-attendance-tabs" data-module="govuk-tabs">
         <h3 class="govuk-tabs__title">Attendance views</h3>
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
@@ -96,7 +96,7 @@
         </ul>
 
         <div class="govuk-tabs__panel" id="attendance-three-year-average">
-            <div class="app-ks4-chart-container">
+            <div class="app-measure-chart-container">
                 <canvas id="school-attendance-three-year-chart"
                         class="js-chart"
                         data-type="bar"
@@ -115,7 +115,7 @@
         </div>
 
         <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-year-by-year">
-            <div class="app-ks4-chart-container">
+            <div class="app-measure-chart-container">
                 <canvas id="school-attendance-year-by-year-chart"
                         class="js-chart"
                         data-type="line"
@@ -202,8 +202,11 @@
 @section Scripts {
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chart-toggle.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }

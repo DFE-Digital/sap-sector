@@ -1,11 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Features.Primary;
+using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.UseCases;
+using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -17,69 +20,102 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Route("school/primary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
+[RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
-    IFeatureFlagService featureFlagService,
-    IRequestSchoolAccessor requestSchoolAccessor) : Controller
+    IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase)
+    : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("ks2")]
-    public async Task<IActionResult> Ks2(string urn)
+    public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        var model = new Ks2MeasuresPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School)
+        };
+
+        return View(model);
     }
 
     [HttpGet]
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("view-similar-schools")]
     public async Task<IActionResult> ViewSimilarSchools(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+    }
+
+    [HttpGet]
+    [Route("view-similar-schools/{similarSchoolUrn}")]
+    public async Task<IActionResult> SimilarSchoolComparison(string urn, string similarSchoolUrn)
+    {
+        var currentSchool = (await getSchoolInfoUseCase.Execute(new(urn))).School;
+        var similarSchool = (await getSchoolInfoUseCase.Execute(new(similarSchoolUrn))).School;
+
+        PopulateViewData(currentSchool);
+
+        return View((SchoolInfoViewModel.FromSchoolInfo(currentSchool), SchoolInfoViewModel.FromSchoolInfo(similarSchool)));
     }
 
     [HttpGet]
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        return await RenderPrimarySchoolViewAsync(urn);
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
-    private async Task<IActionResult> RenderPrimarySchoolViewAsync(string urn)
+    private void PopulateViewData(SchoolInfo currentSchool)
     {
-        if (!await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
-        {
-            return NotFound();
-        }
-
-        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData["SchoolDetails"] = school;
-        if (Url is not null)
-        {
-            ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreatePrimary(
-                Url,
-                school?.Urn ?? urn,
-                ControllerContext.ActionDescriptor.ActionName);
-        }
-
-        return View(school);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
+            Url,
+            currentSchool.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
     }
 }
