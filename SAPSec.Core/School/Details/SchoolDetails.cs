@@ -1,4 +1,6 @@
-﻿namespace SAPSec.Core.Model;
+﻿using SAPSec.Core.Model;
+
+namespace SAPSec.Core.School.Details;
 
 /// <summary>
 /// School details with data availability information.

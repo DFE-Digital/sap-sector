@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Model;
+﻿namespace SAPSec.Core.School.Details;
 
 /// <summary>
 /// School governance structure types.

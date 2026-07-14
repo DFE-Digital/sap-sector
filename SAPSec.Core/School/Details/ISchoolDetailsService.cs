@@ -1,6 +1,4 @@
-﻿using SAPSec.Core.Model;
-
-namespace SAPSec.Core.Interfaces.Services;
+﻿namespace SAPSec.Core.School.Details;
 
 /// <summary>
 /// Service for retrieving school details with business logic applied.

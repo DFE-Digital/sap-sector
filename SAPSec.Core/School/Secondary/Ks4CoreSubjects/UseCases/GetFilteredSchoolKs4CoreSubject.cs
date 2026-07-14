@@ -1,4 +1,4 @@
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.School.Details;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 

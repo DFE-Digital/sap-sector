@@ -1,4 +1,4 @@
-using SAPSec.Core.Model;
+using SAPSec.Core.School.Details;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Data.Repositories;
 

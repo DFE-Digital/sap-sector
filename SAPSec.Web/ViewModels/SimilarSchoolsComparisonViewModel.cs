@@ -1,7 +1,7 @@
 using SAPSec.Core.School.Similarity;
-using SAPSec.Core.Model;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using System.Globalization;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Web.ViewModels;
 

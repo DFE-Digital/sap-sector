@@ -1,5 +1,6 @@
 ﻿using SAPSec.Core.Constants;
 using SAPSec.Core.Model;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Web.Helpers;
 

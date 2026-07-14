@@ -1,8 +1,7 @@
 ﻿using Moq;
 using SAPSec.Core.School.Similarity.UseCases;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Test.Common.InMemory;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 

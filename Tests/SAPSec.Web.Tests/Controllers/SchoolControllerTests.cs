@@ -16,6 +16,7 @@ using SAPSec.Data.Repositories;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Services;
 using System.Text.Json;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
 

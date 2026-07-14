@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.School.Attendance;
+using SAPSec.Core.School.Details;
 using SAPSec.Core.School.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Web.Constants;
@@ -395,7 +396,7 @@ public class SchoolController : Controller
         });
     }
 
-    private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
+    private void SetSchoolViewDataAsync(SchoolDetails school)
     {
         ViewData["SchoolDetails"] = school;
 

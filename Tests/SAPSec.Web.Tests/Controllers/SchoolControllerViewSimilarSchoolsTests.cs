@@ -12,6 +12,7 @@ using SAPSec.Data.Repositories;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
 

@@ -1,25 +1,25 @@
 ﻿using SAPSec.Core.Constants;
-using SAPSec.Core.Interfaces.Rules;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Rules;
+namespace SAPSec.Core.School.Details;
 
 /// <summary>
-/// Business rule: Determines if school has resourced provision.
-/// Single Responsibility: Only handles resourced provision logic.
+/// Business rule: Determines if school has SEN unit based on TypeOfResourcedProvision field.
+/// Single Responsibility: Only handles SEN unit logic.
 /// </summary>
-public sealed class ResourcedProvisionRule : IBusinessRule<bool>
+public sealed class SenUnitRule : IBusinessRule<bool>
 {
     public DataWithAvailability<bool> Evaluate(Establishment establishment)
     {
         var resourcedProvisionName = establishment.ResourcedProvisionName;
 
-        if (ResourcedProvisionValues.NoResourcedProvision(resourcedProvisionName))
+        if (SenUnitValues.NoSenUnit(resourcedProvisionName))
         {
             return DataWithAvailability.Available(false);
         }
-        if (ResourcedProvisionValues.HasResourcedProvision(resourcedProvisionName))
+
+        if (SenUnitValues.HasSenUnit(resourcedProvisionName))
         {
             return DataWithAvailability.Available(true);
         }

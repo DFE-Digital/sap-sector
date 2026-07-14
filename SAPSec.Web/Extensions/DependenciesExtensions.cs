@@ -1,5 +1,4 @@
 using SAPSec.Core.School.Similarity.UseCases;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.School.Info;
 using SAPSec.Core.School.Primary;
 using SAPSec.Core.School.Search;
@@ -15,6 +14,7 @@ using SAPSec.Web.Formatters;
 using SAPSec.Web.Services;
 using System.Diagnostics.CodeAnalysis;
 using SAPSec.Core.School.Attendance;
+using SAPSec.Core.School.Details;
 
 namespace SAPSec.Web.Extensions;
 
