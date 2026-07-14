@@ -2,18 +2,10 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using SAPSec.Core.Authentication;
-using SAPSec.Core.Model;
-using SAPSec.Data.Dto;
-using SAPSec.Data.Dto.Absence;
-using SAPSec.Data.Dto.KS4.Destinations;
-using SAPSec.Data.Dto.KS4.Performance;
-using SAPSec.Data.Dto.SimilarSchools.Secondary;
-using SAPSec.Data.Repositories;
 using SAPSec.Infrastructure.Json;
 using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
@@ -35,18 +27,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
-        var testDataFilePath = GetTestDataFilePath();
-        var configurationValues = CreateConfigurationValues(testDataFilePath);
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(configurationValues)
-            .Build();
-
         builder
-            .UseConfiguration(configuration)
-            .ConfigureAppConfiguration(configurationBuilder =>
-            {
-                configurationBuilder.AddInMemoryCollection(configurationValues);
-            })
             .ConfigureServices(services =>
             {
                 services.RemoveAll<IUserService>();
@@ -54,34 +35,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IUserService, MockUserService>();
                 services.AddScoped<IDsiClient, MockDsiClient>();
 
-                services.RemoveAll<IEstablishmentRepository>();
-                services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
-                services.RemoveAll<IKs4PerformanceRepository>();
-                services.RemoveAll<IKs4DestinationsRepository>();
-                services.RemoveAll<IAbsenceRepository>();
-
-                // JSON files
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>, JsonFile<SimilarSchoolsSecondaryGroupsEntry>>();
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesEntry>, JsonFile<SimilarSchoolsSecondaryValuesEntry>>();
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>, JsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>>();
-                services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
-                services.AddSingleton<IJsonFile<EstablishmentEmail>, JsonFile<EstablishmentEmail>>();
-                services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
-                services.AddSingleton<IJsonFile<EstablishmentAbsence>, JsonFile<EstablishmentAbsence>>();
-                services.AddSingleton<IJsonFile<EstablishmentDestinations>, JsonFile<EstablishmentDestinations>>();
-                services.AddSingleton<IJsonFile<LAPerformance>, JsonFile<LAPerformance>>();
-                services.AddSingleton<IJsonFile<LAAbsence>, JsonFile<LAAbsence>>();
-                services.AddSingleton<IJsonFile<LADestinations>, JsonFile<LADestinations>>();
-                services.AddSingleton<IJsonFile<EnglandPerformance>, JsonFile<EnglandPerformance>>();
-                services.AddSingleton<IJsonFile<EnglandAbsence>, JsonFile<EnglandAbsence>>();
-                services.AddSingleton<IJsonFile<EnglandDestinations>, JsonFile<EnglandDestinations>>();
-                services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
-
-                services.AddSingleton<IEstablishmentRepository, JsonEstablishmentRepository>();
-                services.AddSingleton<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-                services.AddSingleton<IKs4PerformanceRepository, JsonKs4PerformanceRepository>();
-                services.AddSingleton<IKs4DestinationsRepository, JsonKs4DestinationsRepository>();
-                services.AddSingleton<IAbsenceRepository, JsonAbsenceRepository>();
+                services.AddJsonDependencies();
             });
     }
 
@@ -166,34 +120,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 $"Could not find SAPSec.Web. Searched: {string.Join(", ", possiblePaths)}");
 
         return _cachedWebProjectPath;
-    }
-
-    private static string GetTestDataFilePath()
-    {
-        // First try test project's TestData folder
-        var testProjectPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(testProjectPath))
-        {
-            return testProjectPath;
-        }
-
-        // Try web project's TestData folder
-        var webProjectPath = Path.Combine(
-            GetWebProjectPath(),
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(webProjectPath))
-        {
-            return webProjectPath;
-        }
-
-        throw new FileNotFoundException(
-            $"Test data file not found. Searched:\n- {testProjectPath}\n- {webProjectPath}");
     }
 
     #endregion

@@ -19,7 +19,7 @@ public class FindSimilarSchools(
     {
         // TODO: Validate request
 
-        var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var groups = await similarSchoolsRepository.GetGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
 
         var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
@@ -28,8 +28,8 @@ public class FindSimilarSchools(
 
         var schools =
             from e in establishments
-            join p in performance on e.URN equals p.URN into perf
-            join a in absence on e.URN equals a.URN into abs
+            join p in performance on e.URN equals p.Urn into perf
+            join a in absence on e.URN equals a.Urn into abs
             select SimilarSchool.FromData(e, perf.FirstOrDefault()?.EstablishmentPerformance, abs.FirstOrDefault()?.EstablishmentAbsence);
 
         var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);

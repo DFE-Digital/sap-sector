@@ -51,7 +51,7 @@ public class Program
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
         });
         builder.Services.AddFeatureManagement();
-        builder.Services.AddScoped<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.AddSingleton<IFeatureFlagService, FeatureFlagService>();
         builder.Services.Configure<CustomEventLocations>(builder.Configuration.GetSection("CustomEventLocations"));
         builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
 

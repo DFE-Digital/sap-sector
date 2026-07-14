@@ -37,11 +37,4 @@
     <ProjectReference Include="..\SAPSec.Test.Common\SAPSec.Test.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Remove="TestData\Establishments-Integration-Test-Data.csv" />
-    <Content Include="TestData\Establishments-Integration-Test-Data.csv">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
 </Project>

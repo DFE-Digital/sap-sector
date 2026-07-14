@@ -6,31 +6,31 @@ namespace SAPSec.Infrastructure.Json;
 
 public class JsonEstablishmentRepository : IEstablishmentRepository
 {
-    private readonly IJsonFile<Establishment> _establishmentJsonFile;
-    private readonly IJsonFile<EstablishmentEmail> _establishmentEmailJsonFile;
+    private readonly IJsonFile<Establishment> _establishmentFile;
+    private readonly IJsonFile<EstablishmentEmail> _establishmentEmailFile;
 
     private ILogger<JsonEstablishmentRepository> _logger;
 
     public JsonEstablishmentRepository(
-        IJsonFile<Establishment> establishmentJsonFile,
-        IJsonFile<EstablishmentEmail> establishmentEmailJsonFile,
+        IJsonFile<Establishment> establishmentFile,
+        IJsonFile<EstablishmentEmail> establishmentEmailFile,
         ILogger<JsonEstablishmentRepository> logger)
     {
-        _establishmentJsonFile = establishmentJsonFile;
-        _establishmentEmailJsonFile = establishmentEmailJsonFile;
+        _establishmentFile = establishmentFile;
+        _establishmentEmailFile = establishmentEmailFile;
         _logger = logger;
     }
 
     public async Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()
     {
-        var establishments = await _establishmentJsonFile.ReadAllAsync();
+        var establishments = await _establishmentFile.ReadAllAsync();
 
         return establishments.ToList().AsReadOnly();
     }
 
     public async Task<IReadOnlyCollection<Establishment>> GetEstablishmentsAsync(IEnumerable<string> urns)
     {
-        var establishments = await _establishmentJsonFile.ReadAllAsync();
+        var establishments = await _establishmentFile.ReadAllAsync();
 
         return establishments.Where(e => urns.Contains(e.URN)).ToList().AsReadOnly();
     }
@@ -45,14 +45,14 @@ public class JsonEstablishmentRepository : IEstablishmentRepository
 
     public async Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number)
     {
-        var allEstablishments = await _establishmentJsonFile.ReadAllAsync();
+        var allEstablishments = await _establishmentFile.ReadAllAsync();
 
         return allEstablishments.FirstOrDefault(x => x.URN == number || x.UKPRN == number || x.LAESTAB == number);
     }
 
     public async Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
     {
-        var establishmentEmails = await _establishmentEmailJsonFile.ReadAllAsync();
+        var establishmentEmails = await _establishmentEmailFile.ReadAllAsync();
 
         return establishmentEmails.FirstOrDefault(x => x.URN == urn);
     }

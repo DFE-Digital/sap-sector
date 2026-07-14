@@ -1,12 +1,17 @@
 @using SAPSec.Core.Model
+@using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
+
 @{
-    var navigation = ViewData["SchoolNavigation"] as SchoolSideNavigationViewModel;
+    var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
+    var school = ViewData[ViewDataKeys.SchoolLayout] as SchoolLayoutModel;
 }
+
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 @section Breadcrumbs {
     <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
         <ol class="govuk-breadcrumbs__list">

@@ -6,21 +6,21 @@ namespace SAPSec.Infrastructure.Json;
 
 public class JsonEstablishmentEmailRepository : IEstablishmentEmailRepository
 {
-    private readonly IJsonFile<EstablishmentEmail> _establishmentEmailJsonFile;
+    private readonly IJsonFile<EstablishmentEmail> _establishmentEmailFile;
 
     private ILogger<JsonEstablishmentEmailRepository> _logger;
 
     public JsonEstablishmentEmailRepository(
-        IJsonFile<EstablishmentEmail> establishmentEmailJsonFile,
+        IJsonFile<EstablishmentEmail> establishmentEmailFile,
         ILogger<JsonEstablishmentEmailRepository> logger)
     {
-        _establishmentEmailJsonFile = establishmentEmailJsonFile;
+        _establishmentEmailFile = establishmentEmailFile;
         _logger = logger;
     }
 
     public async Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
     {
-        var establishmentEmails = await _establishmentEmailJsonFile.ReadAllAsync();
+        var establishmentEmails = await _establishmentEmailFile.ReadAllAsync();
 
         return establishmentEmails.FirstOrDefault(x => x.URN == urn);
     }

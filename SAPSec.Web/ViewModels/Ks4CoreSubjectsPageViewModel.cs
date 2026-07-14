@@ -1,5 +1,5 @@
 using System.Globalization;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Web.ViewModels;

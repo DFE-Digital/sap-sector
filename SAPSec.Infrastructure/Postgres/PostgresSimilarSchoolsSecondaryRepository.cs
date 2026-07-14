@@ -16,7 +16,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         _factory = factory;
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn)
     {
         using var conn = await _factory.Create().OpenConnectionAsync();
 
@@ -33,7 +33,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             .AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetSecondaryValuesByUrnsAsync(IEnumerable<string> urns)
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns)
     {
         if (!urns.Any())
         {
@@ -55,7 +55,7 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             .AsReadOnly();
     }
 
-    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetSimilarSchoolsSecondaryStandardDeviationsAsync()
+    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetStandardDeviationsAsync()
     {
         const string sql = """
             SELECT

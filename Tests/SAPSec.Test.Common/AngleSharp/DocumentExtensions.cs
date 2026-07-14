@@ -8,26 +8,20 @@ namespace SAPSec.Test.Common.AngleSharp;
 
 public static class DocumentExtensions
 {
-    public static IElement ElementShouldExist(this IDocument doc, string selector)
+    public static IElement ElementWithTestIdShouldExist(this IDocument doc, string testId)
     {
-        var element = doc.QuerySelector(selector);
-        element.Should().NotBeNull();
+        var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
+        el.Should().NotBeNull();
 
-        return element;
+        return el;
     }
 
-    public static IHtmlInputElement InputWithNameShouldExist(this IDocument doc, string name)
+    public static T ElementWithTestIdShouldExist<T>(this IDocument doc, string testId)
+        where T : IElement
     {
-        return doc.QuerySelector($@"input[name=""{name}""]")
-            .Should().NotBeNull().And.BeAssignableTo<IHtmlInputElement>()
-            .Subject;
-    }
-
-    public static IHtmlButtonElement ButtonWithNameShouldExist(this IDocument doc, string name)
-    {
-        return doc.QuerySelector($@"button[name=""{name}""]")
-            .Should().NotBeNull().And.BeAssignableTo<IHtmlButtonElement>()
-            .Subject;
+        var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
+        el.Should().NotBeNull();
+        return el.Should().BeAssignableTo<T>().Subject;
     }
 
     public static async Task<IDocument> SubmitContainingFormAsync(this IDocument doc, IHtmlButtonElement button, params HttpStatusCode[] expectedStatusCodes)
