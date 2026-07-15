@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Constants;
@@ -23,7 +24,8 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase)
+    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
+    IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase)
     : Controller
 {
     [HttpGet]
@@ -68,11 +70,12 @@ public class SchoolController(
     [Route("view-similar-schools")]
     public async Task<IActionResult> ViewSimilarSchools(string urn)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
+        var response = await findPrimarySimilarSchoolsUseCase.Execute(new(urn));
 
-        PopulateViewData(response.School);
+        PopulateViewData(schoolInfoResponse.School);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        return View(PrimarySimilarSchoolsPageViewModel.FromResponse(response));
     }
 
     [HttpGet]
