@@ -34,12 +34,12 @@ public static class DependenciesExtensions
         services.AddSingleton<GetSchoolKs4CoreSubjects>();
         services.AddSingleton<GetFilteredSchoolKs4CoreSubject>();
         services.AddSingleton<GetAttendanceMeasures>();
-        services.AddSingleton<FindPrimarySimilarSchools>();
         services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<GetSimilarSchoolDetails>();
         services.AddSingleton<GetCharacteristicsComparison>();
         services.AddSingleton<IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>, GetSchoolInfoUseCase>();
         services.AddSingleton<IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>, GetSchoolKs2PerformanceMeasuresUseCase>();
+        services.AddSingleton<IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>, FindPrimarySimilarSchools>();
 
         services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
         services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);

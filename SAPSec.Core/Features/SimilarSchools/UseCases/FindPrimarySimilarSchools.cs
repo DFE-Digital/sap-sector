@@ -1,3 +1,6 @@
+using SAPSec.Core.Features.Primary;
+using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -5,63 +8,36 @@ namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 public class FindPrimarySimilarSchools(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository)
+    : IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>
 {
     public async Task<FindPrimarySimilarSchoolsResponse> Execute(FindPrimarySimilarSchoolsRequest request)
     {
-        var groups = await similarSchoolsRepository.GetGroupAsync(request.CurrentSchoolUrn);
-        var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]).Distinct().ToArray();
+        var dataProvider = new PrimarySimilarSchoolsCharacteristicsDataProvider(
+            establishmentRepository,
+            similarSchoolsRepository);
 
-        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-        var values = SimilarSchoolsPrimaryValues.FromData(await similarSchoolsRepository.GetValuesByUrnsAsync(urns))
-            .ToDictionary(v => v.Urn, v => v);
-
-        var currentEstablishment = establishments.FirstOrDefault(e => e.URN == request.CurrentSchoolUrn);
-        if (currentEstablishment is null)
-        {
-            throw new NotFoundException($"School with URN {request.CurrentSchoolUrn} was not found");
-        }
-
-        if (!values.TryGetValue(request.CurrentSchoolUrn, out var currentValues))
-        {
-            throw new NotFoundException($"No similar schools characteristics found for URN {request.CurrentSchoolUrn}");
-        }
-
-        var establishmentsByUrn = establishments.ToDictionary(e => e.URN, e => e);
-
-        var similarSchools = groups
-            .Select(group =>
-            {
-                if (!establishmentsByUrn.TryGetValue(group.NeighbourURN, out var establishment))
-                {
-                    return null;
-                }
-
-                if (!values.TryGetValue(group.NeighbourURN, out var similarValues))
-                {
-                    return null;
-                }
-
-                return new PrimarySimilarSchool(
-                    group.NeighbourURN,
-                    establishment.EstablishmentName,
-                    establishment.LAName,
-                    group.Rank,
-                    group.Dist,
-                    ToCharacteristics(similarValues));
-            })
-            .Where(school => school is not null)
-            .Select(school => school!)
-            .ToList()
-            .AsReadOnly();
+        var (currentSchool, similarSchools) = await dataProvider.GetSimilarSchoolsCharacteristics(request.Urn);
 
         return new(
-            new PrimaryCurrentSchool(
-                currentEstablishment.URN,
-                currentEstablishment.EstablishmentName,
-                currentEstablishment.LAName,
-                ToCharacteristics(currentValues)),
-            similarSchools);
+            ToCurrentSchool(currentSchool),
+            similarSchools.Select(ToSimilarSchool).ToList().AsReadOnly());
     }
+
+    private static PrimaryCurrentSchool ToCurrentSchool(SchoolData<SimilarSchoolsPrimaryValues> school) =>
+        new(
+            school.SchoolInfo.Urn,
+            school.SchoolInfo.Name,
+            school.SchoolInfo.LocalAuthority.Name,
+            ToCharacteristics(school.Data!));
+
+    private static PrimarySimilarSchool ToSimilarSchool(RankedSchoolData<SimilarSchoolsPrimaryValues> school) =>
+        new(
+            school.School.SchoolInfo.Urn,
+            school.School.SchoolInfo.Name,
+            school.School.SchoolInfo.LocalAuthority.Name,
+            school.Rank,
+            school.Distance,
+            ToCharacteristics(school.School.Data!));
 
     private static PrimarySimilarSchoolCharacteristics ToCharacteristics(SimilarSchoolsPrimaryValues values) =>
         new(
@@ -77,7 +53,7 @@ public class FindPrimarySimilarSchools(
             values.PupilsWithEhcPlanPercentage);
 }
 
-public record FindPrimarySimilarSchoolsRequest(string CurrentSchoolUrn);
+public record FindPrimarySimilarSchoolsRequest(string Urn);
 
 public record FindPrimarySimilarSchoolsResponse(
     PrimaryCurrentSchool CurrentSchool,
