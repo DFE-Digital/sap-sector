@@ -91,7 +91,7 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
         var document = await fixture.RequestPageAsync(SchoolAttendancePath);
 
         var absenceTypeSelect = document.ElementWithTestIdShouldExist("attendance-absence-type");
-        var absenceOptions = absenceTypeSelect.ChildTrimmedTextContent().ToArray();
+        var absenceOptions = absenceTypeSelect.ChildTrimmedTextContent();
 
         absenceOptions.Should().BeEquivalentTo(
             ["Overall absence", "Persistent absence"],
@@ -104,7 +104,7 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
         var document = await fixture.RequestPageAsync(SchoolAttendancePath);
 
         var attendanceTabs = document.ElementWithTestIdShouldExist("attendance-tabs");
-        var tabTexts = attendanceTabs.ChildTrimmedTextContent().ToArray();
+        var tabTexts = attendanceTabs.ChildTrimmedTextContent();
 
         tabTexts.Should().NotContain("Top performers");
         tabTexts.Should().Contain("Year by year");
