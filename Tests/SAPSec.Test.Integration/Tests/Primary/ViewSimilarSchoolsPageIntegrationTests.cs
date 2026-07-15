@@ -1,4 +1,3 @@
-using AngleSharp.Html.Dom;
 using FluentAssertions;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Test.Common.AngleSharp;
@@ -77,13 +76,22 @@ public class ViewSimilarSchoolsPageIntegrationTests(
         summary.TextContent.Should().Contain("11.4");
         summary.TextContent.Should().Contain("20.2%");
 
-        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("primary-similar-schools-table");
-        table.ShouldHaveRows(
-            ["School", "LA", "Rank", "Distance", "Read/maths avg", "KS1 prior RWM", "Pupils", "FSM ever 6", "EAL", "Compare"],
-            ["Test School 2", "Test LA 2", "1", "0.1", "101.4", "10.4", "220", "25.4%", "6%", "Compare"],
-            ["Test School 3", "Test LA 3", "2", "0.2", "100.4", "9.4", "230", "30.5%", "7%", "Compare"]);
+        var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
+        list.TextContent.Should().Contain("Test School 2");
+        list.TextContent.Should().Contain("Test LA 2");
+        list.TextContent.Should().Contain("Rank: 1");
+        list.TextContent.Should().Contain("Distance: 0.1");
+        list.TextContent.Should().Contain("101.4");
+        list.TextContent.Should().Contain("10.4");
+        list.TextContent.Should().Contain("220");
+        list.TextContent.Should().Contain("25.4%");
+        list.TextContent.Should().Contain("6%");
+        list.TextContent.Should().Contain("Test School 3");
+        list.TextContent.Should().Contain("Test LA 3");
+        list.TextContent.Should().Contain("Rank: 2");
+        list.TextContent.Should().Contain("Distance: 0.2");
 
-        var links = table.QuerySelectorAll("a").Select(x => x.GetAttribute("href"));
+        var links = list.QuerySelectorAll("a").Select(x => x.GetAttribute("href"));
         links.Should().BeEquivalentTo([
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100002"),
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100003")

@@ -50,41 +50,55 @@
 <section aria-labelledby="similar-schools-heading">
     <h2 class="govuk-heading-m" id="similar-schools-heading">Similar schools</h2>
 
-    <div class="govuk-table-responsive">
-        <table class="govuk-table" data-testid="primary-similar-schools-table">
-            <thead class="govuk-table__head">
-                <tr class="govuk-table__row">
-                    <th scope="col" class="govuk-table__header">School</th>
-                    <th scope="col" class="govuk-table__header">LA</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Rank</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Distance</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Read/maths avg</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">KS1 prior RWM</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">Pupils</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">FSM ever 6</th>
-                    <th scope="col" class="govuk-table__header govuk-table__header--numeric">EAL</th>
-                    <th scope="col" class="govuk-table__header">Compare</th>
-                </tr>
-            </thead>
-            <tbody class="govuk-table__body">
-                @foreach (var school in Model.SimilarSchools)
-                {
-                    <tr class="govuk-table__row">
-                        <th scope="row" class="govuk-table__header">@school.Name</th>
-                        <td class="govuk-table__cell">@school.LocalAuthorityName</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@school.Rank</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@school.Distance</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@school.Characteristics.ReadMatAverage</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@school.Characteristics.Ks1PriorRwmAverage</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@school.Characteristics.PupilCount</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@school.Characteristics.PupilPremiumEligibilityPercentage</td>
-                        <td class="govuk-table__cell govuk-table__cell--numeric">@school.Characteristics.PupilsWithEalPercentage</td>
-                        <td class="govuk-table__cell">
-                            <a class="govuk-link" href="@school.ComparisonUrl">Compare</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="results-bar govuk-!-margin-bottom-1">
+        <p class="govuk-body app-school-results-count">
+            Showing <strong>1-@Model.SimilarSchools.Count</strong> of <strong>@Model.SimilarSchools.Count</strong> similar schools
+        </p>
     </div>
+
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
+
+    <ul class="govuk-list app-school-results" data-testid="primary-similar-schools-list">
+        @foreach (var school in Model.SimilarSchools)
+        {
+            <li class="app-school-result" id="similar-school-@school.Urn">
+                <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
+                   href="@school.ComparisonUrl">
+                    @school.Name
+                </a>
+
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    @school.LocalAuthorityName
+                </p>
+
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>Rank:</strong> @school.Rank
+                    <span class="govuk-!-margin-left-2"><strong>Distance:</strong> @school.Distance</span>
+                </p>
+
+                <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-top-3 govuk-!-margin-bottom-0">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Read/maths average</dt>
+                        <dd class="govuk-summary-list__value">@school.Characteristics.ReadMatAverage</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">KS1 prior RWM</dt>
+                        <dd class="govuk-summary-list__value">@school.Characteristics.Ks1PriorRwmAverage</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Pupils</dt>
+                        <dd class="govuk-summary-list__value">@school.Characteristics.PupilCount</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">FSM ever 6</dt>
+                        <dd class="govuk-summary-list__value">@school.Characteristics.PupilPremiumEligibilityPercentage</dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">EAL</dt>
+                        <dd class="govuk-summary-list__value">@school.Characteristics.PupilsWithEalPercentage</dd>
+                    </div>
+                </dl>
+            </li>
+        }
+    </ul>
 </section>
