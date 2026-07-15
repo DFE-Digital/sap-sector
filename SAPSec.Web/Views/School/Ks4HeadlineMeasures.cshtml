@@ -57,9 +57,9 @@
 
 <partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
 
-<section aria-labelledby="attainment8-heading" class="app-ks4-attainment">
+<section aria-labelledby="attainment8-heading" class="app-measure-section">
     <partial name="~/Views/Shared/_Ks4Attainment8Intro.cshtml" />
-    <div class="govuk-tabs govuk-!-margin-bottom-3 app-ks4-tabs" data-module="govuk-tabs">
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#charts">Charts</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#table-view">Table</a></li>
@@ -69,14 +69,14 @@
         <div class="govuk-tabs__panel" id="charts">
             <content-toggle>
                 <toggle-content id="three-year-average" name="@ks4CurrentYear" active="true">
-                    <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                         @{
                             var attainmentBarData = new decimal?[] { Model.SchoolAttainment8YearByYear.Current, Model.SimilarSchoolsAttainment8YearByYear.Current, Model.LocalAuthorityAttainment8YearByYear.Current, Model.EnglandAttainment8YearByYear.Current };
                         }
                         @if (HasAnyData(attainmentBarData))
                         {
                             <canvas id="ks4-attainment8-school-chart"
-                                    class="js-chart js-chart--school-ks4-bar"
+                                    class="js-chart js-chart--school-measure-bar"
                                     data-type="bar"
                                     data-show-no-data-labels="true"
                                     data-axis-step="30"
@@ -96,9 +96,9 @@
                     </div>
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year">
-                    <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                         <canvas id="ks4-attainment8-school-yearbyyear-chart"
-                                class="js-chart js-chart--school-ks4-line"
+                                class="js-chart js-chart--school-measure-line"
                                 data-type="line"
                                 data-axis-min="0"
                                 data-axis-step="30"
@@ -170,9 +170,9 @@
     </div>
 </section>
 
-<section aria-labelledby="eng-maths-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="eng-maths-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="eng-maths-heading">Grade achieved in English and maths GCSEs</h2>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="engMathsGrade">Grade</label>
             <select class="govuk-select"
@@ -193,7 +193,7 @@
             </select>
         </div>
     </div>
-    <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6 govuk-!-margin-bottom-3" data-module="govuk-tabs">
+    <div class="app-measure-tabs govuk-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#eng-maths-charts">Charts</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-table-view">Table</a></li>
@@ -202,13 +202,13 @@
         <div class="govuk-tabs__panel" id="eng-maths-charts">
             <content-toggle>
                 <toggle-content id="eng-maths-three-year-average" name="@ks4CurrentYear" active="true">
-                    <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                         @{
                             var engMathsBarData = new decimal?[] { Model.SchoolEngMathsYearByYear.Current, Model.SimilarSchoolsEngMathsYearByYear.Current, Model.LocalAuthorityEngMathsYearByYear.Current, Model.EnglandEngMathsYearByYear.Current };
                         }
                         @if (HasAnyData(engMathsBarData))
                         {
-                            <canvas id="eng-maths-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))'></canvas>
+                            <canvas id="eng-maths-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))'></canvas>
                         }
                         else
                         {
@@ -217,8 +217,8 @@
                     </div>
                 </toggle-content>
                 <toggle-content id="eng-maths-year-by-year" name="Year by year">
-                    <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                        <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMathsYearByYear.Previous2, Model.SchoolEngMathsYearByYear.Previous, Model.SchoolEngMathsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMathsYearByYear.Previous2, Model.SimilarSchoolsEngMathsYearByYear.Previous, Model.SimilarSchoolsEngMathsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMathsYearByYear.Previous2, Model.LocalAuthorityEngMathsYearByYear.Previous, Model.LocalAuthorityEngMathsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMathsYearByYear.Previous2, Model.EnglandEngMathsYearByYear.Previous, Model.EnglandEngMathsYearByYear.Current } } } }))'></canvas>
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMathsYearByYear.Previous2, Model.SchoolEngMathsYearByYear.Previous, Model.SchoolEngMathsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMathsYearByYear.Previous2, Model.SimilarSchoolsEngMathsYearByYear.Previous, Model.SimilarSchoolsEngMathsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMathsYearByYear.Previous2, Model.LocalAuthorityEngMathsYearByYear.Previous, Model.LocalAuthorityEngMathsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMathsYearByYear.Previous2, Model.EnglandEngMathsYearByYear.Previous, Model.EnglandEngMathsYearByYear.Current } } } }))'></canvas>
                     </div>
                 </toggle-content>
             </content-toggle>
@@ -274,9 +274,9 @@
     </div>
 </section>
 
-<section aria-labelledby="destinations-heading" class="app-ks4-attainment govuk-!-margin-top-7">
+<section aria-labelledby="destinations-heading" class="app-measure-section">
     <h2 class="govuk-heading-m" id="destinations-heading">Staying in education or entering employment</h2>
-    <details class="govuk-details app-ks4-copy govuk-!-margin-bottom-3 app-ks4-details" data-module="govuk-details">
+    <details class="govuk-details app-measure-details" data-module="govuk-details">
         <summary class="govuk-details__summary">
             <span class="govuk-details__summary-text">Information about staying in education or entering employment data</span>
         </summary>
@@ -289,7 +289,7 @@
             </p>
         </div>
     </details>
-    <div class="app-ks4-filter-row govuk-!-margin-bottom-6">
+    <div class="app-measure-filter-row">
         <div class="govuk-form-group">
             <label class="govuk-label govuk-!-font-weight-bold" for="destinationsType">Destination</label>
             <select class="govuk-select"
@@ -311,7 +311,7 @@
             </select>
         </div>
     </div>
-    <div class="app-ks4-tabs govuk-tabs govuk-!-margin-top-6" data-module="govuk-tabs">
+    <div class="app-measure-tabs govuk-tabs" data-module="govuk-tabs">
         <ul class="govuk-tabs__list">
             <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#destinations-charts">Charts</a></li>
             <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-table-view">Table</a></li>
@@ -320,13 +320,13 @@
         <div class="govuk-tabs__panel" id="destinations-charts">
             <content-toggle>
                 <toggle-content id="destinations-three-year-average" name="@destinationsCurrentYear" active="true">
-                    <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
                         @{
                             var destinationsBarData = new decimal?[] { Model.SchoolDestinationsYearByYear.Current, Model.SimilarSchoolsDestinationsYearByYear.Current, Model.LocalAuthorityDestinationsYearByYear.Current, Model.EnglandDestinationsYearByYear.Current };
                         }
                         @if (HasAnyData(destinationsBarData))
                         {
-                            <canvas id="destinations-school-chart" class="js-chart js-chart--school-ks4-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = destinationsBarData }))'></canvas>
+                            <canvas id="destinations-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = destinationsBarData }))'></canvas>
                         }
                         else
                         {
@@ -335,8 +335,8 @@
                     </div>
                 </toggle-content>
                 <toggle-content id="destinations-year-by-year" name="Year by year">
-                    <div class="app-ks4-chart-container app-ks4-chart-container--school-headline">
-                        <canvas id="destinations-school-yearbyyear-chart" class="js-chart js-chart--school-ks4-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = destinationsYearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolDestinationsYearByYear.Previous2, Model.SchoolDestinationsYearByYear.Previous, Model.SchoolDestinationsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsDestinationsYearByYear.Previous2, Model.SimilarSchoolsDestinationsYearByYear.Previous, Model.SimilarSchoolsDestinationsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityDestinationsYearByYear.Previous2, Model.LocalAuthorityDestinationsYearByYear.Previous, Model.LocalAuthorityDestinationsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandDestinationsYearByYear.Previous2, Model.EnglandDestinationsYearByYear.Previous, Model.EnglandDestinationsYearByYear.Current } } } }))'></canvas>
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        <canvas id="destinations-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = destinationsYearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolDestinationsYearByYear.Previous2, Model.SchoolDestinationsYearByYear.Previous, Model.SchoolDestinationsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsDestinationsYearByYear.Previous2, Model.SimilarSchoolsDestinationsYearByYear.Previous, Model.SimilarSchoolsDestinationsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityDestinationsYearByYear.Previous2, Model.LocalAuthorityDestinationsYearByYear.Previous, Model.LocalAuthorityDestinationsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandDestinationsYearByYear.Previous2, Model.EnglandDestinationsYearByYear.Previous, Model.EnglandDestinationsYearByYear.Current } } } }))'></canvas>
                     </div>
                 </toggle-content>
             </content-toggle>
@@ -397,8 +397,11 @@
 @section Scripts {
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/chart-factory.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/similar-schools-tabs-mobile-fix.js" asp-append-version="true" add-nonce="true"></script>
 }

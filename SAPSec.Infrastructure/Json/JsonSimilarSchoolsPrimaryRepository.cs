@@ -5,27 +5,28 @@ namespace SAPSec.Infrastructure.Json;
 
 public class JsonSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRepository
 {
-    private readonly IJsonFile<SimilarSchoolsPrimaryGroupsEntry> _similarSchoolsGroups;
-    private readonly IJsonFile<SimilarSchoolsPrimaryValuesEntry> _similarSchoolsValues;
+    private readonly IJsonFile<SimilarSchoolsPrimaryGroupsEntry> _groupsFile;
+    private readonly IJsonFile<SimilarSchoolsPrimaryValuesEntry> _valuesFile;
 
     public JsonSimilarSchoolsPrimaryRepository(
-        IJsonFile<SimilarSchoolsPrimaryGroupsEntry> similarSchoolsGroupsRepository,
-        IJsonFile<SimilarSchoolsPrimaryValuesEntry> similarSchoolsValuesRepository)
+        IJsonFile<SimilarSchoolsPrimaryGroupsEntry> groupsFile,
+        IJsonFile<SimilarSchoolsPrimaryValuesEntry> valuesFile)
     {
-        _similarSchoolsGroups = similarSchoolsGroupsRepository;
-        _similarSchoolsValues = similarSchoolsValuesRepository;
+        _groupsFile = groupsFile;
+        _valuesFile = valuesFile;
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)
+    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetGroupAsync(string urn)
     {
-        var rows = await _similarSchoolsGroups.ReadAllAsync();
+        var rows = await _groupsFile.ReadAllAsync();
         return rows
             .Where(r => r.URN == urn)
             .ToList()
             .AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryValuesEntry>> GetPrimaryValuesByUrnsAsync(IEnumerable<string> urns)
+    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryValuesEntry>> GetValuesByUrnsAsync(
+        IEnumerable<string> urns)
     {
         if (urns is null)
         {
@@ -38,7 +39,7 @@ public class JsonSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryReposit
             return Array.Empty<SimilarSchoolsPrimaryValuesEntry>();
         }
 
-        var rows = await _similarSchoolsValues.ReadAllAsync();
+        var rows = await _valuesFile.ReadAllAsync();
         return rows
             .Where(r => urnList.Contains(r.URN))
             .ToList()
@@ -47,7 +48,7 @@ public class JsonSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryReposit
 
     public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
     {
-        var rows = await _similarSchoolsValues.ReadAllAsync();
+        var rows = await _valuesFile.ReadAllAsync();
         return rows.Select(r => r.URN).ToList();
     }
 }

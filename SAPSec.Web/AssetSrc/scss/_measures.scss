@@ -1,0 +1,302 @@
+$app-measure-color-school: #d53880;
+$app-measure-color-authority: #1d70b8;
+$app-measure-color-england: #003078;
+$app-measure-color-panel-bg: #f4f8fb;
+$app-measure-color-panel-tab: #e7ecf0;
+$app-measure-color-border: #b1b4b6;
+$app-measure-color-white: #ffffff;
+$app-measure-color-axis: #505a5f;
+$app-measure-color-grid: #d8d8d8;
+$app-measure-color-track: #f3f2f1;
+
+.app-school-page {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
+}
+
+.app-measure-section {
+  background: $app-measure-color-panel-bg;
+  padding: 16px;
+  margin-top: 60px !important;
+
+  & + & {
+    margin-top: 40px !important;
+  }
+}
+
+.app-measure-message-panel {
+  border-left: 5px solid $app-measure-color-border;
+  padding-left: 14px;
+  max-width: 660px;
+  margin-top: 4px;
+}
+
+.app-measure-details {
+  background: $app-measure-color-panel-bg;
+  margin-bottom: 20px !important;
+  max-width: 660px;
+  line-height: 1.45;
+
+  .govuk-details__summary {
+    background: $app-measure-color-panel-bg;
+  }
+
+  .govuk-details__summary-text {
+    text-decoration: none;
+  }
+
+  .app-measure-copy-list li {
+    margin-bottom: 4px;
+  }
+
+  @supports not (-ms-ime-align: auto) {
+    .govuk-details__summary:focus {
+      outline: 3px solid transparent;
+      color: #0b0c0c;
+      background-color: #fd0 !important;
+    }
+  }
+}
+
+.app-measure-filter-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  margin-bottom: 30px !important;
+}
+
+.app-measure-filter-row .govuk-form-group {
+  margin-bottom: 0;
+}
+
+.app-measure-filter-row .govuk-select {
+  min-width: 260px;
+}
+
+@media (max-width: 40.0625em) {
+  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link {
+    padding-left: 14px;
+    margin-left: 0;
+    color: #1d70b8;
+  }
+
+  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link:visited,
+  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link:hover {
+    color: #1d70b8;
+  }
+}
+
+/**************** TABS *****************/
+
+.app-measure-tabs {
+  margin-bottom: 0 !important;
+
+  .govuk-tabs__list {
+    background: $app-measure-color-panel-bg;
+    border-bottom: none;
+  }
+
+  .govuk-tabs__list-item {
+    background: $app-measure-color-panel-tab;
+  }
+
+  .govuk-tabs__list-item--selected {
+    background: $app-measure-color-white;
+    border: 1px solid $app-measure-color-border;
+    border-bottom: none;
+  }
+
+  .govuk-tabs__panel {
+    background: $app-measure-color-white;
+    padding: 16px;
+    padding-top: 20px;
+    border: 1px solid $app-measure-color-border;
+    margin-bottom: 0 !important;
+  }
+
+  .govuk-tabs__panel--hidden {
+    display: none !important;
+  }
+
+  [id$="table-view"] table {
+    .govuk-table__header.govuk-table__header--numeric {
+      width: 7rem;
+    }
+
+    .govuk-table__row:last-of-type {
+      .govuk-table__cell, .govuk-table__header {
+        border-bottom: none;
+      }
+    }
+  }
+
+  @media (max-width: 40.0625em) {
+    .govuk-tabs__list-item {
+      background: transparent !important;
+    }
+
+    .govuk-tabs__list-item--selected {
+      background: transparent !important;
+      border: 0 !important;
+      border-bottom: 0 !important;
+    }
+
+    .govuk-tabs__panel {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .govuk-table {
+      min-width: 40rem;
+    }
+  }
+}
+
+/**************** CHARTS *****************/
+
+.app-measure-chart-container {
+  display: flex;
+  flex-direction: column;
+  height: 260px;
+  max-width: 760px;
+  position: relative;
+}
+
+.app-measure-chart-container--school-headline {
+  height: 330px;
+}
+
+.app-measure-chart-container .js-chart {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.chart-legend--top {
+  flex: 0 0 auto;
+  margin-bottom: 12px;
+}
+
+.app-chart-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.app-chart-legend__item {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.app-chart-legend__item:last-child {
+  margin-bottom: 0;
+}
+
+.app-chart-legend__label {
+  color: #0b0c0c;
+}
+
+.app-chart-legend__box {
+  border-radius: 50%;
+  display: inline-block;
+  flex: 0 0 14px;
+  height: 14px;
+  width: 14px;
+}
+
+.app-chart-tooltip {
+  background: #ffffff;
+  border: 1px solid #b1b4b6;
+  border-radius: 5px;
+  color: #0b0c0c;
+  display: none;
+  left: 0;
+  max-width: 280px;
+  padding: 10px 12px;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  transform: translate(0, -50%);
+  z-index: 20;
+}
+
+.app-chart-tooltip--visible {
+  display: block;
+}
+
+.app-chart-tooltip__title {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.app-chart-tooltip__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.app-chart-tooltip__row {
+  align-items: center;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 14px 1fr auto;
+}
+
+.app-chart-tooltip__marker {
+  border-radius: 50%;
+  display: block;
+  height: 14px;
+  width: 14px;
+}
+
+.app-chart-tooltip__label,
+.app-chart-tooltip__value {
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.app-chart-tooltip__value {
+  font-weight: 700;
+}
+
+.js-chart {
+  --gds-font-family: "GDS Transport", Arial, sans-serif;
+  --gds-font-size: 14;
+  --gds-text: #0b0c0c;
+  --gds-grey: #b1b4b6;
+  --gds-grid-major: #0b0c0c;
+  --gds-grid-minor: #b1b4b6;
+  --gds-grid-x: #d8d8d8;
+  --gds-on-bar-label: #ffffff;
+  --gds-label-bg: #ffffff;
+  --gds-label-border: #b1b4b6;
+  --gds-label-padding: 4;
+  --chart-color-school: #de6b24;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-comparator: #27a0cc;
+  --chart-color-england: #003c56;
+  --chart-color-fallback: #6f777b;
+}
+
+.js-chart--school-measure-bar {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #2a1950;
+  --chart-color-england: #2a1950;
+}
+
+.js-chart--school-measure-line {
+  --chart-color-school: #ca357c;
+  --chart-color-similar-schools: #2a1950;
+  --chart-color-local-authority: #5694ca;
+  --chart-color-england: #4b9b7d;
+}

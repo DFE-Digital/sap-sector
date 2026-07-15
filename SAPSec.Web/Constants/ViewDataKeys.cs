@@ -8,4 +8,6 @@ public static class ViewDataKeys
     public const string BreadcrumbNode = nameof(BreadcrumbNode);
     public const string SchoolUrn = nameof(SchoolUrn);
     public const string SchoolName = nameof(SchoolName);
+    public const string SchoolLayout = nameof(SchoolLayout);
+    public const string SchoolNavigation = nameof(SchoolNavigation);
 }

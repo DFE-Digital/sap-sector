@@ -1,12 +1,10 @@
-﻿using SAPSec.Core.Constants;
-
-namespace SAPSec.Core.Model;
+﻿namespace SAPSec.Core.Model;
 
 /// <summary>
 /// School details with data availability information.
 /// Pure data container - all logic is in the service layer.
 /// </summary>
-public  class SchoolDetails
+public class SchoolDetails
 {
     // Identifiers
     public required string Urn { get; init; }

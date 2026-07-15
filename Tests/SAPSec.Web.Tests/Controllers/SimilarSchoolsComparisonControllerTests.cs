@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Services;
@@ -65,7 +65,7 @@ public class SimilarSchoolsComparisonControllerTests
             _repoMock.Object);
 
         _repoMock
-            .Setup(r => r.GetSimilarSchoolsSecondaryStandardDeviationsAsync())
+            .Setup(r => r.GetStandardDeviationsAsync())
             .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviationsEntry
             {
                 PPPerc = 13.983589m,
@@ -79,7 +79,7 @@ public class SimilarSchoolsComparisonControllerTests
                 KS2MRP = 2.527329m
             });
         _repoMock
-            .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+            .Setup(r => r.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         var characteristicsFormatter = new CharacteristicsComparisonFormatter();
@@ -296,7 +296,7 @@ public class SimilarSchoolsComparisonControllerTests
             .Setup(r => r.GetEstablishmentAsync(similarUrn))
             .ReturnsAsync(similarSchool);
         _repoMock
-            .Setup(r => r.GetSimilarSchoolsGroupAsync(It.IsAny<string>()))
+            .Setup(r => r.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(group.Select(g => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = g.URN }).ToList());
 
         //_schoolDetailsServiceMock
@@ -341,7 +341,7 @@ public class SimilarSchoolsComparisonControllerTests
         };
 
         _repoMock
-            .Setup(r => r.GetSecondaryValuesByUrnsAsync(
+            .Setup(r => r.GetValuesByUrnsAsync(
                 It.Is<IEnumerable<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
             .ReturnsAsync(values);
     }
@@ -349,7 +349,7 @@ public class SimilarSchoolsComparisonControllerTests
     private void SetupGroupSecondaryValues(string currentUrn, IReadOnlyCollection<string> groupUrns)
     {
         _repoMock
-            .Setup(r => r.GetSimilarSchoolsGroupAsync(currentUrn))
+            .Setup(r => r.GetGroupAsync(currentUrn))
             .ReturnsAsync(groupUrns.Select(urn => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = urn }).ToList());
 
         var groupValues = new List<SimilarSchoolsSecondaryValuesEntry>
@@ -382,7 +382,7 @@ public class SimilarSchoolsComparisonControllerTests
         };
 
         _repoMock
-            .Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(u => u.SequenceEqual(groupUrns))))
+            .Setup(r => r.GetValuesByUrnsAsync(It.Is<IEnumerable<string>>(u => u.SequenceEqual(groupUrns))))
             .ReturnsAsync(groupValues);
     }
 

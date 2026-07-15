@@ -8,11 +8,11 @@ public class FindPrimarySimilarSchools(
 {
     public async Task<FindPrimarySimilarSchoolsResponse> Execute(FindPrimarySimilarSchoolsRequest request)
     {
-        var groups = await similarSchoolsRepository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
+        var groups = await similarSchoolsRepository.GetGroupAsync(request.CurrentSchoolUrn);
         var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]).Distinct().ToArray();
 
         var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-        var values = SimilarSchoolsPrimaryValues.FromData(await similarSchoolsRepository.GetPrimaryValuesByUrnsAsync(urns))
+        var values = SimilarSchoolsPrimaryValues.FromData(await similarSchoolsRepository.GetValuesByUrnsAsync(urns))
             .ToDictionary(v => v.Urn, v => v);
 
         var currentEstablishment = establishments.FirstOrDefault(e => e.URN == request.CurrentSchoolUrn);

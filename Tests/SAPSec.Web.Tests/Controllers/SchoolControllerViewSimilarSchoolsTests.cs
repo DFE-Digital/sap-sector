@@ -241,7 +241,7 @@ public class SimilarSchoolsControllerTests
             .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
             .ReturnsAsync([currentSchool, .. similarSchools]);
         _similarSchoolsRepoMock
-            .Setup(x => x.GetSimilarSchoolsGroupAsync(urn))
+            .Setup(x => x.GetGroupAsync(urn))
             .ReturnsAsync(similarSchools.Select(s => new SimilarSchoolsSecondaryGroupsEntry { URN = urn, NeighbourURN = s.URN }).ToList());
         _absenceRepoMock
             .Setup(r => r.GetByUrnAsync(It.IsAny<string>()))

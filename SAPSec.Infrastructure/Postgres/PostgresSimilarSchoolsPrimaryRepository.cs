@@ -18,7 +18,7 @@ public class PostgresSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRep
         _factory = factory;
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetSimilarSchoolsGroupAsync(string urn)
+    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetGroupAsync(string urn)
     {
         const string sql = """
             SELECT *
@@ -34,7 +34,7 @@ public class PostgresSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRep
             .AsReadOnly();
     }
 
-    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryValuesEntry>> GetPrimaryValuesByUrnsAsync(IEnumerable<string> urns)
+    public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns)
     {
         if (!urns.Any())
         {

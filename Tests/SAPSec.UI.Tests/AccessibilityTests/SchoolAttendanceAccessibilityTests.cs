@@ -4,7 +4,7 @@ using Microsoft.Playwright;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
-namespace SAPSec.UI.Tests.AccessibilityTests;
+namespace SAPSec.UI.Tests.Deprecated.AccessibilityTests;
 
 [Collection("UITestsCollection")]
 public class SchoolAttendanceAccessibilityTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)

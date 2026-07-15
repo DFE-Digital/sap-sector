@@ -13,7 +13,7 @@ public class JsonSimilarSchoolsPrimaryRepositoryTests
         new(_groupsRepo.Object, _valuesRepo.Object);
 
     [Fact]
-    public async Task GetSimilarSchoolsGroupAsync_ReturnsNeighbourUrns()
+    public async Task GetGroupAsync_ReturnsNeighbourUrns()
     {
         _groupsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsPrimaryGroupsEntry>
         {
@@ -24,14 +24,14 @@ public class JsonSimilarSchoolsPrimaryRepositoryTests
 
         var sut = CreateSut();
 
-        var result = await sut.GetSimilarSchoolsGroupAsync("123456");
+        var result = await sut.GetGroupAsync("123456");
 
         result.Should().HaveCount(2);
         result.Select(r => r.NeighbourURN).Should().BeEquivalentTo("654321", "654322");
     }
 
     [Fact]
-    public async Task GetPrimaryValuesByUrnsAsync_ReturnsMatchedValues()
+    public async Task GetValuesByUrnsAsync_ReturnsMatchedValues()
     {
         _valuesRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(new List<SimilarSchoolsPrimaryValuesEntry>
         {
@@ -53,7 +53,7 @@ public class JsonSimilarSchoolsPrimaryRepositoryTests
 
         var sut = CreateSut();
 
-        var result = await sut.GetPrimaryValuesByUrnsAsync(["123456", "654321"]);
+        var result = await sut.GetValuesByUrnsAsync(["123456", "654321"]);
 
         result.Should().ContainSingle();
         result.Single().URN.Should().Be("123456");

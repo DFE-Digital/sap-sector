@@ -1,7 +1,7 @@
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
-using SAPSec.Test.Common.Repositories.InMemory;
+using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 

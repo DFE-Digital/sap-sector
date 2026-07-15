@@ -111,8 +111,8 @@
             return;
         }
 
-        var averageChart = firstPanel.querySelector(".app-ks4-chart-container");
-        var yearlyChart = secondPanel.querySelector(".app-ks4-chart-container");
+        var averageChart = firstPanel.querySelector(".app-measure-chart-container");
+        var yearlyChart = secondPanel.querySelector(".app-measure-chart-container");
 
         if (!averageChart || !yearlyChart || firstPanel.querySelector(".app-content-toggle")) {
             return;
@@ -176,7 +176,7 @@
     }
 
     function init() {
-        document.querySelectorAll(".app-ks4-tabs").forEach(initialiseTabSet);
+        document.querySelectorAll(".app-measure-tabs").forEach(initialiseTabSet);
     }
 
     if (document.readyState === "loading") {
