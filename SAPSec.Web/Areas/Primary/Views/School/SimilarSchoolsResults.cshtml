@@ -1,0 +1,56 @@
+@using SAPSec.Web.Areas.Primary.ViewModels
+@model PrimarySimilarSchoolsPageViewModel
+
+@if (Model.SimilarSchools.Any())
+{
+    <div class="results-bar govuk-!-margin-bottom-1">
+        <p class="govuk-body app-school-results-count">
+            Showing <strong>1-@Model.TotalResults</strong> of <strong>@Model.TotalResults</strong> similar schools
+        </p>
+    </div>
+
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
+
+    <ul class="govuk-list app-school-results" data-testid="primary-similar-schools-list">
+        @foreach (var school in Model.SimilarSchools)
+        {
+            <li class="app-school-result" id="similar-school-@school.Urn">
+                <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
+                   href="@school.ComparisonUrl">
+                    @school.Name
+                </a>
+
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    @school.LocalAuthorityName
+                </p>
+
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>Rank:</strong> @school.Rank
+                </p>
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>Distance:</strong> @school.Distance
+                </p>
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>Read/maths average:</strong> @school.Characteristics.ReadMatAverage
+                </p>
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>KS1 prior RWM:</strong> @school.Characteristics.Ks1PriorRwmAverage
+                </p>
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>Pupils:</strong> @school.Characteristics.PupilCount
+                </p>
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>FSM ever 6:</strong> @school.Characteristics.PupilPremiumEligibilityPercentage
+                </p>
+                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                    <strong>EAL:</strong> @school.Characteristics.PupilsWithEalPercentage
+                </p>
+            </li>
+        }
+    </ul>
+}
+else
+{
+    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
+    <p class="govuk-body">There are no similar schools available for this school.</p>
+}

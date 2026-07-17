@@ -3,102 +3,40 @@
 @{
     Layout = "_Layout";
     ViewData["Title"] = "View similar schools";
+    var hasVisibleResults = Model.SimilarSchools.Any();
 }
 
 <span class="govuk-caption-xl">@Model.CurrentSchool.Name</span>
 <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
 
 <p class="govuk-body">
-    We've identified <strong>@Model.SimilarSchools.Count</strong> similar primary phase schools for this school.
+    We've identified <strong>@Model.TotalResults</strong> similar primary phase schools for this school.
 </p>
-
 <p class="govuk-body">
     Select a school to compare characteristics in more detail and find the best match for peer learning.
 </p>
+<p class="govuk-body">
+    Find out <a href="@Routes.PrimarySchool(Model.CurrentSchool.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE identifies what a similar school is</a>.
+</p>
 
-<section class="govuk-!-margin-bottom-8" aria-labelledby="current-school-summary-heading">
-    <h2 class="govuk-heading-m" id="current-school-summary-heading">Current school summary</h2>
+<div class="govuk-grid-row app-similar-schools-content">
+    <partial name="SimilarSchoolsFilter.cshtml" model="Model" />
 
-    <dl class="govuk-summary-list" data-testid="primary-current-school-summary">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Local authority</dt>
-            <dd class="govuk-summary-list__value">@Model.CurrentSchoolLocalAuthorityName</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Read/maths average</dt>
-            <dd class="govuk-summary-list__value">@Model.CurrentSchoolCharacteristics.ReadMatAverage</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">KS1 prior RWM average</dt>
-            <dd class="govuk-summary-list__value">@Model.CurrentSchoolCharacteristics.Ks1PriorRwmAverage</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">FSM ever 6</dt>
-            <dd class="govuk-summary-list__value">@Model.CurrentSchoolCharacteristics.PupilPremiumEligibilityPercentage</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Pupils with EAL</dt>
-            <dd class="govuk-summary-list__value">@Model.CurrentSchoolCharacteristics.PupilsWithEalPercentage</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Pupil stability</dt>
-            <dd class="govuk-summary-list__value">@Model.CurrentSchoolCharacteristics.PupilStabilityRate</dd>
-        </div>
-    </dl>
-</section>
-
-<section aria-labelledby="similar-schools-heading">
-    <h2 class="govuk-heading-m" id="similar-schools-heading">Similar schools</h2>
-
-    <div class="results-bar govuk-!-margin-bottom-1">
-        <p class="govuk-body app-school-results-count">
-            Showing <strong>1-@Model.SimilarSchools.Count</strong> of <strong>@Model.SimilarSchools.Count</strong> similar schools
-        </p>
-    </div>
-
-    <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
-
-    <ul class="govuk-list app-school-results" data-testid="primary-similar-schools-list">
-        @foreach (var school in Model.SimilarSchools)
+    <div class="govuk-grid-column-two-thirds app-filter__results-column">
+        @if (hasVisibleResults)
         {
-            <li class="app-school-result" id="similar-school-@school.Urn">
-                <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
-                   href="@school.ComparisonUrl">
-                    @school.Name
-                </a>
+            <div id="listView">
+                <partial name="SimilarSchoolsResults.cshtml" model="Model" />
+                <partial name="SimilarSchoolsPagination.cshtml" model="Model" />
+            </div>
 
-                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                    @school.LocalAuthorityName
-                </p>
-
-                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                    <strong>Rank:</strong> @school.Rank
-                    <span class="govuk-!-margin-left-2"><strong>Distance:</strong> @school.Distance</span>
-                </p>
-
-                <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-top-3 govuk-!-margin-bottom-0">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Read/maths average</dt>
-                        <dd class="govuk-summary-list__value">@school.Characteristics.ReadMatAverage</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">KS1 prior RWM</dt>
-                        <dd class="govuk-summary-list__value">@school.Characteristics.Ks1PriorRwmAverage</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Pupils</dt>
-                        <dd class="govuk-summary-list__value">@school.Characteristics.PupilCount</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">FSM ever 6</dt>
-                        <dd class="govuk-summary-list__value">@school.Characteristics.PupilPremiumEligibilityPercentage</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">EAL</dt>
-                        <dd class="govuk-summary-list__value">@school.Characteristics.PupilsWithEalPercentage</dd>
-                    </div>
-                </dl>
-            </li>
+            <div id="mapView" class="govuk-!-display-none">
+                <partial name="SimilarSchoolsMap.cshtml" model="Model" />
+            </div>
         }
-    </ul>
-</section>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/school-search-toggle.js"></script>
+}

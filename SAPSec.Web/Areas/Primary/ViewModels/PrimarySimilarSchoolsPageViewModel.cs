@@ -11,6 +11,8 @@ public record PrimarySimilarSchoolsPageViewModel(
     PrimarySimilarSchoolsCharacteristicsViewModel CurrentSchoolCharacteristics,
     IReadOnlyCollection<PrimarySimilarSchoolsRowViewModel> SimilarSchools)
 {
+    public int TotalResults => SimilarSchools.Count;
+
     public static PrimarySimilarSchoolsPageViewModel FromResponse(
         FindPrimarySimilarSchoolsResponse response) =>
         new(
