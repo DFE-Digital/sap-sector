@@ -75,7 +75,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4HeadlineMeasures")]
+    [Route("ks4-headline-measures")]
     public async Task<IActionResult> Ks4HeadlineMeasures(
         string urn,
         string similarSchoolUrn,
@@ -135,7 +135,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4HeadlineMeasuresData")]
+    [Route("ks4-headline-measures/data")]
     public async Task<IActionResult> Ks4HeadlineMeasuresData(string urn, string similarSchoolUrn, string grade = "4")
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))

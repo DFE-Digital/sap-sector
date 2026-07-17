@@ -69,8 +69,8 @@ public static class Routes
 
         public string Overview => ComparisonBasePath;
         public string Similarity => $"{ComparisonBasePath}/Similarity";
-        public string KS4HeadlineMeasures => $"{ComparisonBasePath}/Ks4HeadlineMeasures";
-        public string KS4HeadlineMeasuresData => $"{ComparisonBasePath}/Ks4HeadlineMeasuresData";
+        public string KS4HeadlineMeasures => $"{ComparisonBasePath}/ks4-headline-measures";
+        public string KS4HeadlineMeasuresData => $"{ComparisonBasePath}/ks4-headline-measures/data";
         public string KS4CoreSubjects => $"{ComparisonBasePath}/Ks4CoreSubjects";
         public string KS4CoreSubjectsData => $"{ComparisonBasePath}/Ks4CoreSubjectsData";
         public string Attendance => $"{ComparisonBasePath}/attendance";
