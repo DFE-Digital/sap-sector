@@ -1,7 +1,8 @@
 using FluentAssertions;
+using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Test.Common.AngleSharp;
-using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -14,12 +15,93 @@ public class ViewSimilarSchoolsPageIntegrationTests(
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     [Fact]
-    public async Task ViewSimilarSchools_ShowsCurrentSchoolSummaryAndSimilarSchoolsTable()
+    public async Task ViewSimilarSchools_ShowsExistingSimilarSchoolFiltersAndResults()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001", "Test LA 1")),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002", "Test LA 2")),
-            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003", "Test LA 3")));
+            new Establishment
+            {
+                URN = "100001",
+                EstablishmentName = "Test School 1",
+                LAId = "001",
+                LAName = "Test LA 1",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                RegionId = "R1",
+                RegionName = "North East",
+                UrbanRuralId = "U1",
+                UrbanRuralName = "Urban",
+                TypeOfEstablishmentId = "34",
+                TypeOfEstablishmentName = "Academy converter",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "3",
+                GenderName = "Mixed",
+                NurseryProvisionName = "No",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                ResourcedProvisionId = "1",
+                ResourcedProvisionName = "Not applicable",
+                Easting = 100000,
+                Northing = 100000,
+                TotalCapacity = 300,
+                TotalPupils = 210
+            },
+            new Establishment
+            {
+                URN = "100002",
+                EstablishmentName = "Test School 2",
+                LAId = "002",
+                LAName = "Test LA 2",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                RegionId = "R1",
+                RegionName = "North East",
+                UrbanRuralId = "U1",
+                UrbanRuralName = "Urban",
+                TypeOfEstablishmentId = "34",
+                TypeOfEstablishmentName = "Academy converter",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "3",
+                GenderName = "Mixed",
+                NurseryProvisionName = "Yes",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                ResourcedProvisionId = "4",
+                ResourcedProvisionName = "Resourced provision",
+                Easting = 108046,
+                Northing = 100000,
+                TotalCapacity = 400,
+                TotalPupils = 220
+            },
+            new Establishment
+            {
+                URN = "100003",
+                EstablishmentName = "Test School 3",
+                LAId = "003",
+                LAName = "Test LA 3",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                RegionId = "R2",
+                RegionName = "South East",
+                UrbanRuralId = "R1",
+                UrbanRuralName = "Rural",
+                TypeOfEstablishmentId = "28",
+                TypeOfEstablishmentName = "Community school",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "2",
+                GenderName = "Girls",
+                NurseryProvisionName = "No",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                ResourcedProvisionId = "8",
+                ResourcedProvisionName = "SEN unit",
+                Easting = 180467,
+                Northing = 100000,
+                TotalCapacity = 500,
+                TotalPupils = 230
+            });
 
         Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
             new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = "100002", Rank = "1", Dist = "0.1" },
@@ -69,12 +151,21 @@ public class ViewSimilarSchoolsPageIntegrationTests(
                 Ks1PriorRwmAverage = "9.4"
             });
 
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            new EstablishmentAbsence { Id = "100001", Abs_Tot_Est_Current_Pct = "4.5", Abs_Persistent_Est_Current_Pct = "12.0" },
+            new EstablishmentAbsence { Id = "100002", Abs_Tot_Est_Current_Pct = "5.1", Abs_Persistent_Est_Current_Pct = "13.0" },
+            new EstablishmentAbsence { Id = "100003", Abs_Tot_Est_Current_Pct = "6.1", Abs_Persistent_Est_Current_Pct = "14.0" });
+
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.OK);
 
-        var summary = page.ElementWithTestIdShouldExist("primary-current-school-summary");
-        summary.TextContent.Should().Contain("102.4");
-        summary.TextContent.Should().Contain("11.4");
-        summary.TextContent.Should().Contain("20.2%");
+        var filter = page.ElementWithTestIdShouldExist("primary-similar-schools-filter");
+        filter.TextContent.Should().Contain("Filters");
+        filter.TextContent.Should().Contain("Location");
+        filter.TextContent.Should().Contain("Distance");
+        filter.TextContent.Should().Contain("Up to 5 miles");
+        filter.TextContent.Should().Contain("Region");
+        filter.TextContent.Should().Contain("School characteristics");
+        filter.TextContent.Should().Contain("Attendance");
 
         var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
         list.TextContent.Should().Contain("Test School 2");

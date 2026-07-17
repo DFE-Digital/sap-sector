@@ -71,11 +71,18 @@ public class SchoolController(
     public async Task<IActionResult> ViewSimilarSchools(string urn)
     {
         var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
-        var response = await findPrimarySimilarSchoolsUseCase.Execute(new(urn));
+        var response = await findPrimarySimilarSchoolsUseCase.Execute(new(
+            urn,
+            Request.Query
+                .Where(kvp => kvp.Key != "sortBy" && kvp.Key != "page")
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Where(v => !string.IsNullOrWhiteSpace(v))!.Select(v => v!),
+                    StringComparer.InvariantCultureIgnoreCase)));
 
         PopulateViewData(schoolInfoResponse.School);
 
-        return View(PrimarySimilarSchoolsPageViewModel.FromResponse(response));
+        return View(PrimarySimilarSchoolsPageViewModel.FromResponse(response, Request.Query));
     }
 
     [HttpGet]
