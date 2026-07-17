@@ -1,4 +1,5 @@
 using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
@@ -103,12 +104,28 @@ public class FindPrimarySimilarSchools(
     }
 
     private static PrimarySimilarSchool ToSimilarSchool(PrimaryRankedSimilarSchoolData school) =>
+        ToSimilarSchool(
+            school,
+            school.SimilarSchool.Coordinates is not null
+                ? CoordinateConverter.Convert(school.SimilarSchool.Coordinates)
+                : null);
+
+    private static PrimarySimilarSchool ToSimilarSchool(
+        PrimaryRankedSimilarSchoolData school,
+        GeographicCoordinates? coordinates) =>
         new(
             school.SimilarSchool.URN,
             school.SimilarSchool.Name,
             school.SimilarSchool.LocalAuthority.Name,
             school.Rank,
             school.Distance,
+            school.SimilarSchool.Address.Street,
+            school.SimilarSchool.Address.Locality,
+            school.SimilarSchool.Address.Address3,
+            school.SimilarSchool.Address.Town,
+            school.SimilarSchool.Address.Postcode,
+            coordinates?.Latitude,
+            coordinates?.Longitude,
             ToCharacteristics(school.Characteristics));
 
     private static PrimarySimilarSchoolCharacteristics ToCharacteristics(SimilarSchoolsPrimaryValues values) =>
@@ -147,6 +164,13 @@ public record PrimarySimilarSchool(
     string LocalAuthorityName,
     string Rank,
     string Distance,
+    string Street,
+    string Locality,
+    string Address3,
+    string Town,
+    string Postcode,
+    double? Latitude,
+    double? Longitude,
     PrimarySimilarSchoolCharacteristics Characteristics);
 
 public record PrimarySimilarSchoolCharacteristics(

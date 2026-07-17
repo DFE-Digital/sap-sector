@@ -45,6 +45,9 @@ public class PrimarySimilarSchoolsPageViewModel
                     row.Rank,
                     row.Distance,
                     Routes.PrimarySchool(response.CurrentSchool.Urn).SimilarSchoolComparison(row.Urn),
+                    BuildFullAddress(row.Street, row.Locality, row.Address3, row.Town, row.Postcode),
+                    row.Latitude?.ToString(CultureInfo.InvariantCulture),
+                    row.Longitude?.ToString(CultureInfo.InvariantCulture),
                     PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(row.Characteristics)))
                 .ToList()
                 .AsReadOnly(),
@@ -176,6 +179,19 @@ public class PrimarySimilarSchoolsPageViewModel
         return parts.Count > 0 ? "?" + string.Join("&", parts) : string.Empty;
     }
 
+    private static string BuildFullAddress(
+        string street,
+        string locality,
+        string address3,
+        string town,
+        string postcode)
+    {
+        var parts = new[] { street, locality, address3, town, postcode }
+            .Where(part => !string.IsNullOrWhiteSpace(part));
+
+        return string.Join(", ", parts);
+    }
+
 }
 
 public record PrimarySimilarSchoolsRowViewModel(
@@ -185,6 +201,9 @@ public record PrimarySimilarSchoolsRowViewModel(
     string Rank,
     string Distance,
     string ComparisonUrl,
+    string FullAddress,
+    string? Latitude,
+    string? Longitude,
     PrimarySimilarSchoolsCharacteristicsViewModel Characteristics);
 
 public record PrimarySimilarSchoolsCharacteristicsViewModel(
