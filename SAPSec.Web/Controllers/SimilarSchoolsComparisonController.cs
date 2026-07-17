@@ -18,7 +18,7 @@ namespace SAPSec.Web.Controllers;
 public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
-    private readonly GetAttendanceMeasures _getAttendanceMeasures;
+    private readonly GetAttendanceMeasuresUseCase _getAttendanceMeasures;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
     private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetKs4HeadlineMeasures _getKs4HeadlineMeasures;
@@ -28,7 +28,7 @@ public class SimilarSchoolsComparisonController : Controller
 
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
-        GetAttendanceMeasures getAttendanceMeasures,
+        GetAttendanceMeasuresUseCase getAttendanceMeasures,
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
         GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetKs4HeadlineMeasures getKs4HeadlineMeasures,

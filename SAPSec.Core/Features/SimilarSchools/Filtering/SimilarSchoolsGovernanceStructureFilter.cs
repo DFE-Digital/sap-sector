@@ -33,7 +33,7 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
     {
-        return items
+        var temp = items
             .GroupBy(FindGroup)
             .Select(g => new FilterOption(
                 g.Key!.Key,
@@ -47,6 +47,10 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
                 "MS" => 2,
                 _ => 3
             });
+
+        var c = temp.Count();
+
+        return temp;
     }
 
     private Group FindGroup(SimilarSchool i)

@@ -5,5 +5,7 @@ public static class Measures
     public static class Primary
     {
         public const string Ks2ExpectedRwm = "expected-rwm";
+        public const string TotalAbsence = "total-absence";
+        public const string PersistentAbsence = "persistent-absence";
     }
 }

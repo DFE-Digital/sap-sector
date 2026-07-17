@@ -1,3 +1,4 @@
+using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
@@ -15,6 +16,7 @@ using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.Services;
 using System.Diagnostics.CodeAnalysis;
+using static SAPSec.Core.Features.Attendance.GetAttendanceMeasuresUseCase;
 
 namespace SAPSec.Web.Extensions;
 
@@ -33,7 +35,7 @@ public static class DependenciesExtensions
         services.AddSingleton<GetSchoolKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4CoreSubjects>();
         services.AddSingleton<GetFilteredSchoolKs4CoreSubject>();
-        services.AddSingleton<GetAttendanceMeasures>();
+        services.AddSingleton<IUseCase<GetAttendanceMeasuresRequest, GetAttendanceMeasuresResponse>, GetAttendanceMeasuresUseCase>();
         services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<GetSimilarSchoolDetails>();
         services.AddSingleton<GetCharacteristicsComparison>();

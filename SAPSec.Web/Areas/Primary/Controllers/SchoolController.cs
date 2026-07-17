@@ -9,6 +9,7 @@ using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
+using static SAPSec.Core.Features.Attendance.GetAttendanceMeasuresUseCase;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -23,7 +24,8 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase)
+    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
+    IUseCase<GetAttendanceMeasuresRequest, GetAttendanceMeasuresResponse> getAttendanceMeasuresUseCase)
     : Controller
 {
     [HttpGet]
@@ -57,11 +59,18 @@ public class SchoolController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var response = await getAttendanceMeasuresUseCase.Execute(new(urn, PhaseOfEducationValues.Primary));
 
         PopulateViewData(response.School);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var model = new AttendanceMeasurePageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            TotalAbsence = MeasureViewModel.FromMeasure(response.TotalAbsence, response.School),
+            PersistentAbsence = MeasureViewModel.FromMeasure(response.PersistentAbsence, response.School)
+        };
+
+        return View(model);
     }
 
     [HttpGet]
