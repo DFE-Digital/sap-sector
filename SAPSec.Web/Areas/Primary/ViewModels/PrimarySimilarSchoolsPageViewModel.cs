@@ -34,7 +34,7 @@ public class PrimarySimilarSchoolsPageViewModel
     public int ShowingTo => Math.Min(CurrentPage * PageSize, TotalResults);
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
-    public bool HasActiveFilters => SelectedFilterTags.Any();
+    public bool HasActiveFilters => CurrentFilters.Any(kvp => kvp.Value.Any(v => !string.IsNullOrWhiteSpace(v)));
 
     public static PrimarySimilarSchoolsPageViewModel FromResponse(
         FindPrimarySimilarSchoolsResponse response,

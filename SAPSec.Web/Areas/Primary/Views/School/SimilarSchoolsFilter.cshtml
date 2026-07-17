@@ -38,16 +38,19 @@
                             </div>
                         </div>
 
-                        <ul class="moj-filter-tags app-filter__tags">
-                            @foreach (var tag in Model.SelectedFilterTags)
-                            {
-                                <li>
-                                    <a class="moj-filter__tag app-filter__tag" href="@tag.RemoveUrl">
-                                        <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
-                                    </a>
-                                </li>
-                            }
-                        </ul>
+                        @if (Model.SelectedFilterTags.Any())
+                        {
+                            <ul class="moj-filter-tags app-filter__tags">
+                                @foreach (var tag in Model.SelectedFilterTags)
+                                {
+                                    <li>
+                                        <a class="moj-filter__tag app-filter__tag" href="@tag.RemoveUrl">
+                                            <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
 
                         <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0 app-clear-filters-spacing">
                             <a class="govuk-link govuk-link--no-visited-state"
