@@ -58,7 +58,7 @@ public class SimilarSchoolsComparisonController : Controller
         Similarity(urn, similarSchoolUrn, similarityCalculation);
 
     [HttpGet]
-    [Route("Similarity")]
+    [Route("similarity")]
     public async Task<IActionResult> Similarity(
         string urn,
         string similarSchoolUrn,
@@ -214,7 +214,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4DestinationsData")]
+    [Route("ks4-destinations/data")]
     public async Task<IActionResult> Ks4DestinationsData(string urn, string similarSchoolUrn, string destination = "all")
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
@@ -287,7 +287,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4CoreSubjects")]
+    [Route("ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(
         string urn,
         string similarSchoolUrn,
@@ -314,7 +314,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4CoreSubjectsData")]
+    [Route("ks4-core-subjects/data")]
     public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string similarSchoolUrn, string subject = "english-language", string grade = "4")
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
@@ -483,7 +483,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("SchoolDetails")]
+    [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(
         string urn,
         string similarSchoolUrn,

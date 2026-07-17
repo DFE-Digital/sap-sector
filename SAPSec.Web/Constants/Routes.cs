@@ -68,14 +68,14 @@ public static class Routes
         private string ComparisonBasePath => $"{basePath}/view-similar-schools/{similarSchoolUrn}";
 
         public string Overview => ComparisonBasePath;
-        public string Similarity => $"{ComparisonBasePath}/Similarity";
+        public string Similarity => $"{ComparisonBasePath}/similarity";
         public string KS4HeadlineMeasures => $"{ComparisonBasePath}/ks4-headline-measures";
         public string KS4HeadlineMeasuresData => $"{ComparisonBasePath}/ks4-headline-measures/data";
-        public string KS4CoreSubjects => $"{ComparisonBasePath}/Ks4CoreSubjects";
-        public string KS4CoreSubjectsData => $"{ComparisonBasePath}/Ks4CoreSubjectsData";
+        public string KS4CoreSubjects => $"{ComparisonBasePath}/ks4-core-subjects";
+        public string KS4CoreSubjectsData => $"{ComparisonBasePath}/ks4-core-subjects/data";
         public string Attendance => $"{ComparisonBasePath}/attendance";
         public string AttendanceData => $"{ComparisonBasePath}/attendance-data";
-        public string SchoolDetails => $"{ComparisonBasePath}/SchoolDetails";
-        public string KS4DestinationsData => $"{ComparisonBasePath}/Ks4DestinationsData";
+        public string SchoolDetails => $"{ComparisonBasePath}/school-details";
+        public string KS4DestinationsData => $"{ComparisonBasePath}/ks4-destinations/data";
     }
 }
