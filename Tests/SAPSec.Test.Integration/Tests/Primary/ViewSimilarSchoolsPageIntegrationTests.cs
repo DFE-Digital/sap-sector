@@ -174,14 +174,10 @@ public class ViewSimilarSchoolsPageIntegrationTests(
         var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
         list.TextContent.Should().Contain("Test School 2");
         list.TextContent.Should().Contain("Test LA 2");
-        list.TextContent.Should().Contain("Rank: 1");
-        list.TextContent.Should().Contain("Distance: 0.1");
         list.TextContent.Should().Contain("Meeting expected standard in reading, writing and maths");
         list.TextContent.Should().Contain("81.0%");
         list.TextContent.Should().Contain("Test School 3");
         list.TextContent.Should().Contain("Test LA 3");
-        list.TextContent.Should().Contain("Rank: 2");
-        list.TextContent.Should().Contain("Distance: 0.2");
         list.TextContent.Should().Contain("78.0%");
 
         page.QuerySelector("#sort-by")?.TextContent.Should().Contain("Meeting expected standard in reading, writing and maths");

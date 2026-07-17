@@ -282,7 +282,7 @@ public class PrimarySimilarSchoolsPageViewModel
     private static string DisplaySortValue(DataWithAvailability<string> value) =>
         value.HasValue && value.Value is not null
             ? value.Value
-            : "Not available";
+            : string.Empty;
 
 }
 

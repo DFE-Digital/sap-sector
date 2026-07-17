@@ -39,16 +39,12 @@
                 <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
                     @school.LocalAuthorityName
                 </p>
-
-                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                    <strong>Rank:</strong> @school.Rank
-                </p>
-                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                    <strong>Distance:</strong> @school.Distance
-                </p>
-                <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
-                    <strong>@school.SortMetricName:</strong> @school.SortMetricDisplayValue
-                </p>
+                @if (!string.IsNullOrWhiteSpace(school.SortMetricDisplayValue))
+                {
+                    <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
+                        <strong>@school.SortMetricName:</strong> @school.SortMetricDisplayValue
+                    </p>
+                }
             </li>
         }
     </ul>
