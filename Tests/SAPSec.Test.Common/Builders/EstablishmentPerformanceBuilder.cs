@@ -7,12 +7,24 @@ public class EstablishmentPerformanceBuilder(string urn)
     string RwmExpected_Tot_Cohort_Est_Current_Num = string.Empty;
     string RwmExpected_Tot_Cohort_Est_Previous_Num = string.Empty;
     string RwmExpected_Tot_Cohort_Est_Previous2_Num = string.Empty;
+    string GpsExpected_Tot_Cohort_Est_Current_Num = string.Empty;
+    string GpsExpected_Tot_Cohort_Est_Previous_Num = string.Empty;
+    string GpsExpected_Tot_Cohort_Est_Previous2_Num = string.Empty;
 
     public EstablishmentPerformanceBuilder WithRwmExpected(string current, string prev, string prev2)
     {
         RwmExpected_Tot_Cohort_Est_Current_Num = current;
         RwmExpected_Tot_Cohort_Est_Previous_Num = prev;
         RwmExpected_Tot_Cohort_Est_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithGpsExpected(string current, string prev, string prev2)
+    {
+        GpsExpected_Tot_Cohort_Est_Current_Num = current;
+        GpsExpected_Tot_Cohort_Est_Previous_Num = prev;
+        GpsExpected_Tot_Cohort_Est_Previous2_Num = prev2;
 
         return this;
     }
@@ -24,5 +36,8 @@ public class EstablishmentPerformanceBuilder(string urn)
             RwmExpected_Tot_Cohort_Est_Current_Num = RwmExpected_Tot_Cohort_Est_Current_Num,
             RwmExpected_Tot_Cohort_Est_Previous_Num = RwmExpected_Tot_Cohort_Est_Previous_Num,
             RwmExpected_Tot_Cohort_Est_Previous2_Num = RwmExpected_Tot_Cohort_Est_Previous2_Num,
+            GpsExpected_Tot_Cohort_Est_Current_Num = GpsExpected_Tot_Cohort_Est_Current_Num,
+            GpsExpected_Tot_Cohort_Est_Previous_Num = GpsExpected_Tot_Cohort_Est_Previous_Num,
+            GpsExpected_Tot_Cohort_Est_Previous2_Num = GpsExpected_Tot_Cohort_Est_Previous2_Num,
         };
 }

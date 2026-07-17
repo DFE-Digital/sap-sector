@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http;
 using SAPSec.Core;
+using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
@@ -20,6 +22,8 @@ public class PrimarySimilarSchoolsPageViewModel
     public Dictionary<string, List<string>> CurrentFilters { get; init; } = new(StringComparer.InvariantCultureIgnoreCase);
     public List<SimilarSchoolsFilterGroupViewModel> FilterGroups { get; init; } = [];
     public List<SimilarSchoolsSelectedFilterTagViewModel> SelectedFilterTags { get; init; } = [];
+    public IReadOnlyCollection<SortOption> SortOptions { get; init; } = [];
+    public string SortBy { get; init; } = "RwmExpected";
     public IReadOnlyCollection<ValidationError> ValidationErrors { get; init; } = [];
     public int CurrentPage { get; init; } = 1;
     public int PageSize { get; init; } = 10;
@@ -58,6 +62,8 @@ public class PrimarySimilarSchoolsPageViewModel
                     BuildFullAddress(row.Street, row.Locality, row.Address3, row.Town, row.Postcode),
                     row.Latitude?.ToString(CultureInfo.InvariantCulture),
                     row.Longitude?.ToString(CultureInfo.InvariantCulture),
+                    row.SortMetricName,
+                    DisplaySortValue(row.SortMetricDisplayValue),
                     PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(row.Characteristics)))
                 .ToList()
                 .AsReadOnly(),
@@ -72,13 +78,17 @@ public class PrimarySimilarSchoolsPageViewModel
                     BuildFullAddress(row.Street, row.Locality, row.Address3, row.Town, row.Postcode),
                     row.Latitude?.ToString(CultureInfo.InvariantCulture),
                     row.Longitude?.ToString(CultureInfo.InvariantCulture),
+                    row.SortMetricName,
+                    DisplaySortValue(row.SortMetricDisplayValue),
                     PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(row.Characteristics)))
                 .ToList()
                 .AsReadOnly(),
             Urn = int.TryParse(response.CurrentSchool.Urn, out var urn) ? urn : 0,
             CurrentFilters = currentFilters,
             FilterGroups = BuildFilterGroups(filterOptions),
-            SelectedFilterTags = BuildSelectedFilterTags(filterOptions, currentFilters, response.CurrentSchool.Urn),
+            SelectedFilterTags = BuildSelectedFilterTags(filterOptions, currentFilters, response.CurrentSchool.Urn, response.SortOptions.FirstOrDefault(o => o.Selected)?.Key ?? "RwmExpected"),
+            SortOptions = response.SortOptions,
+            SortBy = response.SortOptions.FirstOrDefault(o => o.Selected)?.Key ?? "RwmExpected",
             ValidationErrors = response.ValidationErrors,
             CurrentPage = response.SimilarSchoolsPage.CurrentPage,
             PageSize = response.SimilarSchoolsPage.ItemsPerPage,
@@ -134,7 +144,8 @@ public class PrimarySimilarSchoolsPageViewModel
     private static List<SimilarSchoolsSelectedFilterTagViewModel> BuildSelectedFilterTags(
         IReadOnlyCollection<SimilarSchoolsAvailableFilter> filterOptions,
         Dictionary<string, List<string>> currentFilters,
-        string urn)
+        string urn,
+        string sortBy)
     {
         var tags = new List<SimilarSchoolsSelectedFilterTagViewModel>();
         var baseUrl = Routes.PrimarySchool(urn).ViewSimilarSchools;
@@ -145,7 +156,7 @@ public class PrimarySimilarSchoolsPageViewModel
             {
                 foreach (var option in single.Options.Where(o => o.Selected))
                 {
-                    var queryString = BuildQueryStringWithout(currentFilters, [(filter.Key, option.Key)]);
+                    var queryString = BuildQueryStringWithout(currentFilters, sortBy, [(filter.Key, option.Key)]);
                     tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, baseUrl + queryString));
                 }
             }
@@ -154,7 +165,7 @@ public class PrimarySimilarSchoolsPageViewModel
             {
                 foreach (var option in multi.Options.Where(o => o.Selected))
                 {
-                    var queryString = BuildQueryStringWithout(currentFilters, [(filter.Key, option.Key)]);
+                    var queryString = BuildQueryStringWithout(currentFilters, sortBy, [(filter.Key, option.Key)]);
                     tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, baseUrl + queryString));
                 }
             }
@@ -162,7 +173,7 @@ public class PrimarySimilarSchoolsPageViewModel
             if (filter is SimilarSchoolsNumericRangeAvailableFilter range
                 && (!string.IsNullOrWhiteSpace(range.From.Value) || !string.IsNullOrWhiteSpace(range.To.Value)))
             {
-                var queryString = BuildQueryStringWithout(currentFilters,
+                var queryString = BuildQueryStringWithout(currentFilters, sortBy,
                 [
                     (range.From.Key, range.From.Value),
                     (range.To.Key, range.To.Value)
@@ -185,9 +196,15 @@ public class PrimarySimilarSchoolsPageViewModel
 
     private static string BuildQueryStringWithout(
         Dictionary<string, List<string>> currentFilters,
+        string sortBy,
         IEnumerable<(string Key, string Value)> exclude)
     {
         var parts = new List<string>();
+
+        if (!string.IsNullOrWhiteSpace(sortBy))
+        {
+            parts.Add($"sortBy={Uri.EscapeDataString(sortBy)}");
+        }
 
         foreach (var (key, values) in currentFilters)
         {
@@ -209,6 +226,11 @@ public class PrimarySimilarSchoolsPageViewModel
     public string BuildPaginationQueryString(int page)
     {
         var queryParts = new List<string> { $"page={page}" };
+
+        if (!string.IsNullOrWhiteSpace(SortBy))
+        {
+            queryParts.Add($"sortBy={Uri.EscapeDataString(SortBy)}");
+        }
 
         foreach (var (key, values) in CurrentFilters)
         {
@@ -257,6 +279,11 @@ public class PrimarySimilarSchoolsPageViewModel
         return string.Join(", ", parts);
     }
 
+    private static string DisplaySortValue(DataWithAvailability<string> value) =>
+        value.HasValue && value.Value is not null
+            ? value.Value
+            : "Not available";
+
 }
 
 public record PrimarySimilarSchoolsRowViewModel(
@@ -269,6 +296,8 @@ public record PrimarySimilarSchoolsRowViewModel(
     string FullAddress,
     string? Latitude,
     string? Longitude,
+    string SortMetricName,
+    string SortMetricDisplayValue,
     PrimarySimilarSchoolsCharacteristicsViewModel Characteristics);
 
 public record PrimarySimilarSchoolsCharacteristicsViewModel(

@@ -2,6 +2,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
+using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
@@ -11,11 +12,13 @@ public class FindPrimarySimilarSchoolsTests
     private readonly InMemorySimilarSchoolsPrimaryRepository _similarSchoolsRepo = new();
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
     private readonly InMemoryAbsenceRepository _absenceRepo = new();
+    private readonly InMemoryKs2PerformanceRepository _performanceRepo;
     private readonly FindPrimarySimilarSchools _sut;
 
     public FindPrimarySimilarSchoolsTests()
     {
-        _sut = new FindPrimarySimilarSchools(_establishmentRepo, _similarSchoolsRepo, _absenceRepo);
+        _performanceRepo = new InMemoryKs2PerformanceRepository(_establishmentRepo);
+        _sut = new FindPrimarySimilarSchools(_establishmentRepo, _similarSchoolsRepo, _absenceRepo, _performanceRepo);
     }
 
     [Fact]
@@ -126,6 +129,9 @@ public class FindPrimarySimilarSchoolsTests
                 second.Characteristics.PupilPremiumEligibilityPercentage.Should().Be(30.5m);
             });
         response.FilterOptions.Should().NotBeEmpty();
+        response.SortOptions.Should().SatisfyRespectively(
+            o => o.Should().BeEquivalentTo(new { Key = "RwmExpected", Selected = true }),
+            o => o.Should().BeEquivalentTo(new { Key = "GpsExpected", Selected = false }));
         response.ValidationErrors.Should().BeEmpty();
     }
 
@@ -184,6 +190,34 @@ public class FindPrimarySimilarSchoolsTests
         response.FilterOptions.Should().Contain(x => x.Key == "ur");
         response.FilterOptions.Should().Contain(x => x.Key == "reg");
         response.FilterOptions.Should().Contain(x => x.Key == "oar");
+    }
+
+    [Fact]
+    public async Task SortsByGpsExpectedWhenSelected()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new Establishment { URN = "100001", EstablishmentName = "Current School", LAName = "LA One", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 210 },
+            new Establishment { URN = "100002", EstablishmentName = "Alpha School", LAName = "LA Two", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 220 },
+            new Establishment { URN = "100003", EstablishmentName = "Beta School", LAName = "LA Three", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 230 });
+
+        _similarSchoolsRepo.SetupGroups(
+            new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = "100002", Dist = "0.1", Rank = "1" },
+            new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = "100003", Dist = "0.2", Rank = "2" });
+
+        _similarSchoolsRepo.SetupValues(
+            new SimilarSchoolsPrimaryValuesEntry { URN = "100001", PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = "210", ReadMatAverage = "102", Ks1PriorRwmAverage = "11" },
+            new SimilarSchoolsPrimaryValuesEntry { URN = "100002", PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = "220", ReadMatAverage = "101", Ks1PriorRwmAverage = "10" },
+            new SimilarSchoolsPrimaryValuesEntry { URN = "100003", PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = "230", ReadMatAverage = "100", Ks1PriorRwmAverage = "9" });
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsExpected("60", "", "").WithRwmExpected("80", "", "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsExpected("70", "", "").WithRwmExpected("70", "", "")));
+
+        var response = await _sut.Execute(new("100001", SortBy: "GpsExpected"));
+
+        response.SimilarSchoolsPage.Select(x => x.Urn).Should().Equal("100003", "100002");
+        response.SimilarSchoolsPage.First().SortMetricName.Should().Be("Meeting expected standard in grammar, punctuation and spelling");
+        response.SortOptions.Should().Contain(x => x.Key == "GpsExpected" && x.Selected);
     }
 
     [Fact]
