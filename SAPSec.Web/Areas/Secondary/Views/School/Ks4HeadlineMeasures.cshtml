@@ -34,9 +34,9 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandDestinationsYearByYear, Display: Model.EnglandDestinationsDisplay)
     };
 
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).SimilarSchoolComparison(similarSchoolUrn);
-    string WhatIsSimilarSchoolUrl() => Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
+    string SimilarSchoolsUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).Comparison(similarSchoolUrn).Overview;
+    string WhatIsSimilarSchoolUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
 }
 <div class="app-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -180,7 +180,7 @@
                     id="engMathsGrade"
                     name="engMathsGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4HeadlineMeasuresData", "School", new { urn = Model.SchoolDetails.Urn })"
+                    data-endpoint="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4HeadlineMeasuresData"
                     data-query-key="grade"
                     data-bar-chart-id="eng-maths-school-chart"
                     data-line-chart-id="eng-maths-school-yearbyyear-chart"
@@ -297,7 +297,7 @@
                     id="destinationsType"
                     name="destinationsType"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4DestinationsData", "School", new { urn = Model.SchoolDetails.Urn })"
+                    data-endpoint="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4DestinationsData"
                     data-query-key="destination"
                     data-bar-chart-id="destinations-school-chart"
                     data-line-chart-id="destinations-school-yearbyyear-chart"

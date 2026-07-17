@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
@@ -8,8 +9,8 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SimilarSchoolsPath = "/school/secondary/108088/view-similar-schools";
-    private const string NoResultsSimilarSchoolsPath = "/school/secondary/108088/view-similar-schools?ur=doesnotexist";
+    private static readonly string SimilarSchoolsPath = Routes.SecondarySchool("108088").ViewSimilarSchools;
+    private static readonly string NoResultsSimilarSchoolsPath = $"{Routes.SecondarySchool("108088").ViewSimilarSchools}?ur=doesnotexist";
 
     [Fact]
     public async Task SimilarSchoolsPage_LoadsSuccessfully()

@@ -30,9 +30,8 @@
     };
     var chartColors = new[] { "#D53780", "#2a1950", "#2a1950" };
     var lineChartColors = new[] { "#D53780", "#5694CA", "#28A197" };
-    var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
-    var whatIsSimilarSchoolUrl = Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn })
-        ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
+    var attendanceDataEndpoint = SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).AttendanceData;
+    var whatIsSimilarSchoolUrl = SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
 }
 
 <span class="govuk-caption-xl">@Model.SchoolName</span>

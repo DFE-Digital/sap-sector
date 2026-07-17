@@ -1,5 +1,6 @@
 using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Constants;
 using System.Net;
 
 namespace SAPSec.Test.Integration.Tests;
@@ -7,10 +8,15 @@ namespace SAPSec.Test.Integration.Tests;
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public class SimilarSchoolsComparisonIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
+    private static readonly string ComparisonOverviewPath =
+        Routes.SecondarySchool("108088").Comparison("137621").Similarity;
+    private static readonly string ComparisonSchoolDetailsPath =
+        Routes.SecondarySchool("108088").Comparison("137621").SchoolDetails;
+
     [Fact]
     public async Task GetSimilarity_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/Similarity");
+        var response = await fixture.Client.GetAsync(ComparisonOverviewPath);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -19,7 +25,7 @@ public class SimilarSchoolsComparisonIntegrationTests(JsonRepositoryIntegrationT
     [Fact]
     public async Task GetSimilarity_ContainsComparisonHeadingAndTable()
     {
-        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/Similarity");
+        var response = await fixture.Client.GetAsync(ComparisonOverviewPath);
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -31,7 +37,7 @@ public class SimilarSchoolsComparisonIntegrationTests(JsonRepositoryIntegrationT
     [Fact]
     public async Task GetSchoolDetails_HomeBreadcrumb_LinksToSchoolSearch()
     {
-        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/SchoolDetails");
+        var response = await fixture.Client.GetAsync(ComparisonSchoolDetailsPath);
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -41,7 +47,7 @@ public class SimilarSchoolsComparisonIntegrationTests(JsonRepositoryIntegrationT
     [Fact]
     public async Task GetSchoolDetails_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/SchoolDetails");
+        var response = await fixture.Client.GetAsync(ComparisonSchoolDetailsPath);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("text/html");
@@ -50,7 +56,7 @@ public class SimilarSchoolsComparisonIntegrationTests(JsonRepositoryIntegrationT
     [Fact]
     public async Task GetSchoolDetails_ContainsExpectedSections()
     {
-        var response = await fixture.Client.GetAsync("/school/secondary/108088/view-similar-schools/137621/SchoolDetails");
+        var response = await fixture.Client.GetAsync(ComparisonSchoolDetailsPath);
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);

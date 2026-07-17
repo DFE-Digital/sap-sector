@@ -1,6 +1,7 @@
 using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
@@ -9,7 +10,7 @@ namespace SAPSec.UI.Tests.Deprecated.AccessibilityTests;
 [Collection("UITestsCollection")]
 public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolDetailsPath = "/school/secondary/105574/school-details";
+    private static readonly string SchoolDetailsPath = Routes.SecondarySchool("105574").SchoolDetails;
 
     private async Task NavigateToSchoolDetailsAsync()
     {

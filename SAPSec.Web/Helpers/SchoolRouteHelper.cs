@@ -33,32 +33,65 @@ public static class SchoolRouteHelper
     }
 
     private static string GetPrimaryPath(PathString requestPath, string urn)
-    {
-        var path = requestPath.Value ?? string.Empty;
-
-        return path.ToLowerInvariant() switch
-        {
-            var p when p.EndsWith("/attendance") => $"/school/primary/{urn}/attendance",
-            var p when p.EndsWith("/school-details") => $"/school/primary/{urn}/school-details",
-            var p when p.EndsWith("/what-is-a-similar-school") => $"/school/primary/{urn}/what-is-a-similar-school",
-            var p when p.EndsWith("/view-similar-schools") => $"/school/primary/{urn}/view-similar-schools",
-            var p when p.EndsWith("/similar-schools") => $"/school/primary/{urn}/view-similar-schools",
-            _ => $"/school/primary/{urn}"
-        };
-    }
+        => ReplaceSchoolPath(requestPath, urn, Routes.PrimarySchool(urn).Overview);
 
     private static string GetSecondaryPath(PathString requestPath, string urn)
+        => ReplaceSchoolPath(requestPath, urn, Routes.SecondarySchool(urn).Overview);
+
+    private static string ReplaceSchoolPath(PathString requestPath, string urn, string targetBasePath)
     {
         var path = requestPath.Value ?? string.Empty;
+        var normalizedPath = path.EndsWith("/similar-schools", StringComparison.OrdinalIgnoreCase)
+            ? path[..^"/similar-schools".Length] + "/view-similar-schools"
+            : path;
+        var primaryRoutes = Routes.PrimarySchool(urn);
+        var secondaryRoutes = Routes.SecondarySchool(urn);
 
-        return path.ToLowerInvariant() switch
+        foreach (var sourceBasePath in new[]
         {
-            var p when p.EndsWith("/attendance") => Routes.SecondarySchool(urn).Attendance,
-            var p when p.EndsWith("/school-details") => Routes.SecondarySchool(urn).SchoolDetails,
-            var p when p.EndsWith("/what-is-a-similar-school") => Routes.SecondarySchool(urn).WhatIsASimilarSchool,
-            var p when p.EndsWith("/view-similar-schools") => Routes.SecondarySchool(urn).ViewSimilarSchools,
-            var p when p.EndsWith("/similar-schools") => Routes.SecondarySchool(urn).ViewSimilarSchools,
-            _ => Routes.SecondarySchool(urn).Overview
-        };
+            $"/school/{urn}",
+            primaryRoutes.Overview,
+            secondaryRoutes.Overview
+        })
+        {
+            if (normalizedPath.StartsWith(sourceBasePath, StringComparison.OrdinalIgnoreCase))
+            {
+                var candidatePath = targetBasePath + normalizedPath[sourceBasePath.Length..];
+                return IsSupportedTargetPath(candidatePath, primaryRoutes, secondaryRoutes)
+                    ? candidatePath
+                    : targetBasePath;
+            }
+        }
+
+        return targetBasePath;
+    }
+
+    private static bool IsSupportedTargetPath(string candidatePath, Routes.Primary primaryRoutes, Routes.Secondary secondaryRoutes)
+    {
+        var supportedPaths = candidatePath.StartsWith(primaryRoutes.Overview, StringComparison.OrdinalIgnoreCase)
+            ? new[]
+            {
+                primaryRoutes.Overview,
+                primaryRoutes.Attendance,
+                primaryRoutes.SchoolDetails,
+                primaryRoutes.WhatIsASimilarSchool,
+                primaryRoutes.ViewSimilarSchools
+            }
+            : new[]
+            {
+                secondaryRoutes.Overview,
+                secondaryRoutes.Attendance,
+                secondaryRoutes.AttendanceData,
+                secondaryRoutes.SchoolDetails,
+                secondaryRoutes.WhatIsASimilarSchool,
+                secondaryRoutes.ViewSimilarSchools,
+                secondaryRoutes.KS4HeadlineMeasures,
+                secondaryRoutes.KS4HeadlineMeasuresData,
+                secondaryRoutes.KS4DestinationsData,
+                secondaryRoutes.KS4CoreSubjects,
+                secondaryRoutes.KS4CoreSubjectsData
+            };
+
+        return supportedPaths.Any(path => candidatePath.Equals(path, StringComparison.OrdinalIgnoreCase));
     }
 }

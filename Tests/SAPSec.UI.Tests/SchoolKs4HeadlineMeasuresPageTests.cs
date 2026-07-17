@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using System.Text.Json;
 using Xunit;
@@ -9,7 +10,7 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string Path = "/school/secondary/105574/ks4-headline-measures";
+    private static readonly string Path = Routes.SecondarySchool("105574").KS4HeadlineMeasures;
 
     private async Task NavigateAsync()
     {

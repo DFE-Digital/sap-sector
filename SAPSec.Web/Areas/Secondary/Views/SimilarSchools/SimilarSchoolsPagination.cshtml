@@ -2,7 +2,7 @@
 @model SimilarSchoolsPageViewModel
 
 @{
-    var baseUrl = Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.Urn });
+    var baseUrl = SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn.ToString()).ViewSimilarSchools;
 }
 
 @if (Model.TotalPages > 1)

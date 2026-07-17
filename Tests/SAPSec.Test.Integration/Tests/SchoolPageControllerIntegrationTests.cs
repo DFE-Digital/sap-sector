@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Constants;
 using System.Net;
 
 namespace SAPSec.Test.Integration.Tests;
@@ -7,7 +8,7 @@ namespace SAPSec.Test.Integration.Tests;
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public class SchoolPageControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture) : IClassFixture<JsonRepositoryIntegrationTestFixture>
 {
-    private const string SchoolPagePath = "/school/secondary/108088";
+    private static readonly string SchoolPagePath = Routes.SecondarySchool("108088").Overview;
 
     #region Authentication Tests
 

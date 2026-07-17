@@ -11,7 +11,6 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 
 [Area("Secondary")]
 [Route("school/secondary/{urn}")]
-[Route("school/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SimilarSchoolsController : Controller
@@ -94,13 +93,7 @@ public class SimilarSchoolsController : Controller
     [Route("similar-schools")]
     public IActionResult Index(string urn)
     {
-        var url = Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn });
-        if (string.IsNullOrEmpty(url))
-        {
-            return RedirectToAction(nameof(ViewSimilarSchools), new { urn });
-        }
-
-        return Redirect(url + Request.QueryString);
+        return Redirect(Routes.SecondarySchool(urn).ViewSimilarSchools + Request.QueryString);
     }
 
     private static Dictionary<string, IEnumerable<string>> BuildCoreFilters(IQueryCollection query)
@@ -168,9 +161,7 @@ public class SimilarSchoolsController : Controller
         string urn)
     {
         var tags = new List<SimilarSchoolsSelectedFilterTagViewModel>();
-        var baseUrl = Url is null
-            ? Routes.SecondarySchool(urn).ViewSimilarSchools
-            : Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn }) ?? Routes.SecondarySchool(urn).ViewSimilarSchools;
+        var baseUrl = Routes.SecondarySchool(urn).ViewSimilarSchools;
 
         foreach (var filter in filterOptions)
         {

@@ -23,8 +23,7 @@
     };
     var chartColors = new[] { "#d53880", "#2a1950", "#2a1950" };
     var lineChartColors = new[] { "#D53780", "#003078", "#28A197" };
-    var attendanceDataEndpoint = Url.Action("AttendanceData", "SimilarSchoolsComparison",
-        new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn });
+    var attendanceDataEndpoint = Routes.SecondarySchool(Model.Urn).Comparison(Model.SimilarSchoolUrn).AttendanceData;
 }
 
 <h1 class="govuk-heading-l">Attendance measures</h1>

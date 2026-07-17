@@ -17,7 +17,7 @@
     </button>
 
     <form method="get"
-          action="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.Urn })"
+          action="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn.ToString()).ViewSimilarSchools"
           id="app-filter-panel"
           class="app-filter-panel @panelVisibleClass">
 
@@ -53,7 +53,7 @@
 
                         <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0 app-clear-filters-spacing">
                             <a class="govuk-link govuk-link--no-visited-state"
-                               href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.Urn })">
+                               href="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn.ToString()).ViewSimilarSchools">
                                 Clear filters
                             </a>
                         </p>

@@ -47,7 +47,7 @@
     Select a school to compare further and connect with for support. You can also refine the results by applying filters.
 </p>
 <p class="govuk-body">
-    Find out <a href="@Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.Urn })" class="govuk-link">how DfE identifies what a similar school is</a>.
+    Find out <a href="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn.ToString()).WhatIsASimilarSchool" class="govuk-link">how DfE identifies what a similar school is</a>.
 </p>
 
 <div class="govuk-grid-row app-similar-schools-content">

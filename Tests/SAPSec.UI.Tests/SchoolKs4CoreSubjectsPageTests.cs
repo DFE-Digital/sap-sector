@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
@@ -8,7 +9,7 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string PagePath = "/school/secondary/105574/ks4-core-subjects";
+    private static readonly string PagePath = Routes.SecondarySchool("105574").KS4CoreSubjects;
 
     [Fact]
     public async Task Ks4CoreSubjects_LoadsEnglishLanguagePage()

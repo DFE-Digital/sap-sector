@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using SAPSec.Core.Model;
+using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 
@@ -30,7 +31,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/school/primary/123456");
+            .Which.Url.Should().Be(Routes.PrimarySchool("123456").Overview);
     }
 
     [Fact]
@@ -49,7 +50,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/school/secondary/123456");
+            .Which.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -67,7 +68,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/school/primary/123456");
+            .Which.Url.Should().Be(Routes.PrimarySchool("123456").Overview);
     }
 
     [Fact]
@@ -87,7 +88,7 @@ public class RequireSchoolPhaseFilterTests
             pathBase: "/app");
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/app/school/secondary/123456");
+            .Which.Url.Should().Be("/app" + Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -122,7 +123,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/school/primary/123456/attendance");
+            .Which.Url.Should().Be(Routes.PrimarySchool("123456").Attendance);
     }
 
     [Fact]
@@ -140,7 +141,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be("/school/primary/123456");
+            .Which.Url.Should().Be(Routes.PrimarySchool("123456").Overview);
     }
 
     [Fact]
@@ -234,24 +235,24 @@ public class RequireSchoolPhaseFilterTests
         {
             return action switch
             {
-                "Ks2" => $"/school/primary/{urn}/ks2",
-                "Attendance" => $"/school/primary/{urn}/attendance",
-                "SchoolDetails" => $"/school/primary/{urn}/school-details",
-                "WhatIsASimilarSchool" => $"/school/primary/{urn}/what-is-a-similar-school",
-                "ViewSimilarSchools" => $"/school/primary/{urn}/view-similar-schools",
-                _ => $"/school/primary/{urn}"
+                "Ks2" => Routes.PrimarySchool(urn).KS2,
+                "Attendance" => Routes.PrimarySchool(urn).Attendance,
+                "SchoolDetails" => Routes.PrimarySchool(urn).SchoolDetails,
+                "WhatIsASimilarSchool" => Routes.PrimarySchool(urn).WhatIsASimilarSchool,
+                "ViewSimilarSchools" => Routes.PrimarySchool(urn).ViewSimilarSchools,
+                _ => Routes.PrimarySchool(urn).Overview
             };
         }
 
         return action switch
         {
-            "Attendance" => $"/school/secondary/{urn}/attendance",
-            "AttendanceData" => $"/school/secondary/{urn}/attendance-data",
-            "SchoolDetails" => $"/school/secondary/{urn}/school-details",
-            "WhatIsASimilarSchool" => $"/school/secondary/{urn}/what-is-a-similar-school",
-            "ViewSimilarSchools" => $"/school/secondary/{urn}/view-similar-schools",
-            "Ks4HeadlineMeasures" => $"/school/secondary/{urn}/ks4-headline-measures",
-            _ => $"/school/secondary/{urn}"
+            "Attendance" => Routes.SecondarySchool(urn).Attendance,
+            "AttendanceData" => Routes.SecondarySchool(urn).AttendanceData,
+            "SchoolDetails" => Routes.SecondarySchool(urn).SchoolDetails,
+            "WhatIsASimilarSchool" => Routes.SecondarySchool(urn).WhatIsASimilarSchool,
+            "ViewSimilarSchools" => Routes.SecondarySchool(urn).ViewSimilarSchools,
+            "Ks4HeadlineMeasures" => Routes.SecondarySchool(urn).KS4HeadlineMeasures,
+            _ => Routes.SecondarySchool(urn).Overview
         };
     }
 

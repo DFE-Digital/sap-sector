@@ -14,7 +14,6 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 
 [Area("Secondary")]
 [Route("school/secondary/{urn}/view-similar-schools/{similarSchoolUrn}")]
-[Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary, "urn", "similarSchoolUrn")]
 public class SimilarSchoolsComparisonController : Controller

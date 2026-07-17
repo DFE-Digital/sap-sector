@@ -172,7 +172,7 @@
                         id="@item.GradeId"
                         name="@item.GradeId"
                         data-view-switcher="true"
-                        data-endpoint="@Url.Action("Ks4CoreSubjectsData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn, subject = item.Key })"
+                        data-endpoint="@($"{Routes.SecondarySchool(Model.Urn).Comparison(Model.SimilarSchoolUrn).KS4CoreSubjectsData}?subject={item.Key}")"
                         data-query-key="grade"
                         data-bar-chart-id="@item.ChartId"
                         data-line-chart-id="@item.LineChartId"

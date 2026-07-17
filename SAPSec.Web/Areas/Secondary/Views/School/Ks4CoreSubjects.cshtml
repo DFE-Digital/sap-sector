@@ -64,9 +64,9 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.Physics.EnglandYearByYear, Display: Model.Physics.EnglandDisplay)
     };
 
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).SimilarSchoolComparison(similarSchoolUrn);
-    string WhatIsSimilarSchoolUrl() => Url.Action("WhatIsASimilarSchool", "School", new { area = "Secondary", urn = Model.SchoolDetails.Urn }) ?? SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
+    string SimilarSchoolsUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).Comparison(similarSchoolUrn).Overview;
+    string WhatIsSimilarSchoolUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
 }
 <div class="app-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -95,7 +95,7 @@
                     id="englishLanguageGrade"
                     name="englishLanguageGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "english-language" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=english-language")"
                     data-query-key="grade"
                     data-bar-chart-id="english-language-school-chart"
                     data-line-chart-id="english-language-school-yearbyyear-chart"
@@ -197,7 +197,7 @@
                     id="englishLiteratureGrade"
                     name="englishLiteratureGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "english-literature" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=english-literature")"
                     data-query-key="grade"
                     data-bar-chart-id="english-literature-school-chart"
                     data-line-chart-id="english-literature-school-yearbyyear-chart"
@@ -299,7 +299,7 @@
                     id="mathsGrade"
                     name="mathsGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "maths" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=maths")"
                     data-query-key="grade"
                     data-bar-chart-id="maths-school-chart"
                     data-line-chart-id="maths-school-yearbyyear-chart"
@@ -401,7 +401,7 @@
                     id="combinedScienceGrade"
                     name="combinedScienceGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "combined-science-double-award" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=combined-science-double-award")"
                     data-query-key="grade"
                     data-bar-chart-id="combined-science-school-chart"
                     data-line-chart-id="combined-science-school-yearbyyear-chart"
@@ -503,7 +503,7 @@
                     id="biologyGrade"
                     name="biologyGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "biology" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=biology")"
                     data-query-key="grade"
                     data-bar-chart-id="biology-school-chart"
                     data-line-chart-id="biology-school-yearbyyear-chart"
@@ -605,7 +605,7 @@
                     id="chemistryGrade"
                     name="chemistryGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "chemistry" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=chemistry")"
                     data-query-key="grade"
                     data-bar-chart-id="chemistry-school-chart"
                     data-line-chart-id="chemistry-school-yearbyyear-chart"
@@ -707,7 +707,7 @@
                     id="physicsGrade"
                     name="physicsGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "physics" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=physics")"
                     data-query-key="grade"
                     data-bar-chart-id="physics-school-chart"
                     data-line-chart-id="physics-school-yearbyyear-chart"

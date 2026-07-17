@@ -19,7 +19,6 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 /// </summary>
 [Area("Secondary")]
 [Route("school/secondary/{urn}")]
-[Route("school/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SchoolController : Controller

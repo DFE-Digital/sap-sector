@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
@@ -10,7 +11,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SchoolDetailsPath = "/school/secondary/108088/school-details";
+    private static readonly string SchoolDetailsPath = Routes.SecondarySchool("108088").SchoolDetails;
 
     #region Page Load Tests
 
@@ -588,7 +589,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
     [Fact]
     public async Task SchoolDetails_NonExistentUrn_Shows404()
     {
-        var response = await Page.GotoAsync("/school/secondary/999999");
+        var response = await Page.GotoAsync(Routes.SecondarySchool("999999").Overview);
 
         response!.Status.Should().Be(404);
     }

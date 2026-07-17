@@ -23,7 +23,9 @@ var schools = Model.MapSchools
             la = "",
             lat,
             lon,
-            url = Url.Action("Index", "SimilarSchoolsComparison", new { area = "Secondary", urn = Model.Urn, similarSchoolUrn =s.Urn})
+            url = SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn.ToString())
+                .Comparison(string.IsNullOrWhiteSpace(s.UrnRaw) ? s.Urn.ToString() : s.UrnRaw)
+                .Overview
         };
     })
     .Where(x => x != null)
