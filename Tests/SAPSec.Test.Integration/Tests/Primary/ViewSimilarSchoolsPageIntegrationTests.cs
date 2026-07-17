@@ -188,4 +188,121 @@ public class ViewSimilarSchoolsPageIntegrationTests(
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100003")
         ]);
     }
+
+    [Fact]
+    public async Task ViewSimilarSchools_PaginatesPrimarySimilarSchools()
+    {
+        var establishments = new List<Establishment>
+        {
+            new()
+            {
+                URN = "100001",
+                EstablishmentName = "Test School 1",
+                LAId = "001",
+                LAName = "Test LA 1",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                RegionId = "R1",
+                RegionName = "North East",
+                UrbanRuralId = "U1",
+                UrbanRuralName = "Urban",
+                TypeOfEstablishmentId = "34",
+                TypeOfEstablishmentName = "Academy converter",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "3",
+                GenderName = "Mixed",
+                NurseryProvisionName = "No",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                ResourcedProvisionId = "1",
+                ResourcedProvisionName = "Not applicable",
+                Easting = 100000,
+                Northing = 100000,
+                TotalCapacity = 300,
+                TotalPupils = 210
+            }
+        };
+
+        var groups = new List<SimilarSchoolsPrimaryGroupsEntry>();
+        var values = new List<SimilarSchoolsPrimaryValuesEntry>
+        {
+            new()
+            {
+                URN = "100001",
+                PPPerc = "20.2",
+                Polar4QuintilePupils = "2",
+                PStability = "95",
+                PercentSchSupport = "10",
+                PercentEAL = "5",
+                IdaciPupils = "0.123",
+                PercentageStatementOrEhp = "1.5",
+                NumberOfPupils = "210",
+                ReadMatAverage = "102.4",
+                Ks1PriorRwmAverage = "11.4"
+            }
+        };
+
+        for (var i = 0; i < 12; i++)
+        {
+            var urn = (100002 + i).ToString();
+            establishments.Add(new Establishment
+            {
+                URN = urn,
+                EstablishmentName = $"Test School {i + 2}",
+                LAId = $"00{i + 2}",
+                LAName = $"Test LA {i + 2}",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                RegionId = "R1",
+                RegionName = "North East",
+                UrbanRuralId = "U1",
+                UrbanRuralName = "Urban",
+                TypeOfEstablishmentId = "34",
+                TypeOfEstablishmentName = "Academy converter",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "3",
+                GenderName = "Mixed",
+                NurseryProvisionName = "No",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                ResourcedProvisionId = "1",
+                ResourcedProvisionName = "Not applicable",
+                Easting = 108046 + i,
+                Northing = 100000,
+                TotalCapacity = 300,
+                TotalPupils = 220 + i
+            });
+            groups.Add(new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = urn, Rank = (i + 1).ToString(), Dist = $"0.{i + 1}" });
+            values.Add(new SimilarSchoolsPrimaryValuesEntry
+            {
+                URN = urn,
+                PPPerc = "20",
+                Polar4QuintilePupils = "2",
+                PStability = "95",
+                PercentSchSupport = "10",
+                PercentEAL = "5",
+                IdaciPupils = "0.123",
+                PercentageStatementOrEhp = "1.5",
+                NumberOfPupils = (220 + i).ToString(),
+                ReadMatAverage = "100",
+                Ks1PriorRwmAverage = "10"
+            });
+        }
+
+        Fixture.EstablishmentRepository.SetupEstablishments([.. establishments]);
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups([.. groups]);
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues([.. values]);
+
+        var page = await Fixture.RequestPageAsync($"{Routes.PrimarySchool("100001").ViewSimilarSchools}?page=2", HttpStatusCode.OK);
+
+        var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
+        list.TextContent.Should().Contain("Test School 12");
+        list.TextContent.Should().Contain("Test School 13");
+        list.TextContent.Should().NotContain("Test School 2");
+
+        page.QuerySelector(".govuk-pagination").Should().NotBeNull();
+        page.QuerySelector("a[rel='prev']")?.GetAttribute("href").Should().Contain("page=1");
+    }
 }

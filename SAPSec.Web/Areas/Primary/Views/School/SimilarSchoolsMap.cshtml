@@ -7,7 +7,7 @@
 @{
     var inv = CultureInfo.InvariantCulture;
 
-    var schools = Model.SimilarSchools
+    var schools = Model.MapSchools
         .Select(s =>
         {
             var okLat = double.TryParse(s.Latitude, NumberStyles.Float, inv, out var lat);

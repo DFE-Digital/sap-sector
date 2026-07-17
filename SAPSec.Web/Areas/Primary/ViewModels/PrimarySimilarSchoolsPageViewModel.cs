@@ -9,17 +9,27 @@ namespace SAPSec.Web.Areas.Primary.ViewModels;
 
 public class PrimarySimilarSchoolsPageViewModel
 {
+    public const int PaginationEllipsis = -1;
+
     public SchoolInfoViewModel CurrentSchool { get; init; } = null!;
     public string CurrentSchoolLocalAuthorityName { get; init; } = string.Empty;
     public PrimarySimilarSchoolsCharacteristicsViewModel CurrentSchoolCharacteristics { get; init; } = null!;
     public IReadOnlyCollection<PrimarySimilarSchoolsRowViewModel> SimilarSchools { get; init; } = [];
+    public IReadOnlyCollection<PrimarySimilarSchoolsRowViewModel> MapSchools { get; init; } = [];
     public int Urn { get; init; }
     public Dictionary<string, List<string>> CurrentFilters { get; init; } = new(StringComparer.InvariantCultureIgnoreCase);
     public List<SimilarSchoolsFilterGroupViewModel> FilterGroups { get; init; } = [];
     public List<SimilarSchoolsSelectedFilterTagViewModel> SelectedFilterTags { get; init; } = [];
     public IReadOnlyCollection<ValidationError> ValidationErrors { get; init; } = [];
+    public int CurrentPage { get; init; } = 1;
+    public int PageSize { get; init; } = 10;
+    public int TotalResults { get; init; }
 
-    public int TotalResults => SimilarSchools.Count;
+    public int TotalPages => (int)Math.Ceiling((double)TotalResults / PageSize);
+    public int ShowingFrom => TotalResults == 0 ? 0 : ((CurrentPage - 1) * PageSize) + 1;
+    public int ShowingTo => Math.Min(CurrentPage * PageSize, TotalResults);
+    public bool HasPreviousPage => CurrentPage > 1;
+    public bool HasNextPage => CurrentPage < TotalPages;
     public bool HasActiveFilters => SelectedFilterTags.Any();
 
     public static PrimarySimilarSchoolsPageViewModel FromResponse(
@@ -37,7 +47,21 @@ public class PrimarySimilarSchoolsPageViewModel
                 string.Empty),
             CurrentSchoolLocalAuthorityName = response.CurrentSchool.LocalAuthorityName,
             CurrentSchoolCharacteristics = PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(response.CurrentSchool.Characteristics),
-            SimilarSchools = response.SimilarSchools
+            SimilarSchools = response.SimilarSchoolsPage
+                .Select(row => new PrimarySimilarSchoolsRowViewModel(
+                    row.Urn,
+                    row.Name,
+                    row.LocalAuthorityName,
+                    row.Rank,
+                    row.Distance,
+                    Routes.PrimarySchool(response.CurrentSchool.Urn).SimilarSchoolComparison(row.Urn),
+                    BuildFullAddress(row.Street, row.Locality, row.Address3, row.Town, row.Postcode),
+                    row.Latitude?.ToString(CultureInfo.InvariantCulture),
+                    row.Longitude?.ToString(CultureInfo.InvariantCulture),
+                    PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(row.Characteristics)))
+                .ToList()
+                .AsReadOnly(),
+            MapSchools = response.AllSimilarSchools
                 .Select(row => new PrimarySimilarSchoolsRowViewModel(
                     row.Urn,
                     row.Name,
@@ -55,7 +79,10 @@ public class PrimarySimilarSchoolsPageViewModel
             CurrentFilters = currentFilters,
             FilterGroups = BuildFilterGroups(filterOptions),
             SelectedFilterTags = BuildSelectedFilterTags(filterOptions, currentFilters, response.CurrentSchool.Urn),
-            ValidationErrors = response.ValidationErrors
+            ValidationErrors = response.ValidationErrors,
+            CurrentPage = response.SimilarSchoolsPage.CurrentPage,
+            PageSize = response.SimilarSchoolsPage.ItemsPerPage,
+            TotalResults = response.AllSimilarSchools.Count
         };
     }
 
@@ -177,6 +204,44 @@ public class PrimarySimilarSchoolsPageViewModel
         }
 
         return parts.Count > 0 ? "?" + string.Join("&", parts) : string.Empty;
+    }
+
+    public string BuildPaginationQueryString(int page)
+    {
+        var queryParts = new List<string> { $"page={page}" };
+
+        foreach (var (key, values) in CurrentFilters)
+        {
+            foreach (var value in values)
+            {
+                queryParts.Add($"{key}={Uri.EscapeDataString(value)}");
+            }
+        }
+
+        return "?" + string.Join("&", queryParts);
+    }
+
+    public List<int> GetPaginationItems()
+    {
+        var items = new List<int>();
+
+        if (TotalPages <= 7)
+        {
+            for (var i = 1; i <= TotalPages; i++) items.Add(i);
+            return items;
+        }
+
+        items.Add(1);
+        if (CurrentPage > 3) items.Add(PaginationEllipsis);
+
+        var start = Math.Max(2, CurrentPage - 1);
+        var end = Math.Min(TotalPages - 1, CurrentPage + 1);
+        for (var i = start; i <= end; i++) items.Add(i);
+
+        if (CurrentPage < TotalPages - 2) items.Add(PaginationEllipsis);
+        items.Add(TotalPages);
+
+        return items;
     }
 
     private static string BuildFullAddress(

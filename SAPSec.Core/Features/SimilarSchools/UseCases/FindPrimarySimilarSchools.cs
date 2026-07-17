@@ -1,5 +1,6 @@
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
+using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
@@ -89,8 +90,13 @@ public class FindPrimarySimilarSchools(
 
         var filteredSimilarSchools = filters.Filter(similarSchools.Select(x => x.SimilarSchool))
             .Select(school => similarSchools.First(x => x.SimilarSchool.URN == school.URN))
-            .ToList()
-            .AsReadOnly();
+            .ToList();
+
+        var page = int.TryParse(request.Page, out var parsedPage) ? parsedPage : 1;
+        var pagedSimilarSchools = new PagedCollection<PrimaryRankedSimilarSchoolData>(
+            filteredSimilarSchools,
+            page,
+            request.ResultsPerPage);
 
         return new(
             new PrimaryCurrentSchool(
@@ -98,6 +104,7 @@ public class FindPrimarySimilarSchools(
                 currentEstablishment.EstablishmentName,
                 currentEstablishment.LAName,
                 ToCharacteristics(currentCharacteristics)),
+            pagedSimilarSchools.Map(ToSimilarSchool),
             filteredSimilarSchools.Select(ToSimilarSchool).ToList().AsReadOnly(),
             filters.AsAvailableFilters(similarSchools.Select(x => x.SimilarSchool)),
             validationErrors);
@@ -144,11 +151,14 @@ public class FindPrimarySimilarSchools(
 
 public record FindPrimarySimilarSchoolsRequest(
     string Urn,
-    IDictionary<string, IEnumerable<string>>? FilterBy = null);
+    IDictionary<string, IEnumerable<string>>? FilterBy = null,
+    string? Page = null,
+    int ResultsPerPage = 10);
 
 public record FindPrimarySimilarSchoolsResponse(
     PrimaryCurrentSchool CurrentSchool,
-    IReadOnlyCollection<PrimarySimilarSchool> SimilarSchools,
+    IPagedCollection<PrimarySimilarSchool> SimilarSchoolsPage,
+    IReadOnlyCollection<PrimarySimilarSchool> AllSimilarSchools,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
     IReadOnlyCollection<ValidationError> ValidationErrors);
 

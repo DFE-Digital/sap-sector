@@ -105,8 +105,8 @@ public class FindPrimarySimilarSchoolsTests
         response.CurrentSchool.Characteristics.ReadMatAverage.Should().Be(102.4m);
         response.CurrentSchool.Characteristics.Ks1PriorRwmAverage.Should().Be(11.4m);
 
-        response.SimilarSchools.Should().HaveCount(2);
-        response.SimilarSchools.Should().SatisfyRespectively(
+        response.SimilarSchoolsPage.Should().HaveCount(2);
+        response.SimilarSchoolsPage.Should().SatisfyRespectively(
             first =>
             {
                 first.Urn.Should().Be("100002");
@@ -180,9 +180,59 @@ public class FindPrimarySimilarSchoolsTests
             ["ur"] = ["U1"]
         }));
 
-        response.SimilarSchools.Select(x => x.Urn).Should().Equal("100002");
+        response.SimilarSchoolsPage.Select(x => x.Urn).Should().Equal("100002");
         response.FilterOptions.Should().Contain(x => x.Key == "ur");
         response.FilterOptions.Should().Contain(x => x.Key == "reg");
         response.FilterOptions.Should().Contain(x => x.Key == "oar");
+    }
+
+    [Fact]
+    public async Task ReturnsPagedResultsAndAllResults()
+    {
+        var establishments = new List<Establishment>
+        {
+            new()
+            {
+                URN = "100001", EstablishmentName = "Current School", LAName = "LA One",
+                Easting = 100000, Northing = 100000, RegionId = "R1", RegionName = "North East",
+                UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter",
+                PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form",
+                AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed",
+                ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 210
+            }
+        };
+
+        var groups = new List<SimilarSchoolsPrimaryGroupsEntry>();
+        var values = new List<SimilarSchoolsPrimaryValuesEntry>
+        {
+            new() { URN = "100001", PPPerc = "20.2", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = "210", ReadMatAverage = "102.4", Ks1PriorRwmAverage = "11.4" }
+        };
+
+        for (var i = 0; i < 12; i++)
+        {
+            var urn = (100002 + i).ToString();
+            establishments.Add(new Establishment
+            {
+                URN = urn, EstablishmentName = $"Similar School {i + 1}", LAName = $"LA {i + 2}",
+                Easting = 108046 + i, Northing = 100000, RegionId = "R1", RegionName = "North East",
+                UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter",
+                PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form",
+                AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed",
+                ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 200 + i
+            });
+            groups.Add(new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = urn, Dist = $"0.{i + 1}", Rank = (i + 1).ToString() });
+            values.Add(new SimilarSchoolsPrimaryValuesEntry { URN = urn, PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = (200 + i).ToString(), ReadMatAverage = "100", Ks1PriorRwmAverage = "10" });
+        }
+
+        _establishmentRepo.SetupEstablishments([.. establishments]);
+        _similarSchoolsRepo.SetupGroups([.. groups]);
+        _similarSchoolsRepo.SetupValues([.. values]);
+
+        var response = await _sut.Execute(new("100001", Page: "2"));
+
+        response.SimilarSchoolsPage.CurrentPage.Should().Be(2);
+        response.SimilarSchoolsPage.Should().HaveCount(2);
+        response.AllSimilarSchools.Should().HaveCount(12);
+        response.SimilarSchoolsPage.Select(x => x.Rank).Should().Equal("11", "12");
     }
 }

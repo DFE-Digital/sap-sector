@@ -68,7 +68,7 @@ public class SchoolController(
 
     [HttpGet]
     [Route("view-similar-schools")]
-    public async Task<IActionResult> ViewSimilarSchools(string urn)
+    public async Task<IActionResult> ViewSimilarSchools(string urn, [FromQuery] string? page = null)
     {
         var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
         var response = await findPrimarySimilarSchoolsUseCase.Execute(new(
@@ -78,7 +78,8 @@ public class SchoolController(
                 .ToDictionary(
                     kvp => kvp.Key,
                     kvp => kvp.Value.Where(v => !string.IsNullOrWhiteSpace(v))!.Select(v => v!),
-                    StringComparer.InvariantCultureIgnoreCase)));
+                    StringComparer.InvariantCultureIgnoreCase),
+            page));
 
         PopulateViewData(schoolInfoResponse.School);
 
