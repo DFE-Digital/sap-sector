@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.UseCases;
@@ -9,7 +10,6 @@ using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
-using static SAPSec.Core.Features.Attendance.GetAttendanceMeasuresUseCase;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -63,11 +63,10 @@ public class SchoolController(
 
         PopulateViewData(response.School);
 
-        var model = new AttendanceMeasurePageViewModel
+        var model = new AttendanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            TotalAbsence = MeasureViewModel.FromMeasure(response.TotalAbsence, response.School),
-            PersistentAbsence = MeasureViewModel.FromMeasure(response.PersistentAbsence, response.School)
+            Attendance = MeasureViewModel.FromMeasure(response.Attendance, response.School)
         };
 
         return View(model);

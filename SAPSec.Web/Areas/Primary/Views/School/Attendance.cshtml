@@ -1,6 +1,71 @@
 @using SAPSec.Core.Model
 @using SAPSec.Web.ViewModels
 
+@model SAPSec.Web.Areas.Primary.ViewModels.AttendanceMeasuresPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Attendance measures";
+}
+
+<div class="app-school-page">
+    <span class="govuk-caption-xl">@Model.School.Name</span>
+    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+    <p class="govuk-body">
+        Compare this school's attendance measures with:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        @* <li><b>50</b> similar primary phase schools (including all-throughs)</li> *@
+        <li>the local authority average</li>
+        <li>the national average</li>
+    </ul>
+
+    <p class="govuk-body">
+        Find out <a href="@Routes.PrimarySchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE defines what a similar school is</a>.
+    </p>
+
+    <form action="" method="get">
+        <partial name="_AttendanceInfo" />
+
+        <section class="app-measure-section" aria-labelledby="attendance-heading">
+            <h2 class="govuk-heading-m" id="attendance-heading" data-testid="attendance-heading">Attendance</h2>
+
+          @*   <details class="govuk-details app-measure-copy app-measure-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Information about meeting the expected standard</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        Pupils achieve the expected standard when they achieve a scaled score of 100 or more
+                        in reading and maths tests, and are assessed by their teacher in writing as &lsquo;working at
+                        the expected standard&rsquo; or &lsquo;working at greater depth&rsquo;.
+                    </p>
+                </div>
+            </details> *@
+
+            <partial name="Measures/_Measure" model=@Model.Attendance />
+        </section>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
+}
+
+
+
+@* @using SAPSec.Core.Model
+@using SAPSec.Web.ViewModels
+
 @model SchoolInfoViewModel
 @{
     Layout = "_Layout";
@@ -12,4 +77,224 @@
 
 <p class="govuk-body">
     Attendance information for this primary school will appear here.
+</p> *@
+
+@* 
+@using System.Text.Json
+@model SAPSec.Web.ViewModels.AttendanceMeasuresPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Attendance measures";
+    var initialChartData = new
+    {
+        labels = new[]
+        {
+            Model.School.Name,
+            Model.LocalAuthorityLabel,
+            Model.EnglandLabel
+        },
+        data = new decimal?[]
+        {
+
+            //FROM HERE
+            //Need to see how to pass the absence data
+            //From MeasureViewModel.
+            //The page view model is used by primary and secondary
+            //Reused this one
+            //maybe keep the secondary onne separate
+            Model.TotalAbsence.CurrentYear,
+            Model.PersistentAbsence.Value
+        }
+    };
+    var initialLineData = new
+    {
+        labels = Model.AcademicYears,
+        datasets = new object[]
+        {
+            new { label = Model.SchoolName, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 },
+            new { label = Model.EnglandLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5 }
+        }
+    };
+    var chartColors = new[] { "#D53780", "#2a1950", "#2a1950" };
+    var lineChartColors = new[] { "#D53780", "#5694CA", "#28A197" };
+    var attendanceDataEndpoint = Url.Action("AttendanceData", "School", new { urn = Model.SchoolDetails.Urn });
+    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
+}
+
+<span class="govuk-caption-xl">@Model.SchoolName</span>
+<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+<p class="govuk-body">
+    Compare this school's attendance measures with:
 </p>
+<ul class="govuk-list govuk-list--bullet">
+    <li><b>50</b> similar secondary phase schools (including all-throughs)</li>
+    <li>the local authority average</li>
+    <li>the national average</li>
+</ul>
+
+<p class="govuk-body">
+    Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+</p>
+
+<section aria-labelledby="attendance-heading" class="app-measure-section">
+    <h2 class="govuk-heading-m" id="attendance-heading">Attendance</h2>
+
+    <div class="app-measure-filter-row">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--s" for="attendanceAbsenceType">Type of absence</label>
+            <select class="govuk-select"
+                    id="attendanceAbsenceType"
+                    name="attendanceAbsenceType"
+                    data-view-switcher="true"
+                    data-endpoint="@attendanceDataEndpoint"
+                    data-query-key="absenceType"
+                    data-bar-chart-id="school-attendance-three-year-chart"
+                    data-line-chart-id="school-attendance-year-by-year-chart"
+                    data-cell-attribute="data-attendance-cell"
+                    data-cell-prefixes='{"school":"school","localAuthority":"la","england":"england"}'
+                    data-series-keys='["school","localAuthority","england"]'
+                    data-top-performers-table-id="attendance-top-performers-table"
+                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                <option value="overall" selected>Overall absence</option>
+                <option value="persistent">Persistent absence</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="govuk-tabs app-measure-tabs app-attendance-tabs" data-module="govuk-tabs">
+        <h3 class="govuk-tabs__title">Attendance views</h3>
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#attendance-three-year-average">@Model.CurrentAcademicYear</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#attendance-year-by-year">Year by year</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#attendance-table">Table</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#attendance-top-performers">Top performers</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="attendance-three-year-average">
+            <div class="app-measure-chart-container">
+                <canvas id="school-attendance-three-year-chart"
+                        class="js-chart"
+                        data-type="bar"
+                        data-show-no-data-labels="true"
+                        data-axis-mode="auto"
+                        data-bar-label-align="start"
+                        data-axis-suffix="%"
+                        data-label-decimals="2"
+                        data-bar-thickness="50"
+                        data-category-percentage="0.7"
+                        data-bar-percentage="1"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(initialChartData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                </canvas>
+            </div>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-year-by-year">
+            <div class="app-measure-chart-container">
+                <canvas id="school-attendance-year-by-year-chart"
+                        class="js-chart"
+                        data-type="line"
+                        data-axis-mode="auto"
+                        data-axis-suffix="%"
+                        data-tooltip-decimals="2"
+                        data-show-x-grid="true"
+                        data-show-legend="true"
+                        data-show-datalabels="false"
+                        data-chart='@Html.Raw(JsonSerializer.Serialize(initialLineData))'
+                        data-colors='@Html.Raw(JsonSerializer.Serialize(lineChartColors))'>
+                </canvas>
+            </div>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-table">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.AcademicYears[0]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.AcademicYears[1]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.AcademicYears[2]</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.SchoolName</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="school-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Current)</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.LocalAuthorityLabel</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="la-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="la-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="la-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Current)</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.EnglandLabel</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev2">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-prev">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-attendance-cell="england-current">@SAPSec.Web.ViewModels.SchoolAttendancePageViewModel.DisplayPercentNullable(Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Current)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="attendance-top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table" id="attendance-top-performers-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@Model.CurrentAcademicYear</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.OverallAbsenceTopPerformers)
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">@row.Rank</td>
+                            <th scope="row" class="govuk-table__header">
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+
+        ChartFactory.initAll();
+    </script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chart-toggle.js" asp-append-version="true" add-nonce="true"></script>
+}
+
+ *@
