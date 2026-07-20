@@ -9,18 +9,22 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
 {
     internal static IReadOnlyCollection<MeasureSeries> ForSchool<T>(
         SchoolData<T> currentSchool,
-        IEnumerable<SchoolData<T>> similarSchools,
+        IEnumerable<SchoolData<T>>? similarSchools,
         MeasureFieldSelector<T> fieldSelector) => [
             new MeasureSeries(
                 MeasureSeriesType.CurrentSchool,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious(currentSchool.Data)),
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious2(currentSchool.Data))),
+
+            ..(similarSchools is not null ? [
             new MeasureSeries(
                 MeasureSeriesType.SimilarSchoolsAverage,
                 MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolCurrent(x.Data))),
                 MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious(x.Data))),
-                MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x.Data)))),
+                MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x.Data))))
+                ] : Array.Empty<MeasureSeries>()),
+                 
             new MeasureSeries(
                 MeasureSeriesType.LASchoolsAverage,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.LocalAuthorityCurrent(currentSchool.Data)),

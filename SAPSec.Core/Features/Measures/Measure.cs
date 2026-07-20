@@ -15,15 +15,27 @@ public record Measure(
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
         SchoolData<T> currentSchool,
-        IEnumerable<SchoolData<T>> similarSchools,
+        IEnumerable<SchoolData<T>>? similarSchools,
         MeasureFieldSelector<T> fieldSelector)
     {
-        return new Measure(
-            key,
-            dataType,
-            availableFilters.ToList(),
-            MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
-            TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
+
+        try
+        {
+            var temp = new Measure(
+               key,
+               dataType,
+               availableFilters.ToList(),
+               MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
+               TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
+
+            return temp;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            throw;
+        }
+     
     }
 
     internal static Measure ForSchoolComparison<T>(

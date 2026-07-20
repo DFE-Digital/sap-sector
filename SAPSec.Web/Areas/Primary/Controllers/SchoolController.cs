@@ -58,14 +58,14 @@ public class SchoolController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var response = await getAttendanceMeasuresUseCase.Execute(new(urn, PhaseOfEducationValues.Primary));
+        var response = await getAttendanceMeasuresUseCase.Execute(new(urn));
 
         PopulateViewData(response.School);
 
         var model = new AttendanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Attendance = MeasureViewModel.FromMeasure(response.Attendance, response.School)
+            Absence = MeasureViewModel.FromMeasure(response.Absence, response.School)
         };
 
         return View(model);
