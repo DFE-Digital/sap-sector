@@ -1,4 +1,5 @@
 ﻿using CsvHelper;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SAPData.Models;
 using SAPSec.Data.Common;
@@ -34,6 +35,14 @@ internal class Program
         // In CI the working directory is often the repo root.
         // Find SAPData.csproj anywhere under the current directory and use its folder.
         string baseDir = Project.FindProjectDirectoryDownwards("SAPSec.PrimaryJsonFileGenerator.csproj");
+
+        IConfiguration _configuration = new ConfigurationBuilder()
+            .SetBasePath(baseDir)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        var settings = _configuration.Get<JsonGeneratorSettings>()
+            ?? new JsonGeneratorSettings();
 
         string dataMapDir = Path.Combine(baseDir, "DataMap");
         string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
@@ -114,7 +123,7 @@ internal class Program
                 _ => ["National"]
             };
 
-            var json = GenerateJsonFile(includedRows, ids);
+            var json = GenerateJsonFile(includedRows, ids, settings);
             File.WriteAllText(
                 Path.Combine(primaryJsonDir, $"{file.ModelName}.json"),
                 json,
@@ -136,7 +145,7 @@ internal class Program
             StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string GenerateJsonFile(DataMapRow[] rows, string[] ids)
+    private static string GenerateJsonFile(DataMapRow[] rows, string[] ids, JsonGeneratorSettings settings)
     {
         var rnd = new Random();
         var json = new StringBuilder();
@@ -149,7 +158,21 @@ internal class Program
 
             foreach (var (row, j) in rows.Select((r, j) => (r, j)))
             {
-                var randomValue = Math.Round(rnd.NextDouble() * 100.0, 2);
+                double? randomValue;
+
+                if (settings.UrnsWithMissingCurrentYearData.Contains(urn) && row.YearDesc == "Current"
+                    || settings.UrnsWithMissingPreviousYearData.Contains(urn) && row.YearDesc == "Previous"
+                    || settings.UrnsWithMissingPrevious2YearData.Contains(urn) && row.YearDesc == "Previous2")
+                {
+                    randomValue = null;
+                }
+                else
+                {
+                    var maxValue = settings.UrnsWithDataUnderTenPercent.Contains(urn)
+                        ? 10.0
+                        : 100.0;
+                    randomValue = Math.Round(rnd.NextDouble() * maxValue, 2);
+                }
                 json.AppendLine($"    \"{row.PropertyName}\": \"{randomValue}\"{(j < rows.Length - 1 ? "," : "")}");
             }
 
