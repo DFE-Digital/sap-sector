@@ -1,5 +1,6 @@
 using Moq;
-using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Exceptions;
+using SAPSec.Core.School.Attendance;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;

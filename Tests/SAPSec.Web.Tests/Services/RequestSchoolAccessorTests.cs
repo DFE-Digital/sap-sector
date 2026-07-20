@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Data;
+using SAPSec.Core.School.Details;
 using SAPSec.Web.Services;
 
 namespace SAPSec.Web.Tests.Services;

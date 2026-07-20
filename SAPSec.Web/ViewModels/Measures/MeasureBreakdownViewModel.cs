@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Measures;
 using System.Globalization;
 
 namespace SAPSec.Web.ViewModels.Measures;

@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Constants;
+﻿using SAPSec.Core.School.Details;
 using SAPSec.Data.Dto;
 
 namespace SAPSec.Test.Common.Builders;

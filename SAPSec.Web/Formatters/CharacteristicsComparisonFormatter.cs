@@ -1,6 +1,6 @@
 using System.Globalization;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.School.Similarity;
+using SAPSec.Core.School.Similarity.UseCases;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Formatters;

@@ -1,10 +1,11 @@
 using Moq;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.School.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Data.Dto.KS4.Destinations;
 using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Repositories;
+using SAPSec.Core.School.Details;
+using SAPSec.Core.Data;
+using SAPSec.Core.Exceptions;
 
 namespace SAPSec.Core.Tests.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 

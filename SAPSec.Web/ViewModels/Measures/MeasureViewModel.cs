@@ -1,5 +1,5 @@
-using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Measures;
+using SAPSec.Core.School.Info;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.ViewModels.Measures;
@@ -26,7 +26,7 @@ public record MeasureViewModel(
     private static string ResolveMeasureLabel(string measureKey) =>
         measureKey switch
         {
-            Core.Constants.Measures.Primary.Ks2ExpectedRwm =>
+            Core.Measures.Measures.Primary.Ks2ExpectedRwm =>
                 "Meeting expected standard in reading, writing and maths",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };

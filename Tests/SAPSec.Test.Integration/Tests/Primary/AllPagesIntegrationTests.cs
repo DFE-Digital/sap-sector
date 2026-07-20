@@ -1,6 +1,6 @@
 using AngleSharp.Dom;
 using FluentAssertions;
-using SAPSec.Core.Constants;
+using SAPSec.Core.Features;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;

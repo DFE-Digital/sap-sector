@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Analytics;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Test.Common.Authentication;
 using SAPSec.Web;
