@@ -1,47 +1,6 @@
 Range,REF,PropertyName,PropertyDescription,PropertyDescriptionShort,PropertyFilter,PropertyFilterShort,Source,SectorCount,PublicCount,Type,Subtype,Year,YearDesc,File,Field,DataType,DataTypeAlt,RecordFilterBy,Filter,FilterValue,Filter2,Filter2Value,Filter3,Filter3Value,Filter4,Filter4Value,Filter5,Filter5Value,ShouldBeNormalised,NormalisedLookup,CompoundFields,ReturnMultipleRecords,IgnoreMapping
 
-,,, Establishment Metadata ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
-
-Establishment,G_MAT,TrustsId,Establishment Academy Trust ,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Trusts (code),string,text,URN,,,,,,,,,,,Yes,"Trusts (code), Trusts (name)",,,
-Establishment,G_ADD,Address,Establishment Address,,,,GIAS,2,2,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Street + Locality + Address3 + Town + Postcode,string,text,URN,,,,,,,,,,,No,,Field,,
-Establishment,G_ADM,AdmissionsPolicyId,Establishment Admission Policy,,,,GIAS,1,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,AdmissionsPolicy (code),string,text,URN,,,,,,,,,,,Yes,"AdmissionsPolicy (code), AdmissionsPolicy (name)",,,
-Establishment,G_AGE,AgeRange,Establishment Age Range,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,StatutoryLowAge + StatutoryHighAge,string,text,URN,,,,,,,,,,,No,,Field,,
-Establishment,G_DFEN,DFENumber,Establishment DfE Number (LA/Estab),,,,GIAS,1,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,LA (code) + / + EstablishmentNumber,string,text,URN,,,,,,,,,,,No,,Field,,
-Establishment,G_REG,DistrictAdministrativeId,Establishment District Administration ,,,,GIAS,1,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,DistrictAdministrative (code),string,text,URN,,,,,,,,,,,Yes,"DistrictAdministrative (code), DistrictAdministrative (name)",,,
-Establishment,G_PHASE,PhaseOfEducationId,Establishment Educational Phase,,,,GIAS,1,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,PhaseOfEducation (code),string,text,URN,,,,,,,,,,,Yes,"PhaseOfEducation (code), PhaseOfEducation (name)",,,
-Establishment,G_GEN,GenderId,Establishment Gender range,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Gender (code),string,text,URN,,,,,,,,,,,Yes,"Gender (code), Gender (name)",,,
-Establishment,G_HEAD,HeadteacherTitle,Establishment Headteacher title,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,HeadTitle (name),string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_HEAD,HeadteacherFirstName,Establishment Headteacher First Name,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,HeadFirstName,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_HEAD,HeadteacherLastName,Establishment Headteacher Last Name,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,HeadLastName,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_HEAD,HeadteacherPreferredJobTitle,Establishment Headteacher Preferred Job Title,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,HeadPreferredJobTitle,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_ADD,AddressStreet,Establishment Address Street,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Street,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_ADD,AddressLocality,Establishment Address Locality,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Locality,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_ADD,AddressAddress3,Establishment Address Address3,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Address3,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_ADD,AddressTown,Establishment Address Town,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Town,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_ADD,AddressPostcode,Establishment Address Postcode,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Postcode,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_AGE,AgeRangeLow,Establishment Age Low,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,StatutoryLowAge,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_AGE,AgeRangeHigh,Establishment Age High,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,StatutoryHighAge,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_SIX,OfficialSixthFormId,Establishment has official sixth form,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,OfficialSixthForm (code),string,text,URN,,,,,,,,,,,Yes,"OfficialSixthForm (code), OfficialSixthForm (name)",,,
-Establishment,G_HEAD,Headteacher,Establishment Headteacher details,,,,GIAS,2,2,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,HeadTitle (name) + HeadFirstName + HeadLastName,string,text,URN,,,,,,,,,,,No,,Field,,
-Establishment,G_LA,LAId,Establishment Local Authority,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,LA (code),string,number,URN,,,,,,,,,,,Yes,"LA (code), LA (name)",,,
-Establishment,G_REL,ReligiousCharacterId,Establishment Religious Character,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,ReligiousCharacter (code),string,text,URN,,,,,,,,,,,Yes,"ReligiousCharacter (code), ReligiousCharacter (name)",,,
-Establishment,G_STATUS,EstablishmentStatusId,Establishment Status,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,EstablishmentStatus (code),string,text,URN,,,,,,,,,,,Yes,"EstablishmentStatus (code), EstablishmentStatus (name)",,,
-Establishment,G_STATUS,EstablishmentStatusName,Establishment Status Name,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,EstablishmentStatus (name),string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_TEL,TelephoneNum,Establishment Telephone number,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,TelephoneNum,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_PUPTOT,TotalCapacity,Establishment Total Pupil Capacity Number,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,SchoolCapacity,string,number,URN,,,,,,,,,,,No,,,,
-Establishment,G_PUPTOT,TotalPupils,Establishment Total Pupil Number,,,,GIAS,0,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,NumberOfPupils,string,number,URN,,,,,,,,,,,No,,,,
-Establishment,G_TYPE,TypeOfEstablishmentId,Establishment Type,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,TypeOfEstablishment (code),string,text,URN,,,,,,,,,,,Yes,"TypeOfEstablishment (code), TypeOfEstablishment (name)",,,
-Establishment,G_RESPROV,ResourcedProvision,Establishment Type of Resourced Provision,,,,GIAS,1,2,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,TypeOfResourcedProvision (name),string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_UKPRN,UKPRN,Establishment UKPRN,,,,GIAS,2,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,UKPRN,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_UR,UrbanRuralId,Establishment Urban or Rural designation,,,,GIAS,1,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,UrbanRural (code),string,text,URN,,,,,,,,,,,Yes,"UrbanRural (code), UrbanRural (name)",,,
-Establishment,G_URN,URN,Establishment URN,,,,GIAS,2,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,URN,string,number,URN,,,,,,,,,,,No,,,,
-Establishment,G_WEB,Website,Establishment Website,,,,GIAS,2,2,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,SchoolWebsite,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_ENAME,EstablishmentName,Establishment Name,,,,GIAS,1,1,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,EstablishmentName,string,text,URN,,,,,,,,,,,No,,,,
-Establishment,G_ENAME,Easting,Establishment Easting,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Easting,string,number,URN,,,,,,,,,,,No,,,,
-Establishment,G_ENAME,Northing,Establishment Northing,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,Northing,string,number,URN,,,,,,,,,,,No,,,,
-Establishment,G_ENAME,EstablishmentNumber,Establishment Number,,,,GIAS,0,0,All establishment data,Metadata,Current,Current,edubasealldataYYYYmmDD,EstablishmentNumber,string,number,URN,,,,,,,,,,,No,,,,
-
-,,, England Destinations - Current (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Destinations - Current (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,23_KS4D_EDU_ALL_BOY_ENG,AllDest_Boy_Eng_Current_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_nat_202223,overall,double,number,geographic_level,breakdown,Male,data_type,Number of students,institution_group,Total state-funded mainstream and special,time_period,202223,,,,,,,
 England,23_KS4D_EDU_ALL_BOY_PC_ENG,AllDest_Boy_Eng_Current_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_nat_202223,overall,double,percentage,geographic_level,breakdown,Male,data_type,Percentage,institution_group,Total state-funded mainstream and special,time_period,202223,,,,,,,
@@ -84,7 +43,7 @@ England,23_KS4D_EDU_APP_NDS_PC_ENG,Apprentice_NDi_Eng_Current_Pct,Apprenticeship
 England,23_KS4D_EDU_APP_TOT_ENG,Apprentice_Tot_Eng_Current_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_nat_202223,appren,double,number,geographic_level,breakdown,Total,data_type,Number of students,institution_group,Total state-funded mainstream and special,time_period,202223,,,,,,,
 England,23_KS4D_EDU_APP_TOT_PC_ENG,Apprentice_Tot_Eng_Current_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_nat_202223,appren,double,percentage,geographic_level,breakdown,Total,data_type,Percentage,institution_group,Total state-funded mainstream and special,time_period,202223,,,,,,,
 
-,,, England Destinations - Previous (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Destinations - Previous (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,22_KS4D_EDU_ALL_BOY_ENG,AllDest_Boy_Eng_Previous_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_nat_rev,overall,double,number,geographic_level,breakdown,Male,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202223,,,,,,,
 England,22_KS4D_EDU_ALL_BOY_PC_ENG,AllDest_Boy_Eng_Previous_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_nat_rev,overall,double,percentage,geographic_level,breakdown,Male,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202223,,,,,,,
@@ -127,7 +86,7 @@ England,22_KS4D_EDU_APP_NDS_PC_ENG,Apprentice_NDi_Eng_Previous_Pct,Apprenticeshi
 England,22_KS4D_EDU_APP_TOT_ENG,Apprentice_Tot_Eng_Previous_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_nat_rev,appren,double,number,geographic_level,breakdown,Total,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202223,breakdown_topic,Total,,,,,
 England,22_KS4D_EDU_APP_TOT_PC_ENG,Apprentice_Tot_Eng_Previous_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_nat_rev,appren,double,percentage,geographic_level,breakdown,Total,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202223,breakdown_topic,Total,,,,,
 
-,,, England Destinations - Previous2 (2021-22) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Destinations - Previous2 (2021-22) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,21_KS4D_EDU_ALL_BOY_ENG,AllDest_Boy_Eng_Previous2_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_nat_rev,overall,double,number,geographic_level,breakdown,Male,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202122,breakdown_topic,Gender,,,,,
 England,21_KS4D_EDU_ALL_BOY_PC_ENG,AllDest_Boy_Eng_Previous2_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_nat_rev,overall,double,percentage,geographic_level,breakdown,Male,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202122,breakdown_topic,Gender,,,,,
@@ -170,7 +129,7 @@ England,21_KS4D_EDU_APP_NDS_PC_ENG,Apprentice_NDi_Eng_Previous2_Pct,Apprenticesh
 England,21_KS4D_EDU_APP_TOT_ENG,Apprentice_Tot_Eng_Previous2_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_nat_rev,appren,double,number,geographic_level,breakdown,Total,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202122,breakdown_topic,Total,,,,,
 England,21_KS4D_EDU_APP_TOT_PC_ENG,Apprentice_Tot_Eng_Previous2_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_nat_rev,appren,double,percentage,geographic_level,breakdown,Total,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202122,breakdown_topic,Total,,,,,
 
-,,, Establishment Destinations - Current (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Destinations - Current (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,23_KS4D_EDU_ALL_BOY,AllDest_Boy_Est_Current_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_inst_202223,overall,double,number,school_laestab,breakdown,Male,data_type,Number of students,,,,,,,No,,,,
 Establishment,23_KS4D_EDU_ALL_BOY_PC,AllDest_Boy_Est_Current_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_inst_202223,overall,double,percentage,school_laestab,breakdown,Male,data_type,Percentage,,,,,,,No,,,,
@@ -213,7 +172,7 @@ Establishment,23_KS4D_EDU_APP_NDS_PC,Apprentice_NDi_Est_Current_Pct,Apprenticesh
 Establishment,23_KS4D_EDU_APP_TOT,Apprentice_Tot_Est_Current_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_inst_202223,appren,double,number,school_laestab,breakdown,Total,data_type,Number of students,,,,,,,No,,,,
 Establishment,23_KS4D_EDU_APP_TOT_PC,Apprentice_Tot_Est_Current_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_inst_202223,appren,double,percentage,school_laestab,breakdown,Total,data_type,Percentage,,,,,,,No,,,,
 
-,,, Establishment Destinations - Previous (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Destinations - Previous (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,22_KS4D_EDU_ALL_BOY,AllDest_Boy_Est_Previous_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_inst_rev,overall,double,number,school_laestab,breakdown,Male,data_type,Number of pupils,,,,,,,No,,,,
 Establishment,22_KS4D_EDU_ALL_BOY_PC,AllDest_Boy_Est_Previous_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_inst_rev,overall,double,percentage,school_laestab,breakdown,Male,data_type,Percentage,,,,,,,No,,,,
@@ -256,7 +215,7 @@ Establishment,22_KS4D_EDU_APP_NDS_PC,Apprentice_NDi_Est_Previous_Pct,Apprentices
 Establishment,22_KS4D_EDU_APP_TOT,Apprentice_Tot_Est_Previous_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_inst_rev,appren,double,number,school_laestab,breakdown,Total,data_type,Number of pupils,,,,,,,No,,,,
 Establishment,22_KS4D_EDU_APP_TOT_PC,Apprentice_Tot_Est_Previous_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_inst_rev,appren,double,percentage,school_laestab,breakdown,Total,data_type,Percentage,,,,,,,No,,,,
 
-,,, Establishment Destinations - Previous2 (2021-22) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Destinations - Previous2 (2021-22) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,21_KS4D_EDU_ALL_BOY,AllDest_Boy_Est_Previous2_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_inst_rev,overall,double,number,school_laestab,breakdown,Male,data_type,Number of pupils,,,,,,,No,,,,
 Establishment,21_KS4D_EDU_ALL_BOY_PC,AllDest_Boy_Est_Previous2_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_inst_rev,overall,double,percentage,school_laestab,breakdown,Male,data_type,Percentage,,,,,,,No,,,,
@@ -299,7 +258,7 @@ Establishment,21_KS4D_EDU_APP_NDS_PC,Apprentice_NDi_Est_Previous2_Pct,Apprentice
 Establishment,21_KS4D_EDU_APP_TOT,Apprentice_Tot_Est_Previous2_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_inst_rev,appren,double,number,school_laestab,breakdown,Total,data_type,Number of pupils,,,,,,,No,,,,
 Establishment,21_KS4D_EDU_APP_TOT_PC,Apprentice_Tot_Est_Previous2_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_inst_rev,appren,double,percentage,school_laestab,breakdown,Total,data_type,Percentage,,,,,,,No,,,,
 
-,,, LA Destinations - Current (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Destinations - Current (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,23_KS4D_EDU_ALL_BOY_LA,AllDest_Boy_LA_Current_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_la_202223,overall,double,number,old_la_code,breakdown,Male,data_type,Number of students,time_period,202223,institution_group,State-funded mainstream and special,,,,,,,
 LA,23_KS4D_EDU_ALL_BOY_PC_LA,AllDest_Boy_LA_Current_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_la_202223,overall,double,percentage,old_la_code,breakdown,Male,data_type,Percentage,time_period,202223,institution_group,State-funded mainstream and special,,,,,,,
@@ -342,7 +301,7 @@ LA,23_KS4D_EDU_APP_NDS_LA,Apprentice_NDi_LA_Current_Pct,Apprenticeship,Apprentic
 LA,23_KS4D_EDU_APP_TOT_LA,Apprentice_Tot_LA_Current_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_la_202223,appren,double,number,old_la_code,breakdown,Total,data_type,Number of students,time_period,202223,institution_group,State-funded mainstream and special,,,,,,,
 LA,23_KS4D_EDU_APP_TOT_PC_LA,Apprentice_Tot_LA_Current_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2023-2024,Current,ees_ks4_la_202223,appren,double,percentage,old_la_code,breakdown,Total,data_type,Percentage,time_period,202223,institution_group,State-funded mainstream and special,,,,,,,
 
-,,, LA Destinations - Previous (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Destinations - Previous (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,22_KS4D_EDU_ALL_BOY_LA,AllDest_Boy_LA_Previous_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_la_rev,overall,double,number,old_la_code,breakdown,Male,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202223,,,,,,,
 LA,22_KS4D_EDU_ALL_BOY_PC_LA,AllDest_Boy_LA_Previous_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_la_rev,overall,double,percentage,old_la_code,breakdown,Male,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202223,,,,,,,
@@ -385,7 +344,7 @@ LA,22_KS4D_EDU_APP_NDS_PC_LA,Apprentice_NDi_LA_Previous_Pct,Apprenticeship,Appre
 LA,22_KS4D_EDU_APP_TOT_LA,Apprentice_Tot_LA_Previous_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_la_rev,appren,double,number,old_la_code,breakdown,Total,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202223,,,,,,,
 LA,22_KS4D_EDU_APP_TOT_PC_LA,Apprentice_Tot_LA_Previous_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2022-2023,Previous,ks4_dm_ud_202223_la_rev,appren,double,percentage,old_la_code,breakdown,Total,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202223,,,,,,,
 
-,,, LA Destinations - Previous2 (2021-22) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Destinations - Previous2 (2021-22) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,21_KS4D_EDU_ALL_BOY_LA,AllDest_Boy_LA_Previous2_Num,All Destinations,AllDest,Boys,Boy,EES,0,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_la_rev,overall,double,number,old_la_code,breakdown,Male,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202122,,,,,,,
 LA,21_KS4D_EDU_ALL_BOY_PC_LA,AllDest_Boy_LA_Previous2_Pct,All Destinations,AllDest,Boys,Boy,EES,1,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_la_rev,overall,double,percentage,old_la_code,breakdown,Male,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202122,,,,,,,
@@ -428,7 +387,7 @@ LA,21_KS4D_EDU_APP_NDS_PC_LA,Apprentice_NDi_LA_Previous2_Pct,Apprenticeship,Appr
 LA,21_KS4D_EDU_APP_TOT_LA,Apprentice_Tot_LA_Previous2_Num,Apprenticeship,Apprentice,Total,Tot,EES,0,0,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_la_rev,appren,double,number,old_la_code,breakdown,Total,data_type,Number of pupils,institution_group,State-funded mainstream & special schools,time_period,202122,,,,,,,
 LA,21_KS4D_EDU_APP_TOT_PC_LA,Apprentice_Tot_LA_Previous2_Pct,Apprenticeship,Apprentice,Total,Tot,EES,0,1,KS4_Destinations,Destinations,2021-2022,Previous2,ks4_dm_ud_202122_la_rev,appren,double,percentage,old_la_code,breakdown,Total,data_type,Percentage,institution_group,State-funded mainstream & special schools,time_period,202122,,,,,,,
 
-,,, England Headline Measures - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Headline Measures - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,24_KS4_AT8_BOY_ENG,Attainment8_Boy_Eng_Current_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,attainment8_average,double,number,geographic_level,breakdown_topic,Sex,sex,Boys,time_period,202425,,,,,,,,,
 England,24_KS4_AT8_DIS_ENG,Attainment8_Dis_Eng_Current_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,attainment8_average,double,number,geographic_level,breakdown_topic,Disadvantage status,disadvantage_status,Disadvantaged,time_period,202425,,,,,No,,,,
@@ -466,7 +425,7 @@ England,24_KS4_EM95_NDV_ENG_PC,EngMaths59_NDi_Eng_Current_Pct,English and Maths 
 England,24_KS4_EM95_TOT_ENG,EngMaths59_Tot_Eng_Current_Num,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,0,0,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,engmath_95_total,double,number,geographic_level,breakdown_topic,Total,,,time_period,202425,,,,,,,,,
 England,24_KS4_EM95_TOT_ENG_PC,EngMaths59_Tot_Eng_Current_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,engmath_95_percent,double,percentage,geographic_level,breakdown_topic,Total,,,time_period,202425,,,,,,,,,
 
-,,, England Headline Measures - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Headline Measures - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,23_KS4_ATT8_BOY_ENG,Attainment8_Boy_Eng_Previous_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,avg_att8,double,number,geographic_level,breakdown,Total,sex,Boys,,,time_period,202324,,,,,,,
 England,23_KS4_ATT8_DIS_ENG,Attainment8_Dis_Eng_Previous_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,avg_att8,double,number,geographic_level,breakdown,Disadvantage,sex,Total,disadvantage,Disadvantaged,time_period,202324,,,,,,,
@@ -495,7 +454,7 @@ England,23_KS4_EM95_TOT_ENG,EngMaths59_Tot_Eng_Previous_Num,English and Maths gr
 England,23_KS4_EM95_TOT_ENG_PC,EngMaths59_Tot_Eng_Previous_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,pt_l2basics_95,double,percentage,geographic_level,breakdown,Total,sex,Total,,,time_period,202324,,,No,,,,
 England,23_KS4_P8_TOT_ENG,Prog8_Avg_Eng_Previous_Num,Progress 8,Prog8,Average,Avg,EES,0,0,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,avg_p8score,double,number,geographic_level,breakdown,Total,sex,Total,,,time_period,202324,,,,,,,
 
-,,, England Headline Measures - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Headline Measures - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,22_KS4_ATT8_BOY_ENG,Attainment8_Boy_Eng_Previous2_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2022-2023,Previous2,2223_la_char_data_revised,avg_att8,double,number,geographic_level,breakdown,Total,gender,Boys,,,time_period,202223,,,,,,,
 England,22_KS4_ATT8_DIS_ENG,Attainment8_Dis_Eng_Previous2_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2022-2023,Previous2,2223_la_char_data_revised,avg_att8,double,number,geographic_level,breakdown,Disadvantage,gender,Total,disadvantage,Disadvantaged,time_period,202223,,,,,,,
@@ -524,7 +483,7 @@ England,22_KS4_EM95_TOT_ENG,EngMaths59_Tot_Eng_Previous2_Num,English and Maths g
 England,22_KS4_EM95_TOT_ENG_PC,EngMaths59_Tot_Eng_Previous2_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2022-2023,Previous2,2223_la_char_data_revised,pt_l2basics_95,double,percentage,geographic_level,breakdown,Total,gender,Total,,,time_period,202223,,,No,,,,
 England,22_KS4_P8_TOT_ENG,Prog8_Avg_Eng_Previous2_Num,Progress 8,Prog8,Average,Avg,EES,0,0,KS4_Performance,Performance,2022-2023,Previous2,202324_la_char_data_revised,avg_p8score,double,number,geographic_level,breakdown,Total,sex,Total,,,time_period,202223,,,,,,,
 
-,,, Establishment Headline Measures - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Headline Measures - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,24_KS4_AT8_BOY,Attainment8_Boy_Est_Current_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2024-2025,Current,202425_performance_tables_schools_provisional,attainment8_average,double,number,school_urn,breakdown,Boys,,,,,,,,,No,,,,
 Establishment,24_KS4_AT8_DIS,Attainment8_Dis_Est_Current_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2024-2025,Current,202425_performance_tables_schools_provisional,attainment8_average,double,number,school_urn,breakdown,Disadvantaged,,,,,,,,,No,,,,
@@ -562,7 +521,7 @@ Establishment,24_KS4_EM95_NMB_PC,EngMaths59_NMo_Est_Current_Pct,English and Math
 Establishment,24_KS4_EM95_TOT,EngMaths59_Tot_Est_Current_Num,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,0,0,KS4_Performance,Performance,2024-2025,Current,202425_performance_tables_schools_provisional,engmath_95_total,double,number,school_urn,breakdown,Total,,,,,,,,,No,,,,
 Establishment,24_KS4_EM95_TOT_PC,EngMaths59_Tot_Est_Current_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2024-2025,Current,202425_performance_tables_schools_provisional,engmath_95_percent,double,percentage,school_urn,breakdown,Total,,,,,,,,,No,,,,
 
-,,, Establishment Headline Measures - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Headline Measures - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,23_KS4_AT8_BOY,Attainment8_Boy_Est_Previous_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2023-2024,Previous,202324_performance_tables_schools_final,avg_att8,double,number,school_urn,breakdown,Boys,,,,,,,,,No,,,,
 Establishment,23_KS4_AT8_DIS,Attainment8_Dis_Est_Previous_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2023-2024,Previous,202324_performance_tables_schools_final,avg_att8,double,number,school_urn,breakdown,Disadvantaged,,,,,,,,,No,,,,
@@ -596,7 +555,7 @@ Establishment,23_KS4_EM95_TOT,EngMaths59_Tot_Est_Previous_Num,English and Maths 
 Establishment,23_KS4_EM95_TOT_PC,EngMaths59_Tot_Est_Previous_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2023-2024,Previous,202324_performance_tables_schools_final,pt_l2basics_95,double,percentage,school_urn,breakdown,Total,,,,,,,,,No,,,,
 Establishment,23_KS4_P8_TOT,Prog8_Tot_Est_Previous_Num,Progress 8,Prog8,Average,Tot,EES,0,1,KS4_Performance,Performance,2023-2024,Previous,202324_performance_tables_schools_final,avg_p8score,double,number,school_urn,breakdown,Total,,,,,,,,,No,,,,
 
-,,, Establishment Headline Measures - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Headline Measures - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,22_KS4_AT8_BOY,Attainment8_Boy_Est_Previous2_Num,Attainment 8,Attainment8,Boys,Boy,CSCP,1,0,KS4_Performance,Performance,2022-2023,Previous2,2022-2023_england_ks4final,ATT8SCR_BOYS,double,number,URN,,,,,,,,,,,,,,,
 Establishment,22_KS4_AT8_DIS,Attainment8_Dis_Est_Previous2_Num,Attainment 8,Attainment8,Disadvantaged,Dis,CSCP,1,0,KS4_Performance,Performance,2022-2023,Previous2,2022-2023_england_ks4final,ATT8SCR_FSM6CLA1A,double,number,URN,,,,,,,,,,,,,,,
@@ -619,7 +578,7 @@ Establishment,22_KS4_EM95_NMOB_PC,EngMaths59_Mob_Est_Previous2_Pct,English and M
 Establishment,22_KS4_EM95_TOT_PC,EngMaths59_Tot_Est_Previous2_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,CSCP,1,1,KS4_Performance,Performance,2022-2023,Previous2,2022-2023_england_ks4final,PTL2BASICS_95,double,percentage,URN,,,,,,,,,,,,,,,
 Establishment,22_KS4_P8_TOT,Prog8_Tot_Est_Previous2_Num,Progress 8,Prog8,Average,Tot,CSCP,0,1,KS4_Performance,Performance,2022-2023,Previous2,2022-2023_england_ks4final,P8MEA,double,number,URN,,,,,,,,,,,,,,,
 
-,,, LA Headline Measures - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Headline Measures - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,24_KS4_AT8_BOY_LA,Attainment8_Boy_LA_Current_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,attainment8_average,double,number,old_la_code,breakdown_topic,Sex,sex,Boys,time_period,202425,,,,,,,,,
 LA,24_KS4_AT8_DIS_LA,Attainment8_Dis_LA_Current_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,attainment8_average,double,number,old_la_code,breakdown_topic,Disadvantage status,disadvantage_status,Disadvantaged,time_period,202425,,,,,No,,,,
@@ -657,7 +616,7 @@ LA,24_KS4_EM95_NDV_LA_PC,EngMaths59_NDi_LA_Current_Pct,English and Maths grades 
 LA,24_KS4_EM95_TOT_LA,EngMaths59_Tot_LA_Current_Num,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,0,0,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,engmath_95_total,double,number,old_la_code,breakdown_topic,Total,,,time_period,202425,,,,,,,,,
 LA,24_KS4_EM95_TOT_LA_PC,EngMaths59_Tot_LA_Current_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2024-2025,Current,202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_provisional,engmath_95_percent,double,percentage,old_la_code,breakdown_topic,Total,,,time_period,202425,,,,,,,,,
 
-,,, LA Headline Measures - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Headline Measures - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,23_KS4_ATT8_BOY_LA,Attainment8_Boy_LA_Previous_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,avg_att8,double,number,old_la_code,breakdown,Total,sex,Boys,,,time_period,202324,,,,,,,
 LA,23_KS4_ATT8_DIS_LA,Attainment8_Dis_LA_Previous_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,avg_att8,double,number,old_la_code,breakdown,Disadvantage,sex,Total,disadvantage,Disadvantaged,time_period,202324,,,,,,,
@@ -686,7 +645,7 @@ LA,23_KS4_EM95_TOT_LA,EngMaths59_Tot_LA_Previous_Num,English and Maths grades 5 
 LA,23_KS4_EM95_TOT_LA_PC,EngMaths59_Tot_LA_Previous_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,pt_l2basics_95,double,percentage,old_la_code,breakdown,Total,sex,Total,,,time_period,202324,,,No,,,,
 LA,23_KS4_P8_TOT_LA,Prog8_Avg_LA_Previous_Num,Progress 8,Prog8,Average,Avg,EES,0,1,KS4_Performance,Performance,2023-2024,Previous,202324_la_char_data_revised,avg_p8score,double,number,old_la_code,breakdown,Total,sex,Total,,,time_period,202324,,,,,,,
 
-,,, LA Headline Measures - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Headline Measures - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,22_KS4_ATT8_BOY_LA,Attainment8_Boy_LA_Previous2_Num,Attainment 8,Attainment8,Boys,Boy,EES,1,0,KS4_Performance,Performance,2022-2023,Previous2,2223_la_char_data_revised,avg_att8,double,number,old_la_code,breakdown,Total,gender,Boys,,,time_period,202223,,,,,,,
 LA,22_KS4_ATT8_DIS_LA,Attainment8_Dis_LA_Previous2_Num,Attainment 8,Attainment8,Disadvantaged,Dis,EES,1,0,KS4_Performance,Performance,2022-2023,Previous2,2223_la_char_data_revised,avg_att8,double,number,old_la_code,breakdown,Disadvantage,gender,Total,disadvantage,Disadvantaged,time_period,202223,,,,,,,
@@ -715,7 +674,7 @@ LA,22_KS4_EM95_TOT_LA,EngMaths59_Tot_LA_Previous2_Num,English and Maths grades 5
 LA,22_KS4_EM95_TOT_LA_PC,EngMaths59_Tot_LA_Previous2_Pct,English and Maths grades 5 to 9,EngMaths59,Total,Tot,EES,1,1,KS4_Performance,Performance,2022-2023,Previous2,2223_la_char_data_revised,pt_l2basics_95,double,percentage,old_la_code,breakdown,Total,gender,Total,,,time_period,202223,,,No,,,,
 LA,22_KS4_P8_TOT_LA,Prog8_Avg_LA_Previous2_Num,Progress 8,Prog8,Average,Avg,EES,0,1,KS4_Performance,Performance,2022-2023,Previous2,202324_la_char_data_revised,avg_p8score,double,number,old_la_code,breakdown,Total,sex,Total,,,time_period,202223,,,,,,,
 
-,,, England Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,24_KS4SE_BIO_49_BOY_ENG,Bio49_Boy_Eng_Current_Num,Biology grades 4 to 9,Bio49,Boys,Boy,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,geographic_level,subject,Biology,grade,9 to 4,sex,Boys,time_period,202425,,,,,,,
 England,24_KS4SE_BIO_49_GRL_ENG,Bio49_Grl_Eng_Current_Num,Biology grades 4 to 9,Bio49,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,geographic_level,subject,Biology,grade,9 to 4,sex,Girls,time_period,202425,,,,,,,
@@ -844,7 +803,7 @@ England,24_KS4SE_PHYSICS_79_BOY_ENG,Physics79_Boy_Eng_Current_Pct,Physics grades
 England,24_KS4SE_PHYSICS_79_GRL_ENG,Physics79_Grl_Eng_Current_Pct,Physics grades 7 to 9,Physics79,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,geographic_level,subject,Physics,grade,9 to 7,sex,Girls,time_period,202425,,,,,,,
 England,24_KS4SE_PHYSICS_79_TOT_ENG,Physics79_Tot_Eng_Current_Pct,Physics grades 7 to 9,Physics79,Total,Tot,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,geographic_level,subject,Physics,grade,9 to 7,sex,Total,time_period,202425,,,,,,,
 
-,,, England Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,23_KS4SE_BIO_49_BOY_ENG,Bio49_Boy_Eng_Previous_Num,Biology grades 4 to 9,Bio49,Boys,Boy,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,geographic_level,subject,Biology,grade,9 to 4,sex,Boys,time_period,202324,,,,,,,
 England,23_KS4SE_BIO_49_GRL_ENG,Bio49_Grl_Eng_Previous_Num,Biology grades 4 to 9,Bio49,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,geographic_level,subject,Biology,grade,9 to 4,sex,Girls,time_period,202324,,,,,,,
@@ -973,7 +932,7 @@ England,23_KS4SE_PHYSICS_79_BOY_ENG,Physics79_Boy_Eng_Previous_Pct,Physics grade
 England,23_KS4SE_PHYSICS_79_GRL_ENG,Physics79_Grl_Eng_Previous_Pct,Physics grades 7 to 9,Physics79,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,geographic_level,subject,Physics,grade,9 to 7,sex,Girls,time_period,202324,,,,,,,
 England,23_KS4SE_PHYSICS_79_TOT_ENG,Physics79_Tot_Eng_Previous_Pct,Physics grades 7 to 9,Physics79,Total,Tot,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,geographic_level,subject,Physics,grade,9 to 7,sex,Total,time_period,202324,,,,,,,
 
-,,, England Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, England KS4 Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 England,22_KS4SE_BIO_49_BOY_ENG,Bio49_Boy_Eng_Previous2_Num,Biology grades 4 to 9,Bio49,Boys,Boy,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,geographic_level,subject,Biology,grade,9 to 4,sex,Boys,time_period,202223,,,,,,,
 England,22_KS4SE_BIO_49_GRL_ENG,Bio49_Grl_Eng_Previous2_Num,Biology grades 4 to 9,Bio49,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,geographic_level,subject,Biology,grade,9 to 4,sex,Girls,time_period,202223,,,,,,,
@@ -1102,7 +1061,7 @@ England,22_KS4SE_PHYSICS_79_BOY_ENG,Physics79_Boy_Eng_Previous2_Pct,Physics grad
 England,22_KS4SE_PHYSICS_79_GRL_ENG,Physics79_Grl_Eng_Previous2_Pct,Physics grades 7 to 9,Physics79,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,geographic_level,subject,Physics,grade,9 to 7,sex,Girls,time_period,202223,,,,,,,
 England,22_KS4SE_PHYSICS_79_TOT_ENG,Physics79_Tot_Eng_Previous2_Pct,Physics grades 7 to 9,Physics79,Total,Tot,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,geographic_level,subject,Physics,grade,9 to 7,sex,Total,time_period,202223,,,,,,,
 
-,,, Establishment Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,24_KS4SE_BIO_49,Bio49_Sum_Est_Current_Num,Biology grades 4 to 9,Bio49,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202425_subject_school_pupil_entriesachievements_revised,number_achieving,double,number,school_urn,discount_code,RH3,grade,9 to 4,,,,,,,,,,,
 Establishment,24_KS4SE_BIO_59,Bio59_Sum_Est_Current_Num,Biology grades 5 to 9,Bio59,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202425_subject_school_pupil_entriesachievements_revised,number_achieving,double,number,school_urn,discount_code,RH3,grade,9 to 5,,,,,,,,,,,
@@ -1147,7 +1106,7 @@ Establishment,24_KS4SE_PHYSICS_49,Physics49_Sum_Est_Current_Pct,Physics grades 4
 Establishment,24_KS4SE_PHYSICS_59,Physics59_Sum_Est_Current_Pct,Physics grades 5 to 9,Physics59,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202425_subject_school_pupil_entriesachievements_revised,percentage_achieving,double,number,school_urn,discount_code,RC1,grade,9 to 5,,,,,,,,,,,
 Establishment,24_KS4SE_PHYSICS_79,Physics79_Sum_Est_Current_Pct,Physics grades 7 to 9,Physics79,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202425_subject_school_pupil_entriesachievements_revised,percentage_achieving,double,number,school_urn,discount_code,RC1,grade,9 to 7,,,,,,,,,,,
 
-,,, Establishment Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,23_KS4SE_BIO_49,Bio49_Sum_Est_Previous_Num,Biology grades 4 to 9,Bio49,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202324_subject_school_pupil_entriesachievements_final,number_achieving,double,number,school_urn,discount_code,RH3,grade,9 to 4,,,,,,,,,,,
 Establishment,23_KS4SE_BIO_59,Bio59_Sum_Est_Previous_Num,Biology grades 5 to 9,Bio59,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202324_subject_school_pupil_entriesachievements_final,number_achieving,double,number,school_urn,discount_code,RH3,grade,9 to 5,,,,,,,,,,,
@@ -1192,7 +1151,7 @@ Establishment,23_KS4SE_PHYSICS_49,Physics49_Sum_Est_Previous_Pct,Physics grades 
 Establishment,23_KS4SE_PHYSICS_59,Physics59_Sum_Est_Previous_Pct,Physics grades 5 to 9,Physics59,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202324_subject_school_pupil_entriesachievements_final,percentage_achieving,double,number,school_urn,discount_code,RC1,grade,9 to 5,,,,,,,,,,,
 Establishment,23_KS4SE_PHYSICS_79,Physics79_Sum_Est_Previous_Pct,Physics grades 7 to 9,Physics79,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202324_subject_school_pupil_entriesachievements_final,percentage_achieving,double,number,school_urn,discount_code,RC1,grade,9 to 7,,,,,,,,,,,
 
-,,, Establishment Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,22_KS4SE_BIO_49,Bio49_Sum_Est_Previous2_Num,Biology grades 4 to 9,Bio49,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202223_subject_school_pupil_entriesachievements_final,number_achieving,double,number,school_urn,discount_code,RH3,grade,9 to 4,,,,,,,,,,,
 Establishment,22_KS4SE_BIO_59,Bio59_Sum_Est_Previous2_Num,Biology grades 5 to 9,Bio59,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202223_subject_school_pupil_entriesachievements_final,number_achieving,double,number,school_urn,discount_code,RH3,grade,9 to 5,,,,,,,,,,,
@@ -1237,7 +1196,7 @@ Establishment,22_KS4SE_PHYSICS_49,Physics49_Sum_Est_Previous2_Pct,Physics grades
 Establishment,22_KS4SE_PHYSICS_59,Physics59_Sum_Est_Previous2_Pct,Physics grades 5 to 9,Physics59,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202223_subject_school_pupil_entriesachievements_final,percentage_achieving,double,number,school_urn,discount_code,RC1,grade,9 to 5,,,,,,,,,,,
 Establishment,22_KS4SE_PHYSICS_79,Physics79_Sum_Est_Previous2_Pct,Physics grades 7 to 9,Physics79,Sum,Sum,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202223_subject_school_pupil_entriesachievements_final,percentage_achieving,double,number,school_urn,discount_code,RC1,grade,9 to 7,,,,,,,,,,,
 
-,,, LA Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,24_KS4SE_BIO_49_BOY_LA,Bio49_Boy_LA_Current_Num,Biology grades 4 to 9,Bio49,Boys,Boy,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,old_la_code,subject,Biology,grade,9 to 4,sex,Boys,time_period,202425,,,,,,,
 LA,24_KS4SE_BIO_49_GRL_LA,Bio49_Grl_LA_Current_Num,Biology grades 4 to 9,Bio49,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,old_la_code,subject,Biology,grade,9 to 4,sex,Girls,time_period,202425,,,,,,,
@@ -1366,7 +1325,7 @@ LA,24_KS4SE_PHYSICS_79_BOY_LA,Physics79_Boy_LA_Current_Pct,Physics grades 7 to 9
 LA,24_KS4SE_PHYSICS_79_GRL_LA,Physics79_Grl_LA_Current_Pct,Physics grades 7 to 9,Physics79,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,old_la_code,subject,Physics,grade,9 to 7,sex,Girls,time_period,202425,,,,,,,
 LA,24_KS4SE_PHYSICS_79_TOT_LA,Physics79_Tot_LA_Current_Pct,Physics grades 7 to 9,Physics79,Total,Tot,EES,1,0,KS4_Performance,SubjectEntries,2024-2025,Current,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,old_la_code,subject,Physics,grade,9 to 7,sex,Total,time_period,202425,,,,,,,
 
-,,, LA Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,23_KS4SE_BIO_49_BOY_LA,Bio49_Boy_LA_Previous_Num,Biology grades 4 to 9,Bio49,Boys,Boy,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,old_la_code,subject,Biology,grade,9 to 4,sex,Boys,time_period,202324,,,,,,,
 LA,23_KS4SE_BIO_49_GRL_LA,Bio49_Grl_LA_Previous_Num,Biology grades 4 to 9,Bio49,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,old_la_code,subject,Biology,grade,9 to 4,sex,Girls,time_period,202324,,,,,,,
@@ -1495,7 +1454,7 @@ LA,23_KS4SE_PHYSICS_79_BOY_LA,Physics79_Boy_LA_Previous_Pct,Physics grades 7 to 
 LA,23_KS4SE_PHYSICS_79_GRL_LA,Physics79_Grl_LA_Previous_Pct,Physics grades 7 to 9,Physics79,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,old_la_code,subject,Physics,grade,9 to 7,sex,Girls,time_period,202324,,,,,,,
 LA,23_KS4SE_PHYSICS_79_TOT_LA,Physics79_Tot_LA_Previous_Pct,Physics grades 7 to 9,Physics79,Total,Tot,EES,1,0,KS4_Performance,SubjectEntries,2023-2024,Previous,custom_202325_subject_local_authority_pupil_entriesachievements,percentage_achieving,double,number,old_la_code,subject,Physics,grade,9 to 7,sex,Total,time_period,202324,,,,,,,
 
-,,, LA Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, LA KS4 Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 LA,22_KS4SE_BIO_49_BOY_LA,Bio49_Boy_LA_Previous2_Num,Biology grades 4 to 9,Bio49,Boys,Boy,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,old_la_code,subject,Biology,grade,9 to 4,sex,Boys,time_period,202223,,,,,,,
 LA,22_KS4SE_BIO_49_GRL_LA,Bio49_Grl_LA_Previous2_Num,Biology grades 4 to 9,Bio49,Girls,Grl,EES,1,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,custom_202325_subject_local_authority_pupil_entriesachievements,number_achieving,double,number,old_la_code,subject,Biology,grade,9 to 4,sex,Girls,time_period,202223,,,,,,,
@@ -1671,7 +1630,7 @@ LA,22_SUS_TOT_LA,Sus_Tot_LA_Previous2_Pct,Suspension rate,Sus,Total,Tot,EES,1,0,
 Establishment,24_PUP_TEACH_RATIO,Workforce_PupTeaRatio_Est_Current_Num,Workforce,Workforce,Pupil Teacher Ratio,PupTeaRatio,EES,0,1,Workforce,Workforce,2024-2025,Current,workforce_ptrs_2010_2024_sch,pupil_to_qual_teacher_ratio,double,number,school_urn,time_period,202425,,,,,,,,,,,,,
 Establishment,24_PUP_FTE,Workforce_TotPupils_Est_Current_Num,Workforce,Workforce,PupIl FTE,TotPupils,EES,0,1,Workforce,Workforce,2024-2025,Current,workforce_ptrs_2010_2024_sch,pupils_fte,double,number,school_urn,time_period,202425,,,,,,,,,,,,,
 
-,,, Establishment Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Core Subjects - Current (2024-25) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,24_KS4SE_BIO_49,Bio4_Sum_Est_Current_Num,Biology grade 4,Bio4,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2024-2025,Current,202425_subject_school_all_exam_entriesgrades_provisional,number_achieving,double,number,school_urn,discount_code,RH3,grade,4,,,,,,,,,,,
 Establishment,24_KS4SE_BIO_50,Bio5_Sum_Est_Current_Num,Biology grade 5,Bio5,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2024-2025,Current,202425_subject_school_all_exam_entriesgrades_provisional,number_achieving,double,number,school_urn,discount_code,RH3,grade,5,,,,,,,,,,,
@@ -1722,7 +1681,7 @@ Establishment,24_KS4SE_PHYSICS_52,Physics7_Sum_Est_Current_Num,Physics grade 7,P
 Establishment,24_KS4SE_PHYSICS_53,Physics8_Sum_Est_Current_Num,Physics grade 8,Physics8,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2024-2025,Current,202425_subject_school_all_exam_entriesgrades_provisional,number_achieving,double,number,school_urn,discount_code,RC1,grade,8,,,,,,,,,,,
 Establishment,24_KS4SE_PHYSICS_54,Physics9_Sum_Est_Current_Num,Physics grade 9,Physics9,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2024-2025,Current,202425_subject_school_all_exam_entriesgrades_provisional,number_achieving,double,number,school_urn,discount_code,RC1,grade,9,,,,,,,,,,,
 
-,,, Establishment Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Core Subjects - Previous (2023-24) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,23_KS4SE_BIO_49,Bio4_Sum_Est_Previous_Num,Biology grade 4,Bio4,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2023-2024,Previous,202324_subject_school_all_exam_entriesgrades_final,number_achieving,double,number,school_urn,discount_code,RH3,grade,4,,,,,,,,,,,
 Establishment,23_KS4SE_BIO_50,Bio5_Sum_Est_Previous_Num,Biology grade 5,Bio5,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2023-2024,Previous,202324_subject_school_all_exam_entriesgrades_final,number_achieving,double,number,school_urn,discount_code,RH3,grade,5,,,,,,,,,,,
@@ -1773,7 +1732,7 @@ Establishment,23_KS4SE_PHYSICS_52,Physics7_Sum_Est_Previous_Num,Physics grade 7,
 Establishment,23_KS4SE_PHYSICS_53,Physics8_Sum_Est_Previous_Num,Physics grade 8,Physics8,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2023-2024,Previous,202324_subject_school_all_exam_entriesgrades_final,number_achieving,double,number,school_urn,discount_code,RC1,grade,8,,,,,,,,,,,
 Establishment,23_KS4SE_PHYSICS_54,Physics9_Sum_Est_Previous_Num,Physics grade 9,Physics9,Sum,Sum,EES,0,0,KS4_Performance,SubjectEntries,2023-2024,Previous,202324_subject_school_all_exam_entriesgrades_final,number_achieving,double,number,school_urn,discount_code,RC1,grade,9,,,,,,,,,,,
 
-,,, Establishment Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+,,, Establishment KS4 Core Subjects - Previous2 (2022-23) ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 Establishment,22_KS4SE_BIO_49,Bio4_Sum_Est_Previous2_Num,Biology grade 4,Bio4,Sum,Sum,CSCP,0,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,england_ks4underlying_entriesandgrades_2,Number of entries at grade,double,number,Unique Reference Number (URN),Discount Code,RH3,GRADE,4,,,,,,,,,,,
 Establishment,22_KS4SE_BIO_50,Bio5_Sum_Est_Previous2_Num,Biology grade 5,Bio5,Sum,Sum,CSCP,0,0,KS4_Performance,SubjectEntries,2022-2023,Previous2,england_ks4underlying_entriesandgrades_2,Number of entries at grade,double,number,Unique Reference Number (URN),Discount Code,RH3,GRADE,5,,,,,,,,,,,
