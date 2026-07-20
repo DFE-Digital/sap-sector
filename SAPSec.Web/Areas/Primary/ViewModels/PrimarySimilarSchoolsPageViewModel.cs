@@ -59,7 +59,7 @@ public class PrimarySimilarSchoolsPageViewModel
                     row.Rank,
                     row.Distance,
                     Routes.PrimarySchool(response.CurrentSchool.Urn).SimilarSchoolComparison(row.Urn),
-                    BuildFullAddress(row.Address3, row.Town, row.Postcode),
+                    BuildFullAddress(row.Street, row.Locality, row.Town, row.Postcode),
                     row.Latitude?.ToString(CultureInfo.InvariantCulture),
                     row.Longitude?.ToString(CultureInfo.InvariantCulture),
                     row.SortMetricName,
@@ -75,7 +75,7 @@ public class PrimarySimilarSchoolsPageViewModel
                     row.Rank,
                     row.Distance,
                     Routes.PrimarySchool(response.CurrentSchool.Urn).SimilarSchoolComparison(row.Urn),
-                    BuildFullAddress(row.Address3, row.Town, row.Postcode),
+                    BuildFullAddress(row.Street, row.Locality, row.Town, row.Postcode),
                     row.Latitude?.ToString(CultureInfo.InvariantCulture),
                     row.Longitude?.ToString(CultureInfo.InvariantCulture),
                     row.SortMetricName,
@@ -267,11 +267,12 @@ public class PrimarySimilarSchoolsPageViewModel
     }
 
     private static string BuildFullAddress(
-        string address3,
+        string street,
+        string locality,
         string town,
         string postcode)
     {
-        var parts = new[] {  address3, town, postcode }
+        var parts = new[] { street, locality, town, postcode }
             .Where(part => !string.IsNullOrWhiteSpace(part));
 
         return string.Join(", ", parts);
