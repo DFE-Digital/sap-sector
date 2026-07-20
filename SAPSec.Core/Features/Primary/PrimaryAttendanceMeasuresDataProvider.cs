@@ -2,34 +2,34 @@ using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Attendance;
+namespace SAPSec.Core.Features.Primary;
 
-public class AttendanceMeasuresDataProvider(
+public class PrimaryAttendanceMeasuresDataProvider(
     IAbsenceRepository attendanceRepository,
     IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository)
+    ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository
+   /* ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository*/)
 {
     public async Task<SimilarSchoolsData<AbsenceData>> GetSimilarSchoolsAttendance(string currentSchoolUrn, string phase)
     {
         var similarSchoolUrns = new string[0];
 
-        if (phase == PhaseOfEducationValues.Secondary)
-        {
-            similarSchoolUrns = (await similarSchoolsSecondaryRepository.GetGroupAsync(currentSchoolUrn))
-               .Select(x => x.NeighbourURN)
-               .Where(x => !string.IsNullOrWhiteSpace(x))
-               .Distinct(StringComparer.Ordinal)
-               .ToArray();
-        }
-        else
-        {
-            similarSchoolUrns = (await similarSchoolsPrimaryRepository.GetGroupAsync(currentSchoolUrn))
-               .Select(x => x.NeighbourURN)
-               .Where(x => !string.IsNullOrWhiteSpace(x))
-               .Distinct(StringComparer.Ordinal)
-               .ToArray();
-        }
+        //if (phase == PhaseOfEducationValues.Secondary)
+        //{
+        //    similarSchoolUrns = (await similarSchoolsSecondaryRepository.GetGroupAsync(currentSchoolUrn))
+        //       .Select(x => x.NeighbourURN)
+        //       .Where(x => !string.IsNullOrWhiteSpace(x))
+        //       .Distinct(StringComparer.Ordinal)
+        //       .ToArray();
+        //}
+        //else
+        //{
+        similarSchoolUrns = (await similarSchoolsPrimaryRepository.GetGroupAsync(currentSchoolUrn))
+            .Select(x => x.NeighbourURN)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        //}
 
         var schools = (await establishmentRepository.GetEstablishmentsAsync([currentSchoolUrn, .. similarSchoolUrns]))
             .Select(SchoolInfo.SchoolInfo.FromEstablishment)

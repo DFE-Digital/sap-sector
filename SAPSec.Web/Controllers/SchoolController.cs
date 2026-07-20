@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Constants;
-using SAPSec.Core.Features.Attendance;
+using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
 using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
@@ -10,7 +9,6 @@ using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
-using static SAPSec.Core.Features.Attendance.GetAttendanceMeasuresUseCase;
 using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
 
 namespace SAPSec.Web.Controllers;
@@ -27,7 +25,7 @@ public class SchoolController : Controller
     private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
     private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
-    private readonly GetAttendanceMeasuresUseCase _getAttendanceMeasures;
+    private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly IFeatureFlagService _featureFlagService;
     private readonly IRequestSchoolAccessor _requestSchoolAccessor;
     private readonly ILogger<SchoolController> _logger;
@@ -36,7 +34,7 @@ public class SchoolController : Controller
         GetSchoolKs4HeadlineMeasures getSchoolKs4HeadlineMeasures,
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
         GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
-        GetAttendanceMeasuresUseCase getAttendanceMeasures,
+        GetAttendanceMeasures getAttendanceMeasures,
         IFeatureFlagService featureFlagService,
         IRequestSchoolAccessor requestSchoolAccessor,
         ILogger<SchoolController> logger)
@@ -85,7 +83,7 @@ public class SchoolController : Controller
     public async Task<IActionResult> Attendance(string urn)
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        var attendanceMeasures = await _getAttendanceMeasures.Execute(new(urn, PhaseOfEducationValues.Secondary));
+        var attendanceMeasures = await _getAttendanceMeasures.Execute(new(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
         return View(new SchoolAttendancePageViewModel
@@ -105,7 +103,7 @@ public class SchoolController : Controller
         }
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-        var response = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn, "primary"));
+        var response = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
         var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
 

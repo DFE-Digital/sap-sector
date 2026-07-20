@@ -88,15 +88,15 @@ internal static class AttendanceMeasures
                 similarSchool,
                 similarSchools,
                 new(
-                    x => x?.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct,
-                    x => x?.EstablishmentAbsence?.Abs_Tot_Est_Previous_Pct,
-                    x => x?.EstablishmentAbsence?.Abs_Tot_Est_Previous2_Pct,
-                    x => x?.LocalAuthorityAbsence?.Abs_Tot_LA_Current_Pct,
-                    x => x?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous_Pct,
-                    x => x?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous2_Pct,
-                    x => x?.EnglandAbsence?.Abs_Tot_Eng_Current_Pct,
-                    x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous_Pct,
-                    x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous2_Pct));
+                    x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct,
+                    x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct,
+                    x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityAbsence?.Abs_Persistent_LA_Current_Pct,
+                    x => x?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous_Pct,
+                    x => x?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous2_Pct,
+                    x => x?.EnglandAbsence?.Abs_Persistent_Eng_Current_Pct,
+                    x => x?.EnglandAbsence?.Abs_Persistent_Eng_Previous_Pct,
+                    x => x?.EnglandAbsence?.Abs_Persistent_Eng_Previous2_Pct));
         }
     }
 }

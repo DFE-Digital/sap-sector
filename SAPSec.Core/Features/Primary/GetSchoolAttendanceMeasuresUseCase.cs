@@ -1,24 +1,23 @@
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.Primary;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Attendance;
+namespace SAPSec.Core.Features.Primary;
 
-public class GetAttendanceMeasuresUseCase(
+public class GetSchoolAttendanceMeasuresUseCase(
     IAbsenceRepository attendanceRepository,
     IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
+    //ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository)
     : IUseCase<GetAttendanceMeasuresRequest, GetAttendanceMeasuresResponse>
 {
     public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
     {
-        var dataProvider = new AttendanceMeasuresDataProvider(
+        var dataProvider = new PrimaryAttendanceMeasuresDataProvider(
               attendanceRepository,
               establishmentRepository,
-              similarSchoolsPrimaryRepository,
-              similarSchoolsSecondaryRepository);
+              similarSchoolsPrimaryRepository
+             /* similarSchoolsSecondaryRepository*/);
 
         var (currentSchoolPerformance, similarSchoolsPerformance) = await dataProvider.GetSimilarSchoolsAttendance(request.Urn, request.Phase);
 
@@ -30,11 +29,11 @@ public class GetAttendanceMeasuresUseCase(
             AttendanceMeasures.TotalAbsence.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy));
-        //AttendanceMeasures.PersistentAbsence.ForSchool(
-        //    currentSchoolPerformance,
-        //    similarSchoolsPerformance,
-        //    filterBy));
+                filterBy),
+            AttendanceMeasures.PersistentAbsence.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+               filterBy));
     }
 
 }
@@ -47,8 +46,8 @@ IDictionary<string, string>? FilterBy = null);
 public record GetAttendanceMeasuresResponse(
 SchoolInfo.SchoolInfo School,
 int SimilarSchoolsCount,
-Measure Attendance
-/*Measure PersistentAbsence*/);
+Measure Attendance,
+Measure PersistentAbsence);
 
 
 

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
-using SAPSec.Core.Features.Attendance;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.UseCases;
