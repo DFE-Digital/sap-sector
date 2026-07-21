@@ -45,10 +45,11 @@ public class FindPrimarySimilarSchools(
                 await similarSchoolsRepository.GetValuesByUrnsAsync(urns))
             .ToDictionary(values => values.Urn, StringComparer.Ordinal);
 
-        if (!characteristics.TryGetValue(request.Urn, out var currentCharacteristics))
-        {
-            throw new NotFoundException($"No similar schools characteristics found for URN {request.Urn}");
-        }
+        // A school with no similar schools group also has no row in the similar schools
+        // values dataset - that's a valid "no similar schools" state, not a not-found error.
+        var currentCharacteristics = characteristics.TryGetValue(request.Urn, out var foundCharacteristics)
+            ? foundCharacteristics
+            : new SimilarSchoolsPrimaryValues { Urn = request.Urn };
 
         var absences = (await absenceRepository.GetByUrnsAsync(urns))
             .ToDictionary(absence => absence.Urn, StringComparer.Ordinal);

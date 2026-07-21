@@ -73,12 +73,15 @@
                     <span class="toggle-text">View on map</span>
                 </a>
             </div>
+        }
 
-            <div id="listView">
-                <partial name="SimilarSchoolsResults.cshtml" model="Model" />
-                <partial name="SimilarSchoolsPagination.cshtml" model="Model" />
-            </div>
+        <div id="listView">
+            <partial name="SimilarSchoolsResults.cshtml" model="Model" />
+            <partial name="SimilarSchoolsPagination.cshtml" model="Model" />
+        </div>
 
+        @if (hasVisibleResults)
+        {
             <div id="mapView" class="govuk-!-display-none">
                 <partial name="SimilarSchoolsMap.cshtml" model="Model" />
             </div>

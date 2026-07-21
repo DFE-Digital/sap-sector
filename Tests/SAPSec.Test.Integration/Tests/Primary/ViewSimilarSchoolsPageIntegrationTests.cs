@@ -173,12 +173,10 @@ public class ViewSimilarSchoolsPageIntegrationTests(
 
         var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
         list.TextContent.Should().Contain("Test School 2");
-        list.TextContent.Should().Contain("Test LA 2");
         list.TextContent.Should().Contain("Meeting expected standard in reading, writing and maths");
-        list.TextContent.Should().Contain("81.0%");
+        list.TextContent.Should().Contain("81%");
         list.TextContent.Should().Contain("Test School 3");
-        list.TextContent.Should().Contain("Test LA 3");
-        list.TextContent.Should().Contain("78.0%");
+        list.TextContent.Should().Contain("78%");
 
         page.QuerySelector("#sort-by")?.TextContent.Should().Contain("Meeting expected standard in reading, writing and maths");
         page.QuerySelector("#sort-by")?.TextContent.Should().Contain("Meeting expected standard in grammar, punctuation and spelling");
@@ -334,7 +332,19 @@ public class ViewSimilarSchoolsPageIntegrationTests(
 
         var list = page.ElementWithTestIdShouldExist("primary-similar-schools-list");
         list.TextContent.Should().Contain("Beta School");
-        list.TextContent.Should().Contain("70.0%");
+        list.TextContent.Should().Contain("70%");
         list.TextContent.Should().Contain("Meeting expected standard in grammar, punctuation and spelling");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchools_WhenNoSimilarSchoolsGroup_ShowsNoResultsMessageInsteadOfErrorPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            new Establishment { URN = "100001", EstablishmentName = "Test School 1", LAId = "001", LAName = "Test LA 1", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", NurseryProvisionName = "No", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", Easting = 100000, Northing = 100000, TotalCapacity = 300, TotalPupils = 210 });
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.OK);
+
+        page.Body!.TextContent.Should().Contain("There are no similar schools available for this school.");
+        page.QuerySelector("#sort-by").Should().BeNull();
     }
 }

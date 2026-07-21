@@ -31,14 +31,16 @@ public class FindPrimarySimilarSchoolsTests
     }
 
     [Fact]
-    public async Task WhenCurrentSchoolValuesDoNotExist_ThrowsNotFoundException()
+    public async Task WhenCurrentSchoolHasNoSimilarSchoolsGroup_ReturnsEmptyResponse()
     {
-        _establishmentRepo.SetupEstablishments(new Establishment { URN = "100001", EstablishmentName = "Current School" });
+        _establishmentRepo.SetupEstablishments(new Establishment { URN = "100001", EstablishmentName = "Current School", LAName = "LA One" });
 
-        var act = async () => await _sut.Execute(new("100001"));
+        var response = await _sut.Execute(new("100001"));
 
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage("*100001*");
+        response.CurrentSchool.Urn.Should().Be("100001");
+        response.CurrentSchool.Name.Should().Be("Current School");
+        response.SimilarSchoolsPage.Should().BeEmpty();
+        response.AllSimilarSchools.Should().BeEmpty();
     }
 
     [Fact]
