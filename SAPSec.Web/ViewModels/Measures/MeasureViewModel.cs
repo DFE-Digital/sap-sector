@@ -28,7 +28,7 @@ public record MeasureViewModel(
         {
             Core.Constants.Measures.Primary.Ks2ExpectedRwm =>
                 "Meeting expected standard in reading, writing and maths",
-            Core.Constants.Measures.Primary.TotalAbsence =>
+            Core.Constants.Measures.Primary.OverallAbsence =>
                 "Total absence",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };
