@@ -131,7 +131,11 @@ public class FindPrimarySimilarSchoolsTests
         response.FilterOptions.Should().NotBeEmpty();
         response.SortOptions.Should().SatisfyRespectively(
             o => o.Should().BeEquivalentTo(new { Key = "RwmExpected", Selected = true }),
-            o => o.Should().BeEquivalentTo(new { Key = "GpsExpected", Selected = false }));
+            o => o.Should().BeEquivalentTo(new { Key = "RwmHigher", Selected = false }),
+            o => o.Should().BeEquivalentTo(new { Key = "ReadingScaledScore", Selected = false }),
+            o => o.Should().BeEquivalentTo(new { Key = "MathsScaledScore", Selected = false }),
+            o => o.Should().BeEquivalentTo(new { Key = "GpsExpected", Selected = false }),
+            o => o.Should().BeEquivalentTo(new { Key = "GpsHigher", Selected = false }));
         response.ValidationErrors.Should().BeEmpty();
     }
 
@@ -220,6 +224,66 @@ public class FindPrimarySimilarSchoolsTests
         response.SortOptions.Should().Contain(x => x.Key == "GpsExpected" && x.Selected);
     }
 
+    [Theory]
+    [InlineData("RwmHigher", "Achieved a higher standard in reading, writing and maths")]
+    [InlineData("ReadingScaledScore", "Average scaled score in reading")]
+    [InlineData("MathsScaledScore", "Average scaled score in maths")]
+    [InlineData("GpsHigher", "Achieved a higher standard in grammar, punctuation and spelling")]
+    public async Task SortsByEachRemainingMeasureWhenSelected(string sortBy, string expectedSortName)
+    {
+        SetupThreeSchoolsForSorting();
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x
+                .WithRwmHigher("60", "", "")
+                .WithReadingScaledScore("60", "", "")
+                .WithMathsScaledScore("60", "", "")
+                .WithGpsHigher("60", "", "")),
+            Build.Ks2Performance.Establishment("100003", x => x
+                .WithRwmHigher("70", "", "")
+                .WithReadingScaledScore("70", "", "")
+                .WithMathsScaledScore("70", "", "")
+                .WithGpsHigher("70", "", "")));
+
+        var response = await _sut.Execute(new("100001", SortBy: sortBy));
+
+        response.SimilarSchoolsPage.Select(x => x.Urn).Should().Equal("100003", "100002");
+        response.SimilarSchoolsPage.First().SortMetricName.Should().Be(expectedSortName);
+        response.SortOptions.Should().Contain(x => x.Key == sortBy && x.Selected);
+    }
+
+    [Fact]
+    public async Task SortsSchoolsWithEqualOrMissingScoresAlphabetically()
+    {
+        SetupThreeSchoolsForSorting();
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected("70", "", "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithRwmExpected("70", "", "")));
+
+        var response = await _sut.Execute(new("100001", SortBy: "RwmExpected"));
+
+        // Alpha School and Beta School tie on score, so fall back to alphabetical order.
+        response.SimilarSchoolsPage.Select(x => x.Name).Should().Equal("Alpha School", "Beta School");
+    }
+
+    private void SetupThreeSchoolsForSorting()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new Establishment { URN = "100001", EstablishmentName = "Current School", LAName = "LA One", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 210 },
+            new Establishment { URN = "100002", EstablishmentName = "Alpha School", LAName = "LA Two", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 220 },
+            new Establishment { URN = "100003", EstablishmentName = "Beta School", LAName = "LA Three", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 230 });
+
+        _similarSchoolsRepo.SetupGroups(
+            new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = "100002", Dist = "0.1", Rank = "1" },
+            new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = "100003", Dist = "0.2", Rank = "2" });
+
+        _similarSchoolsRepo.SetupValues(
+            new SimilarSchoolsPrimaryValuesEntry { URN = "100001", PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = "210", ReadMatAverage = "102", Ks1PriorRwmAverage = "11" },
+            new SimilarSchoolsPrimaryValuesEntry { URN = "100002", PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = "220", ReadMatAverage = "101", Ks1PriorRwmAverage = "10" },
+            new SimilarSchoolsPrimaryValuesEntry { URN = "100003", PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = "230", ReadMatAverage = "100", Ks1PriorRwmAverage = "9" });
+    }
+
     [Fact]
     public async Task ReturnsPagedResultsAndAllResults()
     {
@@ -267,6 +331,9 @@ public class FindPrimarySimilarSchoolsTests
         response.SimilarSchoolsPage.CurrentPage.Should().Be(2);
         response.SimilarSchoolsPage.Should().HaveCount(2);
         response.AllSimilarSchools.Should().HaveCount(12);
-        response.SimilarSchoolsPage.Select(x => x.Rank).Should().Equal("11", "12");
+
+        // None of the 12 schools have performance data, so they all tie on the default sort
+        // measure and fall back to alphabetical order (AC3) - page 2 is items 11-12 of that order.
+        response.SimilarSchoolsPage.Select(x => x.Name).Should().Equal("Similar School 8", "Similar School 9");
     }
 }
