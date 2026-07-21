@@ -5,8 +5,8 @@ using SAPSec.Data.Repositories;
 namespace SAPSec.Core.Features.Primary;
 
 public class GetSchoolAttendanceMeasuresUseCase(
-    IAbsenceRepository absenceRepository,
-    IEstablishmentRepository establishmentRepository)
+    IEstablishmentRepository establishmentRepository,
+    IAbsenceRepository absenceRepository)
     : IUseCase<GetAttendanceMeasuresRequest, GetAttendanceMeasuresResponse>
 {
     public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
