@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using SAPData.Models;
 using SAPSec.Data.Common;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.SimilarSchools.Primary;
 using System.Globalization;
 using System.Text;
 
@@ -75,13 +76,22 @@ internal class Program
 
         Console.WriteLine($"Loaded {establishments.Count} Establishments");
 
+        var similarSchoolsFile = Path.Combine(generatedJsonDir, "SimilarSchoolsPrimaryGroupsEntry.json");
+        var similarSchoolsGroupEntries = JsonConvert.DeserializeObject<List<SimilarSchoolsPrimaryGroupsEntry>>(File.ReadAllText(similarSchoolsFile)) ?? [];
+        var similarSchoolsGroups = similarSchoolsGroupEntries.GroupBy(e => e.URN);
+        var similarSchoolsUrns = similarSchoolsGroupEntries.Select(g => g.URN).Concat(similarSchoolsGroupEntries.Select(g => g.NeighbourURN)).Distinct().ToList();
+
+        Console.WriteLine($"Loaded {similarSchoolsGroups.Count()} primary similar schools groups");
+
         var primarySchoolUrns = establishments
             .Where(e => e.PhaseOfEducationId is "2")
+            .Where(e => similarSchoolsUrns.Contains(e.URN))
             .Select(e => e.URN)
             .ToArray();
 
         var laIds = establishments
             .Where(e => e.PhaseOfEducationId is "2")
+            .Where(e => similarSchoolsUrns.Contains(e.URN))
             .Select(e => e.LAId)
             .Distinct()
             .ToArray();
