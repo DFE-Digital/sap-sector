@@ -74,14 +74,11 @@ public class SchoolController(
         [FromQuery] string? page = null)
     {
         var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
+        var filterBy = PrimarySimilarSchoolsPageViewModel.ExtractCurrentFilters(Request.Query)
+            .ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<string>)kvp.Value, StringComparer.InvariantCultureIgnoreCase);
         var response = await findPrimarySimilarSchoolsUseCase.Execute(new(
             urn,
-            Request.Query
-                .Where(kvp => kvp.Key != "sortBy" && kvp.Key != "page")
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value.Where(v => !string.IsNullOrWhiteSpace(v))!.Select(v => v!),
-                    StringComparer.InvariantCultureIgnoreCase),
+            filterBy,
             sortBy,
             page));
 

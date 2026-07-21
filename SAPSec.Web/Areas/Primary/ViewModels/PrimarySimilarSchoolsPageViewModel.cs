@@ -51,38 +51,8 @@ public class PrimarySimilarSchoolsPageViewModel
                 string.Empty),
             CurrentSchoolLocalAuthorityName = response.CurrentSchool.LocalAuthorityName,
             CurrentSchoolCharacteristics = PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(response.CurrentSchool.Characteristics),
-            SimilarSchools = response.SimilarSchoolsPage
-                .Select(row => new PrimarySimilarSchoolsRowViewModel(
-                    row.Urn,
-                    row.Name,
-                    row.LocalAuthorityName,
-                    row.Rank,
-                    row.Distance,
-                    Routes.PrimarySchool(response.CurrentSchool.Urn).SimilarSchoolComparison(row.Urn),
-                    BuildFullAddress(row.Street, row.Town, row.Postcode),
-                    row.Latitude?.ToString(CultureInfo.InvariantCulture),
-                    row.Longitude?.ToString(CultureInfo.InvariantCulture),
-                    row.SortMetricName,
-                    DisplaySortValue(row.SortMetricDisplayValue),
-                    PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(row.Characteristics)))
-                .ToList()
-                .AsReadOnly(),
-            MapSchools = response.AllSimilarSchools
-                .Select(row => new PrimarySimilarSchoolsRowViewModel(
-                    row.Urn,
-                    row.Name,
-                    row.LocalAuthorityName,
-                    row.Rank,
-                    row.Distance,
-                    Routes.PrimarySchool(response.CurrentSchool.Urn).SimilarSchoolComparison(row.Urn),
-                    BuildFullAddress(row.Street, row.Town, row.Postcode),
-                    row.Latitude?.ToString(CultureInfo.InvariantCulture),
-                    row.Longitude?.ToString(CultureInfo.InvariantCulture),
-                    row.SortMetricName,
-                    DisplaySortValue(row.SortMetricDisplayValue),
-                    PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(row.Characteristics)))
-                .ToList()
-                .AsReadOnly(),
+            SimilarSchools = MapRows(response.SimilarSchoolsPage, response.CurrentSchool.Urn),
+            MapSchools = MapRows(response.AllSimilarSchools, response.CurrentSchool.Urn),
             Urn = int.TryParse(response.CurrentSchool.Urn, out var urn) ? urn : 0,
             CurrentFilters = currentFilters,
             FilterGroups = BuildFilterGroups(filterOptions),
@@ -96,7 +66,7 @@ public class PrimarySimilarSchoolsPageViewModel
         };
     }
 
-    private static Dictionary<string, List<string>> ExtractCurrentFilters(IQueryCollection query)
+    public static Dictionary<string, List<string>> ExtractCurrentFilters(IQueryCollection query)
     {
         var result = new Dictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
         foreach (var (key, values) in query)
@@ -265,6 +235,26 @@ public class PrimarySimilarSchoolsPageViewModel
 
         return items;
     }
+
+    private static IReadOnlyCollection<PrimarySimilarSchoolsRowViewModel> MapRows(
+        IEnumerable<PrimarySimilarSchool> rows,
+        string currentSchoolUrn) =>
+        rows
+            .Select(row => new PrimarySimilarSchoolsRowViewModel(
+                row.Urn,
+                row.Name,
+                row.LocalAuthorityName,
+                row.Rank,
+                row.Distance,
+                Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparison(row.Urn),
+                BuildFullAddress(row.Street, row.Town, row.Postcode),
+                row.Latitude?.ToString(CultureInfo.InvariantCulture),
+                row.Longitude?.ToString(CultureInfo.InvariantCulture),
+                row.SortMetricName,
+                DisplaySortValue(row.SortMetricDisplayValue),
+                PrimarySimilarSchoolsCharacteristicsViewModel.FromResponse(row.Characteristics)))
+            .ToList()
+            .AsReadOnly();
 
     private static string BuildFullAddress(
         string street,

@@ -10,7 +10,7 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class FindPrimarySimilarSchools(
+public class FindPrimarySimilarSchoolsUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
     IAbsenceRepository absenceRepository,
@@ -19,85 +19,22 @@ public class FindPrimarySimilarSchools(
 {
     public async Task<FindPrimarySimilarSchoolsResponse> Execute(FindPrimarySimilarSchoolsRequest request)
     {
-        var groups = (await similarSchoolsRepository.GetGroupAsync(request.Urn))
-            .Where(group => !string.IsNullOrWhiteSpace(group.NeighbourURN))
-            .ToList();
+        var dataProvider = new PrimarySimilarSchoolsDataProvider(
+            establishmentRepository,
+            similarSchoolsRepository,
+            absenceRepository,
+            performanceRepository);
 
-        var similarSchoolUrns = groups
-            .Select(group => group.NeighbourURN)
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
-
-        var urns = similarSchoolUrns
-            .Concat([request.Urn])
-            .Distinct(StringComparer.Ordinal)
-            .ToArray();
-
-        var establishments = (await establishmentRepository.GetEstablishmentsAsync(urns))
-            .ToDictionary(establishment => establishment.URN, StringComparer.Ordinal);
-
-        if (!establishments.TryGetValue(request.Urn, out var currentEstablishment))
-        {
-            throw new NotFoundException($"School not found with URN: {request.Urn}");
-        }
-
-        var characteristics = SimilarSchoolsPrimaryValues.FromData(
-                await similarSchoolsRepository.GetValuesByUrnsAsync(urns))
-            .ToDictionary(values => values.Urn, StringComparer.Ordinal);
-
-        // A school with no similar schools group also has no row in the similar schools
-        // values dataset - that's a valid "no similar schools" state, not a not-found error.
-        var currentCharacteristics = characteristics.TryGetValue(request.Urn, out var foundCharacteristics)
-            ? foundCharacteristics
-            : new SimilarSchoolsPrimaryValues { Urn = request.Urn };
-
-        var absences = (await absenceRepository.GetByUrnsAsync(urns))
-            .ToDictionary(absence => absence.Urn, StringComparer.Ordinal);
-        var performances = (await performanceRepository.GetByUrnsAsync(urns))
-            .ToDictionary(performance => performance.Urn, StringComparer.Ordinal);
-
-        var currentSimilarSchool = SimilarSchool.FromData(
-            currentEstablishment,
-            null,
-            absences.GetValueOrDefault(request.Urn)?.EstablishmentAbsence);
-
-        var similarSchools = groups
-            .Select(group =>
-            {
-                if (!establishments.TryGetValue(group.NeighbourURN, out var establishment))
-                {
-                    return null;
-                }
-
-                if (!characteristics.TryGetValue(group.NeighbourURN, out var values))
-                {
-                    return null;
-                }
-
-                var similarSchool = SimilarSchool.FromData(
-                    establishment,
-                    null,
-                    absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence);
-
-                return new PrimaryRankedSimilarSchoolData(
-                    group.Rank,
-                    group.Dist,
-                    similarSchool,
-                    values,
-                    performances.GetValueOrDefault(group.NeighbourURN));
-            })
-            .Where(school => school is not null)
-            .Select(school => school!)
-            .ToList();
+        var data = await dataProvider.GetSimilarSchoolsData(request.Urn);
 
         var filters = new SimilarSchoolsFilters(
             request.FilterBy ?? new Dictionary<string, IEnumerable<string>>(),
-            currentSimilarSchool);
+            data.CurrentSimilarSchool);
 
         var validationErrors = filters.Validate();
 
-        var filteredSimilarSchools = filters.Filter(similarSchools.Select(x => x.SimilarSchool))
-            .Select(school => similarSchools.First(x => x.SimilarSchool.URN == school.URN))
+        var filteredSimilarSchools = filters.Filter(data.SimilarSchools.Select(x => x.SimilarSchool))
+            .Select(school => data.SimilarSchools.First(x => x.SimilarSchool.URN == school.URN))
             .ToList();
         var sorting = new PrimarySimilarSchoolsSorting(request.SortBy ?? string.Empty);
         var sortedSimilarSchools = sorting.Sort(filteredSimilarSchools)
@@ -116,13 +53,13 @@ public class FindPrimarySimilarSchools(
 
         return new(
             new PrimaryCurrentSchool(
-                currentEstablishment.URN,
-                currentEstablishment.EstablishmentName,
-                currentEstablishment.LAName,
-                ToCharacteristics(currentCharacteristics)),
+                data.CurrentEstablishment.URN,
+                data.CurrentEstablishment.EstablishmentName,
+                data.CurrentEstablishment.LAName,
+                ToCharacteristics(data.CurrentCharacteristics)),
             pagedSimilarSchools.Map(ToSimilarSchool),
             sortedSimilarSchools.Select(ToSimilarSchool).ToList().AsReadOnly(),
-            filters.AsAvailableFilters(similarSchools.Select(x => x.SimilarSchool)),
+            filters.AsAvailableFilters(data.SimilarSchools.Select(x => x.SimilarSchool)),
             sorting.GetPossibleOptions(request.SortBy).ToList().AsReadOnly(),
             validationErrors);
     }

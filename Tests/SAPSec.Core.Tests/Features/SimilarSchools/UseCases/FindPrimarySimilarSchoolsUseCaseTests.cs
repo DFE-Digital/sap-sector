@@ -7,18 +7,18 @@ using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
-public class FindPrimarySimilarSchoolsTests
+public class FindPrimarySimilarSchoolsUseCaseTests
 {
     private readonly InMemorySimilarSchoolsPrimaryRepository _similarSchoolsRepo = new();
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
     private readonly InMemoryAbsenceRepository _absenceRepo = new();
     private readonly InMemoryKs2PerformanceRepository _performanceRepo;
-    private readonly FindPrimarySimilarSchools _sut;
+    private readonly FindPrimarySimilarSchoolsUseCase _sut;
 
-    public FindPrimarySimilarSchoolsTests()
+    public FindPrimarySimilarSchoolsUseCaseTests()
     {
         _performanceRepo = new InMemoryKs2PerformanceRepository(_establishmentRepo);
-        _sut = new FindPrimarySimilarSchools(_establishmentRepo, _similarSchoolsRepo, _absenceRepo, _performanceRepo);
+        _sut = new FindPrimarySimilarSchoolsUseCase(_establishmentRepo, _similarSchoolsRepo, _absenceRepo, _performanceRepo);
     }
 
     [Fact]

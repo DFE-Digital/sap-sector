@@ -39,7 +39,7 @@ public static class DependenciesExtensions
         services.AddSingleton<GetCharacteristicsComparison>();
         services.AddSingleton<IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>, GetSchoolInfoUseCase>();
         services.AddSingleton<IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>, GetSchoolKs2PerformanceMeasuresUseCase>();
-        services.AddSingleton<IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>, FindPrimarySimilarSchools>();
+        services.AddSingleton<IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>, FindPrimarySimilarSchoolsUseCase>();
 
         services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
         services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);

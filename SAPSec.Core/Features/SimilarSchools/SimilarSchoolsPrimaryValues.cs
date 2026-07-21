@@ -1,5 +1,4 @@
 using SAPSec.Data.Dto.SimilarSchools.Primary;
-using System.Globalization;
 
 namespace SAPSec.Core.Features.SimilarSchools;
 
@@ -22,33 +21,21 @@ public class SimilarSchoolsPrimaryValues
         return new()
         {
             Urn = data.URN,
-            ReadMatAverage = ParseNullableDecimal(data.ReadMatAverage),
-            Ks1PriorRwmAverage = ParseNullableDecimal(data.Ks1PriorRwmAverage),
-            PupilPremiumEligibilityPercentage = ParseNullableDecimal(data.PPPerc),
-            PupilsWithEalPercentage = ParseNullableDecimal(data.PercentEAL),
-            Polar4Quintile = ParseNullableDecimal(data.Polar4QuintilePupils),
-            PupilStabilityRate = ParseNullableDecimal(data.PStability),
-            AverageIdaciScore = ParseNullableDecimal(data.IdaciPupils),
-            PupilsWithSenSupportPercentage = ParseNullableDecimal(data.PercentSchSupport),
-            PupilCount = ParseNullableDecimal(data.NumberOfPupils),
-            PupilsWithEhcPlanPercentage = ParseNullableDecimal(data.PercentageStatementOrEhp)
+            ReadMatAverage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.ReadMatAverage),
+            Ks1PriorRwmAverage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.Ks1PriorRwmAverage),
+            PupilPremiumEligibilityPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PPPerc),
+            PupilsWithEalPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PercentEAL),
+            Polar4Quintile = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.Polar4QuintilePupils),
+            PupilStabilityRate = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PStability),
+            AverageIdaciScore = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.IdaciPupils),
+            PupilsWithSenSupportPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PercentSchSupport),
+            PupilCount = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.NumberOfPupils),
+            PupilsWithEhcPlanPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PercentageStatementOrEhp)
         };
     }
 
     public static IEnumerable<SimilarSchoolsPrimaryValues> FromData(IEnumerable<SimilarSchoolsPrimaryValuesEntry> data)
     {
         return data.Select(FromData);
-    }
-
-    private static decimal ParseNullableDecimal(string? value)
-    {
-        if (string.IsNullOrWhiteSpace(value))
-        {
-            return 0;
-        }
-
-        return decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
-            ? parsed
-            : 0;
     }
 }
