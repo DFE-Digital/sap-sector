@@ -1,5 +1,6 @@
 import { MobileCollapsedTabs } from '/js/mobile-collapsed-tabs.js'
 import * as ChartFactory from '/js/chart-factory.js'
+import * as ContentToggle from '/js/content-toggle.js'
 
 const FILTER_CONFIG = {
     applyFiltersDebounceMs: 100
@@ -16,11 +17,6 @@ function init(select) {
     var form = select.closest('form');
     if (!form) {
         throw new Error('Measure filter must appear within a <form action="" method="get">');
-    }
-
-    var submitButton = select.parentElement.querySelector('button[type="submit"]');
-    if (submitButton) {
-        submitButton.style.display = "none";
     }
 
     function applyFilters() {
@@ -58,6 +54,7 @@ function init(select) {
                 target.innerHTML = measureFromResponse.innerHTML;
 
                 ChartFactory.init(target);
+                ContentToggle.init(target);
                 const tabs = new MobileCollapsedTabs(target.querySelector('[data-module="govuk-tabs"]'));
                 tabs.selectTabById(selectedTab);
             })
