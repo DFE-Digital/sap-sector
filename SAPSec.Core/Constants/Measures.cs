@@ -5,6 +5,6 @@ public static class Measures
     public static class Primary
     {
         public const string Ks2ExpectedRwm = "expected-rwm";
-        public const string TotalAbsence = "overall-absence";
+        public const string OverallAbsence = "overall-absence";
     }
 }

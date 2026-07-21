@@ -11,7 +11,7 @@ internal static class AttendanceMeasures
         public static Measure ForSchool(SchoolData<AbsenceData> currentSchool, IDictionary<string, string> filters)
         {
             var temp = Measure.ForSchool(
-                Constants.Measures.Primary.TotalAbsence,
+                Constants.Measures.Primary.OverallAbsence,
                 MeasureDataType.AbsencePercentage,
                 [],
                 currentSchool,

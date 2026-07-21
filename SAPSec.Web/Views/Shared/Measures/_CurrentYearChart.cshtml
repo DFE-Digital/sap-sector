@@ -52,22 +52,6 @@
                 data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
                 @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
            </canvas>
-
-@*         <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
-                class="js-chart js-chart--school-measure-bar"
-                data-type="bar"
-                data-show-no-data-labels="true"
-                data-axis-step="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 30 : 25)"
-                data-axis-max="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 90 : 100)"
-                data-label-decimals="@decimals"
-                data-tooltip-decimals="@decimals"
-                data-category-percentage="0.6"
-                data-bar-percentage="1"
-                data-bar-thickness="50"
-                data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.AbsencePercentage? "%" : "")"
-                data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
-        </canvas> *@
     }
     else
     {
