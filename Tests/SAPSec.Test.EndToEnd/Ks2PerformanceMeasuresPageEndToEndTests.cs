@@ -1,4 +1,6 @@
-﻿using Microsoft.Playwright;
+﻿using FluentAssertions;
+using Microsoft.Playwright;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
@@ -14,14 +16,17 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     private const string UrlPattern = @"\d{6}";
     private const string MeetingExpectedStandardHeaderText = "Meeting expected standard in reading, writing and maths";
 
-    private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool("145140");
+    private const string Urn = "101206";
+    private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool(Urn);
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await NavigateTo(PrimarySchoolRoute.Overview);
+        await NavigateTo(Routes.FindASchool());
+        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(Urn);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(PrimarySchoolRoute.Overview);
         await Page.GetByText("KS2", new() { Exact = true }).ClickAsync();
-
         await Expect(Page).ToHaveURLAsync(PrimarySchoolRoute.KS2);
     }
 
@@ -111,6 +116,30 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(current).ToBePercentageValuesHavingCount(4);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_ChangeSubjectFilters()
+    {
+        var section = await GetSection(MeetingExpectedStandardHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        List<IEnumerable<string>> subjectValues = [];
+
+        subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+
+        foreach (var subject in new[] { "Reading", "Writing", "Maths" })
+        {
+            await section.GetByRole(AriaRole.Combobox, new() { Name = "Subject" }).SelectOptionAsync(subject);
+            await table.WaitForDomToStopChanging();
+
+            subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        }
+
+        subjectValues.Should().AllBeDifferent();
     }
 
     private async Task<ILocator> GetSection(string headerText)

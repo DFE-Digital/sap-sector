@@ -12,13 +12,14 @@
                 <select class="govuk-select"
                         id="@filter.Key-select"
                         name="@filter.Key"
-                        data-measure-filter-target-id="@Model.HtmlPrefix">
+                        data-measure-filter-target-id="@Model.HtmlPrefix"
+                        data-testid="@filter.Key-filter">
                         @foreach (var option in filter.Options)
                         {
                             <option value="@option.Key" selected=@option.Selected>@option.Name</option>
                         }
                 </select>
-                <button type="submit" class="govuk-button" data-module="govuk-button">Apply</button>
+                <button type="submit" class="govuk-button" data-module="govuk-button" data-testid="@filter.Key-filter-submit">Apply</button>
             </div>
         }
     </div>
