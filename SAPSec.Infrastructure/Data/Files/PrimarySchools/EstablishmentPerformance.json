@@ -167040,6 +167040,12 @@
     "GpsHigher_Mob_Cohort_Est_Previous2_Num": "98.43"
   },
   {
+    "Id": "145140",
+    "ReadingScaledScore_Tot_Cohort_Est_Current_Num": "107.2",
+    "ReadingScaledScore_Tot_Cohort_Est_Previous_Num": "106.1",
+    "ReadingScaledScore_Tot_Cohort_Est_Previous2_Num": "105.3"
+  },
+  {
     "Id": "145362",
     "RwmExpected_Tot_Cohort_Est_Current_Num": "67.92",
     "RwmExpected_Reading_Tot_Cohort_Est_Current_Num": "24.29",

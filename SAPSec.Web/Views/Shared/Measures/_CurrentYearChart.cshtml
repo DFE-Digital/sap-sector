@@ -18,6 +18,9 @@
         MeasureDataType.AbsencePercentage => 2,
         _ => 0
     };
+    var axisMin = Model.MeasureInfo.DataType is MeasureDataType.Score ? 80 : 0;
+    var axisStep = Model.MeasureInfo.DataType is MeasureDataType.Score ? 20 : 25;
+    var axisMax = Model.MeasureInfo.DataType is MeasureDataType.Score ? 120 : 100;
 }
 
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">
@@ -27,8 +30,9 @@
                 class="js-chart js-chart--school-measure-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
-                data-axis-step="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 30 : 25)"
-                data-axis-max="@(Model.MeasureInfo.DataType is MeasureDataType.Score? 90 : 100)"
+                data-axis-min="@axisMin"
+                data-axis-step="@axisStep"
+                data-axis-max="@axisMax"
                 data-label-decimals="@decimals"
                 data-tooltip-decimals="@decimals"
                 data-category-percentage="0.6"

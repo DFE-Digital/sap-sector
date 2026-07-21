@@ -26,15 +26,18 @@
         MeasureDataType.AbsencePercentage => 2,
         _ => 0
     };
+    var axisMin = Model.MeasureInfo.DataType is MeasureDataType.Score ? 80 : 0;
+    var axisStep = Model.MeasureInfo.DataType is MeasureDataType.Score ? 5 : 25;
+    var axisMax = Model.MeasureInfo.DataType is MeasureDataType.Score ? 120 : 100;
 }
 
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">
     <canvas id="@Model.MeasureInfo.HtmlPrefix-school-yearbyyear-chart"
             class="js-chart js-chart--school-measure-line"
             data-type="line"
-            data-axis-min="0"
-            data-axis-step="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? 25 : 30)"
-            data-axis-max="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? 100 : 90)"
+            data-axis-min="@axisMin"
+            data-axis-step="@axisStep"
+            data-axis-max="@axisMax"
             data-axis-auto-skip="false"
             data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? "%" : "")"
             data-show-x-grid="true"

@@ -27,6 +27,10 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
+                filterBy),
+            Ks2PerformanceMeasures.AverageScaledScoreReading.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
                 filterBy));
     }
 }
@@ -38,4 +42,5 @@ public record GetSchoolKs2PerformanceMeasuresRequest(
 public record GetSchoolKs2PerformanceMeasuresResponse(
     SchoolInfo.SchoolInfo School,
     int SimilarSchoolsCount,
-    Measure MeetingExpectedStandardRwm);
+    Measure MeetingExpectedStandardRwm,
+    Measure AverageScaledScoreReading);

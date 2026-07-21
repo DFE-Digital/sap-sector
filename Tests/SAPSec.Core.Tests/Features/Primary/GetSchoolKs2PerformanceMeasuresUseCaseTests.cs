@@ -72,6 +72,43 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_ShouldContainExpectedMeasureSeries()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var seriesTypes = response.AverageScaledScoreReading.Series.Select(s => s.SeriesType);
+
+        seriesTypes.Should().BeEquivalentTo([
+            MeasureSeriesType.CurrentSchool,
+            MeasureSeriesType.SimilarSchoolsAverage,
+            MeasureSeriesType.LASchoolsAverage,
+            MeasureSeriesType.EnglandSchoolsAverage
+        ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_CurrentSchool_ContainsYearByYearValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScore(current: "107.2", prev: "106.3", prev2: "105.1")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, 107.2m, 106.3m, 105.1m));
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardRwm_CurrentSchool_WhenCurrentSchoolHasNoPerformanceData_ContainsNullValues()
     {
         _establishmentRepository.SetupEstablishments(

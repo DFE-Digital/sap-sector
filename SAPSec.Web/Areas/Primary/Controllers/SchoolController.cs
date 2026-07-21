@@ -26,6 +26,9 @@ public class SchoolController(
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase)
     : Controller
 {
+    private static readonly string[] ReadingScoreBarChartColors = ["#ca357c", "#2a1950", "#2a1950", "#2a1950"];
+    private static readonly string[] ReadingScoreYearByYearColors = ["#ca357c", "#2a1950", "#5694ca", "#4b9b7d"];
+
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
@@ -47,7 +50,12 @@ public class SchoolController(
         var model = new Ks2MeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School)
+            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School),
+            AverageScaledScoreReading = MeasureViewModel.FromMeasure(
+                response.AverageScaledScoreReading,
+                response.School,
+                ReadingScoreBarChartColors,
+                ReadingScoreYearByYearColors)
         };
 
         return View(model);

@@ -162,6 +162,40 @@ public class SimilarSchoolsControllerTests
         model.MapSchools.Should().OnlyContain(s => !string.IsNullOrWhiteSpace(s.EstablishmentName));
     }
 
+    [Fact]
+    public async Task ViewSimilarSchools_UsesDummyData_WhenNoResultsAreReturned()
+    {
+        var urn = "105574";
+        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
+
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), urn))
+            .ReturnsAsync(MapSchoolDetails(schoolDetails));
+        _sut.Url = CreateUrlHelperMock(urn).Object;
+
+        _establishmentRepoMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(Array.Empty<Establishment>());
+        _similarSchoolsRepoMock
+            .Setup(x => x.GetGroupAsync(urn))
+            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
+        _absenceRepoMock
+            .Setup(r => r.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new List<AbsenceData>());
+        _performanceRepoMock
+            .Setup(r => r.GetByUrnsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync(new List<Ks4PerformanceData>());
+
+        var result = await _sut.ViewSimilarSchools(urn);
+
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var model = viewResult.Model.Should().BeOfType<SimilarSchoolsPageViewModel>().Subject;
+
+        model.Schools.Should().NotBeEmpty();
+        model.MapSchools.Should().NotBeEmpty();
+        model.TotalResults.Should().BeGreaterThan(0);
+    }
+
     private static Establishment CreateTestSchoolDetails(string urn, string name)
     {
         return new Establishment

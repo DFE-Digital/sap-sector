@@ -11,12 +11,10 @@ public record MeasureViewModel(
     TableViewModel Table,
     TopPerformersViewModel? TopPerformers)
 {
-    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
+    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool) =>
         seriesType switch
         {
             MeasureSeriesType.CurrentSchool => currentSchool.Name,
-            MeasureSeriesType.SimilarSchool => similarSchool?.Name ??
-                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
             MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
             MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
             MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
@@ -28,6 +26,8 @@ public record MeasureViewModel(
         {
             Core.Constants.Measures.Primary.Ks2ExpectedRwm =>
                 "Meeting expected standard in reading, writing and maths",
+            Core.Constants.Measures.Primary.Ks2ReadingScore =>
+                "Average scaled score in reading",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };
 

@@ -8,4 +8,5 @@ public class Ks2MeasuresPageViewModel
     public required SchoolInfoViewModel School { get; set; }
 
     public required MeasureViewModel MeetingExpectedStandardRwm { get; set; }
+    public required MeasureViewModel AverageScaledScoreReading { get; set; }
 }

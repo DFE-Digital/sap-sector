@@ -46,6 +46,24 @@
             
             <partial name="Measures/_Measure" model=@Model.MeetingExpectedStandardRwm />
         </section>
+
+        <section class="app-measure-section" aria-labelledby="reading-score-heading">
+            <h2 class="govuk-heading-m" id="reading-score-heading" data-testid="reading-score-heading">Average scaled score in reading</h2>
+
+            <details class="govuk-details app-measure-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Information about average scaled score in reading</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        This shows the average reading scaled score for pupils at the end of key stage 2.
+                        Scaled scores typically range from 80 to 120, and a score of 100 represents the expected standard.
+                    </p>
+                </div>
+            </details>
+
+            <partial name="Measures/_Measure" model=@Model.AverageScaledScoreReading />
+        </section>
     </form>
 </div>
 

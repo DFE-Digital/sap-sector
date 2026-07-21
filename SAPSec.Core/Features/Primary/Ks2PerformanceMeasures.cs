@@ -49,4 +49,48 @@ internal static class Ks2PerformanceMeasures
                     x => x?.EnglandPerformance?.RwmExpected_Tot_Cohort_Eng_Previous2_Num));
         }
     }
+
+    public static class AverageScaledScoreReading
+    {
+        public static Measure ForSchool(SchoolData<Ks2PerformanceData> currentSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
+        {
+            return Measure.ForSchool(
+                Constants.Measures.Primary.Ks2ReadingScore,
+                MeasureDataType.Score,
+                [],
+                currentSchool,
+                similarSchools,
+                new MeasureFieldSelector<Ks2PerformanceData>(
+                    x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Current_Num,
+                    x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Previous_Num,
+                    x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Previous2_Num,
+                    x => x?.LocalAuthorityPerformance?.ReadingScaledScore_Tot_Cohort_LA_Current_Num,
+                    x => x?.LocalAuthorityPerformance?.ReadingScaledScore_Tot_Cohort_LA_Previous_Num,
+                    x => x?.LocalAuthorityPerformance?.ReadingScaledScore_Tot_Cohort_LA_Previous2_Num,
+                    x => x?.EnglandPerformance?.ReadingScaledScore_Tot_Cohort_Eng_Current_Num,
+                    x => x?.EnglandPerformance?.ReadingScaledScore_Tot_Cohort_Eng_Previous_Num,
+                    x => x?.EnglandPerformance?.ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num));
+        }
+
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, IDictionary<string, string> filters)
+        {
+            return Measure.ForSchoolComparison(
+                Constants.Measures.Primary.Ks2ReadingScore,
+                MeasureDataType.Score,
+                [],
+                currentSchool,
+                similarSchool,
+                similarSchools,
+                new MeasureFieldSelector<Ks2PerformanceData>(
+                    x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Current_Num,
+                    x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Previous_Num,
+                    x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Previous2_Num,
+                    x => x?.LocalAuthorityPerformance?.ReadingScaledScore_Tot_Cohort_LA_Current_Num,
+                    x => x?.LocalAuthorityPerformance?.ReadingScaledScore_Tot_Cohort_LA_Previous_Num,
+                    x => x?.LocalAuthorityPerformance?.ReadingScaledScore_Tot_Cohort_LA_Previous2_Num,
+                    x => x?.EnglandPerformance?.ReadingScaledScore_Tot_Cohort_Eng_Current_Num,
+                    x => x?.EnglandPerformance?.ReadingScaledScore_Tot_Cohort_Eng_Previous_Num,
+                    x => x?.EnglandPerformance?.ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num));
+        }
+    }
 }

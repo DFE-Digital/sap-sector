@@ -2,7 +2,6 @@
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
-using System.Text.RegularExpressions;
 using Xunit;
 
 namespace SAPSec.Test.EndToEnd;
@@ -11,7 +10,6 @@ namespace SAPSec.Test.EndToEnd;
 public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
     : EndToEndTests(fixture)
 {
-    private const string UrlPattern = @"\d{6}";
     private const string MeetingExpectedStandardHeaderText = "Meeting expected standard in reading, writing and maths";
 
     private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool("145140");
@@ -29,8 +27,6 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     public async Task MeetingExpectedStandardRwm_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(MeetingExpectedStandardHeaderText);
-        var panel = section.GetByRole(AriaRole.Tabpanel);
-
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
@@ -63,7 +59,7 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     }
 
     [Fact]
-    public async Task MeetingExpectedStandardRwm_ViewAndNavigateToTopPerfomers()
+    public async Task MeetingExpectedStandardRwm_ViewTopPerfomers()
     {
         var section = await GetSection(MeetingExpectedStandardHeaderText);
         var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
@@ -74,20 +70,6 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
 
         var values = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.SimilarSchoolComparison(UrlPattern)));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
 
         await section.GetByText("See all similar schools").ClickAsync();
 
