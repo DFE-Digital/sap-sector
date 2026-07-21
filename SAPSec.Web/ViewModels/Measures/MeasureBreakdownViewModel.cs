@@ -7,9 +7,12 @@ public abstract record MeasureBreakdownViewModel(
     MeasureInfoViewModel MeasureInfo)
 {
     public string DisplayNumber(decimal? value) =>
-        MeasureInfo.DataType == MeasureDataType.Score
-            ? DisplayValue(value)
-            : DisplayWholePercent(value);
+       MeasureInfo.DataType switch
+       {
+           MeasureDataType.Score => DisplayValue(value),
+           MeasureDataType.AbsencePercentage => DisplayFractionalPercent(value),
+           _ => DisplayWholePercent(value)
+       };           
 
     private static string DisplayValue(decimal? value) =>
         value.HasValue
@@ -20,4 +23,15 @@ public abstract record MeasureBreakdownViewModel(
         value.HasValue
             ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero).ToString("0", CultureInfo.InvariantCulture) + "%"
             : "No available data";
+
+    public static string DisplayPercent(decimal? value) =>
+      value.HasValue
+          ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
+          : "No available data";
+
+    public static string DisplayFractionalPercent(decimal? value) =>
+      value.HasValue
+        ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
+        : "No available data";
 }
+ 

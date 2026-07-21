@@ -18,24 +18,12 @@ public record Measure(
         IEnumerable<SchoolData<T>>? similarSchools,
         MeasureFieldSelector<T> fieldSelector)
     {
-
-        try
-        {
-            var temp = new Measure(
-               key,
-               dataType,
-               availableFilters.ToList(),
-               MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
-               TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
-
-            return temp;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex);
-            throw;
-        }
-     
+        return new Measure(
+            key,
+            dataType,
+            availableFilters.ToList(),
+            MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
+            TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
     }
 
     internal static Measure ForSchoolComparison<T>(
