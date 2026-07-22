@@ -1805,10 +1805,10 @@ Establishment,,TrustSch_Name_Est,TrustRelatedSchools,TrustSch,SchoolName,Name,GI
 
 ,,, Similar Schools ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
-SimilarSchools,,URN,,,,,Similar Schools,,,PrimaryGroups,,,,2026_05_14_neighbours_list_primary,urn,string,,urn,,,,,,,,,,,No,,,,
-SimilarSchools,,NeighbourURN,,,,,Similar Schools,,,PrimaryGroups,,,,2026_05_14_neighbours_list_primary,neighbour_urn,string,,urn,,,,,,,,,,,No,,,,
-SimilarSchools,,Dist,,,,,Similar Schools,,,PrimaryGroups,,,,2026_05_14_neighbours_list_primary,dist,string,,urn,,,,,,,,,,,No,,,,
-SimilarSchools,,Rank,,,,,Similar Schools,,,PrimaryGroups,,,,2026_05_14_neighbours_list_primary,rank,string,,urn,,,,,,,,,,,No,,,,
+SimilarSchools,,URN,,,,,Similar Schools,,,PrimaryGroups,,,,2026_07_03_neighbours_list_primary,urn,string,,urn,,,,,,,,,,,No,,,,
+SimilarSchools,,NeighbourURN,,,,,Similar Schools,,,PrimaryGroups,,,,2026_07_03_neighbours_list_primary,neighbour_urn,string,,urn,,,,,,,,,,,No,,,,
+SimilarSchools,,Dist,,,,,Similar Schools,,,PrimaryGroups,,,,2026_07_03_neighbours_list_primary,dist,string,,urn,,,,,,,,,,,No,,,,
+SimilarSchools,,Rank,,,,,Similar Schools,,,PrimaryGroups,,,,2026_07_03_neighbours_list_primary,rank,string,,urn,,,,,,,,,,,No,,,,
 SimilarSchools,,URN,,,,,Similar Schools,,,PrimaryValues,,,,2026_07_03_matched_primary_schools_data,urn,string,,urn,,,,,,,,,,,No,,,,
 SimilarSchools,,PPPerc,,,,,Similar Schools,,,PrimaryValues,,,,2026_07_03_matched_primary_schools_data,percent_fsm_ever,string,,urn,,,,,,,,,,,No,,,,
 SimilarSchools,,Polar4QuintilePupils,,,,,Similar Schools,,,PrimaryValues,,,,2026_07_03_matched_primary_schools_data,polar4quintile_pupils,string,,urn,,,,,,,,,,,No,,,,
