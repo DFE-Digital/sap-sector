@@ -7,6 +7,7 @@ using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.PrimaryJsonFileGenerator;
 
@@ -166,24 +167,36 @@ internal class Program
             json.AppendLine("  {");
             json.AppendLine($"    \"Id\": \"{urn}\",");
 
+            var propertySpecsApplyingToThisUrn = settings.Properties
+                .Where(p => !p.Urns.Any() || p.Urns.Contains(urn))
+                .ToList();
+
             foreach (var (row, j) in rows.Select((r, j) => (r, j)))
             {
-                double? randomValue;
+                double? value;
 
-                if (settings.UrnsWithMissingCurrentYearData.Contains(urn) && row.YearDesc == "Current"
-                    || settings.UrnsWithMissingPreviousYearData.Contains(urn) && row.YearDesc == "Previous"
-                    || settings.UrnsWithMissingPrevious2YearData.Contains(urn) && row.YearDesc == "Previous2")
+                var propertySpecsApplyingToThisProperty = propertySpecsApplyingToThisUrn
+                    .Where(p => !p.PropertyNamePatterns.Any() || p.PropertyNamePatterns.Any(pattern => Regex.IsMatch(row.PropertyName, pattern)))
+                    .ToList();
+
+                var empty = propertySpecsApplyingToThisProperty.Select(p => p.Empty).FirstOrDefault();
+
+                if (empty)
                 {
-                    randomValue = null;
+                    value = null;
                 }
                 else
                 {
-                    var maxValue = settings.UrnsWithDataUnderTenPercent.Contains(urn)
-                        ? 10.0
-                        : 100.0;
-                    randomValue = Math.Round(rnd.NextDouble() * maxValue, 2);
+                    var propertySpec = propertySpecsApplyingToThisProperty
+                        .FirstOrDefault(p => p.MinValue is not null || p.MaxValue is not null);
+
+                    var minValue = propertySpec?.MinValue ?? 0.0;
+                    var maxValue = propertySpec?.MaxValue ?? 100.0;
+
+                    value = Math.Round(minValue + rnd.NextDouble() * (maxValue - minValue), 2);
                 }
-                json.AppendLine($"    \"{row.PropertyName}\": \"{randomValue}\"{(j < rows.Length - 1 ? "," : "")}");
+
+                json.AppendLine($"    \"{row.PropertyName}\": \"{value}\"{(j < rows.Length - 1 ? "," : "")}");
             }
 
             json.AppendLine($"  }}{(i < ids.Length - 1 ? "," : "")}");
