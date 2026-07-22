@@ -11,7 +11,6 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
 {
     private static readonly string SimilarSchoolsPath = Routes.SecondarySchool("105574").ViewSimilarSchools;
     private static readonly string MissingSimilarSchoolsPath = Routes.SecondarySchool("999999").ViewSimilarSchools;
-    private static readonly string LegacySimilarSchoolsPath = $"{Routes.SecondarySchool("105574").Overview}/similar-schools";
     private static readonly string ComparisonHeadlineMeasuresPath =
         Routes.SecondarySchool("108088").Comparison("137621").KS4HeadlineMeasures;
 
@@ -75,14 +74,6 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
         content.Should().Contain("There are no schools that match your search.");
         content.Should().NotContain("toggleViewLink");
         content.Should().NotContain("View on map");
-    }
-
-    [Fact]
-    public async Task GetSimilarSchools_LegacyRouteReturnsNotFound()
-    {
-        var response = await fixture.NonRedirectingClient.GetAsync(LegacySimilarSchoolsPath);
-
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
