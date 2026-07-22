@@ -54,7 +54,7 @@ public class RequireSchoolPhaseFilterTests
     }
 
     [Fact]
-    public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_RedirectsToPrimaryOverview()
+    public async Task SecondaryFilter_WithPrimarySchoolOnKs4Route_PreservesPathOnPrimaryRedirect()
     {
         var school = CreateSchoolDetails("123456", "Primary");
         _requestSchoolAccessorMock
@@ -68,7 +68,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be(Routes.PrimarySchool("123456").Overview);
+            .Which.Url.Should().Be($"{Routes.PrimarySchool("123456").Overview}/ks4-headline-measures");
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class RequireSchoolPhaseFilterTests
     }
 
     [Fact]
-    public async Task SecondaryFilter_WithPrimarySchoolOnDataRoute_RedirectsToPrimaryOverview()
+    public async Task SecondaryFilter_WithPrimarySchoolOnDataRoute_PreservesPathOnPrimaryRedirect()
     {
         var school = CreateSchoolDetails("123456", "Primary");
         _requestSchoolAccessorMock
@@ -141,7 +141,7 @@ public class RequireSchoolPhaseFilterTests
             routeValues: [("urn", "123456")]);
 
         result.Should().BeOfType<RedirectResult>()
-            .Which.Url.Should().Be(Routes.PrimarySchool("123456").Overview);
+            .Which.Url.Should().Be($"{Routes.PrimarySchool("123456").Overview}/attendance-data");
     }
 
     [Fact]

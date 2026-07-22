@@ -11,7 +11,7 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
 {
     private static readonly string SimilarSchoolsPath = Routes.SecondarySchool("105574").ViewSimilarSchools;
     private static readonly string MissingSimilarSchoolsPath = Routes.SecondarySchool("999999").ViewSimilarSchools;
-    private static readonly string SimilarSchoolsRedirectPath = $"{Routes.SecondarySchool("105574").Overview}/similar-schools";
+    private static readonly string LegacySimilarSchoolsPath = $"{Routes.SecondarySchool("105574").Overview}/similar-schools";
     private static readonly string ComparisonHeadlineMeasuresPath =
         Routes.SecondarySchool("108088").Comparison("137621").KS4HeadlineMeasures;
 
@@ -78,13 +78,11 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
     }
 
     [Fact]
-    public async Task GetSimilarSchools_RouteRedirectsToViewSimilarSchools()
+    public async Task GetSimilarSchools_LegacyRouteReturnsNotFound()
     {
-        var response = await fixture.NonRedirectingClient.GetAsync(SimilarSchoolsRedirectPath);
+        var response = await fixture.NonRedirectingClient.GetAsync(LegacySimilarSchoolsPath);
 
-        response.StatusCode.Should().BeOneOf(HttpStatusCode.Redirect, HttpStatusCode.MovedPermanently, HttpStatusCode.RedirectKeepVerb);
-        response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain(SimilarSchoolsPath);
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]

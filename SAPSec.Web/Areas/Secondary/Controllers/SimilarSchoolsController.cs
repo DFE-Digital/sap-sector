@@ -89,13 +89,6 @@ public class SimilarSchoolsController : Controller
         return View(viewModel);
     }
 
-    [HttpGet]
-    [Route("similar-schools")]
-    public IActionResult Index(string urn)
-    {
-        return Redirect(Routes.SecondarySchool(urn).ViewSimilarSchools + Request.QueryString);
-    }
-
     private static Dictionary<string, IEnumerable<string>> BuildCoreFilters(IQueryCollection query)
     {
         return query
