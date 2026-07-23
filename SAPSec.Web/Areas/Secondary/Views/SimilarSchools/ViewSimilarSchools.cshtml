@@ -1,7 +1,7 @@
 @using SAPSec.Web.ViewModels
 @model ISimilarSchoolsPageViewModel
 @{
-    Layout = "~/Views/School/_Layout.cshtml";
+    Layout = "~/Areas/Secondary/Views/School/_Layout.cshtml";
     ViewData["Title"] = "View similar schools";
     var hasVisibleResults = Model.SimilarSchools.Any();
 }
@@ -52,12 +52,11 @@
 
 <div class="govuk-grid-row app-similar-schools-content">
 
-    @* ── Left column: MOJ filters ── *@
-    <partial name="~/Views/SimilarSchools/SimilarSchoolsFilter.cshtml" model="Model" />
+    @* Left column: MOJ filters *@
+    <partial name="SimilarSchoolsFilter.cshtml" model="Model" />
 
-    @* ── Right column: Sort + Results + Pagination ── *@
+    @* Right column: Sort + Results + Pagination *@
     <div class="govuk-grid-column-two-thirds app-filter__results-column">
-
         @if (hasVisibleResults)
         {
             <div id="toggleWrap" class="results-toggle-wrap">
@@ -84,19 +83,18 @@
             </div>
         }
 
-
-        <div  id="listView">
+        <div id="listView">
             @* Results list *@
-            <partial name="~/Views/SimilarSchools/SimilarSchoolsResults.cshtml" model="Model" />
+            <partial name="SimilarSchoolsResults.cshtml" model="Model" />
 
             @* Pagination *@
-            <partial name="~/Views/SimilarSchools/SimilarSchoolsPagination.cshtml" model="Model" />
+            <partial name="SimilarSchoolsPagination.cshtml" model="Model" />
         </div>
 
         @if (hasVisibleResults)
         {
             <div id="mapView" class="govuk-!-display-none">
-                <partial name="~/Views/SimilarSchools/SimilarSchoolsMap.cshtml" model="Model" />
+                <partial name="SimilarSchoolsMap.cshtml" model="Model" />
             </div>
         }
 
@@ -116,7 +114,6 @@
 </script>
 
 @section Scripts {
-    <script src="~/js/similar-schools-filter.js"></script>
     <script src="~/js/school-search-toggle.js"></script>
     <script src="~/js/map-schools.js"></script>
     <script src="~/js/leaflet.js"></script>
