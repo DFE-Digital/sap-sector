@@ -509,3 +509,4 @@ wwwroot/**/*.min.js
 
 # Copilot files
 .github/copilot-instructions.md
+/.claude
