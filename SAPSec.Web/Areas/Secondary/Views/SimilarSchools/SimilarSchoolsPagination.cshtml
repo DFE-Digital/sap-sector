@@ -1,8 +1,8 @@
 @using SAPSec.Web.ViewModels
-@model SimilarSchoolsPageViewModel
+@model ISimilarSchoolsPageViewModel
 
 @{
-    var baseUrl = SAPSec.Web.Constants.Routes.SecondarySchool(Model.Urn.ToString()).ViewSimilarSchools;
+    var baseUrl = Model.ResultsBaseUrl;
 }
 
 @if (Model.TotalPages > 1)
@@ -26,7 +26,7 @@
         <ul class="govuk-pagination__list">
             @foreach (var item in Model.GetPaginationItems())
             {
-                if (item == SimilarSchoolsPageViewModel.PaginationEllipsis)
+                if (item == SimilarSchoolsPagination.Ellipsis)
                 {
                     <li class="govuk-pagination__item govuk-pagination__item--ellipsis">&ctdot;</li>
                 }

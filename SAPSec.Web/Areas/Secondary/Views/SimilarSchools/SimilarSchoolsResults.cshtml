@@ -1,13 +1,8 @@
 @using SAPSec.Web.ViewModels
-@model SimilarSchoolsPageViewModel
+@model ISimilarSchoolsPageViewModel
 
-@{
-    var currentSchoolUrn = ViewContext.RouteData.Values["urn"]?.ToString() ?? Model.Urn.ToString();
-}
-
-@if (Model.Schools.Any())
+@if (Model.SimilarSchools.Any())
 {
-    @* Sort dropdown *@
     <div class="govuk-form-group app-similar-schools-sort">
         <label class="govuk-label app-similar-schools-sort__label" for="sort-by">Sort by</label>
         <select class="govuk-select app-similar-schools-sort__select" id="sort-by" name="sortBy" form="app-filter-panel">
@@ -26,20 +21,22 @@
         <!-- Parent view will move the toggle link into here -->
         <div id="resultsBarActions"></div>
     </div>
-    
+
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
 
-    <ul class="govuk-list app-school-results">
-        @foreach (var school in Model.Schools)
+    <ul class="govuk-list app-school-results" data-testid="@(Model.PhaseLabel)-similar-schools-list">
+        @foreach (var school in Model.SimilarSchools)
         {
             <li class="app-school-result" id="similar-school-@school.Urn">
                 <a class="govuk-link govuk-link--no-visited-state govuk-!-font-weight-bold"
-                   href="@SAPSec.Web.Constants.Routes.SecondarySchool(currentSchoolUrn).Comparison(string.IsNullOrWhiteSpace(school.UrnRaw) ? school.Urn.ToString() : school.UrnRaw).Overview">
-                    @school.EstablishmentName
+                   href="@school.ComparisonUrl">
+                    @school.Name
                 </a>
+
                 <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
                     @school.FullAddress
                 </p>
+
                 <p class="govuk-body-s govuk-!-margin-top-1 govuk-!-margin-bottom-0">
                     <strong>@school.SortMetricName:</strong> @school.SortMetricDisplayValue
                 </p>
@@ -50,8 +47,5 @@
 else
 {
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
-    <p class="govuk-body">There are no schools that match your search.</p>
+    <p class="govuk-body">@Model.NoResultsMessage</p>
 }
-
-
-

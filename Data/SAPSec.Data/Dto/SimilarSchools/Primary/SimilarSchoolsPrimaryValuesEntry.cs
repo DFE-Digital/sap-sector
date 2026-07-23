@@ -18,4 +18,5 @@ public class SimilarSchoolsPrimaryValuesEntry
     public string PercentageStatementOrEhp { get; set; } = string.Empty;
     public string NumberOfPupils { get; set; } = string.Empty;
     public string ReadMatAverage { get; set; } = string.Empty;
+    public string Ks1PriorRwmAverage { get; set; } = string.Empty;
 }

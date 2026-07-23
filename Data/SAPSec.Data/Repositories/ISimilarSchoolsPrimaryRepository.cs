@@ -1,4 +1,4 @@
-﻿using SAPSec.Data.Dto.SimilarSchools.Primary;
+using SAPSec.Data.Dto.SimilarSchools.Primary;
 
 namespace SAPSec.Data.Repositories;
 
