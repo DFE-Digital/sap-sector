@@ -48,7 +48,7 @@ public class SchoolKs4CoreSubjectsPageTests(WebApplicationSetupFixture fixture) 
     {
         await Page.GotoAsync(PagePath);
 
-        var charts = Page.Locator("canvas.js-chart--school-ks4-bar[data-label-decimals='0']");
+        var charts = Page.Locator("canvas.js-chart--school-measure-bar[data-label-decimals='0']");
         await Expect(charts).ToHaveCountAsync(7);
     }
 }
