@@ -53,7 +53,7 @@
 <div class="govuk-grid-row app-similar-schools-content">
 
     @* Left column: MOJ filters *@
-    <partial name="SimilarSchoolsFilter.cshtml" model="Model" />
+    <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsFilter.cshtml" model="Model" />
 
     @* Right column: Sort + Results + Pagination *@
     <div class="govuk-grid-column-two-thirds app-filter__results-column">
@@ -85,16 +85,16 @@
 
         <div id="listView">
             @* Results list *@
-            <partial name="SimilarSchoolsResults.cshtml" model="Model" />
+            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsResults.cshtml" model="Model" />
 
             @* Pagination *@
-            <partial name="SimilarSchoolsPagination.cshtml" model="Model" />
+            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsPagination.cshtml" model="Model" />
         </div>
 
         @if (hasVisibleResults)
         {
             <div id="mapView" class="govuk-!-display-none">
-                <partial name="SimilarSchoolsMap.cshtml" model="Model" />
+                <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsMap.cshtml" model="Model" />
             </div>
         }
 
