@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Constants;
@@ -24,6 +25,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
+    IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase)
     IUseCase<GetAttendanceMeasuresRequest, GetAttendanceMeasuresResponse> getAttendanceMeasuresUseCase)
     : Controller
 {
@@ -73,13 +75,23 @@ public class SchoolController(
 
     [HttpGet]
     [Route("view-similar-schools")]
-    public async Task<IActionResult> ViewSimilarSchools(string urn)
+    public async Task<IActionResult> ViewSimilarSchools(
+        string urn,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? page = null)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
+        var filterBy = PrimarySimilarSchoolsPageViewModel.ExtractCurrentFilters(Request.Query)
+            .ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<string>)kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+        var response = await findPrimarySimilarSchoolsUseCase.Execute(new(
+            urn,
+            filterBy,
+            sortBy,
+            page));
 
-        PopulateViewData(response.School);
+        PopulateViewData(schoolInfoResponse.School);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        return View(PrimarySimilarSchoolsPageViewModel.FromResponse(response, Request.Query));
     }
 
     [HttpGet]
