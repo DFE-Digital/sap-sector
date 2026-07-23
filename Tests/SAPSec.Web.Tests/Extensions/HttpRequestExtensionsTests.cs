@@ -10,27 +10,29 @@ public class HttpRequestExtensionsTests
     [Fact]
     public void GetCanonicalUrl_ReturnsSecondarySchoolUrlWithoutQueryString()
     {
+        var schoolDetailsUrl = Routes.SecondarySchool("123456").SchoolDetails;
         var request = new DefaultHttpContext().Request;
         request.Scheme = "https";
         request.Host = new HostString("service.education.gov.uk");
-        request.Path = Routes.SecondarySchool("123456").SchoolDetails;
+        request.Path = schoolDetailsUrl;
         request.QueryString = new QueryString("?sort=desc");
 
         var result = request.GetCanonicalUrl();
 
-        result.Should().Be($"https://service.education.gov.uk{Routes.SecondarySchool(\"123456\").SchoolDetails}");
+        result.Should().Be($"https://service.education.gov.uk{schoolDetailsUrl}");
     }
 
     [Fact]
     public void GetCanonicalUrl_ReturnsPrimarySchoolUrl()
     {
+        var attendanceUrl = Routes.PrimarySchool("654321").Attendance;
         var request = new DefaultHttpContext().Request;
         request.Scheme = "https";
         request.Host = new HostString("service.education.gov.uk");
-        request.Path = Routes.PrimarySchool("654321").Attendance;
+        request.Path = attendanceUrl;
 
         var result = request.GetCanonicalUrl();
 
-        result.Should().Be($"https://service.education.gov.uk{Routes.PrimarySchool(\"654321\").Attendance}");
+        result.Should().Be($"https://service.education.gov.uk{attendanceUrl}");
     }
 }
