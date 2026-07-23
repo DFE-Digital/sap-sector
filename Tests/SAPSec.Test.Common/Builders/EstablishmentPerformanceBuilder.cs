@@ -7,6 +7,15 @@ public class EstablishmentPerformanceBuilder(string urn)
     string RwmExpected_Tot_Cohort_Est_Current_Num = string.Empty;
     string RwmExpected_Tot_Cohort_Est_Previous_Num = string.Empty;
     string RwmExpected_Tot_Cohort_Est_Previous2_Num = string.Empty;
+    string RwmExpected_Reading_Tot_Cohort_Est_Current_Num = string.Empty;
+    string RwmExpected_Reading_Tot_Cohort_Est_Previous_Num = string.Empty;
+    string RwmExpected_Reading_Tot_Cohort_Est_Previous2_Num = string.Empty;
+    string RwmExpected_Writing_Tot_Cohort_Est_Current_Num = string.Empty;
+    string RwmExpected_Writing_Tot_Cohort_Est_Previous_Num = string.Empty;
+    string RwmExpected_Writing_Tot_Cohort_Est_Previous2_Num = string.Empty;
+    string RwmExpected_Maths_Tot_Cohort_Est_Current_Num = string.Empty;
+    string RwmExpected_Maths_Tot_Cohort_Est_Previous_Num = string.Empty;
+    string RwmExpected_Maths_Tot_Cohort_Est_Previous2_Num = string.Empty;
     string RwmHigher_Tot_Cohort_Est_Current_Num = string.Empty;
     string RwmHigher_Tot_Cohort_Est_Previous_Num = string.Empty;
     string RwmHigher_Tot_Cohort_Est_Previous2_Num = string.Empty;
@@ -28,6 +37,33 @@ public class EstablishmentPerformanceBuilder(string urn)
         RwmExpected_Tot_Cohort_Est_Current_Num = current;
         RwmExpected_Tot_Cohort_Est_Previous_Num = prev;
         RwmExpected_Tot_Cohort_Est_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithRwmExpectedReading(string current, string prev, string prev2)
+    {
+        RwmExpected_Reading_Tot_Cohort_Est_Current_Num = current;
+        RwmExpected_Reading_Tot_Cohort_Est_Previous_Num = prev;
+        RwmExpected_Reading_Tot_Cohort_Est_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithRwmExpectedWriting(string current, string prev, string prev2)
+    {
+        RwmExpected_Writing_Tot_Cohort_Est_Current_Num = current;
+        RwmExpected_Writing_Tot_Cohort_Est_Previous_Num = prev;
+        RwmExpected_Writing_Tot_Cohort_Est_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithRwmExpectedMaths(string current, string prev, string prev2)
+    {
+        RwmExpected_Maths_Tot_Cohort_Est_Current_Num = current;
+        RwmExpected_Maths_Tot_Cohort_Est_Previous_Num = prev;
+        RwmExpected_Maths_Tot_Cohort_Est_Previous2_Num = prev2;
 
         return this;
     }
@@ -78,12 +114,21 @@ public class EstablishmentPerformanceBuilder(string urn)
     }
 
     public EstablishmentPerformance Build() =>
-        new EstablishmentPerformance()
+        new()
         {
             Id = urn,
             RwmExpected_Tot_Cohort_Est_Current_Num = RwmExpected_Tot_Cohort_Est_Current_Num,
             RwmExpected_Tot_Cohort_Est_Previous_Num = RwmExpected_Tot_Cohort_Est_Previous_Num,
             RwmExpected_Tot_Cohort_Est_Previous2_Num = RwmExpected_Tot_Cohort_Est_Previous2_Num,
+            RwmExpected_Reading_Tot_Cohort_Est_Current_Num = RwmExpected_Reading_Tot_Cohort_Est_Current_Num,
+            RwmExpected_Reading_Tot_Cohort_Est_Previous_Num = RwmExpected_Reading_Tot_Cohort_Est_Previous_Num,
+            RwmExpected_Reading_Tot_Cohort_Est_Previous2_Num = RwmExpected_Reading_Tot_Cohort_Est_Previous2_Num,
+            RwmExpected_Writing_Tot_Cohort_Est_Current_Num = RwmExpected_Writing_Tot_Cohort_Est_Current_Num,
+            RwmExpected_Writing_Tot_Cohort_Est_Previous_Num = RwmExpected_Writing_Tot_Cohort_Est_Previous_Num,
+            RwmExpected_Writing_Tot_Cohort_Est_Previous2_Num = RwmExpected_Writing_Tot_Cohort_Est_Previous2_Num,
+            RwmExpected_Maths_Tot_Cohort_Est_Current_Num = RwmExpected_Maths_Tot_Cohort_Est_Current_Num,
+            RwmExpected_Maths_Tot_Cohort_Est_Previous_Num = RwmExpected_Maths_Tot_Cohort_Est_Previous_Num,
+            RwmExpected_Maths_Tot_Cohort_Est_Previous2_Num = RwmExpected_Maths_Tot_Cohort_Est_Previous2_Num,
             RwmHigher_Tot_Cohort_Est_Current_Num = RwmHigher_Tot_Cohort_Est_Current_Num,
             RwmHigher_Tot_Cohort_Est_Previous_Num = RwmHigher_Tot_Cohort_Est_Previous_Num,
             RwmHigher_Tot_Cohort_Est_Previous2_Num = RwmHigher_Tot_Cohort_Est_Previous2_Num,

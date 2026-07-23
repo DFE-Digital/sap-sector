@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.Filtering;
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
@@ -28,7 +28,7 @@ public class FindPrimarySimilarSchoolsUseCase(
         var data = await dataProvider.GetSimilarSchoolsData(request.Urn);
 
         var filters = new SimilarSchoolsFilters(
-            request.FilterBy ?? new Dictionary<string, IEnumerable<string>>(),
+            request.FilterBy.AsCaseInsensitive(),
             data.CurrentSimilarSchool);
 
         var validationErrors = filters.Validate();

@@ -64,8 +64,9 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.Physics.EnglandYearByYear, Display: Model.Physics.EnglandDisplay)
     };
 
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
+    string SimilarSchoolsUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).Comparison(similarSchoolUrn).Overview;
+    string WhatIsSimilarSchoolUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
 }
 <div class="app-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -82,7 +83,7 @@
 </ul>
 
 <p class="govuk-body">
-    Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+    Find out <a href="@WhatIsSimilarSchoolUrl()" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
 
 <section aria-labelledby="english-language-heading" class="app-measure-section">
@@ -94,7 +95,7 @@
                     id="englishLanguageGrade"
                     name="englishLanguageGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "english-language" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=english-language")"
                     data-query-key="grade"
                     data-bar-chart-id="english-language-school-chart"
                     data-line-chart-id="english-language-school-yearbyyear-chart"
@@ -102,7 +103,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="english-language-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
@@ -196,7 +197,7 @@
                     id="englishLiteratureGrade"
                     name="englishLiteratureGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "english-literature" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=english-literature")"
                     data-query-key="grade"
                     data-bar-chart-id="english-literature-school-chart"
                     data-line-chart-id="english-literature-school-yearbyyear-chart"
@@ -204,7 +205,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="english-literature-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
@@ -298,7 +299,7 @@
                     id="mathsGrade"
                     name="mathsGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "maths" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=maths")"
                     data-query-key="grade"
                     data-bar-chart-id="maths-school-chart"
                     data-line-chart-id="maths-school-yearbyyear-chart"
@@ -306,7 +307,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="maths-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
@@ -400,7 +401,7 @@
                     id="combinedScienceGrade"
                     name="combinedScienceGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "combined-science-double-award" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=combined-science-double-award")"
                     data-query-key="grade"
                     data-bar-chart-id="combined-science-school-chart"
                     data-line-chart-id="combined-science-school-yearbyyear-chart"
@@ -408,7 +409,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="combined-science-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4-4 and above</option>
                 <option value="5">Grade 5-5 and above</option>
                 <option value="7">Grade 7-7 and above</option>
@@ -502,7 +503,7 @@
                     id="biologyGrade"
                     name="biologyGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "biology" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=biology")"
                     data-query-key="grade"
                     data-bar-chart-id="biology-school-chart"
                     data-line-chart-id="biology-school-yearbyyear-chart"
@@ -510,7 +511,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="biology-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
@@ -604,7 +605,7 @@
                     id="chemistryGrade"
                     name="chemistryGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "chemistry" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=chemistry")"
                     data-query-key="grade"
                     data-bar-chart-id="chemistry-school-chart"
                     data-line-chart-id="chemistry-school-yearbyyear-chart"
@@ -612,7 +613,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="chemistry-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>
@@ -706,7 +707,7 @@
                     id="physicsGrade"
                     name="physicsGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4CoreSubjectsData", "School", new { urn = Model.SchoolDetails.Urn, subject = "physics" })"
+                    data-endpoint="@($"{SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4CoreSubjectsData}?subject=physics")"
                     data-query-key="grade"
                     data-bar-chart-id="physics-school-chart"
                     data-line-chart-id="physics-school-yearbyyear-chart"
@@ -714,7 +715,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="physics-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
                 <option value="7">Grade 7 and above</option>

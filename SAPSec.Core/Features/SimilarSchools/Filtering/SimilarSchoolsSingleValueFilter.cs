@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
@@ -6,7 +7,7 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 public abstract class SimilarSchoolsSingleValueFilter(
     string key,
     string name,
-    IDictionary<string, IEnumerable<string>> filterValues,
+    CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool)
     : SimilarSchoolsFilter(key, name, filterValues, currentSchool)
 {

@@ -1,3 +1,4 @@
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
@@ -19,7 +20,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
 
         var (currentSchoolPerformance, similarSchoolsPerformance) = await dataProvider.GetSimilarSchoolsPerformance(request.Urn);
 
-        var filterBy = request.FilterBy ?? new Dictionary<string, string>();
+        var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolPerformance.SchoolInfo,

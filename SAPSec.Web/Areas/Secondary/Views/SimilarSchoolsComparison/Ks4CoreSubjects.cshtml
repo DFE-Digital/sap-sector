@@ -172,7 +172,7 @@
                         id="@item.GradeId"
                         name="@item.GradeId"
                         data-view-switcher="true"
-                        data-endpoint="@Url.Action("Ks4CoreSubjectsData", "SimilarSchoolsComparison", new { urn = Model.Urn, similarSchoolUrn = Model.SimilarSchoolUrn, subject = item.Key })"
+                        data-endpoint="@($"{Routes.SecondarySchool(Model.Urn).Comparison(Model.SimilarSchoolUrn).KS4CoreSubjectsData}?subject={item.Key}")"
                         data-query-key="grade"
                         data-bar-chart-id="@item.ChartId"
                         data-line-chart-id="@item.LineChartId"
@@ -286,9 +286,10 @@
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script type="module" add-nonce="true">
         import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
 
         ChartFactory.initAll();
+        ContentToggle.initAll();
     </script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
 }

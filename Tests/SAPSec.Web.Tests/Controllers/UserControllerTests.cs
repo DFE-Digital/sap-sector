@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.Model;
+using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;
 
@@ -55,7 +56,7 @@ public class UserControllerTests
         var result = await _controller.Index();
 
         var redirect = result.Should().BeOfType<RedirectResult>().Subject;
-        redirect.Url.Should().Be("/school/primary/123456");
+        redirect.Url.Should().Be(Routes.PrimarySchool("123456").Overview);
     }
 
     [Fact]
@@ -83,6 +84,6 @@ public class UserControllerTests
         var result = await _controller.Index();
 
         var redirect = result.Should().BeOfType<RedirectResult>().Subject;
-        redirect.Url.Should().Be("/school/654321");
+        redirect.Url.Should().Be(Routes.SecondarySchool("654321").Overview);
     }
 }
