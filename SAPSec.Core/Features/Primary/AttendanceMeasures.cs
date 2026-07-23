@@ -6,11 +6,11 @@ namespace SAPSec.Core.Features.Primary;
 
 internal static class AttendanceMeasures
 {
-    public static class TotalAbsence
+    public static class Absence
     {
         public static Measure ForSchool(SchoolData<AbsenceData> currentSchool, IDictionary<string, string> filters)
         {
-            var temp = Measure.ForSchool(
+            return Measure.ForSchool(
                 Constants.Measures.Primary.OverallAbsence,
                 MeasureDataType.AbsencePercentage,
                 [],
@@ -26,8 +26,29 @@ internal static class AttendanceMeasures
                     x => x?.EnglandAbsence?.Abs_Tot_Eng_Current_Pct,
                     x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous_Pct,
                     x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous2_Pct));
-
-            return temp;
         }
     }
+
+    //public static class PersistentAbsence
+    //{
+    //    public static Measure ForSchool(SchoolData<AbsenceData> currentSchool, IDictionary<string, string> filters)
+    //    {
+    //        return Measure.ForSchool(
+    //            Constants.Measures.Primary.PersistentAbsence,
+    //            MeasureDataType.AbsencePercentage,
+    //            [],
+    //            currentSchool,
+    //            null,
+    //            new(
+    //                x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct,
+    //                x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct,
+    //                x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct,
+    //                x => x?.LocalAuthorityAbsence?.Abs_Persistent_LA_Current_Pct,
+    //                x => x?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous_Pct,
+    //                x => x?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous2_Pct,
+    //                x => x?.EnglandAbsence?.Abs_Persistent_Eng_Current_Pct,
+    //                x => x?.EnglandAbsence?.Abs_Persistent_Eng_Previous_Pct,
+    //                x => x?.EnglandAbsence?.Abs_Persistent_Eng_Previous2_Pct));
+    //    }
+    //}
 }

@@ -25,7 +25,7 @@ public class GetAttendanceMeasuresTests
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var act = async () => await sut.Execute(new GetAttendanceMeasuresRequest("999999"));
+        var act = async () => await sut.Execute(new GetSchoolAttendanceMeasuresRequest("999999"));
 
         await act.Should().ThrowAsync<NotFoundException>()
             .WithMessage("*999999*");
@@ -121,7 +121,7 @@ public class GetAttendanceMeasuresTests
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
+        var result = await sut.Execute(new GetSchoolAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(5.0m, 5.5m, 4.7m, 4.8m));
         result.OverallAbsenceTopPerformers.Should().BeEquivalentTo(
@@ -168,7 +168,7 @@ public class GetAttendanceMeasuresTests
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
+        var result = await sut.Execute(new GetSchoolAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(null, null, null, null));
         result.OverallAbsenceTopPerformers.Should().BeEmpty();
@@ -232,7 +232,7 @@ public class GetAttendanceMeasuresTests
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
+        var result = await sut.Execute(new GetSchoolAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(5.0m, null, 4.7m, 4.8m));
         result.OverallAbsenceTopPerformers.Should().BeEquivalentTo(

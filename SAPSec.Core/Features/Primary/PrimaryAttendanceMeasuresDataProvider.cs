@@ -11,7 +11,7 @@ public class PrimaryAttendanceMeasuresDataProvider(
     {
         var school = await establishmentRepository.GetEstablishmentAsync(currentSchoolUrn);
 
-        if (school.URN is null)
+        if (school is null)
         {
             throw new NotFoundException($"School not found with URN: {currentSchoolUrn}");
         }

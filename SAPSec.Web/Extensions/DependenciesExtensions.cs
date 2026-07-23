@@ -34,7 +34,7 @@ public static class DependenciesExtensions
         services.AddSingleton<GetSchoolKs4CoreSubjects>();
         services.AddSingleton<GetFilteredSchoolKs4CoreSubject>();
         services.AddSingleton<GetAttendanceMeasures>();
-        services.AddSingleton<IUseCase<Core.Features.Primary.GetAttendanceMeasuresRequest, Core.Features.Primary.GetAttendanceMeasuresResponse>, GetSchoolAttendanceMeasuresUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Primary.GetSchoolAttendanceMeasuresRequest, Core.Features.Primary.GetSchoolAttendanceMeasuresResponse>, GetSchoolAttendanceMeasuresUseCase>();
         services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<GetSimilarSchoolDetails>();
         services.AddSingleton<GetCharacteristicsComparison>();
