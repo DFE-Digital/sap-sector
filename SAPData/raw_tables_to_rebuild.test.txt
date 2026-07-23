@@ -6,3 +6,7 @@ edubasealldataYYYYmmDD
 links_edubasealldataYYYYmmDD
 grouplinks_edubaseallacademiesandfreeYYYYmmDD
 secondary-email-addresses-12-01-2026
+
+# Similar School Sources
+2026_07_03_neighbours_list_primary
+2026_07_03_matched_primary_schools_data
