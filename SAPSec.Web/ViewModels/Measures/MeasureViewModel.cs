@@ -1,6 +1,7 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.Constants;
+using static SAPSec.Core.Constants.Measures.Primary;
 
 namespace SAPSec.Web.ViewModels.Measures;
 
@@ -26,7 +27,7 @@ public record MeasureViewModel(
     private static string ResolveMeasureLabel(string measureKey) =>
         measureKey switch
         {
-            Core.Constants.Measures.Primary.Ks2ExpectedRwm =>
+            Ks2ExpectedRwm.Key =>
                 "Meeting expected standard in reading, writing and maths",
             Core.Constants.Measures.Primary.OverallAbsence =>
                 "Total absence",

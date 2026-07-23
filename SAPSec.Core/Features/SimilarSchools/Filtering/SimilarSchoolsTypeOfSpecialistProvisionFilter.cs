@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
 using SAPSec.Core.Rules;
 
@@ -6,7 +7,7 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
     string name,
-    IDictionary<string, IEnumerable<string>> filterValues,
+    CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool)
     : SimilarSchoolsMultiValueFilter(
         key,
@@ -45,8 +46,8 @@ public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
             .Select(g => new FilterOption(
                 g.Key!.Key,
                 g.Key.Name,
-                g.Count(),
-                values.Contains(g.Key.Key, StringComparer.OrdinalIgnoreCase)))
+                values.Contains(g.Key.Key, StringComparer.OrdinalIgnoreCase),
+                g.Count()))
             .OrderBy(fo => fo.Key switch
             {
                 "R" => 0,

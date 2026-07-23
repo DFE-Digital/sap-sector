@@ -43,7 +43,8 @@ public class SchoolController(
     [Route("ks2")]
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
-        var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn));
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn, filters));
 
         PopulateViewData(response.School);
 
