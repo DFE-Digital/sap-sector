@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using SAPSec.Web.Constants;
 using SAPSec.Web.Extensions;
 
 namespace SAPSec.Web.Tests.Extensions;
@@ -12,12 +13,12 @@ public class HttpRequestExtensionsTests
         var request = new DefaultHttpContext().Request;
         request.Scheme = "https";
         request.Host = new HostString("service.education.gov.uk");
-        request.Path = "/school/123456/school-details";
+        request.Path = Routes.SecondarySchool("123456").SchoolDetails;
         request.QueryString = new QueryString("?sort=desc");
 
         var result = request.GetCanonicalUrl();
 
-        result.Should().Be("https://service.education.gov.uk/school/123456/school-details");
+        result.Should().Be($"https://service.education.gov.uk{Routes.SecondarySchool(\"123456\").SchoolDetails}");
     }
 
     [Fact]
@@ -26,10 +27,10 @@ public class HttpRequestExtensionsTests
         var request = new DefaultHttpContext().Request;
         request.Scheme = "https";
         request.Host = new HostString("service.education.gov.uk");
-        request.Path = "/school/primary/654321/attendance";
+        request.Path = Routes.PrimarySchool("654321").Attendance;
 
         var result = request.GetCanonicalUrl();
 
-        result.Should().Be("https://service.education.gov.uk/school/primary/654321/attendance");
+        result.Should().Be($"https://service.education.gov.uk{Routes.PrimarySchool(\"654321\").Attendance}");
     }
 }
