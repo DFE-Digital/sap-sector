@@ -34,16 +34,6 @@ internal class PrimarySimilarSchoolsDataProvider(
             throw new NotFoundException($"School not found with URN: {currentSchoolUrn}");
         }
 
-        var characteristics = SimilarSchoolsPrimaryValues.FromData(
-                await similarSchoolsRepository.GetValuesByUrnsAsync(urns))
-            .ToDictionary(values => values.Urn, StringComparer.Ordinal);
-
-        // A school with no similar schools group also has no row in the similar schools
-        // values dataset - that's a valid "no similar schools" state, not a not-found error.
-        var currentCharacteristics = characteristics.TryGetValue(currentSchoolUrn, out var foundCharacteristics)
-            ? foundCharacteristics
-            : new SimilarSchoolsPrimaryValues { Urn = currentSchoolUrn };
-
         var absences = (await absenceRepository.GetByUrnsAsync(urns))
             .ToDictionary(absence => absence.Urn, StringComparer.Ordinal);
         var performances = (await performanceRepository.GetByUrnsAsync(urns))
@@ -62,11 +52,6 @@ internal class PrimarySimilarSchoolsDataProvider(
                     return null;
                 }
 
-                if (!characteristics.TryGetValue(group.NeighbourURN, out var values))
-                {
-                    return null;
-                }
-
                 var similarSchool = SimilarSchool.FromData(
                     establishment,
                     null,
@@ -76,7 +61,6 @@ internal class PrimarySimilarSchoolsDataProvider(
                     group.Rank,
                     group.Dist,
                     similarSchool,
-                    values,
                     performances.GetValueOrDefault(group.NeighbourURN));
             })
             .Where(school => school is not null)
@@ -86,7 +70,6 @@ internal class PrimarySimilarSchoolsDataProvider(
 
         return new PrimarySimilarSchoolsSourceData(
             currentEstablishment,
-            currentCharacteristics,
             currentSimilarSchool,
             similarSchools);
     }
@@ -94,6 +77,5 @@ internal class PrimarySimilarSchoolsDataProvider(
 
 internal record PrimarySimilarSchoolsSourceData(
     Establishment CurrentEstablishment,
-    SimilarSchoolsPrimaryValues CurrentCharacteristics,
     SimilarSchool CurrentSimilarSchool,
     IReadOnlyCollection<PrimaryRankedSimilarSchoolData> SimilarSchools);

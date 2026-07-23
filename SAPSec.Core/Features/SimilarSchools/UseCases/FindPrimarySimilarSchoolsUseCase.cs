@@ -38,11 +38,7 @@ public class FindPrimarySimilarSchoolsUseCase(
             .ToList();
         var sorting = new PrimarySimilarSchoolsSorting(request.SortBy ?? string.Empty);
         var sortedSimilarSchools = sorting.Sort(filteredSimilarSchools)
-            .Select(sortedItem => sortedItem.Item with
-            {
-                SortMetricName = sortedItem.Value.Name,
-                SortMetricDisplayValue = sortedItem.Value.Value
-            })
+            .Select(sortedItem => sortedItem.Item with { SortValue = sortedItem.Value })
             .ToList();
 
         var page = int.TryParse(request.Page, out var parsedPage) ? parsedPage : 1;
@@ -55,8 +51,7 @@ public class FindPrimarySimilarSchoolsUseCase(
             new PrimaryCurrentSchool(
                 data.CurrentEstablishment.URN,
                 data.CurrentEstablishment.EstablishmentName,
-                data.CurrentEstablishment.LAName,
-                ToCharacteristics(data.CurrentCharacteristics)),
+                data.CurrentEstablishment.LAName),
             pagedSimilarSchools.Map(ToSimilarSchool),
             sortedSimilarSchools.Select(ToSimilarSchool).ToList().AsReadOnly(),
             filters.AsAvailableFilters(data.SimilarSchools.Select(x => x.SimilarSchool)),
@@ -65,44 +60,17 @@ public class FindPrimarySimilarSchoolsUseCase(
     }
 
     private static PrimarySimilarSchool ToSimilarSchool(PrimaryRankedSimilarSchoolData school) =>
-        ToSimilarSchool(
-            school,
+        new(
+            school.SimilarSchool,
             school.SimilarSchool.Coordinates is not null
                 ? CoordinateConverter.Convert(school.SimilarSchool.Coordinates)
-                : null);
-
-    private static PrimarySimilarSchool ToSimilarSchool(
-        PrimaryRankedSimilarSchoolData school,
-        GeographicCoordinates? coordinates) =>
-        new(
-            school.SimilarSchool.URN,
-            school.SimilarSchool.Name,
-            school.SimilarSchool.LocalAuthority.Name,
+                : null,
             school.Rank,
             school.Distance,
-            school.SimilarSchool.Address.Street ?? string.Empty,
-            school.SimilarSchool.Address.Locality ?? string.Empty,
-            school.SimilarSchool.Address.Address3 ?? string.Empty,
-            school.SimilarSchool.Address.Town ?? string.Empty,
-            school.SimilarSchool.Address.Postcode ?? string.Empty,
-            coordinates?.Latitude,
-            coordinates?.Longitude,
-            school.SortMetricName,
-            school.SortMetricDisplayValue ?? DataWithAvailability.NotAvailable<string>(),
-            ToCharacteristics(school.Characteristics));
-
-    private static PrimarySimilarSchoolCharacteristics ToCharacteristics(SimilarSchoolsPrimaryValues values) =>
-        new(
-            values.ReadMatAverage,
-            values.Ks1PriorRwmAverage,
-            values.PupilPremiumEligibilityPercentage,
-            values.PupilsWithEalPercentage,
-            values.Polar4Quintile,
-            values.PupilStabilityRate,
-            values.AverageIdaciScore,
-            values.PupilsWithSenSupportPercentage,
-            values.PupilCount,
-            values.PupilsWithEhcPlanPercentage);
+            school.SortValue ?? new SortOptionValue<DataWithAvailability<string>>(
+                string.Empty,
+                string.Empty,
+                DataWithAvailability.NotAvailable<string>()));
 }
 
 public record FindPrimarySimilarSchoolsRequest(
@@ -123,43 +91,18 @@ public record FindPrimarySimilarSchoolsResponse(
 public record PrimaryCurrentSchool(
     string Urn,
     string Name,
-    string LocalAuthorityName,
-    PrimarySimilarSchoolCharacteristics Characteristics);
+    string LocalAuthorityName);
 
 public record PrimarySimilarSchool(
-    string Urn,
-    string Name,
-    string LocalAuthorityName,
+    SimilarSchool SimilarSchool,
+    GeographicCoordinates? Coordinates,
     string Rank,
     string Distance,
-    string Street,
-    string Locality,
-    string Address3,
-    string Town,
-    string Postcode,
-    double? Latitude,
-    double? Longitude,
-    string SortMetricName,
-    DataWithAvailability<string> SortMetricDisplayValue,
-    PrimarySimilarSchoolCharacteristics Characteristics);
-
-public record PrimarySimilarSchoolCharacteristics(
-    decimal ReadMatAverage,
-    decimal Ks1PriorRwmAverage,
-    decimal PupilPremiumEligibilityPercentage,
-    decimal PupilsWithEalPercentage,
-    decimal Polar4Quintile,
-    decimal PupilStabilityRate,
-    decimal AverageIdaciScore,
-    decimal PupilsWithSenSupportPercentage,
-    decimal PupilCount,
-    decimal PupilsWithEhcPlanPercentage);
+    SortOptionValue<DataWithAvailability<string>> SortValue);
 
 internal record PrimaryRankedSimilarSchoolData(
     string Rank,
     string Distance,
     SimilarSchool SimilarSchool,
-    SimilarSchoolsPrimaryValues Characteristics,
     Ks2PerformanceData? PerformanceData,
-    string SortMetricName = "",
-    DataWithAvailability<string>? SortMetricDisplayValue = null);
+    SortOptionValue<DataWithAvailability<string>>? SortValue = null);

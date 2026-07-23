@@ -1,3 +1,4 @@
+using SAPSec.Core.Features.Measures;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 
 namespace SAPSec.Core.Features.SimilarSchools;
@@ -21,16 +22,16 @@ public class SimilarSchoolsPrimaryValues
         return new()
         {
             Urn = data.URN,
-            ReadMatAverage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.ReadMatAverage),
-            Ks1PriorRwmAverage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.Ks1PriorRwmAverage),
-            PupilPremiumEligibilityPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PPPerc),
-            PupilsWithEalPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PercentEAL),
-            Polar4Quintile = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.Polar4QuintilePupils),
-            PupilStabilityRate = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PStability),
-            AverageIdaciScore = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.IdaciPupils),
-            PupilsWithSenSupportPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PercentSchSupport),
-            PupilCount = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.NumberOfPupils),
-            PupilsWithEhcPlanPercentage = SimilarSchoolsDecimalParsing.ParseNullableDecimal(data.PercentageStatementOrEhp)
+            ReadMatAverage = MeasureHelper.ParseNullableDecimal(data.ReadMatAverage) ?? 0,
+            Ks1PriorRwmAverage = MeasureHelper.ParseNullableDecimal(data.Ks1PriorRwmAverage) ?? 0,
+            PupilPremiumEligibilityPercentage = MeasureHelper.ParseNullableDecimal(data.PPPerc) ?? 0,
+            PupilsWithEalPercentage = MeasureHelper.ParseNullableDecimal(data.PercentEAL) ?? 0,
+            Polar4Quintile = MeasureHelper.ParseNullableDecimal(data.Polar4QuintilePupils) ?? 0,
+            PupilStabilityRate = MeasureHelper.ParseNullableDecimal(data.PStability) ?? 0,
+            AverageIdaciScore = MeasureHelper.ParseNullableDecimal(data.IdaciPupils) ?? 0,
+            PupilsWithSenSupportPercentage = MeasureHelper.ParseNullableDecimal(data.PercentSchSupport) ?? 0,
+            PupilCount = MeasureHelper.ParseNullableDecimal(data.NumberOfPupils) ?? 0,
+            PupilsWithEhcPlanPercentage = MeasureHelper.ParseNullableDecimal(data.PercentageStatementOrEhp) ?? 0
         };
     }
 

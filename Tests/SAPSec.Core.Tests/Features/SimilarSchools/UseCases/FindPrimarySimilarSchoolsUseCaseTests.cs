@@ -107,28 +107,24 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             Name = "Current School",
             LocalAuthorityName = "LA One"
         });
-        response.CurrentSchool.Characteristics.ReadMatAverage.Should().Be(102.4m);
-        response.CurrentSchool.Characteristics.Ks1PriorRwmAverage.Should().Be(11.4m);
 
         response.SimilarSchoolsPage.Should().HaveCount(2);
         response.SimilarSchoolsPage.Should().SatisfyRespectively(
             first =>
             {
-                first.Urn.Should().Be("100002");
-                first.Name.Should().Be("Similar School 1");
-                first.LocalAuthorityName.Should().Be("LA Two");
+                first.SimilarSchool.URN.Should().Be("100002");
+                first.SimilarSchool.Name.Should().Be("Similar School 1");
+                first.SimilarSchool.LocalAuthority.Name.Should().Be("LA Two");
                 first.Rank.Should().Be("1");
                 first.Distance.Should().Be("0.1");
-                first.Characteristics.PupilCount.Should().Be(220m);
             },
             second =>
             {
-                second.Urn.Should().Be("100003");
-                second.Name.Should().Be("Similar School 2");
-                second.LocalAuthorityName.Should().Be("LA Three");
+                second.SimilarSchool.URN.Should().Be("100003");
+                second.SimilarSchool.Name.Should().Be("Similar School 2");
+                second.SimilarSchool.LocalAuthority.Name.Should().Be("LA Three");
                 second.Rank.Should().Be("2");
                 second.Distance.Should().Be("0.2");
-                second.Characteristics.PupilPremiumEligibilityPercentage.Should().Be(30.5m);
             });
         response.FilterOptions.Should().NotBeEmpty();
         response.SortOptions.Should().SatisfyRespectively(
@@ -192,7 +188,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["ur"] = ["U1"]
         }));
 
-        response.SimilarSchoolsPage.Select(x => x.Urn).Should().Equal("100002");
+        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.URN).Should().Equal("100002");
         response.FilterOptions.Should().Contain(x => x.Key == "ur");
         response.FilterOptions.Should().Contain(x => x.Key == "reg");
         response.FilterOptions.Should().Contain(x => x.Key == "oar");
@@ -221,8 +217,8 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(new("100001", SortBy: "GpsExpected"));
 
-        response.SimilarSchoolsPage.Select(x => x.Urn).Should().Equal("100003", "100002");
-        response.SimilarSchoolsPage.First().SortMetricName.Should().Be("Meeting expected standard in grammar, punctuation and spelling");
+        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.URN).Should().Equal("100003", "100002");
+        response.SimilarSchoolsPage.First().SortValue.Name.Should().Be("Meeting expected standard in grammar, punctuation and spelling");
         response.SortOptions.Should().Contain(x => x.Key == "GpsExpected" && x.Selected);
     }
 
@@ -249,8 +245,8 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(new("100001", SortBy: sortBy));
 
-        response.SimilarSchoolsPage.Select(x => x.Urn).Should().Equal("100003", "100002");
-        response.SimilarSchoolsPage.First().SortMetricName.Should().Be(expectedSortName);
+        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.URN).Should().Equal("100003", "100002");
+        response.SimilarSchoolsPage.First().SortValue.Name.Should().Be(expectedSortName);
         response.SortOptions.Should().Contain(x => x.Key == sortBy && x.Selected);
     }
 
@@ -266,7 +262,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         var response = await _sut.Execute(new("100001", SortBy: "RwmExpected"));
 
         // Alpha School and Beta School tie on score, so fall back to alphabetical order.
-        response.SimilarSchoolsPage.Select(x => x.Name).Should().Equal("Alpha School", "Beta School");
+        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Alpha School", "Beta School");
     }
 
     private void SetupThreeSchoolsForSorting()
@@ -336,6 +332,6 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         // None of the 12 schools have performance data, so they all tie on the default sort
         // measure and fall back to alphabetical order (AC3) - page 2 is items 11-12 of that order.
-        response.SimilarSchoolsPage.Select(x => x.Name).Should().Equal("Similar School 8", "Similar School 9");
+        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Similar School 8", "Similar School 9");
     }
 }
