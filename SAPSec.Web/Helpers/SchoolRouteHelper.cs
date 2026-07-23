@@ -33,39 +33,12 @@ public static class SchoolRouteHelper
     }
 
     private static string GetPrimaryPath(PathString requestPath, string urn)
-        => ReplaceSchoolPath(
-            requestPath,
-            urn,
-            Routes.PrimarySchool(urn).Overview,
-            Routes.SecondarySchool(urn).Overview);
+        => (requestPath.Value ?? string.Empty)
+            .Replace($"/school/{urn}", Routes.PrimarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.SecondarySchool(urn).Overview, Routes.PrimarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase);
 
     private static string GetSecondaryPath(PathString requestPath, string urn)
-        => ReplaceSchoolPath(
-            requestPath,
-            urn,
-            Routes.SecondarySchool(urn).Overview,
-            Routes.PrimarySchool(urn).Overview);
-
-    private static string ReplaceSchoolPath(
-        PathString requestPath,
-        string urn,
-        string targetBasePath,
-        string sourcePhaseBasePath)
-    {
-        var path = requestPath.Value ?? string.Empty;
-
-        foreach (var sourceBasePath in new[]
-        {
-            $"/school/{urn}",
-            sourcePhaseBasePath
-        })
-        {
-            if (path.StartsWith(sourceBasePath, StringComparison.OrdinalIgnoreCase))
-            {
-                return targetBasePath + path[sourceBasePath.Length..];
-            }
-        }
-
-        return targetBasePath;
-    }
+        => (requestPath.Value ?? string.Empty)
+            .Replace($"/school/{urn}", Routes.SecondarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.PrimarySchool(urn).Overview, Routes.SecondarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase);
 }
