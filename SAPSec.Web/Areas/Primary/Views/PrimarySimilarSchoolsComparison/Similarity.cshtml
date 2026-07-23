@@ -1,0 +1,23 @@
+@using SAPSec.Web.Constants
+@model SAPSec.Web.Areas.Primary.ViewModels.PrimarySimilarSchoolsComparisonViewModel
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = Model.SimilarSchoolName;
+}
+
+<h2 class="govuk-heading-l">How these schools compare</h2>
+
+<p class="govuk-body">
+    This school is part of a group of similar primary schools that the DfE has identified as similar
+    based on a number of key characteristics.
+</p>
+
+<p class="govuk-body">
+    Find out more about <a href="@Routes.PrimarySchool(Model.Urn).WhatIsASimilarSchool" class="govuk-link">
+        the characteristics used to measure similarity.
+    </a>
+</p>
+
+<div class="govuk-inset-text">
+    Similarity comparison for primary schools is coming soon.
+</div>

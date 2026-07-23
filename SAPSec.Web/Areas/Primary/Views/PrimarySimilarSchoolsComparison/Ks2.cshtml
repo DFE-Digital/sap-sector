@@ -1,0 +1,15 @@
+@using SAPSec.Web.Constants
+@model SAPSec.Web.Areas.Primary.ViewModels.PrimarySimilarSchoolsComparisonViewModel
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = Model.SimilarSchoolName;
+}
+
+<h2 class="govuk-heading-l">KS2 performance measures</h2>
+<p class="govuk-body">
+    How @Model.Name compares with @Model.SimilarSchoolName based on KS2 performance measures.
+</p>
+
+<div class="govuk-inset-text">
+    KS2 comparison for primary schools is coming soon.
+</div>

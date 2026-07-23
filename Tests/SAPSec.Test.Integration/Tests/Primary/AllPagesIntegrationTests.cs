@@ -82,11 +82,20 @@ public class AllPagesIntegrationTests(
 
         var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
 
-        navigationItems.Should().SatisfyRespectively(n => n.ShouldLinkTo("Home", Routes.FindASchool()));
+        if (path == Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002"))
+        {
+            navigationItems.Should().SatisfyRespectively(
+                n => n.ShouldLinkTo("Home", Routes.FindASchool()),
+                n => n.ShouldLinkTo("View similar schools", Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools));
+        }
+        else
+        {
+            navigationItems.Should().SatisfyRespectively(n => n.ShouldLinkTo("Home", Routes.FindASchool()));
+        }
     }
 
     [Theory]
-    [MemberData(nameof(AllPages))]
+    [MemberData(nameof(AllPagesWithSideNavigation))]
     public async Task AllPages_Navigation_ShowsLinksInCorrectOrder(string path)
     {
         var page = await Fixture.RequestPageAsync(path);
@@ -142,6 +151,20 @@ public class AllPagesIntegrationTests(
         foreach (var page in PrimaryPages)
         {
             data.Add(page.Path);
+        }
+
+        return data;
+    }
+
+    public static TheoryData<string> AllPagesWithSideNavigation()
+    {
+        var data = new TheoryData<string>();
+        foreach (var page in PrimaryPages)
+        {
+            if (page.IsInNavigation)
+            {
+                data.Add(page.Path);
+            }
         }
 
         return data;

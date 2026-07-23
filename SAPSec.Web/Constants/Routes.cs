@@ -39,6 +39,12 @@ public static class Routes
         public string ViewSimilarSchools => $"{BasePath}/view-similar-schools";
         public string SimilarSchoolComparison(string similarSchoolUrn)
             => $"{BasePath}/view-similar-schools/{similarSchoolUrn}";
+        public string SimilarSchoolComparisonKs2(string similarSchoolUrn)
+            => $"{SimilarSchoolComparison(similarSchoolUrn)}/ks2";
+        public string SimilarSchoolComparisonAttendance(string similarSchoolUrn)
+            => $"{SimilarSchoolComparison(similarSchoolUrn)}/attendance";
+        public string SimilarSchoolComparisonSchoolDetails(string similarSchoolUrn)
+            => $"{SimilarSchoolComparison(similarSchoolUrn)}/school-details";
         public string SchoolDetails => $"{BasePath}/school-details";
         public string WhatIsASimilarSchool => $"{BasePath}/what-is-a-similar-school";
     }
