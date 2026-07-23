@@ -1,10 +1,13 @@
 ﻿using CsvHelper;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using SAPData.Models;
 using SAPSec.Data.Common;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.SimilarSchools.Primary;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.PrimaryJsonFileGenerator;
 
@@ -34,6 +37,14 @@ internal class Program
         // In CI the working directory is often the repo root.
         // Find SAPData.csproj anywhere under the current directory and use its folder.
         string baseDir = Project.FindProjectDirectoryDownwards("SAPSec.PrimaryJsonFileGenerator.csproj");
+
+        IConfiguration _configuration = new ConfigurationBuilder()
+            .SetBasePath(baseDir)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+
+        var settings = _configuration.Get<JsonGeneratorSettings>()
+            ?? new JsonGeneratorSettings();
 
         string dataMapDir = Path.Combine(baseDir, "DataMap");
         string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
@@ -66,13 +77,22 @@ internal class Program
 
         Console.WriteLine($"Loaded {establishments.Count} Establishments");
 
+        var similarSchoolsFile = Path.Combine(generatedJsonDir, "SimilarSchoolsPrimaryGroupsEntry.json");
+        var similarSchoolsGroupEntries = JsonConvert.DeserializeObject<List<SimilarSchoolsPrimaryGroupsEntry>>(File.ReadAllText(similarSchoolsFile)) ?? [];
+        var similarSchoolsGroups = similarSchoolsGroupEntries.GroupBy(e => e.URN);
+        var similarSchoolsUrns = similarSchoolsGroupEntries.Select(g => g.URN).Concat(similarSchoolsGroupEntries.Select(g => g.NeighbourURN)).Distinct().ToList();
+
+        Console.WriteLine($"Loaded {similarSchoolsGroups.Count()} primary similar schools groups");
+
         var primarySchoolUrns = establishments
             .Where(e => e.PhaseOfEducationId is "2")
+            .Where(e => similarSchoolsUrns.Contains(e.URN))
             .Select(e => e.URN)
             .ToArray();
 
         var laIds = establishments
             .Where(e => e.PhaseOfEducationId is "2")
+            .Where(e => similarSchoolsUrns.Contains(e.URN))
             .Select(e => e.LAId)
             .Distinct()
             .ToArray();
@@ -114,7 +134,7 @@ internal class Program
                 _ => ["National"]
             };
 
-            var json = GenerateJsonFile(includedRows, ids);
+            var json = GenerateJsonFile(includedRows, ids, settings);
             File.WriteAllText(
                 Path.Combine(primaryJsonDir, $"{file.ModelName}.json"),
                 json,
@@ -136,7 +156,7 @@ internal class Program
             StringComparison.OrdinalIgnoreCase);
     }
 
-    private static string GenerateJsonFile(DataMapRow[] rows, string[] ids)
+    private static string GenerateJsonFile(DataMapRow[] rows, string[] ids, JsonGeneratorSettings settings)
     {
         var rnd = new Random();
         var json = new StringBuilder();
@@ -147,10 +167,36 @@ internal class Program
             json.AppendLine("  {");
             json.AppendLine($"    \"Id\": \"{urn}\",");
 
+            var propertySpecsApplyingToThisUrn = settings.Properties
+                .Where(p => !p.Urns.Any() || p.Urns.Contains(urn))
+                .ToList();
+
             foreach (var (row, j) in rows.Select((r, j) => (r, j)))
             {
-                var randomValue = Math.Round(rnd.NextDouble() * 100.0, 2);
-                json.AppendLine($"    \"{row.PropertyName}\": \"{randomValue}\"{(j < rows.Length - 1 ? "," : "")}");
+                double? value;
+
+                var propertySpecsApplyingToThisProperty = propertySpecsApplyingToThisUrn
+                    .Where(p => !p.PropertyNamePatterns.Any() || p.PropertyNamePatterns.Any(pattern => Regex.IsMatch(row.PropertyName, pattern)))
+                    .ToList();
+
+                var empty = propertySpecsApplyingToThisProperty.Select(p => p.Empty).FirstOrDefault();
+
+                if (empty)
+                {
+                    value = null;
+                }
+                else
+                {
+                    var propertySpec = propertySpecsApplyingToThisProperty
+                        .FirstOrDefault(p => p.MinValue is not null || p.MaxValue is not null);
+
+                    var minValue = propertySpec?.MinValue ?? 0.0;
+                    var maxValue = propertySpec?.MaxValue ?? 100.0;
+
+                    value = Math.Round(minValue + rnd.NextDouble() * (maxValue - minValue), 2);
+                }
+
+                json.AppendLine($"    \"{row.PropertyName}\": \"{value}\"{(j < rows.Length - 1 ? "," : "")}");
             }
 
             json.AppendLine($"  }}{(i < ids.Length - 1 ? "," : "")}");

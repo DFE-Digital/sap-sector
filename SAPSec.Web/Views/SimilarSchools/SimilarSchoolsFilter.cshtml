@@ -1,5 +1,5 @@
 @using SAPSec.Web.ViewModels
-@model SimilarSchoolsPageViewModel
+@model ISimilarSchoolsPageViewModel
 
 @{
     var hasActiveFilters = Model.HasActiveFilters;
@@ -17,11 +17,11 @@
     </button>
 
     <form method="get"
-          action="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })"
+          action="@Model.FilterFormUrl"
           id="app-filter-panel"
           class="app-filter-panel @panelVisibleClass">
 
-        <div class="moj-filter app-filter">
+        <div class="moj-filter app-filter" data-testid="@(Model.PhaseLabel)-similar-schools-filter">
             <div class="moj-filter__header app-filter__header">
                 <div class="moj-filter__header-title">
                     <h2 class="govuk-heading-m">Filters</h2>
@@ -40,20 +40,23 @@
                             </div>
                         </div>
 
-                        <ul class="moj-filter-tags app-filter__tags">
-                            @foreach (var tag in Model.SelectedFilterTags)
-                            {
-                                <li>
-                                    <a class="moj-filter__tag app-filter__tag" href="@tag.RemoveUrl">
-                                        <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
-                                    </a>
-                                </li>
-                            }
-                        </ul>
+                        @if (Model.SelectedFilterTags.Any())
+                        {
+                            <ul class="moj-filter-tags app-filter__tags">
+                                @foreach (var tag in Model.SelectedFilterTags)
+                                {
+                                    <li>
+                                        <a class="moj-filter__tag app-filter__tag" href="@tag.RemoveUrl">
+                                            <span class="govuk-visually-hidden">Remove this filter</span> @tag.Label
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        }
 
                         <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0 app-clear-filters-spacing">
                             <a class="govuk-link govuk-link--no-visited-state"
-                               href="@Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.Urn })">
+                               href="@Model.FilterFormUrl">
                                 Clear filters
                             </a>
                         </p>
@@ -74,7 +77,7 @@
                             {
                                 var filter = group.Filters[i];
                                 var isLastInGroup = i == group.Filters.Count - 1;
-                                <partial name="SimilarSchoolsFilterSection.cshtml"
+                                <partial name="~/Views/SimilarSchools/SimilarSchoolsFilterSection.cshtml"
                                          model="filter"
                                          view-data='new ViewDataDictionary(ViewData) { ["IsLastInGroup"] = isLastInGroup }' />
                             }
@@ -90,73 +93,3 @@
         </div>
     </form>
 </div>
-
-<script add-nonce="true">
-    (function () {
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initFilterProtection);
-        } else {
-            initFilterProtection();
-        }
-
-        function initFilterProtection() {
-            var filterForm = document.getElementById('app-filter-panel');
-            if (!filterForm) return;
-
-            const applyButtons = document.getElementsByClassName('app-filter__apply-button');
-
-            filterForm.onsubmit = function (e) {
-                const submitEvent = e;
-                const submitter = submitEvent.submitter;
-                const isApplyButton = [...applyButtons].indexOf(submitter) > -1;
-
-                if (!isApplyButton) {
-                    e.preventDefault();
-                    return false;
-                }
-
-                for(var applyButton of applyButtons) {
-                    applyButton.classList.add('govuk-button--loading');
-                    applyButton.disabled = true;
-                }
-            };
-
-            var checkboxes = filterForm.querySelectorAll('input[type="checkbox"]');
-            checkboxes.forEach(function (cb) {
-                var clone = cb.cloneNode(true);
-                cb.parentNode.replaceChild(clone, cb);
-            });
-        }
-    })();
-
-    (function () {
-        var sections = document.querySelectorAll('[data-module="app-filter-section"]');
-        sections.forEach(function (section) {
-            var toggle = section.querySelector('.app-filter-section__toggle');
-            var content = section.querySelector('.app-filter-section__content');
-            if (toggle && content) {
-                toggle.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    var expanded = toggle.getAttribute('aria-expanded') === 'true';
-                    toggle.setAttribute('aria-expanded', !expanded);
-                    expanded ? content.setAttribute('hidden', '') : content.removeAttribute('hidden');
-                });
-            }
-        });
-
-        var filterToggle = document.querySelector('[data-module="app-filter-toggle"]');
-        var filterPanel = document.getElementById('app-filter-panel');
-        if (filterToggle && filterPanel) {
-            filterToggle.addEventListener('click', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-                var expanded = filterToggle.getAttribute('aria-expanded') === 'true';
-                filterToggle.setAttribute('aria-expanded', !expanded);
-                expanded
-                    ? filterPanel.classList.remove('app-filter-panel--visible')
-                    : filterPanel.classList.add('app-filter-panel--visible');
-            });
-        }
-    })();
-</script>
