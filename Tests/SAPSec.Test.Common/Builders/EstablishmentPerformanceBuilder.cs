@@ -20,7 +20,7 @@ public class EstablishmentPerformanceBuilder(string urn)
         return this;
     }
 
-    public EstablishmentPerformanceBuilder WithReadingScore(string current, string prev, string prev2)
+    public EstablishmentPerformanceBuilder WithReadingScaledScore(string current, string prev, string prev2)
     {
         ReadingScaledScore_Tot_Cohort_Est_Current_Num = current;
         ReadingScaledScore_Tot_Cohort_Est_Previous_Num = prev;

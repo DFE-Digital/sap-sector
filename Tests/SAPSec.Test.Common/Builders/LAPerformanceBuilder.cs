@@ -20,7 +20,7 @@ public class LAPerformanceBuilder(string laId)
         return this;
     }
 
-    public LAPerformanceBuilder WithReadingScore(string current, string prev, string prev2)
+    public LAPerformanceBuilder WithReadingScaledScore(string current, string prev, string prev2)
     {
         ReadingScaledScore_Tot_Cohort_LA_Current_Num = current;
         ReadingScaledScore_Tot_Cohort_LA_Previous_Num = prev;

@@ -27,11 +27,14 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy),
+                filterBy
+            ),
             Ks2PerformanceMeasures.AverageScaledScoreReading.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy));
+                filterBy
+            )
+        );
     }
 }
 

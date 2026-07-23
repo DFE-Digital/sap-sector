@@ -7,7 +7,7 @@ public abstract record MeasureBreakdownViewModel(
     MeasureInfoViewModel MeasureInfo)
 {
     public string DisplayNumber(decimal? value) =>
-        MeasureInfo.DataType == MeasureDataType.Score
+        MeasureInfo.DataType is MeasureDataType.Score or MeasureDataType.ScaledScore
             ? DisplayValue(value)
             : DisplayWholePercent(value);
 

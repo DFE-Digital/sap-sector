@@ -15,12 +15,15 @@
     var decimals = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => 1,
+        MeasureDataType.ScaledScore => 1,
         MeasureDataType.AbsencePercentage => 2,
         _ => 0
     };
-    var axisMin = Model.MeasureInfo.DataType is MeasureDataType.Score ? 80 : 0;
-    var axisStep = Model.MeasureInfo.DataType is MeasureDataType.Score ? 20 : 25;
-    var axisMax = Model.MeasureInfo.DataType is MeasureDataType.Score ? 120 : 100;
+    var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
+    {
+        MeasureDataType.ScaledScore => (80, 20, 120),
+        _ => (0, 25, 100)
+    };
 }
 
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">

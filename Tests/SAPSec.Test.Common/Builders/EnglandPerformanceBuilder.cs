@@ -20,7 +20,7 @@ public class EnglandPerformanceBuilder()
         return this;
     }
 
-    public EnglandPerformanceBuilder WithReadingScore(string current, string prev, string prev2)
+    public EnglandPerformanceBuilder WithReadingScaledScore(string current, string prev, string prev2)
     {
         ReadingScaledScore_Tot_Cohort_Eng_Current_Num = current;
         ReadingScaledScore_Tot_Cohort_Eng_Previous_Num = prev;

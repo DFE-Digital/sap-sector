@@ -96,7 +96,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
             Build.Establishment("100001", "Test School", x => x.Primary()));
 
         _performanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScore(current: "107.2", prev: "106.3", prev2: "105.1")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "107.2", prev: "106.3", prev2: "105.1")));
 
         var response = await _sut.Execute(Request("100001"));
 
@@ -106,6 +106,403 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
         series.Should().NotBeNull();
         series.Should().Be(
             new MeasureSeries(MeasureSeriesType.CurrentSchool, 107.2m, 106.3m, 105.1m));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_CurrentSchool_WhenCurrentSchoolHasNoPerformanceData_ContainsNullValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_CurrentSchool_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_SimilarSchoolsAverage_WhenNoSimilarSchoolsForCurrentSchool_ContainsNullValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_SimilarSchoolsAverage_WhenNoPerformanceDataForSimilarSchools_ContainsNullValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_SimilarSchoolsAverage_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScaledScore(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_SimilarSchoolsAverage_ContainsYearByYearValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "106.4", prev: "103.1", prev2: "101.2")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "104.0", prev: "102.3", prev2: "99.8")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 105.2m, 102.7m, 100.5m));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_SimilarSchoolsAverage_WhenEmptyValuesPresent_CalculatesAverageOfRemainingValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "", prev: "103.1", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "106.4", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScaledScore(current: "104.0", prev: "102.3", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 105.2m, 102.7m, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_LASchoolsAverage_WhenNoPerformanceDataForLA_ContainsNullValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_LASchoolsAverage_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _performanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithReadingScaledScore(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_LASchoolsAverage_ContainsYearByYearValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _performanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithReadingScaledScore(current: "106.2", prev: "105.4", prev2: "104.1")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.LASchoolsAverage, 106.2m, 105.4m, 104.1m));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_EnglandSchoolsAverage_WhenNoPerformanceDataForNational_ContainsNullValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_EnglandSchoolsAverage_WhenEmptyValues_ContainsNulls()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()));
+
+        _performanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_EnglandSchoolsAverage_ContainsYearByYearValues()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()));
+
+        _performanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var series = response.AverageScaledScoreReading.Series
+            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, 107.4m, 106.6m, 105.8m));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TopPerfomers_WhenNoPerformanceDataForSimilarSchools_IsEmpty()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        var response = await _sut.Execute(Request("100001"));
+        var topPerformers = response.AverageScaledScoreReading.TopPerformers;
+
+        topPerformers.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TopPerfomers_WhenNoPerformanceDataForSchool_SchoolDoesNotAppear()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var topPerformers = response.AverageScaledScoreReading.TopPerformers;
+
+        topPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100003", "Test School 3", 106.3m, IsCurrentSchool: false),
+            new TopPerformer(2, "100001", "Test School 1", 101.1m, IsCurrentSchool: true)
+        ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TopPerfomers_WhenNoPerformanceDataForSchoolForCurrentYear_SchoolDoesNotAppear()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "", prev: "102.8", prev2: "101.8")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var topPerformers = response.AverageScaledScoreReading.TopPerformers;
+
+        topPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100003", "Test School 3", 106.3m, IsCurrentSchool: false),
+            new TopPerformer(2, "100001", "Test School 1", 101.1m, IsCurrentSchool: true)
+        ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TopPerfomers_RanksSimilarSchoolsBasedOnCurrentYearValue()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "104.2", prev: "103.1", prev2: "102.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var topPerformers = response.AverageScaledScoreReading.TopPerformers;
+
+        topPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100003", "Test School 3", 106.3m, IsCurrentSchool: false),
+            new TopPerformer(2, "100002", "Test School 2", 104.2m, IsCurrentSchool: false),
+            new TopPerformer(3, "100001", "Test School 1", 101.1m, IsCurrentSchool: true)
+        ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TopPerfomers_RanksSimilarSchoolsBasedOnNameIfSameCurrentYearValue()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School CCC", x => x.Primary()),
+            Build.Establishment("100002", "Test School AAA", x => x.Primary()),
+            Build.Establishment("100003", "Test School BBB", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "104.2", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "104.2", prev: "103.1", prev2: "102.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "104.2", prev: "105.4", prev2: "104.4")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var topPerformers = response.AverageScaledScoreReading.TopPerformers;
+
+        topPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100002", "Test School AAA", 104.2m, IsCurrentSchool: false),
+            new TopPerformer(2, "100003", "Test School BBB", 104.2m, IsCurrentSchool: false),
+            new TopPerformer(3, "100001", "Test School CCC", 104.2m, IsCurrentSchool: true)
+        ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TopPerfomers_LimitedToTop3()
+    {
+        _establishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        _similarSchoolsRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        _performanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "104.2", prev: "103.1", prev2: "102.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "104.3", prev: "102.8", prev2: "101.8")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithReadingScaledScore(current: "103.7", prev: "102.9", prev2: "101.9")));
+
+        var response = await _sut.Execute(Request("100001"));
+        var topPerformers = response.AverageScaledScoreReading.TopPerformers;
+
+        topPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100004", "Test School 4", 106.3m, IsCurrentSchool: false),
+            new TopPerformer(2, "100003", "Test School 3", 104.3m, IsCurrentSchool: false),
+            new TopPerformer(3, "100002", "Test School 2", 104.2m, IsCurrentSchool: false)
+        ]);
     }
 
     [Fact]

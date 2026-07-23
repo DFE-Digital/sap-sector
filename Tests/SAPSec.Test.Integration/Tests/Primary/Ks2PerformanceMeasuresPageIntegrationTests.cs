@@ -5,6 +5,7 @@ using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
+using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
 namespace SAPSec.Test.Integration.Tests.Primary;
@@ -35,18 +36,6 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("expected-rwm-heading");
         heading.ShouldHaveTextContent("Meeting expected standard in reading, writing and maths");
-    }
-
-    [Fact]
-    public async Task AverageScaledScoreReading_MeasureExistsOnPage()
-    {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
-
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
-
-        var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
-        heading.ShouldHaveTextContent("Average scaled score in reading");
     }
 
     [Fact]
@@ -185,6 +174,38 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_MeasureExistsOnPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
+        heading.ShouldHaveTextContent("Average scaled score in reading");
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_ChartsUseScaledScoreAxis()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var response = await Fixture.Client.GetAsync(Routes.PrimarySchool("100001").KS2);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+        GetCanvasMarkup(content, "reading-score-school-chart").Should().ContainAll(
+            "data-axis-min=\"80\"",
+            "data-axis-step=\"20\"",
+            "data-axis-max=\"120\"");
+        GetCanvasMarkup(content, "reading-score-school-yearbyyear-chart").Should().ContainAll(
+            "data-axis-min=\"80\"",
+            "data-axis-step=\"5\"",
+            "data-axis-max=\"120\"");
+    }
+
+    [Fact]
     public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -196,15 +217,15 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002", "100003"]));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
-            Build.Ks2Performance.England(x => x.WithReadingScore(current: "107.4", prev: "106.6", prev2: "105.8")));
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
 
         Fixture.Ks2PerformanceRepository.SetupLAPerformance(
-            Build.Ks2Performance.LA("001", x => x.WithReadingScore(current: "104.5", prev: "103.5", prev2: "102.5")));
+            Build.Ks2Performance.LA("001", x => x.WithReadingScaledScore(current: "104.5", prev: "103.5", prev2: "102.5")));
 
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScore(current: "101.4", prev: "100.4", prev2: "99.4")),
-            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScore(current: "103.2", prev: "102.2", prev2: "101.2")),
-            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScore(current: "105.2", prev: "104.2", prev2: "103.2")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "105.2", prev: "104.2", prev2: "103.2")));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
@@ -232,11 +253,11 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
 
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScore(current: "101.1", prev: "100.5", prev2: "99.5")),
-            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScore(current: "104.2", prev: "103.1", prev2: "102.1")),
-            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScore(current: "104.2", prev: "102.8", prev2: "101.8")),
-            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScore(current: "106.3", prev: "105.4", prev2: "104.4")),
-            Build.Ks2Performance.Establishment("100005", x => x.WithReadingScore(current: "103.7", prev: "102.9", prev2: "101.9")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "104.2", prev: "103.1", prev2: "102.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "104.2", prev: "102.8", prev2: "101.8")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithReadingScaledScore(current: "103.7", prev: "102.9", prev2: "101.9")));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
@@ -247,6 +268,15 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             ["1", "Test School 4", "106.3"],
             ["2", "Test School 2", "104.2"],
             ["3", "Test School 3", "104.2"]);
+    }
+
+    private static string GetCanvasMarkup(string content, string id)
+    {
+        var pattern = $"""<canvas[^>]*id="{Regex.Escape(id)}"[^>]*>""";
+        var match = Regex.Match(content, pattern, RegexOptions.Singleline);
+
+        match.Success.Should().BeTrue($"expected canvas '{id}' to be rendered");
+        return match.Value;
     }
 
 }

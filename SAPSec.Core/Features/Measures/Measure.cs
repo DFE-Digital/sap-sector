@@ -46,6 +46,7 @@ public record Measure(
 public enum MeasureDataType
 {
     Score,
+    ScaledScore,
     GradePercentage,
     AbsencePercentage
 }

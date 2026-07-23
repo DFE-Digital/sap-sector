@@ -165,10 +165,6 @@ public class Program
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
-        if (builder.Environment.IsDevelopment())
-        {
-            builder.Services.AddJsonDependencies();
-        }
         builder.Services.AddDependencies();
 
         // Add custom error handler for NotFoundExceptions

@@ -62,6 +62,21 @@ public class Ks4HeadlineMeasuresIntegrationTests(JsonRepositoryIntegrationTestFi
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasures_Attainment8ChartsUseDefaultScoreAxis()
+    {
+        var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.EnsureSuccessStatusCode();
+        GetCanvasMarkup(content, "ks4-attainment8-school-chart").Should().ContainAll(
+            "data-axis-step=\"30\"",
+            "data-axis-max=\"90\"");
+        GetCanvasMarkup(content, "ks4-attainment8-school-yearbyyear-chart").Should().ContainAll(
+            "data-axis-step=\"30\"",
+            "data-axis-max=\"90\"");
+    }
+
+    [Fact]
     public async Task Ks4HeadlineMeasures_Attainment8YearByYear_DisablesAxisAutoSkip()
     {
         var response = await fixture.Client.GetAsync(Ks4HeadlineMeasuresPath);

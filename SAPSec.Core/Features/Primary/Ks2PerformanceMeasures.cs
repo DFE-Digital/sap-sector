@@ -56,7 +56,7 @@ internal static class Ks2PerformanceMeasures
         {
             return Measure.ForSchool(
                 Constants.Measures.Primary.Ks2ReadingScore,
-                MeasureDataType.Score,
+                MeasureDataType.ScaledScore,
                 [],
                 currentSchool,
                 similarSchools,
@@ -76,7 +76,7 @@ internal static class Ks2PerformanceMeasures
         {
             return Measure.ForSchoolComparison(
                 Constants.Measures.Primary.Ks2ReadingScore,
-                MeasureDataType.Score,
+                MeasureDataType.ScaledScore,
                 [],
                 currentSchool,
                 similarSchool,

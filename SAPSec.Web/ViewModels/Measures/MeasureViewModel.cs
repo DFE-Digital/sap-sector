@@ -11,10 +11,15 @@ public record MeasureViewModel(
     TableViewModel Table,
     TopPerformersViewModel? TopPerformers)
 {
-    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool) =>
+    private static readonly string[] ReadingScoreChartColors = ["#ca357c", "#2a1950", "#2a1950", "#2a1950"];
+    private static readonly string[] ReadingScoreYearByYearColors = ["#ca357c", "#2a1950", "#5694ca", "#4b9b7d"];
+
+    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
         seriesType switch
         {
             MeasureSeriesType.CurrentSchool => currentSchool.Name,
+            MeasureSeriesType.SimilarSchool => similarSchool?.Name ??
+                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
             MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
             MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
             MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
@@ -31,20 +36,29 @@ public record MeasureViewModel(
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };
 
+    private static IEnumerable<string>? ResolveChartColors(string measureKey) =>
+        measureKey == Core.Constants.Measures.Primary.Ks2ReadingScore
+            ? ReadingScoreChartColors
+            : null;
+
+    private static IEnumerable<string>? ResolveYearByYearColors(string measureKey) =>
+        measureKey == Core.Constants.Measures.Primary.Ks2ReadingScore
+            ? ReadingScoreYearByYearColors
+            : null;
+
     public static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
-        IEnumerable<string>? chartColors = null,
-        IEnumerable<string>? yearByYearColors = null)
+        SchoolInfo? similarSchool = null)
     {
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
             ResolveMeasureLabel(measure.Key),
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo)),
-            chartColors,
-            yearByYearColors);
+            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
+            ResolveChartColors(measure.Key),
+            ResolveYearByYearColors(measure.Key));
 
         decimal? MapCurrentYear(MeasureSeries series) =>
             series.Current;
