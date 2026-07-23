@@ -1,11 +1,12 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsNurseryProvisionFilter(string key,
     string name,
-    IDictionary<string, IEnumerable<string>> filterValues,
+    CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool)
     : SimilarSchoolsMultiValueFilter(
         key,
@@ -32,8 +33,8 @@ public class SimilarSchoolsNurseryProvisionFilter(string key,
             .Select(g => new FilterOption(
                 g.Key,
                 g.Key,
-                g.Count(),
-                values.Contains(g.Key, StringComparer.OrdinalIgnoreCase)))
+                values.Contains(g.Key, StringComparer.OrdinalIgnoreCase),
+                g.Count()))
             .OrderBy(fo => fo.Key switch
             {
                 "Has Nursery Classes" => 0,

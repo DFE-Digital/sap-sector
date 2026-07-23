@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
@@ -6,7 +7,7 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 public class SimilarSchoolsDistanceFilter(
     string key,
     string name,
-    IDictionary<string, IEnumerable<string>> filterValues,
+    CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool) : SimilarSchoolsSingleValueFilter(key, name, filterValues, currentSchool)
 {
     protected override DataWithAvailability<string>? CurrentSchoolValue => null;
@@ -45,37 +46,37 @@ public class SimilarSchoolsDistanceFilter(
             var count = items.Count(i => i.Coordinates is not null && i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 5);
             if (count > 0)
             {
-                yield return new FilterOption("5", "Up to 5 miles", count, value == "5");
+                yield return new FilterOption("5", "Up to 5 miles", value == "5", count);
             }
 
             count = items.Count(i => i.Coordinates is not null && i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 10);
             if (count > 0)
             {
-                yield return new FilterOption("10", "Up to 10 miles", count, value == "10");
+                yield return new FilterOption("10", "Up to 10 miles", value == "10", count);
             }
 
             count = items.Count(i => i.Coordinates is not null && i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 25);
             if (count > 0)
             {
-                yield return new FilterOption("25", "Up to 25 miles", count, value == "25");
+                yield return new FilterOption("25", "Up to 25 miles", value == "25", count);
             }
 
             count = items.Count(i => i.Coordinates is not null && i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 50);
             if (count > 0)
             {
-                yield return new FilterOption("50", "Up to 50 miles", count, value == "50");
+                yield return new FilterOption("50", "Up to 50 miles", value == "50", count);
             }
 
             count = items.Count(i => i.Coordinates is not null && i.Coordinates.DistanceMiles(CurrentSchool.Coordinates) <= 100);
             if (count > 0)
             {
-                yield return new FilterOption("100", "Up to 100 miles", count, value == "100");
+                yield return new FilterOption("100", "Up to 100 miles", value == "100", count);
             }
 
             count = items.Count();
             if (count > 0)
             {
-                yield return new FilterOption("All", "All schools", count, value?.ToLowerInvariant() == "all");
+                yield return new FilterOption("All", "All schools", value?.ToLowerInvariant() == "all", count);
             }
         }
     }

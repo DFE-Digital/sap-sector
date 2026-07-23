@@ -1017,7 +1017,7 @@ function initAll() {
         return;
     }
 
-    document.querySelectorAll('.js-chart').forEach(initCharts);
+    init(document);
 
     window.addEventListener('scroll', hideAllHtmlTooltips, { passive: true });
     window.addEventListener('resize', hideAllHtmlTooltips, { passive: true });
