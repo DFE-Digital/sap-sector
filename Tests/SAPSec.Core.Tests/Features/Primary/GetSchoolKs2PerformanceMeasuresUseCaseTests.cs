@@ -72,6 +72,42 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
         ]);
     }
 
+    [Fact]
+    public async Task MeetingExpectedStandardGps_ShouldContainExpectedMeasureSeries()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var seriesTypes = response.MeetingExpectedStandardGps.Series.Select(s => s.SeriesType);
+
+        seriesTypes.Should().BeEquivalentTo([
+            MeasureSeriesType.CurrentSchool,
+            MeasureSeriesType.SimilarSchoolsAverage,
+            MeasureSeriesType.LASchoolsAverage,
+            MeasureSeriesType.EnglandSchoolsAverage
+        ]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_ShouldContainExpectedMeasureSeries()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var seriesTypes = response.AchievedHigherStandardGps.Series.Select(s => s.SeriesType);
+
+        seriesTypes.Should().BeEquivalentTo([
+            MeasureSeriesType.CurrentSchool,
+            MeasureSeriesType.SimilarSchoolsAverage,
+            MeasureSeriesType.LASchoolsAverage,
+            MeasureSeriesType.EnglandSchoolsAverage
+        ]);
+    }
+
     [InlineData(MeasureSeriesType.CurrentSchool, 62.0, 61.0, 60.0)]
     [InlineData(MeasureSeriesType.SimilarSchoolsAverage, 76.5, 75.5, 74.5)]
     [InlineData(MeasureSeriesType.LASchoolsAverage, 73.0, 72.0, 71.0)]
@@ -142,6 +178,112 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
         series.Should().NotBeNull();
         series.Should().Be(
             new MeasureSeries(seriesType, (decimal?)current, (decimal?)prev, (decimal?)prev2));
+    }
+
+    [InlineData(MeasureSeriesType.CurrentSchool)]
+    [InlineData(MeasureSeriesType.SimilarSchoolsAverage)]
+    [InlineData(MeasureSeriesType.LASchoolsAverage)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
+    [Theory]
+    public async Task MeetingExpectedStandardGps_WhenNoPerformanceData_ContainsNullValues(MeasureSeriesType seriesType)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var series = response.MeetingExpectedStandardGps.Series
+            .FirstOrDefault(s => s.SeriesType == seriesType);
+
+        series.Should().NotBeNull();
+        series.Should().Be(new MeasureSeries(seriesType, null, null, null));
+    }
+
+    [InlineData(MeasureSeriesType.CurrentSchool)]
+    [InlineData(MeasureSeriesType.SimilarSchoolsAverage)]
+    [InlineData(MeasureSeriesType.LASchoolsAverage)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
+    [Theory]
+    public async Task AchievedHigherStandardGps_WhenNoPerformanceData_ContainsNullValues(MeasureSeriesType seriesType)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var series = response.AchievedHigherStandardGps.Series
+            .FirstOrDefault(s => s.SeriesType == seriesType);
+
+        series.Should().NotBeNull();
+        series.Should().Be(new MeasureSeries(seriesType, null, null, null));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_TopPerfomers_LimitedToTop3_AndTiedValuesSortAlphabetically()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School B", x => x.Primary()),
+            Build.Establishment("100003", "Test School A", x => x.Primary()),
+            Build.Establishment("100004", "Test School C", x => x.Primary()),
+            Build.Establishment("100005", "Test School D", x => x.Primary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsExpected(current: "62", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsExpected(current: "77", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsExpected(current: "77", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsExpected(current: "76", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithGpsExpected(current: "75", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.MeetingExpectedStandardGps.TopPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100003", "Test School A", 77m, IsCurrentSchool: false),
+            new TopPerformer(2, "100002", "Test School B", 77m, IsCurrentSchool: false),
+            new TopPerformer(3, "100004", "Test School C", 76m, IsCurrentSchool: false)
+        ]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_TopPerfomers_LimitedToTop3_AndTiedValuesSortAlphabetically()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School B", x => x.Primary()),
+            Build.Establishment("100003", "Test School A", x => x.Primary()),
+            Build.Establishment("100004", "Test School C", x => x.Primary()),
+            Build.Establishment("100005", "Test School D", x => x.Primary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "24", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsHigher(current: "24", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsHigher(current: "23", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithGpsHigher(current: "22", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.AchievedHigherStandardGps.TopPerformers.Should().BeEquivalentTo([
+            new TopPerformer(1, "100003", "Test School A", 24m, IsCurrentSchool: false),
+            new TopPerformer(2, "100002", "Test School B", 24m, IsCurrentSchool: false),
+            new TopPerformer(3, "100004", "Test School C", 23m, IsCurrentSchool: false)
+        ]);
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]

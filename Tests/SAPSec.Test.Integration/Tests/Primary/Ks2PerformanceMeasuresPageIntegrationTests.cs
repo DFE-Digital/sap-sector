@@ -332,6 +332,42 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardGps_TopPerformers_ShouldLinkToSimilarSchoolsPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsExpected(current: "62", prev: "61", prev2: "60")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsExpected(current: "77", prev: "76", prev2: "75")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsExpected(current: "77", prev: "75", prev2: "74")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsExpected(current: "76", prev: "74", prev2: "73")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithGpsExpected(current: "70", prev: "69", prev2: "68")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("expected-gps-top-performers-similar-schools-link");
+        similarSchoolsLink.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").ViewSimilarSchools);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-top-performers-table");
+        var topPerfomersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
+
+        topPerfomersLinks.Should().BeEquivalentTo([
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100002"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100003"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100004")
+        ]);
+    }
+
+    [Fact]
     public async Task AchievedHigherStandardGps_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -406,6 +442,42 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             ["1", "Test School 2", "24%"],
             ["2", "Test School 3", "24%"],
             ["3", "Test School 4", "23%"]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_TopPerformers_ShouldLinkToSimilarSchoolsPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18", prev: "17", prev2: "16")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "24", prev: "23", prev2: "22")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsHigher(current: "24", prev: "22", prev2: "21")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsHigher(current: "23", prev: "21", prev2: "20")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithGpsHigher(current: "19", prev: "18", prev2: "17")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("higher-gps-top-performers-similar-schools-link");
+        similarSchoolsLink.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").ViewSimilarSchools);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-top-performers-table");
+        var topPerfomersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
+
+        topPerfomersLinks.Should().BeEquivalentTo([
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100002"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100003"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100004")
+        ]);
     }
 
     [Fact]

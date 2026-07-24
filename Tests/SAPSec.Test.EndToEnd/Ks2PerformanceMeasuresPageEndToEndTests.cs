@@ -16,6 +16,8 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
     private const string UrlPattern = @"\d{6}";
     private const string MeetingExpectedStandardHeaderText = "Meeting expected standard in reading, writing and maths";
     private const string ReadingScaledScoreHeaderText = "Average scaled score in reading";
+    private const string MeetingExpectedStandardGpsHeaderText = "Meeting expected standard in grammar, punctuation and spelling";
+    private const string AchievedHigherStandardGpsHeaderText = "Achieved a higher standard in grammar, punctuation and spelling";
 
     private const string Urn = "101206";
     private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool(Urn);
@@ -191,6 +193,104 @@ public class Ks2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixtur
         var values = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(values).ToHaveCountAsync(3);
         (await values.AllTrimmedTextContentsAsync()).Should().AllSatisfy(v => decimal.TryParse(v, out _).Should().BeTrue());
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
+    {
+        var section = await GetSection(MeetingExpectedStandardGpsHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+
+        await Expect(currentYearHeader).ToBeVisibleAsync();
+        await Expect(yearByYearHeader).ToBeHiddenAsync();
+
+        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
+
+        await Expect(currentYearHeader).ToBeHiddenAsync();
+        await Expect(yearByYearHeader).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_ViewTableView()
+    {
+        var section = await GetSection(MeetingExpectedStandardGpsHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var current = await table.GetTableColumnAsync("2024 to 2025");
+        await Expect(current).ToBePercentageValuesHavingCount(4);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_ViewAndNavigateToTopPerfomers()
+    {
+        var section = await GetSection(MeetingExpectedStandardGpsHeaderText);
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        await topPerfomersTab.ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var schools = await table.GetTableColumnAsync("School");
+        await Expect(schools).ToHaveCountAsync(3);
+
+        await schools.GetByRole(AriaRole.Link).Nth(0).ClickAsync();
+
+        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.SimilarSchoolComparison(UrlPattern)));
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
+    {
+        var section = await GetSection(AchievedHigherStandardGpsHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+
+        await Expect(currentYearHeader).ToBeVisibleAsync();
+        await Expect(yearByYearHeader).ToBeHiddenAsync();
+
+        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
+
+        await Expect(currentYearHeader).ToBeHiddenAsync();
+        await Expect(yearByYearHeader).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_ViewTableView()
+    {
+        var section = await GetSection(AchievedHigherStandardGpsHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var current = await table.GetTableColumnAsync("2024 to 2025");
+        await Expect(current).ToBePercentageValuesHavingCount(4);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_ViewAndNavigateToTopPerfomers()
+    {
+        var section = await GetSection(AchievedHigherStandardGpsHeaderText);
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        await topPerfomersTab.ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var schools = await table.GetTableColumnAsync("School");
+        await Expect(schools).ToHaveCountAsync(3);
+
+        await schools.GetByRole(AriaRole.Link).Nth(0).ClickAsync();
+
+        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.SimilarSchoolComparison(UrlPattern)));
     }
 
     private async Task<ILocator> GetSection(string headerText)
