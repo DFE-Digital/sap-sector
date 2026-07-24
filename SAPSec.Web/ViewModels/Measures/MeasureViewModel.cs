@@ -32,6 +32,10 @@ public record MeasureViewModel(
         {
             Ks2ExpectedRwm.Key =>
                 "Meeting expected standard in reading, writing and maths",
+            Ks2GpsExpected =>
+                "Meeting expected standard in grammar, punctuation and spelling",
+            Ks2GpsHigher =>
+                "Achieved a higher standard in grammar, punctuation and spelling",
             Core.Constants.Measures.Primary.Ks2ReadingScore =>
                 "Average scaled score in reading",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")

@@ -64,6 +64,42 @@
 
             <partial name="Measures/_Measure" model=@Model.AverageScaledScoreReading />
         </section>
+
+        <section class="app-measure-section" aria-labelledby="expected-gps-heading">
+            <h2 class="govuk-heading-m" id="expected-gps-heading" data-testid="expected-gps-heading">Meeting expected standard in grammar, punctuation and spelling</h2>
+
+            <details class="govuk-details app-measure-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Information about meeting the expected standard</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        Pupils achieve the expected standard when they achieve a scaled score of 100 or more
+                        in the grammar, punctuation and spelling test.
+                    </p>
+                </div>
+            </details>
+
+            <partial name="Measures/_Measure" model=@Model.MeetingExpectedStandardGps />
+        </section>
+
+        <section class="app-measure-section" aria-labelledby="higher-gps-heading">
+            <h2 class="govuk-heading-m" id="higher-gps-heading" data-testid="higher-gps-heading">Achieved a higher standard in grammar, punctuation and spelling</h2>
+
+            <details class="govuk-details app-measure-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Information about achieving the higher standard</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        Pupils achieve the higher standard when they achieve a scaled score of 110 or more
+                        in the grammar, punctuation and spelling test.
+                    </p>
+                </div>
+            </details>
+
+            <partial name="Measures/_Measure" model=@Model.AchievedHigherStandardGps />
+        </section>
     </form>
 </div>
 

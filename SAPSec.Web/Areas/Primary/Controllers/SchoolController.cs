@@ -51,7 +51,9 @@ public class SchoolController(
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School),
-            AverageScaledScoreReading = MeasureViewModel.FromMeasure(response.AverageScaledScoreReading, response.School)
+            MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardGps, response.School),
+            AverageScaledScoreReading = MeasureViewModel.FromMeasure(response.AverageScaledScoreReading, response.School),
+            AchievedHigherStandardGps = MeasureViewModel.FromMeasure(response.AchievedHigherStandardGps, response.School)
         };
 
         return View(model);
