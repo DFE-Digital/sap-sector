@@ -47,7 +47,8 @@ public enum MeasureDataType
 {
     Score,
     GradePercentage,
-    AbsencePercentage
+    OverallAbsencePercentage,
+    PersistentAbsencePercentage
 }
 
 public record MeasureAvailableFilter(

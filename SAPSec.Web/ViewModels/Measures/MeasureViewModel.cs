@@ -1,6 +1,7 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.Constants;
+using static SAPSec.Core.Constants.Measures;
 using static SAPSec.Core.Constants.Measures.Primary;
 
 namespace SAPSec.Web.ViewModels.Measures;
@@ -29,7 +30,7 @@ public record MeasureViewModel(
         {
             Ks2ExpectedRwm.Key =>
                 "Meeting expected standard in reading, writing and maths",
-            Core.Constants.Measures.Primary.OverallAbsence =>
+            Absence.Key =>
                 "Total absence",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };

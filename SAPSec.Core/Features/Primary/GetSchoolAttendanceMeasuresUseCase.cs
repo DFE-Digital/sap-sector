@@ -1,3 +1,4 @@
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
@@ -7,9 +8,9 @@ namespace SAPSec.Core.Features.Primary;
 public class GetSchoolAttendanceMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
     IAbsenceRepository absenceRepository)
-    : IUseCase<GetAttendanceMeasuresRequest, GetAttendanceMeasuresResponse>
+    : IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse>
 {
-    public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
+    public async Task<GetSchoolAttendanceMeasuresResponse> Execute(GetSchoolAttendanceMeasuresRequest request)
     {
         var dataProvider = new PrimaryAttendanceMeasuresDataProvider(
               absenceRepository,
@@ -17,21 +18,21 @@ public class GetSchoolAttendanceMeasuresUseCase(
 
         var currentSchoolPerformance = await dataProvider.GetSchoolAttendance(request.Urn);
 
-        var filterBy = request.FilterBy ?? new Dictionary<string, string>();
+        var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolPerformance.SchoolInfo,
-            AttendanceMeasures.TotalAbsence.ForSchool(
+            AttendanceMeasures.Absence.ForSchool(
                 currentSchoolPerformance,
                 filterBy));
     }
 
 }
 
-public record GetAttendanceMeasuresRequest(
+public record GetSchoolAttendanceMeasuresRequest(
 string Urn,
 IDictionary<string, string>? FilterBy = null);
 
-public record GetAttendanceMeasuresResponse(
+public record GetSchoolAttendanceMeasuresResponse(
 SchoolInfo.SchoolInfo School,
 Measure Absence);

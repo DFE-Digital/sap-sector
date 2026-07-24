@@ -23,14 +23,14 @@
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">
     @if (hasAnyData)
     {
-        var dataAxisStep = Model.MeasureInfo.DataType switch
+        var axisStep = Model.MeasureInfo.DataType switch
         {
             MeasureDataType.Score => 30,
             MeasureDataType.AbsencePercentage => 1,
             _ => 25
         };
 
-        var dataAxisMax = Model.MeasureInfo.DataType switch
+        var axisMax = Model.MeasureInfo.DataType switch
         {
             MeasureDataType.Score => 90,
             MeasureDataType.AbsencePercentage => 10,
@@ -41,8 +41,8 @@
                 class="js-chart js-chart--school-measure-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
-                data-axis-step=@dataAxisStep
-                data-axis-max=@dataAxisMax
+                data-axis-step=@axisStep
+                data-axis-max=@axisMax
                 data-label-decimals="@decimals"
                 data-tooltip-decimals="@decimals"
                 data-category-percentage="0.6"

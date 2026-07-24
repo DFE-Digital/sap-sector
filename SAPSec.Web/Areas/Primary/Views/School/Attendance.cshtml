@@ -38,10 +38,12 @@
     <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
         import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
 
+        MeasureFilters.initAll();
         ChartFactory.initAll();
+        ContentToggle.initAll();
     </script>
-    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
-    <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
 }
