@@ -15,6 +15,7 @@ public class AllPagesIntegrationTests(
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     private const string PrimarySchoolUrn = "100001";
+    private static readonly string ComparisonPath = Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002");
 
     private static readonly PageTestCase[] PrimaryPages = [
         new(Routes.PrimarySchool(PrimarySchoolUrn).Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
@@ -23,7 +24,7 @@ public class AllPagesIntegrationTests(
         new(Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools, "View similar schools"),
         new(Routes.PrimarySchool(PrimarySchoolUrn).SchoolDetails, "School details"),
         new(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool, "What is a similar school?"),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002"), "Test School 2", IsInNavigation: false, HasStandardSchoolLayout: false)
+        new(ComparisonPath, "Test School 2", IsInNavigation: false)
     ];
 
     public override Task InitializeAsync()
@@ -55,22 +56,6 @@ public class AllPagesIntegrationTests(
         await Fixture.RequestPageAsync(path, HttpStatusCode.NotFound);
     }
 
-    [Fact]
-    public async Task SimilarSchoolComparison_HeadingAndTitle_ReflectComparisonPage()
-    {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002"));
-
-        page.Title.Should().Be("School details compared to Test School 2 - Get school improvement insights - GOV.UK");
-
-        var heading = page.QuerySelector("h1.govuk-heading-xl");
-        heading.Should().NotBeNull();
-        heading.TrimmedTextContent().Should().Be("Test School 2");
-
-        var caption = page.QuerySelector(".govuk-caption-xl");
-        caption.Should().NotBeNull();
-        caption.TrimmedTextContent().Should().Be("Test School 1");
-    }
-
     [Theory]
     [MemberData(nameof(AllPagesWithPageHeadings))]
     public async Task AllPages_Headings(string path, string expectedHeading, bool isOverviewPage)
@@ -91,32 +76,30 @@ public class AllPagesIntegrationTests(
     }
 
     [Theory]
-    [MemberData(nameof(AllPagesWithStandardSchoolLayout))]
+    [MemberData(nameof(AllPages))]
     public async Task AllPages_Breadcrumbs(string path)
     {
         var page = await Fixture.RequestPageAsync(path);
 
         var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
 
-        navigationItems.Should().SatisfyRespectively(n => n.ShouldLinkTo("Home", Routes.FindASchool()));
-    }
-
-    [Fact]
-    public async Task SimilarSchoolComparison_Breadcrumbs_LinkToHomeAndViewSimilarSchools()
-    {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002"));
-
-        var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
-
-        navigationItems.Should().SatisfyRespectively(
-            n => n.ShouldLinkTo("Home", Routes.FindASchool()),
-            n => n.ShouldLinkTo("View similar schools", Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools));
+        if (path == ComparisonPath)
+        {
+            navigationItems.Should().SatisfyRespectively(
+                n => n.ShouldLinkTo("Home", Routes.FindASchool()),
+                n => n.ShouldLinkTo("View similar schools", Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools));
+        }
+        else
+        {
+            navigationItems.Should().SatisfyRespectively(n => n.ShouldLinkTo("Home", Routes.FindASchool()));
+        }
     }
 
     [Fact]
     public async Task SimilarSchoolComparison_SchoolDetails_ContainsExpectedSections()
     {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002"));
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonSchoolDetails("100002"));
 
         var headings = page.QuerySelectorAll("h2").Select(h => h.TrimmedTextContent()).ToList();
 
@@ -125,8 +108,25 @@ public class AllPagesIntegrationTests(
         headings.Should().Contain("Further information");
     }
 
+    [Fact]
+    public async Task SimilarSchoolComparison_SchoolDetails_HeadingAndTitle_ReflectComparisonPage()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonSchoolDetails("100002"));
+
+        page.Title.Should().Be("School details compared to Test School 2 - Get school improvement insights - GOV.UK");
+
+        var heading = page.QuerySelector("h1.govuk-heading-xl");
+        heading.Should().NotBeNull();
+        heading.TrimmedTextContent().Should().Be("Test School 2");
+
+        var caption = page.QuerySelector(".govuk-caption-xl");
+        caption.Should().NotBeNull();
+        caption.TrimmedTextContent().Should().Be("Test School 1");
+    }
+
     [Theory]
-    [MemberData(nameof(AllPagesWithStandardSchoolLayout))]
+    [MemberData(nameof(AllPagesWithSideNavigation))]
     public async Task AllPages_Navigation_ShowsLinksInCorrectOrder(string path)
     {
         var page = await Fixture.RequestPageAsync(path);
@@ -187,12 +187,12 @@ public class AllPagesIntegrationTests(
         return data;
     }
 
-    public static TheoryData<string> AllPagesWithStandardSchoolLayout()
+    public static TheoryData<string> AllPagesWithSideNavigation()
     {
         var data = new TheoryData<string>();
         foreach (var page in PrimaryPages)
         {
-            if (page.HasStandardSchoolLayout)
+            if (page.IsInNavigation)
             {
                 data.Add(page.Path);
             }
@@ -220,20 +220,11 @@ public class AllPagesIntegrationTests(
         var data = new TheoryData<string, string, bool>();
         foreach (var page in PrimaryPages)
         {
-            if (page.HasStandardSchoolLayout)
-            {
-                data.Add(page.Path, page.Heading, page.IsOverviewPage);
-            }
+            data.Add(page.Path, page.Heading, page.IsOverviewPage);
         }
 
         return data;
     }
 
-    private record PageTestCase(
-        string Path,
-        string Heading,
-        string? NavigationText = null,
-        bool IsOverviewPage = false,
-        bool IsInNavigation = true,
-        bool HasStandardSchoolLayout = true);
+    private record PageTestCase(string Path, string Heading, string? NavigationText = null, bool IsOverviewPage = false, bool IsInNavigation = true);
 }
