@@ -57,7 +57,7 @@ internal static class AttendanceMeasures
                 x => x?.EnglandAbsence?.Abs_Tot_Eng_Current_Pct,
                 x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous_Pct,
                 x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous2_Pct),
-            _ when subject.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.Type.Values.Persistent) => new(
+            _ when type.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.Type.Values.Persistent) => new(
                 x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct,
                 x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct,
                 x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct,
