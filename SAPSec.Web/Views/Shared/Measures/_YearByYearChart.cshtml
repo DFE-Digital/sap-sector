@@ -23,7 +23,7 @@
     var decimals = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => 1,
-        MeasureDataType.AbsencePercentage => 2,
+        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
     };
 }

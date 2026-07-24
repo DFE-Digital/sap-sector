@@ -10,7 +10,7 @@ public abstract record MeasureBreakdownViewModel(
        MeasureInfo.DataType switch
        {
            MeasureDataType.Score => DisplayValue(value),
-           MeasureDataType.AbsencePercentage => DisplayFractionalPercent(value),
+           MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => DisplayPercent(value),
            _ => DisplayWholePercent(value)
        };           
 
@@ -28,10 +28,5 @@ public abstract record MeasureBreakdownViewModel(
       value.HasValue
           ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
           : "No available data";
-
-    public static string DisplayFractionalPercent(decimal? value) =>
-      value.HasValue
-        ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
-        : "No available data";
 }
  

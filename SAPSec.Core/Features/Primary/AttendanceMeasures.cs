@@ -25,7 +25,6 @@ internal static class AttendanceMeasures
                 fieldSelector);
         }
     }
-
     private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<AbsenceData> FieldSelector, MeasureDataType MeasureDataType) ResolveFilters(CaseInsensitiveDictionary<string> filters)
     {
         var type = filters.ContainsKey(Constants.Measures.Absence.Filters.Type.Key)
