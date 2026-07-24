@@ -250,43 +250,35 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
             new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
     }
 
-    [InlineData(Ks2ExpectedRwm.Filters.Subject.Values.Reading, new[] { 72.0, 71.0, 70.0 }, new[] { 71.0, 70.0, 69.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
-    [InlineData(Ks2ExpectedRwm.Filters.Subject.Values.Writing, new[] { 62.0, 61.0, 60.0 }, new[] { 61.0, 60.0, 59.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
-    [InlineData(Ks2ExpectedRwm.Filters.Subject.Values.Maths, new[] { 52.0, 51.0, 50.0 }, new[] { 51.0, 50.0, 49.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
-    [InlineData(Ks2ExpectedRwm.Filters.Subject.Values.ReadingWritingMaths, new[] { 82.0, 81.0, 80.0 }, new[] { 81.0, 80.0, 79.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [InlineData(Absence.Filters.Type.Values.Overall, new[] { 5.20, 6.04, 4.30 }, new[] { 8.24, 5.44, 9.34 }, new[] { 3.24, 2.20, 1.20 })]
+    [InlineData(Absence.Filters.Type.Values.Persistent, new[] { 2.27, 1.24, 8.20 }, new[] { 7.23, 7.29, 5.20 }, new[] { 3.20, 2.24, 2.20 })]
     // Empty or invalid filter values default to ReadingWritingMaths
-    [InlineData("", new[] { 82.0, 81.0, 80.0 }, new[] { 81.0, 80.0, 79.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
-    [InlineData("xyz", new[] { 82.0, 81.0, 80.0 }, new[] { 81.0, 80.0, 79.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [InlineData("", new[] { 5.20, 6.04, 4.30 }, new[] { 8.24, 5.44, 9.34 }, new[] { 3.24, 2.20, 1.20 })]
+    [InlineData("xyz",new[] { 2.27, 1.24, 8.20 }, new[] { 7.23, 7.29, 5.20 }, new[] { 3.20, 2.24, 2.20 })]
     [Theory]
-    public async Task MeetingExpectedStandardRwm_FilterBy_Subject_ContainsYearByYearValuesForSelectedSubject(string subject, double[] currentSchool, double[] similarSchools, double[] la, double[] england)
+    public async Task Absence_FilterBy_Type_ContainsYearByYearValuesForSelectedType(string type, double[] currentSchool, double[] la, double[] england)
     {
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
 
         _absenceRepo.SetupEstablishmentAbsence(
-            Build.Ks2Performance.Establishment("100001", x => x
-                .WithRwmExpected(current: "82", prev: "81", prev2: "80")
-                .WithRwmExpectedReading(current: "72", prev: "71", prev2: "70")
-                .WithRwmExpectedWriting(current: "62", prev: "61", prev2: "60")
-                .WithRwmExpectedMaths(current: "52", prev: "51", prev2: "50")));
+            Build.Absence.Establishment("100001", x => x
+                .WithOverallAbsence(current: "5.00", previous: "6.00", previous2: "4.30")
+                .WithPersistentAbsence(current: "2.27", previous: "1.24", previous2: "8.20")));
 
         _absenceRepo.SetupLAAbsence(
-             Build.Ks2Performance.LA("001", x => x
-                .WithRwmExpected(current: "83", prev: "82", prev2: "81")
-                .WithRwmExpectedReading(current: "73", prev: "72", prev2: "71")
-                .WithRwmExpectedWriting(current: "63", prev: "62", prev2: "61")
-                .WithRwmExpectedMaths(current: "53", prev: "52", prev2: "51")));
+             Build.Absence.LA("001", x => x
+                .WithOverallAbsence(current: "8.24", previous: "5.44", previous2: "9.34")
+                .WithPersistentAbsence(current: "7.23", previous: "7.29", previous2: "5.20")));
 
         _absenceRepo.SetupEnglandAbsence(
-            Build.Ks2Performance.England(x => x
-                .WithRwmExpected(current: "84", prev: "83", prev2: "82")
-                .WithRwmExpectedReading(current: "74", prev: "73", prev2: "72")
-                .WithRwmExpectedWriting(current: "64", prev: "63", prev2: "62")
-                .WithRwmExpectedMaths(current: "54", prev: "53", prev2: "52")));
+            Build.Absence.England(x => x
+                .WithOverallAbsence(current: "3.24", previous: "2.20", previous2: "1.20")
+                .WithPersistentAbsence(current: "3.20", previous: "3.24", previous2: "2.20")));
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
         {
-            [Ks2ExpectedRwm.Filters.Subject.Key] = subject
+            [Absence.Filters.Type.Key] = type
         }));
 
         var series = response.Absence.Series;
@@ -294,7 +286,6 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
         series.Should().NotBeNull();
         series.Should().Equal([
             new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
-            new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
             new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]),
             new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
         ]);
