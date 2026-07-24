@@ -14,7 +14,7 @@ using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Controllers;
+using SAPSec.Web.Areas.Secondary.Controllers;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Text.Json;

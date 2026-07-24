@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Constants;
@@ -23,7 +24,8 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase)
+    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
+    IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase)
     : Controller
 {
     [HttpGet]
@@ -40,7 +42,8 @@ public class SchoolController(
     [Route("ks2")]
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
-        var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn));
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn, filters));
 
         PopulateViewData(response.School);
 
@@ -66,25 +69,23 @@ public class SchoolController(
 
     [HttpGet]
     [Route("view-similar-schools")]
-    public async Task<IActionResult> ViewSimilarSchools(string urn)
+    public async Task<IActionResult> ViewSimilarSchools(
+        string urn,
+        [FromQuery] string? sortBy = null,
+        [FromQuery] string? page = null)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
+        var filterBy = PrimarySimilarSchoolsPageViewModel.ExtractCurrentFilters(Request.Query)
+            .ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<string>)kvp.Value, StringComparer.InvariantCultureIgnoreCase);
+        var response = await findPrimarySimilarSchoolsUseCase.Execute(new(
+            urn,
+            filterBy,
+            sortBy,
+            page));
 
-        PopulateViewData(response.School);
+        PopulateViewData(schoolInfoResponse.School);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
-    }
-
-    [HttpGet]
-    [Route("view-similar-schools/{similarSchoolUrn}")]
-    public async Task<IActionResult> SimilarSchoolComparison(string urn, string similarSchoolUrn)
-    {
-        var currentSchool = (await getSchoolInfoUseCase.Execute(new(urn))).School;
-        var similarSchool = (await getSchoolInfoUseCase.Execute(new(similarSchoolUrn))).School;
-
-        PopulateViewData(currentSchool);
-
-        return View((SchoolInfoViewModel.FromSchoolInfo(currentSchool), SchoolInfoViewModel.FromSchoolInfo(similarSchool)));
+        return View(PrimarySimilarSchoolsPageViewModel.FromResponse(response, Request.Query));
     }
 
     [HttpGet]
