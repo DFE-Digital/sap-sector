@@ -1,9 +1,10 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
+using SAPSec.Web.Areas.Secondary.Controllers;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Filters;
 using PrimarySchoolController = SAPSec.Web.Areas.Primary.Controllers.SchoolController;
-using SecondarySchoolController = SAPSec.Web.Controllers.SchoolController;
+using SecondarySchoolController = SAPSec.Web.Areas.Secondary.Controllers.SchoolController;
 
 namespace SAPSec.Web.Tests.Controllers;
 

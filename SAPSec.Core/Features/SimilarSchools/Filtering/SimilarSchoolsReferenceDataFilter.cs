@@ -1,4 +1,5 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
@@ -6,7 +7,7 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 public class SimilarSchoolsReferenceDataFilter(
     string key,
     string name,
-    IDictionary<string, IEnumerable<string>> filterValues,
+    CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool,
     Func<SimilarSchool, ReferenceData> field) : SimilarSchoolsMultiValueFilter(key, name, filterValues, currentSchool)
 {
@@ -29,7 +30,7 @@ public class SimilarSchoolsReferenceDataFilter(
             .Select(g => new FilterOption(
                 g.Key.Id,
                 g.Key.Name,
-                g.Count(),
-                values.Contains(g.Key.Id, StringComparer.OrdinalIgnoreCase)))
+                values.Contains(g.Key.Id, StringComparer.OrdinalIgnoreCase),
+                g.Count()))
             .OrderBy(fo => fo.Name);
 }

@@ -1,10 +1,12 @@
-﻿using SAPSec.Core.Features.SimilarSchools.UseCases;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Extensions;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filterValues, SimilarSchool currentSchool)
+public class SimilarSchoolsFilters(CaseInsensitiveDictionary<IEnumerable<string>> filterValues, SimilarSchool currentSchool)
 {
-    private Dictionary<string, ISimilarSchoolsFilter> _filters = new ISimilarSchoolsFilter[]
+    private CaseInsensitiveDictionary<ISimilarSchoolsFilter> _filters = new ISimilarSchoolsFilter[]
     {
         new SimilarSchoolsDistanceFilter("dist", "Distance", filterValues, currentSchool),
         new SimilarSchoolsReferenceDataFilter("reg", "Region", filterValues, currentSchool, s => s.Region),
@@ -20,7 +22,7 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
         new SimilarSchoolsReferenceDataFilter("goe", "Gender of entry", filterValues, currentSchool, s => s.Gender),
         new SimilarSchoolsOverallAbsenceRateFilter("oar", "Overall absence rate", filterValues, currentSchool),
         new SimilarSchoolsPersistentAbsenceRateFilter("par", "Persistent absence rate", filterValues, currentSchool)
-    }.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
+    }.ToDictionary(x => x.Key).AsCaseInsensitive();
 
     public IReadOnlyCollection<ValidationError> Validate()
     {

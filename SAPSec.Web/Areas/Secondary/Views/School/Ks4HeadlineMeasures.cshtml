@@ -34,8 +34,9 @@
         (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandDestinationsYearByYear, Display: Model.EnglandDestinationsDisplay)
     };
 
-    string SimilarSchoolsUrl() => Url.Action("ViewSimilarSchools", "SimilarSchools", new { urn = Model.SchoolDetails.Urn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools";
-    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => Url.Action("Index", "SimilarSchoolsComparison", new { urn = Model.SchoolDetails.Urn, similarSchoolUrn }) ?? $"/school/{Model.SchoolDetails.Urn}/view-similar-schools/{similarSchoolUrn}";
+    string SimilarSchoolsUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).Comparison(similarSchoolUrn).Overview;
+    string WhatIsSimilarSchoolUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
 }
 <div class="app-school-page">
 <span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
@@ -52,7 +53,7 @@
 </ul>
 
 <p class="govuk-body">
-    Find out <a href="/school/@Model.SchoolDetails.Urn/what-is-a-similar-school" class="govuk-link">how DfE defines what a similar school is</a>.
+    Find out <a href="@WhatIsSimilarSchoolUrl()" class="govuk-link">how DfE defines what a similar school is</a>.
 </p>
 
 <partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
@@ -179,7 +180,7 @@
                     id="engMathsGrade"
                     name="engMathsGrade"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4HeadlineMeasuresData", "School", new { urn = Model.SchoolDetails.Urn })"
+                    data-endpoint="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4HeadlineMeasuresData"
                     data-query-key="grade"
                     data-bar-chart-id="eng-maths-school-chart"
                     data-line-chart-id="eng-maths-school-yearbyyear-chart"
@@ -187,7 +188,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="eng-maths-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="4" selected>Grade 4 and above</option>
                 <option value="5">Grade 5 and above</option>
             </select>
@@ -296,7 +297,7 @@
                     id="destinationsType"
                     name="destinationsType"
                     data-view-switcher="true"
-                    data-endpoint="@Url.Action("Ks4DestinationsData", "School", new { urn = Model.SchoolDetails.Urn })"
+                    data-endpoint="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4DestinationsData"
                     data-query-key="destination"
                     data-bar-chart-id="destinations-school-chart"
                     data-line-chart-id="destinations-school-yearbyyear-chart"
@@ -304,7 +305,7 @@
                     data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
                     data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
                     data-top-performers-table-id="destinations-top-performers-table"
-                    data-top-performer-base-url="/school/@Model.SchoolDetails.Urn/view-similar-schools">
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
                 <option value="all" selected>All destinations</option>
                 <option value="education">Education</option>
                 <option value="employment">Employment and apprenticeships</option>
@@ -399,8 +400,10 @@
     <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
     <script type="module" add-nonce="true">
         import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
 
         ChartFactory.initAll();
+        ContentToggle.initAll();
     </script>
     <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
     <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>

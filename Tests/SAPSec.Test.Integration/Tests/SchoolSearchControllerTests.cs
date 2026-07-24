@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Constants;
 using System.Net;
 using System.Text.Json;
 
@@ -152,7 +153,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/138361");
+        response.Headers.Location!.ToString().Should().Contain(Routes.SecondarySchool("138361").Overview);
     }
 
     [Fact]
@@ -169,7 +170,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().Should().Contain("/school/138361");
+        response.Headers.Location!.ToString().Should().Contain(Routes.SecondarySchool("138361").Overview);
     }
 
     #endregion
@@ -301,7 +302,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location.Should().NotBeNull();
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
+        response.Headers.Location!.ToString().ToLower().Should().Contain(Routes.SecondarySchool("105574").Overview);
     }
 
     [Fact]
@@ -366,7 +367,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
+        response.Headers.Location!.ToString().ToLower().Should().Contain(Routes.SecondarySchool("105574").Overview);
     }
 
     [Fact]
@@ -382,7 +383,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         var response = await fixture.NonRedirectingClient.PostAsync("/find-a-school/search", content);
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
-        response.Headers.Location!.ToString().ToLower().Should().Contain("/school/105574");
+        response.Headers.Location!.ToString().ToLower().Should().Contain(Routes.SecondarySchool("105574").Overview);
     }
 
     #endregion

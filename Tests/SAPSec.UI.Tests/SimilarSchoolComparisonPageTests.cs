@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
@@ -10,7 +11,8 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SimilarSchoolComparisonPath = "/school/108088/view-similar-schools/137621/SchoolDetails";
+    private static readonly string SimilarSchoolComparisonPath =
+        Routes.SecondarySchool("108088").Comparison("137621").SchoolDetails;
 
     #region Page Load Tests
 
