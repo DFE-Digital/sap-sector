@@ -1,0 +1,57 @@
+@using SAPSec.Web.ViewModels
+@using SAPSec.Web.Constants
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var comparisonModel = ViewData["ComparisonSchool"] as SimilarSchoolDetailsViewModel;
+}
+
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile school-comparison-breadcrumb" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Routes.FindASchool()">Home</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link"
+                   href="@Routes.PrimarySchool(comparisonModel!.Urn).ViewSimilarSchools">
+                    View similar schools
+                </a>
+            </li>
+        </ol>
+    </nav>
+}
+
+<div class="govuk-grid-row">
+
+    @* LEFT: back link *@
+    <div class="app-side-navigation-container">
+        <a class="govuk-back-link"
+           href="@Routes.PrimarySchool(comparisonModel!.Urn).ViewSimilarSchools">
+            Back
+        </a>
+    </div>
+
+    @* MAIN CONTENT *@
+    <div class="app-body-container-with-side-navigation">
+        <span class="govuk-caption-xl">
+            @comparisonModel!.Name
+        </span>
+
+        <span class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-padding-top-1 govuk-!-padding-bottom-1">
+            Comparing to
+        </span>
+
+        <h1 class="govuk-heading-xl">
+            @comparisonModel.SimilarSchoolName
+        </h1>
+
+        <div class="govuk-!-margin-top-9">
+            @RenderBody()
+        </div>
+
+    </div>
+</div>
+
+@await RenderSectionAsync("Scripts", required: false)
