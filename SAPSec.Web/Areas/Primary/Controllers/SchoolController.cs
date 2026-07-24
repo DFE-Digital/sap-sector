@@ -8,6 +8,7 @@ using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
@@ -25,7 +26,8 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
-    IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase)
+    IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
+    IRequestSchoolAccessor requestSchoolAccessor)
     : Controller
 {
     [HttpGet]
@@ -108,7 +110,9 @@ public class SchoolController(
 
         PopulateViewData(response.School);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+
+        return View(schoolDetails);
     }
 
     [HttpGet]
