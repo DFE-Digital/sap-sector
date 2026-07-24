@@ -265,6 +265,22 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Alpha School", "Beta School");
     }
 
+    [Fact]
+    public async Task SortsSchoolsWithSameDisplayedScoreAlphabetically_WhenUnderlyingValuesDifferSlightly()
+    {
+        SetupThreeSchoolsForSorting();
+
+        // Both round to 70% for display, but are not exactly equal underneath -
+        // the tie-break should still be based on what the user sees.
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected("70.4", "", "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithRwmExpected("70.2", "", "")));
+
+        var response = await _sut.Execute(new("100001", SortBy: "RwmExpected"));
+
+        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Alpha School", "Beta School");
+    }
+
     private void SetupThreeSchoolsForSorting()
     {
         _establishmentRepo.SetupEstablishments(
