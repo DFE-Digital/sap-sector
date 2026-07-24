@@ -33,6 +33,8 @@ public static class Measures
             }
         }
 
+        public const string Ks2GpsExpected = "expected-gps";
+        public const string Ks2GpsHigher = "higher-gps";
         public const string Ks2ReadingScore = "reading-score";
     }
 

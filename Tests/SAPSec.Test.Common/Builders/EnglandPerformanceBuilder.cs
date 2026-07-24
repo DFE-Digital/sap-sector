@@ -19,6 +19,12 @@ public class EnglandPerformanceBuilder()
     string ReadingScaledScore_Tot_Cohort_Eng_Current_Num = string.Empty;
     string ReadingScaledScore_Tot_Cohort_Eng_Previous_Num = string.Empty;
     string ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num = string.Empty;
+    string GpsExpected_Tot_Cohort_Eng_Current_Num = string.Empty;
+    string GpsExpected_Tot_Cohort_Eng_Previous_Num = string.Empty;
+    string GpsExpected_Tot_Cohort_Eng_Previous2_Num = string.Empty;
+    string GpsHigher_Tot_Cohort_Eng_Current_Num = string.Empty;
+    string GpsHigher_Tot_Cohort_Eng_Previous_Num = string.Empty;
+    string GpsHigher_Tot_Cohort_Eng_Previous2_Num = string.Empty;
 
     public EnglandPerformanceBuilder WithRwmExpected(string current, string prev, string prev2)
     {
@@ -65,6 +71,24 @@ public class EnglandPerformanceBuilder()
         return this;
     }
 
+    public EnglandPerformanceBuilder WithGpsExpected(string current, string prev, string prev2)
+    {
+        GpsExpected_Tot_Cohort_Eng_Current_Num = current;
+        GpsExpected_Tot_Cohort_Eng_Previous_Num = prev;
+        GpsExpected_Tot_Cohort_Eng_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EnglandPerformanceBuilder WithGpsHigher(string current, string prev, string prev2)
+    {
+        GpsHigher_Tot_Cohort_Eng_Current_Num = current;
+        GpsHigher_Tot_Cohort_Eng_Previous_Num = prev;
+        GpsHigher_Tot_Cohort_Eng_Previous2_Num = prev2;
+
+        return this;
+    }
+
     public EnglandPerformance Build() =>
         new()
         {
@@ -84,5 +108,11 @@ public class EnglandPerformanceBuilder()
             ReadingScaledScore_Tot_Cohort_Eng_Current_Num = ReadingScaledScore_Tot_Cohort_Eng_Current_Num,
             ReadingScaledScore_Tot_Cohort_Eng_Previous_Num = ReadingScaledScore_Tot_Cohort_Eng_Previous_Num,
             ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num = ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num,
+            GpsExpected_Tot_Cohort_Eng_Current_Num = GpsExpected_Tot_Cohort_Eng_Current_Num,
+            GpsExpected_Tot_Cohort_Eng_Previous_Num = GpsExpected_Tot_Cohort_Eng_Previous_Num,
+            GpsExpected_Tot_Cohort_Eng_Previous2_Num = GpsExpected_Tot_Cohort_Eng_Previous2_Num,
+            GpsHigher_Tot_Cohort_Eng_Current_Num = GpsHigher_Tot_Cohort_Eng_Current_Num,
+            GpsHigher_Tot_Cohort_Eng_Previous_Num = GpsHigher_Tot_Cohort_Eng_Previous_Num,
+            GpsHigher_Tot_Cohort_Eng_Previous2_Num = GpsHigher_Tot_Cohort_Eng_Previous2_Num,
         };
 }

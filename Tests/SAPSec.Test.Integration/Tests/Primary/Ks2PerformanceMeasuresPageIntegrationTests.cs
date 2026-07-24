@@ -255,6 +255,160 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardGps_MeasureExistsOnPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var heading = page.ElementWithTestIdShouldExist("expected-gps-heading");
+        heading.TrimmedTextContent().Should().Be("Meeting expected standard in grammar, punctuation and spelling");
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsExpected(current: "62", prev: "61", prev2: "60")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsExpected(current: "77", prev: "76", prev2: "75")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsExpected(current: "76", prev: "75", prev2: "74")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69", prev: "68", prev2: "67")));
+
+        Fixture.Ks2PerformanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithGpsExpected(current: "73", prev: "72", prev2: "71")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "60%", "61%", "62%"],
+            ["Similar schools average", "75%", "76%", "77%"],
+            ["Local authority schools average", "71%", "72%", "73%"],
+            ["Schools in England average", "67%", "68%", "69%"]);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_TopPerformers_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsExpected(current: "62", prev: "61", prev2: "60")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsExpected(current: "77", prev: "76", prev2: "75")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsExpected(current: "77", prev: "75", prev2: "74")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsExpected(current: "76", prev: "74", prev2: "73")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithGpsExpected(current: "70", prev: "69", prev2: "68")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-top-performers-table");
+
+        table.ShouldHaveRows(
+            ["Rank", "School", "2024 to 2025"],
+            ["1", "Test School 2", "77%"],
+            ["2", "Test School 3", "77%"],
+            ["3", "Test School 4", "76%"]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_MeasureExistsOnPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var heading = page.ElementWithTestIdShouldExist("higher-gps-heading");
+        heading.TrimmedTextContent().Should().Be("Achieved a higher standard in grammar, punctuation and spelling");
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18", prev: "17", prev2: "16")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "24", prev: "23", prev2: "22")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsHigher(current: "23", prev: "22", prev2: "21")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15", prev: "14", prev2: "13")));
+
+        Fixture.Ks2PerformanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithGpsHigher(current: "19", prev: "18", prev2: "17")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "16%", "17%", "18%"],
+            ["Similar schools average", "22%", "23%", "24%"],
+            ["Local authority schools average", "17%", "18%", "19%"],
+            ["Schools in England average", "13%", "14%", "15%"]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_TopPerformers_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18", prev: "17", prev2: "16")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "24", prev: "23", prev2: "22")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsHigher(current: "24", prev: "22", prev2: "21")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsHigher(current: "23", prev: "21", prev2: "20")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithGpsHigher(current: "19", prev: "18", prev2: "17")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-top-performers-table");
+
+        table.ShouldHaveRows(
+            ["Rank", "School", "2024 to 2025"],
+            ["1", "Test School 2", "24%"],
+            ["2", "Test School 3", "24%"],
+            ["3", "Test School 4", "23%"]);
+    }
+
+    [Fact]
     public async Task AverageScaledScoreReading_ChartsUseScaledScoreAxis()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
