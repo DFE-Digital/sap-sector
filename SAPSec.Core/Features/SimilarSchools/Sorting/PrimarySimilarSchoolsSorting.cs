@@ -8,7 +8,9 @@ namespace SAPSec.Core.Features.SimilarSchools.Sorting;
 internal class PrimarySimilarSchoolsSorting(string sortBy)
 {
     private const string PercentFormat = "0\\%";
+    private const int PercentDecimalPlaces = 0;
     private const string ScaledScoreFormat = "0.0";
+    private const int ScaledScoreDecimalPlaces = 1;
 
     public IEnumerable<SortedItem<PrimaryRankedSimilarSchoolData, DataWithAvailability<string>>> Sort(
         IEnumerable<PrimaryRankedSimilarSchoolData> items)
@@ -20,42 +22,48 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 "RwmHigher",
                 "Achieved a higher standard in reading, writing and maths",
                 i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.RwmHigher_Tot_Cohort_Est_Current_Num),
-                PercentFormat),
+                PercentFormat,
+                PercentDecimalPlaces),
 
             "readingscaledscore" => Sort(
                 items,
                 "ReadingScaledScore",
                 "Average scaled score in reading",
                 i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Current_Num),
-                ScaledScoreFormat),
+                ScaledScoreFormat,
+                ScaledScoreDecimalPlaces),
 
             "mathsscaledscore" => Sort(
                 items,
                 "MathsScaledScore",
                 "Average scaled score in maths",
                 i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Current_Num),
-                ScaledScoreFormat),
+                ScaledScoreFormat,
+                ScaledScoreDecimalPlaces),
 
             "gpsexpected" => Sort(
                 items,
                 "GpsExpected",
                 "Meeting expected standard in grammar, punctuation and spelling",
                 i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.GpsExpected_Tot_Cohort_Est_Current_Num),
-                PercentFormat),
+                PercentFormat,
+                PercentDecimalPlaces),
 
             "gpshigher" => Sort(
                 items,
                 "GpsHigher",
                 "Achieved a higher standard in grammar, punctuation and spelling",
                 i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.GpsHigher_Tot_Cohort_Est_Current_Num),
-                PercentFormat),
+                PercentFormat,
+                PercentDecimalPlaces),
 
             _ => Sort(
                 items,
                 "RwmExpected",
                 "Meeting expected standard in reading, writing and maths",
                 i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.RwmExpected_Tot_Cohort_Est_Current_Num),
-                PercentFormat)
+                PercentFormat,
+                PercentDecimalPlaces)
         };
     }
 
@@ -64,19 +72,16 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
         string sortKey,
         string sortName,
         Func<PrimaryRankedSimilarSchoolData, DataWithAvailability<decimal>> property,
-        string displayFormat) =>
-        items
-            .Select(item => new SortedItem<PrimaryRankedSimilarSchoolData, DataWithAvailability<decimal>>(
-                item,
-                new SortOptionValue<DataWithAvailability<decimal>>(sortKey, sortName, property(item))))
-            .OrderByDescending(i => i.Value.Value, DataWithAvailability<decimal>.Comparer)
-            .ThenBy(i => i.Item.SimilarSchool.Name, StringComparer.OrdinalIgnoreCase)
-            .Select(item => new SortedItem<PrimaryRankedSimilarSchoolData, DataWithAvailability<string>>(
-                item.Item,
-                new SortOptionValue<DataWithAvailability<string>>(
-                    item.Value.Key,
-                    item.Value.Name,
-                    item.Value.Value.Map(v => v.ToString(displayFormat)))));
+        string displayFormat,
+        int decimalPlaces) =>
+        SimilarSchoolsSortEngine.Sort(
+            items,
+            sortKey,
+            sortName,
+            property,
+            i => i.SimilarSchool.Name,
+            displayFormat,
+            decimalPlaces);
 
     public IEnumerable<SortOption> GetPossibleOptions(string? selectedSortBy)
     {
