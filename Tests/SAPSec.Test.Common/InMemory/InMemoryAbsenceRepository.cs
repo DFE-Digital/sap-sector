@@ -31,9 +31,6 @@ public class InMemoryAbsenceRepository(IEstablishmentRepository establishmentRep
         _england = [];
     }
 
-    //public Task<AbsenceData?> GetByUrnAsync(string urn)
-    //    => Task.FromResult(GetByUrn(urn));
-
     public async Task<AbsenceData?> GetByUrnAsync(string urn)
     {
         var establishment = await establishmentRepository.GetEstablishmentAsync(urn);
@@ -50,6 +47,15 @@ public class InMemoryAbsenceRepository(IEstablishmentRepository establishmentRep
                 england);
     }
 
-    public Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)
-        => Task.FromResult((IReadOnlyCollection<AbsenceData>)urns.Select(GetByUrnAsync).Where(x => x is not null).ToList());
+    public async Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)
+    {
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
+
+        return establishments.Select(e => new AbsenceData(
+                e.URN,
+                _establishment.FirstOrDefault(x => x.Id == e.URN),
+                _la.FirstOrDefault(x => x.Id == e.LAId),
+                _england.FirstOrDefault(x => x.Id == "National")))
+            .ToList();
+    }
 }

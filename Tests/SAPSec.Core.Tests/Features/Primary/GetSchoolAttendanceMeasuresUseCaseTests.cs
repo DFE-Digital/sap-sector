@@ -252,9 +252,9 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
 
     [InlineData(Absence.Filters.Type.Values.Overall, new[] { 5.20, 6.04, 4.30 }, new[] { 8.24, 5.44, 9.34 }, new[] { 3.24, 2.20, 1.20 })]
     [InlineData(Absence.Filters.Type.Values.Persistent, new[] { 2.27, 1.24, 8.20 }, new[] { 7.23, 7.29, 5.20 }, new[] { 3.20, 2.24, 2.20 })]
-    // Empty or invalid filter values default to ReadingWritingMaths
+    //Empty or invalid filter values default to Overall absence
     [InlineData("", new[] { 5.20, 6.04, 4.30 }, new[] { 8.24, 5.44, 9.34 }, new[] { 3.24, 2.20, 1.20 })]
-    [InlineData("xyz",new[] { 2.27, 1.24, 8.20 }, new[] { 7.23, 7.29, 5.20 }, new[] { 3.20, 2.24, 2.20 })]
+    [InlineData("xyz",new[] { 5.20, 6.04, 4.30 }, new[] { 8.24, 5.44, 9.34 }, new[] { 3.24, 2.20, 1.20 } )]
     [Theory]
     public async Task Absence_FilterBy_Type_ContainsYearByYearValuesForSelectedType(string type, double[] currentSchool, double[] la, double[] england)
     {
@@ -263,7 +263,7 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x
-                .WithOverallAbsence(current: "5.00", previous: "6.00", previous2: "4.30")
+                .WithOverallAbsence(current: "5.20", previous: "6.04", previous2: "4.30")
                 .WithPersistentAbsence(current: "2.27", previous: "1.24", previous2: "8.20")));
 
         _absenceRepo.SetupLAAbsence(
@@ -274,7 +274,7 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
         _absenceRepo.SetupEnglandAbsence(
             Build.Absence.England(x => x
                 .WithOverallAbsence(current: "3.24", previous: "2.20", previous2: "1.20")
-                .WithPersistentAbsence(current: "3.20", previous: "3.24", previous2: "2.20")));
+                .WithPersistentAbsence(current: "3.20", previous: "2.24", previous2: "2.20")));
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
         {

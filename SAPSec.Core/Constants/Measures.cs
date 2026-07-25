@@ -43,7 +43,7 @@ public static class Measures
             public static class Type
             {
                 public const string Key = $"{Absence.Key}-type";
-                public const string Name = "Type";
+                public const string Name = "Type of absence";
 
                 public static class Values
                 {
@@ -51,12 +51,13 @@ public static class Measures
                     public const string Persistent = "persistent";
 
                     public static readonly FilterValueDefinition[] AllValues = [
-                        new(Overall, "Overall"),
-                        new(Persistent, "Persistent")
+                        new(Overall, "Overall absence"),
+                        new(Persistent, "Persistent absence")
                     ];
                 }
             }
         }
     }
+
     public record FilterValueDefinition(string Value, string Name);
 }

@@ -66,6 +66,16 @@ internal static class AttendanceMeasures
                 x => x?.EnglandAbsence?.Abs_Persistent_Eng_Current_Pct,
                 x => x?.EnglandAbsence?.Abs_Persistent_Eng_Previous_Pct,
                 x => x?.EnglandAbsence?.Abs_Persistent_Eng_Previous2_Pct),
+            _ => new(
+                x => x?.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct,
+                x => x?.EstablishmentAbsence?.Abs_Tot_Est_Previous_Pct,
+                x => x?.EstablishmentAbsence?.Abs_Tot_Est_Previous2_Pct,
+                x => x?.LocalAuthorityAbsence?.Abs_Tot_LA_Current_Pct,
+                x => x?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous_Pct,
+                x => x?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous2_Pct,
+                x => x?.EnglandAbsence?.Abs_Tot_Eng_Current_Pct,
+                x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous_Pct,
+                x => x?.EnglandAbsence?.Abs_Tot_Eng_Previous2_Pct)
         };
 
         return (availableFilters, fieldSelector, measureDataType);
