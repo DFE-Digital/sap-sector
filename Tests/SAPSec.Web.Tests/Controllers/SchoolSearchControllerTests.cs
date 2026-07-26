@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Data.Dto;
+using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
@@ -177,7 +178,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Index(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -193,7 +194,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Index(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -209,7 +210,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Index(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/primary/456789");
+        redirectResult.Url.Should().Be(Routes.PrimarySchool("456789").Overview);
     }
 
     [Fact]
@@ -294,7 +295,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -307,7 +308,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/primary/456789");
+        redirectResult.Url.Should().Be(Routes.PrimarySchool("456789").Overview);
     }
 
     [Fact]
@@ -406,7 +407,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -424,7 +425,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/primary/456789");
+        redirectResult.Url.Should().Be(Routes.PrimarySchool("456789").Overview);
     }
 
     [Fact]
@@ -472,7 +473,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/100273");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("100273").Overview);
     }
 
     #endregion
@@ -701,7 +702,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -718,7 +719,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -918,7 +919,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/222222");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("222222").Overview);
     }
 
     [Fact]
@@ -1008,7 +1009,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/222222");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("222222").Overview);
     }
 
     [Fact]
@@ -1109,7 +1110,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -1143,7 +1144,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Search(query, null, 1);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/999999");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("999999").Overview);
     }
 
     #endregion

@@ -11,13 +11,14 @@ using SAPSec.Web.ViewModels;
 using System.Globalization;
 using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
 
-namespace SAPSec.Web.Controllers;
+namespace SAPSec.Web.Areas.Secondary.Controllers;
 
 /// <summary>
 /// Controller for school details pages.
 /// Single Responsibility: HTTP handling and view selection only.
 /// </summary>
-[Route("school/{urn}")]
+[Area("Secondary")]
+[Route("school/secondary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SchoolController : Controller

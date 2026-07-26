@@ -45,7 +45,7 @@
 </p>
 
 <div class="govuk-grid-row app-similar-schools-content">
-    <partial name="~/Views/SimilarSchools/SimilarSchoolsFilter.cshtml" model="Model" />
+    <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsFilter.cshtml" model="Model" />
 
     <div class="govuk-grid-column-two-thirds app-filter__results-column">
         @if (hasVisibleResults)
@@ -76,14 +76,14 @@
         }
 
         <div id="listView">
-            <partial name="~/Views/SimilarSchools/SimilarSchoolsResults.cshtml" model="Model" />
-            <partial name="~/Views/SimilarSchools/SimilarSchoolsPagination.cshtml" model="Model" />
+            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsResults.cshtml" model="Model" />
+            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsPagination.cshtml" model="Model" />
         </div>
 
         @if (hasVisibleResults)
         {
             <div id="mapView" class="govuk-!-display-none">
-                <partial name="~/Views/SimilarSchools/SimilarSchoolsMap.cshtml" model="Model" />
+                <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsMap.cshtml" model="Model" />
             </div>
         }
     </div>
