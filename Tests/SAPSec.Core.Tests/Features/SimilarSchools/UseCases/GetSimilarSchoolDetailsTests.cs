@@ -11,12 +11,14 @@ public class GetSimilarSchoolDetailsTests
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo = new();
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
     private readonly InMemoryKs4PerformanceRepository _performanceRepo = new();
-    private readonly InMemoryAbsenceRepository _absenceRepo = new();
+    private readonly InMemoryAbsenceRepository _absenceRepo;
     private readonly Mock<ISchoolDetailsService> _schoolDetailsService = new Mock<ISchoolDetailsService>();
     private readonly GetSimilarSchoolDetails _sut;
 
     public GetSimilarSchoolDetailsTests()
     {
+        _absenceRepo = new InMemoryAbsenceRepository(_establishmentRepo);
+
         _sut = new GetSimilarSchoolDetails(
             _establishmentRepo,
             _similarSchoolsRepo,

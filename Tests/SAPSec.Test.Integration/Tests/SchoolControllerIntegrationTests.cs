@@ -4,16 +4,17 @@ using AngleSharp.Dom;
 using FluentAssertions;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Constants;
 
 namespace SAPSec.Test.Integration.Tests;
 
 [Collection("JsonRepositoryIntegrationTestsCollection")]
 public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
-    private const string SchoolOverviewPath = "/school/105574";
-    private const string SchoolAttendancePath = "/school/105574/attendance";
-    private const string SchoolDetailsPath = "/school/105574/school-details";
-    private const string WhatIsASimilarSchoolPath = "/school/105574/what-is-a-similar-school";
+    private static readonly string SchoolOverviewPath = Routes.SecondarySchool("105574").Overview;
+    private static readonly string SchoolAttendancePath = Routes.SecondarySchool("105574").Attendance;
+    private static readonly string SchoolDetailsPath = Routes.SecondarySchool("105574").SchoolDetails;
+    private static readonly string WhatIsASimilarSchoolPath = Routes.SecondarySchool("105574").WhatIsASimilarSchool;
 
     [Fact]
     public async Task GetSchoolOverview_ReturnsSuccess()

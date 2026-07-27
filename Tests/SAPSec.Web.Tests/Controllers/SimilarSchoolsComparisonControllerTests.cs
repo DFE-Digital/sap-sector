@@ -14,7 +14,7 @@ using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Constants;
-using SAPSec.Web.Controllers;
+using SAPSec.Web.Areas.Secondary.Controllers;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Text.Json;
@@ -247,12 +247,12 @@ public class SimilarSchoolsComparisonControllerTests
                 new LAAbsence(),
                 new EnglandAbsence
                 {
-                    Abs_Tot_Eng_Current_Pct = "4.8",
-                    Abs_Tot_Eng_Previous_Pct = "4.9",
-                    Abs_Tot_Eng_Previous2_Pct = "5.0",
-                    Abs_Persistent_Eng_Current_Pct = "15.6",
-                    Abs_Persistent_Eng_Previous_Pct = "15.8",
-                    Abs_Persistent_Eng_Previous2_Pct = "16.0"
+                    Abs_Tot_Secondary_Eng_Current_Pct = "4.8",
+                    Abs_Tot_Secondary_Eng_Previous_Pct = "4.9",
+                    Abs_Tot_Secondary_Eng_Previous2_Pct = "5.0",
+                    Abs_Persistent_Secondary_Eng_Current_Pct = "15.6",
+                    Abs_Persistent_Secondary_Eng_Previous_Pct = "15.8",
+                    Abs_Persistent_Secondary_Eng_Previous2_Pct = "16.0"
                 }));
 
         var result = await _sut.AttendanceData("145327", "142075");

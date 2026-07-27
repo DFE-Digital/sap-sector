@@ -10,9 +10,10 @@ using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
 
-namespace SAPSec.Web.Controllers;
+namespace SAPSec.Web.Areas.Secondary.Controllers;
 
-[Route("school/{urn}/view-similar-schools/{similarSchoolUrn}")]
+[Area("Secondary")]
+[Route("school/secondary/{urn}/view-similar-schools/{similarSchoolUrn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary, "urn", "similarSchoolUrn")]
 public class SimilarSchoolsComparisonController : Controller
@@ -57,7 +58,7 @@ public class SimilarSchoolsComparisonController : Controller
         Similarity(urn, similarSchoolUrn, similarityCalculation);
 
     [HttpGet]
-    [Route("Similarity")]
+    [Route("similarity")]
     public async Task<IActionResult> Similarity(
         string urn,
         string similarSchoolUrn,
@@ -74,7 +75,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4HeadlineMeasures")]
+    [Route("ks4-headline-measures")]
     public async Task<IActionResult> Ks4HeadlineMeasures(
         string urn,
         string similarSchoolUrn,
@@ -134,7 +135,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4HeadlineMeasuresData")]
+    [Route("ks4-headline-measures/data")]
     public async Task<IActionResult> Ks4HeadlineMeasuresData(string urn, string similarSchoolUrn, string grade = "4")
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
@@ -213,7 +214,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4DestinationsData")]
+    [Route("ks4-destinations/data")]
     public async Task<IActionResult> Ks4DestinationsData(string urn, string similarSchoolUrn, string destination = "all")
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
@@ -286,7 +287,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4CoreSubjects")]
+    [Route("ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(
         string urn,
         string similarSchoolUrn,
@@ -313,7 +314,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("Ks4CoreSubjectsData")]
+    [Route("ks4-core-subjects/data")]
     public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string similarSchoolUrn, string subject = "english-language", string grade = "4")
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
@@ -482,7 +483,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("SchoolDetails")]
+    [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(
         string urn,
         string similarSchoolUrn,

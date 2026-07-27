@@ -39,18 +39,14 @@ public class SimilarSchoolsSorting(string sortBy)
     }
 
     private IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<string>>> Sort(IEnumerable<SimilarSchool> items, string sortKey, string sortName, Func<SimilarSchool, DataWithAvailability<decimal>> property) =>
-        items
-            .Select(item => new SortedItem<SimilarSchool, DataWithAvailability<decimal>>(
-                item,
-                new SortOptionValue<DataWithAvailability<decimal>>(sortKey, sortName, property(item))))
-            .OrderByDescending(i => i.Value.Value, DataWithAvailability<decimal>.Comparer)
-            .Select(item => new SortedItem<SimilarSchool, DataWithAvailability<string>>(
-                item.Item,
-                new SortOptionValue<DataWithAvailability<string>>(item.Value.Key, item.Value.Name, sortKey.ToLowerInvariant() switch
-                {
-                    "att8" => item.Value.Value.Map(v => v.ToString("0.0")),
-                    _ => item.Value.Value.Map(v => v.ToString("0.0\\%"))
-                })));
+        SimilarSchoolsSortEngine.Sort(
+            items,
+            sortKey,
+            sortName,
+            property,
+            i => i.Name,
+            sortKey.ToLowerInvariant() == "att8" ? "0.0" : "0.0\\%",
+            decimalPlaces: 1);
 
     public IEnumerable<SortOption> GetPossibleOptions(string sortBy)
     {

@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using System.Text.Json;
 using Xunit;
@@ -9,7 +10,7 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string Path = "/school/108088/view-similar-schools/137621/Ks4HeadlineMeasures";
+    private static readonly string Path = Routes.SecondarySchool("108088").Comparison("137621").KS4HeadlineMeasures;
 
     private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
     {

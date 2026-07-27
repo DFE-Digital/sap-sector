@@ -97,18 +97,6 @@ public class SchoolController(
     }
 
     [HttpGet]
-    [Route("view-similar-schools/{similarSchoolUrn}")]
-    public async Task<IActionResult> SimilarSchoolComparison(string urn, string similarSchoolUrn)
-    {
-        var currentSchool = (await getSchoolInfoUseCase.Execute(new(urn))).School;
-        var similarSchool = (await getSchoolInfoUseCase.Execute(new(similarSchoolUrn))).School;
-
-        PopulateViewData(currentSchool);
-
-        return View((SchoolInfoViewModel.FromSchoolInfo(currentSchool), SchoolInfoViewModel.FromSchoolInfo(similarSchool)));
-    }
-
-    [HttpGet]
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {

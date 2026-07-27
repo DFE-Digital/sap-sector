@@ -18,10 +18,8 @@ public class PrimaryAttendanceMeasuresDataProvider(
 
         var attendances = (await attendanceRepository.GetByUrnAsync(school.URN));
 
-        var temp = new SchoolData<AbsenceData>(
+        return new SchoolData<AbsenceData>(
          SchoolInfo.SchoolInfo.FromEstablishment(school),
          attendances);
-
-        return temp;
     }
 }

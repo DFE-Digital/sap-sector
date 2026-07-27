@@ -7,9 +7,10 @@ using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 
-namespace SAPSec.Web.Controllers;
+namespace SAPSec.Web.Areas.Secondary.Controllers;
 
-[Route("school/{urn}")]
+[Area("Secondary")]
+[Route("school/secondary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SimilarSchoolsController : Controller
@@ -65,7 +66,7 @@ public class SimilarSchoolsController : Controller
             .ToList();
 
         var responseSortBy = response.SortOptions.First(o => o.Selected).Key;
-        var baseUrl = BuildBaseUrl(urn);
+        var baseUrl = Routes.SecondarySchool(urn).ViewSimilarSchools;
 
         var viewModel = new SimilarSchoolsPageViewModel
         {
@@ -89,23 +90,10 @@ public class SimilarSchoolsController : Controller
             TotalResults = response.AllResults.Count,
             ValidationErrors = response.ValidationErrors,
             FilterFormUrl = baseUrl,
-            WhatIsASimilarSchoolUrl = Url?.Action("WhatIsASimilarSchool", "School", new { urn }) ?? $"/school/{urn}/what-is-a-similar-school"
+            WhatIsASimilarSchoolUrl = Routes.SecondarySchool(urn).WhatIsASimilarSchool
         };
 
         return View(viewModel);
-    }
-
-    [HttpGet]
-    [Route("similar-schools")]
-    public IActionResult Index(string urn)
-    {
-        var url = Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn });
-        if (string.IsNullOrEmpty(url))
-        {
-            return RedirectToAction(nameof(ViewSimilarSchools), new { urn });
-        }
-
-        return Redirect(url + Request.QueryString);
     }
 
     private static Dictionary<string, IEnumerable<string>> BuildCoreFilters(IQueryCollection query)
@@ -130,11 +118,6 @@ public class SimilarSchoolsController : Controller
         return result;
     }
 
-    private string BuildBaseUrl(string urn) =>
-        Url is null
-            ? $"/school/{urn}/view-similar-schools"
-            : Url.Action(nameof(ViewSimilarSchools), "SimilarSchools", new { urn }) ?? $"/school/{urn}/view-similar-schools";
-
     private SimilarSchoolViewModel MapToViewModel(SimilarSchoolResult result, string currentSchoolUrn)
     {
         var school = result.SimilarSchool;
@@ -154,8 +137,7 @@ public class SimilarSchoolsController : Controller
             UrbanOrRural = school.UrbanRural.Name,
             SortMetricName = result.SortValue.Name,
             SortMetricDisplayValue = result.SortValue.Value.Display(),
-            ComparisonUrl = Url?.Action("Index", "SimilarSchoolsComparison", new { urn = currentSchoolUrn, similarSchoolUrn = school.URN })
-                ?? $"/school/{currentSchoolUrn}/similar-schools-comparison/{school.URN}"
+            ComparisonUrl = Routes.SecondarySchool(currentSchoolUrn).Comparison(school.URN).Overview
         };
     }
 }

@@ -14,10 +14,10 @@ public record TopPerformer(
         IEnumerable<SchoolData<T>>? similarSchools,
         MeasureFieldSelector<T> fieldSelector)
     {
-        if(similarSchools is not null)
+        if (similarSchools is not null)
         {
             return similarSchools
-            // Include current school in list
+                // Include current school in list
                 .Append(currentSchool)
                 .Select(x => new TopPerformerCandidate(
                     x.SchoolInfo.Urn,
@@ -42,7 +42,7 @@ public record TopPerformer(
                 .AsReadOnly();
         }
 
-        return null;
+        return [];
     }
 
 

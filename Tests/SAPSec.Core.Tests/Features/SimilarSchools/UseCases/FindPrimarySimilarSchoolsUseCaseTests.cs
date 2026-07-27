@@ -11,12 +11,13 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 {
     private readonly InMemorySimilarSchoolsPrimaryRepository _similarSchoolsRepo = new();
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
-    private readonly InMemoryAbsenceRepository _absenceRepo = new();
+    private readonly InMemoryAbsenceRepository _absenceRepo;
     private readonly InMemoryKs2PerformanceRepository _performanceRepo;
     private readonly FindPrimarySimilarSchoolsUseCase _sut;
 
     public FindPrimarySimilarSchoolsUseCaseTests()
     {
+        _absenceRepo = new InMemoryAbsenceRepository(_establishmentRepo);
         _performanceRepo = new InMemoryKs2PerformanceRepository(_establishmentRepo);
         _sut = new FindPrimarySimilarSchoolsUseCase(_establishmentRepo, _similarSchoolsRepo, _absenceRepo, _performanceRepo);
     }
@@ -262,6 +263,22 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         var response = await _sut.Execute(new("100001", SortBy: "RwmExpected"));
 
         // Alpha School and Beta School tie on score, so fall back to alphabetical order.
+        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Alpha School", "Beta School");
+    }
+
+    [Fact]
+    public async Task SortsSchoolsWithSameDisplayedScoreAlphabetically_WhenUnderlyingValuesDifferSlightly()
+    {
+        SetupThreeSchoolsForSorting();
+
+        // Both round to 70% for display, but are not exactly equal underneath -
+        // the tie-break should still be based on what the user sees.
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected("70.4", "", "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithRwmExpected("70.2", "", "")));
+
+        var response = await _sut.Execute(new("100001", SortBy: "RwmExpected"));
+
         response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Alpha School", "Beta School");
     }
 
