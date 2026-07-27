@@ -16,12 +16,11 @@ internal static class AttendanceMeasures
         {
             var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(filters);
 
-            return Measure.ForSchool(
+            return Measure.ForSchoolAttendance(
                 Constants.Measures.Absence.Key,
                 measureDataType,
                 availableFilters,
                 currentSchool,
-                null,
                 fieldSelector);
         }
     }

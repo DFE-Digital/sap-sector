@@ -1,10 +1,7 @@
-﻿using FluentAssertions;
-using Microsoft.Playwright;
-using SAPSec.Test.Common.FluentAssertions;
+﻿using Microsoft.Playwright;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
-using System.Text.RegularExpressions;
 using Xunit;
 
 namespace SAPSec.Test.EndToEnd;
@@ -85,30 +82,6 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
         var current = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
-
-    //[Fact]
-    //public async Task Attendance_ChangeAbsenceTypeFilters()
-    //{
-    //    var section = await GetSection(AttendanceMeasuresHeaderText);
-    //    await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
-
-    //    var table = section.GetByRole(AriaRole.Table);
-    //    await Expect(table).ToBeVisibleAsync();
-
-    //    List<IEnumerable<string>> absenceTypeValues = [];
-
-    //    absenceTypeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
-
-    //    foreach (var absenceType in new[] { "Overall absence", "Persistent absence" })
-    //    {
-    //        await section.GetByRole(AriaRole.Combobox, new() { Name = "Type of absence" }).SelectOptionAsync(absenceType);
-    //        await table.WaitForDomToStopChanging();
-
-    //        absenceTypeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
-    //    }
-
-    //    absenceTypeValues.Should().AllBeDifferent();
-    //}
 
     private async Task<ILocator> GetSection(string headerText)
     {
