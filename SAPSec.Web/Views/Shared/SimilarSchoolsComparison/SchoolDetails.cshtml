@@ -2,6 +2,7 @@
 @using System.Text.Encodings.Web
 @using System.Text.Json
 @using SAPSec.Core.Constants
+@using SAPSec.Core.Extensions
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
@@ -289,7 +290,7 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Ofsted report</dt>
             <dd class="govuk-summary-list__value">
-                <a href="https://reports.ofsted.gov.uk/provider/23/@Model.SimilarSchoolDetails.Urn"
+                <a href="https://reports.ofsted.gov.uk/provider/@(Model.SimilarSchoolDetails.IsPrimarySchool() ? 21 : 23)/@Model.SimilarSchoolDetails.Urn"
                     class="govuk-link" target="_blank" rel="noopener noreferrer">
                     View the latest Ofsted report (opens in a new tab)
                 </a>

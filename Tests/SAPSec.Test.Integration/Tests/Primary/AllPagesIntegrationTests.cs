@@ -125,6 +125,27 @@ public class AllPagesIntegrationTests(
         caption.TrimmedTextContent().Should().Be("Test School 1");
     }
 
+    [Fact]
+    public async Task SchoolDetails_OfstedReportLink_UsesPrimaryProviderType()
+    {
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool(PrimarySchoolUrn).SchoolDetails);
+
+        var ofstedLink = page.QuerySelector("a[href*='reports.ofsted.gov.uk']");
+        ofstedLink.Should().NotBeNull();
+        ofstedLink!.GetAttribute("href").Should().Be($"https://reports.ofsted.gov.uk/provider/21/{PrimarySchoolUrn}");
+    }
+
+    [Fact]
+    public async Task SimilarSchoolComparison_SchoolDetails_OfstedReportLink_UsesPrimaryProviderType()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonSchoolDetails("100002"));
+
+        var ofstedLink = page.QuerySelector("a[href*='reports.ofsted.gov.uk']");
+        ofstedLink.Should().NotBeNull();
+        ofstedLink!.GetAttribute("href").Should().Be("https://reports.ofsted.gov.uk/provider/21/100002");
+    }
+
     [Theory]
     [MemberData(nameof(AllPagesWithSideNavigation))]
     public async Task AllPages_Navigation_ShowsLinksInCorrectOrder(string path)

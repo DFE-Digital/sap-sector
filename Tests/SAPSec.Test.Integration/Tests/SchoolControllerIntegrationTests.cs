@@ -87,6 +87,16 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
     }
 
     [Fact]
+    public async Task GetSchoolDetails_OfstedReportLink_UsesSecondaryProviderType()
+    {
+        var response = await fixture.Client.GetAsync(SchoolDetailsPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("https://reports.ofsted.gov.uk/provider/23/105574");
+    }
+
+    [Fact]
     public async Task GetSchoolAttendance_OffersBothAbsenceTypes()
     {
         var document = await fixture.RequestPageAsync(SchoolAttendancePath);
