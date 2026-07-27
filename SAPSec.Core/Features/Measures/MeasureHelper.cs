@@ -4,7 +4,7 @@ namespace SAPSec.Core.Features.Measures;
 
 public class MeasureHelper
 {
-    public static decimal? Average(IEnumerable<string?>? stringValues) =>
+    public static decimal? Average(IEnumerable<string?> stringValues) =>
         Average(stringValues.Select(ParseNullableDecimal));
 
     public static decimal? Average(params string?[] values) => Average((IEnumerable<string?>)values);
