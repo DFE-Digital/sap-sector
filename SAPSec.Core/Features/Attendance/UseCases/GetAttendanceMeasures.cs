@@ -54,22 +54,22 @@ public class GetAttendanceMeasures(
             ParseNullableDecimal(data?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct));
 
         var overallLocalAuthoritySeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_LA_Current_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_Secondary_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_Secondary_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Tot_Secondary_LA_Previous2_Pct));
         var persistentLocalAuthoritySeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_LA_Current_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous_Pct),
-            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_LA_Previous2_Pct));
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_Secondary_LA_Current_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_Secondary_LA_Previous_Pct),
+            ParseNullableDecimal(data?.LocalAuthorityAbsence?.Abs_Persistent_Secondary_LA_Previous2_Pct));
 
         var overallEnglandSeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Eng_Current_Pct),
-            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Eng_Previous_Pct),
-            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Secondary_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Secondary_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Tot_Secondary_Eng_Previous2_Pct));
         var persistentEnglandSeries = new AttendanceMeasureSeries(
-            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Eng_Current_Pct),
-            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Eng_Previous_Pct),
-            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Eng_Previous2_Pct));
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Secondary_Eng_Current_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Secondary_Eng_Previous_Pct),
+            ParseNullableDecimal(data?.EnglandAbsence?.Abs_Persistent_Secondary_Eng_Previous2_Pct));
         var overallSimilarSchoolsSeries = new AttendanceMeasureSeries(
             AverageAvailable(similarSchoolData.Select(x => ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Tot_Est_Current_Pct))),
             AverageAvailable(similarSchoolData.Select(x => ParseNullableDecimal(x.EstablishmentAbsence?.Abs_Tot_Est_Previous_Pct))),
