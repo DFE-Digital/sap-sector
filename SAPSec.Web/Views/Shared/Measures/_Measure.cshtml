@@ -1,8 +1,13 @@
-﻿@using SAPSec.Web.Constants
-@using System.Text.Json
+﻿@using SAPSec.Core.Features.Measures
 @using SAPSec.Web.ViewModels.Measures
 
 @model MeasureViewModel
+
+@{
+    var currentYear = (Model.MeasureInfo.DataType == MeasureDataType.OverallAbsencePercentage || Model.MeasureInfo.DataType == MeasureDataType.PersistentAbsencePercentage)
+                                                     ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentAttendance
+                                                     : SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4;
+}
 
 <partial name="Measures/_Filters" model=@Model.MeasureInfo />
 
@@ -10,7 +15,7 @@
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="2024 to 2025" active="true">
+                <toggle-content id="current-year" name="@currentYear" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year">
