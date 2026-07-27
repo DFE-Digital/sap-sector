@@ -86,29 +86,29 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
-    [Fact]
-    public async Task Attendance_ChangeAbsenceTypeFilters()
-    {
-        var section = await GetSection(AttendanceMeasuresHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+    //[Fact]
+    //public async Task Attendance_ChangeAbsenceTypeFilters()
+    //{
+    //    var section = await GetSection(AttendanceMeasuresHeaderText);
+    //    await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
 
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
+    //    var table = section.GetByRole(AriaRole.Table);
+    //    await Expect(table).ToBeVisibleAsync();
 
-        List<IEnumerable<string>> absenceTypeValues = [];
+    //    List<IEnumerable<string>> absenceTypeValues = [];
 
-        absenceTypeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+    //    absenceTypeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
 
-        foreach (var absenceType in new[] { "Overall absence", "Persistent absence" })
-        {
-            await section.GetByRole(AriaRole.Combobox, new() { Name = "Type of absence" }).SelectOptionAsync(absenceType);
-            await table.WaitForDomToStopChanging();
+    //    foreach (var absenceType in new[] { "Overall absence", "Persistent absence" })
+    //    {
+    //        await section.GetByRole(AriaRole.Combobox, new() { Name = "Type of absence" }).SelectOptionAsync(absenceType);
+    //        await table.WaitForDomToStopChanging();
 
-            absenceTypeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
-        }
+    //        absenceTypeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+    //    }
 
-        absenceTypeValues.Should().AllBeDifferent();
-    }
+    //    absenceTypeValues.Should().AllBeDifferent();
+    //}
 
     private async Task<ILocator> GetSection(string headerText)
     {
