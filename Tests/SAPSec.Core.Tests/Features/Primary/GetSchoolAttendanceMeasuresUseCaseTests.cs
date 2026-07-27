@@ -101,10 +101,10 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "", previous: "", previous2: "")));
 
        _absenceRepo.SetupLAAbsence(
-            Build.Absence.LA("001", x => x.WithOverallAbsence(current: "", previous: "", previous2: "")));
+            Build.Absence.LA("001", x => x.WithOverallAbsencePrimary(current: "", previous: "", previous2: "")));
 
         _absenceRepo.SetupEnglandAbsence(
-            Build.Absence.England(x => x.WithOverallAbsence(current: "", previous: "", previous2: "")));
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "", previous: "", previous2: "")));
 
         var response = await _sut.Execute(Request("100001"));
 
@@ -129,10 +129,10 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
             Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "x", previous: "y2", previous2: "3z")));
 
         _absenceRepo.SetupLAAbsence(
-            Build.Absence.LA("001", x => x.WithOverallAbsence(current: "x", previous: "y2", previous2: "3z")));
+            Build.Absence.LA("001", x => x.WithOverallAbsencePrimary(current: "x", previous: "y2", previous2: "3z")));
 
         _absenceRepo.SetupEnglandAbsence(
-            Build.Absence.England(x => x.WithOverallAbsence(current: "x", previous: "y2", previous2: "3z")));
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "x", previous: "y2", previous2: "3z")));
 
         var response = await _sut.Execute(Request("100001"));
 
@@ -157,10 +157,10 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")));
 
         _absenceRepo.SetupLAAbsence(
-            Build.Absence.LA("001", x => x.WithOverallAbsence(current: "7.05", previous: "7.10", previous2: "6.20")));
+            Build.Absence.LA("001", x => x.WithOverallAbsencePrimary(current: "7.05", previous: "7.10", previous2: "6.20")));
 
         _absenceRepo.SetupEnglandAbsence(
-            Build.Absence.England(x => x.WithOverallAbsence(current: "6.10", previous: "6.90", previous2: "5.45")));
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "6.10", previous: "6.90", previous2: "5.45")));
 
         var response = await _sut.Execute(Request("100001"));
 
@@ -184,7 +184,7 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
             Build.Establishment("100003", "Test School 3", x => x.Primary().InLA("XYZ")));
 
         _absenceRepo.SetupLAAbsence(
-            Build.Absence.LA("001", x => x.WithOverallAbsence(current: "71", previous: "70", previous2: "69")));
+            Build.Absence.LA("001", x => x.WithOverallAbsencePrimary(current: "71", previous: "70", previous2: "69")));
 
         var response = await _sut.Execute(Request(urn));
 
@@ -228,13 +228,13 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
 
         _absenceRepo.SetupLAAbsence(
              Build.Absence.LA("001", x => x
-                .WithOverallAbsence(current: "81", previous: "80", previous2: "79")
-                .WithPersistentAbsence(current: "", previous: "", previous2: "")));
+                .WithOverallAbsencePrimary(current: "81", previous: "80", previous2: "79")
+                .WithPersistentAbsencePrimary(current: "", previous: "", previous2: "")));
 
         _absenceRepo.SetupEnglandAbsence(
             Build.Absence.England(x => x
-                .WithOverallAbsence(current: "81", previous: "80", previous2: "79")
-                .WithPersistentAbsence(current: "", previous: "", previous2: "")));
+                .WithOverallAbsencePrimary(current: "81", previous: "80", previous2: "79")
+                .WithPersistentAbsencePrimary(current: "", previous: "", previous2: "")));
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
         {
@@ -268,13 +268,13 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
 
         _absenceRepo.SetupLAAbsence(
              Build.Absence.LA("001", x => x
-                .WithOverallAbsence(current: "8.24", previous: "5.44", previous2: "9.34")
-                .WithPersistentAbsence(current: "7.23", previous: "7.29", previous2: "5.20")));
+                .WithOverallAbsencePrimary(current: "8.24", previous: "5.44", previous2: "9.34")
+                .WithPersistentAbsencePrimary(current: "7.23", previous: "7.29", previous2: "5.20")));
 
         _absenceRepo.SetupEnglandAbsence(
             Build.Absence.England(x => x
-                .WithOverallAbsence(current: "3.24", previous: "2.20", previous2: "1.20")
-                .WithPersistentAbsence(current: "3.20", previous: "2.24", previous2: "2.20")));
+                .WithOverallAbsencePrimary(current: "3.24", previous: "2.20", previous2: "1.20")
+                .WithPersistentAbsencePrimary(current: "3.20", previous: "2.24", previous2: "2.20")));
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
         {
