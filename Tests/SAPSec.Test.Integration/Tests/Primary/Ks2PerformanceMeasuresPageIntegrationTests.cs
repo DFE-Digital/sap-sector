@@ -255,6 +255,148 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
+
+        Fixture.Ks2PerformanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithReadingScaledScore(current: "104.5", prev: "103.5", prev2: "102.5")));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "105.2", prev: "104.2", prev2: "103.2")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "99.4", "100.4", "101.4"],
+            ["Similar schools average", "102.2", "103.2", "104.2"],
+            ["Local authority schools average", "102.5", "103.5", "104.5"],
+            ["Schools in England average", "105.8", "106.6", "107.4"]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TopPerformers_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "104.2", prev: "103.1", prev2: "102.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "104.2", prev: "102.8", prev2: "101.8")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithReadingScaledScore(current: "103.7", prev: "102.9", prev2: "101.9")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-top-performers-table");
+
+        table.ShouldHaveRows(
+            ["Rank", "School", "2024 to 2025"],
+            ["1", "Test School 4", "106.3"],
+            ["2", "Test School 2", "104.2"],
+            ["3", "Test School 3", "104.2"]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_MeasureExistsOnPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var heading = page.ElementWithTestIdShouldExist("maths-score-heading");
+        heading.TrimmedTextContent().Should().Be("Average scaled score in maths");
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.4", prev: "107.6", prev2: "106.8")));
+
+        Fixture.Ks2PerformanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithMathsScaledScore(current: "105.5", prev: "104.5", prev2: "103.5")));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithMathsScaledScore(current: "102.4", prev: "101.4", prev2: "100.4")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithMathsScaledScore(current: "104.2", prev: "103.2", prev2: "102.2")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithMathsScaledScore(current: "106.2", prev: "105.2", prev2: "104.2")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "100.4", "101.4", "102.4"],
+            ["Similar schools average", "103.2", "104.2", "105.2"],
+            ["Local authority schools average", "103.5", "104.5", "105.5"],
+            ["Schools in England average", "106.8", "107.6", "108.4"]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_TopPerformers_ShouldShowCorrectValues()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithMathsScaledScore(current: "102.1", prev: "101.5", prev2: "100.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithMathsScaledScore(current: "105.2", prev: "104.1", prev2: "103.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithMathsScaledScore(current: "105.2", prev: "103.8", prev2: "102.8")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithMathsScaledScore(current: "107.3", prev: "106.4", prev2: "105.4")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithMathsScaledScore(current: "104.7", prev: "103.9", prev2: "102.9")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-top-performers-table");
+
+        table.ShouldHaveRows(
+            ["Rank", "School", "2024 to 2025"],
+            ["1", "Test School 4", "107.3"],
+            ["2", "Test School 2", "105.2"],
+            ["3", "Test School 3", "105.2"]);
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardGps_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -478,88 +620,6 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100003"),
             Routes.PrimarySchool("100001").SimilarSchoolComparison("100004")
         ]);
-    }
-
-    [Fact]
-    public async Task AverageScaledScoreReading_ChartsUseScaledScoreAxis()
-    {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
-
-        var response = await Fixture.Client.GetAsync(Routes.PrimarySchool("100001").KS2);
-        var content = await response.Content.ReadAsStringAsync();
-
-        response.EnsureSuccessStatusCode();
-        content.Should().Contain("id=\"reading-score-school-chart\"");
-        content.Should().Contain("data-axis-min=\"80\"");
-        content.Should().Contain("data-axis-max=\"120\"");
-        content.Should().Contain("id=\"reading-score-school-yearbyyear-chart\"");
-        content.Should().Contain("data-axis-step=\"5\"");
-    }
-
-    [Fact]
-    public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
-    {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")),
-            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003")));
-
-        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
-            Build.PrimaryGroup("100001", ["100002", "100003"]));
-
-        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
-            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
-
-        Fixture.Ks2PerformanceRepository.SetupLAPerformance(
-            Build.Ks2Performance.LA("001", x => x.WithReadingScaledScore(current: "104.5", prev: "103.5", prev2: "102.5")));
-
-        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
-            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")),
-            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "105.2", prev: "104.2", prev2: "103.2")));
-
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
-
-        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
-
-        table.ShouldHaveRows(
-            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "99.4", "100.4", "101.4"],
-            ["Similar schools average", "102.2", "103.2", "104.2"],
-            ["Local authority schools average", "102.5", "103.5", "104.5"],
-            ["Schools in England average", "105.8", "106.6", "107.4"]);
-    }
-
-    [Fact]
-    public async Task AverageScaledScoreReading_TopPerformers_ShouldShowCorrectValues()
-    {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()),
-            Build.Establishment("100003", "Test School 3", x => x.Primary()),
-            Build.Establishment("100004", "Test School 4", x => x.Primary()),
-            Build.Establishment("100005", "Test School 5", x => x.Primary()));
-
-        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
-            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
-
-        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
-            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "104.2", prev: "103.1", prev2: "102.1")),
-            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "104.2", prev: "102.8", prev2: "101.8")),
-            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")),
-            Build.Ks2Performance.Establishment("100005", x => x.WithReadingScaledScore(current: "103.7", prev: "102.9", prev2: "101.9")));
-
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
-
-        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-top-performers-table");
-
-        table.ShouldHaveRows(
-            ["Rank", "School", "2024 to 2025"],
-            ["1", "Test School 4", "106.3"],
-            ["2", "Test School 2", "104.2"],
-            ["3", "Test School 3", "104.2"]);
     }
 
 }

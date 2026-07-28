@@ -190,6 +190,50 @@ internal static class Ks2PerformanceMeasures
         }
     }
 
+    public static class AverageScaledScoreMaths
+    {
+        public static Measure ForSchool(SchoolData<Ks2PerformanceData> currentSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        {
+            return Measure.ForSchool(
+                Ks2MathsScore,
+                MeasureDataType.ScaledScore,
+                [],
+                currentSchool,
+                similarSchools,
+                new MeasureFieldSelector<Ks2PerformanceData>(
+                    x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Current_Num,
+                    x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Previous_Num,
+                    x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Previous2_Num,
+                    x => x?.LocalAuthorityPerformance?.MathsScaledScore_Tot_Cohort_LA_Current_Num,
+                    x => x?.LocalAuthorityPerformance?.MathsScaledScore_Tot_Cohort_LA_Previous_Num,
+                    x => x?.LocalAuthorityPerformance?.MathsScaledScore_Tot_Cohort_LA_Previous2_Num,
+                    x => x?.EnglandPerformance?.MathsScaledScore_Tot_Cohort_Eng_Current_Num,
+                    x => x?.EnglandPerformance?.MathsScaledScore_Tot_Cohort_Eng_Previous_Num,
+                    x => x?.EnglandPerformance?.MathsScaledScore_Tot_Cohort_Eng_Previous2_Num));
+        }
+
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        {
+            return Measure.ForSchoolComparison(
+                Ks2MathsScore,
+                MeasureDataType.ScaledScore,
+                [],
+                currentSchool,
+                similarSchool,
+                similarSchools,
+                new MeasureFieldSelector<Ks2PerformanceData>(
+                    x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Current_Num,
+                    x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Previous_Num,
+                    x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Previous2_Num,
+                    x => x?.LocalAuthorityPerformance?.MathsScaledScore_Tot_Cohort_LA_Current_Num,
+                    x => x?.LocalAuthorityPerformance?.MathsScaledScore_Tot_Cohort_LA_Previous_Num,
+                    x => x?.LocalAuthorityPerformance?.MathsScaledScore_Tot_Cohort_LA_Previous2_Num,
+                    x => x?.EnglandPerformance?.MathsScaledScore_Tot_Cohort_Eng_Current_Num,
+                    x => x?.EnglandPerformance?.MathsScaledScore_Tot_Cohort_Eng_Previous_Num,
+                    x => x?.EnglandPerformance?.MathsScaledScore_Tot_Cohort_Eng_Previous2_Num));
+        }
+    }
+
     public static class AchievedHigherStandardGps
     {
         public static Measure ForSchool(SchoolData<Ks2PerformanceData> currentSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)

@@ -19,6 +19,9 @@ public class EnglandPerformanceBuilder()
     string ReadingScaledScore_Tot_Cohort_Eng_Current_Num = string.Empty;
     string ReadingScaledScore_Tot_Cohort_Eng_Previous_Num = string.Empty;
     string ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num = string.Empty;
+    string MathsScaledScore_Tot_Cohort_Eng_Current_Num = string.Empty;
+    string MathsScaledScore_Tot_Cohort_Eng_Previous_Num = string.Empty;
+    string MathsScaledScore_Tot_Cohort_Eng_Previous2_Num = string.Empty;
     string GpsExpected_Tot_Cohort_Eng_Current_Num = string.Empty;
     string GpsExpected_Tot_Cohort_Eng_Previous_Num = string.Empty;
     string GpsExpected_Tot_Cohort_Eng_Previous2_Num = string.Empty;
@@ -40,6 +43,15 @@ public class EnglandPerformanceBuilder()
         ReadingScaledScore_Tot_Cohort_Eng_Current_Num = current;
         ReadingScaledScore_Tot_Cohort_Eng_Previous_Num = prev;
         ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EnglandPerformanceBuilder WithMathsScaledScore(string current, string prev, string prev2)
+    {
+        MathsScaledScore_Tot_Cohort_Eng_Current_Num = current;
+        MathsScaledScore_Tot_Cohort_Eng_Previous_Num = prev;
+        MathsScaledScore_Tot_Cohort_Eng_Previous2_Num = prev2;
 
         return this;
     }
@@ -108,6 +120,9 @@ public class EnglandPerformanceBuilder()
             ReadingScaledScore_Tot_Cohort_Eng_Current_Num = ReadingScaledScore_Tot_Cohort_Eng_Current_Num,
             ReadingScaledScore_Tot_Cohort_Eng_Previous_Num = ReadingScaledScore_Tot_Cohort_Eng_Previous_Num,
             ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num = ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num,
+            MathsScaledScore_Tot_Cohort_Eng_Current_Num = MathsScaledScore_Tot_Cohort_Eng_Current_Num,
+            MathsScaledScore_Tot_Cohort_Eng_Previous_Num = MathsScaledScore_Tot_Cohort_Eng_Previous_Num,
+            MathsScaledScore_Tot_Cohort_Eng_Previous2_Num = MathsScaledScore_Tot_Cohort_Eng_Previous2_Num,
             GpsExpected_Tot_Cohort_Eng_Current_Num = GpsExpected_Tot_Cohort_Eng_Current_Num,
             GpsExpected_Tot_Cohort_Eng_Previous_Num = GpsExpected_Tot_Cohort_Eng_Previous_Num,
             GpsExpected_Tot_Cohort_Eng_Previous2_Num = GpsExpected_Tot_Cohort_Eng_Previous2_Num,

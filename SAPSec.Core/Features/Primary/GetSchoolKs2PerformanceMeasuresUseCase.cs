@@ -40,6 +40,11 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
                 similarSchoolsPerformance,
                 filterBy
             ),
+            Ks2PerformanceMeasures.AverageScaledScoreMaths.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
             Ks2PerformanceMeasures.AchievedHigherStandardGps.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
@@ -59,4 +64,5 @@ public record GetSchoolKs2PerformanceMeasuresResponse(
     Measure MeetingExpectedStandardRwm,
     Measure MeetingExpectedStandardGps,
     Measure AverageScaledScoreReading,
+    Measure AverageScaledScoreMaths,
     Measure AchievedHigherStandardGps);

@@ -12,9 +12,6 @@ public record MeasureViewModel(
     TableViewModel Table,
     TopPerformersViewModel? TopPerformers)
 {
-    private static readonly string[] ReadingScoreChartColors = ["#ca357c", "#2a1950", "#2a1950", "#2a1950"];
-    private static readonly string[] ReadingScoreYearByYearColors = ["#ca357c", "#2a1950", "#5694ca", "#4b9b7d"];
-
     private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
         seriesType switch
         {
@@ -36,20 +33,12 @@ public record MeasureViewModel(
                 "Meeting expected standard in grammar, punctuation and spelling",
             Ks2GpsHigher =>
                 "Achieved a higher standard in grammar, punctuation and spelling",
-            Core.Constants.Measures.Primary.Ks2ReadingScore =>
+            Ks2ReadingScore =>
                 "Average scaled score in reading",
+            Ks2MathsScore =>
+                "Average scaled score in maths",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };
-
-    private static IEnumerable<string>? ResolveChartColors(string measureKey) =>
-        measureKey == Core.Constants.Measures.Primary.Ks2ReadingScore
-            ? ReadingScoreChartColors
-            : null;
-
-    private static IEnumerable<string>? ResolveYearByYearColors(string measureKey) =>
-        measureKey == Core.Constants.Measures.Primary.Ks2ReadingScore
-            ? ReadingScoreYearByYearColors
-            : null;
 
     public static MeasureViewModel FromMeasure(
         Measure measure,
@@ -62,8 +51,8 @@ public record MeasureViewModel(
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
             measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
-            ResolveChartColors(measure.Key),
-            ResolveYearByYearColors(measure.Key));
+            null,
+            null);
 
         decimal? MapCurrentYear(MeasureSeries series) =>
             series.Current;

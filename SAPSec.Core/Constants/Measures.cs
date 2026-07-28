@@ -36,6 +36,7 @@ public static class Measures
         public const string Ks2GpsExpected = "expected-gps";
         public const string Ks2GpsHigher = "higher-gps";
         public const string Ks2ReadingScore = "reading-score";
+        public const string Ks2MathsScore = "maths-score";
     }
 
     public record FilterValueDefinition(string Value, string Name);
