@@ -320,6 +320,42 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_TopPerformers_ShouldLinkToSimilarSchoolsPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "104.2", prev: "103.1", prev2: "102.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithReadingScaledScore(current: "104.2", prev: "102.8", prev2: "101.8")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithReadingScaledScore(current: "106.3", prev: "105.4", prev2: "104.4")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithReadingScaledScore(current: "103.7", prev: "102.9", prev2: "101.9")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("reading-score-top-performers-similar-schools-link");
+        similarSchoolsLink.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").ViewSimilarSchools);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-top-performers-table");
+        var topPerformersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
+
+        topPerformersLinks.Should().BeEquivalentTo([
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100004"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100002"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100003")
+        ]);
+    }
+
+    [Fact]
     public async Task AverageScaledScoreMaths_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -394,6 +430,42 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             ["1", "Test School 4", "107.3"],
             ["2", "Test School 2", "105.2"],
             ["3", "Test School 3", "105.2"]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_TopPerformers_ShouldLinkToSimilarSchoolsPage()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100005", "Test School 5", x => x.Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithMathsScaledScore(current: "102.1", prev: "101.5", prev2: "100.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithMathsScaledScore(current: "105.2", prev: "104.1", prev2: "103.1")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithMathsScaledScore(current: "105.2", prev: "103.8", prev2: "102.8")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithMathsScaledScore(current: "107.3", prev: "106.4", prev2: "105.4")),
+            Build.Ks2Performance.Establishment("100005", x => x.WithMathsScaledScore(current: "104.7", prev: "103.9", prev2: "102.9")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("maths-score-top-performers-similar-schools-link");
+        similarSchoolsLink.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").ViewSimilarSchools);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-top-performers-table");
+        var topPerformersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
+
+        topPerformersLinks.Should().BeEquivalentTo([
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100004"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100002"),
+            Routes.PrimarySchool("100001").SimilarSchoolComparison("100003")
+        ]);
     }
 
     [Fact]
