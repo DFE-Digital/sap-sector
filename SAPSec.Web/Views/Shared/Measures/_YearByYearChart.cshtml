@@ -29,6 +29,7 @@
     };
     var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
     {
+        MeasureDataType.Score => (0, 30, 90),
         MeasureDataType.ScaledScore => (80, 5, 120),
         _ => (0, 25, 100)
     };

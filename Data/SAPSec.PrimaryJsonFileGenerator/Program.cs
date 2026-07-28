@@ -179,8 +179,7 @@ internal class Program
                     .Where(p => !p.PropertyNamePatterns.Any() || p.PropertyNamePatterns.Any(pattern => Regex.IsMatch(row.PropertyName, pattern)))
                     .ToList();
 
-                var empty = SelectBestPropertySpec(propertySpecsApplyingToThisProperty, urn, row.PropertyName)
-                    ?.Empty ?? false;
+                var empty = propertySpecsApplyingToThisProperty.Select(p => p.Empty).FirstOrDefault();
 
                 if (empty)
                 {
@@ -188,10 +187,8 @@ internal class Program
                 }
                 else
                 {
-                    var propertySpec = SelectBestPropertySpec(
-                        propertySpecsApplyingToThisProperty.Where(p => p.MinValue is not null || p.MaxValue is not null),
-                        urn,
-                        row.PropertyName);
+                    var propertySpec = propertySpecsApplyingToThisProperty
+                        .FirstOrDefault(p => p.MinValue is not null || p.MaxValue is not null);
 
                     var minValue = propertySpec?.MinValue ?? 0.0;
                     var maxValue = propertySpec?.MaxValue ?? 100.0;
@@ -207,17 +204,6 @@ internal class Program
         json.AppendLine("]");
 
         return json.ToString();
-    }
-
-    private static PropertyDataSpec? SelectBestPropertySpec(IEnumerable<PropertyDataSpec> matchingSpecs, string urn, string propertyName)
-    {
-        return matchingSpecs
-            .Select((spec, index) => new { spec, index })
-            .OrderByDescending(x => x.spec.PropertyNamePatterns.Any(pattern => Regex.IsMatch(propertyName, pattern)))
-            .ThenByDescending(x => x.spec.Urns.Contains(urn))
-            .ThenBy(x => x.index)
-            .Select(x => x.spec)
-            .FirstOrDefault();
     }
 
     private static string GenerateCsFile(string modelName, DataMapRow[] rows)
