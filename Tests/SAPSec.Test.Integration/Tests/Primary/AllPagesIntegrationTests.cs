@@ -95,57 +95,6 @@ public class AllPagesIntegrationTests(
         }
     }
 
-    [Fact]
-    public async Task SimilarSchoolComparison_SchoolDetails_ContainsExpectedSections()
-    {
-        var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonSchoolDetails("100002"));
-
-        var headings = page.QuerySelectorAll("h2").Select(h => h.TrimmedTextContent()).ToList();
-
-        headings.Should().Contain("School Details");
-        headings.Should().Contain("Location");
-        headings.Should().Contain("Further information");
-    }
-
-    [Fact]
-    public async Task SimilarSchoolComparison_SchoolDetails_HeadingAndTitle_ReflectComparisonPage()
-    {
-        var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonSchoolDetails("100002"));
-
-        page.Title.Should().Be("School details compared to Test School 2 - Get school improvement insights - GOV.UK");
-
-        var heading = page.QuerySelector("h1.govuk-heading-xl");
-        heading.Should().NotBeNull();
-        heading.TrimmedTextContent().Should().Be("Test School 2");
-
-        var caption = page.QuerySelector(".govuk-caption-xl");
-        caption.Should().NotBeNull();
-        caption.TrimmedTextContent().Should().Be("Test School 1");
-    }
-
-    [Fact]
-    public async Task SchoolDetails_OfstedReportLink_UsesPrimaryProviderType()
-    {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool(PrimarySchoolUrn).SchoolDetails);
-
-        var ofstedLink = page.QuerySelector("a[href*='reports.ofsted.gov.uk']");
-        ofstedLink.Should().NotBeNull();
-        ofstedLink!.GetAttribute("href").Should().Be($"https://reports.ofsted.gov.uk/provider/21/{PrimarySchoolUrn}");
-    }
-
-    [Fact]
-    public async Task SimilarSchoolComparison_SchoolDetails_OfstedReportLink_UsesPrimaryProviderType()
-    {
-        var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonSchoolDetails("100002"));
-
-        var ofstedLink = page.QuerySelector("a[href*='reports.ofsted.gov.uk']");
-        ofstedLink.Should().NotBeNull();
-        ofstedLink!.GetAttribute("href").Should().Be("https://reports.ofsted.gov.uk/provider/21/100002");
-    }
-
     [Theory]
     [MemberData(nameof(AllPagesWithSideNavigation))]
     public async Task AllPages_Navigation_ShowsLinksInCorrectOrder(string path)

@@ -13,38 +13,17 @@ public class GetPrimarySimilarSchoolDetailsUseCase(
 {
     public async Task<GetPrimarySimilarSchoolDetailsResponse> Execute(GetPrimarySimilarSchoolDetailsRequest request)
     {
-        var establishments = (await establishmentRepository.GetEstablishmentsAsync(
-                [request.CurrentSchoolUrn, request.SimilarSchoolUrn]))
-            .ToDictionary(e => e.URN, StringComparer.Ordinal);
+        var dataProvider = new PrimarySimilarSchoolDetailsDataProvider(establishmentRepository);
 
-        if (!establishments.TryGetValue(request.CurrentSchoolUrn, out var currentEstablishment))
-        {
-            throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
-        }
-
-        if (!establishments.TryGetValue(request.SimilarSchoolUrn, out var similarEstablishment))
-        {
-            throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
-        }
-
-        var currentCoordinates = BNGCoordinates.TryParse(
-            currentEstablishment.Easting, currentEstablishment.Northing, out var parsedCurrent)
-            ? parsedCurrent
-            : null;
-        var similarCoordinates = BNGCoordinates.TryParse(
-            similarEstablishment.Easting, similarEstablishment.Northing, out var parsedSimilar)
-            ? parsedSimilar
-            : null;
+        var coordinates = await dataProvider.GetCoordinates(request.CurrentSchoolUrn, request.SimilarSchoolUrn);
 
         var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
 
         return new(
-            currentEstablishment.EstablishmentName,
-            currentCoordinates is null ? null : CoordinateConverter.Convert(currentCoordinates),
-            similarCoordinates is null ? null : CoordinateConverter.Convert(similarCoordinates),
-            currentCoordinates is null || similarCoordinates is null
-                ? null
-                : currentCoordinates.DistanceMiles(similarCoordinates),
+            coordinates.CurrentSchoolName,
+            coordinates.CurrentSchoolCoordinates,
+            coordinates.SimilarSchoolCoordinates,
+            coordinates.DistanceMiles,
             similarSchoolDetails);
     }
 }
