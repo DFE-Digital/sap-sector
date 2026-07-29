@@ -19,6 +19,15 @@ public class EstablishmentPerformanceBuilder(string urn)
     string RwmHigher_Tot_Cohort_Est_Current_Num = string.Empty;
     string RwmHigher_Tot_Cohort_Est_Previous_Num = string.Empty;
     string RwmHigher_Tot_Cohort_Est_Previous2_Num = string.Empty;
+    string RwmHigher_Reading_Tot_Cohort_Est_Current_Num = string.Empty;
+    string RwmHigher_Reading_Tot_Cohort_Est_Previous_Num = string.Empty;
+    string RwmHigher_Reading_Tot_Cohort_Est_Previous2_Num = string.Empty;
+    string RwmHigher_Writing_Tot_Cohort_Est_Current_Num = string.Empty;
+    string RwmHigher_Writing_Tot_Cohort_Est_Previous_Num = string.Empty;
+    string RwmHigher_Writing_Tot_Cohort_Est_Previous2_Num = string.Empty;
+    string RwmHigher_Maths_Tot_Cohort_Est_Current_Num = string.Empty;
+    string RwmHigher_Maths_Tot_Cohort_Est_Previous_Num = string.Empty;
+    string RwmHigher_Maths_Tot_Cohort_Est_Previous2_Num = string.Empty;
     string ReadingScaledScore_Tot_Cohort_Est_Current_Num = string.Empty;
     string ReadingScaledScore_Tot_Cohort_Est_Previous_Num = string.Empty;
     string ReadingScaledScore_Tot_Cohort_Est_Previous2_Num = string.Empty;
@@ -73,6 +82,33 @@ public class EstablishmentPerformanceBuilder(string urn)
         RwmHigher_Tot_Cohort_Est_Current_Num = current;
         RwmHigher_Tot_Cohort_Est_Previous_Num = prev;
         RwmHigher_Tot_Cohort_Est_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithRwmHigherReading(string current, string prev, string prev2)
+    {
+        RwmHigher_Reading_Tot_Cohort_Est_Current_Num = current;
+        RwmHigher_Reading_Tot_Cohort_Est_Previous_Num = prev;
+        RwmHigher_Reading_Tot_Cohort_Est_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithRwmHigherWriting(string current, string prev, string prev2)
+    {
+        RwmHigher_Writing_Tot_Cohort_Est_Current_Num = current;
+        RwmHigher_Writing_Tot_Cohort_Est_Previous_Num = prev;
+        RwmHigher_Writing_Tot_Cohort_Est_Previous2_Num = prev2;
+
+        return this;
+    }
+
+    public EstablishmentPerformanceBuilder WithRwmHigherMaths(string current, string prev, string prev2)
+    {
+        RwmHigher_Maths_Tot_Cohort_Est_Current_Num = current;
+        RwmHigher_Maths_Tot_Cohort_Est_Previous_Num = prev;
+        RwmHigher_Maths_Tot_Cohort_Est_Previous2_Num = prev2;
 
         return this;
     }
@@ -132,6 +168,15 @@ public class EstablishmentPerformanceBuilder(string urn)
             RwmHigher_Tot_Cohort_Est_Current_Num = RwmHigher_Tot_Cohort_Est_Current_Num,
             RwmHigher_Tot_Cohort_Est_Previous_Num = RwmHigher_Tot_Cohort_Est_Previous_Num,
             RwmHigher_Tot_Cohort_Est_Previous2_Num = RwmHigher_Tot_Cohort_Est_Previous2_Num,
+            RwmHigher_Reading_Tot_Cohort_Est_Current_Num = RwmHigher_Reading_Tot_Cohort_Est_Current_Num,
+            RwmHigher_Reading_Tot_Cohort_Est_Previous_Num = RwmHigher_Reading_Tot_Cohort_Est_Previous_Num,
+            RwmHigher_Reading_Tot_Cohort_Est_Previous2_Num = RwmHigher_Reading_Tot_Cohort_Est_Previous2_Num,
+            RwmHigher_Writing_Tot_Cohort_Est_Current_Num = RwmHigher_Writing_Tot_Cohort_Est_Current_Num,
+            RwmHigher_Writing_Tot_Cohort_Est_Previous_Num = RwmHigher_Writing_Tot_Cohort_Est_Previous_Num,
+            RwmHigher_Writing_Tot_Cohort_Est_Previous2_Num = RwmHigher_Writing_Tot_Cohort_Est_Previous2_Num,
+            RwmHigher_Maths_Tot_Cohort_Est_Current_Num = RwmHigher_Maths_Tot_Cohort_Est_Current_Num,
+            RwmHigher_Maths_Tot_Cohort_Est_Previous_Num = RwmHigher_Maths_Tot_Cohort_Est_Previous_Num,
+            RwmHigher_Maths_Tot_Cohort_Est_Previous2_Num = RwmHigher_Maths_Tot_Cohort_Est_Previous2_Num,
             ReadingScaledScore_Tot_Cohort_Est_Current_Num = ReadingScaledScore_Tot_Cohort_Est_Current_Num,
             ReadingScaledScore_Tot_Cohort_Est_Previous_Num = ReadingScaledScore_Tot_Cohort_Est_Previous_Num,
             ReadingScaledScore_Tot_Cohort_Est_Previous2_Num = ReadingScaledScore_Tot_Cohort_Est_Previous2_Num,
