@@ -243,6 +243,8 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
 
         // Override GOVUKFrontend initAll() to replace Tabs component with MobileCollapsedTabs
         function initAll() {
+            window.GOVUKComponents = {};
+
             [
                 GOVUKFrontend.Accordion,
                 GOVUKFrontend.Button,
@@ -259,7 +261,8 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                 GOVUKFrontend.SkipLink,
                 MobileCollapsedTabs // Replace Tabs component with MobileCollapsedTabs
             ].forEach(Component => {
-                GOVUKFrontend.createAll(Component, {} , {})
+                // Store component objects on window so component can be accessed to get/set state
+                window.GOVUKComponents[Component.name] = GOVUKFrontend.createAll(Component, {}, {}); 
             })
         }
 

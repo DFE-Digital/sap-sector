@@ -175,6 +175,10 @@ const copyStaticAssets = () =>
                 .pipe(gulp.dest("wwwroot/css/"))
         );
 
+const watchStaticAssets = () =>
+    gulp
+        .watch(["AssetSrc/js/*"], copyStaticAssets);
+
 gulp.task("build-fe", () => {
     return async.series([
         (next) => buildSass().on("end", next),
@@ -183,7 +187,8 @@ gulp.task("build-fe", () => {
 });
 
 gulp.task("watch-fe", () => {
-    return async.series([
-        (next) => watchSass().on("end", next)
+    return async.parallel([
+        (next) => watchSass().on("end", next),
+        (next) => watchStaticAssets().on("end", next)
     ]);
 });

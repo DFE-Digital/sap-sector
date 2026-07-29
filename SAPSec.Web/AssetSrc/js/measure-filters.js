@@ -47,16 +47,28 @@ function init(select) {
                     return;
                 }
 
-                const responseContent = new DOMParser().parseFromString(content, "text/html");
-                const measureFromResponse = responseContent.getElementById(targetId);
-                const target = document.getElementById(targetId);
-                const selectedTab = target.querySelector('a[aria-selected="true"]')?.getAttribute('href');
-                target.innerHTML = measureFromResponse.innerHTML;
+                const targetElement = document.getElementById(targetId);
 
-                ChartFactory.init(target);
-                ContentToggle.init(target);
-                const tabs = new MobileCollapsedTabs(target.querySelector('[data-module="govuk-tabs"]'));
-                tabs.selectTabById(selectedTab);
+                // Get current state of tab panels
+                const tabs = window.GOVUKComponents['MobileCollapsedTabs'];
+                const i = tabs.findIndex(t => t.$root == targetElement.querySelector('[data-module="govuk-tabs"]'));
+                var tabState = tabs[i].getState();
+
+                // Get current state of content toggle
+                var toggleActiveIndex = ContentToggle.getActiveIndex(targetElement);
+
+                // Replace target element with same element from response
+                const responseContent = new DOMParser().parseFromString(content, "text/html");
+                const targetElementFromResponse = responseContent.getElementById(targetId);
+                targetElement.innerHTML = targetElementFromResponse.innerHTML;
+
+                // Re-initialise components, with saved state
+                tabs[i].teardown();
+                tabs[i] = new MobileCollapsedTabs(targetElement.querySelector('[data-module="govuk-tabs"]'));
+                tabs[i].setState(tabState);
+
+                ChartFactory.init(targetElement);
+                ContentToggle.init(targetElement, toggleActiveIndex);
             })
             .catch(function (error) {
                 console.error("Failed to load view data.", error);
