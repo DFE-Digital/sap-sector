@@ -52,7 +52,11 @@ public class SchoolController(
         var model = new Ks2MeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School)
+            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School),
+            AverageScaledScoreReading = MeasureViewModel.FromMeasure(response.AverageScaledScoreReading, response.School),
+            AverageScaledScoreMaths = MeasureViewModel.FromMeasure(response.AverageScaledScoreMaths, response.School),
+            MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardGps, response.School),
+            AchievedHigherStandardGps = MeasureViewModel.FromMeasure(response.AchievedHigherStandardGps, response.School)
         };
 
         return View(model);

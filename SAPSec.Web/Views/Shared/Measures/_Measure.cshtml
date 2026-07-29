@@ -10,7 +10,7 @@
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="2024 to 2025" active="true">
+                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs2" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year">
