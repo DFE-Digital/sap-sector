@@ -31,15 +31,6 @@ public class EstablishmentPerformanceBuilder(string urn)
     string GpsHigher_Tot_Cohort_Est_Current_Num = string.Empty;
     string GpsHigher_Tot_Cohort_Est_Previous_Num = string.Empty;
     string GpsHigher_Tot_Cohort_Est_Previous2_Num = string.Empty;
-    //string RwmExpected_Reading_Tot_Cohort_Est_Current_Num = string.Empty;
-    //string RwmExpected_Reading_Tot_Cohort_Est_Previous_Num = string.Empty;
-    //string RwmExpected_Reading_Tot_Cohort_Est_Previous2_Num = string.Empty;
-    //string RwmExpected_Writing_Tot_Cohort_Est_Current_Num = string.Empty;
-    //string RwmExpected_Writing_Tot_Cohort_Est_Previous_Num = string.Empty;
-    //string RwmExpected_Writing_Tot_Cohort_Est_Previous2_Num = string.Empty;
-    //string RwmExpected_Maths_Tot_Cohort_Est_Current_Num = string.Empty;
-    //string RwmExpected_Maths_Tot_Cohort_Est_Previous_Num = string.Empty;
-    //string RwmExpected_Maths_Tot_Cohort_Est_Previous2_Num = string.Empty;
 
     public EstablishmentPerformanceBuilder WithRwmExpected(string current, string prev, string prev2)
     {
