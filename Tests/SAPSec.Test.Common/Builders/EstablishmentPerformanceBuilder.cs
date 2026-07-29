@@ -67,7 +67,7 @@ public class EstablishmentPerformanceBuilder(string urn)
 
         return this;
     }
-    
+
     public EstablishmentPerformanceBuilder WithRwmHigher(string current, string prev, string prev2)
     {
         RwmHigher_Tot_Cohort_Est_Current_Num = current;
@@ -114,7 +114,7 @@ public class EstablishmentPerformanceBuilder(string urn)
     }
 
     public EstablishmentPerformance Build() =>
-        new EstablishmentPerformance()
+        new()
         {
             Id = urn,
             RwmExpected_Tot_Cohort_Est_Current_Num = RwmExpected_Tot_Cohort_Est_Current_Num,

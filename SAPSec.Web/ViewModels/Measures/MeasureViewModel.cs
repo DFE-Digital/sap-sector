@@ -29,23 +29,30 @@ public record MeasureViewModel(
         {
             Ks2ExpectedRwm.Key =>
                 "Meeting expected standard in reading, writing and maths",
+            Ks2GpsExpected =>
+                "Meeting expected standard in grammar, punctuation and spelling",
+            Ks2GpsHigher =>
+                "Achieved a higher standard in grammar, punctuation and spelling",
+            Ks2ReadingScore =>
+                "Average scaled score in reading",
+            Ks2MathsScore =>
+                "Average scaled score in maths",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };
 
     public static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
-        IEnumerable<string>? chartColors = null,
-        IEnumerable<string>? yearByYearColors = null)
+        SchoolInfo? similarSchool = null)
     {
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
             ResolveMeasureLabel(measure.Key),
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo)),
-            chartColors,
-            yearByYearColors);
+            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
+            null,
+            null);
 
         decimal? MapCurrentYear(MeasureSeries series) =>
             series.Current;

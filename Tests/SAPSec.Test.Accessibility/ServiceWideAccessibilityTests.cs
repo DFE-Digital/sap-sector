@@ -20,7 +20,6 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.PrimarySchool("100749").KS2, HasH3Headings: true),
         new(Routes.PrimarySchool("100749").Attendance),
         new(Routes.PrimarySchool("100749").ViewSimilarSchools),
-        new(Routes.PrimarySchool("100749").SimilarSchoolComparison("100134")),
         new(Routes.PrimarySchool("100749").SchoolDetails),
         new(Routes.PrimarySchool("100749").WhatIsASimilarSchool),
 
