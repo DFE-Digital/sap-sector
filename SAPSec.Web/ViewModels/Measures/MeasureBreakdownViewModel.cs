@@ -9,7 +9,7 @@ public abstract record MeasureBreakdownViewModel(
     public string DisplayNumber(decimal? value) =>
        MeasureInfo.DataType switch
        {
-           MeasureDataType.Score => DisplayValue(value),
+           MeasureDataType.Score or MeasureDataType.ScaledScore => DisplayValue(value),
            MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => DisplayPercent(value),
            _ => DisplayWholePercent(value)
        };           

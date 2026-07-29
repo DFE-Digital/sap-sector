@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Constants;
+namespace SAPSec.Core.Constants;
 
 public static class Measures
 {
@@ -32,6 +32,11 @@ public static class Measures
                 }
             }
         }
+
+        public const string Ks2GpsExpected = "expected-gps";
+        public const string Ks2GpsHigher = "higher-gps";
+        public const string Ks2ReadingScore = "reading-score";
+        public const string Ks2MathsScore = "maths-score";
     }
 
     public static class Absence

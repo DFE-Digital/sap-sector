@@ -14,36 +14,31 @@
     var decimals = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => 1,
+        MeasureDataType.ScaledScore => 1,
         MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
+    };
+    var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
+    {
+        MeasureDataType.Score => (0, 30, 90),
+        MeasureDataType.ScaledScore => (80, 20, 120),
+        MeasureDataType.OverallAbsencePercentage => (0, 1, 10),
+        MeasureDataType.PersistentAbsencePercentage => (0, 5, 30),
+        _ => (0, 25, 100)
     };
 }
 
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">
     @if (hasAnyData)
     {
-        var axisStep = Model.MeasureInfo.DataType switch
-        {
-            MeasureDataType.Score => 30,
-            MeasureDataType.OverallAbsencePercentage => 1,
-            MeasureDataType.PersistentAbsencePercentage => 5,
-            _ => 25
-        };
-
-        var axisMax = Model.MeasureInfo.DataType switch
-        {
-            MeasureDataType.Score => 90,
-            MeasureDataType.OverallAbsencePercentage => 10,
-            MeasureDataType.PersistentAbsencePercentage => 30,
-            _ => 100
-        };
 
           <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
                 class="js-chart js-chart--school-measure-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
-                data-axis-step=@axisStep
-                data-axis-max=@axisMax
+                data-axis-min="@axisMin"
+                data-axis-step="@axisStep"
+                data-axis-max="@axisMax"
                 data-label-decimals="@decimals"
                 data-tooltip-decimals="@decimals"
                 data-category-percentage="0.6"

@@ -28,7 +28,29 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy));
+                filterBy
+            ),
+            Ks2PerformanceMeasures.MeetingExpectedStandardGps.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
+            Ks2PerformanceMeasures.AverageScaledScoreReading.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
+            Ks2PerformanceMeasures.AverageScaledScoreMaths.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
+            Ks2PerformanceMeasures.AchievedHigherStandardGps.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            )
+        );
     }
 }
 
@@ -39,4 +61,8 @@ public record GetSchoolKs2PerformanceMeasuresRequest(
 public record GetSchoolKs2PerformanceMeasuresResponse(
     SchoolInfo.SchoolInfo School,
     int SimilarSchoolsCount,
-    Measure MeetingExpectedStandardRwm);
+    Measure MeetingExpectedStandardRwm,
+    Measure MeetingExpectedStandardGps,
+    Measure AverageScaledScoreReading,
+    Measure AverageScaledScoreMaths,
+    Measure AchievedHigherStandardGps);

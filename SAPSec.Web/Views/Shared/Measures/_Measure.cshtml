@@ -4,9 +4,12 @@
 @model MeasureViewModel
 
 @{
-    var currentYear = (Model.MeasureInfo.DataType == MeasureDataType.OverallAbsencePercentage || Model.MeasureInfo.DataType == MeasureDataType.PersistentAbsencePercentage)
-                                                     ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentAttendance
-                                                     : SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4;
+    var currentYear = Model.MeasureInfo.DataType switch
+     {
+         MeasureDataType.Score or MeasureDataType.ScaledScore => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs2,
+         MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentAttendance,
+         _ => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4
+     };
 }
 
 <partial name="Measures/_Filters" model=@Model.MeasureInfo />
