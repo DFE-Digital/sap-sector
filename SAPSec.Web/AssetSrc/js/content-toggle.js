@@ -26,7 +26,7 @@ function resizeCharts(container) {
     });
 }
 
-function initialiseToggle(toggle) {
+function initialiseToggle(toggle, activeIndex) {
     var title = toggle.querySelector(".app-content-toggle__title");
     var button = toggle.querySelector(".app-content-toggle__header button[type='button']");
     var panels = Array.prototype.slice.call(toggle.querySelectorAll("[data-content-toggle-panel]"));
@@ -35,9 +35,11 @@ function initialiseToggle(toggle) {
         return;
     }
 
-    var activeIndex = panels.findIndex(function (panel) {
-        return !panel.hasAttribute("hidden");
-    });
+    if (!activeIndex) {
+        activeIndex = panels.findIndex(function (panel) {
+            return !panel.hasAttribute("hidden");
+        });
+    }
 
     if (activeIndex < 0) {
         activeIndex = 0;
@@ -70,8 +72,21 @@ function initialiseToggle(toggle) {
     render(activeIndex);
 }
 
-function init(element) {
-    element.querySelectorAll('.app-content-toggle').forEach(initialiseToggle);
+function getActiveIndex(element) {
+    var panels = Array.prototype.slice.call(element.querySelectorAll(".app-content-toggle [data-content-toggle-panel]"));
+    var activeIndex = panels.findIndex(function (panel) {
+        return !panel.hasAttribute("hidden");
+    });
+
+    if (activeIndex < 0) {
+        activeIndex = 0;
+    }
+
+    return activeIndex;
+}
+
+function init(element, activeIndex) {
+    element.querySelectorAll('.app-content-toggle').forEach(t => initialiseToggle(t, activeIndex));
 }
 
 function initAll() {
@@ -85,5 +100,6 @@ function initAll() {
 
 export {
     init,
-    initAll
+    initAll,
+    getActiveIndex
 };
