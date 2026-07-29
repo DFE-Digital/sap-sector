@@ -104,7 +104,7 @@ public class SchoolController : Controller
         }
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-        var response = await _getAttendanceMeasures.Execute(new GetSchoolAttendanceMeasuresRequest(urn));
+        var response = await _getAttendanceMeasures.Execute(new(urn));
         var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
 

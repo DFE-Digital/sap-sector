@@ -47,8 +47,8 @@ public static class Measures
 
                 public static class Values
                 {
-                    public const string Overall = "overall";
-                    public const string Persistent = "persistent";
+                    public const string Overall = "o";
+                    public const string Persistent = "p";
 
                     public static readonly FilterValueDefinition[] AllValues = [
                         new(Overall, "Overall absence"),

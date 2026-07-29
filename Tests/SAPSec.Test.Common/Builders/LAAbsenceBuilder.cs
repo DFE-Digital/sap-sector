@@ -17,7 +17,7 @@ public class LAAbsenceBuilder(string laId)
     string Abs_Persistent_Primary_LA_Previous_Pct = string.Empty;
     string Abs_Persistent_Primary_LA_Previous2_Pct = string.Empty;
 
-    public LAAbsenceBuilder WithOverallAbsence(
+    public LAAbsenceBuilder WithOverallAbsenceSecondary(
                  string current, 
                  string previous, 
                  string previous2)
@@ -29,7 +29,7 @@ public class LAAbsenceBuilder(string laId)
         return this;
     }
 
-    public LAAbsenceBuilder WithPersistentAbsence(
+    public LAAbsenceBuilder WithPersistentAbsenceSecondary(
                string current,
                string previous,
                string previous2)

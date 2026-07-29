@@ -1,6 +1,5 @@
 ﻿@using System.Text.Json
 @using SAPSec.Core.Features.Measures
-@using SAPSec.Web.Constants
 @using SAPSec.Web.ViewModels.Measures
 
 @model YearByYearChartViewModel
@@ -8,9 +7,9 @@
 @{
     var chartData = new
     {
-        labels = (Model.MeasureInfo.DataType == MeasureDataType.OverallAbsencePercentage || Model.MeasureInfo.DataType == MeasureDataType.PersistentAbsencePercentage)
-                                                ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
-                                                : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
+        labels = Model.MeasureInfo.DataType is MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage
+                                            ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
+                                            : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
         datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
             new {
                 label = x.First,

@@ -35,8 +35,8 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
 
     //No similar schools average for attendance measures on school overview page
     internal static IReadOnlyCollection<MeasureSeries> ForSchoolAttendance<T>(
-    SchoolData<T> currentSchool,
-    MeasureFieldSelector<T> fieldSelector) => [
+        SchoolData<T> currentSchool,
+        MeasureFieldSelector<T> fieldSelector) => [
         new MeasureSeries(
                 MeasureSeriesType.CurrentSchool,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),

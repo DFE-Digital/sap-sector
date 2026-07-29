@@ -17,7 +17,7 @@ public class EnglandAbsenceBuilder()
     string Abs_Persistent_Primary_Eng_Previous_Pct = string.Empty;
     string Abs_Persistent_Primary_Eng_Previous2_Pct = string.Empty;
 
-    public EnglandAbsenceBuilder WithOverallAbsence(
+    public EnglandAbsenceBuilder WithOverallAbsenceSecondary(
                  string current, 
                  string previous, 
                  string previous2)
@@ -29,7 +29,7 @@ public class EnglandAbsenceBuilder()
         return this;
     }
 
-    public EnglandAbsenceBuilder WithPersistentAbsence(
+    public EnglandAbsenceBuilder WithPersistentAbsenceSecondary(
                string current,
                string previous,
                string previous2)
