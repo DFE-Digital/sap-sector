@@ -5,10 +5,24 @@ namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 public class SchoolDetailsBuilder(string urn)
 {
     private string? _name = null;
+    private string? _telephone = null;
+    private string? _website = null;
 
     public SchoolDetailsBuilder WithName(string name)
     {
         _name = name;
+        return this;
+    }
+
+    public SchoolDetailsBuilder WithTelephone(string telephone)
+    {
+        _telephone = telephone;
+        return this;
+    }
+
+    public SchoolDetailsBuilder WithWebsite(string website)
+    {
+        _website = website;
         return this;
     }
 
@@ -40,8 +54,8 @@ public class SchoolDetailsBuilder(string urn)
             HasSenUnit = DataWithAvailability.NotAvailable<bool>(),
             HasResourcedProvision = DataWithAvailability.NotAvailable<bool>(),
             HeadteacherName = DataWithAvailability.NotAvailable<string>(),
-            Website = DataWithAvailability.NotAvailable<string>(),
-            Telephone = DataWithAvailability.NotAvailable<string>(),
+            Website = _website is null ? DataWithAvailability.NotAvailable<string>() : DataWithAvailability.Available(_website),
+            Telephone = _telephone is null ? DataWithAvailability.NotAvailable<string>() : DataWithAvailability.Available(_telephone),
             Email = DataWithAvailability.NotAvailable<string>(),
         };
     }

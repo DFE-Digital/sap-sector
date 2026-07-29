@@ -68,6 +68,8 @@ public class GetPrimarySimilarSchoolDetailsTests
         var response = await _sut.Execute(new("100001", "100002"));
 
         response.CurrentSchoolCoordinates.Should().NotBeNull();
+        response.CurrentSchoolCoordinates!.Latitude.Should().BeApproximately(53.3160875, 0.0000001);
+        response.CurrentSchoolCoordinates.Longitude.Should().BeApproximately(-1.5511531, 0.0000001);
     }
 
     [Fact]
@@ -92,6 +94,8 @@ public class GetPrimarySimilarSchoolDetailsTests
         var response = await _sut.Execute(new("100001", "100002"));
 
         response.SimilarSchoolCoordinates.Should().NotBeNull();
+        response.SimilarSchoolCoordinates!.Latitude.Should().BeApproximately(53.3250185, 0.0000001);
+        response.SimilarSchoolCoordinates.Longitude.Should().BeApproximately(-1.5360459, 0.0000001);
     }
 
     [Fact]
@@ -115,7 +119,7 @@ public class GetPrimarySimilarSchoolDetailsTests
 
         var response = await _sut.Execute(new("100001", "100002"));
 
-        response.DistanceMiles.Should().BeGreaterThan(0);
+        response.DistanceMiles.Should().BeApproximately(0.8787516, 0.0000001);
     }
 
     [Fact]
@@ -149,9 +153,19 @@ public class GetPrimarySimilarSchoolDetailsTests
             new Establishment { URN = "100001", EstablishmentName = "Current School" },
             new Establishment { URN = "100002", EstablishmentName = "Similar School" });
 
+        _schoolDetailsService
+            .Setup(s => s.GetByUrnAsync("100002"))
+            .ReturnsAsync(SchoolDetails("100002", b => b
+                .WithName("Similar School")
+                .WithTelephone("01234 567890")
+                .WithWebsite("https://similar-school.example.com")));
+
         var response = await _sut.Execute(new("100001", "100002"));
 
         response.SimilarSchoolDetails.Urn.Should().Be("100002");
+        response.SimilarSchoolDetails.Name.Should().Be("Similar School");
+        response.SimilarSchoolDetails.Telephone.Value.Should().Be("01234 567890");
+        response.SimilarSchoolDetails.Website.Value.Should().Be("https://similar-school.example.com");
         _schoolDetailsService.Verify(s => s.GetByUrnAsync("100002"), Times.Once);
     }
 
