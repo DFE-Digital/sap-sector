@@ -15,6 +15,7 @@ public class AllPagesIntegrationTests(
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     private const string PrimarySchoolUrn = "100001";
+    private static readonly string ComparisonPath = Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002");
 
     private static readonly PageTestCase[] PrimaryPages = [
         new(Routes.PrimarySchool(PrimarySchoolUrn).Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
@@ -23,7 +24,7 @@ public class AllPagesIntegrationTests(
         new(Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools, "View similar schools"),
         new(Routes.PrimarySchool(PrimarySchoolUrn).SchoolDetails, "School details"),
         new(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool, "What is a similar school?"),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002"), "Test School 2", IsInNavigation: false)
+        new(ComparisonPath, "Test School 2", IsInNavigation: false)
     ];
 
     public override Task InitializeAsync()
@@ -82,7 +83,7 @@ public class AllPagesIntegrationTests(
 
         var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
 
-        if (path == Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002"))
+        if (path == ComparisonPath)
         {
             navigationItems.Should().SatisfyRespectively(
                 n => n.ShouldLinkTo("Home", Routes.FindASchool()),

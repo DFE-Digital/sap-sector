@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Filters;
+using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -13,8 +15,9 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary, "urn", "similarSchoolUrn")]
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
-public class PrimarySimilarSchoolsComparisonController(
-    IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase)
+public class SimilarSchoolsComparisonController(
+    IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+    IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase)
     : Controller
 {
     [HttpGet]
@@ -26,6 +29,7 @@ public class PrimarySimilarSchoolsComparisonController(
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
     {
         var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        ViewData["ComparisonSchool"] = model;
         return View("Similarity", model);
     }
 
@@ -34,6 +38,7 @@ public class PrimarySimilarSchoolsComparisonController(
     public async Task<IActionResult> Ks2(string urn, string similarSchoolUrn)
     {
         var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        ViewData["ComparisonSchool"] = model;
         return View(model);
     }
 
@@ -42,6 +47,7 @@ public class PrimarySimilarSchoolsComparisonController(
     public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
         var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        ViewData["ComparisonSchool"] = model;
         return View(model);
     }
 
@@ -49,8 +55,32 @@ public class PrimarySimilarSchoolsComparisonController(
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn, string similarSchoolUrn)
     {
-        var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
-        return View(model);
+        var response = await getPrimarySimilarSchoolDetailsUseCase.Execute(
+            new GetPrimarySimilarSchoolDetailsRequest(urn, similarSchoolUrn));
+
+        ViewData["ComparisonSchool"] = new PrimarySimilarSchoolsComparisonViewModel
+        {
+            Urn = urn,
+            SimilarSchoolUrn = similarSchoolUrn,
+            Name = response.SchoolName,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name
+        };
+
+        var schoolDetailsModel = new SimilarSchoolDetailsViewModel
+        {
+            Urn = urn,
+            SimilarSchoolUrn = similarSchoolUrn,
+            Name = response.SchoolName,
+            SimilarSchoolName = response.SimilarSchoolDetails.Name,
+            CurrentSchoolLatitude = response.CurrentSchoolCoordinates?.Latitude,
+            CurrentSchoolLongitude = response.CurrentSchoolCoordinates?.Longitude,
+            SimilarSchoolLatitude = response.SimilarSchoolCoordinates?.Latitude,
+            SimilarSchoolLongitude = response.SimilarSchoolCoordinates?.Longitude,
+            Distance = response.DistanceMiles,
+            SimilarSchoolDetails = response.SimilarSchoolDetails
+        };
+
+        return View("~/Views/Shared/SimilarSchoolsComparison/SchoolDetails.cshtml", schoolDetailsModel);
     }
 
     private async Task<PrimarySimilarSchoolsComparisonViewModel> BuildBaseModelAsync(string urn, string similarSchoolUrn)

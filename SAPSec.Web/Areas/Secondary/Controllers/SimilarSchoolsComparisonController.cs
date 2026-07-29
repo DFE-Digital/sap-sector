@@ -493,8 +493,24 @@ public class SimilarSchoolsComparisonController : Controller
         if (modelResult.Result != null)
             return modelResult.Result;
 
-        SetComparisonSchoolViewData(modelResult.Model!);
-        return View(modelResult.Model);
+        var comparisonModel = modelResult.Model!;
+        SetComparisonSchoolViewData(comparisonModel);
+
+        var schoolDetailsModel = new SimilarSchoolDetailsViewModel
+        {
+            Urn = comparisonModel.Urn,
+            SimilarSchoolUrn = comparisonModel.SimilarSchoolUrn,
+            Name = comparisonModel.Name,
+            SimilarSchoolName = comparisonModel.SimilarSchoolName,
+            CurrentSchoolLatitude = comparisonModel.CurrentSchoolLatitude,
+            CurrentSchoolLongitude = comparisonModel.CurrentSchoolLongitude,
+            SimilarSchoolLatitude = comparisonModel.SimilarSchoolLatitude,
+            SimilarSchoolLongitude = comparisonModel.SimilarSchoolLongitude,
+            Distance = comparisonModel.Distance,
+            SimilarSchoolDetails = comparisonModel.SimilarSchoolDetails
+        };
+
+        return View("~/Views/Shared/SimilarSchoolsComparison/SchoolDetails.cshtml", schoolDetailsModel);
     }
 
     /// <summary>
