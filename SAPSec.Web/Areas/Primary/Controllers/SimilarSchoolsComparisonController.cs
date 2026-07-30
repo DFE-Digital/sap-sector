@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
+using static SAPSec.Core.Constants.Measures.Primary;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -17,7 +20,8 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SimilarSchoolsComparisonController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase)
+    IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase,
+    IUseCase<GetSchoolKs2PerformanceComparisonRequest, GetSchoolKs2PerformanceComparisonResponse> getSchoolKs2PerformanceComparisonUseCase)
     : Controller
 {
     [HttpGet]
@@ -38,9 +42,80 @@ public class SimilarSchoolsComparisonController(
     public async Task<IActionResult> Ks2(string urn, string similarSchoolUrn)
     {
         var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
+
+        var comparisonResponse = await getSchoolKs2PerformanceComparisonUseCase.Execute(
+            new GetSchoolKs2PerformanceComparisonRequest(urn, similarSchoolUrn));
+        model.MeetingExpectedStandardRwm = comparisonResponse.MeetingExpectedStandardRwm;
+
         ViewData["ComparisonSchool"] = model;
         return View(model);
     }
+
+    [HttpGet]
+    [Route("ks2/data")]
+    public async Task<IActionResult> Ks2Data(string urn, string similarSchoolUrn, string subject = "rwm")
+    {
+        if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
+        {
+            return BadRequest(new { error = "Missing route parameters." });
+        }
+
+        var normalizedSubject = NormalizeSubjectFilter(subject);
+
+        var response = await getSchoolKs2PerformanceComparisonUseCase.Execute(
+            new GetSchoolKs2PerformanceComparisonRequest(urn, similarSchoolUrn, new Dictionary<string, string>
+            {
+                [Ks2ExpectedRwm.Filters.Subject.Key] = normalizedSubject
+            }));
+
+        var series = response.MeetingExpectedStandardRwm.Series;
+        var currentSchoolSeries = series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+        var similarSchoolSeries = series.First(s => s.SeriesType == MeasureSeriesType.SimilarSchool);
+        var englandSeries = series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
+
+        return Json(new
+        {
+            subject = normalizedSubject,
+            bar = new decimal?[]
+            {
+                currentSchoolSeries.Current,
+                similarSchoolSeries.Current,
+                englandSeries.Current
+            },
+            line = new
+            {
+                thisSchool = new decimal?[] { currentSchoolSeries.Previous2, currentSchoolSeries.Previous, currentSchoolSeries.Current },
+                similarSchool = new decimal?[] { similarSchoolSeries.Previous2, similarSchoolSeries.Previous, similarSchoolSeries.Current },
+                england = new decimal?[] { englandSeries.Previous2, englandSeries.Previous, englandSeries.Current }
+            },
+            table = new
+            {
+                thisSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(currentSchoolSeries.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(currentSchoolSeries.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(currentSchoolSeries.Current)
+                },
+                similarSchool = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolSeries.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolSeries.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolSeries.Current)
+                },
+                england = new[]
+                {
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries.Previous2),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries.Previous),
+                    SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries.Current)
+                }
+            }
+        });
+    }
+
+    private static string NormalizeSubjectFilter(string? subject) =>
+        Ks2ExpectedRwm.Filters.Subject.Values.AllValues.Any(v => v.Value == subject)
+            ? subject!
+            : Ks2ExpectedRwm.Filters.Subject.Values.ReadingWritingMaths;
 
     [HttpGet]
     [Route("attendance")]

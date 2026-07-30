@@ -1,8 +1,23 @@
+@using System.Text.Json
+@using SAPSec.Core.Features.Measures
 @using SAPSec.Web.Constants
+@using SAPSec.Web.ViewModels
+@using static SAPSec.Core.Constants.Measures.Primary
 @model SAPSec.Web.Areas.Primary.ViewModels.PrimarySimilarSchoolsComparisonViewModel
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = Model.SimilarSchoolName;
+
+    var expectedRwmSeries = Model.MeetingExpectedStandardRwm?.Series ?? Array.Empty<MeasureSeries>();
+    var thisSchoolExpectedRwm = expectedRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+    var similarSchoolExpectedRwm = expectedRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchool);
+    var englandExpectedRwm = expectedRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
+
+    var ks2YearLabels = AcademicYearLabelConfig.YearByYear;
+    var ks2CurrentYear = AcademicYearLabelConfig.CurrentKs2;
+    var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
+    var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
+    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
 }
 
 <h2 class="govuk-heading-l">KS2 performance measures</h2>
@@ -11,3 +26,214 @@
 </p>
 
 <partial name="_Ks2ProgressRWMInfo" />
+
+<section class="app-measure-section" aria-labelledby="expected-rwm-heading">
+    <h2 class="govuk-heading-m" id="expected-rwm-heading">Meeting expected standard in reading, writing and maths</h2>
+
+    <details class="govuk-details app-measure-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about meeting the expected standard</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                Pupils achieve the expected standard when they achieve a scaled score of 100 or more
+                in reading and maths tests, and are assessed by their teacher in writing as &lsquo;working at
+                the expected standard&rsquo; or &lsquo;working at greater depth&rsquo;.
+            </p>
+        </div>
+    </details>
+
+    <div class="app-measure-filter-row">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="expectedRwmSubject">Subject</label>
+            <select class="govuk-select"
+                    id="expectedRwmSubject"
+                    name="subject"
+                    data-view-switcher="true"
+                    data-endpoint="@Routes.PrimarySchool(Model.Urn).SimilarSchoolComparisonKs2Data(Model.SimilarSchoolUrn)"
+                    data-query-key="subject"
+                    data-bar-chart-id="expected-rwm-comparison-chart"
+                    data-line-chart-id="expected-rwm-comparison-yearbyyear-chart"
+                    data-cell-attribute="data-expected-rwm-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchool":"similar","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchool","england"]'>
+                @foreach (var option in Ks2ExpectedRwm.Filters.Subject.Values.AllValues)
+                {
+                    <option value="@option.Value" selected="@(option.Value == Ks2ExpectedRwm.Filters.Subject.Values.ReadingWritingMaths ? "selected" : null)">@option.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="app-measure-tabs govuk-tabs" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#expected-rwm-charts">Charts</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#expected-rwm-table-view">Table</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="expected-rwm-charts">
+            <content-toggle>
+                <toggle-content id="expected-rwm-three-year-average" name="@ks2CurrentYear" active="true">
+                    @{
+                        var expectedRwmChartData = new
+                        {
+                            labels = new[]
+                            {
+                                Model.Name,
+                                Model.SimilarSchoolName,
+                                "Schools in England average"
+                            },
+                            data = new decimal?[]
+                            {
+                                thisSchoolExpectedRwm?.Current,
+                                similarSchoolExpectedRwm?.Current,
+                                englandExpectedRwm?.Current
+                            }
+                        };
+                    }
+                    <div class="app-measure-chart-container">
+                        @if (HasAnyData(expectedRwmChartData.data))
+                        {
+                            <canvas id="expected-rwm-comparison-chart"
+                                    class="js-chart"
+                                    data-type="bar"
+                                    data-show-no-data-labels="true"
+                                    data-axis-step="25"
+                                    data-axis-max="100"
+                                    data-axis-suffix="%"
+                                    data-label-decimals="0"
+                                    data-bar-thickness="50"
+                                    data-category-percentage="0.7"
+                                    data-bar-percentage="1"
+                                    data-chart='@Html.Raw(JsonSerializer.Serialize(expectedRwmChartData))'
+                                    data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                            </canvas>
+                        }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="expected-rwm-year-by-year" name="Year by year">
+                    @{
+                        var expectedRwmYearByYearData = new
+                        {
+                            labels = ks2YearLabels,
+                            datasets = new object[]
+                            {
+                                new
+                                {
+                                    label = Model.Name,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        thisSchoolExpectedRwm?.Previous2,
+                                        thisSchoolExpectedRwm?.Previous,
+                                        thisSchoolExpectedRwm?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = Model.SimilarSchoolName,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        similarSchoolExpectedRwm?.Previous2,
+                                        similarSchoolExpectedRwm?.Previous,
+                                        similarSchoolExpectedRwm?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = "Schools in England average",
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        englandExpectedRwm?.Previous2,
+                                        englandExpectedRwm?.Previous,
+                                        englandExpectedRwm?.Current
+                                    }
+                                }
+                            }
+                        };
+                    }
+                    <div class="app-measure-chart-container">
+                        <canvas id="expected-rwm-comparison-yearbyyear-chart"
+                                class="js-chart"
+                                data-type="line"
+                                data-axis-step="25"
+                                data-axis-max="100"
+                                data-axis-suffix="%"
+                                data-tooltip-decimals="0"
+                                data-show-legend="true"
+                                data-show-datalabels="false"
+                                data-show-x-grid="true"
+                                data-chart='@Html.Raw(JsonSerializer.Serialize(expectedRwmYearByYearData))'
+                                data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                        </canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="expected-rwm-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks2YearLabels[0]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks2YearLabels[1]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks2YearLabels[2]</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.Name</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="this-prev2">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolExpectedRwm?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="this-prev">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolExpectedRwm?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="this-current">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolExpectedRwm?.Current)</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="similar-prev2">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolExpectedRwm?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="similar-prev">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolExpectedRwm?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="similar-current">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolExpectedRwm?.Current)</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Schools in England average</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="england-prev2">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandExpectedRwm?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="england-prev">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandExpectedRwm?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="england-current">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandExpectedRwm?.Current)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+}
