@@ -150,11 +150,17 @@ public class SimilarSchoolsComparisonControllerTests
         var result = await _sut.SchoolDetails(urn, similarUrn);
 
         var view = result.Should().BeOfType<ViewResult>().Subject;
-        var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
+        view.ViewName.Should().Be("~/Views/Shared/SimilarSchoolsComparison/SchoolDetails.cshtml");
 
+        var model = view.Model.Should().BeOfType<SimilarSchoolDetailsViewModel>().Subject;
+
+        model.Urn.Should().Be(urn);
+        model.SimilarSchoolUrn.Should().Be(similarUrn);
         model.Distance.Should().BeGreaterThan(0);
         model.SimilarSchoolDetails.Should().NotBeNull();
         model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
+
+        _sut.ViewData["ComparisonSchool"].Should().BeOfType<SimilarSchoolsComparisonViewModel>();
     }
 
     [Fact]

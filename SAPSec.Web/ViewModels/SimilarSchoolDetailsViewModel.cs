@@ -1,0 +1,23 @@
+using System.Globalization;
+using SAPSec.Core.Model;
+
+namespace SAPSec.Web.ViewModels;
+
+public class SimilarSchoolDetailsViewModel
+{
+    public required string Urn { get; init; }
+    public required string SimilarSchoolUrn { get; init; }
+    public required string Name { get; init; }
+    public required string SimilarSchoolName { get; init; }
+    public double? CurrentSchoolLatitude { get; init; }
+    public double? CurrentSchoolLongitude { get; init; }
+    public double? SimilarSchoolLatitude { get; init; }
+    public double? SimilarSchoolLongitude { get; init; }
+    public double? Distance { get; init; }
+    public SchoolDetails? SimilarSchoolDetails { get; init; }
+
+    public string DistanceDisplay =>
+        Distance is double d
+            ? d.ToString("0.0", CultureInfo.InvariantCulture)
+            : string.Empty;
+}
