@@ -44,7 +44,7 @@
             data-axis-step="@axisStep"
             data-axis-max="@axisMax"
             data-axis-auto-skip="false"
-            data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? "%" : "")"
+            data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage ? "%" : "")"
             data-show-x-grid="true"
             data-show-legend="true"
             data-show-datalabels="false"
