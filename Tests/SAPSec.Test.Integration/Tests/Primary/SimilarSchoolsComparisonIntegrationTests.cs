@@ -47,4 +47,30 @@ public class SimilarSchoolsComparisonIntegrationTests(
         caption.Should().NotBeNull();
         caption.TrimmedTextContent().Should().Be("Test School 1");
     }
+
+    [Fact]
+    public async Task SimilarSchoolComparison_Ks2_DisplaysProgressScoreSectionWithDetailsToggle()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var tabHeading = page.QuerySelector("h2.govuk-heading-l");
+        tabHeading.Should().NotBeNull();
+        tabHeading.TrimmedTextContent().Should().Be("KS2 performance measures");
+
+        var progressHeading = page.QuerySelector("#progress-rwm-heading");
+        progressHeading.Should().NotBeNull();
+        progressHeading.TrimmedTextContent().Should().Be("Progress score in reading, writing and maths");
+
+        var details = page.QuerySelector("details.govuk-details");
+        details.Should().NotBeNull();
+
+        var summary = details!.QuerySelector(".govuk-details__summary-text");
+        summary.Should().NotBeNull();
+        summary.TrimmedTextContent().Should().Be("Information about progress score in reading, writing and maths");
+
+        var insetPanel = page.QuerySelector(".app-measure-message-panel");
+        insetPanel.Should().NotBeNull();
+        insetPanel.TrimmedTextContent().Should().Contain("There are no KS1-KS2 progress scores");
+    }
 }
