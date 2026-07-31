@@ -26,7 +26,6 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
-    IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
     IRequestSchoolAccessor requestSchoolAccessor)
     : Controller
@@ -67,18 +66,11 @@ public class SchoolController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getAttendanceMeasuresUseCase.Execute(new(urn, filters));
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
 
         PopulateViewData(response.School);
 
-        var model = new AttendanceMeasuresPageViewModel
-        {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Absence = MeasureViewModel.FromMeasure(response.Absence, response.School)
-        };
-
-        return View(model);
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     [HttpGet]

@@ -3,7 +3,7 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
 
-public class InMemoryAbsenceRepository(IEstablishmentRepository establishmentRepository) : IAbsenceRepository
+public class InMemoryAbsenceRepository : IAbsenceRepository
 {
     private List<EstablishmentAbsence> _establishment = new();
     private List<LAAbsence> _la = new();
@@ -31,31 +31,24 @@ public class InMemoryAbsenceRepository(IEstablishmentRepository establishmentRep
         _england = [];
     }
 
-    public async Task<AbsenceData?> GetByUrnAsync(string urn)
+    public Task<AbsenceData?> GetByUrnAsync(string urn)
+        => Task.FromResult(GetByUrn(urn));
+
+    private AbsenceData? GetByUrn(string urn)
     {
-        var establishment = await establishmentRepository.GetEstablishmentAsync(urn);
-        var ep = _establishment.FirstOrDefault(x => x.Id == urn);
-        var la = _la.FirstOrDefault(x => x.Id == establishment?.LAId);
-        var england = _england.FirstOrDefault(x => x.Id == "National");
+        var establishment = _establishment.FirstOrDefault(x => x.Id == urn);
+        var la = _la.FirstOrDefault(x => x.Id == urn);
+        var england = _england.FirstOrDefault(x => x.Id == urn);
 
         return establishment is null && la is null && england is null
             ? null
             : new AbsenceData(
                 urn,
-                ep,
+                establishment,
                 la,
                 england);
     }
 
-    public async Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)
-    {
-        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-
-        return establishments.Select(e => new AbsenceData(
-                e.URN,
-                _establishment.FirstOrDefault(x => x.Id == e.URN),
-                _la.FirstOrDefault(x => x.Id == e.LAId),
-                _england.FirstOrDefault(x => x.Id == "National")))
-            .ToList();
-    }
+    public Task<IReadOnlyCollection<AbsenceData>> GetByUrnsAsync(IEnumerable<string> urns)
+        => Task.FromResult((IReadOnlyCollection<AbsenceData>)urns.Select(GetByUrn).Where(x => x is not null).ToList());
 }

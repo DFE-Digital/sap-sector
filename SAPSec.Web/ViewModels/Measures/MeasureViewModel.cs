@@ -1,7 +1,6 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.Constants;
-using static SAPSec.Core.Constants.Measures;
 using static SAPSec.Core.Constants.Measures.Primary;
 
 namespace SAPSec.Web.ViewModels.Measures;
@@ -38,8 +37,6 @@ public record MeasureViewModel(
                 "Average scaled score in reading",
             Ks2MathsScore =>
                 "Average scaled score in maths",
-            Absence.Key =>
-                "Total absence",
             _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
         };
 

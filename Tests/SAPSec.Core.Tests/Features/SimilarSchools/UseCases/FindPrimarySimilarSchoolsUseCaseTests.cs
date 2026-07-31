@@ -11,13 +11,12 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 {
     private readonly InMemorySimilarSchoolsPrimaryRepository _similarSchoolsRepo = new();
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
-    private readonly InMemoryAbsenceRepository _absenceRepo;
+    private readonly InMemoryAbsenceRepository _absenceRepo = new();
     private readonly InMemoryKs2PerformanceRepository _performanceRepo;
     private readonly FindPrimarySimilarSchoolsUseCase _sut;
 
     public FindPrimarySimilarSchoolsUseCaseTests()
     {
-        _absenceRepo = new InMemoryAbsenceRepository(_establishmentRepo);
         _performanceRepo = new InMemoryKs2PerformanceRepository(_establishmentRepo);
         _sut = new FindPrimarySimilarSchoolsUseCase(_establishmentRepo, _similarSchoolsRepo, _absenceRepo, _performanceRepo);
     }

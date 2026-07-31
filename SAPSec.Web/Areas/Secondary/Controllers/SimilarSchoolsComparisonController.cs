@@ -426,8 +426,8 @@ public class SimilarSchoolsComparisonController : Controller
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
 
-        var thisSchoolAttendance = await _getAttendanceMeasures.Execute(new GetSchoolAttendanceMeasuresRequest(urn));
-        var similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetSchoolAttendanceMeasuresRequest(similarSchoolUrn));
+        var thisSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var similarSchoolAttendance = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
 
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
         var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;

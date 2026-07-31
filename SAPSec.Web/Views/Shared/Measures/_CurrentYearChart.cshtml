@@ -1,5 +1,6 @@
 ﻿@using System.Text.Json
 @using SAPSec.Core.Features.Measures
+@using SAPSec.Web.Constants
 @using SAPSec.Web.ViewModels.Measures
 
 @model CurrentYearChartViewModel
@@ -15,14 +16,12 @@
     {
         MeasureDataType.Score => 1,
         MeasureDataType.ScaledScore => 1,
-        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
+        MeasureDataType.AbsencePercentage => 2,
         _ => 0
     };
     var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => (0, 30, 90),
-        MeasureDataType.OverallAbsencePercentage => (0, 1, 10),
-        MeasureDataType.PersistentAbsencePercentage => (0, 5, 30),
         MeasureDataType.ScaledScore => (0, 20, 120),
         _ => (0, 25, 100)
     };
@@ -31,8 +30,7 @@
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">
     @if (hasAnyData)
     {
-
-          <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
+        <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
                 class="js-chart js-chart--school-measure-bar"
                 data-type="bar"
                 data-show-no-data-labels="true"
@@ -44,10 +42,10 @@
                 data-category-percentage="0.6"
                 data-bar-percentage="1"
                 data-bar-thickness="50"
-                data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage? "%" : "")"
+                data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.AbsencePercentage? "%" : "")"
                 data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
                 @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
-           </canvas>
+        </canvas>
     }
     else
     {

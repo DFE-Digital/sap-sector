@@ -20,7 +20,7 @@ public class AllPagesIntegrationTests(
     private static readonly PageTestCase[] PrimaryPages = [
         new(Routes.PrimarySchool(PrimarySchoolUrn).Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
         new(Routes.PrimarySchool(PrimarySchoolUrn).KS2, "KS2 performance measures", NavigationText: "KS2"),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).Attendance, "Attendance measures", NavigationText: "Attendance"),
+        new(Routes.PrimarySchool(PrimarySchoolUrn).Attendance, "Attendance"),
         new(Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools, "View similar schools"),
         new(Routes.PrimarySchool(PrimarySchoolUrn).SchoolDetails, "School details"),
         new(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool, "What is a similar school?"),
