@@ -1,8 +1,16 @@
-﻿@using SAPSec.Web.Constants
-@using System.Text.Json
+﻿@using SAPSec.Core.Features.Measures
 @using SAPSec.Web.ViewModels.Measures
 
 @model MeasureViewModel
+
+@{
+    var currentYear = Model.MeasureInfo.DataType switch
+     {
+         MeasureDataType.Score or MeasureDataType.ScaledScore => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs2,
+         MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentAttendance,
+         _ => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4
+     };
+}
 
 <partial name="Measures/_Filters" model=@Model.MeasureInfo />
 
@@ -10,7 +18,7 @@
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs2" active="true">
+                <toggle-content id="current-year" name="@currentYear" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year">
@@ -22,9 +30,11 @@
         <tab-content id="table-view" name="Table">
             <partial name="Measures/_Table" model=@Model.Table />
         </tab-content>
-
+        @if(Model.TopPerformers is not null)
+        {
         <tab-content id="top-performers" name="Top performers">
             <partial name="Measures/_TopPerformers" model=@Model.TopPerformers />
         </tab-content>
+        }
     </tabbed-view>
 </div>

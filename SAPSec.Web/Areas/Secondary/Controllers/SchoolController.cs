@@ -84,7 +84,7 @@ public class SchoolController : Controller
     public async Task<IActionResult> Attendance(string urn)
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        var attendanceMeasures = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var attendanceMeasures = await _getAttendanceMeasures.Execute(new(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
         return View(new SchoolAttendancePageViewModel
@@ -104,7 +104,7 @@ public class SchoolController : Controller
         }
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-        var response = await _getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
+        var response = await _getAttendanceMeasures.Execute(new(urn));
         var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
 

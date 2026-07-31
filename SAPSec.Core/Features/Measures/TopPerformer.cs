@@ -39,7 +39,6 @@ public record TopPerformer(
             .ToList()
             .AsReadOnly();
     }
-
     private sealed record TopPerformerCandidate(
         string Urn,
         string Name,
