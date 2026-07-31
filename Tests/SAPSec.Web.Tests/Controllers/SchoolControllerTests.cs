@@ -326,21 +326,21 @@ public class SchoolControllerTests
                 },
                 new LAAbsence
                 {
-                    Abs_Tot_Secondary_LA_Current_Pct = "4.8",
-                    Abs_Tot_Secondary_LA_Previous_Pct = "4.7",
-                    Abs_Tot_Secondary_LA_Previous2_Pct = "4.6",
-                    Abs_Persistent_Secondary_LA_Current_Pct = "15.2",
-                    Abs_Persistent_Secondary_LA_Previous_Pct = "15.0",
-                    Abs_Persistent_Secondary_LA_Previous2_Pct = "14.8"
+                    Abs_Tot_LA_Current_Pct = "4.8",
+                    Abs_Tot_LA_Previous_Pct = "4.7",
+                    Abs_Tot_LA_Previous2_Pct = "4.6",
+                    Abs_Persistent_LA_Current_Pct = "15.2",
+                    Abs_Persistent_LA_Previous_Pct = "15.0",
+                    Abs_Persistent_LA_Previous2_Pct = "14.8"
                 },
                 new EnglandAbsence
                 {
-                    Abs_Tot_Secondary_Eng_Current_Pct = "4.7",
-                    Abs_Tot_Secondary_Eng_Previous_Pct = "4.6",
-                    Abs_Tot_Secondary_Eng_Previous2_Pct = "4.5",
-                    Abs_Persistent_Secondary_Eng_Current_Pct = "15.1",
-                    Abs_Persistent_Secondary_Eng_Previous_Pct = "14.9",
-                    Abs_Persistent_Secondary_Eng_Previous2_Pct = "14.7"
+                    Abs_Tot_Eng_Current_Pct = "4.7",
+                    Abs_Tot_Eng_Previous_Pct = "4.6",
+                    Abs_Tot_Eng_Previous2_Pct = "4.5",
+                    Abs_Persistent_Eng_Current_Pct = "15.1",
+                    Abs_Persistent_Eng_Previous_Pct = "14.9",
+                    Abs_Persistent_Eng_Previous2_Pct = "14.7"
                 }));
         _similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync(urn))

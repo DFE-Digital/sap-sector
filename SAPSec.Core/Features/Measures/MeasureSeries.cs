@@ -20,7 +20,7 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
                 MeasureSeriesType.SimilarSchoolsAverage,
                 MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolCurrent(x.Data))),
                 MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious(x.Data))),
-                MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x.Data)))),            
+                MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x.Data)))),
             new MeasureSeries(
                 MeasureSeriesType.LASchoolsAverage,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.LocalAuthorityCurrent(currentSchool.Data)),
@@ -32,27 +32,6 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
                 MeasureHelper.ParseNullableDecimal(fieldSelector.EnglandPrevious(currentSchool.Data)),
                 MeasureHelper.ParseNullableDecimal(fieldSelector.EnglandPrevious2(currentSchool.Data)))
         ];
-
-    //No similar schools average for attendance measures on school overview page
-    internal static IReadOnlyCollection<MeasureSeries> ForSchoolAttendance<T>(
-        SchoolData<T> currentSchool,
-        MeasureFieldSelector<T> fieldSelector) => [
-        new MeasureSeries(
-                MeasureSeriesType.CurrentSchool,
-                MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),
-                MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious(currentSchool.Data)),
-                MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious2(currentSchool.Data))),
-            new MeasureSeries(
-                MeasureSeriesType.LASchoolsAverage,
-                MeasureHelper.ParseNullableDecimal(fieldSelector.LocalAuthorityCurrent(currentSchool.Data)),
-                MeasureHelper.ParseNullableDecimal(fieldSelector.LocalAuthorityPrevious(currentSchool.Data)),
-                MeasureHelper.ParseNullableDecimal(fieldSelector.LocalAuthorityPrevious2(currentSchool.Data))),
-            new MeasureSeries(
-                MeasureSeriesType.EnglandSchoolsAverage,
-                MeasureHelper.ParseNullableDecimal(fieldSelector.EnglandCurrent(currentSchool.Data)),
-                MeasureHelper.ParseNullableDecimal(fieldSelector.EnglandPrevious(currentSchool.Data)),
-                MeasureHelper.ParseNullableDecimal(fieldSelector.EnglandPrevious2(currentSchool.Data)))
-    ];
 
     internal static IReadOnlyCollection<MeasureSeries> ForSchoolComparison<T>(
         SchoolData<T> currentSchool,

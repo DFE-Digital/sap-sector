@@ -25,7 +25,7 @@ public class GetAttendanceMeasuresTests
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var act = async () => await sut.Execute(new GetSchoolAttendanceMeasuresRequest("999999"));
+        var act = async () => await sut.Execute(new GetAttendanceMeasuresRequest("999999"));
 
         await act.Should().ThrowAsync<NotFoundException>()
             .WithMessage("*999999*");
@@ -57,21 +57,21 @@ public class GetAttendanceMeasuresTests
                 },
                 new LAAbsence
                 {
-                    Abs_Tot_Secondary_LA_Current_Pct = "4.7",
-                    Abs_Tot_Secondary_LA_Previous_Pct = "4.8",
-                    Abs_Tot_Secondary_LA_Previous2_Pct = "5.0",
-                    Abs_Persistent_Secondary_LA_Current_Pct = "15.1",
-                    Abs_Persistent_Secondary_LA_Previous_Pct = "15.3",
-                    Abs_Persistent_Secondary_LA_Previous2_Pct = "15.5"
+                    Abs_Tot_LA_Current_Pct = "4.7",
+                    Abs_Tot_LA_Previous_Pct = "4.8",
+                    Abs_Tot_LA_Previous2_Pct = "5.0",
+                    Abs_Persistent_LA_Current_Pct = "15.1",
+                    Abs_Persistent_LA_Previous_Pct = "15.3",
+                    Abs_Persistent_LA_Previous2_Pct = "15.5"
                 },
                 new EnglandAbsence
                 {
-                    Abs_Tot_Secondary_Eng_Current_Pct = "4.8",
-                    Abs_Tot_Secondary_Eng_Previous_Pct = "4.9",
-                    Abs_Tot_Secondary_Eng_Previous2_Pct = "5.0",
-                    Abs_Persistent_Secondary_Eng_Current_Pct = "15.7",
-                    Abs_Persistent_Secondary_Eng_Previous_Pct = "15.8",
-                    Abs_Persistent_Secondary_Eng_Previous2_Pct = "16.0"
+                    Abs_Tot_Eng_Current_Pct = "4.8",
+                    Abs_Tot_Eng_Previous_Pct = "4.9",
+                    Abs_Tot_Eng_Previous2_Pct = "5.0",
+                    Abs_Persistent_Eng_Current_Pct = "15.7",
+                    Abs_Persistent_Eng_Previous_Pct = "15.8",
+                    Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
         similarSchoolsRepositoryMock
             .Setup(x => x.GetGroupAsync("123456"))
@@ -121,7 +121,7 @@ public class GetAttendanceMeasuresTests
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var result = await sut.Execute(new GetSchoolAttendanceMeasuresRequest("123456"));
+        var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(5.0m, 5.5m, 4.7m, 4.8m));
         result.OverallAbsenceTopPerformers.Should().BeEquivalentTo(
@@ -168,7 +168,7 @@ public class GetAttendanceMeasuresTests
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var result = await sut.Execute(new GetSchoolAttendanceMeasuresRequest("123456"));
+        var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(null, null, null, null));
         result.OverallAbsenceTopPerformers.Should().BeEmpty();
@@ -213,26 +213,26 @@ public class GetAttendanceMeasuresTests
                 },
                 new LAAbsence
                 {
-                    Abs_Tot_Secondary_LA_Current_Pct = "4.7",
-                    Abs_Tot_Secondary_LA_Previous_Pct = "4.8",
-                    Abs_Tot_Secondary_LA_Previous2_Pct = null,
-                    Abs_Persistent_Secondary_LA_Current_Pct = "15.1",
-                    Abs_Persistent_Secondary_LA_Previous_Pct = null,
-                    Abs_Persistent_Secondary_LA_Previous2_Pct = "15.5"
+                    Abs_Tot_LA_Current_Pct = "4.7",
+                    Abs_Tot_LA_Previous_Pct = "4.8",
+                    Abs_Tot_LA_Previous2_Pct = null,
+                    Abs_Persistent_LA_Current_Pct = "15.1",
+                    Abs_Persistent_LA_Previous_Pct = null,
+                    Abs_Persistent_LA_Previous2_Pct = "15.5"
                 },
                 new EnglandAbsence
                 {
-                    Abs_Tot_Secondary_Eng_Current_Pct = "4.8",
-                    Abs_Tot_Secondary_Eng_Previous_Pct = "4.9",
-                    Abs_Tot_Secondary_Eng_Previous2_Pct = null,
-                    Abs_Persistent_Secondary_Eng_Current_Pct = "15.7",
-                    Abs_Persistent_Secondary_Eng_Previous_Pct = null,
-                    Abs_Persistent_Secondary_Eng_Previous2_Pct = "16.0"
+                    Abs_Tot_Eng_Current_Pct = "4.8",
+                    Abs_Tot_Eng_Previous_Pct = "4.9",
+                    Abs_Tot_Eng_Previous2_Pct = null,
+                    Abs_Persistent_Eng_Current_Pct = "15.7",
+                    Abs_Persistent_Eng_Previous_Pct = null,
+                    Abs_Persistent_Eng_Previous2_Pct = "16.0"
                 }));
 
         var sut = new GetAttendanceMeasures(repositoryMock.Object, establishmentRepositoryMock.Object, similarSchoolsRepositoryMock.Object);
 
-        var result = await sut.Execute(new GetSchoolAttendanceMeasuresRequest("123456"));
+        var result = await sut.Execute(new GetAttendanceMeasuresRequest("123456"));
 
         result.OverallAbsenceThreeYearAverage.Should().Be(new AttendanceMeasureAverage(5.0m, null, 4.7m, 4.8m));
         result.OverallAbsenceTopPerformers.Should().BeEquivalentTo(
