@@ -46,6 +46,7 @@ public class SimilarSchoolsComparisonController(
         var comparisonResponse = await getSchoolKs2PerformanceComparisonUseCase.Execute(
             new GetSchoolKs2PerformanceComparisonRequest(urn, similarSchoolUrn));
         model.MeetingExpectedStandardRwm = comparisonResponse.MeetingExpectedStandardRwm;
+        model.AchievedHigherStandardRwm = comparisonResponse.AchievedHigherStandardRwm;
 
         ViewData["ComparisonSchool"] = model;
         return View(model);
@@ -68,12 +69,37 @@ public class SimilarSchoolsComparisonController(
                 [Ks2ExpectedRwm.Filters.Subject.Key] = normalizedSubject
             }));
 
-        var series = response.MeetingExpectedStandardRwm.Series;
+        return Json(BuildComparisonMeasureJson(response.MeetingExpectedStandardRwm, normalizedSubject));
+    }
+
+    [HttpGet]
+    [Route("ks2/higher-rwm/data")]
+    public async Task<IActionResult> Ks2HigherRwmData(string urn, string similarSchoolUrn, string subject = "rwm")
+    {
+        if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
+        {
+            return BadRequest(new { error = "Missing route parameters." });
+        }
+
+        var normalizedSubject = NormalizeSubjectFilter(subject);
+
+        var response = await getSchoolKs2PerformanceComparisonUseCase.Execute(
+            new GetSchoolKs2PerformanceComparisonRequest(urn, similarSchoolUrn, new Dictionary<string, string>
+            {
+                [Ks2HigherRwm.Filters.Subject.Key] = normalizedSubject
+            }));
+
+        return Json(BuildComparisonMeasureJson(response.AchievedHigherStandardRwm, normalizedSubject));
+    }
+
+    private static object BuildComparisonMeasureJson(Measure measure, string normalizedSubject)
+    {
+        var series = measure.Series;
         var currentSchoolSeries = series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
         var similarSchoolSeries = series.First(s => s.SeriesType == MeasureSeriesType.SimilarSchool);
         var englandSeries = series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
 
-        return Json(new
+        return new
         {
             subject = normalizedSubject,
             bar = new decimal?[]
@@ -109,7 +135,7 @@ public class SimilarSchoolsComparisonController(
                     SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandSeries.Current)
                 }
             }
-        });
+        };
     }
 
     private static string NormalizeSubjectFilter(string? subject) =>

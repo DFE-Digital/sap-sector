@@ -43,6 +43,8 @@ public static class Routes
             => $"{SimilarSchoolComparison(similarSchoolUrn)}/ks2";
         public string SimilarSchoolComparisonKs2Data(string similarSchoolUrn)
             => $"{SimilarSchoolComparisonKs2(similarSchoolUrn)}/data";
+        public string SimilarSchoolComparisonKs2HigherRwmData(string similarSchoolUrn)
+            => $"{SimilarSchoolComparisonKs2(similarSchoolUrn)}/higher-rwm/data";
         public string SimilarSchoolComparisonAttendance(string similarSchoolUrn)
             => $"{SimilarSchoolComparison(similarSchoolUrn)}/attendance";
         public string SimilarSchoolComparisonSchoolDetails(string similarSchoolUrn)

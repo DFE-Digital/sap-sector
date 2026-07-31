@@ -117,4 +117,48 @@ public class SimilarSchoolsComparisonIntegrationTests(
             new[] { "Schools in England average", "59%", "60%", "61%" }
         });
     }
+
+    [Fact]
+    public async Task SimilarSchoolComparison_Ks2_DisplaysAchievedHigherStandardSection()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithRwmHigher(current: "31", prev: "30", prev2: "29")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithRwmHigher(current: "20", prev: "21", prev2: "22")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmHigher(current: "21", prev: "20", prev2: "19")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var heading = page.QuerySelector("#higher-rwm-heading");
+        heading.Should().NotBeNull();
+        heading!.TrimmedTextContent().Should().Be("Achieved a higher standard in reading, writing and maths");
+
+        var details = page.QuerySelectorAll("details.govuk-details")
+            .FirstOrDefault(d => d.QuerySelector(".govuk-details__summary-text")?.TrimmedTextContent()
+                == "Information about achieving the higher standard");
+        details.Should().NotBeNull();
+        details!.HasAttribute("open").Should().BeFalse();
+
+        var subjectSelect = page.QuerySelector("#higherRwmSubject");
+        subjectSelect.Should().NotBeNull();
+        var options = subjectSelect!.QuerySelectorAll("option").Select(o => o.TrimmedTextContent()).ToList();
+        options.Should().Equal("Reading, writing and maths", "Reading", "Writing", "Maths");
+
+        var tabs = page.QuerySelector("#higher-rwm-charts")!.Closest(".app-measure-tabs");
+        tabs.Should().NotBeNull();
+        var tabLabels = tabs!.QuerySelectorAll(".govuk-tabs__tab").Select(t => t.TrimmedTextContent()).ToList();
+        tabLabels.Should().Equal("Charts", "Table");
+
+        var tableRows = page.QuerySelector("#higher-rwm-table-view table")!
+            .QuerySelectorAll("tbody tr").Select(r => r.QuerySelectorAll("th, td").Select(c => c.TrimmedTextContent()).ToArray());
+
+        tableRows.Should().BeEquivalentTo(new[]
+        {
+            new[] { "Test School 1", "29%", "30%", "31%" },
+            new[] { "Test School 2", "22%", "21%", "20%" },
+            new[] { "Schools in England average", "19%", "20%", "21%" }
+        });
+    }
 }

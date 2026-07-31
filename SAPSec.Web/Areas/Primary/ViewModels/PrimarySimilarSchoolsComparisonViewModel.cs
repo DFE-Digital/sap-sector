@@ -9,4 +9,5 @@ public class PrimarySimilarSchoolsComparisonViewModel
     public required string Name { get; set; }
     public required string SimilarSchoolName { get; set; }
     public Measure? MeetingExpectedStandardRwm { get; set; }
+    public Measure? AchievedHigherStandardRwm { get; set; }
 }

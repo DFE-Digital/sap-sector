@@ -13,6 +13,11 @@
     var similarSchoolExpectedRwm = expectedRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchool);
     var englandExpectedRwm = expectedRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
 
+    var higherRwmSeries = Model.AchievedHigherStandardRwm?.Series ?? Array.Empty<MeasureSeries>();
+    var thisSchoolHigherRwm = higherRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+    var similarSchoolHigherRwm = higherRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchool);
+    var englandHigherRwm = higherRwmSeries.FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage);
+
     var ks2YearLabels = AcademicYearLabelConfig.YearByYear;
     var ks2CurrentYear = AcademicYearLabelConfig.CurrentKs2;
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
@@ -218,6 +223,203 @@
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="england-prev2">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandExpectedRwm?.Previous2)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="england-prev">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandExpectedRwm?.Previous)</td>
                         <td class="govuk-table__cell govuk-table__cell--numeric" data-expected-rwm-cell="england-current">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandExpectedRwm?.Current)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section class="app-measure-section" aria-labelledby="higher-rwm-heading">
+    <h2 class="govuk-heading-m" id="higher-rwm-heading">Achieved a higher standard in reading, writing and maths</h2>
+
+    <details class="govuk-details app-measure-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about achieving the higher standard</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                Pupils achieve the higher standard when they achieve a scaled score of 110 or more
+                in reading and maths tests, and are assessed by their teacher in writing as &lsquo;working at greater depth&rsquo;.
+            </p>
+        </div>
+    </details>
+
+    <div class="app-measure-filter-row">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="higherRwmSubject">Subject</label>
+            <select class="govuk-select"
+                    id="higherRwmSubject"
+                    name="subject"
+                    data-view-switcher="true"
+                    data-endpoint="@Routes.PrimarySchool(Model.Urn).SimilarSchoolComparisonKs2HigherRwmData(Model.SimilarSchoolUrn)"
+                    data-query-key="subject"
+                    data-bar-chart-id="higher-rwm-comparison-chart"
+                    data-line-chart-id="higher-rwm-comparison-yearbyyear-chart"
+                    data-cell-attribute="data-higher-rwm-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchool":"similar","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchool","england"]'>
+                @foreach (var option in Ks2HigherRwm.Filters.Subject.Values.AllValues)
+                {
+                    <option value="@option.Value" selected="@(option.Value == Ks2HigherRwm.Filters.Subject.Values.ReadingWritingMaths ? "selected" : null)">@option.Name</option>
+                }
+            </select>
+        </div>
+    </div>
+
+    <div class="app-measure-tabs govuk-tabs" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected">
+                <a class="govuk-tabs__tab" href="#higher-rwm-charts">Charts</a>
+            </li>
+            <li class="govuk-tabs__list-item">
+                <a class="govuk-tabs__tab" href="#higher-rwm-table-view">Table</a>
+            </li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="higher-rwm-charts">
+            <content-toggle>
+                <toggle-content id="higher-rwm-three-year-average" name="@ks2CurrentYear" active="true">
+                    @{
+                        var higherRwmChartData = new
+                        {
+                            labels = new[]
+                            {
+                                Model.Name,
+                                Model.SimilarSchoolName,
+                                "Schools in England average"
+                            },
+                            data = new decimal?[]
+                            {
+                                thisSchoolHigherRwm?.Current,
+                                similarSchoolHigherRwm?.Current,
+                                englandHigherRwm?.Current
+                            }
+                        };
+                    }
+                    <div class="app-measure-chart-container">
+                        @if (HasAnyData(higherRwmChartData.data))
+                        {
+                            <canvas id="higher-rwm-comparison-chart"
+                                    class="js-chart"
+                                    data-type="bar"
+                                    data-show-no-data-labels="true"
+                                    data-axis-step="25"
+                                    data-axis-max="100"
+                                    data-axis-suffix="%"
+                                    data-label-decimals="0"
+                                    data-bar-thickness="50"
+                                    data-category-percentage="0.7"
+                                    data-bar-percentage="1"
+                                    data-chart='@Html.Raw(JsonSerializer.Serialize(higherRwmChartData))'
+                                    data-colors='@Html.Raw(JsonSerializer.Serialize(chartColors))'>
+                            </canvas>
+                        }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="higher-rwm-year-by-year" name="Year by year">
+                    @{
+                        var higherRwmYearByYearData = new
+                        {
+                            labels = ks2YearLabels,
+                            datasets = new object[]
+                            {
+                                new
+                                {
+                                    label = Model.Name,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        thisSchoolHigherRwm?.Previous2,
+                                        thisSchoolHigherRwm?.Previous,
+                                        thisSchoolHigherRwm?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = Model.SimilarSchoolName,
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        similarSchoolHigherRwm?.Previous2,
+                                        similarSchoolHigherRwm?.Previous,
+                                        similarSchoolHigherRwm?.Current
+                                    }
+                                },
+                                new
+                                {
+                                    label = "Schools in England average",
+                                    borderWidth = 2,
+                                    pointRadius = 4,
+                                    pointHoverRadius = 5,
+                                    tension = 0,
+                                    data = new decimal?[]
+                                    {
+                                        englandHigherRwm?.Previous2,
+                                        englandHigherRwm?.Previous,
+                                        englandHigherRwm?.Current
+                                    }
+                                }
+                            }
+                        };
+                    }
+                    <div class="app-measure-chart-container">
+                        <canvas id="higher-rwm-comparison-yearbyyear-chart"
+                                class="js-chart"
+                                data-type="line"
+                                data-axis-step="25"
+                                data-axis-max="100"
+                                data-axis-suffix="%"
+                                data-tooltip-decimals="0"
+                                data-show-legend="true"
+                                data-show-datalabels="false"
+                                data-show-x-grid="true"
+                                data-chart='@Html.Raw(JsonSerializer.Serialize(higherRwmYearByYearData))'
+                                data-colors='@Html.Raw(JsonSerializer.Serialize(yearByYearColors))'>
+                        </canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="higher-rwm-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">School(s)</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks2YearLabels[0]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks2YearLabels[1]</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks2YearLabels[2]</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.Name</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="this-prev2">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolHigherRwm?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="this-prev">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolHigherRwm?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="this-current">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(thisSchoolHigherRwm?.Current)</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">@Model.SimilarSchoolName</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="similar-prev2">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolHigherRwm?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="similar-prev">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolHigherRwm?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="similar-current">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(similarSchoolHigherRwm?.Current)</td>
+                    </tr>
+                    <tr class="govuk-table__row">
+                        <th scope="row" class="govuk-table__header">Schools in England average</th>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="england-prev2">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandHigherRwm?.Previous2)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="england-prev">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandHigherRwm?.Previous)</td>
+                        <td class="govuk-table__cell govuk-table__cell--numeric" data-higher-rwm-cell="england-current">@SimilarSchoolsComparisonViewModel.DisplayWholePercent(englandHigherRwm?.Current)</td>
                     </tr>
                 </tbody>
             </table>
