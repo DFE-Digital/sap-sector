@@ -1,6 +1,8 @@
 ﻿using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
+using SAPSec.Test.Common.Builders;
 
 namespace SAPSec.Test.Common.Builders;
 
@@ -37,6 +39,27 @@ public static class Build
         {
             build ??= b => b;
             return build(new EnglandPerformanceBuilder()).Build();
+        }
+    }
+
+    public static class Absence
+    {
+        public static EstablishmentAbsence Establishment(string urn, Func<EstablishmentAbsenceBuilder, EstablishmentAbsenceBuilder>? build = null)
+        {
+            build ??= b => b;
+            return build(new EstablishmentAbsenceBuilder(urn)).Build();
+        }
+
+        public static LAAbsence LA(string laId, Func<LAAbsenceBuilder, LAAbsenceBuilder>? build = null)
+        {
+            build ??= b => b;
+            return build(new LAAbsenceBuilder(laId)).Build();
+        }
+
+        public static EnglandAbsence England(Func<EnglandAbsenceBuilder, EnglandAbsenceBuilder>? build = null)
+        {
+            build ??= b => b;
+            return build(new EnglandAbsenceBuilder()).Build();
         }
     }
 }

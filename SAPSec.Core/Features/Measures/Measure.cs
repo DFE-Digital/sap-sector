@@ -29,6 +29,20 @@ public record Measure(
             TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
     }
 
+    internal static Measure ForSchoolAttendance<T>(
+        string key,
+        MeasureDataType dataType,
+        IEnumerable<MeasureAvailableFilter> availableFilters,
+        SchoolData<T> currentSchool,
+        MeasureFieldSelector<T> fieldSelector)
+    {
+        return new Measure(
+            key,
+            dataType,
+            availableFilters.ToList(),
+            MeasureSeries.ForSchoolAttendance(currentSchool, fieldSelector));
+    }
+
     internal static Measure ForSchoolComparison<T>(
         string key,
         string name,
@@ -53,7 +67,8 @@ public enum MeasureDataType
     Score,
     ScaledScore,
     GradePercentage,
-    AbsencePercentage
+    OverallAbsencePercentage,
+    PersistentAbsencePercentage
 }
 
 public record MeasureAvailableFilter(
