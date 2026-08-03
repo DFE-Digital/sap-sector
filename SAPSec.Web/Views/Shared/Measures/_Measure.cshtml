@@ -23,8 +23,11 @@
             <partial name="Measures/_Table" model=@Model.Table />
         </tab-content>
 
-        <tab-content id="top-performers" name="Top performers">
-            <partial name="Measures/_TopPerformers" model=@Model.TopPerformers />
-        </tab-content>
+        @if (Model.TopPerformers is not null)
+        {
+            <tab-content id="top-performers" name="Top performers">
+                <partial name="Measures/_TopPerformers" model=@Model.TopPerformers />
+            </tab-content>
+        }
     </tabbed-view>
 </div>

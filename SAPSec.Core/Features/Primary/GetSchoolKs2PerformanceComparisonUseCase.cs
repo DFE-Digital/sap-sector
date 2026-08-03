@@ -1,6 +1,5 @@
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
@@ -13,32 +12,13 @@ public class GetSchoolKs2PerformanceComparisonUseCase(
 {
     public async Task<GetSchoolKs2PerformanceComparisonResponse> Execute(GetSchoolKs2PerformanceComparisonRequest request)
     {
-        var urns = new[] { request.Urn, request.SimilarSchoolUrn };
+        var dataProvider = new PrimarySchoolComparisonPerformanceDataProvider(
+            establishmentRepository,
+            performanceRepository);
 
-        var schools = (await establishmentRepository.GetEstablishmentsAsync(urns))
-            .Select(SchoolInfo.SchoolInfo.FromEstablishment)
-            .ToDictionary(x => x.Urn, StringComparer.Ordinal);
-
-        if (!schools.ContainsKey(request.Urn))
-        {
-            throw new NotFoundException($"School not found with URN: {request.Urn}");
-        }
-
-        if (!schools.ContainsKey(request.SimilarSchoolUrn))
-        {
-            throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
-        }
-
-        var performances = (await performanceRepository.GetByUrnsAsync(urns))
-            .ToDictionary(x => x.Urn, StringComparer.Ordinal);
-
-        var currentSchoolData = new SchoolData<Ks2PerformanceData>(
-            schools[request.Urn],
-            performances.TryGetValue(request.Urn, out var currentPerformance) ? currentPerformance : null);
-
-        var similarSchoolData = new SchoolData<Ks2PerformanceData>(
-            schools[request.SimilarSchoolUrn],
-            performances.TryGetValue(request.SimilarSchoolUrn, out var similarPerformance) ? similarPerformance : null);
+        var (currentSchoolData, similarSchoolData) = await dataProvider.GetComparisonPerformance(
+            request.Urn,
+            request.SimilarSchoolUrn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
