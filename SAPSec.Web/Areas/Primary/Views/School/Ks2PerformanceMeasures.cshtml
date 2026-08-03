@@ -29,7 +29,7 @@
         <partial name="_Ks2ProgressRWMInfo" />
 
         <section class="app-measure-section" aria-labelledby="expected-rwm-heading">
-            <h2 class="govuk-heading-m" id="expected-rwm-heading" data-testid="expected-rwm-heading">Meeting expected standard in reading, writing and maths</h2>
+            <h2 class="govuk-heading-m" id="expected-rwm-heading" data-testid="expected-rwm-heading">@Model.MeetingExpectedStandardRwm.MeasureInfo.Name</h2>
 
             <details class="govuk-details app-measure-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
@@ -47,8 +47,26 @@
             <partial name="Measures/_Measure" model=@Model.MeetingExpectedStandardRwm />
         </section>
 
+        <section class="app-measure-section" aria-labelledby="higher-rwm-heading">
+            <h2 class="govuk-heading-m" id="higher-rwm-heading" data-testid="higher-rwm-heading">@Model.AchievedHigherStandardRwm.MeasureInfo.Name</h2>
+
+            <details class="govuk-details app-measure-details" data-module="govuk-details">
+                <summary class="govuk-details__summary">
+                    <span class="govuk-details__summary-text">Information about achieving the higher standard</span>
+                </summary>
+                <div class="govuk-details__text">
+                    <p class="govuk-body-s govuk-!-margin-bottom-2">
+                        Pupils achieve the higher standard when they achieve a scaled score of 110 or more
+                        in reading and maths tests, and are assessed by their teacher in writing as &lsquo;working at greater depth&rsquo;.
+                    </p>
+                </div>
+            </details>
+            
+            <partial name="Measures/_Measure" model=@Model.AchievedHigherStandardRwm />
+        </section>
+
         <section class="app-measure-section" aria-labelledby="reading-score-heading">
-            <h2 class="govuk-heading-m" id="reading-score-heading" data-testid="reading-score-heading">Average scaled score in reading</h2>
+            <h2 class="govuk-heading-m" id="reading-score-heading" data-testid="reading-score-heading">@Model.AverageScaledScoreReading.MeasureInfo.Name</h2>
 
             <details class="govuk-details app-measure-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
@@ -69,7 +87,7 @@
         </section>
         
         <section class="app-measure-section" aria-labelledby="maths-score-heading">
-            <h2 class="govuk-heading-m" id="maths-score-heading" data-testid="maths-score-heading">Average scaled score in maths</h2>
+            <h2 class="govuk-heading-m" id="maths-score-heading" data-testid="maths-score-heading">@Model.AverageScaledScoreMaths.MeasureInfo.Name</h2>
 
             <details class="govuk-details app-measure-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
@@ -90,7 +108,7 @@
         </section>
 
         <section class="app-measure-section" aria-labelledby="expected-gps-heading">
-            <h2 class="govuk-heading-m" id="expected-gps-heading" data-testid="expected-gps-heading">Meeting expected standard in grammar, punctuation and spelling</h2>
+            <h2 class="govuk-heading-m" id="expected-gps-heading" data-testid="expected-gps-heading">@Model.MeetingExpectedStandardGps.MeasureInfo.Name</h2>
 
             <details class="govuk-details app-measure-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">
@@ -108,7 +126,7 @@
         </section>
 
         <section class="app-measure-section" aria-labelledby="higher-gps-heading">
-            <h2 class="govuk-heading-m" id="higher-gps-heading" data-testid="higher-gps-heading">Achieved a higher standard in grammar, punctuation and spelling</h2>
+            <h2 class="govuk-heading-m" id="higher-gps-heading" data-testid="higher-gps-heading">@Model.AchievedHigherStandardGps.MeasureInfo.Name</h2>
 
             <details class="govuk-details app-measure-details" data-module="govuk-details">
                 <summary class="govuk-details__summary">

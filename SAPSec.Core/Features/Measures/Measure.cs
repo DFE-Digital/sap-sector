@@ -5,6 +5,7 @@ namespace SAPSec.Core.Features.Measures;
 
 public record Measure(
     string Key,
+    string Name,
     MeasureDataType DataType,
     IReadOnlyCollection<MeasureAvailableFilter> Filters,
     IReadOnlyCollection<MeasureSeries> Series,
@@ -12,6 +13,7 @@ public record Measure(
 {
     internal static Measure ForSchool<T>(
         string key,
+        string name,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
         SchoolData<T> currentSchool,
@@ -20,6 +22,7 @@ public record Measure(
     {
         return new Measure(
             key,
+            name,
             dataType,
             availableFilters.ToList(),
             MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
@@ -28,6 +31,7 @@ public record Measure(
 
     internal static Measure ForSchoolComparison<T>(
         string key,
+        string name,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
         SchoolData<T> currentSchool,
@@ -37,6 +41,7 @@ public record Measure(
     {
         return new Measure(
             key,
+            name,
             dataType,
             availableFilters.ToList(),
             MeasureSeries.ForSchoolComparison(currentSchool, similarSchool, fieldSelector));
