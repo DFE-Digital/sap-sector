@@ -31,6 +31,7 @@ public record Measure(
 
     internal static Measure ForSchoolAttendance<T>(
         string key,
+        string name,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
         SchoolData<T> currentSchool,
@@ -38,6 +39,7 @@ public record Measure(
     {
         return new Measure(
             key,
+            name,
             dataType,
             availableFilters.ToList(),
             MeasureSeries.ForSchoolAttendance(currentSchool, fieldSelector));

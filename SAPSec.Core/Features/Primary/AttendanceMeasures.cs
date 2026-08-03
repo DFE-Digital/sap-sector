@@ -14,17 +14,18 @@ internal static class AttendanceMeasures
     {
         public static Measure ForSchool(SchoolData<AbsenceData> currentSchool, CaseInsensitiveDictionary<string> filters)
         {
-            var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(filters);
+            var (availableFilters, fieldSelector, measureDataType, measureName) = ResolveFilters(filters);
 
             return Measure.ForSchoolAttendance(
                 Constants.Measures.Absence.Key,
+                measureName,
                 measureDataType,
                 availableFilters,
                 currentSchool,
                 fieldSelector);
         }
     }
-    private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<AbsenceData> FieldSelector, MeasureDataType MeasureDataType) ResolveFilters(CaseInsensitiveDictionary<string> filters)
+    private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<AbsenceData> FieldSelector, MeasureDataType MeasureDataType, string MeasureName) ResolveFilters(CaseInsensitiveDictionary<string> filters)
     {
         var type = filters.ContainsKey(Constants.Measures.Absence.Filters.Type.Key)
             ? filters[Constants.Measures.Absence.Filters.Type.Key]
@@ -33,6 +34,9 @@ internal static class AttendanceMeasures
         var measureDataType = type == Constants.Measures.Absence.Filters.Type.Values.Overall
             ? MeasureDataType.OverallAbsencePercentage
             : MeasureDataType.PersistentAbsencePercentage;
+        var measureName = type.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.Type.Values.Persistent)
+            ? "Persistent absence"
+            : "Overall absence";
 
         IEnumerable<MeasureAvailableFilter> availableFilters = [
             new MeasureAvailableFilter(
@@ -67,6 +71,6 @@ internal static class AttendanceMeasures
                 x => x?.EnglandAbsence?.Abs_Tot_Primary_Eng_Previous2_Pct)
         };
 
-        return (availableFilters, fieldSelector, measureDataType);
+        return (availableFilters, fieldSelector, measureDataType, measureName);
     }
 }
