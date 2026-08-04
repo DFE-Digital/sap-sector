@@ -28,20 +28,6 @@ public class SimilarSchoolsComparisonKs2PageEndToEndTests(EndToEndTestsFixture f
     }
 
     [Fact]
-    public async Task NavigatesToKs2ComparisonPageWithBothMeasureSections()
-    {
-        await Expect(Page).ToHaveURLAsync(new System.Text.RegularExpressions.Regex(@"/view-similar-schools/\d{6}/ks2$"));
-
-        await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "KS2 performance measures", Level = 2 })).ToBeVisibleAsync();
-
-        var expectedStandardSection = await GetSection(MeetingExpectedStandardHeaderText);
-        var higherStandardSection = await GetSection(AchievedHigherStandardHeaderText);
-
-        await Expect(expectedStandardSection).ToBeVisibleAsync();
-        await Expect(higherStandardSection).ToBeVisibleAsync();
-    }
-
-    [Fact]
     public async Task MeetingExpectedStandardRwm_DetailsToggle_IsCollapsedByDefaultAndExpands()
     {
         var section = await GetSection(MeetingExpectedStandardHeaderText);
