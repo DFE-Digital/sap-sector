@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -17,7 +19,8 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SimilarSchoolsComparisonController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase)
+    IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase,
+    IUseCase<GetSchoolKs2PerformanceComparisonRequest, GetSchoolKs2PerformanceComparisonResponse> getSchoolKs2PerformanceComparisonUseCase)
     : Controller
 {
     [HttpGet]
@@ -28,7 +31,7 @@ public class SimilarSchoolsComparisonController(
     [Route("Similarity")]
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
     {
-        var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
         ViewData["ComparisonSchool"] = model;
         return View("Similarity", model);
     }
@@ -37,7 +40,17 @@ public class SimilarSchoolsComparisonController(
     [Route("ks2")]
     public async Task<IActionResult> Ks2(string urn, string similarSchoolUrn)
     {
-        var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        var (model, currentSchool, similarSchool) = await BuildBaseModelAsync(urn, similarSchoolUrn);
+
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var comparisonResponse = await getSchoolKs2PerformanceComparisonUseCase.Execute(
+            new GetSchoolKs2PerformanceComparisonRequest(urn, similarSchoolUrn, filters));
+
+        model.MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(
+            comparisonResponse.MeetingExpectedStandardRwm, currentSchool, similarSchool);
+        model.AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(
+            comparisonResponse.AchievedHigherStandardRwm, currentSchool, similarSchool);
+
         ViewData["ComparisonSchool"] = model;
         return View(model);
     }
@@ -46,7 +59,7 @@ public class SimilarSchoolsComparisonController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
-        var model = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
         ViewData["ComparisonSchool"] = model;
         return View(model);
     }
@@ -83,17 +96,20 @@ public class SimilarSchoolsComparisonController(
         return View("~/Views/Shared/SimilarSchoolsComparison/SchoolDetails.cshtml", schoolDetailsModel);
     }
 
-    private async Task<PrimarySimilarSchoolsComparisonViewModel> BuildBaseModelAsync(string urn, string similarSchoolUrn)
+    private async Task<(PrimarySimilarSchoolsComparisonViewModel Model, SchoolInfo CurrentSchool, SchoolInfo SimilarSchool)>
+        BuildBaseModelAsync(string urn, string similarSchoolUrn)
     {
         var currentSchool = (await getSchoolInfoUseCase.Execute(new GetSchoolInfoRequest(urn))).School;
         var similarSchool = (await getSchoolInfoUseCase.Execute(new GetSchoolInfoRequest(similarSchoolUrn))).School;
 
-        return new PrimarySimilarSchoolsComparisonViewModel
+        var model = new PrimarySimilarSchoolsComparisonViewModel
         {
             Urn = urn,
             SimilarSchoolUrn = similarSchoolUrn,
             Name = currentSchool.Name,
             SimilarSchoolName = similarSchool.Name
         };
+
+        return (model, currentSchool, similarSchool);
     }
 }
