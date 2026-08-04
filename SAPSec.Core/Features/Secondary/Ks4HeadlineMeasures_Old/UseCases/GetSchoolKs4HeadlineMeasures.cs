@@ -3,7 +3,7 @@ using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+namespace SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 
 public class GetSchoolKs4HeadlineMeasures(
     IKs4PerformanceRepository performanceRepository,
@@ -160,7 +160,7 @@ public class GetSchoolKs4HeadlineMeasures(
     }
 
     private static GetKs4HeadlineMeasuresResponse BuildSchoolResponse(
-        Model.SchoolDetails schoolDetails,
+        SchoolDetails schoolDetails,
         Ks4PerformanceData? performance,
         Ks4DestinationsData? destinations) =>
         new(
@@ -336,7 +336,7 @@ public class GetSchoolKs4HeadlineMeasures(
     }
 
     private static IReadOnlyList<Ks4TopPerformer> BuildTopPerformers(
-        Model.SchoolDetails currentSchool,
+        SchoolDetails currentSchool,
         decimal? currentSchoolValue,
         IEnumerable<SimilarSchoolMeasure> similarSchoolResponses,
         Func<SimilarSchoolMeasure, decimal?> selector,
@@ -481,7 +481,7 @@ public record SchoolKs4EngMathsSelection(
 }
 
 public record GetSchoolKs4HeadlineMeasuresResponse(
-    Model.SchoolDetails SchoolDetails,
+    SchoolDetails SchoolDetails,
     int SimilarSchoolsCount,
     SchoolKs4ComparisonAverage Attainment8ThreeYearAverage,
     IReadOnlyList<Ks4TopPerformer> Attainment8TopPerformers,

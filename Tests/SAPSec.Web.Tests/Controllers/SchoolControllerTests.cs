@@ -4,8 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Secondary;
 using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -61,6 +62,11 @@ public class SchoolControllerTests
             _schoolDetailsServiceMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
+        var getSchoolKs4HeadlineMeasuresUseCase = new GetSchoolKs4HeadlineMeasuresUseCase(
+            _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object,
+            _ks4PerformanceRepositoryMock.Object,
+            _ks4DestinationsRepositoryMock.Object);
         var getSchoolKs4CoreSubjects = new GetSchoolKs4CoreSubjects(
             _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object,
@@ -74,6 +80,7 @@ public class SchoolControllerTests
 
         _sut = new SchoolController(
             getSchoolKs4HeadlineMeasures,
+            getSchoolKs4HeadlineMeasuresUseCase,
             getSchoolKs4CoreSubjects,
             getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,

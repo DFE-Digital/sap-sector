@@ -8,7 +8,7 @@
 @{
     var chartData = new
     {
-        labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
+        labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatYearByYear(Model.MeasureInfo.Year),
         datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
             new {
                 label = x.First,

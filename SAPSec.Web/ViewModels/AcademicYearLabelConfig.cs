@@ -10,4 +10,11 @@ public static class AcademicYearLabelConfig
     public static string CurrentKs4 => YearByYear[^1];
     public static string CurrentAttendance => AttendanceYearByYear[^1];
     public static string CurrentDestinations => DestinationsYearByYear[^1];
+
+    public static string FormatAcademicYear(int year) => $"{year} to {year + 1}";
+    public static string[] FormatYearByYear(int year) => [
+        FormatAcademicYear(year - 2),
+        FormatAcademicYear(year - 1),
+        FormatAcademicYear(year)
+    ];
 }

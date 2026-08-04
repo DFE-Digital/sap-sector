@@ -8,15 +8,21 @@ namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
 public class GetSimilarSchoolDetailsTests
 {
-    private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo = new();
-    private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
-    private readonly InMemoryKs4PerformanceRepository _performanceRepo = new();
-    private readonly InMemoryAbsenceRepository _absenceRepo = new();
-    private readonly Mock<ISchoolDetailsService> _schoolDetailsService = new Mock<ISchoolDetailsService>();
+    private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
+    private readonly InMemoryEstablishmentRepository _establishmentRepo;
+    private readonly InMemoryKs4PerformanceRepository _performanceRepo;
+    private readonly InMemoryAbsenceRepository _absenceRepo;
+    private readonly Mock<ISchoolDetailsService> _schoolDetailsService;
     private readonly GetSimilarSchoolDetails _sut;
 
     public GetSimilarSchoolDetailsTests()
     {
+        _establishmentRepo = new();
+        _similarSchoolsRepo = new();
+        _performanceRepo = new(_establishmentRepo);
+        _absenceRepo = new();
+        _schoolDetailsService = new Mock<ISchoolDetailsService>();
+
         _sut = new GetSimilarSchoolDetails(
             _establishmentRepo,
             _similarSchoolsRepo,
