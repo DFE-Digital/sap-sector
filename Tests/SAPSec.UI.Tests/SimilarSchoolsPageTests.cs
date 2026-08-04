@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Microsoft.Playwright;
-using SAPSec.Web.Constants;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
