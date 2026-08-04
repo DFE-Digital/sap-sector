@@ -245,4 +245,42 @@ public class SimilarSchoolsComparisonIntegrationTests(
             ["Test School 2", .. similarSchool],
             ["Schools in England average", .. england]);
     }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_MeasureExistsOnPage()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
+        heading.TrimmedTextContent().Should().Be("Average scaled score in reading");
+
+        var details = page.QuerySelectorAll("details.govuk-details")
+            .FirstOrDefault(d => d.QuerySelector(".govuk-details__summary-text")?.TrimmedTextContent()
+                == "Information about average scaled score in reading");
+        details.Should().NotBeNull();
+        details!.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "99.4", "100.4", "101.4"],
+            ["Test School 2", "101.2", "102.2", "103.2"],
+            ["Schools in England average", "105.8", "106.6", "107.4"]);
+    }
 }

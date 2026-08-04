@@ -50,6 +50,8 @@ public class SimilarSchoolsComparisonController(
             comparisonResponse.MeetingExpectedStandardRwm, currentSchool, similarSchool);
         model.AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(
             comparisonResponse.AchievedHigherStandardRwm, currentSchool, similarSchool);
+        model.AverageScaledScoreReading = MeasureViewModel.FromMeasure(
+            comparisonResponse.AverageScaledScoreReading, currentSchool, similarSchool);
 
         ViewData["ComparisonSchool"] = model;
         return View(model);

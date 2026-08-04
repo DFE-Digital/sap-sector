@@ -257,6 +257,65 @@ public class GetSchoolKs2PerformanceComparisonUseCaseTests
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_ShouldContainExpectedMeasureSeries()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001", "100002"));
+
+        var seriesTypes = response.AverageScaledScoreReading.Series.Select(s => s.SeriesType);
+
+        seriesTypes.Should().BeEquivalentTo([
+            MeasureSeriesType.CurrentSchool,
+            MeasureSeriesType.SimilarSchool,
+            MeasureSeriesType.EnglandSchoolsAverage
+        ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_ContainsYearByYearValuesForCurrentAndSimilarSchool()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
+
+        var response = await _sut.Execute(Request("100001", "100002"));
+        var series = response.AverageScaledScoreReading.Series;
+
+        series.Should().BeEquivalentTo([
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, 101.4m, 100.4m, 99.4m),
+            new MeasureSeries(MeasureSeriesType.SimilarSchool, 103.2m, 102.2m, 101.2m),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, 107.4m, 106.6m, 105.8m)
+        ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_WhenNoPerformanceDataForSimilarSchool_ContainsNullValues()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")));
+
+        var response = await _sut.Execute(Request("100001", "100002"));
+        var series = response.AverageScaledScoreReading.Series
+            .First(s => s.SeriesType == MeasureSeriesType.SimilarSchool);
+
+        series.Should().Be(new MeasureSeries(MeasureSeriesType.SimilarSchool, null, null, null));
+    }
+
+    [Fact]
     public async Task FilterBy_ForOneMeasure_DoesNotAffectTheOther()
     {
         _establishmentRepo.SetupEstablishments(

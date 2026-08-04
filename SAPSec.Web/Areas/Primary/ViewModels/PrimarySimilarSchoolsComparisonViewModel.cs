@@ -10,4 +10,5 @@ public class PrimarySimilarSchoolsComparisonViewModel
     public required string SimilarSchoolName { get; set; }
     public MeasureViewModel? MeetingExpectedStandardRwm { get; set; }
     public MeasureViewModel? AchievedHigherStandardRwm { get; set; }
+    public MeasureViewModel? AverageScaledScoreReading { get; set; }
 }

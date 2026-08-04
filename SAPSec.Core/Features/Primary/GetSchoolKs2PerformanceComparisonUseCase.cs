@@ -32,6 +32,11 @@ public class GetSchoolKs2PerformanceComparisonUseCase(
                 currentSchoolData,
                 similarSchoolData,
                 [],
+                filterBy),
+            Ks2PerformanceMeasures.AverageScaledScoreReading.ForSchoolComparison(
+                currentSchoolData,
+                similarSchoolData,
+                [],
                 filterBy));
     }
 }
@@ -43,4 +48,5 @@ public record GetSchoolKs2PerformanceComparisonRequest(
 
 public record GetSchoolKs2PerformanceComparisonResponse(
     Measure MeetingExpectedStandardRwm,
-    Measure AchievedHigherStandardRwm);
+    Measure AchievedHigherStandardRwm,
+    Measure AverageScaledScoreReading);

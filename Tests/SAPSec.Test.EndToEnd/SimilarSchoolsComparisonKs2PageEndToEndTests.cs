@@ -14,6 +14,7 @@ public class SimilarSchoolsComparisonKs2PageEndToEndTests(EndToEndTestsFixture f
 {
     private const string MeetingExpectedStandardHeaderText = "Meeting expected standard in reading, writing and maths";
     private const string AchievedHigherStandardHeaderText = "Achieved a higher standard in reading, writing and maths";
+    private const string ReadingScaledScoreHeaderText = "Average scaled score in reading";
 
     private const string Urn = "101206";
     private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool(Urn);
@@ -133,6 +134,49 @@ public class SimilarSchoolsComparisonKs2PageEndToEndTests(EndToEndTestsFixture f
     public async Task AchievedHigherStandardRwm_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(AchievedHigherStandardHeaderText);
+
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+
+        await Expect(currentYearHeader).ToBeVisibleAsync();
+        await Expect(yearByYearHeader).ToBeHiddenAsync();
+
+        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
+
+        await Expect(currentYearHeader).ToBeHiddenAsync();
+        await Expect(yearByYearHeader).ToBeVisibleAsync();
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_DetailsToggle_IsCollapsedByDefaultAndExpands()
+    {
+        var section = await GetSection(ReadingScaledScoreHeaderText);
+        var details = section.Locator(".app-measure-details");
+
+        await Expect(details).Not.ToHaveAttributeAsync("open", "");
+        await details.Locator("summary").ClickAsync();
+        await Expect(details).ToHaveAttributeAsync("open", "");
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_ViewTableView()
+    {
+        var section = await GetSection(ReadingScaledScoreHeaderText);
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+
+        var table = section.GetByRole(AriaRole.Table);
+        await Expect(table).ToBeVisibleAsync();
+
+        var schools = await table.GetTableColumnAsync("School(s)");
+        await Expect(schools).ToHaveCountAsync(3);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_ToggleBetweenYearByYearAndCurrentYearView()
+    {
+        var section = await GetSection(ReadingScaledScoreHeaderText);
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
