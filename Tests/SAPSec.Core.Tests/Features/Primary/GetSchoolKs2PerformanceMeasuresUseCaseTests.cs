@@ -1932,6 +1932,32 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task AchievedHigherStandardGps_TopPerfomers_WhenDisplayedValuesTie_SortsAlphabetically()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Thoresby Primary School", x => x.Primary()),
+            Build.Establishment("100003", "Manor Park Primary Academy", x => x.Primary()),
+            Build.Establishment("100004", "Montem Academy", x => x.Primary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "96.6", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsHigher(current: "96.5", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsHigher(current: "91.4", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.AchievedHigherStandardGps.TopPerformers.Should().Equal(
+            new TopPerformer(1, "100003", "Manor Park Primary Academy", 96.5m, IsCurrentSchool: false),
+            new TopPerformer(2, "100002", "Thoresby Primary School", 96.6m, IsCurrentSchool: false),
+            new TopPerformer(3, "100004", "Montem Academy", 91.4m, IsCurrentSchool: false));
+    }
+
+    [Fact]
     public async Task AverageScaledScoreReading_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(

@@ -893,9 +893,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()),
-            Build.Establishment("100003", "Test School 3", x => x.Primary()),
-            Build.Establishment("100004", "Test School 4", x => x.Primary()),
+            Build.Establishment("100002", "Thoresby Primary School", x => x.Primary()),
+            Build.Establishment("100003", "Manor Park Primary Academy", x => x.Primary()),
+            Build.Establishment("100004", "Montem Academy", x => x.Primary()),
             Build.Establishment("100005", "Test School 5", x => x.Primary()));
 
         Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
@@ -903,9 +903,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18", prev: "17", prev2: "16")),
-            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "24", prev: "23", prev2: "22")),
-            Build.Ks2Performance.Establishment("100003", x => x.WithGpsHigher(current: "24", prev: "22", prev2: "21")),
-            Build.Ks2Performance.Establishment("100004", x => x.WithGpsHigher(current: "23", prev: "21", prev2: "20")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "96.6", prev: "23", prev2: "22")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithGpsHigher(current: "96.5", prev: "22", prev2: "21")),
+            Build.Ks2Performance.Establishment("100004", x => x.WithGpsHigher(current: "91.4", prev: "21", prev2: "20")),
             Build.Ks2Performance.Establishment("100005", x => x.WithGpsHigher(current: "19", prev: "18", prev2: "17")));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
@@ -914,9 +914,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["Rank", "School", "2024 to 2025"],
-            ["1", "Test School 2", "24%"],
-            ["2", "Test School 3", "24%"],
-            ["3", "Test School 4", "23%"]);
+            ["1", "Manor Park Primary Academy", "97%"],
+            ["2", "Thoresby Primary School", "97%"],
+            ["3", "Montem Academy", "91%"]);
     }
 
     [Fact]
