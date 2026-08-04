@@ -1,0 +1,413 @@
+@using System.Text.Json
+@model SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "KS4 headline performance measures";
+    var ks4YearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear;
+    var ks4CurrentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4;
+    var destinationsYearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.DestinationsYearByYear;
+    var destinationsCurrentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentDestinations;
+    var labels = new[] { Model.SchoolLabel, Model.SimilarSchoolsLabel, Model.LocalAuthorityLabel, Model.EnglandLabel };
+    bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
+
+    var attainmentRows = new[]
+    {
+        (Model.SchoolLabel, Model.SchoolAttainment8YearByYear, Model.SchoolAttainment8Display),
+        (Model.SimilarSchoolsLabel, Model.SimilarSchoolsAttainment8YearByYear, Model.SimilarSchoolsAttainment8Display),
+        (Model.LocalAuthorityLabel, Model.LocalAuthorityAttainment8YearByYear, Model.LocalAuthorityAttainment8Display),
+        (Model.EnglandLabel, Model.EnglandAttainment8YearByYear, Model.EnglandAttainment8Display)
+    };
+
+    var engMathsRows = new[]
+    {
+        (Key: "this", Label: Model.SchoolLabel, Series: Model.SchoolEngMathsYearByYear, Display: Model.SchoolEngMathsDisplay),
+        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.SimilarSchoolsEngMathsYearByYear, Display: Model.SimilarSchoolsEngMathsDisplay),
+        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.LocalAuthorityEngMathsYearByYear, Display: Model.LocalAuthorityEngMathsDisplay),
+        (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandEngMathsYearByYear, Display: Model.EnglandEngMathsDisplay)
+    };
+
+    var destinationsRows = new[]
+    {
+        (Key: "this", Label: Model.SchoolLabel, Series: Model.SchoolDestinationsYearByYear, Display: Model.SchoolDestinationsDisplay),
+        (Key: "similar", Label: Model.SimilarSchoolsLabel, Series: Model.SimilarSchoolsDestinationsYearByYear, Display: Model.SimilarSchoolsDestinationsDisplay),
+        (Key: "la", Label: Model.LocalAuthorityLabel, Series: Model.LocalAuthorityDestinationsYearByYear, Display: Model.LocalAuthorityDestinationsDisplay),
+        (Key: "england", Label: Model.EnglandLabel, Series: Model.EnglandDestinationsYearByYear, Display: Model.EnglandDestinationsDisplay)
+    };
+
+    string SimilarSchoolsUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).ViewSimilarSchools;
+    string SimilarSchoolComparisonUrl(string similarSchoolUrn) => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).Comparison(similarSchoolUrn).Overview;
+    string WhatIsSimilarSchoolUrl() => SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).WhatIsASimilarSchool;
+}
+<div class="app-school-page">
+<span class="govuk-caption-xl">@Model.SchoolDetails.Name</span>
+<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+<p class="govuk-body">
+    Compare this school's KS4 headline performance measures with:
+</p>
+
+<ul class="govuk-list govuk-list--bullet">
+    <li><b>50</b> similar secondary phase schools (including all-throughs)</li>
+    <li>the local authority average</li>
+    <li>the national average</li>
+</ul>
+
+<p class="govuk-body">
+    Find out <a href="@WhatIsSimilarSchoolUrl()" class="govuk-link">how DfE defines what a similar school is</a>.
+</p>
+
+<partial name="~/Views/Shared/_Ks4Progress8Info.cshtml" />
+
+<section aria-labelledby="attainment8-heading" class="app-measure-section">
+    <h2 class="govuk-heading-m" id="attainment8-heading" data-testid="attainment8-heading">Attainment 8</h2>
+
+    <partial name="~/Views/Shared/_Ks4Attainment8Intro.cshtml" />
+    
+    <div class="govuk-tabs app-measure-tabs" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#charts">Charts</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#top-performers">Top performers</a></li>
+        </ul>
+
+        <div class="govuk-tabs__panel" id="charts">
+            <content-toggle>
+                <toggle-content id="three-year-average" name="@ks4CurrentYear" active="true">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        @{
+                            var attainmentBarData = new decimal?[] { Model.SchoolAttainment8YearByYear.Current, Model.SimilarSchoolsAttainment8YearByYear.Current, Model.LocalAuthorityAttainment8YearByYear.Current, Model.EnglandAttainment8YearByYear.Current };
+                        }
+                        @if (HasAnyData(attainmentBarData))
+                        {
+                            <canvas id="ks4-attainment8-school-chart"
+                                    class="js-chart js-chart--school-measure-bar"
+                                    data-type="bar"
+                                    data-show-no-data-labels="true"
+                                    data-axis-step="30"
+                                    data-axis-max="90"
+                                    data-label-decimals="1"
+                                    data-bar-thickness="50"
+                                    data-category-percentage="0.6"
+                                    data-bar-percentage="1"
+                                    data-axis-suffix=""
+                                    data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = attainmentBarData }))'>
+                            </canvas>
+                        }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="year-by-year" name="Year by year">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        <canvas id="ks4-attainment8-school-yearbyyear-chart"
+                                class="js-chart js-chart--school-measure-line"
+                                data-type="line"
+                                data-axis-min="0"
+                                data-axis-step="30"
+                                data-axis-max="90"
+                                data-axis-auto-skip="false"
+                                data-axis-suffix=""
+                                data-tooltip-decimals="1"
+                                data-show-x-grid="true"
+                                data-show-legend="true"
+                                data-show-datalabels="false"
+                                data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolAttainment8YearByYear.Previous2, Model.SchoolAttainment8YearByYear.Previous, Model.SchoolAttainment8YearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsAttainment8YearByYear.Previous2, Model.SimilarSchoolsAttainment8YearByYear.Previous, Model.SimilarSchoolsAttainment8YearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityAttainment8YearByYear.Previous2, Model.LocalAuthorityAttainment8YearByYear.Previous, Model.LocalAuthorityAttainment8YearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandAttainment8YearByYear.Previous2, Model.EnglandAttainment8YearByYear.Previous, Model.EnglandAttainment8YearByYear.Current } } } }))'>
+                        </canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4CurrentYear</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.Attainment8TopPerformers)
+                    {
+                        <tr class="govuk-table__row">
+                            <td class="govuk-table__cell">@row.Rank</td>
+                            <th scope="row" class="govuk-table__header">
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+        </div>
+
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in attainmentRows)
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">@row.Item1</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayValue(row.Item2.Current)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section aria-labelledby="eng-maths-heading" class="app-measure-section">
+    <h2 class="govuk-heading-m" id="eng-maths-heading">Grade achieved in English and maths GCSEs</h2>
+    <div class="app-measure-filter-row">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="engMathsGrade">Grade</label>
+            <select class="govuk-select"
+                    id="engMathsGrade"
+                    name="engMathsGrade"
+                    data-view-switcher="true"
+                    data-endpoint="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4HeadlineMeasuresData"
+                    data-query-key="grade"
+                    data-bar-chart-id="eng-maths-school-chart"
+                    data-line-chart-id="eng-maths-school-yearbyyear-chart"
+                    data-cell-attribute="data-eng-maths-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
+                    data-top-performers-table-id="eng-maths-top-performers-table"
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
+                <option value="4" selected>Grade 4 and above</option>
+                <option value="5">Grade 5 and above</option>
+            </select>
+        </div>
+    </div>
+    <div class="app-measure-tabs govuk-tabs" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#eng-maths-charts">Charts</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#eng-maths-top-performers">Top performers</a></li>
+        </ul>
+        <div class="govuk-tabs__panel" id="eng-maths-charts">
+            <content-toggle>
+                <toggle-content id="eng-maths-three-year-average" name="@ks4CurrentYear" active="true">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        @{
+                            var engMathsBarData = new decimal?[] { Model.SchoolEngMathsYearByYear.Current, Model.SimilarSchoolsEngMathsYearByYear.Current, Model.LocalAuthorityEngMathsYearByYear.Current, Model.EnglandEngMathsYearByYear.Current };
+                        }
+                        @if (HasAnyData(engMathsBarData))
+                        {
+                            <canvas id="eng-maths-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = engMathsBarData }))'></canvas>
+                        }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="eng-maths-year-by-year" name="Year by year">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        <canvas id="eng-maths-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = ks4YearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolEngMathsYearByYear.Previous2, Model.SchoolEngMathsYearByYear.Previous, Model.SchoolEngMathsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsEngMathsYearByYear.Previous2, Model.SimilarSchoolsEngMathsYearByYear.Previous, Model.SimilarSchoolsEngMathsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityEngMathsYearByYear.Previous2, Model.LocalAuthorityEngMathsYearByYear.Previous, Model.LocalAuthorityEngMathsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandEngMathsYearByYear.Previous2, Model.EnglandEngMathsYearByYear.Previous, Model.EnglandEngMathsYearByYear.Current } } } }))'></canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table" id="eng-maths-top-performers-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4CurrentYear</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.EngMathsTopPerformers)
+                    {
+                        <tr class="govuk-table__row" data-top-performer-row="eng-maths">
+                            <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="eng-maths-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@ks4YearLabels[2]</th></tr></thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in engMathsRows)
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">@row.Label</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-eng-maths-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Current)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<section aria-labelledby="destinations-heading" class="app-measure-section">
+    <h2 class="govuk-heading-m" id="destinations-heading">Staying in education or entering employment</h2>
+    <details class="govuk-details app-measure-details" data-module="govuk-details">
+        <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Information about staying in education or entering employment data</span>
+        </summary>
+        <div class="govuk-details__text">
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                This data shows the number of pupils who either stayed in education, started an apprenticeship, or entered employment for at least 2 terms after completing KS4.
+            </p>
+            <p class="govuk-body-s govuk-!-margin-bottom-2">
+                The most recent data covers pupils who finished year 11 in 2023. Results are shown for @destinationsCurrentYear.
+            </p>
+        </div>
+    </details>
+    <div class="app-measure-filter-row">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-!-font-weight-bold" for="destinationsType">Destination</label>
+            <select class="govuk-select"
+                    id="destinationsType"
+                    name="destinationsType"
+                    data-view-switcher="true"
+                    data-endpoint="@SAPSec.Web.Constants.Routes.SecondarySchool(Model.SchoolDetails.Urn).KS4DestinationsData"
+                    data-query-key="destination"
+                    data-bar-chart-id="destinations-school-chart"
+                    data-line-chart-id="destinations-school-yearbyyear-chart"
+                    data-cell-attribute="data-destinations-cell"
+                    data-cell-prefixes='{"thisSchool":"this","similarSchools":"similar","localAuthority":"la","england":"england"}'
+                    data-series-keys='["thisSchool","similarSchools","localAuthority","england"]'
+                    data-top-performers-table-id="destinations-top-performers-table"
+                    data-top-performer-base-url="@SimilarSchoolsUrl()">
+                <option value="all" selected>All destinations</option>
+                <option value="education">Education</option>
+                <option value="employment">Employment and apprenticeships</option>
+            </select>
+        </div>
+    </div>
+    <div class="app-measure-tabs govuk-tabs" data-module="govuk-tabs">
+        <ul class="govuk-tabs__list">
+            <li class="govuk-tabs__list-item govuk-tabs__list-item--selected"><a class="govuk-tabs__tab" href="#destinations-charts">Charts</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-table-view">Table</a></li>
+            <li class="govuk-tabs__list-item"><a class="govuk-tabs__tab" href="#destinations-top-performers">Top performers</a></li>
+        </ul>
+        <div class="govuk-tabs__panel" id="destinations-charts">
+            <content-toggle>
+                <toggle-content id="destinations-three-year-average" name="@destinationsCurrentYear" active="true">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        @{
+                            var destinationsBarData = new decimal?[] { Model.SchoolDestinationsYearByYear.Current, Model.SimilarSchoolsDestinationsYearByYear.Current, Model.LocalAuthorityDestinationsYearByYear.Current, Model.EnglandDestinationsYearByYear.Current };
+                        }
+                        @if (HasAnyData(destinationsBarData))
+                        {
+                            <canvas id="destinations-school-chart" class="js-chart js-chart--school-measure-bar" data-type="bar" data-show-no-data-labels="true" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-label-decimals="0" data-bar-thickness="50" data-category-percentage="0.6" data-bar-percentage="1" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels, data = destinationsBarData }))'></canvas>
+                        }
+                        else
+                        {
+                            <p class="govuk-body">No available data</p>
+                        }
+                    </div>
+                </toggle-content>
+                <toggle-content id="destinations-year-by-year" name="Year by year">
+                    <div class="app-measure-chart-container app-measure-chart-container--school-headline">
+                        <canvas id="destinations-school-yearbyyear-chart" class="js-chart js-chart--school-measure-line" data-type="line" data-axis-step="25" data-axis-max="100" data-axis-suffix="%" data-tooltip-decimals="0" data-show-legend="true" data-show-datalabels="false" data-show-x-grid="true" data-chart='@Html.Raw(JsonSerializer.Serialize(new { labels = destinationsYearLabels, datasets = new object[] { new { label = Model.SchoolLabel, data = new decimal?[] { Model.SchoolDestinationsYearByYear.Previous2, Model.SchoolDestinationsYearByYear.Previous, Model.SchoolDestinationsYearByYear.Current } }, new { label = Model.SimilarSchoolsLabel, data = new decimal?[] { Model.SimilarSchoolsDestinationsYearByYear.Previous2, Model.SimilarSchoolsDestinationsYearByYear.Previous, Model.SimilarSchoolsDestinationsYearByYear.Current } }, new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.LocalAuthorityDestinationsYearByYear.Previous2, Model.LocalAuthorityDestinationsYearByYear.Previous, Model.LocalAuthorityDestinationsYearByYear.Current } }, new { label = Model.EnglandLabel, data = new decimal?[] { Model.EnglandDestinationsYearByYear.Previous2, Model.EnglandDestinationsYearByYear.Previous, Model.EnglandDestinationsYearByYear.Current } } } }))'></canvas>
+                    </div>
+                </toggle-content>
+            </content-toggle>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-top-performers">
+            <p class="govuk-body">These are the top performing similar schools for this measure.</p>
+            <table class="govuk-table" id="destinations-top-performers-table">
+                <thead class="govuk-table__head">
+                    <tr class="govuk-table__row">
+                        <th scope="col" class="govuk-table__header">Rank</th>
+                        <th scope="col" class="govuk-table__header">School</th>
+                        <th scope="col" class="govuk-table__header govuk-table__header--numeric">@destinationsCurrentYear</th>
+                    </tr>
+                </thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in Model.DestinationsTopPerformers)
+                    {
+                        <tr class="govuk-table__row" data-top-performer-row="destinations">
+                            <td class="govuk-table__cell" data-top-performer-rank>@row.Rank</td>
+                            <th scope="row" class="govuk-table__header" data-top-performer-name>
+                                @if (row.IsCurrentSchool)
+                                {
+                                    @row.Name
+                                }
+                                else
+                                {
+                                    <a href="@SimilarSchoolComparisonUrl(row.Urn)" class="govuk-link">@row.Name</a>
+                                }
+                            </th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-top-performer-value>@row.DisplayValue</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <p class="govuk-body govuk-!-margin-bottom-1"><a href="@SimilarSchoolsUrl()" class="govuk-link">See all similar schools</a></p>
+        </div>
+        <div class="govuk-tabs__panel govuk-tabs__panel--hidden" id="destinations-table-view">
+            <table class="govuk-table">
+                <thead class="govuk-table__head"><tr class="govuk-table__row"><th scope="col" class="govuk-table__header">School(s)</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@destinationsYearLabels[0]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@destinationsYearLabels[1]</th><th scope="col" class="govuk-table__header govuk-table__header--numeric">@destinationsYearLabels[2]</th></tr></thead>
+                <tbody class="govuk-table__body">
+                    @foreach (var row in destinationsRows)
+                    {
+                        <tr class="govuk-table__row">
+                            <th scope="row" class="govuk-table__header">@row.Label</th>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="@($"{row.Key}-prev2")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous2)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="@($"{row.Key}-prev")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Previous)</td>
+                            <td class="govuk-table__cell govuk-table__cell--numeric" data-destinations-cell="@($"{row.Key}-current")">@SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(row.Series.Current)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+</div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+    <script src="~/js/data-view-switcher.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/content-toggle.js" asp-append-version="true" add-nonce="true"></script>
+}

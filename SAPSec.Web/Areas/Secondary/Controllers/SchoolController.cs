@@ -1,13 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 using System.Globalization;
 using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
 
@@ -24,6 +27,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 public class SchoolController : Controller
 {
     private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
+    private readonly IUseCase<SAPSec.Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresRequest, SAPSec.Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresResponse> _getSchoolKs4HeadlineMeasuresUseCase;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
     private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
@@ -33,6 +37,7 @@ public class SchoolController : Controller
 
     public SchoolController(
         GetSchoolKs4HeadlineMeasures getSchoolKs4HeadlineMeasures,
+        IUseCase<SAPSec.Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresRequest, SAPSec.Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
         GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetAttendanceMeasures getAttendanceMeasures,
@@ -41,6 +46,7 @@ public class SchoolController : Controller
         ILogger<SchoolController> logger)
     {
         _getSchoolKs4HeadlineMeasures = getSchoolKs4HeadlineMeasures;
+        _getSchoolKs4HeadlineMeasuresUseCase = getSchoolKs4HeadlineMeasuresUseCase;
         _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects;
         _getFilteredSchoolKs4CoreSubject = getFilteredSchoolKs4CoreSubject;
         _getAttendanceMeasures = getAttendanceMeasures;
@@ -176,6 +182,29 @@ public class SchoolController : Controller
     [Route("ks4-headline-measures")]
     public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
     {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await _getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
+
+        PopulateViewData(response.School);
+
+        Func<string, string> viewSimilarSchools = urn => Routes.SecondarySchool(urn).ViewSimilarSchools;
+        Func<string, string, string> similarSchoolComparison = (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn);
+
+        var model = new ViewModels.Ks4HeadlineMeasuresPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Attainment8 = MeasureViewModel.FromMeasure(response.Attainment8, response.School, null, viewSimilarSchools, similarSchoolComparison),
+            EnglishMaths = MeasureViewModel.FromMeasure(response.EnglishMaths, response.School, null, viewSimilarSchools, similarSchoolComparison),
+            Destinations = MeasureViewModel.FromMeasure(response.Destinations, response.School, null, viewSimilarSchools, similarSchoolComparison)
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    [Route("ks4-headline-measures-old")]
+    public async Task<IActionResult> Ks4HeadlineMeasures_Old(string urn)
+    {
         var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(response.SchoolDetails);
@@ -184,7 +213,7 @@ public class SchoolController : Controller
     }
 
     [HttpGet]
-    [Route("ks4-headline-measures/data")]
+    [Route("ks4-headline-measures-old/data")]
     public async Task<IActionResult> Ks4HeadlineMeasuresData(string urn, string grade = "4")
     {
         var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
@@ -394,6 +423,16 @@ public class SchoolController : Controller
                     DisplayValue = Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value)
                 })
         });
+    }
+
+    private void PopulateViewData(SchoolInfo currentSchool)
+    {
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
+            Url,
+            currentSchool.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
     }
 
     private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)

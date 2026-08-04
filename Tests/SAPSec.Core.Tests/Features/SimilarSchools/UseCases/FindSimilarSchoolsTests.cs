@@ -6,14 +6,19 @@ namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
 public class FindSimilarSchoolsTests
 {
-    private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo = new();
-    private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
-    private readonly InMemoryKs4PerformanceRepository _performanceRepo = new();
-    private readonly InMemoryAbsenceRepository _absenceRepo = new();
+    private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
+    private readonly InMemoryEstablishmentRepository _establishmentRepo;
+    private readonly InMemoryKs4PerformanceRepository _performanceRepo;
+    private readonly InMemoryAbsenceRepository _absenceRepo;
     private readonly FindSimilarSchools _sut;
 
     public FindSimilarSchoolsTests()
     {
+        _establishmentRepo = new();
+        _similarSchoolsRepo = new();
+        _performanceRepo = new(_establishmentRepo);
+        _absenceRepo = new();
+
         _sut = new FindSimilarSchools(
             _establishmentRepo,
             _similarSchoolsRepo,
@@ -1583,7 +1588,7 @@ public class FindSimilarSchoolsTests
     [InlineData("gs", new[] { "M" }, new[] { "100003" })]
     [InlineData("gs", new[] { "MS" }, new[] { "100004", "100005", "100006" })]
     [InlineData("gs", new[] { "N" }, new[] { "100007" })]
-    [InlineData("gs", new[] { "S", "M" , "MS", "N" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007" })] 
+    [InlineData("gs", new[] { "S", "M", "MS", "N" }, new[] { "100002", "100003", "100004", "100005", "100006", "100007" })]
     // Filter key is case insensitive
     [InlineData("GS", new[] { "S", "M" }, new[] { "100002", "100003" })]
     // Filter values are case insensitive
@@ -1603,8 +1608,8 @@ public class FindSimilarSchoolsTests
             new() { URN = "100002", TrustSchoolFlagId = "5" },
             new() { URN = "100003", TrustSchoolFlagId = "3" },
             new() { URN = "100004", TrustSchoolFlagId = "1" },
-            new() { URN = "100005", TrustSchoolFlagId = "2", EstablishmentTypeGroupId = "2"},
-            new() { URN = "100006", TrustSchoolFlagId = "0", EstablishmentTypeGroupId = "4"},
+            new() { URN = "100005", TrustSchoolFlagId = "2", EstablishmentTypeGroupId = "2" },
+            new() { URN = "100006", TrustSchoolFlagId = "0", EstablishmentTypeGroupId = "4" },
             new() { URN = "100007", TrustSchoolFlagId = "0", EstablishmentTypeGroupId = "3" }
 
         );
@@ -1734,7 +1739,7 @@ public class FindSimilarSchoolsTests
         );
 
         var response = await _sut.Execute(Request("100001"));
- 
+
         response.FilterOptions.Select(f => f.Key)
             // Numeric range filters are always included
             .Should().Equal("sciu", "oar", "par");

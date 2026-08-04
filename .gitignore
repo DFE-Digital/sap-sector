@@ -509,3 +509,9 @@ wwwroot/**/*.min.js
 
 # Copilot files
 .github/copilot-instructions.md
+
+SAPData/DataMap/SourceFiles
+SAPData/DataMap/CleanedFiles
+SAPData/Sql
+!SAPData/Sql/00_cleanup.sql
+!SAPData/Sql/run_all.sql
