@@ -7,9 +7,7 @@
 @{
     var chartData = new
     {
-        labels = Model.MeasureInfo.DataType is MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage
-            ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
-            : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
+        labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatYearByYear(Model.MeasureInfo.Year),
         datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
             new {
                 label = x.First,

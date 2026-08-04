@@ -55,7 +55,7 @@ public static class Routes
 
         public string Overview => BasePath;
         public string KS4HeadlineMeasures => $"{BasePath}/ks4-headline-measures";
-        public string KS4HeadlineMeasuresData => $"{KS4HeadlineMeasures}/data";
+        public string KS4HeadlineMeasuresData => $"{KS4HeadlineMeasures}-old/data";
         public string KS4CoreSubjects => $"{BasePath}/ks4-core-subjects";
         public string KS4CoreSubjectsData => $"{KS4CoreSubjects}/data";
         public string Attendance => $"{BasePath}/attendance";

@@ -1,6 +1,5 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.ViewModels.Measures;
 
@@ -33,13 +32,16 @@ public record MeasureViewModel(
     public static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
-        SchoolInfo? similarSchool = null)
+        SchoolInfo? similarSchool,
+        Func<string, string>? viewSimilarSchoolsUrl,
+        Func<string, string, string>? similarSchoolComparisonUrl)
     {
         var isComparison = similarSchool is not null;
 
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
             measure.Name,
+            measure.Year,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
             measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
@@ -67,21 +69,22 @@ public record MeasureViewModel(
             measureInfo,
             measure.Series.Select(MapTableRow));
 
-        TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
-            t.Rank,
-            t.Urn,
-            t.Name,
-            Routes.PrimarySchool(schoolInfo.Urn).SimilarSchoolComparison(t.Urn),
-            t.Value,
-            t.IsCurrentSchool);
-
         TopPerformersViewModel? topPerformers = null;
-        if (measure.TopPerformers is not null)
+        // TODO: Extract out similar school urls into a view helper
+        if (measure.TopPerformers is not null && similarSchoolComparisonUrl is not null && viewSimilarSchoolsUrl is not null)
         {
+            TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
+                t.Rank,
+                t.Urn,
+                t.Name,
+                similarSchoolComparisonUrl(schoolInfo.Urn, t.Urn),
+                t.Value,
+                t.IsCurrentSchool);
+
             topPerformers = new TopPerformersViewModel(
                 measureInfo,
                 measure.TopPerformers.Select(MapTopPerformer),
-                Routes.PrimarySchool(schoolInfo.Urn).ViewSimilarSchools);
+                viewSimilarSchoolsUrl(schoolInfo.Urn));
         }
 
         return new(
@@ -99,6 +102,7 @@ public record MeasureViewModel(
 public record MeasureInfoViewModel(
     string HtmlPrefix,
     string Name,
+    int Year,
     MeasureDataType DataType,
     IEnumerable<MeasureAvailableFilterViewModel> Filters,
     IEnumerable<string> Labels,
