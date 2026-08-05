@@ -11,4 +11,7 @@ public class PrimarySimilarSchoolsComparisonViewModel
     public MeasureViewModel? MeetingExpectedStandardRwm { get; set; }
     public MeasureViewModel? AchievedHigherStandardRwm { get; set; }
     public MeasureViewModel? AverageScaledScoreReading { get; set; }
+    public MeasureViewModel? AverageScaledScoreMaths { get; set; }
+    public MeasureViewModel? MeetingExpectedStandardGps { get; set; }
+    public MeasureViewModel? AchievedHigherStandardGps { get; set; }
 }
