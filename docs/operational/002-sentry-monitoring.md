@@ -23,6 +23,9 @@ When Sentry is enabled and a DSN is configured, the web app captures:
 - stack traces
 - Sentry environment tags
 
+The web app currently uses `Sentry.AspNetCore` via `UseSentry(...)`.
+Serilog is still configured for console/debug logging only and is not forwarded to Sentry in this change set.
+
 Web defaults:
 
 - breadcrumb level: `Information`
@@ -117,6 +120,9 @@ The pipeline does not require an appsettings file for Sentry.
 ### Web runtime
 
 Terraform reads the `SentryDsn` secret from Key Vault and exposes it to the application as `SENTRY_DSN`.
+
+The expected Key Vault secret name is exactly `SentryDsn`.
+The deployment/runtime identity that reads application secrets must have permission to read that secret.
 
 ### Data pipeline workflow
 

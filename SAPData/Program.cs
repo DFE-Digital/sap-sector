@@ -13,6 +13,7 @@ internal class Program
     static void Main(string[] args)
     {
         IConfiguration configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
             .AddUserSecrets<Program>()
             .Build();
 
@@ -153,8 +154,11 @@ internal class Program
         }
         catch (Exception ex)
         {
-            SentrySdk.CaptureException(ex);
-            SentrySdk.FlushAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+            if (sentry is not null)
+            {
+                SentrySdk.CaptureException(ex);
+                SentrySdk.FlushAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+            }
             throw;
         }
     }
