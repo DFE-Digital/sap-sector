@@ -26,7 +26,7 @@ public record Measure(
             dataType,
             availableFilters.ToList(),
             MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
-            TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
+            TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector, dataType));
     }
 
     internal static Measure ForSchoolComparison<T>(
