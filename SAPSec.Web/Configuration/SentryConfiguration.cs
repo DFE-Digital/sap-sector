@@ -37,6 +37,12 @@ public static class SentryConfiguration
 
     public static string GetEnvironmentName(IConfiguration configuration, string? environmentName)
     {
+        var configuredEnvironment = configuration[$"{SentrySettings.SectionName}:{nameof(SentrySettings.Environment)}"];
+        if (!string.IsNullOrWhiteSpace(configuredEnvironment))
+        {
+            return configuredEnvironment.Trim().ToLowerInvariant();
+        }
+
         if (string.IsNullOrWhiteSpace(environmentName))
         {
             return Environments.Production.ToLowerInvariant();

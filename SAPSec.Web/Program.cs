@@ -275,6 +275,11 @@ public class Program
                 SentrySdk.CaptureMessage("Hello Sentry");
                 return Results.Ok("Sent to Sentry");
             }).AllowAnonymous();
+
+            app.MapGet("/dev/sentry-exception", () =>
+            {
+                throw new InvalidOperationException("Local Sentry exception verification");
+            }).AllowAnonymous();
         }
 
         app.UseAnalytics(app.Environment);
