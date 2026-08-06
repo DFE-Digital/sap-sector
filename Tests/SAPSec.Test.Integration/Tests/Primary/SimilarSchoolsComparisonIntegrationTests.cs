@@ -263,6 +263,21 @@ public class SimilarSchoolsComparisonIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardRwm_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var barChart = page.QuerySelector("[id$='expected-rwm-school-chart']");
+        barChart.Should().NotBeNull();
+        barChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var lineChart = page.QuerySelector("[id$='expected-rwm-school-yearbyyear-chart']");
+        lineChart.Should().NotBeNull();
+        lineChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
     public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
     {
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
