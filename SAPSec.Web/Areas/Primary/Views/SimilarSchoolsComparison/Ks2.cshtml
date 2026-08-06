@@ -49,6 +49,84 @@
 
         <partial name="Measures/_Measure" model=@Model.AchievedHigherStandardRwm />
     </section>
+
+    <section class="app-measure-section" aria-labelledby="reading-score-heading">
+        <h2 class="govuk-heading-m" id="reading-score-heading" data-testid="reading-score-heading">@Model.AverageScaledScoreReading!.MeasureInfo.Name</h2>
+
+        <details class="govuk-details app-measure-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">Information about average scaled score in reading</span>
+            </summary>
+            <div class="govuk-details__text">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    This score shows how well pupils performed in the key stage 2 reading test. It is the
+                    mean scaled score of all pupils who took the test and achieved a scaled score.
+                </p>
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    The expected standard is 100 or more. The higher standard is 110 or more.
+                </p>
+            </div>
+        </details>
+
+        <partial name="Measures/_Measure" model=@Model.AverageScaledScoreReading />
+    </section>
+
+    <section class="app-measure-section" aria-labelledby="maths-score-heading">
+        <h2 class="govuk-heading-m" id="maths-score-heading" data-testid="maths-score-heading">@Model.AverageScaledScoreMaths!.MeasureInfo.Name</h2>
+
+        <details class="govuk-details app-measure-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">Information about average scaled score in maths</span>
+            </summary>
+            <div class="govuk-details__text">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    This score shows how well pupils performed in the key stage 2 maths test. It is the mean
+                    scaled score of all pupils who took the test and achieved a scaled score.
+                </p>
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    The expected standard is 100 or more. The higher standard is 110 or more.
+                </p>
+            </div>
+        </details>
+
+        <partial name="Measures/_Measure" model=@Model.AverageScaledScoreMaths />
+    </section>
+
+    <section class="app-measure-section" aria-labelledby="expected-gps-heading">
+        <h2 class="govuk-heading-m" id="expected-gps-heading" data-testid="expected-gps-heading">@Model.MeetingExpectedStandardGps!.MeasureInfo.Name</h2>
+
+        <details class="govuk-details app-measure-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">Information about meeting the expected standard</span>
+            </summary>
+            <div class="govuk-details__text">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    Pupils achieve the expected standard when they achieve a scaled score of 100 or more
+                    in their key stage 2 grammar, punctuation and spelling test.
+                </p>
+            </div>
+        </details>
+
+        <partial name="Measures/_Measure" model=@Model.MeetingExpectedStandardGps />
+    </section>
+
+    <section class="app-measure-section" aria-labelledby="higher-gps-heading">
+        <h2 class="govuk-heading-m" id="higher-gps-heading" data-testid="higher-gps-heading">@Model.AchievedHigherStandardGps!.MeasureInfo.Name</h2>
+
+        <details class="govuk-details app-measure-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">Information about achieving the higher standard</span>
+            </summary>
+            <div class="govuk-details__text">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    Pupils achieve the higher standard when they achieve a scaled score of 110 or more
+                    in their key stage 2 grammar, punctuation and spelling test.
+                </p>
+            </div>
+        </details>
+
+        <partial name="Measures/_Measure" model=@Model.AchievedHigherStandardGps />
+    </section>
 </form>
 
 @section Scripts {

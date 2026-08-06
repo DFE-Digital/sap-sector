@@ -245,4 +245,177 @@ public class SimilarSchoolsComparisonIntegrationTests(
             ["Test School 2", .. similarSchool],
             ["Schools in England average", .. england]);
     }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_MeasureExistsOnPage()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
+        heading.TrimmedTextContent().Should().Be("Average scaled score in reading");
+
+        var details = page.QuerySelectorAll("details.govuk-details")
+            .FirstOrDefault(d => d.QuerySelector(".govuk-details__summary-text")?.TrimmedTextContent()
+                == "Information about average scaled score in reading");
+        details.Should().NotBeNull();
+        details!.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var barChart = page.QuerySelector("[id$='expected-rwm-school-chart']");
+        barChart.Should().NotBeNull();
+        barChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var lineChart = page.QuerySelector("[id$='expected-rwm-school-yearbyyear-chart']");
+        lineChart.Should().NotBeNull();
+        lineChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "99.4", "100.4", "101.4"],
+            ["Test School 2", "101.2", "102.2", "103.2"],
+            ["Schools in England average", "105.8", "106.6", "107.4"]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_MeasureExistsOnPage()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var heading = page.ElementWithTestIdShouldExist("maths-score-heading");
+        heading.TrimmedTextContent().Should().Be("Average scaled score in maths");
+
+        var details = page.QuerySelectorAll("details.govuk-details")
+            .FirstOrDefault(d => d.QuerySelector(".govuk-details__summary-text")?.TrimmedTextContent()
+                == "Information about average scaled score in maths");
+        details.Should().NotBeNull();
+        details!.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithMathsScaledScore(current: "102.4", prev: "101.4", prev2: "100.4")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithMathsScaledScore(current: "104.2", prev: "103.2", prev2: "102.2")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.4", prev: "107.6", prev2: "106.8")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "100.4", "101.4", "102.4"],
+            ["Test School 2", "102.2", "103.2", "104.2"],
+            ["Schools in England average", "106.8", "107.6", "108.4"]);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_MeasureExistsOnPage()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var heading = page.ElementWithTestIdShouldExist("expected-gps-heading");
+        heading.TrimmedTextContent().Should().Be("Meeting expected standard in grammar, punctuation and spelling");
+
+        var section = heading.Closest(".app-measure-section");
+        section.Should().NotBeNull();
+
+        var details = section!.QuerySelector("details.govuk-details");
+        details.Should().NotBeNull();
+        details!.QuerySelector(".govuk-details__summary-text")!.TrimmedTextContent()
+            .Should().Be("Information about meeting the expected standard");
+        details.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsExpected(current: "62", prev: "61", prev2: "60")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsExpected(current: "77", prev: "76", prev2: "75")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69", prev: "68", prev2: "67")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "60%", "61%", "62%"],
+            ["Test School 2", "75%", "76%", "77%"],
+            ["Schools in England average", "67%", "68%", "69%"]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_MeasureExistsOnPage()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var heading = page.ElementWithTestIdShouldExist("higher-gps-heading");
+        heading.TrimmedTextContent().Should().Be("Achieved a higher standard in grammar, punctuation and spelling");
+
+        var section = heading.Closest(".app-measure-section");
+        section.Should().NotBeNull();
+
+        var details = section!.QuerySelector("details.govuk-details");
+        details.Should().NotBeNull();
+        details!.QuerySelector(".govuk-details__summary-text")!.TrimmedTextContent()
+            .Should().Be("Information about achieving the higher standard");
+        details.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_TableView_ShouldShowCorrectValues()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsHigher(current: "18", prev: "17", prev2: "16")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsHigher(current: "24", prev: "23", prev2: "22")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15", prev: "14", prev2: "13")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "16%", "17%", "18%"],
+            ["Test School 2", "22%", "23%", "24%"],
+            ["Schools in England average", "13%", "14%", "15%"]);
+    }
 }
