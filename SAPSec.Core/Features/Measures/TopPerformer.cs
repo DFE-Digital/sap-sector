@@ -12,7 +12,8 @@ public record TopPerformer(
     internal static IReadOnlyCollection<TopPerformer> BuildTopPerformers<T>(
         SchoolData<T> currentSchool,
         IEnumerable<SchoolData<T>> similarSchools,
-        MeasureFieldSelector<T> fieldSelector)
+        MeasureFieldSelector<T> fieldSelector,
+        MeasureDataType dataType)
     {
         return similarSchools
             // Include current school in list
@@ -32,13 +33,19 @@ public record TopPerformer(
             .GroupBy(x => x.Urn, StringComparer.Ordinal)
             .Select(x => x.OrderByDescending(candidate => candidate.IsCurrentSchool).First())
 
-            .OrderByDescending(x => x.Value)
+            .OrderByDescending(x => TopPerformerSortValue(x.Value, dataType))
             .ThenBy(x => x.Name, StringComparer.OrdinalIgnoreCase)
             .Take(3)
             .Select((x, index) => new TopPerformer(index + 1, x.Urn, x.Name, x.Value, x.IsCurrentSchool))
             .ToList()
             .AsReadOnly();
     }
+
+    private static decimal TopPerformerSortValue(decimal? value, MeasureDataType dataType) =>
+        Math.Round(value!.Value, DisplayDecimalPlaces(dataType), MidpointRounding.AwayFromZero);
+
+    private static int DisplayDecimalPlaces(MeasureDataType dataType) =>
+        dataType is MeasureDataType.Score or MeasureDataType.ScaledScore ? 1 : 0;
 
     private sealed record TopPerformerCandidate(
         string Urn,
