@@ -1,4 +1,4 @@
-﻿@using System.Text.Json
+@using System.Text.Json
 @using SAPSec.Core.Features.Measures
 @using SAPSec.Web.ViewModels.Measures
 
@@ -8,8 +8,8 @@
     var chartData = new
     {
         labels = Model.MeasureInfo.DataType is MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage
-                                            ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
-                                            : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
+            ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
+            : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
         datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
             new {
                 label = x.First,
@@ -24,14 +24,14 @@
     var decimals = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => 1,
-        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         MeasureDataType.ScaledScore => 1,
+        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
     };
     var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => (0, 30, 90),
-        MeasureDataType.ScaledScore => (80, 5, 120),
+        MeasureDataType.ScaledScore => (80, 20, 120),
         _ => (0, 25, 100)
     };
 }
