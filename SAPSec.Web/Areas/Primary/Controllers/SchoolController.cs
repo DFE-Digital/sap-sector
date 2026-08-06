@@ -26,6 +26,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
+    IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
     IRequestSchoolAccessor requestSchoolAccessor)
     : Controller
@@ -53,6 +54,7 @@ public class SchoolController(
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School),
+            AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(response.AchievedHigherStandardRwm, response.School),
             AverageScaledScoreReading = MeasureViewModel.FromMeasure(response.AverageScaledScoreReading, response.School),
             AverageScaledScoreMaths = MeasureViewModel.FromMeasure(response.AverageScaledScoreMaths, response.School),
             MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardGps, response.School),
@@ -66,11 +68,18 @@ public class SchoolController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getAttendanceMeasuresUseCase.Execute(new(urn, filters));
 
         PopulateViewData(response.School);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var model = new AttendanceMeasuresPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Absence = MeasureViewModel.FromMeasure(response.Absence, response.School)
+        };
+
+        return View(model);
     }
 
     [HttpGet]

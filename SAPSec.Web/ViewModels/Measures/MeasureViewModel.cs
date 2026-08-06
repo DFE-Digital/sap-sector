@@ -1,7 +1,6 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Web.Constants;
-using static SAPSec.Core.Constants.Measures.Primary;
 
 namespace SAPSec.Web.ViewModels.Measures;
 
@@ -24,22 +23,6 @@ public record MeasureViewModel(
             _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
         };
 
-    private static string ResolveMeasureLabel(string measureKey) =>
-        measureKey switch
-        {
-            Ks2ExpectedRwm.Key =>
-                "Meeting expected standard in reading, writing and maths",
-            Ks2GpsExpected =>
-                "Meeting expected standard in grammar, punctuation and spelling",
-            Ks2GpsHigher =>
-                "Achieved a higher standard in grammar, punctuation and spelling",
-            Ks2ReadingScore =>
-                "Average scaled score in reading",
-            Ks2MathsScore =>
-                "Average scaled score in maths",
-            _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
-        };
-
     public static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
@@ -47,7 +30,7 @@ public record MeasureViewModel(
     {
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
-            ResolveMeasureLabel(measure.Key),
+            measure.Name,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
             measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),

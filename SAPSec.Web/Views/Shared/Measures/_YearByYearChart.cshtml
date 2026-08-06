@@ -1,6 +1,5 @@
-﻿@using System.Text.Json
+@using System.Text.Json
 @using SAPSec.Core.Features.Measures
-@using SAPSec.Web.Constants
 @using SAPSec.Web.ViewModels.Measures
 
 @model YearByYearChartViewModel
@@ -8,7 +7,9 @@
 @{
     var chartData = new
     {
-        labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
+        labels = Model.MeasureInfo.DataType is MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage
+            ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
+            : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
         datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
             new {
                 label = x.First,
@@ -24,13 +25,13 @@
     {
         MeasureDataType.Score => 1,
         MeasureDataType.ScaledScore => 1,
-        MeasureDataType.AbsencePercentage => 2,
+        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
     };
     var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => (0, 30, 90),
-        MeasureDataType.ScaledScore => (80, 5, 120),
+        MeasureDataType.ScaledScore => (80, 20, 120),
         _ => (0, 25, 100)
     };
 }
@@ -43,7 +44,7 @@
             data-axis-step="@axisStep"
             data-axis-max="@axisMax"
             data-axis-auto-skip="false"
-            data-axis-suffix="@(Model.MeasureInfo.DataType == MeasureDataType.GradePercentage ? "%" : "")"
+            data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage ? "%" : "")"
             data-show-x-grid="true"
             data-show-legend="true"
             data-show-datalabels="false"

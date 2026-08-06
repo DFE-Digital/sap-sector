@@ -64,10 +64,11 @@ const CHART_CONFIG = {
         },
         datalabels: {
             anchor: 'end',
-            smallValueAlign: 'end',
+            smallValueAlign: 'right',
             defaultAlign: 'start',
             mobileInsideThresholdRatio: 0.4,
-            offset: 10,
+            defaultOffset: 10,
+            smallValueOffset: 6,
             fontWeight: 'bold'
         },
         noData: {
@@ -175,7 +176,12 @@ function canBarFitLabel(ctx, axisSuffix) {
         return true;
     }
 
-    const barLength = Math.abs(xScale.getPixelForValue(value) - xScale.getPixelForValue(0));
+    const axisMin = typeof xScale.min === 'number' ? xScale.min : 0;
+    const axisMax = typeof xScale.max === 'number' ? xScale.max : 0;
+    const baseValue = axisMin > 0 && value >= axisMin && axisMax > axisMin
+        ? axisMin
+        : 0;
+    const barLength = Math.abs(xScale.getPixelForValue(value) - xScale.getPixelForValue(baseValue));
     const font = Chart.helpers.toFont(ctx.chart.options?.plugins?.datalabels?.font);
 
     canvasContext.save();
@@ -183,7 +189,7 @@ function canBarFitLabel(ctx, axisSuffix) {
     const labelWidth = canvasContext.measureText(getBarLabelText(value, axisSuffix)).width;
     canvasContext.restore();
 
-    return barLength >= labelWidth + (CHART_CONFIG.bar.datalabels.offset * 2);
+    return barLength >= labelWidth + (CHART_CONFIG.bar.datalabels.defaultOffset * 2);
 }
 
 function isMobileViewport() {
@@ -228,6 +234,13 @@ function getBarLabelColor(ctx, gdsStyles, axisSuffix, barLabelAlign) {
     return align === CHART_CONFIG.bar.datalabels.defaultAlign
         ? gdsStyles.onBarLabel
         : gdsStyles.text;
+}
+
+function getBarLabelOffset(ctx, axisSuffix, barLabelAlign) {
+    const align = getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
+    return align === CHART_CONFIG.bar.datalabels.defaultAlign
+        ? CHART_CONFIG.bar.datalabels.defaultOffset
+        : CHART_CONFIG.bar.datalabels.smallValueOffset;
 }
 
 function buildExplicitTicks(axisMin, axisMax, stepSize) {
@@ -636,7 +649,9 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     align: function (ctx) {
                         return getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
                     },
-                    offset: CHART_CONFIG.bar.datalabels.offset,
+                    offset: function (ctx) {
+                        return getBarLabelOffset(ctx, axisSuffix, barLabelAlign);
+                    },
                     color: function (ctx) {
                         return getBarLabelColor(ctx, gdsStyles, axisSuffix, barLabelAlign);
                     },
@@ -1017,7 +1032,7 @@ function initAll() {
         return;
     }
 
-    init(document);
+    document.querySelectorAll('.js-chart').forEach(initCharts);
 
     window.addEventListener('scroll', hideAllHtmlTooltips, { passive: true });
     window.addEventListener('resize', hideAllHtmlTooltips, { passive: true });
