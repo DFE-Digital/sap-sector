@@ -130,7 +130,7 @@ $app-measure-color-track: #f3f2f1;
       width: 7rem;
     }
 
-    .govuk-table__row:last-of-type {
+    .govuk-table__body .govuk-table__row:last-of-type {
       .govuk-table__cell, .govuk-table__header {
         border-bottom: none;
       }

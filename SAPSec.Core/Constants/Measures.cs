@@ -87,7 +87,31 @@ public static class Measures
             public const string Key = "higher-gps";
             public const string Name = "Achieved a higher standard in grammar, punctuation and spelling";
         }
+    }
 
+    public static class Absence
+    {
+        public const string Key = "absence";
+
+        public static class Filters
+        {
+            public static class Type
+            {
+                public const string Key = $"{Absence.Key}-type";
+                public const string Name = "Type of absence";
+
+                public static class Values
+                {
+                    public const string Overall = "o";
+                    public const string Persistent = "p";
+
+                    public static readonly FilterValueDefinition[] AllValues = [
+                        new(Overall, "Overall absence"),
+                        new(Persistent, "Persistent absence")
+                    ];
+                }
+            }
+        }
     }
 
     public record FilterValueDefinition(string Value, string Name);
