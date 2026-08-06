@@ -5,6 +5,7 @@ namespace SAPSec.Core.Features.Measures;
 
 public record Measure(
     string Key,
+    string Name,
     MeasureDataType DataType,
     IReadOnlyCollection<MeasureAvailableFilter> Filters,
     IReadOnlyCollection<MeasureSeries> Series,
@@ -12,6 +13,7 @@ public record Measure(
 {
     internal static Measure ForSchool<T>(
         string key,
+        string name,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
         SchoolData<T> currentSchool,
@@ -20,14 +22,32 @@ public record Measure(
     {
         return new Measure(
             key,
+            name,
             dataType,
             availableFilters.ToList(),
             MeasureSeries.ForSchool(currentSchool, similarSchools, fieldSelector),
-            TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector));
+            TopPerformer.BuildTopPerformers(currentSchool, similarSchools, fieldSelector, dataType));
+    }
+
+    internal static Measure ForSchoolAttendance<T>(
+        string key,
+        string name,
+        MeasureDataType dataType,
+        IEnumerable<MeasureAvailableFilter> availableFilters,
+        SchoolData<T> currentSchool,
+        MeasureFieldSelector<T> fieldSelector)
+    {
+        return new Measure(
+            key,
+            name,
+            dataType,
+            availableFilters.ToList(),
+            MeasureSeries.ForSchoolAttendance(currentSchool, fieldSelector));
     }
 
     internal static Measure ForSchoolComparison<T>(
         string key,
+        string name,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
         SchoolData<T> currentSchool,
@@ -37,6 +57,7 @@ public record Measure(
     {
         return new Measure(
             key,
+            name,
             dataType,
             availableFilters.ToList(),
             MeasureSeries.ForSchoolComparison(currentSchool, similarSchool, fieldSelector));
@@ -48,7 +69,8 @@ public enum MeasureDataType
     Score,
     ScaledScore,
     GradePercentage,
-    AbsencePercentage
+    OverallAbsencePercentage,
+    PersistentAbsencePercentage
 }
 
 public record MeasureAvailableFilter(

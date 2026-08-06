@@ -10,6 +10,57 @@
     How @Model.Name compares with @Model.SimilarSchoolName based on KS2 performance measures.
 </p>
 
-<div class="govuk-inset-text">
-    KS2 comparison for primary schools is coming soon.
-</div>
+<form action="" method="get">
+    <partial name="_Ks2ProgressRWMInfo" />
+
+    <section class="app-measure-section" aria-labelledby="expected-rwm-heading">
+        <h2 class="govuk-heading-m" id="expected-rwm-heading" data-testid="expected-rwm-heading">@Model.MeetingExpectedStandardRwm!.MeasureInfo.Name</h2>
+
+        <details class="govuk-details app-measure-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">Information about meeting the expected standard</span>
+            </summary>
+            <div class="govuk-details__text">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    Pupils achieve the expected standard when they achieve a scaled score of 100 or more
+                    in reading and maths tests, and are assessed by their teacher in writing as &lsquo;working at
+                    the expected standard&rsquo; or &lsquo;working at greater depth&rsquo;.
+                </p>
+            </div>
+        </details>
+
+        <partial name="Measures/_Measure" model=@Model.MeetingExpectedStandardRwm />
+    </section>
+
+    <section class="app-measure-section" aria-labelledby="higher-rwm-heading">
+        <h2 class="govuk-heading-m" id="higher-rwm-heading" data-testid="higher-rwm-heading">@Model.AchievedHigherStandardRwm!.MeasureInfo.Name</h2>
+
+        <details class="govuk-details app-measure-details" data-module="govuk-details">
+            <summary class="govuk-details__summary">
+                <span class="govuk-details__summary-text">Information about achieving the higher standard</span>
+            </summary>
+            <div class="govuk-details__text">
+                <p class="govuk-body-s govuk-!-margin-bottom-2">
+                    Pupils achieve the higher standard when they achieve a scaled score of 110 or more
+                    in reading and maths tests, and are assessed by their teacher in writing as &lsquo;working at greater depth&rsquo;.
+                </p>
+            </div>
+        </details>
+
+        <partial name="Measures/_Measure" model=@Model.AchievedHigherStandardRwm />
+    </section>
+</form>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}
