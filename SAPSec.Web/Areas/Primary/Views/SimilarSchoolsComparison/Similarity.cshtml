@@ -8,8 +8,7 @@
 <h2 class="govuk-heading-l">How these schools compare</h2>
 
 <p class="govuk-body">
-    This school is part of a group of similar primary schools that the DfE has identified as similar
-    based on a number of key characteristics.
+    This school is part of a group of <strong>50</strong> schools identified as similar based on 9 key characteristics.
 </p>
 
 <p class="govuk-body">
@@ -18,6 +17,25 @@
     </a>
 </p>
 
-<div class="govuk-inset-text">
-    Similarity comparison for primary schools is coming soon.
+<div class="govuk-!-margin-top-8">
+    <table class="govuk-table govuk-table--responsive">
+        <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Characteristic</th>
+            <th scope="col" class="govuk-table__header">@Model.Name</th>
+            <th scope="col" class="govuk-table__header">@Model.SimilarSchoolName</th>
+        </tr>
+        </thead>
+
+        <tbody class="govuk-table__body">
+        @foreach (var row in Model.CharacteristicsRows)
+        {
+            <tr class="govuk-table__row">
+                <th scope="row" class="govuk-table__header">@row.Characteristic</th>
+                <td class="govuk-table__cell">@row.CurrentSchoolValue</td>
+                <td class="govuk-table__cell">@row.SimilarSchoolValue</td>
+            </tr>
+        }
+        </tbody>
+    </table>
 </div>
