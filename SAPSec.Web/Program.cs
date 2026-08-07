@@ -16,6 +16,8 @@ using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using SAPSec.Web.Services;
 using SAPSec.Web.Setup;
+using Sentry;
+using Sentry.AspNetCore;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
@@ -32,6 +34,25 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
+        var sentrySettings = SentryConfiguration.GetSettings(builder.Configuration);
+
+        builder.WebHost.UseSentry((context, options) =>
+        {
+            if (!SentryConfiguration.IsEnabled(sentrySettings))
+            {
+                options.Dsn = null;
+                return;
+            }
+
+            options.Dsn = sentrySettings.Dsn;
+            options.Environment = SentryConfiguration.GetEnvironmentName(context.Configuration, context.HostingEnvironment.EnvironmentName);
+            options.Debug = sentrySettings.Debug;
+            options.SendDefaultPii = false;
+            options.AttachStacktrace = true;
+            options.MinimumBreadcrumbLevel = SentryConfiguration.GetMinimumBreadcrumbLevel(sentrySettings);
+            options.MinimumEventLevel = SentryConfiguration.GetMinimumEventLevel(sentrySettings);
+        });
+
         builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
         builder.Services.AddGovUkFrontend(options =>
@@ -246,6 +267,20 @@ public class Program
         app.UseAuthorization();
 
         app.MapHealthChecks("/healthcheck").AllowAnonymous();
+
+        if (isDevelopment)
+        {
+            app.MapGet("/dev/sentry-message", () =>
+            {
+                SentrySdk.CaptureMessage("Hello Sentry");
+                return Results.Ok("Sent to Sentry");
+            }).AllowAnonymous();
+
+            app.MapGet("/dev/sentry-exception", () =>
+            {
+                throw new InvalidOperationException("Local Sentry exception verification");
+            }).AllowAnonymous();
+        }
 
         app.UseAnalytics(app.Environment);
 

@@ -13,6 +13,11 @@ data "azurerm_key_vault_secret" "dsi_api_secret" {
   key_vault_id = data.azurerm_key_vault.app_key_vault.id
 }
 
+data "azurerm_key_vault_secret" "sentry_dsn" {
+  name         = "SentryDsn"
+  key_vault_id = data.azurerm_key_vault.app_key_vault.id
+}
+
 module "application_configuration" {
   source = "./vendor/modules/aks//aks/application_configuration"
 
@@ -33,6 +38,7 @@ module "application_configuration" {
     ConnectionStrings__PostgresConnectionString = module.postgres.dotnet_connection_string
     DsiConfiguration__ClientSecret              = data.azurerm_key_vault_secret.dsi_client_secret.value
     DsiConfiguration__ApiSecret                 = data.azurerm_key_vault_secret.dsi_api_secret.value
+    SENTRY_DSN                                  = data.azurerm_key_vault_secret.sentry_dsn.value
     StorageConnectionString                     = "DefaultEndpointsProtocol=https;AccountName=${module.storage.name};AccountKey=${module.storage.primary_access_key}"
   }, local.federated_auth_secrets)
 }
