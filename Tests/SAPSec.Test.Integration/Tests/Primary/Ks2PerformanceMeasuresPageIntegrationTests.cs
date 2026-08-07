@@ -657,7 +657,7 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             var chart = page.QuerySelector($"#{chartId}");
             chart.Should().NotBeNull();
             chart.GetAttribute("data-axis-min").Should().Be("80");
-            chart.GetAttribute("data-axis-step").Should().Be("5");
+            chart.GetAttribute("data-axis-step").Should().Be("20");
             chart.GetAttribute("data-axis-max").Should().Be("120");
         }
     }

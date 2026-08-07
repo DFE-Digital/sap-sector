@@ -338,6 +338,19 @@ function getDynamicLineAxisConfig(chartData, axisSuffix) {
     };
 }
 
+function toFixedRoundedHalfAwayFromZero(value, decimals) {
+    // Number.prototype.toFixed rounds based on the binary floating-point
+    // representation of `value`, which can differ from the decimal value's
+    // true nearest/rounded representation (e.g. (98.05).toFixed(1) === "98.0").
+    // Rounding the absolute value (nudged by Number.EPSILON to correct for
+    // float imprecision) and reapplying the sign matches the server-side
+    // decimal rounding used for the table (0.0-style, half away from zero).
+    const factor = Math.pow(10, decimals);
+    const sign = value < 0 ? -1 : 1;
+    const rounded = sign * Math.round((Math.abs(value) + Number.EPSILON) * factor) / factor;
+    return rounded.toFixed(decimals);
+}
+
 function formatTooltipValue(value, axisSuffix, decimals) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
         return 'No data';
@@ -345,7 +358,7 @@ function formatTooltipValue(value, axisSuffix, decimals) {
 
     const numericValue = Number(value);
     const formattedValue = decimals !== null && decimals !== undefined
-        ? numericValue.toFixed(decimals)
+        ? toFixedRoundedHalfAwayFromZero(numericValue, decimals)
         : numericValue;
 
     return `${formattedValue}${axisSuffix}`;
@@ -906,7 +919,7 @@ function initCharts(canvas) {
                 if (!showDataLabels || value === null || value === undefined || Number.isNaN(value)) {
                     return null;
                 }
-                return `${Number(value).toFixed(labelDecimals)}${axisSuffix}`;
+                return `${toFixedRoundedHalfAwayFromZero(Number(value), labelDecimals)}${axisSuffix}`;
             };
         }
 

@@ -50,6 +50,14 @@ public class SimilarSchoolsComparisonController(
             comparisonResponse.MeetingExpectedStandardRwm, currentSchool, similarSchool);
         model.AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(
             comparisonResponse.AchievedHigherStandardRwm, currentSchool, similarSchool);
+        model.AverageScaledScoreReading = MeasureViewModel.FromMeasure(
+            comparisonResponse.AverageScaledScoreReading, currentSchool, similarSchool);
+        model.AverageScaledScoreMaths = MeasureViewModel.FromMeasure(
+            comparisonResponse.AverageScaledScoreMaths, currentSchool, similarSchool);
+        model.MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(
+            comparisonResponse.MeetingExpectedStandardGps, currentSchool, similarSchool);
+        model.AchievedHigherStandardGps = MeasureViewModel.FromMeasure(
+            comparisonResponse.AchievedHigherStandardGps, currentSchool, similarSchool);
 
         ViewData["ComparisonSchool"] = model;
         return View(model);
