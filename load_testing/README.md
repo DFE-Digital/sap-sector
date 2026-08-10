@@ -188,6 +188,23 @@ verified the same way to return real results.
 
 Select via `--env SCENARIO=<name>` (defaults to `quick`).
 
+## Running in CI
+
+[`.github/workflows/loadtest.yml`](../.github/workflows/loadtest.yml) runs
+this suite on demand from the Actions tab (`workflow_dispatch`), the same way
+[publish-teacher-training's `loadtest.yml`](https://github.com/DFE-Digital/publish-teacher-training/blob/main/.github/workflows/loadtest.yml)
+does - **it does not run automatically on every PR.** Pick a `scenario` and
+target `environment` (`review` or `test`) when triggering it manually; for
+`review` you also need to supply the PR number. It only covers the anonymous
+journeys (same as running against `review`/`test` locally - see
+[What's covered](#whats-covered)); it doesn't run against `production`, and
+it doesn't set up a `LoadTest`-mode instance to exercise the authenticated
+pages. Reports are uploaded as a workflow artifact.
+
+We deliberately didn't wire this into `pull_request`: `test` sits behind a
+rate-limited WAF shared with other traffic, and most PRs don't touch anything
+performance-sensitive enough to justify load-testing every single one.
+
 ## Output
 
 - **Local:** results printed to the terminal; `sap-sector-load-test-summary.json`
