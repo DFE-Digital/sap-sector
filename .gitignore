@@ -509,3 +509,7 @@ wwwroot/**/*.min.js
 
 # Copilot files
 .github/copilot-instructions.md
+
+# k6 load test output
+load_testing/*.json
+load_testing/*-report.html

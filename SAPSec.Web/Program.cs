@@ -96,7 +96,7 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest")
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -165,6 +165,17 @@ public class Program
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
+
+        // LoadTest is a dedicated, explicitly-opted-into environment name for running
+        // k6 load tests locally without a Postgres database - it swaps in the same
+        // JSON-file-backed repositories used by the integration test suite. It must
+        // never be used for the shared review/test/production environments, which
+        // continue to use AddPostgresqlDependencies() above.
+        if (builder.Environment.EnvironmentName == "LoadTest")
+        {
+            builder.Services.AddJsonDependencies();
+        }
+
         builder.Services.AddDependencies();
 
         // Add custom error handler for NotFoundExceptions
