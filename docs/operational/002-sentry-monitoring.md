@@ -212,30 +212,19 @@ dotnet run --project .\SAPData\SAPData.csproj
 
 ### Web application
 
-The development environment exposes two anonymous endpoints:
-
-- `/dev/sentry-message`
-- `/dev/sentry-exception`
-
-Use `/dev/sentry-message` to verify basic event delivery.
-
-Use `/dev/sentry-exception` to verify real exception capture.
-
 Typical local flow:
 
 ```powershell
 dotnet run --project .\SAPSec.Web\SAPSec.Web.csproj
 ```
 
-Then open:
-
-- `https://localhost:<port>/dev/sentry-message`
-- `https://localhost:<port>/dev/sentry-exception`
+Then verify using a controlled exception path that exists in the current application, or by exercising a known failing scenario in a non-production environment.
 
 Expected result:
 
-- `/dev/sentry-message` creates a message event in Sentry
-- `/dev/sentry-exception` creates an exception event in Sentry
+- the exception appears in Sentry
+- the event has the expected `environment` tag
+- the event includes a stack trace
 
 ### Data pipeline
 
@@ -323,7 +312,7 @@ To prove alerts are wired correctly:
 3. Confirm the event appears in Sentry with the expected `environment` tag.
 4. Confirm the linked alert rule opens or notifies the configured channel.
 
-For the web app, prefer `/dev/sentry-exception` in a non-production environment first.
+For the web app, use a controlled non-production failure path that exists in the deployed build.
 
 For the data pipeline, prefer the `test` GitHub Actions environment first.
 
