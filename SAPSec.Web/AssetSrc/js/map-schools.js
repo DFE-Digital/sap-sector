@@ -2,6 +2,73 @@
     let initialised = false;
     let mapInstance = null;
 
+    function focusElement(el) {
+        if (el && typeof el.focus === "function") {
+            el.focus();
+        }
+    }
+
+    function focusNextMarker(marker) {
+        const markerElement = marker.getElement?.();
+        const mapContainer = marker._map?.getContainer?.();
+        if (!markerElement || !mapContainer) return false;
+
+        const focusableMarkers = Array.from(mapContainer.querySelectorAll(".leaflet-marker-icon"))
+            .filter((el) => el.tabIndex >= 0);
+
+        const currentIndex = focusableMarkers.indexOf(markerElement);
+        if (currentIndex < 0) return false;
+
+        const nextMarker = focusableMarkers[currentIndex + 1];
+        if (!nextMarker) return false;
+
+        focusElement(nextMarker);
+        return true;
+    }
+
+    function wirePopupFocusOrder(marker) {
+        marker.on("popupopen", function (event) {
+            const popupElement = event.popup?.getElement?.();
+            if (!popupElement) return;
+
+            const markerElement = marker.getElement?.();
+            const openedFromMarkerFocus = document.activeElement === markerElement;
+            if (!openedFromMarkerFocus) return;
+
+            const primaryLink = popupElement.querySelector(".popup-name[href]");
+            const closeButton = popupElement.querySelector(".leaflet-popup-close-button");
+
+            if (!primaryLink && !closeButton) return;
+
+            if (primaryLink && closeButton) {
+                primaryLink.addEventListener("keydown", function onPrimaryLinkKeydown(e) {
+                    if (e.key === "Tab" && !e.shiftKey) {
+                        e.preventDefault();
+                        focusElement(closeButton);
+                    }
+                });
+
+                closeButton.addEventListener("keydown", function onCloseButtonKeydown(e) {
+                    if (e.key === "Tab" && e.shiftKey) {
+                        e.preventDefault();
+                        focusElement(primaryLink);
+                        return;
+                    }
+
+                    if (e.key === "Tab" && !e.shiftKey) {
+                        e.preventDefault();
+                        marker.closePopup();
+                        setTimeout(function () {
+                            focusNextMarker(marker);
+                        }, 0);
+                    }
+                });
+            }
+
+            focusElement(primaryLink || closeButton);
+        });
+    }
+
     function parseSchools(host) {
         const el = document.getElementById("schools-data");
         const schoolsJson = el ? el.textContent : "[]";
@@ -190,7 +257,13 @@
                 iconToUse = s.isComparedSchool ? blueSchoolIcon : pinkSchoolIcon;
             }
 
-            const m = L.marker(ll, { icon: iconToUse }).bindPopup(popupHtml(s));
+            const m = L.marker(ll, {
+                icon: iconToUse,
+                title: s.name || "School",
+                alt: s.name || "School",
+            }).bindPopup(popupHtml(s));
+
+            wirePopupFocusOrder(m);
 
             if (useClusters) {
                 clusters.addLayer(m);
