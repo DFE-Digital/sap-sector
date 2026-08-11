@@ -51,6 +51,8 @@ jobs:
       SENSITIVE_DATASET_URL: ${{ secrets.SENSITIVE_DATASET_URL }}
       SENSITIVE_ESTABLISHMENT_LINKS_URL: ${{ secrets.SENSITIVE_ESTABLISHMENT_LINKS_URL }}
       SENSITIVE_MAT_LINKS_URL: ${{ secrets.SENSITIVE_MAT_LINKS_URL }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      Sentry__Enabled: "true"
 
       # Konduit / AKS settings (also in GitHub secrets)
       AKS_RESOURCE_GROUP: ${{ secrets.AKS_RESOURCE_GROUP }}
