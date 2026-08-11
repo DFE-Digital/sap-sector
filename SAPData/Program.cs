@@ -1,5 +1,6 @@
-﻿using CsvHelper;
+using CsvHelper;
 using Microsoft.Extensions.Configuration;
+using Sentry;
 using SAPData.Models;
 using SAPSec.Data.Common;
 using System.Globalization;
@@ -12,139 +13,180 @@ internal class Program
     static void Main(string[] args)
     {
         IConfiguration configuration = new ConfigurationBuilder()
+            .AddEnvironmentVariables()
             .AddUserSecrets<Program>()
             .Build();
 
-        var runningLocally = bool.TryParse(configuration["RunningLocally"], out var val) && val;
+        using var sentry = InitialiseSentry(configuration);
 
-        Console.WriteLine($"RunningLocally: {runningLocally}");
-
-        Console.WriteLine("Generating Raw Data Tables and Scripts...");
-
-        // In CI the working directory is often the repo root.
-        // Find SAPData.csproj anywhere under the current directory and use its folder.
-        string baseDir = Project.FindProjectDirectoryDownwards("SAPData.csproj");
-
-        string dataMapDir = Path.Combine(baseDir, "DataMap");
-        string rawInputDir = Path.Combine(dataMapDir, "SourceFiles");
-        string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
-        string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
-        string sqlDir = Path.Combine(baseDir, "Sql");
-        string rawTablesToRebuildPath = ResolveRawTablesToRebuildPath(baseDir, configuration);
-        string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
-        List<string> sqlFiles = new();
-
-        string infrastructureDir = Path.Combine(Directory.GetParent(baseDir)!.FullName, "SAPSec.Infrastructure");
-        string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
-        string generatedJsonDir = Path.Combine(jsonDir, "Generated");
-        string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
-
-        Directory.CreateDirectory(cleanedDir);
-        Directory.CreateDirectory(sqlDir);
-        Directory.CreateDirectory(jsonDir);
-        Directory.CreateDirectory(generatedJsonDir);
-
-        // -------------------------------------------------
-        // 1. Load DataMap
-        // -------------------------------------------------
-        List<DataMapRow> dataMaps;
-        using (var reader = new StreamReader(dataMapCsv))
-        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+        try
         {
-            csv.Context.RegisterClassMap<DataMapMapping>();
-            dataMaps = csv.GetRecords<DataMapRow>().ToList();
+            var runningLocally = bool.TryParse(configuration["RunningLocally"], out var val) && val;
+
+            Console.WriteLine($"RunningLocally: {runningLocally}");
+
+            Console.WriteLine("Generating Raw Data Tables and Scripts...");
+
+            // In CI the working directory is often the repo root.
+            // Find SAPData.csproj anywhere under the current directory and use its folder.
+            string baseDir = Project.FindProjectDirectoryDownwards("SAPData.csproj");
+
+            string dataMapDir = Path.Combine(baseDir, "DataMap");
+            string rawInputDir = Path.Combine(dataMapDir, "SourceFiles");
+            string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
+            string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
+            string sqlDir = Path.Combine(baseDir, "Sql");
+            string rawTablesToRebuildPath = ResolveRawTablesToRebuildPath(baseDir, configuration);
+            string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
+            List<string> sqlFiles = new();
+
+            string infrastructureDir = Path.Combine(Directory.GetParent(baseDir)!.FullName, "SAPSec.Infrastructure");
+            string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
+            string generatedJsonDir = Path.Combine(jsonDir, "Generated");
+            string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
+
+            Directory.CreateDirectory(cleanedDir);
+            Directory.CreateDirectory(sqlDir);
+            Directory.CreateDirectory(jsonDir);
+            Directory.CreateDirectory(generatedJsonDir);
+
+            // -------------------------------------------------
+            // 1. Load DataMap
+            // -------------------------------------------------
+            List<DataMapRow> dataMaps;
+            using (var reader = new StreamReader(dataMapCsv))
+            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
+            {
+                csv.Context.RegisterClassMap<DataMapMapping>();
+                dataMaps = csv.GetRecords<DataMapRow>().ToList();
+            }
+
+            Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
+
+            var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
+            var logicalKeysToRebuild = rebuildAllRawTables
+                ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
+            WriteCleanupSql(
+                Path.Combine(sqlDir, "00_cleanup.sql"),
+                logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
+                rebuildAllRawTables);
+
+            // -------------------------------------------------
+            // 2. Generate raw tables + cleaned files + mapping
+            // -------------------------------------------------
+            new GenerateRawTables(
+                rawInputDir,
+                cleanedDir,
+                sqlDir,
+                tableMappingPath,
+                sqlFiles,
+                logicalKeysToRebuild,
+                rebuildAllRawTables
+            ).Run();
+
+            // -------------------------------------------------
+            // 3. Generate views
+            // -------------------------------------------------
+            new GenerateViews(
+                dataMaps,
+                tableMappingPath,
+                sqlDir,
+                jsonDir,
+                generatedJsonDir,
+                sqlFiles,
+                logicalKeysToRebuild,
+                rebuildAllRawTables
+            ).Run();
+
+            // -------------------------------------------------
+            // 10. Generate indexes
+            // -------------------------------------------------
+            new GenerateIndexes(
+                sqlDir,
+                sqlFiles
+            ).Run();
+
+            // -------------------------------------------------
+            // 50. Generate similar schools views
+            // -------------------------------------------------
+            new GenerateSimilarSchoolsViews(
+                dataMaps,
+                tableMappingPath,
+                sqlDir,
+                generatedJsonDir,
+                sqlFiles,
+                logicalKeysToRebuild,
+                rebuildAllRawTables
+            ).Run();
+
+            // -------------------------------------------------
+            // 60. Generate similar schools indexes
+            // -------------------------------------------------
+            new GenerateSimilarSchoolsIndexes(
+                sqlDir,
+                sqlFiles
+            ).Run();
+
+            var runAllSql = new StringBuilder();
+            runAllSql.AppendLine(@"-- ================================================================");
+            runAllSql.AppendLine(@"-- run_all.sql");
+            runAllSql.AppendLine(@"-- ================================================================");
+            runAllSql.AppendLine(@"");
+            runAllSql.AppendLine(@"\set ON_ERROR_STOP on");
+            runAllSql.AppendLine(@"");
+            runAllSql.AppendLine(@"\ir 00_cleanup.sql");
+
+            foreach (var line in sqlFiles.Order())
+            {
+                runAllSql.AppendLine(@$"\ir {line}");
+            }
+
+            File.WriteAllText(runAllSqlFile, runAllSql.ToString());
+
+            Console.WriteLine("Run Complete.");
+
+            // Optional: avoid blocking in CI
+            if (!Console.IsInputRedirected)
+            {
+                Console.ReadLine();
+            }
+        }
+        catch (Exception ex)
+        {
+            if (sentry is not null)
+            {
+                SentrySdk.CaptureException(ex);
+                SentrySdk.FlushAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
+            }
+            throw;
+        }
+    }
+
+    private static IDisposable? InitialiseSentry(IConfiguration configuration)
+    {
+        var enabledValue = configuration["Sentry:Enabled"] ?? Environment.GetEnvironmentVariable("Sentry__Enabled");
+        var enabled = bool.TryParse(enabledValue, out var parsedEnabled) && parsedEnabled;
+        var dsn = configuration["Sentry:Dsn"] ?? configuration["SENTRY_DSN"];
+
+        if (!enabled || string.IsNullOrWhiteSpace(dsn))
+        {
+            return null;
         }
 
-        Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
+        var environment =
+            Environment.GetEnvironmentVariable("DEPLOY_ENV")
+            ?? Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT")
+            ?? Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            ?? "production";
 
-        var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
-        var logicalKeysToRebuild = rebuildAllRawTables
-            ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-            : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
-        WriteCleanupSql(
-            Path.Combine(sqlDir, "00_cleanup.sql"),
-            logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
-            rebuildAllRawTables);
-
-        // -------------------------------------------------
-        // 2. Generate raw tables + cleaned files + mapping
-        // -------------------------------------------------
-        new GenerateRawTables(
-            rawInputDir,
-            cleanedDir,
-            sqlDir,
-            tableMappingPath,
-            sqlFiles,
-            logicalKeysToRebuild,
-            rebuildAllRawTables
-        ).Run();
-
-        // -------------------------------------------------
-        // 3. Generate views
-        // -------------------------------------------------
-        new GenerateViews(
-            dataMaps,
-            tableMappingPath,
-            sqlDir,
-            jsonDir,
-            generatedJsonDir,
-            sqlFiles,
-            logicalKeysToRebuild,
-            rebuildAllRawTables
-        ).Run();
-
-        // -------------------------------------------------
-        // 10. Generate indexes
-        // -------------------------------------------------
-        new GenerateIndexes(
-            sqlDir,
-            sqlFiles
-        ).Run();
-
-        // -------------------------------------------------
-        // 50. Generate similar schools views
-        // -------------------------------------------------
-        new GenerateSimilarSchoolsViews(
-            dataMaps,
-            tableMappingPath,
-            sqlDir,
-            generatedJsonDir,
-            sqlFiles,
-            logicalKeysToRebuild,
-            rebuildAllRawTables
-        ).Run();
-
-        // -------------------------------------------------
-        // 60. Generate similar schools indexes
-        // -------------------------------------------------
-        new GenerateSimilarSchoolsIndexes(
-            sqlDir,
-            sqlFiles
-        ).Run();
-
-        var runAllSql = new StringBuilder();
-        runAllSql.AppendLine(@"-- ================================================================");
-        runAllSql.AppendLine(@"-- run_all.sql");
-        runAllSql.AppendLine(@"-- ================================================================");
-        runAllSql.AppendLine(@"");
-        runAllSql.AppendLine(@"\set ON_ERROR_STOP on");
-        runAllSql.AppendLine(@"");
-        runAllSql.AppendLine(@"\ir 00_cleanup.sql");
-
-        foreach (var line in sqlFiles.Order())
+        return SentrySdk.Init(options =>
         {
-            runAllSql.AppendLine(@$"\ir {line}");
-        }
-
-        File.WriteAllText(runAllSqlFile, runAllSql.ToString());
-
-        Console.WriteLine("Run Complete.");
-
-        // Optional: avoid blocking in CI
-        if (!Console.IsInputRedirected)
-        {
-            Console.ReadLine();
-        }
+            options.Dsn = dsn;
+            options.Environment = environment.Trim().ToLowerInvariant();
+            options.SendDefaultPii = false;
+            options.AttachStacktrace = true;
+        });
     }
 
     private static string ResolveRawTablesToRebuildPath(string baseDir, IConfiguration configuration)
