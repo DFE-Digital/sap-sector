@@ -23,28 +23,28 @@ public record MeasureViewModel(
             _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
         };
 
-    private static string ResolveMeasureLabel(string measureKey) =>
-        measureKey switch
-        {
-            Core.Constants.Measures.Primary.Ks2ExpectedRwm =>
-                "Meeting expected standard in reading, writing and maths",
-            _ => throw new InvalidOperationException($"No label found for Measure Key: {measureKey}")
-        };
+    // chart-factory.js assigns bar/line colours to datasets by array position (school/similarSchools/
+    // localAuthority/england), which assumes the 4-series shape produced by Measure.ForSchool. The 3-series
+    // comparison shape (CurrentSchool/SimilarSchool/EnglandSchoolsAverage) puts England at the position
+    // chart-factory.js treats as "local authority", so comparison charts must supply explicit colours.
+    private static readonly string[] ComparisonChartColors = ["#ca357c", "#2a1950", "#2a1950"];
+    private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
 
     public static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
-        IEnumerable<string>? chartColors = null,
-        IEnumerable<string>? yearByYearColors = null)
+        SchoolInfo? similarSchool = null)
     {
+        var isComparison = similarSchool is not null;
+
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
-            ResolveMeasureLabel(measure.Key),
+            measure.Name,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo)),
-            chartColors,
-            yearByYearColors);
+            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
+            isComparison ? ComparisonChartColors : null,
+            isComparison ? ComparisonYearByYearColors : null);
 
         decimal? MapCurrentYear(MeasureSeries series) =>
             series.Current;

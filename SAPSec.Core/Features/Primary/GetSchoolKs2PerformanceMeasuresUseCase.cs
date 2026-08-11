@@ -1,3 +1,4 @@
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
@@ -19,7 +20,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
 
         var (currentSchoolPerformance, similarSchoolsPerformance) = await dataProvider.GetSimilarSchoolsPerformance(request.Urn);
 
-        var filterBy = request.FilterBy ?? new Dictionary<string, string>();
+        var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolPerformance.SchoolInfo,
@@ -27,7 +28,34 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchool(
                 currentSchoolPerformance,
                 similarSchoolsPerformance,
-                filterBy));
+                filterBy
+            ),
+            Ks2PerformanceMeasures.AchievedHigherStandardRwm.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
+            Ks2PerformanceMeasures.AverageScaledScoreReading.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
+            Ks2PerformanceMeasures.AverageScaledScoreMaths.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
+            Ks2PerformanceMeasures.MeetingExpectedStandardGps.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            ),
+            Ks2PerformanceMeasures.AchievedHigherStandardGps.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy
+            )
+        );
     }
 }
 
@@ -38,4 +66,9 @@ public record GetSchoolKs2PerformanceMeasuresRequest(
 public record GetSchoolKs2PerformanceMeasuresResponse(
     SchoolInfo.SchoolInfo School,
     int SimilarSchoolsCount,
-    Measure MeetingExpectedStandardRwm);
+    Measure MeetingExpectedStandardRwm,
+    Measure AchievedHigherStandardRwm,
+    Measure AverageScaledScoreReading,
+    Measure AverageScaledScoreMaths,
+    Measure MeetingExpectedStandardGps,
+    Measure AchievedHigherStandardGps);

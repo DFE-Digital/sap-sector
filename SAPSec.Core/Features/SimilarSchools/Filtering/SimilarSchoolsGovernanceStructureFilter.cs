@@ -1,3 +1,4 @@
+using SAPSec.Core.Collections;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Model;
@@ -6,7 +7,7 @@ namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsGovernanceStructureFilter(string key,
     string name,
-    IDictionary<string, IEnumerable<string>> filterValues,
+    CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool)
     : SimilarSchoolsMultiValueFilter(
         key,
@@ -38,8 +39,8 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
             .Select(g => new FilterOption(
                 g.Key!.Key,
                 g.Key.Name,
-                g.Count(),
-                values.Contains(g.Key.Key, StringComparer.OrdinalIgnoreCase)))
+                values.Contains(g.Key.Key, StringComparer.OrdinalIgnoreCase),
+                g.Count()))
             .OrderBy(fo => fo.Key switch
             {
                 "S" => 0,

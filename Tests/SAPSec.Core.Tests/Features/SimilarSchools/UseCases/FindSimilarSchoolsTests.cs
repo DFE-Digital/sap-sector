@@ -9,11 +9,13 @@ public class FindSimilarSchoolsTests
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo = new();
     private readonly InMemoryEstablishmentRepository _establishmentRepo = new();
     private readonly InMemoryKs4PerformanceRepository _performanceRepo = new();
-    private readonly InMemoryAbsenceRepository _absenceRepo = new();
+    private readonly InMemoryAbsenceRepository _absenceRepo;
     private readonly FindSimilarSchools _sut;
 
     public FindSimilarSchoolsTests()
     {
+        _absenceRepo = new InMemoryAbsenceRepository(_establishmentRepo);
+
         _sut = new FindSimilarSchools(
             _establishmentRepo,
             _similarSchoolsRepo,
@@ -3647,6 +3649,57 @@ public class FindSimilarSchoolsTests
             o => o.Should().BeEquivalentTo(new { Key = "Chem", Selected = false }),
             o => o.Should().BeEquivalentTo(new { Key = "Phys", Selected = false })
         );
+    }
+
+    [Fact]
+    public async Task SortBy_WhenScoresAreTied_OrdersAlphabeticallyByName()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002", EstablishmentName = "Zebra School" },
+            new() { URN = "100003", EstablishmentName = "Acorn School" },
+            new() { URN = "100004", EstablishmentName = "Maple School" }
+        );
+        _performanceRepo.SetupEstablishmentPerformance(
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "50" },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "50" },
+            new() { Id = "100004", Attainment8_Tot_Est_Current_Num = "50" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" },
+            new() { URN = "100001", NeighbourURN = "100004" }
+        );
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.AllResults.Select(r => r.SimilarSchool.URN)
+            .Should().Equal("100003", "100004", "100002");
+    }
+
+    [Fact]
+    public async Task SortBy_WhenDisplayedScoresAreTiedButUnderlyingValuesDiffer_OrdersAlphabeticallyByName()
+    {
+        _establishmentRepo.SetupEstablishments(
+            new() { URN = "100001" },
+            new() { URN = "100002", EstablishmentName = "Zebra School" },
+            new() { URN = "100003", EstablishmentName = "Acorn School" }
+        );
+        // Both round to 30.0 for display, but are not exactly equal underneath -
+        // the tie-break should still be based on what the user sees.
+        _performanceRepo.SetupEstablishmentPerformance(
+            new() { Id = "100002", Attainment8_Tot_Est_Current_Num = "30.04" },
+            new() { Id = "100003", Attainment8_Tot_Est_Current_Num = "29.96" }
+        );
+        _similarSchoolsRepo.SetupGroups(
+            new() { URN = "100001", NeighbourURN = "100002" },
+            new() { URN = "100001", NeighbourURN = "100003" }
+        );
+
+        var response = await _sut.Execute(Request("100001"));
+
+        response.AllResults.Select(r => r.SimilarSchool.URN)
+            .Should().Equal("100003", "100002");
     }
 
     [Fact]

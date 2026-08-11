@@ -19,8 +19,10 @@ public class JsonSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryReposit
     public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetGroupAsync(string urn)
     {
         var rows = await _groupsFile.ReadAllAsync();
-        var groupRows = rows.Where(r => r.URN == urn).ToList();
-        return groupRows.AsReadOnly();
+        return rows
+            .Where(r => r.URN == urn)
+            .ToList()
+            .AsReadOnly();
     }
 
     public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryValuesEntry>> GetValuesByUrnsAsync(
@@ -38,9 +40,8 @@ public class JsonSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryReposit
         }
 
         var rows = await _valuesFile.ReadAllAsync();
-        var matched = rows.Where(r => urnList.Contains(r.URN)).ToList();
-
-        return matched
+        return rows
+            .Where(r => urnList.Contains(r.URN))
             .ToList()
             .AsReadOnly();
     }
