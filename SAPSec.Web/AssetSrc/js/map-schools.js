@@ -2,70 +2,125 @@
     let initialised = false;
     let mapInstance = null;
 
-    function focusElement(el) {
-        if (el && typeof el.focus === "function") {
-            el.focus();
+    function getFocusablePopupElements(marker) {
+        const popupEl = marker.getPopup()?.getElement();
+        if (!popupEl) {
+            return { popupEl: null, nameLink: null, closeButton: null };
         }
+
+        return {
+            popupEl,
+            nameLink: popupEl.querySelector(".popup-name[href]"),
+            closeButton: popupEl.querySelector(".leaflet-popup-close-button"),
+        };
     }
 
-    function focusNextMarker(marker) {
-        const markerElement = marker.getElement?.();
-        const mapContainer = marker._map?.getContainer?.();
-        if (!markerElement || !mapContainer) return false;
+    function focusMarker(markerStates, index, direction) {
+        for (let i = index + direction; i >= 0 && i < markerStates.length; i += direction) {
+            const element = markerStates[i].marker.getElement?.();
+            if (!element) continue;
 
-        const focusableMarkers = Array.from(mapContainer.querySelectorAll(".leaflet-marker-icon"))
-            .filter((el) => el.tabIndex >= 0);
+            element.focus();
+            return true;
+        }
 
-        const currentIndex = focusableMarkers.indexOf(markerElement);
-        if (currentIndex < 0) return false;
+        return false;
+    }
 
-        const nextMarker = focusableMarkers[currentIndex + 1];
-        if (!nextMarker) return false;
+    function focusPopupStart(marker) {
+        const { nameLink, closeButton } = getFocusablePopupElements(marker);
+        const target = nameLink || closeButton;
 
-        focusElement(nextMarker);
+        if (!target) return false;
+
+        target.focus();
         return true;
     }
 
-    function wirePopupFocusOrder(marker) {
-        marker.on("popupopen", function (event) {
-            const popupElement = event.popup?.getElement?.();
-            if (!popupElement) return;
+    function enhancePopupFocus(markerStates, markerState) {
+        const { marker, school, index } = markerState;
+        const { popupEl, nameLink, closeButton } = getFocusablePopupElements(marker);
 
-            const markerElement = marker.getElement?.();
-            const openedFromMarkerFocus = document.activeElement === markerElement;
-            if (!openedFromMarkerFocus) return;
+        if (!popupEl || popupEl.dataset.focusManaged === "true") {
+            return;
+        }
 
-            const primaryLink = popupElement.querySelector(".popup-name[href]");
-            const closeButton = popupElement.querySelector(".leaflet-popup-close-button");
+        popupEl.dataset.focusManaged = "true";
 
-            if (!primaryLink && !closeButton) return;
+        if (closeButton) {
+            closeButton.setAttribute("aria-label", `Close ${school.name || "school"} popover`);
+        }
 
-            if (primaryLink && closeButton) {
-                primaryLink.addEventListener("keydown", function onPrimaryLinkKeydown(e) {
-                    if (e.key === "Tab" && !e.shiftKey) {
-                        e.preventDefault();
-                        focusElement(closeButton);
+        if (nameLink) {
+            nameLink.addEventListener("keydown", (event) => {
+                if (event.key !== "Tab") return;
+
+                if (event.shiftKey) {
+                    event.preventDefault();
+                    if (!focusMarker(markerStates, index, -1)) {
+                        marker.getElement?.()?.focus();
                     }
-                });
+                    return;
+                }
 
-                closeButton.addEventListener("keydown", function onCloseButtonKeydown(e) {
-                    if (e.key === "Tab" && e.shiftKey) {
-                        e.preventDefault();
-                        focusElement(primaryLink);
-                        return;
-                    }
+                if (closeButton) {
+                    event.preventDefault();
+                    closeButton.focus();
+                }
+            });
+        }
 
-                    if (e.key === "Tab" && !e.shiftKey) {
-                        e.preventDefault();
-                        marker.closePopup();
-                        setTimeout(function () {
-                            focusNextMarker(marker);
-                        }, 0);
+        if (closeButton) {
+            closeButton.addEventListener("keydown", (event) => {
+                if (event.key !== "Tab") return;
+
+                if (event.shiftKey) {
+                    event.preventDefault();
+                    if (nameLink) {
+                        nameLink.focus();
+                    } else if (!focusMarker(markerStates, index, -1)) {
+                        marker.getElement?.()?.focus();
                     }
-                });
+                    return;
+                }
+
+                if (focusMarker(markerStates, index, 1)) {
+                    event.preventDefault();
+                }
+            });
+        }
+    }
+
+    function enhanceMarkerFocus(markerStates, markerState) {
+        const { marker, school, index } = markerState;
+        const element = marker.getElement?.();
+
+        if (!element || element.dataset.focusManaged === "true") {
+            return;
+        }
+
+        element.dataset.focusManaged = "true";
+        element.setAttribute("aria-label", school.name ? `Open ${school.name} on map` : "Open school on map");
+
+        element.addEventListener("focus", () => {
+            if (!marker.isPopupOpen()) {
+                marker.openPopup();
+            }
+        });
+
+        element.addEventListener("keydown", (event) => {
+            if (event.key !== "Tab" || event.shiftKey) return;
+
+            if (!marker.isPopupOpen()) {
+                marker.openPopup();
             }
 
-            focusElement(primaryLink || closeButton);
+            event.preventDefault();
+            requestAnimationFrame(() => {
+                if (!focusPopupStart(marker)) {
+                    focusMarker(markerStates, index, 1);
+                }
+            });
         });
     }
 
@@ -244,6 +299,7 @@
 
 
         const markers = []; // collect markers for bounds when NOT clustering
+        const markerStates = [];
 
         for (const s of schools) {
             const ll = L.latLng(s.lat, s.lon);
@@ -257,13 +313,18 @@
                 iconToUse = s.isComparedSchool ? blueSchoolIcon : pinkSchoolIcon;
             }
 
-            const m = L.marker(ll, {
-                icon: iconToUse,
-                title: s.name || "School",
-                alt: s.name || "School",
-            }).bindPopup(popupHtml(s));
+            const m = L.marker(ll, { icon: iconToUse }).bindPopup(popupHtml(s));
+            const markerState = { marker: m, school: s, index: markerStates.length };
+            markerStates.push(markerState);
 
-            wirePopupFocusOrder(m);
+            m.on("add", () => {
+                enhanceMarkerFocus(markerStates, markerState);
+            });
+
+            m.on("popupopen", () => {
+                enhanceMarkerFocus(markerStates, markerState);
+                enhancePopupFocus(markerStates, markerState);
+            });
 
             if (useClusters) {
                 clusters.addLayer(m);
@@ -286,7 +347,10 @@
         }
 
         // Ensure correct render after toggle
-        setTimeout(() => mapInstance?.invalidateSize(true), 0);
+        setTimeout(() => {
+            mapInstance?.invalidateSize(true);
+            markerStates.forEach((markerState) => enhanceMarkerFocus(markerStates, markerState));
+        }, 0);
 
         initialised = true;
     }
