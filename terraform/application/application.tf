@@ -40,6 +40,7 @@ module "application_configuration" {
     DsiConfiguration__ApiSecret                 = data.azurerm_key_vault_secret.dsi_api_secret.value
     SENTRY_DSN                                  = data.azurerm_key_vault_secret.sentry_dsn.value
     StorageConnectionString                     = "DefaultEndpointsProtocol=https;AccountName=${module.storage.name};AccountKey=${module.storage.primary_access_key}"
+    REDIS_CACHE_URL                             = local.selected_redis.cache_url
   }, local.federated_auth_secrets)
 }
 
