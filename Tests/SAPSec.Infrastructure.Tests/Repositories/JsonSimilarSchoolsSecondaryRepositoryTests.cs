@@ -9,13 +9,11 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
 {
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryGroupsEntry>> _groupsRepo = new();
     private readonly Mock<IJsonFile<SimilarSchoolsSecondaryValuesEntry>> _valuesRepo = new();
-    private readonly Mock<IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>> _standardDeviationsRepo = new();
 
     private JsonSimilarSchoolsSecondaryRepository CreateSut() =>
         new(
             _groupsRepo.Object,
-            _valuesRepo.Object,
-            _standardDeviationsRepo.Object);
+            _valuesRepo.Object);
 
     [Fact]
     public async Task GetSimilarSchoolsGroupAsync_ReturnsNeighbourUrns()
@@ -102,30 +100,4 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         Assert.Equal("500", a.NumberOfPupils);
     }
 
-    [Fact]
-    public async Task GetSimilarSchoolsSecondaryStandardDeviationsAsync_ReturnsFirstRow()
-    {
-        var rows = new List<SimilarSchoolsSecondaryStandardDeviationsEntry>
-        {
-            new()
-            {
-                KS2MRP = 2.45M,
-                PPPerc = 10M,
-                PercentEAL = 5M,
-                Polar4QuintilePupils = 1.1M,
-                PStability = 6M,
-                IdaciPupils = 0.08M,
-                PercentSchSupport = 3M,
-                NumberOfPupils = 400M,
-                PercentageStatementOrEHP = 1.5M
-            }
-        };
-        _standardDeviationsRepo.Setup(r => r.ReadAllAsync()).ReturnsAsync(rows);
-
-        var sut = CreateSut();
-
-        var result = await sut.GetStandardDeviationsAsync();
-
-        Assert.Equal(2.45m, result.KS2MRP);
-    }
 }

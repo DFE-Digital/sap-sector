@@ -1,5 +1,4 @@
 using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Model;
 using System.Globalization;
 
@@ -52,9 +51,6 @@ public class SimilarSchoolsComparisonViewModel
         public required string Characteristic { get; init; }
         public required string CurrentSchoolValue { get; init; }
         public required string SimilarSchoolValue { get; init; }
-        public bool IsNumeric { get; init; }
-
-        public SchoolSimilarity Similarity { get; init; }
     }
     public decimal? ThisSchoolAttainment8ThreeYearAverage { get; set; }
     public decimal? SelectedSchoolAttainment8ThreeYearAverage { get; set; }

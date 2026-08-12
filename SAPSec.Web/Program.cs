@@ -40,7 +40,7 @@ public class Program
         {
             if (!SentryConfiguration.IsEnabled(sentrySettings))
             {
-                options.Dsn = null;
+                options.Dsn = "";
                 return;
             }
 
