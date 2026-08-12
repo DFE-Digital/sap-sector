@@ -4,6 +4,8 @@ Load testing suite for the [SAP Sector](../README.md) (School Account Profile) s
 
 Structure follows the same pattern used by [DFE-Digital/publish-teacher-training's load_testing suite](https://github.com/DFE-Digital/publish-teacher-training/tree/main/load_testing), scaled down to a single service.
 
+New to this? See **[RUNNING_LOCALLY.md](RUNNING_LOCALLY.md)** for a quick-start guide to running it on your own machine.
+
 ## What's covered
 
 **Anonymous pages** (run against local/review/test/production):
