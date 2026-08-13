@@ -23,6 +23,17 @@
                 return rect.width > 0 && rect.height > 0;
             })
             .sort((left, right) => {
+                const leftGroup = left.dataset.mapFocusGroup || "marker";
+                const rightGroup = right.dataset.mapFocusGroup || "marker";
+
+                if (leftGroup !== rightGroup) {
+                    return leftGroup === "control" ? 1 : -1;
+                }
+
+                if (leftGroup === "control") {
+                    return 0;
+                }
+
                 const leftRect = left.getBoundingClientRect();
                 const rightRect = right.getBoundingClientRect();
                 const topDiff = leftRect.top - rightRect.top;
@@ -172,6 +183,7 @@
 
         element.dataset.focusManaged = "true";
         element.dataset.mapFocusable = "true";
+        element.dataset.mapFocusGroup = "marker";
         element.tabIndex = 0;
         element.setAttribute("role", "button");
         element.setAttribute("aria-haspopup", "dialog");
@@ -216,6 +228,7 @@
 
             element.dataset.focusManaged = "true";
             element.dataset.mapFocusable = "true";
+            element.dataset.mapFocusGroup = "marker";
             element.tabIndex = 0;
             element.setAttribute("role", "button");
 
@@ -244,6 +257,41 @@
         });
     }
 
+    function enhanceZoomControlFocus(host) {
+        host.querySelectorAll(".leaflet-control-zoom a").forEach((element) => {
+            if (element.dataset.focusManaged === "true") {
+                return;
+            }
+
+            element.dataset.focusManaged = "true";
+            element.dataset.mapFocusable = "true";
+            element.dataset.mapFocusGroup = "control";
+
+            if (!element.getAttribute("aria-label")) {
+                const zoomLabel = element.classList.contains("leaflet-control-zoom-in")
+                    ? "Zoom in"
+                    : element.classList.contains("leaflet-control-zoom-out")
+                        ? "Zoom out"
+                        : (element.getAttribute("title") || "").trim();
+
+                if (zoomLabel) {
+                    element.setAttribute("aria-label", zoomLabel);
+                }
+            }
+
+            element.addEventListener("keydown", (event) => {
+                if (event.key !== "Tab") return;
+
+                const direction = event.shiftKey ? -1 : 1;
+                if (!focusAdjacentMapItem(host, element, direction)) {
+                    return;
+                }
+
+                event.preventDefault();
+            });
+        });
+    }
+
     function refreshMapAccessibility(host, markerStates) {
         markerStates.forEach((markerState) => {
             enhanceMarkerFocus(host, markerState);
@@ -251,6 +299,7 @@
         });
 
         enhanceClusterFocus(host);
+        enhanceZoomControlFocus(host);
     }
 
     function parseSchools(host) {
