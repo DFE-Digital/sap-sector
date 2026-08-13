@@ -12,11 +12,11 @@ public class GetSchoolAttendanceComparisonUseCase(
 {
     public async Task<GetSchoolAttendanceComparisonResponse> Execute(GetSchoolAttendanceComparisonRequest request)
     {
-        var dataProvider = new PrimaryAttendanceComparisonDataProvider(
+        var dataProvider = new PrimaryAbsenceComparisonDataProvider(
             establishmentRepository,
             absenceRepository);
 
-        var (currentSchoolData, similarSchoolData) = await dataProvider.GetComparisonAttendance(
+        var (currentSchoolData, similarSchoolData) = await dataProvider.GetComparisonAbsence(
             request.Urn,
             request.SimilarSchoolUrn);
 

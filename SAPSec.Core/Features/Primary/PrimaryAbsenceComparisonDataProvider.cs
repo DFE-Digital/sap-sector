@@ -3,11 +3,11 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Primary;
 
-public class PrimaryAttendanceComparisonDataProvider(
+public class PrimaryAbsenceComparisonDataProvider(
     IEstablishmentRepository establishmentRepository,
     IAbsenceRepository absenceRepository)
 {
-    public async Task<(SchoolData<AbsenceData> CurrentSchool, SchoolData<AbsenceData> SimilarSchool)> GetComparisonAttendance(
+    public async Task<(SchoolData<AbsenceData> CurrentSchool, SchoolData<AbsenceData> SimilarSchool)> GetComparisonAbsence(
         string currentSchoolUrn,
         string similarSchoolUrn)
     {
@@ -27,16 +27,16 @@ public class PrimaryAttendanceComparisonDataProvider(
             throw new NotFoundException($"School not found with URN: {similarSchoolUrn}");
         }
 
-        var attendances = (await absenceRepository.GetByUrnsAsync(urns))
+        var absences = (await absenceRepository.GetByUrnsAsync(urns))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
         var currentSchoolData = new SchoolData<AbsenceData>(
             schools[currentSchoolUrn],
-            attendances.TryGetValue(currentSchoolUrn, out var currentAttendance) ? currentAttendance : null);
+            absences.TryGetValue(currentSchoolUrn, out var currentAbsence) ? currentAbsence : null);
 
         var similarSchoolData = new SchoolData<AbsenceData>(
             schools[similarSchoolUrn],
-            attendances.TryGetValue(similarSchoolUrn, out var similarAttendance) ? similarAttendance : null);
+            absences.TryGetValue(similarSchoolUrn, out var similarAbsence) ? similarAbsence : null);
 
         return (currentSchoolData, similarSchoolData);
     }

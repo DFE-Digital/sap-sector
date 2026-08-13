@@ -110,9 +110,140 @@ public class GetSchoolAttendanceComparisonUseCaseTests
         series.Should().Be(new MeasureSeries(MeasureSeriesType.SimilarSchool, null, null, null));
     }
 
+    [InlineData(MeasureSeriesType.CurrentSchool)]
+    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
+    public async Task Absence_WhenNoAbsenceData_ContainsNullValues(MeasureSeriesType seriesType)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        var response = await _sut.Execute(Request("100001", "100002"));
+
+        var series = response.Absence.Series
+            .FirstOrDefault(s => s.SeriesType == seriesType);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(seriesType, null, null, null));
+    }
+
+    [InlineData(MeasureSeriesType.CurrentSchool)]
+    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
+    [Theory]
+    public async Task Absence_WhenEmptyValues_ContainsNulls(MeasureSeriesType seriesType)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        _absenceRepo.SetupEstablishmentAbsence(
+            Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "", previous: "", previous2: "")),
+            Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "", previous: "", previous2: "")));
+
+        _absenceRepo.SetupEnglandAbsence(
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "", previous: "", previous2: "")));
+
+        var response = await _sut.Execute(Request("100001", "100002"));
+
+        var series = response.Absence.Series
+            .FirstOrDefault(s => s.SeriesType == seriesType);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(seriesType, null, null, null));
+    }
+
+    [InlineData(MeasureSeriesType.CurrentSchool)]
+    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
+    [Theory]
+    public async Task Absence_WhenInvalidValues_ContainsNulls(MeasureSeriesType seriesType)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        _absenceRepo.SetupEstablishmentAbsence(
+            Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "x", previous: "y2", previous2: "3z")),
+            Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "x", previous: "y2", previous2: "3z")));
+
+        _absenceRepo.SetupEnglandAbsence(
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "x", previous: "y2", previous2: "3z")));
+
+        var response = await _sut.Execute(Request("100001", "100002"));
+
+        var series = response.Absence.Series
+            .FirstOrDefault(s => s.SeriesType == seriesType);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(seriesType, null, null, null));
+    }
+
+    [Fact]
+    public async Task FilterBy_IgnoresInvalidFilterKeys()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        _absenceRepo.SetupEstablishmentAbsence(
+            Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "18", previous: "75", previous2: "80")));
+
+        var response = await _sut.Execute(Request("100001", "100002", new()
+        {
+            ["xxx"] = "1",
+            [Absence.Filters.Type.Key] = Absence.Filters.Type.Values.Overall,
+            ["yyy"] = "2",
+        }));
+
+        response.Absence.Series.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task Absence_FilterBy_Type_WhenMissingEmptyOrInvalidValuesForSelectedSubject_ContainsNullValues()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+
+        _absenceRepo.SetupEstablishmentAbsence(
+            Build.Absence.Establishment("100001", x => x
+                .WithOverallAbsence(current: "81", previous: "80", previous2: "79")
+                .WithPersistentAbsence(current: "", previous: "", previous2: "")),
+            Build.Absence.Establishment("100002", x => x
+                .WithOverallAbsence(current: "81", previous: "80", previous2: "79")
+                .WithPersistentAbsence(current: "", previous: "", previous2: "")));
+
+        _absenceRepo.SetupEnglandAbsence(
+            Build.Absence.England(x => x
+                .WithOverallAbsencePrimary(current: "81", previous: "80", previous2: "79")
+                .WithPersistentAbsencePrimary(current: "", previous: "", previous2: "")));
+
+        var response = await _sut.Execute(Request("100001", "100002", new()
+        {
+            [Absence.Filters.Type.Key] = Absence.Filters.Type.Values.Persistent
+        }));
+
+        var series = response.Absence.Series;
+
+        series.Should().NotBeNull();
+        series.Should().Equal(
+            new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null),
+            new MeasureSeries(MeasureSeriesType.SimilarSchool, null, null, null),
+            new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
     [InlineData(Absence.Filters.Type.Values.Overall, 8.00, 6.10, 6.10)]
     [InlineData(Absence.Filters.Type.Values.Persistent, 2.27, 1.24, 3.20)]
+    //Empty or invalid filter values default to Overall absence
+    [InlineData("", 8.00, 6.10, 6.10)]
+    [InlineData("xyz", 8.00, 6.10, 6.10)]
+    [Theory]
     public async Task Absence_FilterBy_Type_ContainsCurrentYearValuesForSelectedType(
         string type, double currentSchool, double similarSchool, double england)
     {
