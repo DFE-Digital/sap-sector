@@ -31,7 +31,6 @@ public static class DependenciesExtensions
 
         // Use cases
         services.AddSingleton<GetKs4HeadlineMeasures>();
-        services.AddSingleton<GetSchoolKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4CoreSubjects>();
         services.AddSingleton<GetFilteredSchoolKs4CoreSubject>();
         services.AddSingleton<GetAttendanceMeasures>();

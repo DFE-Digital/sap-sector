@@ -172,4 +172,21 @@ public record GetKs4HeadlineMeasuresResponse(
     Ks4HeadlineMeasureAverage DestinationsEmploymentThreeYearAverage,
     Ks4HeadlineMeasureYearByYear DestinationsEmploymentYearByYear);
 
+public record SchoolKs4ComparisonAverage(
+    decimal? SchoolValue,
+    decimal? SimilarSchoolsValue,
+    decimal? LocalAuthorityValue,
+    decimal? EnglandValue);
 
+public record Ks4TopPerformer(
+    int Rank,
+    string Urn,
+    string Name,
+    decimal? Value,
+    bool IsCurrentSchool = false);
+
+public record SchoolKs4ComparisonYearByYear(
+    Ks4HeadlineMeasureSeries School,
+    Ks4HeadlineMeasureSeries SimilarSchools,
+    Ks4HeadlineMeasureSeries LocalAuthority,
+    Ks4HeadlineMeasureSeries England);
