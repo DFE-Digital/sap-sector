@@ -18,7 +18,7 @@ public class Ks4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
     private const string EnglishMathsHeaderText = "Grade achieved in English and maths GCSEs";
     private const string DestinationsHeaderText = "Staying in education or entering employment";
 
-    private const string Urn = "100049";
+    private const string Urn = "100052";
     private static readonly Routes.Secondary SecondarySchoolRoute = Routes.SecondarySchool(Urn);
 
     public override async Task InitializeAsync()
