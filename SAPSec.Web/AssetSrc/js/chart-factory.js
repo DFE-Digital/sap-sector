@@ -64,10 +64,11 @@ const CHART_CONFIG = {
         },
         datalabels: {
             anchor: 'end',
-            smallValueAlign: 'end',
+            smallValueAlign: 'right',
             defaultAlign: 'start',
             mobileInsideThresholdRatio: 0.4,
-            offset: 10,
+            defaultOffset: 10,
+            smallValueOffset: 6,
             fontWeight: 'bold'
         },
         noData: {
@@ -175,7 +176,12 @@ function canBarFitLabel(ctx, axisSuffix) {
         return true;
     }
 
-    const barLength = Math.abs(xScale.getPixelForValue(value) - xScale.getPixelForValue(0));
+    const axisMin = typeof xScale.min === 'number' ? xScale.min : 0;
+    const axisMax = typeof xScale.max === 'number' ? xScale.max : 0;
+    const baseValue = axisMin > 0 && value >= axisMin && axisMax > axisMin
+        ? axisMin
+        : 0;
+    const barLength = Math.abs(xScale.getPixelForValue(value) - xScale.getPixelForValue(baseValue));
     const font = Chart.helpers.toFont(ctx.chart.options?.plugins?.datalabels?.font);
 
     canvasContext.save();
@@ -183,7 +189,7 @@ function canBarFitLabel(ctx, axisSuffix) {
     const labelWidth = canvasContext.measureText(getBarLabelText(value, axisSuffix)).width;
     canvasContext.restore();
 
-    return barLength >= labelWidth + (CHART_CONFIG.bar.datalabels.offset * 2);
+    return barLength >= labelWidth + (CHART_CONFIG.bar.datalabels.defaultOffset * 2);
 }
 
 function isMobileViewport() {
@@ -228,6 +234,13 @@ function getBarLabelColor(ctx, gdsStyles, axisSuffix, barLabelAlign) {
     return align === CHART_CONFIG.bar.datalabels.defaultAlign
         ? gdsStyles.onBarLabel
         : gdsStyles.text;
+}
+
+function getBarLabelOffset(ctx, axisSuffix, barLabelAlign) {
+    const align = getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
+    return align === CHART_CONFIG.bar.datalabels.defaultAlign
+        ? CHART_CONFIG.bar.datalabels.defaultOffset
+        : CHART_CONFIG.bar.datalabels.smallValueOffset;
 }
 
 function buildExplicitTicks(axisMin, axisMax, stepSize) {
@@ -325,6 +338,19 @@ function getDynamicLineAxisConfig(chartData, axisSuffix) {
     };
 }
 
+function toFixedRoundedHalfAwayFromZero(value, decimals) {
+    // Number.prototype.toFixed rounds based on the binary floating-point
+    // representation of `value`, which can differ from the decimal value's
+    // true nearest/rounded representation (e.g. (98.05).toFixed(1) === "98.0").
+    // Rounding the absolute value (nudged by Number.EPSILON to correct for
+    // float imprecision) and reapplying the sign matches the server-side
+    // decimal rounding used for the table (0.0-style, half away from zero).
+    const factor = Math.pow(10, decimals);
+    const sign = value < 0 ? -1 : 1;
+    const rounded = sign * Math.round((Math.abs(value) + Number.EPSILON) * factor) / factor;
+    return rounded.toFixed(decimals);
+}
+
 function formatTooltipValue(value, axisSuffix, decimals) {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
         return 'No data';
@@ -332,7 +358,7 @@ function formatTooltipValue(value, axisSuffix, decimals) {
 
     const numericValue = Number(value);
     const formattedValue = decimals !== null && decimals !== undefined
-        ? numericValue.toFixed(decimals)
+        ? toFixedRoundedHalfAwayFromZero(numericValue, decimals)
         : numericValue;
 
     return `${formattedValue}${axisSuffix}`;
@@ -636,7 +662,9 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     align: function (ctx) {
                         return getBarLabelAlignment(ctx, axisSuffix, barLabelAlign);
                     },
-                    offset: CHART_CONFIG.bar.datalabels.offset,
+                    offset: function (ctx) {
+                        return getBarLabelOffset(ctx, axisSuffix, barLabelAlign);
+                    },
                     color: function (ctx) {
                         return getBarLabelColor(ctx, gdsStyles, axisSuffix, barLabelAlign);
                     },
@@ -891,7 +919,7 @@ function initCharts(canvas) {
                 if (!showDataLabels || value === null || value === undefined || Number.isNaN(value)) {
                     return null;
                 }
-                return `${Number(value).toFixed(labelDecimals)}${axisSuffix}`;
+                return `${toFixedRoundedHalfAwayFromZero(Number(value), labelDecimals)}${axisSuffix}`;
             };
         }
 

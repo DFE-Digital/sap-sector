@@ -12,8 +12,8 @@ public static class LocatorAssertionsExtensions
     {
         await assertions.ToHaveCountAsync(count);
         var locator = assertions.GetActualLocator();
-        var previous2Values = await locator.AllTrimmedTextContentsAsync();
-        previous2Values.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
+        var values = await locator.AllTrimmedTextContentsAsync();
+        values.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
     }
 
     private static ILocator GetActualLocator(this ILocatorAssertions assertions)

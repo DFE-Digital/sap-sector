@@ -1,3 +1,4 @@
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
@@ -40,7 +41,7 @@ public class FindSimilarSchools(
 
         var similarSchools = schools.Except([currentSchool]);
 
-        var filterBy = request.FilterBy ?? new Dictionary<string, IEnumerable<string>>();
+        var filterBy = request.FilterBy.AsCaseInsensitive();
         var filters = new SimilarSchoolsFilters(filterBy, currentSchool);
 
         var errors = filters.Validate();

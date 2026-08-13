@@ -16,11 +16,6 @@ public static class ElementExtensions
         return el.Children.Select(c => c.TextContent.Trim());
     }
 
-    public static void ShouldHaveTextContent(this IElement el, string text)
-    {
-        el.TrimmedTextContent().Should().Be(text.Trim());
-    }
-
     public static void ShouldLinkTo(this IElement el, string text, string path)
     {
         el.TrimmedTextContent().Should().Be(text.Trim());
@@ -31,5 +26,13 @@ public static class ElementExtensions
     {
         var rows = table.QuerySelectorAll("tr").Select(r => r.QuerySelectorAll("th, td").Select(TrimmedTextContent));
         rows.Should().BeEquivalentTo(expectedRows);
+    }
+
+    public static void SelectOption(this IHtmlSelectElement select, string optionText)
+    {
+        foreach (var option in select.Options)
+        {
+            option.IsSelected = option.TrimmedTextContent() == optionText;
+        }
     }
 }

@@ -1,11 +1,12 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public class SimilarSchoolsOverallAbsenceRateFilter(
     string key,
     string name,
-    IDictionary<string, IEnumerable<string>> filterValues,
+    CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool) : SimilarSchoolsNumericRangeFilter(key, name, filterValues, currentSchool)
 {
     protected override DataWithAvailability<string> CurrentSchoolValue

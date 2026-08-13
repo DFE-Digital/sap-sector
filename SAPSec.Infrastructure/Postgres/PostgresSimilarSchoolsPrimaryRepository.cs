@@ -10,7 +10,9 @@ public class PostgresSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRep
     private readonly ILogger<PostgresSimilarSchoolsPrimaryRepository> _logger;
     private readonly NpgsqlDataSourceFactory _factory;
 
-    public PostgresSimilarSchoolsPrimaryRepository(ILogger<PostgresSimilarSchoolsPrimaryRepository> logger, NpgsqlDataSourceFactory factory)
+    public PostgresSimilarSchoolsPrimaryRepository(
+        ILogger<PostgresSimilarSchoolsPrimaryRepository> logger,
+        NpgsqlDataSourceFactory factory)
     {
         _logger = logger;
         _factory = factory;
@@ -18,14 +20,13 @@ public class PostgresSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRep
 
     public async Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetGroupAsync(string urn)
     {
-        using var conn = await _factory.Create().OpenConnectionAsync();
-
         const string sql = """
             SELECT *
-            FROM public.v_similar_schools_primary_groups 
+            FROM public.v_similar_schools_primary_groups
             WHERE "URN" = @urn
         """;
 
+        using var conn = await _factory.Create().OpenConnectionAsync();
         var results = await conn.QueryAsync<SimilarSchoolsPrimaryGroupsEntry>(sql, new { urn });
 
         return results
@@ -47,7 +48,6 @@ public class PostgresSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRep
         """;
 
         using var conn = await _factory.Create().OpenConnectionAsync();
-
         var results = await conn.QueryAsync<SimilarSchoolsPrimaryValuesEntry>(sql, new { urns = urns.ToArray() });
 
         return results
@@ -58,9 +58,8 @@ public class PostgresSimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRep
     public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
     {
         const string sql = """
-            SELECT
-                DISTINCT "URN" 
-            FROM v_similar_schools_primary_values;
+            SELECT DISTINCT "URN"
+            FROM public.v_similar_schools_primary_values;
         """;
 
         using var conn = await _factory.Create().OpenConnectionAsync();

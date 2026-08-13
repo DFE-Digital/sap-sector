@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
@@ -8,8 +9,8 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SimilarSchoolsPath = "/school/108088/view-similar-schools";
-    private const string NoResultsSimilarSchoolsPath = "/school/108088/view-similar-schools?ur=doesnotexist";
+    private static readonly string SimilarSchoolsPath = Routes.SecondarySchool("108088").ViewSimilarSchools;
+    private static readonly string NoResultsSimilarSchoolsPath = $"{Routes.SecondarySchool("108088").ViewSimilarSchools}?ur=doesnotexist";
 
     [Fact]
     public async Task SimilarSchoolsPage_LoadsSuccessfully()
@@ -135,6 +136,39 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
         var type = await schoolsData.GetAttributeAsync("type");
 
         type.Should().Be("application/json", "Schools data should have correct type attribute");
+    }
+
+    [Fact]
+    public async Task ClickFilterToggle_ExpandsFilterPanel()
+    {
+        await Page.GotoAsync(SimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var filterToggle = Page.Locator("[data-module='app-filter-toggle']");
+        await filterToggle.ClickAsync();
+
+        var filterPanel = Page.Locator("#app-filter-panel");
+        var hasVisibleClass = await filterPanel.EvaluateAsync<bool>("el => el.classList.contains('app-filter-panel--visible')");
+
+        hasVisibleClass.Should().BeTrue("Filter panel should be visible after clicking the filter toggle");
+    }
+
+    [Fact]
+    public async Task ClickFilterSectionToggle_TogglesFilterSectionExpandedState()
+    {
+        await Page.GotoAsync(SimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var filterToggle = Page.Locator("[data-module='app-filter-toggle']");
+        await filterToggle.ClickAsync();
+
+        var sectionToggle = Page.Locator(".app-filter-section__toggle").First;
+        var initiallyExpanded = await sectionToggle.GetAttributeAsync("aria-expanded");
+
+        await sectionToggle.ClickAsync();
+
+        var expandedAfterClick = await sectionToggle.GetAttributeAsync("aria-expanded");
+        expandedAfterClick.Should().NotBe(initiallyExpanded, "Clicking a filter section toggle should flip its expanded state");
     }
 
     [Fact]

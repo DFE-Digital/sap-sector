@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Model;
+using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Helpers;
 
@@ -32,32 +33,12 @@ public static class SchoolRouteHelper
     }
 
     private static string GetPrimaryPath(PathString requestPath, string urn)
-    {
-        var path = requestPath.Value ?? string.Empty;
-
-        return path.ToLowerInvariant() switch
-        {
-            var p when p.EndsWith("/attendance") => $"/school/primary/{urn}/attendance",
-            var p when p.EndsWith("/school-details") => $"/school/primary/{urn}/school-details",
-            var p when p.EndsWith("/what-is-a-similar-school") => $"/school/primary/{urn}/what-is-a-similar-school",
-            var p when p.EndsWith("/view-similar-schools") => $"/school/primary/{urn}/view-similar-schools",
-            var p when p.EndsWith("/similar-schools") => $"/school/primary/{urn}/view-similar-schools",
-            _ => $"/school/primary/{urn}"
-        };
-    }
+        => (requestPath.Value ?? string.Empty)
+            .Replace($"/school/{urn}", Routes.PrimarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.SecondarySchool(urn).Overview, Routes.PrimarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase);
 
     private static string GetSecondaryPath(PathString requestPath, string urn)
-    {
-        var path = requestPath.Value ?? string.Empty;
-
-        return path.ToLowerInvariant() switch
-        {
-            var p when p.EndsWith("/attendance") => $"/school/{urn}/attendance",
-            var p when p.EndsWith("/school-details") => $"/school/{urn}/school-details",
-            var p when p.EndsWith("/what-is-a-similar-school") => $"/school/{urn}/what-is-a-similar-school",
-            var p when p.EndsWith("/view-similar-schools") => $"/school/{urn}/view-similar-schools",
-            var p when p.EndsWith("/similar-schools") => $"/school/{urn}/view-similar-schools",
-            _ => $"/school/{urn}"
-        };
-    }
+        => (requestPath.Value ?? string.Empty)
+            .Replace($"/school/{urn}", Routes.SecondarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase)
+            .Replace(Routes.PrimarySchool(urn).Overview, Routes.SecondarySchool(urn).Overview, StringComparison.OrdinalIgnoreCase);
 }
