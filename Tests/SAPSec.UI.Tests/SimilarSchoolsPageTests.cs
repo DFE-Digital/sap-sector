@@ -142,6 +142,7 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
     [Fact]
     public async Task ClickFilterToggle_ExpandsFilterPanel()
     {
+        await Page.SetViewportSizeAsync(375, 667);
         await Page.GotoAsync(SimilarSchoolsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -157,6 +158,7 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
     [Fact]
     public async Task ClickFilterSectionToggle_TogglesFilterSectionExpandedState()
     {
+        await Page.SetViewportSizeAsync(375, 667);
         await Page.GotoAsync(SimilarSchoolsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 

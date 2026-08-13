@@ -22,4 +22,10 @@ public static class FluentAssertionExtensions
             }
         }
     }
+
+    public static void Contain(this GenericDictionaryAssertions<IEnumerable<KeyValuePair<string, string>>, string, string> keyValuePairs, params (string, string)[] expectedPairs)
+    {
+        var expected = expectedPairs.Select(p => new KeyValuePair<string, string>(p.Item1, p.Item2)).ToArray();
+        keyValuePairs.Contain(expected);
+    }
 }

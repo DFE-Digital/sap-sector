@@ -1,10 +1,10 @@
 using FluentAssertions;
 using Microsoft.Playwright;
-using SAPSec.Web.Constants;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using System.Text.Json;
 using Xunit;
-using SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 namespace SAPSec.UI.Tests.Deprecated;
 
@@ -17,7 +17,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
     {
         await Page.GotoAsync(Path, new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "KS4 headline performance measures" })).ToBeVisibleAsync();
-        await Expect(Page.Locator("#ks4-attainment8-school-chart")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#attainment8-school-chart")).ToBeVisibleAsync();
     }
 
     private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
@@ -41,8 +41,8 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
     {
         await NavigateAsync();
 
-        var barChart = Page.Locator("#ks4-attainment8-school-chart");
-        var lineChart = Page.Locator("#ks4-attainment8-school-yearbyyear-chart");
+        var barChart = Page.Locator("#attainment8-school-chart");
+        var lineChart = Page.Locator("#attainment8-school-yearbyyear-chart");
 
         await Expect(barChart).ToBeVisibleAsync();
         await ToggleChartViewAsync();
@@ -72,7 +72,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
         await NavigateAsync();
 
         await ToggleChartViewAsync();
-        var lineChart = Page.Locator("#ks4-attainment8-school-yearbyyear-chart");
+        var lineChart = Page.Locator("#attainment8-school-yearbyyear-chart");
         await Expect(lineChart).ToBeVisibleAsync();
 
         var axis = await lineChart.EvaluateAsync<JsonElement>(@"
@@ -103,7 +103,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
 
         var barChartSelectors = new[]
         {
-            "#ks4-attainment8-school-chart",
+            "#attainment8-school-chart",
             "#eng-maths-school-chart",
             "#destinations-school-chart"
         };
@@ -127,7 +127,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
 
         var lineChartSelectors = new[]
         {
-            "#ks4-attainment8-school-yearbyyear-chart",
+            "#attainment8-school-yearbyyear-chart",
             "#eng-maths-school-yearbyyear-chart",
             "#destinations-school-yearbyyear-chart"
         };

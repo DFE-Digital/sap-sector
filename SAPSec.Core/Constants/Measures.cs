@@ -150,11 +150,12 @@ public static class Measures
             }
         }
     }
-    
-    
+
+
     public static class Absence
     {
         public const string Key = "absence";
+        public const string Name = "Attendance";
 
         public static class Filters
         {

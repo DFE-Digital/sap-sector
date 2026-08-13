@@ -16,16 +16,16 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
 {
     private static readonly TimeSpan SearchIndexTimeout = TimeSpan.FromSeconds(3);
 
-    protected IntegrationTestsWebApplicationFactory _factory = null!;
+    protected IntegrationTestsWebApplicationFactory? _factory;
 
-    private IBrowsingContext _browsingContext = null!;
+    private IBrowsingContext? _browsingContext = null;
 
     public HttpClient Client { get; private set; } = null!;
 
     public HttpClient NonRedirectingClient { get; private set; } = null!;
 
     public MockFeatureFlagService FeatureFlagService =>
-        (MockFeatureFlagService)_factory.Services.GetRequiredService<IFeatureFlagService>();
+        (MockFeatureFlagService)_factory!.Services.GetRequiredService<IFeatureFlagService>();
 
     public Task InitializeAsync()
     {
@@ -60,13 +60,18 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
     {
         Client?.Dispose();
         NonRedirectingClient?.Dispose();
-        await _factory.DisposeAsync();
-        _browsingContext.Dispose();
+
+        if (_factory is not null)
+        {
+            await _factory.DisposeAsync();
+        }
+
+        _browsingContext?.Dispose();
     }
 
     public async Task RebuildSearchIndex()
     {
-        var indexBuilder = _factory.Services.GetServices<IHostedService>()
+        var indexBuilder = _factory!.Services.GetServices<IHostedService>()
             .OfType<StartupIndexBuilder>()
             .Single();
         indexBuilder.IndexBuiltSuccessfully = false;
@@ -90,7 +95,7 @@ public abstract class IntegrationTestFixture : IAsyncLifetime
             expectedStatusCodes = [HttpStatusCode.OK];
         }
 
-        var document = await _browsingContext.OpenAsync($"https://127.0.0.1:0{path}");
+        var document = await _browsingContext!.OpenAsync($"https://127.0.0.1:0{path}");
 
         document.StatusCode.Should().BeOneOf(expectedStatusCodes);
 

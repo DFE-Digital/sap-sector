@@ -2,6 +2,7 @@
 using FluentAssertions;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -13,6 +14,17 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
+    [Fact]
+    public async Task Ks4HeadlineMeasures_WithNonExistentUrn_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var response = await Fixture.Client.GetAsync(Routes.SecondarySchool("999999").KS4HeadlineMeasures);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
     [Fact]
     public async Task Progress8_MeasureExistsOnPage()
     {
@@ -136,6 +148,32 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
             Routes.SecondarySchool("100001").SimilarSchoolComparison("100002"),
             Routes.SecondarySchool("100001").SimilarSchoolComparison("100003")
         ]);
+    }
+
+    [Fact]
+    public async Task Attainment8_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("attainment8-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "30"),
+            ("axis-max", "90"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("attainment8-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "30"),
+            ("axis-max", "90"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
     }
 
     [Fact]
@@ -283,6 +321,32 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
             Routes.SecondarySchool("100001").SimilarSchoolComparison("100003"),
             Routes.SecondarySchool("100001").SimilarSchoolComparison("100002")
         ]);
+    }
+
+    [Fact]
+    public async Task EnglishMaths_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("eng-maths-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("eng-maths-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
     }
 
     [Fact]
@@ -495,6 +559,32 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
             Routes.SecondarySchool("100001").SimilarSchoolComparison("100003"),
             Routes.SecondarySchool("100001").SimilarSchoolComparison("100002")
         ]);
+    }
+
+    [Fact]
+    public async Task Destinations_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("destinations-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("destinations-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
     }
 
     [Fact]

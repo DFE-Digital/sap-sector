@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
@@ -16,8 +15,6 @@ using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using SAPSec.Web.Services;
 using SAPSec.Web.Setup;
-using Sentry;
-using Sentry.AspNetCore;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
@@ -40,7 +37,7 @@ public class Program
         {
             if (!SentryConfiguration.IsEnabled(sentrySettings))
             {
-                options.Dsn = null;
+                options.Dsn = "";
                 return;
             }
 
