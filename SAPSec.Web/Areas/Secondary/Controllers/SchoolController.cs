@@ -184,15 +184,12 @@ public class SchoolController : Controller
 
         PopulateViewData(response.School);
 
-        Func<string, string> viewSimilarSchools = urn => Routes.SecondarySchool(urn).ViewSimilarSchools;
-        Func<string, string, string> similarSchoolComparison = (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn);
-
         var model = new ViewModels.Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Attainment8 = MeasureViewModel.FromMeasure(response.Attainment8, response.School, null, viewSimilarSchools, similarSchoolComparison),
-            EnglishMaths = MeasureViewModel.FromMeasure(response.EnglishMaths, response.School, null, viewSimilarSchools, similarSchoolComparison),
-            Destinations = MeasureViewModel.FromMeasure(response.Destinations, response.School, null, viewSimilarSchools, similarSchoolComparison)
+            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School),
+            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School),
+            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School)
         };
 
         return View(model);

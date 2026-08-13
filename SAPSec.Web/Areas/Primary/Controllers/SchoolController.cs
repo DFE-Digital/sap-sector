@@ -50,18 +50,15 @@ public class SchoolController(
 
         PopulateViewData(response.School);
 
-        Func<string, string> viewSimilarSchools = urn => Routes.PrimarySchool(urn).ViewSimilarSchools;
-        Func<string, string, string> similarSchoolComparison = (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn);
-
         var model = new Ks2MeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School, null, viewSimilarSchools, similarSchoolComparison),
-            AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(response.AchievedHigherStandardRwm, response.School, null, viewSimilarSchools, similarSchoolComparison),
-            AverageScaledScoreReading = MeasureViewModel.FromMeasure(response.AverageScaledScoreReading, response.School, null, viewSimilarSchools, similarSchoolComparison),
-            AverageScaledScoreMaths = MeasureViewModel.FromMeasure(response.AverageScaledScoreMaths, response.School, null, viewSimilarSchools, similarSchoolComparison),
-            MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardGps, response.School, null, viewSimilarSchools, similarSchoolComparison),
-            AchievedHigherStandardGps = MeasureViewModel.FromMeasure(response.AchievedHigherStandardGps, response.School, null, viewSimilarSchools, similarSchoolComparison)
+            MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School),
+            AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School),
+            AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School),
+            AverageScaledScoreMaths = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreMaths, response.School),
+            MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardGps, response.School),
+            AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School)
         };
 
         return View(model);
@@ -79,7 +76,7 @@ public class SchoolController(
         var model = new AttendanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Absence = MeasureViewModel.FromMeasure(response.Absence, response.School, null, null, null)
+            Absence = MeasureViewModel.FromPrimaryMeasure(response.Absence, response.School)
         };
 
         return View(model);

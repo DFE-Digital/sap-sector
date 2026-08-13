@@ -1,5 +1,6 @@
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.ViewModels.Measures;
 
@@ -10,18 +11,6 @@ public record MeasureViewModel(
     TableViewModel Table,
     TopPerformersViewModel? TopPerformers)
 {
-    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
-        seriesType switch
-        {
-            MeasureSeriesType.CurrentSchool => currentSchool.Name,
-            MeasureSeriesType.SimilarSchool => similarSchool?.Name ??
-                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
-            MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
-            MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
-            MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
-            _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
-        };
-
     // chart-factory.js assigns bar/line colours to datasets by array position (school/similarSchools/
     // localAuthority/england), which assumes the 4-series shape produced by Measure.ForSchool. The 3-series
     // comparison shape (CurrentSchool/SimilarSchool/EnglandSchoolsAverage) puts England at the position
@@ -29,12 +18,31 @@ public record MeasureViewModel(
     private static readonly string[] ComparisonChartColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
 
-    public static MeasureViewModel FromMeasure(
+    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn));
+
+    public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+        => FromMeasure(measure, schoolInfo, similarSchool,
+            urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn),
+            ComparisonChartColors,
+            ComparisonYearByYearColors);
+
+    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn));
+
+    private static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
         SchoolInfo? similarSchool,
-        Func<string, string>? viewSimilarSchoolsUrl,
-        Func<string, string, string>? similarSchoolComparisonUrl)
+        Func<string, string> viewSimilarSchoolsUrl,
+        Func<string, string, string> similarSchoolComparisonUrl,
+        string[]? currentYearChartColors = null,
+        string[]? yearByYearChartColors = null)
     {
         var isComparison = similarSchool is not null;
 
@@ -70,8 +78,8 @@ public record MeasureViewModel(
             measure.Series.Select(MapTableRow));
 
         TopPerformersViewModel? topPerformers = null;
-        // TODO: Extract out similar school urls into a view helper
-        if (measure.TopPerformers is not null && similarSchoolComparisonUrl is not null && viewSimilarSchoolsUrl is not null)
+
+        if (measure.TopPerformers is not null)
         {
             TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
                 t.Rank,
@@ -94,6 +102,18 @@ public record MeasureViewModel(
             table,
             topPerformers);
     }
+
+    private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>
+       seriesType switch
+       {
+           MeasureSeriesType.CurrentSchool => currentSchool.Name,
+           MeasureSeriesType.SimilarSchool => similarSchool?.Name ??
+               throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
+           MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
+           MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
+           MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
+           _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
+       };
 
     private static MeasureAvailableFilterViewModel MapAvailableFilter(MeasureAvailableFilter availableFilter) =>
         new(availableFilter.Key, availableFilter.Name, availableFilter.Options.Select(o => new MeasureFilterOptionViewModel(o.Key, o.Name, o.Count, o.Selected)));
