@@ -7,6 +7,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
@@ -20,7 +21,10 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class SimilarSchoolsComparisonController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase,
-    IUseCase<GetSchoolKs2PerformanceComparisonRequest, GetSchoolKs2PerformanceComparisonResponse> getSchoolKs2PerformanceComparisonUseCase)
+    IUseCase<GetSchoolKs2PerformanceComparisonRequest, GetSchoolKs2PerformanceComparisonResponse> getSchoolKs2PerformanceComparisonUseCase,
+    GetPrimaryCharacteristicsComparison getPrimaryCharacteristicsComparison,
+    IPrimaryCharacteristicsComparisonFormatter primaryCharacteristicsComparisonFormatter,
+    IUseCase<GetSchoolAttendanceComparisonRequest, GetSchoolAttendanceComparisonResponse> getSchoolAttendanceComparisonUseCase)
     : Controller
 {
     [HttpGet]
@@ -32,6 +36,11 @@ public class SimilarSchoolsComparisonController(
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
     {
         var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
+
+        var characteristicsResponse = await getPrimaryCharacteristicsComparison.Execute(
+            new GetPrimaryCharacteristicsComparisonRequest(urn, similarSchoolUrn));
+        model.CharacteristicsRows = primaryCharacteristicsComparisonFormatter.BuildRows(characteristicsResponse);
+
         ViewData["ComparisonSchool"] = model;
         return View("Similarity", model);
     }
@@ -67,7 +76,15 @@ public class SimilarSchoolsComparisonController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
-        var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        var (model, currentSchool, similarSchool) = await BuildBaseModelAsync(urn, similarSchoolUrn);
+
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var comparisonResponse = await getSchoolAttendanceComparisonUseCase.Execute(
+            new GetSchoolAttendanceComparisonRequest(urn, similarSchoolUrn, filters));
+
+        model.Absence = MeasureViewModel.FromMeasure(
+            comparisonResponse.Absence, currentSchool, similarSchool);
+
         ViewData["ComparisonSchool"] = model;
         return View(model);
     }

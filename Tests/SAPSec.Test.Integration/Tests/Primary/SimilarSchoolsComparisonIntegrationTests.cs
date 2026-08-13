@@ -1,11 +1,13 @@
 using AngleSharp.Html.Dom;
 using FluentAssertions;
 using SAPSec.Core.Constants;
+using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using Xunit.Abstractions;
+using static SAPSec.Core.Constants.Measures;
 
 namespace SAPSec.Test.Integration.Tests.Primary;
 
@@ -417,5 +419,150 @@ public class SimilarSchoolsComparisonIntegrationTests(
             ["Test School 1", "16%", "17%", "18%"],
             ["Test School 2", "22%", "23%", "24%"],
             ["Schools in England average", "13%", "14%", "15%"]);
+    }
+
+    [Fact]
+    public async Task Similarity_DisplaysCharacteristicsTable_WithCorrectHeadersAndValues()
+    {
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            new SimilarSchoolsPrimaryValuesEntry
+            {
+                URN = PrimarySchoolUrn,
+                Ks1PriorRwmAverage = "100.4",
+                PPPerc = "19.44",
+                Polar4QuintilePupils = "1.4",
+                PStability = "90.5",
+                IdaciPupils = "0.1305",
+                PercentSchSupport = "10.5",
+                NumberOfPupils = "300.5",
+                PercentageStatementOrEhp = "2.5",
+                PercentEAL = "20.5"
+            },
+            new SimilarSchoolsPrimaryValuesEntry
+            {
+                URN = SimilarSchoolUrn,
+                Ks1PriorRwmAverage = "102.6",
+                PPPerc = "25.44",
+                Polar4QuintilePupils = "2.6",
+                PStability = "85.5",
+                IdaciPupils = "0.1314",
+                PercentSchSupport = "15.5",
+                NumberOfPupils = "320.5",
+                PercentageStatementOrEhp = "3.5",
+                PercentEAL = "30.5"
+            });
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison(SimilarSchoolUrn));
+
+        var table = page.QuerySelector("table.govuk-table") as IHtmlTableElement;
+        table.Should().NotBeNull();
+
+        table!.ShouldHaveRows(
+            ["Characteristic", "Test School 1", "Test School 2"],
+            ["Combined average KS1 reading, writing and maths prior attainment", "100", "103"],
+            ["Total number of pupils", "301", "321"],
+            ["Pupil stability rate", "90.5%", "85.5%"],
+            ["Eligibility for pupil premium", "19.4%", "25.4%"],
+            ["Average IDACI score", "0.131", "0.131"],
+            ["Average POLAR4 quintile", "Quintile 1", "Quintile 3"],
+            ["Percentage of pupils with an EHC plan", "2.5%", "3.5%"],
+            ["Percentage of pupils with SEN support", "10.5%", "15.5%"],
+            ["Percentage of pupils with EAL", "20.5%", "30.5%"]);
+    }
+
+    [Fact]
+    public async Task Similarity_LinksToWhatIsASimilarSchoolPage()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison(SimilarSchoolUrn));
+
+        var link = page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("what-is-a-similar-school-link");
+
+        link.PathName.Should().Be(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool);
+    }
+
+    [Fact]
+    public async Task Attendance_DisplaysHeadingAndFilterOptions()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+
+        var heading = page.ElementWithTestIdShouldExist("attendance-heading");
+        heading.TrimmedTextContent().Should().Be("Attendance");
+
+        var filter = page.ElementWithTestIdShouldExist("absence-type-filter");
+        filter.ChildTrimmedTextContent().Should().Equal(["Overall absence", "Persistent absence"]);
+    }
+
+    [Fact]
+    public async Task Attendance_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+
+        var barChart = page.QuerySelector("[id$='absence-school-chart']");
+        barChart.Should().NotBeNull();
+        barChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var lineChart = page.QuerySelector("[id$='absence-school-yearbyyear-chart']");
+        lineChart.Should().NotBeNull();
+        lineChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
+    public async Task Attendance_TableView_ShowsOverallAbsenceValuesByDefault()
+    {
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(PrimarySchoolUrn, x => x.WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")),
+            Build.Absence.Establishment(SimilarSchoolUrn, x => x.WithOverallAbsence(current: "6.10", previous: "6.20", previous2: "6.30")));
+
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "6.10", previous: "6.90", previous2: "5.45")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
+            ["Test School 1", "7.91%", "8.05%", "8.00%"],
+            ["Test School 2", "6.30%", "6.20%", "6.10%"],
+            ["Schools in England average", "5.45%", "6.90%", "6.10%"]);
+    }
+
+    [Fact]
+    public async Task Attendance_FilterBy_Persistent_UpdatesTableViewWithPersistentAbsenceValues()
+    {
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(PrimarySchoolUrn, x => x
+                .WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")
+                .WithPersistentAbsence(current: "2.27", previous: "1.24", previous2: "8.20")),
+            Build.Absence.Establishment(SimilarSchoolUrn, x => x
+                .WithOverallAbsence(current: "6.10", previous: "6.20", previous2: "6.30")
+                .WithPersistentAbsence(current: "1.24", previous: "1.30", previous2: "1.40")));
+
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x
+                .WithOverallAbsencePrimary(current: "6.10", previous: "6.90", previous2: "5.45")
+                .WithPersistentAbsencePrimary(current: "3.20", previous: "2.24", previous2: "2.20")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+
+        var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("absence-type-filter");
+        filter.SelectOption("Persistent absence");
+
+        var submitButton = page.ElementWithTestIdShouldExist<IHtmlButtonElement>("absence-type-filter-submit");
+        var newPage = await page.SubmitContainingFormAsync(submitButton);
+
+        var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
+            ["Test School 1", "8.20%", "1.24%", "2.27%"],
+            ["Test School 2", "1.40%", "1.30%", "1.24%"],
+            ["Schools in England average", "2.20%", "2.24%", "3.20%"]);
     }
 }
