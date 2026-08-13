@@ -76,8 +76,7 @@ public class SimilarSchoolsComparisonController(
         var comparisonResponse = await getSchoolAttendanceComparisonUseCase.Execute(
             new GetSchoolAttendanceComparisonRequest(urn, similarSchoolUrn, filters));
 
-        model.Absence = MeasureViewModel.FromMeasure(
-            comparisonResponse.Absence, currentSchool, similarSchool);
+        model.Absence = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.Absence, currentSchool, similarSchool);
 
         ViewData["ComparisonSchool"] = model;
         return View(model);
