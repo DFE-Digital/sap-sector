@@ -1,4 +1,4 @@
-# 004 - Architecture Decision Record: Data Storage Strategy
+# 004 - Architecture Decision Record: Data Storage Strategy (Deprecated)
 
 **Title**: Data Storage Strategy: Prefer In-Memory, Fallback to Redis, then Postgres  
 **Status**: Accepted  
