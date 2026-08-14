@@ -36,22 +36,19 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         var sentrySettings = SentryConfiguration.GetSettings(builder.Configuration);
 
-        builder.WebHost.UseSentry((context, options) =>
+        if (SentryConfiguration.IsEnabled(sentrySettings))
         {
-            if (!SentryConfiguration.IsEnabled(sentrySettings))
+            builder.WebHost.UseSentry((context, options) =>
             {
-                options.Dsn = "";
-                return;
-            }
-
-            options.Dsn = sentrySettings.Dsn;
-            options.Environment = SentryConfiguration.GetEnvironmentName(context.Configuration, context.HostingEnvironment.EnvironmentName);
-            options.Debug = sentrySettings.Debug;
-            options.SendDefaultPii = false;
-            options.AttachStacktrace = true;
-            options.MinimumBreadcrumbLevel = SentryConfiguration.GetMinimumBreadcrumbLevel(sentrySettings);
-            options.MinimumEventLevel = SentryConfiguration.GetMinimumEventLevel(sentrySettings);
-        });
+                options.Dsn = sentrySettings.Dsn;
+                options.Environment = SentryConfiguration.GetEnvironmentName(context.Configuration, context.HostingEnvironment.EnvironmentName);
+                options.Debug = sentrySettings.Debug;
+                options.SendDefaultPii = false;
+                options.AttachStacktrace = true;
+                options.MinimumBreadcrumbLevel = SentryConfiguration.GetMinimumBreadcrumbLevel(sentrySettings);
+                options.MinimumEventLevel = SentryConfiguration.GetMinimumEventLevel(sentrySettings);
+            });
+        }
 
         builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 
