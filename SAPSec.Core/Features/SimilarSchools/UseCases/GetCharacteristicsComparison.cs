@@ -1,4 +1,5 @@
 using SAPSec.Data.Repositories;
+using static SAPSec.Core.Features.SimilarSchools.CharacteristicValueRounding;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
@@ -52,24 +53,11 @@ public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository rep
         };
     }
 
-    private static SimilarSchoolCharacteristicComparison<decimal> Build(decimal current, decimal similar) =>
+    private static SchoolComparisonValue<decimal> Build(decimal current, decimal similar) =>
         new(current, similar);
 
-    private static SimilarSchoolCharacteristicComparison<int> Build(int current, int similar) =>
+    private static SchoolComparisonValue<int> Build(int current, int similar) =>
         new(current, similar);
-
-    private static int RoundInt(decimal value) =>
-        Convert.ToInt32(Math.Round(value, MidpointRounding.AwayFromZero));
-
-    private static decimal RoundWholeNumber(decimal value) =>
-        decimal.Round(value, 0, MidpointRounding.AwayFromZero);
-
-    private static decimal RoundToOneDecimalPlace(decimal value) =>
-        decimal.Round(value, 1, MidpointRounding.AwayFromZero);
-
-    private static decimal RoundToThreeDecimalPlaces(decimal value) =>
-        decimal.Round(value, 3, MidpointRounding.AwayFromZero);
-
 }
 
 public record GetCharacteristicsComparisonRequest(string CurrentSchoolUrn, string SimilarSchoolUrn);
@@ -78,17 +66,13 @@ public record GetCharacteristicsComparisonResponse
 {
     public required string CurrentSchoolUrn { get; init; }
     public required string SimilarSchoolUrn { get; init; }
-    public required SimilarSchoolCharacteristicComparison<decimal> Ks2AverageScore { get; init; }
-    public required SimilarSchoolCharacteristicComparison<decimal> PupilPremiumEligibilityPercentage { get; init; }
-    public required SimilarSchoolCharacteristicComparison<decimal> PupilsWithEalPercentage { get; init; }
-    public required SimilarSchoolCharacteristicComparison<int> Polar4Quintile { get; init; }
-    public required SimilarSchoolCharacteristicComparison<int> PupilCount { get; init; }
-    public required SimilarSchoolCharacteristicComparison<decimal> PupilStabilityRate { get; init; }
-    public required SimilarSchoolCharacteristicComparison<decimal> AverageIdaciScore { get; init; }
-    public required SimilarSchoolCharacteristicComparison<decimal> PupilsWithSenSupportPercentage { get; init; }
-    public required SimilarSchoolCharacteristicComparison<decimal> PupilsWithEhcPlanPercentage { get; init; }
+    public required SchoolComparisonValue<decimal> Ks2AverageScore { get; init; }
+    public required SchoolComparisonValue<decimal> PupilPremiumEligibilityPercentage { get; init; }
+    public required SchoolComparisonValue<decimal> PupilsWithEalPercentage { get; init; }
+    public required SchoolComparisonValue<int> Polar4Quintile { get; init; }
+    public required SchoolComparisonValue<int> PupilCount { get; init; }
+    public required SchoolComparisonValue<decimal> PupilStabilityRate { get; init; }
+    public required SchoolComparisonValue<decimal> AverageIdaciScore { get; init; }
+    public required SchoolComparisonValue<decimal> PupilsWithSenSupportPercentage { get; init; }
+    public required SchoolComparisonValue<decimal> PupilsWithEhcPlanPercentage { get; init; }
 }
-
-public record SimilarSchoolCharacteristicComparison<T>(
-    T CurrentSchoolValue,
-    T SimilarSchoolValue);
