@@ -1,3 +1,4 @@
+using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.ViewModels;
@@ -14,4 +15,7 @@ public class PrimarySimilarSchoolsComparisonViewModel
     public MeasureViewModel? AverageScaledScoreMaths { get; set; }
     public MeasureViewModel? MeetingExpectedStandardGps { get; set; }
     public MeasureViewModel? AchievedHigherStandardGps { get; set; }
+    public MeasureViewModel? Absence { get; set; }
+    public IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow> CharacteristicsRows { get; set; }
+        = Array.Empty<SimilarSchoolsComparisonViewModel.CharacteristicRow>();
 }
