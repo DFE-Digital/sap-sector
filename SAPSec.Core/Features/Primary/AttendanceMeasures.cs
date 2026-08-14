@@ -24,6 +24,24 @@ internal static class AttendanceMeasures
                 currentSchool,
                 fieldSelector);
         }
+
+        public static Measure ForSchoolComparison(
+            SchoolData<AbsenceData> currentSchool,
+            SchoolData<AbsenceData> similarSchool,
+            CaseInsensitiveDictionary<string> filters)
+        {
+            var (availableFilters, fieldSelector, measureDataType, measureName) = ResolveFilters(filters);
+
+            return Measure.ForSchoolComparison(
+                Constants.Measures.Absence.Key,
+                measureName,
+                measureDataType,
+                availableFilters,
+                currentSchool,
+                similarSchool,
+                [],
+                fieldSelector);
+        }
     }
     private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<AbsenceData> FieldSelector, MeasureDataType MeasureDataType, string MeasureName) ResolveFilters(CaseInsensitiveDictionary<string> filters)
     {
