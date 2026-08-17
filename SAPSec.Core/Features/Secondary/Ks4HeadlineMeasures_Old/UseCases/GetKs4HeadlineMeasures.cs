@@ -2,7 +2,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+namespace SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 
 public class GetKs4HeadlineMeasures(
     IKs4PerformanceRepository performanceRepository,
@@ -158,7 +158,7 @@ public record Ks4HeadlineMeasureYearByYear(
     Ks4HeadlineMeasureSeries England);
 
 public record GetKs4HeadlineMeasuresResponse(
-    Model.SchoolDetails SchoolDetails,
+    SchoolDetails SchoolDetails,
     Ks4HeadlineMeasureAverage Attainment8ThreeYearAverage,
     Ks4HeadlineMeasureYearByYear Attainment8YearByYear,
     Ks4HeadlineMeasureAverage EngMaths49ThreeYearAverage,
@@ -172,4 +172,21 @@ public record GetKs4HeadlineMeasuresResponse(
     Ks4HeadlineMeasureAverage DestinationsEmploymentThreeYearAverage,
     Ks4HeadlineMeasureYearByYear DestinationsEmploymentYearByYear);
 
+public record SchoolKs4ComparisonAverage(
+    decimal? SchoolValue,
+    decimal? SimilarSchoolsValue,
+    decimal? LocalAuthorityValue,
+    decimal? EnglandValue);
 
+public record Ks4TopPerformer(
+    int Rank,
+    string Urn,
+    string Name,
+    decimal? Value,
+    bool IsCurrentSchool = false);
+
+public record SchoolKs4ComparisonYearByYear(
+    Ks4HeadlineMeasureSeries School,
+    Ks4HeadlineMeasureSeries SimilarSchools,
+    Ks4HeadlineMeasureSeries LocalAuthority,
+    Ks4HeadlineMeasureSeries England);

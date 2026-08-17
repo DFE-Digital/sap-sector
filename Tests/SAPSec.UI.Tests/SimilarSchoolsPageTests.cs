@@ -1,7 +1,8 @@
 using FluentAssertions;
 using Microsoft.Playwright;
-using SAPSec.Web.Constants;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
@@ -141,6 +142,7 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
     [Fact]
     public async Task ClickFilterToggle_ExpandsFilterPanel()
     {
+        await Page.SetViewportSizeAsync(375, 667);
         await Page.GotoAsync(SimilarSchoolsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -156,6 +158,7 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
     [Fact]
     public async Task ClickFilterSectionToggle_TogglesFilterSectionExpandedState()
     {
+        await Page.SetViewportSizeAsync(375, 667);
         await Page.GotoAsync(SimilarSchoolsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 

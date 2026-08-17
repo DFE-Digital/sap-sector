@@ -31,22 +31,22 @@
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">
     @if (hasAnyData)
     {
-
           <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
-                class="js-chart js-chart--school-measure-bar"
-                data-type="bar"
-                data-show-no-data-labels="true"
-                data-axis-min="@axisMin"
-                data-axis-step="@axisStep"
-                data-axis-max="@axisMax"
-                data-label-decimals="@decimals"
-                data-tooltip-decimals="@decimals"
-                data-category-percentage="0.6"
-                data-bar-percentage="1"
-                data-bar-thickness="50"
-                data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage? "%" : "")"
-                data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
+                  data-testid="@Model.MeasureInfo.HtmlPrefix-current-year-chart"
+                  class="js-chart js-chart--school-measure-bar"
+                  data-type="bar"
+                  data-show-no-data-labels="true"
+                  data-axis-min="@axisMin"
+                  data-axis-step="@axisStep"
+                  data-axis-max="@axisMax"
+                  data-label-decimals="@decimals"
+                  data-tooltip-decimals="@decimals"
+                  data-category-percentage="0.6"
+                  data-bar-percentage="1"
+                  data-bar-thickness="50"
+                  data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage? "%" : "")"
+                  data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+                  @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
            </canvas>
     }
     else

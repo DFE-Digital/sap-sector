@@ -146,7 +146,7 @@ jobs:
           HEADED: 0
           PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
         run: |
-          TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
+          TEST_PROJECTS=$(find ./Tests -type f \( -name "*.Tests.csproj" -or -name "*.Tests.Deprecated.csproj" -or -name "*.Test.*.csproj" \) | sort)
 
           for proj in $TEST_PROJECTS; do
             echo "=== Running tests in $proj ==="
