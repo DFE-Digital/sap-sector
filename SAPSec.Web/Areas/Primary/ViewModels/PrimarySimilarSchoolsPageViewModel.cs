@@ -147,7 +147,7 @@ public class PrimarySimilarSchoolsPageViewModel : ISimilarSchoolsPageViewModel
                 row.SimilarSchool.LocalAuthority.Name,
                 row.Rank,
                 row.Distance,
-                Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparison(row.SimilarSchool.URN),
+                Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparisonSimilarity(row.SimilarSchool.URN),
                 BuildFullAddress(row.SimilarSchool.Address.Street, row.SimilarSchool.Address.Town, row.SimilarSchool.Address.Postcode),
                 row.Coordinates?.Latitude.ToString(CultureInfo.InvariantCulture),
                 row.Coordinates?.Longitude.ToString(CultureInfo.InvariantCulture),

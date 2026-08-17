@@ -71,7 +71,7 @@ public record MeasureViewModel(
             t.Rank,
             t.Urn,
             t.Name,
-            Routes.PrimarySchool(schoolInfo.Urn).SimilarSchoolComparison(t.Urn),
+            Routes.PrimarySchool(schoolInfo.Urn).SimilarSchoolComparisonSimilarity(t.Urn),
             t.Value,
             t.IsCurrentSchool);
 
