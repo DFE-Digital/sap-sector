@@ -8,16 +8,15 @@ namespace SAPSec.Test.Common.AngleSharp;
 
 public static class DocumentExtensions
 {
-    public static IElement ElementWithTestIdShouldExist(this IDocument doc, string testId)
+    public static IHtmlElement ElementWithTestIdShouldExist(this IDocument doc, string testId)
     {
         var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
         el.Should().NotBeNull();
-
-        return el;
+        return el.Should().BeAssignableTo<IHtmlElement>().Subject;
     }
 
     public static T ElementWithTestIdShouldExist<T>(this IDocument doc, string testId)
-        where T : IElement
+        where T : IHtmlElement
     {
         var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
         el.Should().NotBeNull();

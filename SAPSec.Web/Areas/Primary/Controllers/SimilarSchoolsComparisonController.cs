@@ -55,18 +55,12 @@ public class SimilarSchoolsComparisonController(
         var comparisonResponse = await getSchoolKs2PerformanceComparisonUseCase.Execute(
             new GetSchoolKs2PerformanceComparisonRequest(urn, similarSchoolUrn, filters));
 
-        model.MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(
-            comparisonResponse.MeetingExpectedStandardRwm, currentSchool, similarSchool);
-        model.AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(
-            comparisonResponse.AchievedHigherStandardRwm, currentSchool, similarSchool);
-        model.AverageScaledScoreReading = MeasureViewModel.FromMeasure(
-            comparisonResponse.AverageScaledScoreReading, currentSchool, similarSchool);
-        model.AverageScaledScoreMaths = MeasureViewModel.FromMeasure(
-            comparisonResponse.AverageScaledScoreMaths, currentSchool, similarSchool);
-        model.MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(
-            comparisonResponse.MeetingExpectedStandardGps, currentSchool, similarSchool);
-        model.AchievedHigherStandardGps = MeasureViewModel.FromMeasure(
-            comparisonResponse.AchievedHigherStandardGps, currentSchool, similarSchool);
+        model.MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.MeetingExpectedStandardRwm, currentSchool, similarSchool);
+        model.AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AchievedHigherStandardRwm, currentSchool, similarSchool);
+        model.AverageScaledScoreReading = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AverageScaledScoreReading, currentSchool, similarSchool);
+        model.AverageScaledScoreMaths = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AverageScaledScoreMaths, currentSchool, similarSchool);
+        model.MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.MeetingExpectedStandardGps, currentSchool, similarSchool);
+        model.AchievedHigherStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AchievedHigherStandardGps, currentSchool, similarSchool);
 
         ViewData["ComparisonSchool"] = model;
         return View(model);
@@ -82,8 +76,7 @@ public class SimilarSchoolsComparisonController(
         var comparisonResponse = await getSchoolAttendanceComparisonUseCase.Execute(
             new GetSchoolAttendanceComparisonRequest(urn, similarSchoolUrn, filters));
 
-        model.Absence = MeasureViewModel.FromMeasure(
-            comparisonResponse.Absence, currentSchool, similarSchool);
+        model.Absence = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.Absence, currentSchool, similarSchool);
 
         ViewData["ComparisonSchool"] = model;
         return View(model);
