@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.Secondary;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
 using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
@@ -27,6 +27,7 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 public class SchoolController : Controller
 {
     private readonly IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> _getSchoolKs4HeadlineMeasuresUseCase;
+    private readonly IUseCase<Core.Features.Secondary.GetSchoolKs4CoreSubjectsRequest, Core.Features.Secondary.GetSchoolKs4CoreSubjectsResponse> _getSchoolKs4CoreSubjectsUseCase;
     private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
     private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
@@ -36,6 +37,7 @@ public class SchoolController : Controller
 
     public SchoolController(
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
+        IUseCase<Core.Features.Secondary.GetSchoolKs4CoreSubjectsRequest, Core.Features.Secondary.GetSchoolKs4CoreSubjectsResponse> getSchoolKs4CoreSubjectsUseCase,
         GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
         GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
         GetAttendanceMeasures getAttendanceMeasures,
@@ -44,6 +46,7 @@ public class SchoolController : Controller
         ILogger<SchoolController> logger)
     {
         _getSchoolKs4HeadlineMeasuresUseCase = getSchoolKs4HeadlineMeasuresUseCase;
+        _getSchoolKs4CoreSubjectsUseCase = getSchoolKs4CoreSubjectsUseCase;
         _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects;
         _getFilteredSchoolKs4CoreSubject = getFilteredSchoolKs4CoreSubject;
         _getAttendanceMeasures = getAttendanceMeasures;
@@ -199,15 +202,33 @@ public class SchoolController : Controller
     [Route("ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
-        var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await _getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
+
+        PopulateViewData(response.School);
+
+        var model = new ViewModels.Ks4CoreSubjectsPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Measures = response.Measures.Select(m => MeasureViewModel.FromSecondaryMeasure(m, response.School)).ToArray()
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    [Route("ks4-core-subjects-old")]
+    public async Task<IActionResult> Ks4CoreSubjectsOld(string urn)
+    {
+        var response = await _getSchoolKs4CoreSubjects.Execute(new Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases.GetSchoolKs4CoreSubjectsRequest(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(response.SchoolDetails);
         return View(BuildKs4CoreSubjectsViewModel(response));
     }
 
     [HttpGet]
-    [Route("ks4-core-subjects/data")]
-    public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string subject = "english-language", string grade = "4")
+    [Route("ks4-core-subjects-old/data")]
+    public async Task<IActionResult> Ks4CoreSubjectsOldData(string urn, string subject = "english-language", string grade = "4")
     {
         GetFilteredSchoolKs4CoreSubjectResponse filteredSubject;
         try
@@ -307,7 +328,7 @@ public class SchoolController : Controller
         [series.Previous2, series.Previous, series.Current];
 
     private static Ks4CoreSubjectsPageViewModel BuildKs4CoreSubjectsViewModel(
-        GetSchoolKs4CoreSubjectsResponse response)
+        Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases.GetSchoolKs4CoreSubjectsResponse response)
     {
         var defaultEnglishLanguage = SchoolKs4CoreSubjectSelection.From(
             response,

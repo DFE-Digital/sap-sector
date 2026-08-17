@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Secondary;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -60,6 +60,11 @@ public class SchoolControllerTests
             _similarSchoolsRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object);
+        var getSchoolKs4CoreSubjectsUseCase = new GetSchoolKs4CoreSubjectsUseCase(
+            _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object,
+            _ks4PerformanceRepositoryMock.Object,
+            _ks4DestinationsRepositoryMock.Object);
         var getSchoolKs4CoreSubjects = new GetSchoolKs4CoreSubjects(
             _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object,
@@ -73,6 +78,7 @@ public class SchoolControllerTests
 
         _sut = new SchoolController(
             getSchoolKs4HeadlineMeasuresUseCase,
+            getSchoolKs4CoreSubjectsUseCase,
             getSchoolKs4CoreSubjects,
             getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,
@@ -173,7 +179,7 @@ public class SchoolControllerTests
             .Setup(x => x.GetByUrnAsync(urn))
             .ReturnsAsync(new Ks4PerformanceData(urn, new EstablishmentPerformance(), new LAPerformance(), new EnglandPerformance()));
 
-        var result = await _sut.Ks4CoreSubjects(urn);
+        var result = await _sut.Ks4CoreSubjectsOld(urn);
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.Model.Should().BeOfType<ViewModels.Ks4CoreSubjectsPageViewModel>();
@@ -215,7 +221,7 @@ public class SchoolControllerTests
                     EngLang49_Tot_Eng_Previous2_Pct = "59"
                 }));
 
-        var result = await _sut.Ks4CoreSubjectsData(urn, "english-language", "4");
+        var result = await _sut.Ks4CoreSubjectsOldData(urn, "english-language", "4");
 
         var json = result.Should().BeOfType<JsonResult>().Subject;
         json.Value.Should().NotBeNull();
@@ -224,7 +230,7 @@ public class SchoolControllerTests
     [Fact]
     public async Task Ks4CoreSubjectsData_InvalidFilter_ReturnsBadRequest()
     {
-        var result = await _sut.Ks4CoreSubjectsData("123456", "unknown-subject", "4");
+        var result = await _sut.Ks4CoreSubjectsOldData("123456", "unknown-subject", "4");
 
         result.Should().BeOfType<BadRequestObjectResult>();
     }

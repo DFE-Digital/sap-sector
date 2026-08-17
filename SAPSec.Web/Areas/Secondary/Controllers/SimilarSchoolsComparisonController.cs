@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
 using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
