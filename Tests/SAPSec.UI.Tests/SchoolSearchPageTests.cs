@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
@@ -144,7 +146,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/105574/school-details");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").SchoolDetails);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Loreto High School Chorlton");
     }
@@ -163,7 +165,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/105574");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").Overview);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Loreto High School Chorlton");
     }
@@ -302,7 +304,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/105574/school-details");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").SchoolDetails);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Loreto High School Chorlton");
     }
@@ -443,7 +445,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/105574/school-details");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").SchoolDetails);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
         schoolName.Should().Contain("Loreto High School Chorlton");
     }

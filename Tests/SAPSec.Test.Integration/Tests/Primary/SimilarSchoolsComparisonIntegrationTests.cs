@@ -4,6 +4,7 @@ using SAPSec.Core.Constants;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using Xunit.Abstractions;
@@ -38,7 +39,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task SimilarSchoolComparison_SchoolDetails_HeadingAndTitle_ReflectComparisonPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonSchoolDetails(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).SchoolDetails);
 
         page.Title.Should().Be("School details compared to Test School 2 - Get school improvement insights - GOV.UK");
 
@@ -55,7 +56,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task SimilarSchoolComparison_Ks2_DisplaysProgressScoreSection()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var tabHeading = page.QuerySelector("h2.govuk-heading-l");
         tabHeading.Should().NotBeNull();
@@ -74,7 +75,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task MeetingExpectedStandardRwm_MeasureExistsOnPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("expected-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Meeting expected standard in reading, writing and maths");
@@ -97,7 +98,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             Build.Ks2Performance.England(x => x.WithRwmExpected(current: "61", prev: "60", prev2: "59")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
 
@@ -109,10 +110,71 @@ public class SimilarSchoolsComparisonIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardRwm_TableView_ValuesRoundTo0DecimalPlaces()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithRwmExpected(current: "81.0", prev: "80.3", prev2: "78.5")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithRwmExpected(current: "59.8", prev: "61.4", prev2: "62.2")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmExpected(current: "60.5", prev: "60.4", prev2: "59.3")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "79%", "80%", "81%"],
+            ["Test School 2", "62%", "61%", "60%"],
+            ["Schools in England average", "59%", "60%", "61%"]);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardRwm_SubjectFilter_HasExpectedOptions()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var filter = page.ElementWithTestIdShouldExist("expected-rwm-subject-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Reading, writing and maths", "Reading", "Writing", "Maths"]);
@@ -142,7 +204,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
                 .WithRwmExpectedMaths(current: "54", prev: "53", prev2: "52")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("expected-rwm-subject-filter");
         filter.SelectOption(filterOption);
@@ -163,7 +225,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task AchievedHigherStandardRwm_MeasureExistsOnPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("higher-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in reading, writing and maths");
@@ -186,7 +248,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             Build.Ks2Performance.England(x => x.WithRwmHigher(current: "21", prev: "20", prev2: "19")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-rwm-table-view-table");
 
@@ -198,10 +260,71 @@ public class SimilarSchoolsComparisonIntegrationTests(
     }
 
     [Fact]
+    public async Task AchievedHigherStandardRwm_TableView_ValuesRoundTo0DecimalPlaces()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithRwmHigher(current: "31.0", prev: "30.3", prev2: "28.5")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithRwmHigher(current: "19.8", prev: "21.4", prev2: "22.2")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmHigher(current: "20.5", prev: "20.4", prev2: "19.3")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-rwm-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "29%", "30%", "31%"],
+            ["Test School 2", "22%", "21%", "20%"],
+            ["Schools in England average", "19%", "20%", "21%"]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardRwm_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("higher-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task AchievedExpectedStandardRwm_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("higher-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
     public async Task AchievedHigherStandardRwm_SubjectFilter_HasExpectedOptions()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var filter = page.ElementWithTestIdShouldExist("higher-rwm-subject-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Reading, writing and maths", "Reading", "Writing", "Maths"]);
@@ -231,7 +354,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
                 .WithRwmHigherMaths(current: "14", prev: "13", prev2: "12")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("higher-rwm-subject-filter");
         filter.SelectOption(filterOption);
@@ -252,7 +375,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task AverageScaledScoreReading_MeasureExistsOnPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in reading");
@@ -262,21 +385,6 @@ public class SimilarSchoolsComparisonIntegrationTests(
                 == "Information about average scaled score in reading");
         details.Should().NotBeNull();
         details!.HasAttribute("open").Should().BeFalse();
-    }
-
-    [Fact]
-    public async Task MeetingExpectedStandardRwm_Charts_UseCorrectSchoolColours()
-    {
-        var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
-
-        var barChart = page.QuerySelector("[id$='expected-rwm-school-chart']");
-        barChart.Should().NotBeNull();
-        barChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
-
-        var lineChart = page.QuerySelector("[id$='expected-rwm-school-yearbyyear-chart']");
-        lineChart.Should().NotBeNull();
-        lineChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
     }
 
     [Fact]
@@ -290,7 +398,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
 
@@ -302,10 +410,71 @@ public class SimilarSchoolsComparisonIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_TableView_ValuesRoundTo1DecimalPlace()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithReadingScaledScore(current: "101.41", prev: "100.43", prev2: "99.42")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithReadingScaledScore(current: "103.24", prev: "102.20", prev2: "101.15")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.42", prev: "106.59", prev2: "105.82")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "99.4", "100.4", "101.4"],
+            ["Test School 2", "101.2", "102.2", "103.2"],
+            ["Schools in England average", "105.8", "106.6", "107.4"]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("reading-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("reading-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
     public async Task AverageScaledScoreMaths_MeasureExistsOnPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("maths-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in maths");
@@ -328,7 +497,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.4", prev: "107.6", prev2: "106.8")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
 
@@ -340,10 +509,71 @@ public class SimilarSchoolsComparisonIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreMaths_TableView_ValuesRoundTo1DecimalPlace()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithMathsScaledScore(current: "102.42", prev: "101.41", prev2: "100.39")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithMathsScaledScore(current: "104.21", prev: "103.22", prev2: "102.19")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.37", prev: "107.61", prev2: "106.79")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "100.4", "101.4", "102.4"],
+            ["Test School 2", "102.2", "103.2", "104.2"],
+            ["Schools in England average", "106.8", "107.6", "108.4"]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("maths-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("maths-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardGps_MeasureExistsOnPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("expected-gps-heading");
         heading.TrimmedTextContent().Should().Be("Meeting expected standard in grammar, punctuation and spelling");
@@ -369,7 +599,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69", prev: "68", prev2: "67")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
 
@@ -381,10 +611,71 @@ public class SimilarSchoolsComparisonIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardGps_TableView_ValuesRoundTo0DecimalPlaces()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsExpected(current: "62.0", prev: "61.2", prev2: "59.6")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsExpected(current: "77.2", prev: "76.4", prev2: "74.5")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69.0", prev: "67.5", prev2: "67.1")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "60%", "61%", "62%"],
+            ["Test School 2", "75%", "76%", "77%"],
+            ["Schools in England average", "67%", "68%", "69%"]);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+
+    [Fact]
     public async Task AchievedHigherStandardGps_MeasureExistsOnPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("higher-gps-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in grammar, punctuation and spelling");
@@ -410,7 +701,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15", prev: "14", prev2: "13")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonKs2(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
 
@@ -420,6 +711,68 @@ public class SimilarSchoolsComparisonIntegrationTests(
             ["Test School 2", "22%", "23%", "24%"],
             ["Schools in England average", "13%", "14%", "15%"]);
     }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_TableView_ValuesRoundTo0DecimalPlaces()
+    {
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsHigher(current: "18.1", prev: "17.2", prev2: "15.5")),
+            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsHigher(current: "24.0", prev: "23.2", prev2: "21.8")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15.1", prev: "13.6", prev2: "13.2")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "16%", "17%", "18%"],
+            ["Test School 2", "22%", "23%", "24%"],
+            ["Schools in England average", "13%", "14%", "15%"]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+    }
+    
 
     [Fact]
     public async Task Similarity_DisplaysCharacteristicsTable_WithCorrectHeadersAndValues()
@@ -453,7 +806,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             });
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Overview);
 
         var table = page.QuerySelector("table.govuk-table") as IHtmlTableElement;
         table.Should().NotBeNull();
@@ -475,7 +828,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task Similarity_LinksToWhatIsASimilarSchoolPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Overview);
 
         var link = page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("what-is-a-similar-school-link");
 
@@ -486,7 +839,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task Attendance_DisplaysHeadingAndFilterOptions()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
 
         var heading = page.ElementWithTestIdShouldExist("attendance-heading");
         heading.TrimmedTextContent().Should().Be("Attendance");
@@ -499,7 +852,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
     public async Task Attendance_Charts_UseCorrectSchoolColours()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
 
         var barChart = page.QuerySelector("[id$='absence-school-chart']");
         barChart.Should().NotBeNull();
@@ -521,7 +874,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
             Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "6.10", previous: "6.90", previous2: "5.45")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
 
@@ -549,7 +902,7 @@ public class SimilarSchoolsComparisonIntegrationTests(
                 .WithPersistentAbsencePrimary(current: "3.20", previous: "2.24", previous2: "2.20")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparisonAttendance(SimilarSchoolUrn));
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("absence-type-filter");
         filter.SelectOption("Persistent absence");

@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Secondary;
 using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -55,12 +55,11 @@ public class SchoolControllerTests
             _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
-        var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
-            _ks4PerformanceRepositoryMock.Object,
-            _ks4DestinationsRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
+        var getSchoolKs4HeadlineMeasuresUseCase = new GetSchoolKs4HeadlineMeasuresUseCase(
             _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
+            _similarSchoolsRepositoryMock.Object,
+            _ks4PerformanceRepositoryMock.Object,
+            _ks4DestinationsRepositoryMock.Object);
         var getSchoolKs4CoreSubjects = new GetSchoolKs4CoreSubjects(
             _ks4PerformanceRepositoryMock.Object,
             _schoolDetailsServiceMock.Object,
@@ -73,7 +72,7 @@ public class SchoolControllerTests
             _similarSchoolsRepositoryMock.Object);
 
         _sut = new SchoolController(
-            getSchoolKs4HeadlineMeasures,
+            getSchoolKs4HeadlineMeasuresUseCase,
             getSchoolKs4CoreSubjects,
             getFilteredSchoolKs4CoreSubject,
             getAttendanceMeasures,
@@ -151,41 +150,6 @@ public class SchoolControllerTests
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().BeNull();
-    }
-
-    #endregion
-
-    #region KS4 Headline Measures Tests
-
-    [Fact]
-    public async Task Ks4HeadlineMeasures_ValidUrn_ReturnsViewWithExpectedModel()
-    {
-        var urn = "123456";
-        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
-
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
-            .ReturnsAsync(schoolDetails);
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(schoolDetails);
-
-        _similarSchoolsRepositoryMock
-            .Setup(x => x.GetGroupAsync(urn))
-            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
-
-        _ks4PerformanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4PerformanceData(urn, null, null, null));
-
-        _ks4DestinationsRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4DestinationsData(urn, null, null, null));
-
-        var result = await _sut.Ks4HeadlineMeasures(urn);
-
-        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
-        viewResult.Model.Should().BeOfType<ViewModels.Ks4HeadlineMeasuresPageViewModel>();
     }
 
     #endregion

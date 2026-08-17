@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+namespace SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 
 internal static class Ks4HeadlineMeasuresCalculator
 {
