@@ -56,6 +56,9 @@ public class GetCharacteristicsComparisonTests
         Assert.Equal(103, result.PupilCount.SimilarSchoolValue);
         Assert.Equal(2.1m, result.PupilsWithEhcPlanPercentage.CurrentSchoolValue);
         Assert.Equal(3.3m, result.PupilsWithEhcPlanPercentage.SimilarSchoolValue);
+        Assert.Null(result.Ks2AverageScore.Similarity);
+        Assert.Null(result.PupilPremiumEligibilityPercentage.Similarity);
+        Assert.Null(result.PupilsWithEalPercentage.Similarity);
     }
 
     [Fact]

@@ -99,5 +99,4 @@ public class JsonSimilarSchoolsSecondaryRepositoryTests
         Assert.Equal("3", a.Polar4QuintilePupils);
         Assert.Equal("500", a.NumberOfPupils);
     }
-
 }
