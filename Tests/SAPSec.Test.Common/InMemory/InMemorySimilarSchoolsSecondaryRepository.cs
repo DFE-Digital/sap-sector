@@ -7,6 +7,7 @@ public class InMemorySimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 {
     private List<SimilarSchoolsSecondaryGroupsEntry> _groups = new();
     private List<SimilarSchoolsSecondaryValuesEntry> _values = new();
+    private List<SimilarSchoolsSecondaryStandardDeviationsEntry> _standardDeviations = new();
 
     public void SetupGroups(params SimilarSchoolsSecondaryGroupsEntry[] groups)
     {
@@ -18,10 +19,16 @@ public class InMemorySimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
         _values = values.ToList();
     }
 
+    public void SetupStandardDeviations(SimilarSchoolsSecondaryStandardDeviationsEntry standardDeviations)
+    {
+        _standardDeviations = [standardDeviations];
+    }
+
     public void ClearDown()
     {
         _groups = [];
         _values = [];
+        _standardDeviations = [];
     }
 
     public Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn)
@@ -29,6 +36,9 @@ public class InMemorySimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
 
     public Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns)
         => Task.FromResult((IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>)_values.Where(x => urns.Contains(x.URN)).ToList());
+
+    public Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetStandardDeviationsAsync()
+        => Task.FromResult(_standardDeviations.FirstOrDefault());
 
     public Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
         => Task.FromResult((IReadOnlyCollection<string>)_values.Select(v => v.URN).ToList());

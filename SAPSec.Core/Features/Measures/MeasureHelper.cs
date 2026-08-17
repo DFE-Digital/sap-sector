@@ -30,6 +30,11 @@ public class MeasureHelper
             return null;
         }
 
+        if (value.EndsWith("%"))
+        {
+            value = value[0..^1];
+        }
+
         return decimal.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var parsed)
             ? parsed
             : null;

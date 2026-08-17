@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
@@ -16,8 +15,6 @@ using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
 using SAPSec.Web.Services;
 using SAPSec.Web.Setup;
-using Sentry;
-using Sentry.AspNetCore;
 using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
@@ -36,19 +33,22 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
         var sentrySettings = SentryConfiguration.GetSettings(builder.Configuration);
 
-        if (SentryConfiguration.IsEnabled(sentrySettings))
+        builder.WebHost.UseSentry((context, options) =>
         {
-            builder.WebHost.UseSentry((context, options) =>
+            if (!SentryConfiguration.IsEnabled(sentrySettings))
             {
-                options.Dsn = sentrySettings.Dsn;
-                options.Environment = SentryConfiguration.GetEnvironmentName(context.Configuration, context.HostingEnvironment.EnvironmentName);
-                options.Debug = sentrySettings.Debug;
-                options.SendDefaultPii = false;
-                options.AttachStacktrace = true;
-                options.MinimumBreadcrumbLevel = SentryConfiguration.GetMinimumBreadcrumbLevel(sentrySettings);
-                options.MinimumEventLevel = SentryConfiguration.GetMinimumEventLevel(sentrySettings);
-            });
-        }
+                options.Dsn = "";
+                return;
+            }
+
+            options.Dsn = sentrySettings.Dsn;
+            options.Environment = SentryConfiguration.GetEnvironmentName(context.Configuration, context.HostingEnvironment.EnvironmentName);
+            options.Debug = sentrySettings.Debug;
+            options.SendDefaultPii = false;
+            options.AttachStacktrace = true;
+            options.MinimumBreadcrumbLevel = SentryConfiguration.GetMinimumBreadcrumbLevel(sentrySettings);
+            options.MinimumEventLevel = SentryConfiguration.GetMinimumEventLevel(sentrySettings);
+        });
 
         builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
 

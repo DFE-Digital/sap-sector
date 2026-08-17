@@ -7,13 +7,16 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
 {
     private readonly IJsonFile<SimilarSchoolsSecondaryGroupsEntry> _groupsFile;
     private readonly IJsonFile<SimilarSchoolsSecondaryValuesEntry> _valuesFile;
+    private readonly IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> _standardDeviationsFile;
 
     public JsonSimilarSchoolsSecondaryRepository(
         IJsonFile<SimilarSchoolsSecondaryGroupsEntry> groupsFile,
-        IJsonFile<SimilarSchoolsSecondaryValuesEntry> valuesFile)
+        IJsonFile<SimilarSchoolsSecondaryValuesEntry> valuesFile,
+        IJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry> standardDeviationsFile)
     {
         _groupsFile = groupsFile;
         _valuesFile = valuesFile;
+        _standardDeviationsFile = standardDeviationsFile;
     }
 
     public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn)
@@ -43,6 +46,12 @@ public class JsonSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRep
         return matched
             .ToList()
             .AsReadOnly();
+    }
+
+    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetStandardDeviationsAsync()
+    {
+        var list = await _standardDeviationsFile.ReadAllAsync();
+        return list.FirstOrDefault();
     }
 
     public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()

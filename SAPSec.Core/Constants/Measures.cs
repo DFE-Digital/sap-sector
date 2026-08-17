@@ -88,10 +88,74 @@ public static class Measures
             public const string Name = "Achieved a higher standard in grammar, punctuation and spelling";
         }
     }
+    public static class Secondary
+    {
+        public static class Ks4Attainment8
+        {
+            public const string Key = "attainment8";
+            public const string Name = "Attainment 8";
+        }
+
+        public static class Ks4EnglishMaths
+        {
+            public const string Key = "eng-maths";
+            public const string Name = "Grade achieved in English and maths GCSEs";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4EnglishMaths.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade4AndAbove = "4";
+                        public const string Grade5AndAbove = "5";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade4AndAbove, "Grade 4 and above"),
+                            new(Grade5AndAbove, "Grade 5 and above")
+                        ];
+                    }
+                }
+            }
+        }
+
+        public static class Ks4Destinations
+        {
+            public const string Key = "destinations";
+            public const string Name = "Staying in education or entering employment";
+
+            public static class Filters
+            {
+                public static class Destination
+                {
+                    public const string Key = $"{Ks4Destinations.Key}-dest";
+                    public const string Name = "Destination";
+
+                    public static class Values
+                    {
+                        public const string AllDestinations = "all";
+                        public const string Education = "ed";
+                        public const string Employment = "emp";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllDestinations, "All destinations"),
+                            new(Education, "Education"),
+                            new(Employment, "Employment and apprenticeships")
+                        ];
+                    }
+                }
+            }
+        }
+    }
+
 
     public static class Absence
     {
         public const string Key = "absence";
+        public const string Name = "Attendance";
 
         public static class Filters
         {

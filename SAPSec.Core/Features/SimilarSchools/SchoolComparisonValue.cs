@@ -2,4 +2,5 @@ namespace SAPSec.Core.Features.SimilarSchools;
 
 public record SchoolComparisonValue<T>(
     T CurrentSchoolValue,
-    T SimilarSchoolValue);
+    T SimilarSchoolValue,
+    SchoolSimilarity? Similarity = null);

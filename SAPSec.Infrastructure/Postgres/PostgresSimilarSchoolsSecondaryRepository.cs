@@ -55,6 +55,28 @@ public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondar
             .AsReadOnly();
     }
 
+    public async Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetStandardDeviationsAsync()
+    {
+        const string sql = """
+            SELECT
+                "KS2MRP",
+                "PPPerc",
+                "PercentEAL",
+                "Polar4QuintilePupils",
+                "PStability",
+                "IdaciPupils",
+                "PercentSchSupport",
+                "NumberOfPupils",
+                "PercentageStatementOrEHP"
+            FROM public.v_similar_schools_secondary_values_national_sd;
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+        var result = await conn.QuerySingleOrDefaultAsync<SimilarSchoolsSecondaryStandardDeviationsEntry>(sql);
+
+        return result;
+    }
+
     public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
     {
         const string sql = """
