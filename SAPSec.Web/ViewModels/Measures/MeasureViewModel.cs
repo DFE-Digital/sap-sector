@@ -21,19 +21,19 @@ public record MeasureViewModel(
     public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
-            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn));
+            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview);
 
     public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
-            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn),
+            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview,
             ComparisonChartColors,
             ComparisonYearByYearColors);
 
     public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
-            (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).SimilarSchoolComparison(similarSchoolUrn));
+            (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview);
 
     private static MeasureViewModel FromMeasure(
         Measure measure,

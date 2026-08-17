@@ -15,7 +15,7 @@ public class AllPagesIntegrationTests(
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     private const string PrimarySchoolUrn = "100001";
-    private static readonly string ComparisonPath = Routes.PrimarySchool(PrimarySchoolUrn).SimilarSchoolComparison("100002");
+    private static readonly string ComparisonPath = Routes.PrimarySchool(PrimarySchoolUrn).Comparison("100002").Overview;
 
     private static readonly PageTestCase[] PrimaryPages = [
         new(Routes.PrimarySchool(PrimarySchoolUrn).Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
