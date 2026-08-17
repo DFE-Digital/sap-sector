@@ -26,6 +26,8 @@
                 const leftGroup = left.dataset.mapFocusGroup || "marker";
                 const rightGroup = right.dataset.mapFocusGroup || "marker";
 
+                // Keep markers in visual order and leave zoom controls until last so
+                // tabbing follows the map content before the supporting controls.
                 if (leftGroup !== rightGroup) {
                     return leftGroup === "control" ? 1 : -1;
                 }
@@ -102,6 +104,8 @@
             return;
         }
 
+        // Leaflet popups are not part of the normal page tab order, so we wire the
+        // popup contents into the same keyboard flow as the markers.
         popupEl.dataset.focusManaged = "true";
 
         if (closeButton) {
@@ -123,6 +127,8 @@
             nameLink.addEventListener("keydown", (event) => {
                 if (event.key !== "Tab") return;
 
+                // Shift+Tab from the first popup item should close the popup and
+                // return focus to the marker that opened it.
                 if (event.shiftKey) {
                     event.preventDefault();
                     closePopupAndFocus(marker, marker.getElement?.());
@@ -138,6 +144,8 @@
                 const markerElement = marker.getElement?.();
                 if (!markerElement) return;
 
+                // Tabbing past the popup should continue to the next visible map
+                // item instead of dropping focus out of the map unexpectedly.
                 if (focusAdjacentMapItem(host, markerElement, 1)) {
                     event.preventDefault();
                     marker.closePopup();
@@ -191,6 +199,8 @@
         syncMarkerExpandedState(markerState);
 
         element.addEventListener("keydown", (event) => {
+            // Markers are rendered as images by Leaflet, so we promote them to
+            // keyboard-operable buttons and move focus into the popup on open.
             if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
 
@@ -398,6 +408,7 @@
         const host = document.getElementById("map");
         if (!host) return;
 
+        // If already initialised, just fix sizing (e.g. after tab toggle)
         if (initialised) {
             mapInstance?.invalidateSize(true);
             return;
