@@ -29,7 +29,7 @@
     <form action="" method="get">
         @foreach (var measure in Model.Measures)
         {
-            <section class="app-measure-section" aria-labelledby="@measure.MeasureInfo.HtmlPrefix.-heading">
+            <section class="app-measure-section" aria-labelledby="@measure.MeasureInfo.HtmlPrefix-heading">
                 <h2 class="govuk-heading-m" id="@measure.MeasureInfo.HtmlPrefix-heading" data-testid="@measure.MeasureInfo.HtmlPrefix-heading">@measure.MeasureInfo.Name</h2>
 
                 <partial name="Measures/_Measure" model=@measure />

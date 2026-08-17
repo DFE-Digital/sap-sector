@@ -60,8 +60,6 @@ public static class Routes
         public string Overview => _basePath;
         public string KS4HeadlineMeasures => $"{_basePath}/ks4-headline-measures";
         public string KS4CoreSubjects => $"{_basePath}/ks4-core-subjects";
-        public string KS4CoreSubjectsOld => $"{_basePath}/ks4-core-subjects-old";
-        public string KS4CoreSubjectsOldData => $"{KS4CoreSubjectsOld}/data";
         public string Attendance => $"{_basePath}/attendance";
         public string AttendanceData => $"{_basePath}/attendance-data";
         public string ViewSimilarSchools => $"{_basePath}/view-similar-schools";

@@ -8,8 +8,7 @@ namespace SAPSec.Core.Features.Secondary;
 public class GetSchoolKs4CoreSubjectsUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
-    IKs4PerformanceRepository performanceRepository,
-    IKs4DestinationsRepository destinationsRepository)
+    IKs4PerformanceRepository performanceRepository)
     : IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse>
 {
     public async Task<GetSchoolKs4CoreSubjectsResponse> Execute(GetSchoolKs4CoreSubjectsRequest request)
@@ -19,49 +18,41 @@ public class GetSchoolKs4CoreSubjectsUseCase(
             similarSchoolsRepository,
             performanceRepository);
 
-        var destinations = new SecondarySimilarSchoolsDestinationsDataProvider(
-            establishmentRepository,
-            similarSchoolsRepository,
-            destinationsRepository);
-
         var (currentSchoolPerformance, similarSchoolsPerformance) = await performance.GetSimilarSchoolsData(request.Urn);
-        var (currentSchoolDestinations, similarSchoolsDestinations) = await destinations.GetSimilarSchoolsData(request.Urn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolPerformance.SchoolInfo,
             similarSchoolsPerformance.Count,
-            [
-                Ks4CoreSubjects.EnglishLanguage.ForSchool(
-                    currentSchoolPerformance,
-                    similarSchoolsPerformance,
-                    filterBy),
-                Ks4CoreSubjects.EnglishLiterature.ForSchool(
-                    currentSchoolPerformance,
-                    similarSchoolsPerformance,
-                    filterBy),
-                Ks4CoreSubjects.Maths.ForSchool(
-                    currentSchoolPerformance,
-                    similarSchoolsPerformance,
-                    filterBy),
-                Ks4CoreSubjects.CombinedScience.ForSchool(
-                    currentSchoolPerformance,
-                    similarSchoolsPerformance,
-                    filterBy),
-                Ks4CoreSubjects.Biology.ForSchool(
-                    currentSchoolPerformance,
-                    similarSchoolsPerformance,
-                    filterBy),
-                Ks4CoreSubjects.Chemistry.ForSchool(
-                    currentSchoolPerformance,
-                    similarSchoolsPerformance,
-                    filterBy),
-                Ks4CoreSubjects.Physics.ForSchool(
-                    currentSchoolPerformance,
-                    similarSchoolsPerformance,
-                    filterBy)
-            ]
+            Ks4CoreSubjects.EnglishLanguage.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy),
+            Ks4CoreSubjects.EnglishLiterature.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy),
+            Ks4CoreSubjects.Maths.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy),
+            Ks4CoreSubjects.CombinedScience.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy),
+            Ks4CoreSubjects.Biology.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy),
+            Ks4CoreSubjects.Chemistry.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy),
+            Ks4CoreSubjects.Physics.ForSchool(
+                currentSchoolPerformance,
+                similarSchoolsPerformance,
+                filterBy)
         );
     }
 }
@@ -73,4 +64,11 @@ public record GetSchoolKs4CoreSubjectsRequest(
 public record GetSchoolKs4CoreSubjectsResponse(
     SchoolInfo.SchoolInfo School,
     int SimilarSchoolsCount,
-    IReadOnlyCollection<Measure> Measures);
+    Measure EnglishLanguage,
+    Measure EnglishLiterature,
+    Measure Maths,
+    Measure CombinedScience,
+    Measure Biology,
+    Measure Chemistry,
+    Measure Physics
+);
