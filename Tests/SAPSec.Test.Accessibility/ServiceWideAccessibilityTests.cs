@@ -20,8 +20,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.PrimarySchool("100171").KS2, HasH3Headings: true),
         new(Routes.PrimarySchool("100171").Attendance, HasH3Headings: true),
         new(Routes.PrimarySchool("100171").ViewSimilarSchools),
-        new(Routes.PrimarySchool("100171").SimilarSchoolComparison("150318")),
-        new(Routes.PrimarySchool("100171").SimilarSchoolComparisonSchoolDetails("150318")),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Overview),
+        new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
         new(Routes.PrimarySchool("100171").SchoolDetails),
         new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
 
@@ -31,7 +31,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
         // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
-        new(Routes.SecondarySchool("100182").SimilarSchoolComparison("136555"), AllowHorizontalScroll: true),
+        new(Routes.SecondarySchool("100182").Comparison("136555").Overview, AllowHorizontalScroll: true),
         new(Routes.SecondarySchool("100182").Comparison("136555").SchoolDetails),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),

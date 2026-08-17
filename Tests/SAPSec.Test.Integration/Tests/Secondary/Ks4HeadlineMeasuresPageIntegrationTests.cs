@@ -144,9 +144,9 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerformersLinks.Should().BeEquivalentTo([
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100004"),
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100002"),
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100003")
+            Routes.SecondarySchool("100001").Comparison("100004").Overview,
+            Routes.SecondarySchool("100001").Comparison("100002").Overview,
+            Routes.SecondarySchool("100001").Comparison("100003").Overview
         ]);
     }
 
@@ -317,9 +317,9 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100004"),
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100003"),
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100002")
+            Routes.SecondarySchool("100001").Comparison("100004").Overview,
+            Routes.SecondarySchool("100001").Comparison("100003").Overview,
+            Routes.SecondarySchool("100001").Comparison("100002").Overview
         ]);
     }
 
@@ -555,9 +555,9 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100004"),
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100003"),
-            Routes.SecondarySchool("100001").SimilarSchoolComparison("100002")
+            Routes.SecondarySchool("100001").Comparison("100004").Overview,
+            Routes.SecondarySchool("100001").Comparison("100003").Overview,
+            Routes.SecondarySchool("100001").Comparison("100002").Overview
         ]);
     }
 

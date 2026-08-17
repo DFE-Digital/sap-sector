@@ -138,7 +138,7 @@ public class Ks4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
         var schoolLinks = schools.GetByRole(AriaRole.Link);
         await schoolLinks.Nth(0).ClickAsync();
 
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.SimilarSchoolComparison(UrlPattern)));
+        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Overview));
 
         await Page.GoBackAsync();
 
@@ -250,7 +250,7 @@ public class Ks4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
         var schoolLinks = schools.GetByRole(AriaRole.Link);
         await schoolLinks.Nth(0).ClickAsync();
 
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.SimilarSchoolComparison(UrlPattern)));
+        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Overview));
 
         await Page.GoBackAsync();
 
