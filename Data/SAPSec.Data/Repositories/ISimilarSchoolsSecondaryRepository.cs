@@ -6,6 +6,5 @@ public interface ISimilarSchoolsSecondaryRepository
 {
     Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn);
     Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns);
-    Task<SimilarSchoolsSecondaryStandardDeviationsEntry?> GetStandardDeviationsAsync();
     Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet();
 }

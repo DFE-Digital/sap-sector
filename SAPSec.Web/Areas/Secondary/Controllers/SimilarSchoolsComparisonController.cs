@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
 using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
@@ -53,20 +53,18 @@ public class SimilarSchoolsComparisonController : Controller
     [HttpGet]
     public Task<IActionResult> Index(
         string urn,
-        string similarSchoolUrn,
-        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null) =>
-        Similarity(urn, similarSchoolUrn, similarityCalculation);
+        string similarSchoolUrn) =>
+        Similarity(urn, similarSchoolUrn);
 
     [HttpGet]
     [Route("similarity")]
     public async Task<IActionResult> Similarity(
         string urn,
-        string similarSchoolUrn,
-        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
+        string similarSchoolUrn)
     {
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
 
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -78,10 +76,9 @@ public class SimilarSchoolsComparisonController : Controller
     [Route("ks4-headline-measures")]
     public async Task<IActionResult> Ks4HeadlineMeasures(
         string urn,
-        string similarSchoolUrn,
-        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
+        string similarSchoolUrn)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -290,10 +287,9 @@ public class SimilarSchoolsComparisonController : Controller
     [Route("ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(
         string urn,
-        string similarSchoolUrn,
-        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
+        string similarSchoolUrn)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -401,10 +397,9 @@ public class SimilarSchoolsComparisonController : Controller
     [Route("attendance")]
     public async Task<IActionResult> Attendance(
         string urn,
-        string similarSchoolUrn,
-        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
+        string similarSchoolUrn)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
+        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -486,10 +481,9 @@ public class SimilarSchoolsComparisonController : Controller
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(
         string urn,
-        string similarSchoolUrn,
-        [FromQuery(Name = "similarityCalculation")] string? similarityCalculation = null)
+        string similarSchoolUrn)
     {
-        var modelResult = await TryBuildFullSchoolDetailsModelAsync(urn, similarSchoolUrn, similarityCalculation);
+        var modelResult = await TryBuildFullSchoolDetailsModelAsync(urn, similarSchoolUrn);
         if (modelResult.Result != null)
             return modelResult.Result;
 
@@ -513,12 +507,8 @@ public class SimilarSchoolsComparisonController : Controller
         return View("~/Views/Shared/SimilarSchoolsComparison/SchoolDetails.cshtml", schoolDetailsModel);
     }
 
-    /// <summary>
-    /// Builds the "base" view model used by Similarity/KS4/Attendance pages.
-    /// Handles: invalid params, null response, missing SimilarSchoolDetails, exceptions.
-    /// </summary>
     private async Task<(SimilarSchoolsComparisonViewModel? Model, IActionResult? Result)>
-        TryBuildBaseModelAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
+        TryBuildBaseModelAsync(string urn, string similarSchoolUrn)
     {
         if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
         {
@@ -540,22 +530,17 @@ public class SimilarSchoolsComparisonController : Controller
             SimilarSchoolName = response.SimilarSchoolDetails.Name
         };
 
-        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn, similarityCalculation);
+        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, similarSchoolUrn);
         return (model, null);
     }
 
-    /// <summary>
-    /// Builds the model for SchoolDetails page (includes coordinates/distance/details).
-    /// </summary>
     private async Task<(SimilarSchoolsComparisonViewModel? Model, IActionResult? Result)>
-        TryBuildFullSchoolDetailsModelAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
+        TryBuildFullSchoolDetailsModelAsync(string urn, string similarSchoolUrn)
     {
-        var baseResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn, similarityCalculation);
+        var baseResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
         if (baseResult.Result != null)
             return baseResult;
 
-        // We need the full response again to map coords etc.
-        // If you want to avoid calling Execute twice, we can refactor to return response as well.
         GetSimilarSchoolDetailsResponse? response;
         try
         {
@@ -599,20 +584,12 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>
-        BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn, string? similarityCalculation)
+        BuildCharacteristicRowsAsync(string urn, string similarSchoolUrn)
     {
-        var calculationMethod = ParseSimilarityCalculation(similarityCalculation);
         var response = await _getCharacteristicsComparison.Execute(
-            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn, calculationMethod));
+            new GetCharacteristicsComparisonRequest(urn, similarSchoolUrn));
 
         return _characteristicsFormatter.BuildRows(response);
-    }
-
-    private static SimilarityCalculationMethod ParseSimilarityCalculation(string? value)
-    {
-        return Enum.TryParse<SimilarityCalculationMethod>(value, true, out var similarityCalculationMethod)
-            ? similarityCalculationMethod
-            : SimilarityCalculationMethod.National;
     }
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
@@ -678,5 +655,4 @@ public class SimilarSchoolsComparisonController : Controller
             "employment" => response?.DestinationsEmploymentYearByYear,
             _ => response?.DestinationsYearByYear
         };
-
 }

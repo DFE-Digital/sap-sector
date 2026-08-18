@@ -11,10 +11,6 @@ public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository rep
 
         var values = SimilarSchoolsSecondaryValues.FromData(await repository.GetValuesByUrnsAsync(urns));
 
-        var standardDeviations = request.SimilarityCalculationMethod == SimilarityCalculationMethod.Group
-            ? await BuildGroupStandardDeviationsAsync(request.CurrentSchoolUrn)
-            : SimilarSchoolsSecondaryStandardDeviations.FromData(await repository.GetStandardDeviationsAsync());
-
         var current = values.FirstOrDefault(v => v.Urn == request.CurrentSchoolUrn);
         if (current is null)
             throw new NotFoundException($"No characteristics found for URN {request.CurrentSchoolUrn}");
@@ -29,123 +25,44 @@ public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository rep
             SimilarSchoolUrn = request.SimilarSchoolUrn,
             Ks2AverageScore = Build(
                 RoundWholeNumber(current.Ks2AverageScore),
-                RoundWholeNumber(similar.Ks2AverageScore),
-                standardDeviations.Ks2AverageScore),
+                RoundWholeNumber(similar.Ks2AverageScore)),
             PupilPremiumEligibilityPercentage = Build(
                 RoundToOneDecimalPlace(current.PupilPremiumEligibilityPercentage),
-                RoundToOneDecimalPlace(similar.PupilPremiumEligibilityPercentage),
-                standardDeviations.PupilPremiumEligibilityPercentage),
+                RoundToOneDecimalPlace(similar.PupilPremiumEligibilityPercentage)),
             PupilsWithEalPercentage = Build(
                 RoundToOneDecimalPlace(current.PupilsWithEalPercentage),
-                RoundToOneDecimalPlace(similar.PupilsWithEalPercentage),
-                standardDeviations.PupilsWithEalPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithEalPercentage)),
             Polar4Quintile = Build(
                 RoundInt(current.Polar4Quintile),
-                RoundInt(similar.Polar4Quintile),
-                standardDeviations.Polar4Quintile),
+                RoundInt(similar.Polar4Quintile)),
             PupilCount = Build(
                 RoundInt(current.PupilCount),
-                RoundInt(similar.PupilCount),
-                standardDeviations.PupilCount),
+                RoundInt(similar.PupilCount)),
             PupilStabilityRate = Build(
                 RoundToOneDecimalPlace(current.PupilStabilityRate),
-                RoundToOneDecimalPlace(similar.PupilStabilityRate),
-                standardDeviations.PupilStabilityRate),
+                RoundToOneDecimalPlace(similar.PupilStabilityRate)),
             AverageIdaciScore = Build(
                 RoundToThreeDecimalPlaces(current.AverageIdaciScore),
-                RoundToThreeDecimalPlaces(similar.AverageIdaciScore),
-                standardDeviations.AverageIdaciScore),
+                RoundToThreeDecimalPlaces(similar.AverageIdaciScore)),
             PupilsWithSenSupportPercentage = Build(
                 RoundToOneDecimalPlace(current.PupilsWithSenSupportPercentage),
-                RoundToOneDecimalPlace(similar.PupilsWithSenSupportPercentage),
-                standardDeviations.PupilsWithSenSupportPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithSenSupportPercentage)),
             PupilsWithEhcPlanPercentage = Build(
                 RoundToOneDecimalPlace(current.PupilsWithEhcPlanPercentage),
-                RoundToOneDecimalPlace(similar.PupilsWithEhcPlanPercentage),
-                standardDeviations.PupilsWithEhcPlanPercentage)
+                RoundToOneDecimalPlace(similar.PupilsWithEhcPlanPercentage))
         };
     }
 
-    private async Task<SimilarSchoolsSecondaryStandardDeviations> BuildGroupStandardDeviationsAsync(string currentSchoolUrn)
-    {
-        var groupUrns = await repository.GetGroupAsync(currentSchoolUrn);
+    private static SchoolComparisonValue<decimal> Build(decimal current, decimal similar) =>
+        new(current, similar);
 
-        // TODO: Test standard deviation calculations include current school
-        var groupValues = SimilarSchoolsSecondaryValues.FromData(await repository.GetValuesByUrnsAsync(groupUrns.Select(g => g.NeighbourURN).Concat([currentSchoolUrn])));
-
-        return new SimilarSchoolsSecondaryStandardDeviations
-        {
-            Ks2AverageScore = PopulationStandardDeviation(groupValues.Select(v => v.Ks2AverageScore)),
-            PupilPremiumEligibilityPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilPremiumEligibilityPercentage)),
-            PupilsWithEalPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilsWithEalPercentage)),
-            Polar4Quintile = PopulationStandardDeviation(groupValues.Select(v => v.Polar4Quintile)),
-            PupilStabilityRate = PopulationStandardDeviation(groupValues.Select(v => v.PupilStabilityRate)),
-            AverageIdaciScore = PopulationStandardDeviation(groupValues.Select(v => v.AverageIdaciScore)),
-            PupilsWithSenSupportPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilsWithSenSupportPercentage)),
-            PupilCount = PopulationStandardDeviation(groupValues.Select(v => v.PupilCount)),
-            PupilsWithEhcPlanPercentage = PopulationStandardDeviation(groupValues.Select(v => v.PupilsWithEhcPlanPercentage))
-        };
-    }
-
-    private static SchoolComparisonValue<decimal> Build(decimal current, decimal similar, decimal? standardDeviation)
-    {
-        return new SchoolComparisonValue<decimal>(
-            current,
-            similar,
-            Calculate(current, similar, standardDeviation));
-    }
-
-    private static SchoolComparisonValue<int> Build(int current, int similar, decimal? standardDeviation)
-    {
-        return new SchoolComparisonValue<int>(
-            current,
-            similar,
-            Calculate(current, similar, standardDeviation));
-    }
-
-    // Calculates standardized difference: d = (xA - xB) / standardDeviation.
-    // Uses |d| to classify similarity:
-    // <= 0.3 => Similar, <= 0.7 => LessSimilar, > 0.7 => NotSimilar.
-    private static SchoolSimilarity Calculate(decimal xA, decimal xB, decimal? standardDeviation)
-    {
-        if (standardDeviation is null || standardDeviation <= 0)
-            return SchoolSimilarity.NotSimilar;
-
-        var d = (xA - xB) / standardDeviation.Value;
-        var absD = Math.Abs(d);
-
-        if (absD <= 0.3m) return SchoolSimilarity.Similar;
-        if (absD <= 0.7m) return SchoolSimilarity.LessSimilar;
-        return SchoolSimilarity.NotSimilar;
-    }
-
-    private static decimal PopulationStandardDeviation(IEnumerable<decimal> values)
-    {
-        var samples = values.ToArray();
-        if (samples.Length == 0)
-        {
-            return 0m;
-        }
-
-        var mean = samples.Average();
-        var variance = samples
-            .Select(v => (v - mean) * (v - mean))
-            .Average();
-
-        return (decimal)Math.Sqrt((double)variance);
-    }
+    private static SchoolComparisonValue<int> Build(int current, int similar) =>
+        new(current, similar);
 }
 
 public record GetCharacteristicsComparisonRequest(
     string CurrentSchoolUrn,
-    string SimilarSchoolUrn,
-    SimilarityCalculationMethod SimilarityCalculationMethod = SimilarityCalculationMethod.National);
-
-public enum SimilarityCalculationMethod
-{
-    National,
-    Group
-}
+    string SimilarSchoolUrn);
 
 public record GetCharacteristicsComparisonResponse
 {
