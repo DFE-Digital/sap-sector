@@ -9,7 +9,8 @@ public record MeasureViewModel(
     CurrentYearChartViewModel CurrentYear,
     YearByYearChartViewModel YearByYear,
     TableViewModel Table,
-    TopPerformersViewModel? TopPerformers)
+    TopPerformersViewModel? TopPerformers,
+    bool HasSimilarSchools = true)
 {
     // chart-factory.js assigns bar/line colours to datasets by array position (school/similarSchools/
     // localAuthority/england), which assumes the 4-series shape produced by Measure.ForSchool. The 3-series
@@ -18,22 +19,24 @@ public record MeasureViewModel(
     private static readonly string[] ComparisonChartColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
 
-    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
-            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview);
+            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview,
+            hasSimilarSchools: hasSimilarSchools);
 
     public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview,
-            ComparisonChartColors,
-            ComparisonYearByYearColors);
+            currentYearChartColors: ComparisonChartColors,
+            yearByYearChartColors: ComparisonYearByYearColors);
 
-    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
-            (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview);
+            (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview,
+            hasSimilarSchools: hasSimilarSchools);
 
     private static MeasureViewModel FromMeasure(
         Measure measure,
@@ -42,7 +45,8 @@ public record MeasureViewModel(
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[]? currentYearChartColors = null,
-        string[]? yearByYearChartColors = null)
+        string[]? yearByYearChartColors = null,
+        bool hasSimilarSchools = true)
     {
         var isComparison = similarSchool is not null;
 
@@ -53,8 +57,8 @@ public record MeasureViewModel(
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
             measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
-            isComparison ? ComparisonChartColors : null,
-            isComparison ? ComparisonYearByYearColors : null);
+            currentYearChartColors,
+            yearByYearChartColors);
 
         decimal? MapCurrentYear(MeasureSeries series) =>
             series.Current;
@@ -79,7 +83,7 @@ public record MeasureViewModel(
 
         TopPerformersViewModel? topPerformers = null;
 
-        if (measure.TopPerformers is not null)
+        if (hasSimilarSchools && measure.TopPerformers is not null)
         {
             TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
                 t.Rank,
@@ -100,7 +104,8 @@ public record MeasureViewModel(
             currentYear,
             yearByYear,
             table,
-            topPerformers);
+            topPerformers,
+            hasSimilarSchools);
     }
 
     private static string ResolveSeriesLabel(MeasureSeriesType seriesType, SchoolInfo currentSchool, SchoolInfo? similarSchool = null) =>

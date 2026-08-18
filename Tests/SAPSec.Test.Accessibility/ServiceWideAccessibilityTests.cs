@@ -1,6 +1,5 @@
 ﻿using Deque.AxeCore.Playwright;
 using FluentAssertions;
-using Microsoft.Playwright;
 using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;

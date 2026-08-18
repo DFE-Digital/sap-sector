@@ -177,6 +177,43 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasures_HidesTopPerformers_WhenSchoolHasNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment("100001", x => x
+                .WithAttainment8(current: "101.4", prev: "100.4", prev2: "99.4")
+                .WithEngMaths49(current: "81", prev: "80", prev2: "79")));
+
+        Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks4Performance.England(x => x
+                .WithAttainment8(current: "107.4", prev: "106.6", prev2: "105.8")
+                .WithEngMaths49(current: "101", prev: "100", prev2: "99")));
+
+        Fixture.Ks4PerformanceRepository.SetupLAPerformance(
+            Build.Ks4Performance.LA("001", x => x
+                .WithAttainment8(current: "104.5", prev: "103.5", prev2: "102.5")
+                .WithEngMaths49(current: "91", prev: "90", prev2: "89")));
+
+        Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
+            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "81", prev: "80", prev2: "79")));
+
+        Fixture.Ks4DestinationsRepository.SetupEnglandDestinations(
+            Build.Ks4Destinations.England(x => x.WithAllDest(current: "101", prev: "100", prev2: "99")));
+
+        Fixture.Ks4DestinationsRepository.SetupLADestinations(
+            Build.Ks4Destinations.LA("001", x => x.WithAllDest(current: "91", prev: "90", prev2: "89")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        page.QuerySelector("#attainment8-top-performers-table").Should().BeNull();
+        page.QuerySelector("#eng-maths-top-performers-table").Should().BeNull();
+        page.QuerySelector("#destinations-top-performers-table").Should().BeNull();
+    }
+
+    [Fact]
     public async Task EnglishMaths_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(

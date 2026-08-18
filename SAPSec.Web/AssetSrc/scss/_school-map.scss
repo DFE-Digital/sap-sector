@@ -100,28 +100,11 @@
   height: 5px;
 }
 
-.leaflet-popup .popup-name:focus,
-.leaflet-popup .leaflet-popup-close-button:focus {
-  outline: none;
-  box-shadow: none;
-}
-
 /* Mobile */
 @media (max-width: 768px) {
   .popup-name,
   .popup-address {
     font-size: 13px;
-  }
-}
-
-.leaflet-popup {
-  .popup-name:focus,
-  .leaflet-popup-close-button:focus {
-    outline: 3px solid transparent;
-    color: govuk-colour("black");
-    background-color: govuk-colour("yellow");
-    box-shadow: 0 -2px govuk-colour("yellow"), 0 4px govuk-colour("black");
-    text-decoration: none;
   }
 }
 

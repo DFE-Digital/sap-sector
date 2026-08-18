@@ -199,6 +199,53 @@ public class Ks4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Ks4CoreSubjects_HidesTopPerformers_WhenSchoolHasNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment("100001", x => x
+                .WithEngLang49(current: "81", prev: "80", prev2: "79")
+                .WithEngLit49(current: "81", prev: "80", prev2: "79")
+                .WithMaths49(current: "81", prev: "80", prev2: "79")
+                .WithCombSci49(current: "81", prev: "80", prev2: "79")
+                .WithBio49(current: "81", prev: "80", prev2: "79")
+                .WithChem49(current: "81", prev: "80", prev2: "79")
+                .WithPhysics49(current: "81", prev: "80", prev2: "79")));
+
+        Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks4Performance.England(x => x
+                .WithEngLang49(current: "101", prev: "100", prev2: "99")
+                .WithEngLit49(current: "101", prev: "100", prev2: "99")
+                .WithMaths49(current: "101", prev: "100", prev2: "99")
+                .WithCombSci49(current: "101", prev: "100", prev2: "99")
+                .WithBio49(current: "101", prev: "100", prev2: "99")
+                .WithChem49(current: "101", prev: "100", prev2: "99")
+                .WithPhysics49(current: "101", prev: "100", prev2: "99")));
+
+        Fixture.Ks4PerformanceRepository.SetupLAPerformance(
+            Build.Ks4Performance.LA("001", x => x
+                .WithEngLang49(current: "91", prev: "90", prev2: "89")
+                .WithEngLit49(current: "91", prev: "90", prev2: "89")
+                .WithMaths49(current: "91", prev: "90", prev2: "89")
+                .WithCombSci49(current: "91", prev: "90", prev2: "89")
+                .WithBio49(current: "91", prev: "90", prev2: "89")
+                .WithChem49(current: "91", prev: "90", prev2: "89")
+                .WithPhysics49(current: "91", prev: "90", prev2: "89")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        page.QuerySelector("#eng-lang-top-performers-table").Should().BeNull();
+        page.QuerySelector("#eng-lit-top-performers-table").Should().BeNull();
+        page.QuerySelector("#maths-top-performers-table").Should().BeNull();
+        page.QuerySelector("#comb-sci-top-performers-table").Should().BeNull();
+        page.QuerySelector("#bio-top-performers-table").Should().BeNull();
+        page.QuerySelector("#chem-top-performers-table").Should().BeNull();
+        page.QuerySelector("#phys-top-performers-table").Should().BeNull();
+    }
+
+    [Fact]
     public async Task EnglishLanguage_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(

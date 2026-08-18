@@ -200,6 +200,29 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Ks2Measures_HidesTopPerformers_WhenSchoolHasNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithRwmExpected(current: "81", prev: "80", prev2: "79")));
+
+        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmExpected(current: "101", prev: "100", prev2: "99")));
+
+        Fixture.Ks2PerformanceRepository.SetupLAPerformance(
+            Build.Ks2Performance.LA("001", x => x.WithRwmExpected(current: "91", prev: "90", prev2: "89")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        page.QuerySelector("#expected-rwm-school-chart").Should().NotBeNull();
+        page.QuerySelector("#expected-rwm-top-performers-table").Should().BeNull();
+        page.QuerySelector("#expected-rwm-school-yearbyyear-chart").Should().NotBeNull();
+        page.QuerySelector("content-toggle").Should().NotBeNull();
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardRwm_SubjectFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(

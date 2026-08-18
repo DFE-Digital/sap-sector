@@ -182,9 +182,9 @@ public class SchoolController : Controller
         var model = new ViewModels.Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School),
-            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School),
-            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School)
+            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School, response.SimilarSchoolsCount > 0),
+            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School, response.SimilarSchoolsCount > 0),
+            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School, response.SimilarSchoolsCount > 0)
         };
 
         return View(model);
@@ -203,13 +203,13 @@ public class SchoolController : Controller
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Measures = [
-                MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Maths, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.CombinedScience, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Biology, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Chemistry, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Physics, response.School)
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School, response.SimilarSchoolsCount > 0),
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School, response.SimilarSchoolsCount > 0),
+                MeasureViewModel.FromSecondaryMeasure(response.Maths, response.School, response.SimilarSchoolsCount > 0),
+                MeasureViewModel.FromSecondaryMeasure(response.CombinedScience, response.School, response.SimilarSchoolsCount > 0),
+                MeasureViewModel.FromSecondaryMeasure(response.Biology, response.School, response.SimilarSchoolsCount > 0),
+                MeasureViewModel.FromSecondaryMeasure(response.Chemistry, response.School, response.SimilarSchoolsCount > 0),
+                MeasureViewModel.FromSecondaryMeasure(response.Physics, response.School, response.SimilarSchoolsCount > 0)
             ]
         };
 

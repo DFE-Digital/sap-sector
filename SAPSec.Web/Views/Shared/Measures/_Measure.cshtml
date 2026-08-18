@@ -4,12 +4,15 @@
 @model MeasureViewModel
 
 <partial name="Measures/_Filters" model=@Model.MeasureInfo />
+@{
+    var currentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year);
+}
 
 <div id="@Model.MeasureInfo.HtmlPrefix">
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" active="true">
+                <toggle-content id="current-year" name="@currentYear" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year">
