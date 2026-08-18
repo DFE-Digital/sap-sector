@@ -97,7 +97,7 @@ internal static class Ks4HeadlineMeasures
 
         private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4PerformanceData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters)
         {
-            var subject = filters.ContainsKey(Ks4EnglishMaths.Filters.Grade.Key)
+            var grade = filters.ContainsKey(Ks4EnglishMaths.Filters.Grade.Key)
                 ? filters[Ks4EnglishMaths.Filters.Grade.Key]
                 : Ks4EnglishMaths.Filters.Grade.Values.Grade4AndAbove;
 
@@ -106,13 +106,13 @@ internal static class Ks4HeadlineMeasures
                     Ks4EnglishMaths.Filters.Grade.Key,
                     Ks4EnglishMaths.Filters.Grade.Name,
                     Ks4EnglishMaths.Filters.Grade.Values.AllValues.Select(f =>
-                        new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(subject)))
+                        new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(grade)))
                     .ToList())
             ];
 
-            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = subject switch
+            MeasureFieldSelector<Ks4PerformanceData> fieldSelector = grade switch
             {
-                _ when subject.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove) => new(
+                _ when grade.EqualsCaseInsensitive(Ks4EnglishMaths.Filters.Grade.Values.Grade5AndAbove) => new(
                     x => x?.EstablishmentPerformance?.EngMaths59_Tot_Est_Current_Pct,
                     x => x?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous_Pct,
                     x => x?.EstablishmentPerformance?.EngMaths59_Tot_Est_Previous2_Pct,
@@ -174,7 +174,7 @@ internal static class Ks4HeadlineMeasures
 
         private static (IEnumerable<MeasureAvailableFilter> AvailableFilters, MeasureFieldSelector<Ks4DestinationsData> FieldSelector) ResolveFilters(CaseInsensitiveDictionary<string> filters)
         {
-            var subject = filters.ContainsKey(Ks4Destinations.Filters.Destination.Key)
+            var destination = filters.ContainsKey(Ks4Destinations.Filters.Destination.Key)
                 ? filters[Ks4Destinations.Filters.Destination.Key]
                 : Ks4Destinations.Filters.Destination.Values.AllDestinations;
 
@@ -183,13 +183,13 @@ internal static class Ks4HeadlineMeasures
                     Ks4Destinations.Filters.Destination.Key,
                     Ks4Destinations.Filters.Destination.Name,
                     Ks4Destinations.Filters.Destination.Values.AllValues.Select(f =>
-                        new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(subject)))
+                        new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(destination)))
                     .ToList())
             ];
 
-            MeasureFieldSelector<Ks4DestinationsData> fieldSelector = subject switch
+            MeasureFieldSelector<Ks4DestinationsData> fieldSelector = destination switch
             {
-                _ when subject.EqualsCaseInsensitive(Ks4Destinations.Filters.Destination.Values.Education) => new(
+                _ when destination.EqualsCaseInsensitive(Ks4Destinations.Filters.Destination.Values.Education) => new(
                     x => x?.EstablishmentDestinations?.Education_Tot_Est_Current_Pct,
                     x => x?.EstablishmentDestinations?.Education_Tot_Est_Previous_Pct,
                     x => x?.EstablishmentDestinations?.Education_Tot_Est_Previous2_Pct,
@@ -200,7 +200,7 @@ internal static class Ks4HeadlineMeasures
                     x => x?.EnglandDestinations?.Education_Tot_Eng_Previous_Pct,
                     x => x?.EnglandDestinations?.Education_Tot_Eng_Previous2_Pct),
 
-                _ when subject.EqualsCaseInsensitive(Ks4Destinations.Filters.Destination.Values.Employment) => new(
+                _ when destination.EqualsCaseInsensitive(Ks4Destinations.Filters.Destination.Values.Employment) => new(
                     x => x?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
                     x => x?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,
                     x => x?.EstablishmentDestinations?.Employment_Tot_Est_Previous2_Pct,
