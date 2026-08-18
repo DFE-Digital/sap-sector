@@ -430,6 +430,7 @@
         const mode = (host.dataset.mapMode || "all").toLowerCase();
         const useClusters = mode !== "compare";
 
+        // Create the Leaflet map once the host is visible and data is available.
         mapInstance = L.map(host, { scrollWheelZoom: true }).setView(
             [schools[0].lat, schools[0].lon],
             fixedZoom
@@ -444,6 +445,7 @@
         let clusters = null;
 
         if (useClusters) {
+            // Cluster schools in non-compare mode so dense areas stay navigable.
             clusters = L.markerClusterGroup({
                 showCoverageOnHover: false,
                 spiderfyOnMaxZoom: true,
@@ -487,6 +489,7 @@
 
             let iconToUse = blueSchoolIcon;
 
+            // Compare mode renders the selected school in pink because clustering is off.
             if (!useClusters) {
                 iconToUse = s.isComparedSchool ? blueSchoolIcon : pinkSchoolIcon;
             }
@@ -547,6 +550,7 @@
             refreshMapAccessibility(host, markerStates);
         };
 
+        // Recalculate layout and focus order after map movement or cluster changes.
         mapInstance.on("zoomend moveend", () => {
             requestAnimationFrame(refresh);
         });
