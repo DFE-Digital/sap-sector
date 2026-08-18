@@ -29,7 +29,6 @@ public class Program
         [$"{GeneratedSubFolder}\\SimilarSchoolsPrimaryValuesEntry"] = "SimilarSchools\\Primary",
         [$"{GeneratedSubFolder}\\SimilarSchoolsSecondaryGroupsEntry"] = "SimilarSchools\\Secondary",
         [$"{GeneratedSubFolder}\\SimilarSchoolsSecondaryValuesEntry"] = "SimilarSchools\\Secondary",
-        [$"{GeneratedSubFolder}\\SimilarSchoolsSecondaryStandardDeviationsEntry"] = "SimilarSchools\\Secondary",
 
         [$"{PrimarySubFolder}\\EstablishmentPerformance"] = "KS2\\Performance",
         [$"{PrimarySubFolder}\\EstablishmentSubjectEntries"] = "KS2\\Performance",

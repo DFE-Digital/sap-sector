@@ -87,18 +87,6 @@ public sealed class GenerateSimilarSchoolsViews
             Console.WriteLine($"Generated {view.ViewName}");
         }
 
-        var viewName = "v_similar_schools_secondary_values_national_sd";
-        var modelName = "SimilarSchoolsSecondaryStandardDeviationsEntry";
-        var sdModelFile = Path.Combine(_generatedJsonDir, $"{modelName}.json");
-
-        var rebuildSecondaryNationalSd = ShouldRebuildSecondaryValuesNationalSd(tableMap);
-        var sdSql = rebuildSecondaryNationalSd
-            ? GenerateSecondaryValuesNationalSdView(viewName, tableMap)
-            : BuildSkippedSql(viewName, "No rebuilt raw tables affect this view.");
-        WriteSql("50", viewName, sdSql);
-
-        var sdJsonSql = $@"\copy (select json_array(select row_to_json(r) from(select * from {viewName}) r)) to '{sdModelFile}' with(format text);";
-        WriteSql("70", viewName, sdJsonSql);
     }
 
     private bool ShouldRebuildView(List<DataMapRow> rows, Dictionary<string, string> tableMap)
@@ -125,17 +113,6 @@ public sealed class GenerateSimilarSchoolsViews
         }
 
         return false;
-    }
-
-    private bool ShouldRebuildSecondaryValuesNationalSd(Dictionary<string, string> tableMap)
-    {
-        var viewRows = _rows
-            .Where(r => r.Range == "SimilarSchools")
-            .Where(r => r.Type == "SecondaryValues")
-            .Where(r => !string.IsNullOrWhiteSpace(r.FileName))
-            .ToList();
-
-        return ShouldRebuildView(viewRows, tableMap);
     }
 
     private static string BuildSkippedSql(string viewName, string reason)
@@ -208,69 +185,6 @@ public sealed class GenerateSimilarSchoolsViews
         }
 
         sb.AppendLine(";");
-
-        return sb.ToString();
-    }
-
-    // =====================================================
-    // Similar Schools - Secondary Values (National SD)
-    // =====================================================
-
-    private string GenerateSecondaryValuesNationalSdView(string viewName, Dictionary<string, string> tableMap)
-    {
-        var viewRows = _rows
-            .Where(r => r.Range == "SimilarSchools")
-            .Where(r => r.Type == "SecondaryValues")
-            .Where(r => !string.IsNullOrWhiteSpace(r.FileName))
-            .ToList();
-
-        if (viewRows.Count == 0)
-        {
-            Console.WriteLine($"Skipped {viewName}: no DataMap rows found.");
-            return string.Empty;
-        }
-
-        var fileKeys = viewRows
-            .Select(r => (r.FileName ?? "").Trim().TrimStart('\uFEFF'))
-            .Where(k => !string.IsNullOrWhiteSpace(k))
-            .Distinct(StringComparer.OrdinalIgnoreCase)
-            .ToList();
-
-        if (fileKeys.Count != 1)
-            throw new InvalidOperationException(
-                $"Expected exactly one source file for {viewName}, found {fileKeys.Count}.");
-
-        if (!TryResolveRawTable(tableMap, fileKeys[0], out var rawTable) || string.IsNullOrWhiteSpace(rawTable))
-            throw new InvalidOperationException(
-                $"Missing table mapping for '{fileKeys[0]}' when generating {viewName}.");
-
-        var sb = new StringBuilder();
-
-        sb.AppendLine($"-- AUTO-GENERATED MATERIALIZED VIEW: {viewName}");
-        sb.AppendLine("-- Computes population standard deviation (stddev_pop) for each metric.");
-        sb.AppendLine();
-        sb.AppendLine($"DROP MATERIALIZED VIEW IF EXISTS {viewName};");
-        sb.AppendLine();
-        sb.AppendLine($"CREATE MATERIALIZED VIEW {viewName}");
-        sb.AppendLine("TABLESPACE pg_default");
-        sb.AppendLine("AS");
-        sb.AppendLine("SELECT");
-        sb.AppendLine("    count(*)::int AS \"RowCount\",");
-        sb.AppendLine();
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(ks2_mrp, 'NA'), '')::numeric(10,5))::numeric(10,5)                  AS \"KS2MRP\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(pp_perc, 'NA'), '')::numeric(10,5))::numeric(10,5)                  AS \"PPPerc\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_eal, 'NA'), '')::numeric(10,5))::numeric(10,5)              AS \"PercentEAL\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(polar4quintile_pupils, 'NA'), '')::numeric(10,5))::numeric(10,5)    AS \"Polar4QuintilePupils\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(p_stability, 'NA'), '')::numeric(10,5))::numeric(10,5)              AS \"PStability\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(idaci_pupils, 'NA'), '')::numeric(10,5))::numeric(10,5)             AS \"IdaciPupils\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_sch_support, 'NA'), '')::numeric(10,5))::numeric(10,5)      AS \"PercentSchSupport\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(number_of_pupils, 'NA'), '')::numeric(10,5))::numeric(10,5)         AS \"NumberOfPupils\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(percent_statement_or_ehp, 'NA'), '')::numeric(10,5))::numeric(10,5) AS \"PercentageStatementOrEHP\",");
-        sb.AppendLine("    stddev_pop(NULLIF(NULLIF(att8scr, 'NA'), '')::numeric(10,5))::numeric(10,5)                  AS \"Att8Scr\"");
-        sb.AppendLine($"FROM public.{rawTable}");
-        sb.AppendLine("WITH DATA;");
-
-        Console.WriteLine($"Generated {viewName}");
 
         return sb.ToString();
     }

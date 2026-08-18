@@ -54,7 +54,7 @@ public class SimilarSchoolsComparisonViewModel
         public required string SimilarSchoolValue { get; init; }
         public bool IsNumeric { get; init; }
 
-        public SchoolSimilarity Similarity { get; init; }
+        public SchoolSimilarity? Similarity { get; init; }
     }
     public decimal? ThisSchoolAttainment8ThreeYearAverage { get; set; }
     public decimal? SelectedSchoolAttainment8ThreeYearAverage { get; set; }

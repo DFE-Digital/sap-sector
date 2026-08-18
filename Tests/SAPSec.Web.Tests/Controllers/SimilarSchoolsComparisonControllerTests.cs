@@ -65,20 +65,6 @@ public class SimilarSchoolsComparisonControllerTests
             _repoMock.Object);
 
         _repoMock
-            .Setup(r => r.GetStandardDeviationsAsync())
-            .ReturnsAsync(new SimilarSchoolsSecondaryStandardDeviationsEntry
-            {
-                PPPerc = 13.983589m,
-                PercentEAL = 18.755181m,
-                Polar4QuintilePupils = 1.022255m,
-                PStability = 6.442814m,
-                IdaciPupils = 0.078069m,
-                PercentSchSupport = 5.530940m,
-                NumberOfPupils = 388.664809m,
-                PercentageStatementOrEHP = 1.678816m,
-                KS2MRP = 2.527329m
-            });
-        _repoMock
             .Setup(r => r.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
@@ -164,7 +150,7 @@ public class SimilarSchoolsComparisonControllerTests
     }
 
     [Fact]
-    public async Task Similarity_ReturnsView_WithCharacteristicsRows_AndSimilarityLabels()
+    public async Task Similarity_ReturnsView_WithCharacteristicsRows()
     {
         var urn = "145327";
         var similarUrn = "142075";
@@ -194,40 +180,7 @@ public class SimilarSchoolsComparisonControllerTests
         model.CharacteristicsRows[0].CurrentSchoolValue.Should().NotBeNullOrWhiteSpace();
         model.CharacteristicsRows[0].SimilarSchoolValue.Should().NotBeNullOrWhiteSpace();
 
-        model.CharacteristicsRows[4].Characteristic.Should().Be("Average IDACI score");
-        model.CharacteristicsRows[4].Similarity.Should().Be(SchoolSimilarity.LessSimilar);
-
-        model.CharacteristicsRows[5].Characteristic.Should().Be("Average POLAR4 quintile");
-        model.CharacteristicsRows[5].Similarity.Should().Be(SchoolSimilarity.NotSimilar);
-    }
-
-    [Fact]
-    public async Task Similarity_WithGroupCalculationQuery_UsesRoundedDisplayedKs2Value()
-    {
-        var urn = "145327";
-        var similarUrn = "142075";
-
-        var currentSchool = CreateSchool(urn, "Main School",
-            new BNGCoordinates(Easting: 430000, Northing: 380000));
-
-        var similarSchool = CreateSchool(similarUrn, "Similar School Group",
-            new BNGCoordinates(Easting: 431000, Northing: 381000));
-
-        //var similarDetails = CreateSchoolDetails(similarUrn, "Similar School");
-
-        SetupBaseDependencies(urn, similarUrn, currentSchool, similarSchool);//, similarDetails);
-        SetupSecondaryValues(urn, similarUrn);
-        SetupGroupSecondaryValues(urn, new[] { similarUrn, "300001", "300002", "300003", "300004" });
-        SetupAbsence();
-        SetupPerfomance();
-
-        var result = await _sut.Similarity(urn, similarUrn, "group");
-
-        var view = result.Should().BeOfType<ViewResult>().Subject;
-        var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
-
-        model.CharacteristicsRows.Should().NotBeNull();
-        model.CharacteristicsRows[0].Similarity.Should().Be(SchoolSimilarity.Similar);
+        model.CharacteristicsRows.All(row => row.Similarity is null).Should().BeTrue();
     }
 
     [Fact]
@@ -350,46 +303,6 @@ public class SimilarSchoolsComparisonControllerTests
             .Setup(r => r.GetValuesByUrnsAsync(
                 It.Is<IEnumerable<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
             .ReturnsAsync(values);
-    }
-
-    private void SetupGroupSecondaryValues(string currentUrn, IReadOnlyCollection<string> groupUrns)
-    {
-        _repoMock
-            .Setup(r => r.GetGroupAsync(currentUrn))
-            .ReturnsAsync(groupUrns.Select(urn => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = urn }).ToList());
-
-        var groupValues = new List<SimilarSchoolsSecondaryValuesEntry>
-        {
-            new()
-            {
-                URN = groupUrns.ElementAt(0),
-                KS2MRP = "101"
-            },
-            new()
-            {
-                URN = groupUrns.ElementAt(1),
-                KS2MRP = "102"
-            },
-            new()
-            {
-                URN = groupUrns.ElementAt(2),
-                KS2MRP = "103"
-            },
-            new()
-            {
-                URN = groupUrns.ElementAt(3),
-                KS2MRP = "104"
-            },
-            new()
-            {
-                URN = groupUrns.ElementAt(4),
-                KS2MRP = "105"
-            }
-        };
-
-        _repoMock
-            .Setup(r => r.GetValuesByUrnsAsync(It.Is<IEnumerable<string>>(u => u.SequenceEqual(groupUrns))))
-            .ReturnsAsync(groupValues);
     }
 
     private void SetupAbsence()
