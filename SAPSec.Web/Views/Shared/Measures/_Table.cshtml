@@ -4,10 +4,8 @@
 @model TableViewModel
 
 @{
-    var yearLabels = Model.MeasureInfo.DataType is MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage
-                                                ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
-                                                : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear;
-                    }
+    var yearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatYearByYear(Model.MeasureInfo.Year);
+}
 
 <table class="govuk-table" data-testid="@Model.MeasureInfo.HtmlPrefix-table-view-table">
     <thead class="govuk-table__head">

@@ -94,6 +94,9 @@ jobs:
     name: Run Unit & Integration Tests with Coverage
     if: ${{ github.event_name != 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Check out repository
@@ -143,7 +146,7 @@ jobs:
           HEADED: 0
           PLAYWRIGHT_IGNORE_HTTPS_ERRORS: true
         run: |
-          TEST_PROJECTS=$(find ./Tests -type f -name "*.Tests.csproj" | sort)
+          TEST_PROJECTS=$(find ./Tests -type f \( -name "*.Tests.csproj" -or -name "*.Tests.Deprecated.csproj" -or -name "*.Test.*.csproj" \) | sort)
 
           for proj in $TEST_PROJECTS; do
             echo "=== Running tests in $proj ==="
@@ -196,7 +199,7 @@ jobs:
 
       - name: Add Coverage PR Comment
         uses: marocchino/sticky-pull-request-comment@773744901bac0e8cbb5a0dc842800d45e9b2b405 # Pinned at v2.9.4
-        if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && (success() || failure())
+        if: steps.code_coverage_report_action.outputs.file != '' && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && (success() || failure())
         with:
           recreate: true
           path: code-coverage-results.md

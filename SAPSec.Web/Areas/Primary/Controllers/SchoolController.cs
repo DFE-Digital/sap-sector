@@ -53,12 +53,12 @@ public class SchoolController(
         var model = new Ks2MeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardRwm, response.School),
-            AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(response.AchievedHigherStandardRwm, response.School),
-            AverageScaledScoreReading = MeasureViewModel.FromMeasure(response.AverageScaledScoreReading, response.School),
-            AverageScaledScoreMaths = MeasureViewModel.FromMeasure(response.AverageScaledScoreMaths, response.School),
-            MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(response.MeetingExpectedStandardGps, response.School),
-            AchievedHigherStandardGps = MeasureViewModel.FromMeasure(response.AchievedHigherStandardGps, response.School)
+            MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School),
+            AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School),
+            AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School),
+            AverageScaledScoreMaths = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreMaths, response.School),
+            MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardGps, response.School),
+            AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School)
         };
 
         return View(model);
@@ -76,7 +76,7 @@ public class SchoolController(
         var model = new AttendanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Absence = MeasureViewModel.FromMeasure(response.Absence, response.School)
+            Absence = MeasureViewModel.FromPrimaryMeasure(response.Absence, response.School)
         };
 
         return View(model);

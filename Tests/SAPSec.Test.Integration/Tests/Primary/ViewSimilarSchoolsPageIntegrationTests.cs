@@ -183,8 +183,8 @@ public class ViewSimilarSchoolsPageIntegrationTests(
 
         var links = list.QuerySelectorAll("a").Select(x => x.GetAttribute("href"));
         links.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100002"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100003")
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity
         ]);
     }
 

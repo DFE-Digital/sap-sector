@@ -2,6 +2,7 @@
 using FluentAssertions;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -166,10 +167,36 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100004"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100003"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100002")
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity
         ]);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
     }
 
     [Fact]
@@ -383,10 +410,36 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100004"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100003"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100002")
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity
         ]);
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardRwm_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("higher-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
     }
 
     [Fact]
@@ -566,10 +619,36 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerformersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100004"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100002"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100003")
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity
         ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("reading-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
     }
 
     [Fact]
@@ -616,50 +695,6 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             ["Similar schools average", "103.2", "104.2", "105.2"],
             ["Local authority schools average", "103.5", "104.5", "105.5"],
             ["Schools in England average", "106.8", "107.6", "108.4"]);
-    }
-
-    [Fact]
-    public async Task AverageScaledScoreCharts_ShouldStartAxisAt80()
-    {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")),
-            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003")));
-
-        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
-            Build.PrimaryGroup("100001", ["100002", "100003"]));
-
-        Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
-            Build.Ks2Performance.England(x => x
-                .WithReadingScaledScore(current: "108.4", prev: "107.6", prev2: "106.8")
-                .WithMathsScaledScore(current: "108.4", prev: "107.6", prev2: "106.8")));
-
-        Fixture.Ks2PerformanceRepository.SetupLAPerformance(
-            Build.Ks2Performance.LA("001", x => x
-                .WithReadingScaledScore(current: "105.5", prev: "104.5", prev2: "103.5")
-                .WithMathsScaledScore(current: "105.5", prev: "104.5", prev2: "103.5")));
-
-        Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment("100001", x => x
-                .WithReadingScaledScore(current: "102.4", prev: "101.4", prev2: "100.4")
-                .WithMathsScaledScore(current: "102.4", prev: "101.4", prev2: "100.4")),
-            Build.Ks2Performance.Establishment("100002", x => x
-                .WithReadingScaledScore(current: "104.2", prev: "103.2", prev2: "102.2")
-                .WithMathsScaledScore(current: "104.2", prev: "103.2", prev2: "102.2")),
-            Build.Ks2Performance.Establishment("100003", x => x
-                .WithReadingScaledScore(current: "106.2", prev: "105.2", prev2: "104.2")
-                .WithMathsScaledScore(current: "106.2", prev: "105.2", prev2: "104.2")));
-
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
-
-        foreach (var chartId in new[] { "reading-score-school-chart", "maths-score-school-chart" })
-        {
-            var chart = page.QuerySelector($"#{chartId}");
-            chart.Should().NotBeNull();
-            chart.GetAttribute("data-axis-min").Should().Be("80");
-            chart.GetAttribute("data-axis-step").Should().Be("20");
-            chart.GetAttribute("data-axis-max").Should().Be("120");
-        }
     }
 
     [Fact]
@@ -723,10 +758,36 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerformersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100004"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100002"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100003")
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity
         ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("maths-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "80"),
+            ("axis-step", "20"),
+            ("axis-max", "120"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "1"),
+            ("tooltip-decimals", "1"));
     }
 
     [Fact]
@@ -836,10 +897,36 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100002"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100003"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100004")
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity
         ]);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
     }
 
     [Fact]
@@ -949,10 +1036,35 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100002"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100003"),
-            Routes.PrimarySchool("100001").SimilarSchoolComparisonSimilarity("100004")
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity
         ]);
     }
 
+    [Fact]
+    public async Task AchievedHigherStandardGps_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "25"),
+            ("axis-max", "100"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "0"),
+            ("tooltip-decimals", "0"));
+    }
 }
