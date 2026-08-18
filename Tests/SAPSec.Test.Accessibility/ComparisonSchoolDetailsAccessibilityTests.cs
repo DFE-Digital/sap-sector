@@ -40,6 +40,8 @@ public class ComparisonSchoolDetailsAccessibilityTests(AccessibilityTestsFixture
         var closeButton = Page.Locator(".leaflet-popup-close-button");
         await closeButton.WaitForAsync(new LocatorWaitForOptions { State = WaitForSelectorState.Visible });
 
+        // Wait for focus to move to the close button
+        await Page.WaitForFunctionAsync("() => document.activeElement?.classList.contains('leaflet-popup-close-button')");
         var expandedMarkers = Page.Locator("#map .leaflet-marker-icon[data-map-focusable='true'][aria-expanded='true']");
         (await expandedMarkers.CountAsync()).Should().Be(1, "keyboard activation should expand a single map marker");
         (await closeButton.GetAttributeAsync("aria-label")).Should().NotBeNullOrWhiteSpace();
