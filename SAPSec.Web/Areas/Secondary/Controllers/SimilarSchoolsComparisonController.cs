@@ -2,8 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Secondary;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
@@ -24,8 +22,8 @@ public class SimilarSchoolsComparisonController : Controller
 {
     private readonly GetSimilarSchoolDetails _getSimilarSchoolDetails;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
-    private readonly IUseCase<GetSchoolComparisonKs4HeadlineMeasuresRequest, GetSchoolComparisonKs4HeadlineMeasuresResponse> _getKs4HeadlineMeasuresUseCase;
-    private readonly IUseCase<GetSchoolComparisonKs4CoreSubjectsRequest, GetSchoolComparisonKs4CoreSubjectsResponse> _getKs4CoreSubjectsUseCase;
+    private readonly IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse> _getKs4HeadlineMeasuresUseCase;
+    private readonly IUseCase<GetComparisonKs4CoreSubjectsRequest, GetComparisonKs4CoreSubjectsResponse> _getKs4CoreSubjectsUseCase;
     private readonly GetCharacteristicsComparison _getCharacteristicsComparison;
     private readonly ILogger<SimilarSchoolsComparisonController> _logger;
     private readonly ICharacteristicsComparisonFormatter _characteristicsFormatter;
@@ -33,8 +31,8 @@ public class SimilarSchoolsComparisonController : Controller
     public SimilarSchoolsComparisonController(
         GetSimilarSchoolDetails getSimilarSchoolDetails,
         GetAttendanceMeasures getAttendanceMeasures,
-        IUseCase<GetSchoolComparisonKs4HeadlineMeasuresRequest, GetSchoolComparisonKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
-        IUseCase<GetSchoolComparisonKs4CoreSubjectsRequest, GetSchoolComparisonKs4CoreSubjectsResponse> getKs4CoreSubjectsUseCase,
+        IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
+        IUseCase<GetComparisonKs4CoreSubjectsRequest, GetComparisonKs4CoreSubjectsResponse> getKs4CoreSubjectsUseCase,
         GetCharacteristicsComparison getCharacteristicsComparison,
         ICharacteristicsComparisonFormatter characteristicsFormatter,
         ILogger<SimilarSchoolsComparisonController> logger)
@@ -340,51 +338,4 @@ public class SimilarSchoolsComparisonController : Controller
         value.HasValue
             ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
             : "No available data";
-
-    private static string NormalizeDestinationFilter(string? destination) =>
-        destination?.ToLowerInvariant() switch
-        {
-            "education" => "education",
-            "employment" => "employment",
-            _ => "all"
-        };
-
-    private static SimilarSchoolsComparisonViewModel.CoreSubjectSection BuildComparisonCoreSubjectSection(
-        Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases.GetSchoolKs4CoreSubjectsResponse thisSchoolResponse,
-        Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases.GetSchoolKs4CoreSubjectsResponse selectedSchoolResponse,
-        SchoolKs4CoreSubject subject)
-    {
-        var thisSchoolSelection = SchoolKs4CoreSubjectSelection.From(
-            thisSchoolResponse,
-            subject,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-        var selectedSchoolSelection = SchoolKs4CoreSubjectSelection.From(
-            selectedSchoolResponse,
-            subject,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-
-        return new SimilarSchoolsComparisonViewModel.CoreSubjectSection(
-            thisSchoolSelection.ThreeYearAverage.SchoolValue,
-            selectedSchoolSelection.ThreeYearAverage.SchoolValue,
-            thisSchoolSelection.ThreeYearAverage.EnglandValue ?? selectedSchoolSelection.ThreeYearAverage.EnglandValue,
-            thisSchoolSelection.YearByYear.School,
-            selectedSchoolSelection.YearByYear.School,
-            thisSchoolSelection.YearByYear.England ?? selectedSchoolSelection.YearByYear.England);
-    }
-
-    private static Ks4HeadlineMeasureAverage? SelectDestinationsAverage(GetKs4HeadlineMeasuresResponse? response, string destination) =>
-        destination switch
-        {
-            "education" => response?.DestinationsEducationThreeYearAverage,
-            "employment" => response?.DestinationsEmploymentThreeYearAverage,
-            _ => response?.DestinationsThreeYearAverage
-        };
-
-    private static Ks4HeadlineMeasureYearByYear? SelectDestinationsYearByYear(GetKs4HeadlineMeasuresResponse? response, string destination) =>
-        destination switch
-        {
-            "education" => response?.DestinationsEducationYearByYear,
-            "employment" => response?.DestinationsEmploymentYearByYear,
-            _ => response?.DestinationsYearByYear
-        };
 }

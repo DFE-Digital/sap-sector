@@ -13,7 +13,7 @@ public class GetSchoolKs4CoreSubjectsUseCase(
 {
     public async Task<GetSchoolKs4CoreSubjectsResponse> Execute(GetSchoolKs4CoreSubjectsRequest request)
     {
-        var performance = new SecondarySimilarSchoolsPerformanceDataProvider(
+        var performance = new SchoolPerformanceDataProvider(
             establishmentRepository,
             similarSchoolsRepository,
             performanceRepository);

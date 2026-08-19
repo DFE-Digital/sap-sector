@@ -1,4 +1,4 @@
-using SAPSec.Web.ViewModels;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.ViewModels;
@@ -19,6 +19,16 @@ public class PrimarySimilarSchoolsComparisonViewModel
 
     public MeasureViewModel? Absence { get; set; }
 
-    public IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow> CharacteristicsRows { get; set; }
-        = Array.Empty<SimilarSchoolsComparisonViewModel.CharacteristicRow>();
+    public IReadOnlyList<CharacteristicRow> CharacteristicsRows { get; set; }
+        = Array.Empty<CharacteristicRow>();
+
+    public sealed class CharacteristicRow
+    {
+        public required string Characteristic { get; init; }
+        public required string CurrentSchoolValue { get; init; }
+        public required string SimilarSchoolValue { get; init; }
+        public bool IsNumeric { get; init; }
+
+        public SchoolSimilarity? Similarity { get; init; }
+    }
 }

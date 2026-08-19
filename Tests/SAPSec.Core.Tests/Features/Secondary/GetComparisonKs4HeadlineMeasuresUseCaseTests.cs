@@ -7,19 +7,19 @@ using static SAPSec.Core.Constants.Measures.Secondary;
 
 namespace SAPSec.Core.Tests.Features.Secondary;
 
-public class GetSchoolComparisonKs4HeadlineMeasuresUseCaseTests
+public class GetComparisonKs4HeadlineMeasuresUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
     private readonly InMemoryKs4DestinationsRepository _destinationsRepo;
-    private readonly GetSchoolComparisonKs4HeadlineMeasuresUseCase _sut;
+    private readonly GetComparisonKs4HeadlineMeasuresUseCase _sut;
 
-    public GetSchoolComparisonKs4HeadlineMeasuresUseCaseTests()
+    public GetComparisonKs4HeadlineMeasuresUseCaseTests()
     {
         _establishmentRepo = new();
         _performanceRepo = new(_establishmentRepo);
         _destinationsRepo = new(_establishmentRepo);
-        _sut = new GetSchoolComparisonKs4HeadlineMeasuresUseCase(
+        _sut = new GetComparisonKs4HeadlineMeasuresUseCase(
             _establishmentRepo,
             _performanceRepo,
             _destinationsRepo);
@@ -640,6 +640,6 @@ public class GetSchoolComparisonKs4HeadlineMeasuresUseCaseTests
         ]);
     }
 
-    private GetSchoolComparisonKs4HeadlineMeasuresRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null) =>
+    private GetComparisonKs4HeadlineMeasuresRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null) =>
             new(currentSchoolUrn, similarSchoolUrn, filterBy ?? []);
 }

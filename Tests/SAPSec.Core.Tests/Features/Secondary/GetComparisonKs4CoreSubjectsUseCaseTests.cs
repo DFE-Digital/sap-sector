@@ -7,17 +7,17 @@ using static SAPSec.Core.Constants.Measures.Secondary;
 
 namespace SAPSec.Core.Tests.Features.Secondary;
 
-public class GetSchoolComparisonKs4CoreSubjectsUseCaseTests
+public class GetComparisonKs4CoreSubjectsUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
-    private readonly GetSchoolComparisonKs4CoreSubjectsUseCase _sut;
+    private readonly GetComparisonKs4CoreSubjectsUseCase _sut;
 
-    public GetSchoolComparisonKs4CoreSubjectsUseCaseTests()
+    public GetComparisonKs4CoreSubjectsUseCaseTests()
     {
         _establishmentRepo = new();
         _performanceRepo = new(_establishmentRepo);
-        _sut = new GetSchoolComparisonKs4CoreSubjectsUseCase(
+        _sut = new GetComparisonKs4CoreSubjectsUseCase(
             _establishmentRepo,
             _performanceRepo);
     }
@@ -1565,6 +1565,6 @@ public class GetSchoolComparisonKs4CoreSubjectsUseCaseTests
         ]);
     }
 
-    private GetSchoolComparisonKs4CoreSubjectsRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null) =>
+    private GetComparisonKs4CoreSubjectsRequest Request(string currentSchoolUrn, string similarSchoolUrn, Dictionary<string, string>? filterBy = null) =>
             new(currentSchoolUrn, similarSchoolUrn, filterBy ?? []);
 }

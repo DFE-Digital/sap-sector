@@ -14,12 +14,12 @@ public class GetSchoolKs4HeadlineMeasuresUseCase(
 {
     public async Task<GetSchoolKs4HeadlineMeasuresResponse> Execute(GetSchoolKs4HeadlineMeasuresRequest request)
     {
-        var performance = new SecondarySimilarSchoolsPerformanceDataProvider(
+        var performance = new SchoolPerformanceDataProvider(
             establishmentRepository,
             similarSchoolsRepository,
             performanceRepository);
 
-        var destinations = new SecondarySimilarSchoolsDestinationsDataProvider(
+        var destinations = new SchoolDestinationsDataProvider(
             establishmentRepository,
             similarSchoolsRepository,
             destinationsRepository);

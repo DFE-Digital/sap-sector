@@ -5,8 +5,6 @@ using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Secondary;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
@@ -42,27 +40,13 @@ public class SimilarSchoolsComparisonControllerTests
             schoolDetailsService,
             _ks4PerformanceRepositoryMock.Object,
             _absenceRepositoryMock.Object);
-        var ks4HeadlineMeasuresUseCase = new GetSchoolComparisonKs4HeadlineMeasuresUseCase(
+        var ks4HeadlineMeasuresUseCase = new GetComparisonKs4HeadlineMeasuresUseCase(
             _establishmentRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object);
-        var ks4CoreSubjectsUseCase = new GetSchoolComparisonKs4CoreSubjectsUseCase(
+        var ks4CoreSubjectsUseCase = new GetComparisonKs4CoreSubjectsUseCase(
             _establishmentRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object);
-        var ks4HeadlineMeasures = new GetKs4HeadlineMeasures(
-            _ks4PerformanceRepositoryMock.Object,
-            _ks4DestinationsRepositoryMock.Object,
-            schoolDetailsService);
-        var ks4CoreSubjects = new GetSchoolKs4CoreSubjects(
-            _ks4PerformanceRepositoryMock.Object,
-            schoolDetailsService,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
-        var filteredKs4CoreSubjects = new GetFilteredSchoolKs4CoreSubject(
-            _ks4PerformanceRepositoryMock.Object,
-            schoolDetailsService,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
             _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object,
@@ -82,9 +66,6 @@ public class SimilarSchoolsComparisonControllerTests
             attendanceUseCase,
             ks4HeadlineMeasuresUseCase,
             ks4CoreSubjectsUseCase,
-            ks4CoreSubjects,
-            filteredKs4CoreSubjects,
-            ks4HeadlineMeasures,
             getCharacteristicsComparison,
             characteristicsFormatter,
             _loggerMock.Object);

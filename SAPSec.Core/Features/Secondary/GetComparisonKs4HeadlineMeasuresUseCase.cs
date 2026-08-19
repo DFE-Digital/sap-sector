@@ -5,19 +5,19 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Secondary;
 
-public class GetSchoolComparisonKs4HeadlineMeasuresUseCase(
+public class GetComparisonKs4HeadlineMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
     IKs4PerformanceRepository performanceRepository,
     IKs4DestinationsRepository destinationsRepository)
-    : IUseCase<GetSchoolComparisonKs4HeadlineMeasuresRequest, GetSchoolComparisonKs4HeadlineMeasuresResponse>
+    : IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse>
 {
-    public async Task<GetSchoolComparisonKs4HeadlineMeasuresResponse> Execute(GetSchoolComparisonKs4HeadlineMeasuresRequest request)
+    public async Task<GetComparisonKs4HeadlineMeasuresResponse> Execute(GetComparisonKs4HeadlineMeasuresRequest request)
     {
-        var performance = new SecondarySchoolComparisonPerformanceDataProvider(
+        var performance = new ComparisonPerformanceDataProvider(
             establishmentRepository,
             performanceRepository);
 
-        var destinations = new SecondarySchoolComparisonDestinationsDataProvider(
+        var destinations = new ComparisonDestinationsDataProvider(
             establishmentRepository,
             destinationsRepository);
 
@@ -48,12 +48,12 @@ public class GetSchoolComparisonKs4HeadlineMeasuresUseCase(
     }
 }
 
-public record GetSchoolComparisonKs4HeadlineMeasuresRequest(
+public record GetComparisonKs4HeadlineMeasuresRequest(
     string Urn,
     string SimilarSchoolUrn,
     IDictionary<string, string>? FilterBy = null);
 
-public record GetSchoolComparisonKs4HeadlineMeasuresResponse(
+public record GetComparisonKs4HeadlineMeasuresResponse(
     SchoolInfo.SchoolInfo School,
     SchoolInfo.SchoolInfo SimilarSchool,
     Measure Attainment8,

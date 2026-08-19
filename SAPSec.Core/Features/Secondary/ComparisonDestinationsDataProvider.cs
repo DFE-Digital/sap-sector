@@ -3,7 +3,7 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Secondary;
 
-public class SecondarySchoolComparisonDestinationsDataProvider(
+public class ComparisonDestinationsDataProvider(
     IEstablishmentRepository establishmentRepository,
     IKs4DestinationsRepository destinationsRepository)
 {
