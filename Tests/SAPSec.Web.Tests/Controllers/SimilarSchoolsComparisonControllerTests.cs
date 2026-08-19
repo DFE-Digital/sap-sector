@@ -26,8 +26,8 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<IAbsenceRepository> _absenceRepositoryMock = new();
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock = new();
-    private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
-    private readonly SimilarSchoolsComparisonController _sut;
+    private readonly Mock<ILogger<ComparisonController>> _loggerMock = new();
+    private readonly ComparisonController _sut;
 
     public SimilarSchoolsComparisonControllerTests()
     {
@@ -61,7 +61,7 @@ public class SimilarSchoolsComparisonControllerTests
 
         var characteristicsFormatter = new CharacteristicsComparisonFormatter();
 
-        _sut = new SimilarSchoolsComparisonController(
+        _sut = new ComparisonController(
             getSimilarSchoolDetails,
             attendanceUseCase,
             ks4HeadlineMeasuresUseCase,

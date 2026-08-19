@@ -1,0 +1,33 @@
+@using SAPSec.Web.Constants
+@model SAPSec.Web.Areas.Primary.ViewModels.Comparison.AttendancePageViewModel
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = Model.SimilarSchoolName;
+}
+
+<h2 class="govuk-heading-l">Attendance measures</h2>
+<p class="govuk-body">
+    How @Model.Name compares with @Model.SimilarSchoolName based on attendance measures.
+</p>
+
+<form action="" method="get">
+    <section class="app-measure-section" aria-labelledby="attendance-heading">
+        <h2 class="govuk-heading-m" id="attendance-heading" data-testid="attendance-heading">Attendance</h2>
+
+        <partial name="Measures/_Measure" model=@Model.Absence />
+    </section>
+</form>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}

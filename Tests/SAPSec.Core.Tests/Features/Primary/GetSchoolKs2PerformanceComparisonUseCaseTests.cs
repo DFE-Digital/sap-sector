@@ -11,18 +11,18 @@ public class GetSchoolKs2PerformanceComparisonUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryKs2PerformanceRepository _performanceRepo;
-    private readonly GetSchoolKs2PerformanceComparisonUseCase _sut;
+    private readonly GetComparisonKs2PerformanceMeasuresUseCase _sut;
 
     public GetSchoolKs2PerformanceComparisonUseCaseTests()
     {
         _establishmentRepo = new();
         _performanceRepo = new(_establishmentRepo);
-        _sut = new GetSchoolKs2PerformanceComparisonUseCase(
+        _sut = new GetComparisonKs2PerformanceMeasuresUseCase(
             _establishmentRepo,
             _performanceRepo);
     }
 
-    private static GetSchoolKs2PerformanceComparisonRequest Request(
+    private static GetComparisonKs2PerformanceMeasuresRequest Request(
         string urn,
         string similarSchoolUrn,
         Dictionary<string, string>? filterBy = null) =>

@@ -1,0 +1,40 @@
+@using SAPSec.Core.Model
+@using SAPSec.Web.ViewModels
+@using SAPSec.Web.Constants 
+
+@model SAPSec.Web.Areas.Secondary.ViewModels.Comparison.Ks4CoreSubjectsPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = "KS4 core subject GCSE results";
+}
+
+<h1 class="govuk-heading-l">@ViewData[ViewDataKeys.Title]</h1>
+
+<p class="govuk-body">
+    How @Model.School.Name compares with @Model.SimilarSchool.Name based on KS4 core subject GCSE results.
+</p>
+
+<form action="" method="get">
+    @foreach (var measure in Model.Measures)
+    {
+        <section class="app-measure-section" aria-labelledby="@measure.MeasureInfo.HtmlPrefix-heading">
+            <h2 class="govuk-heading-m" id="@measure.MeasureInfo.HtmlPrefix-heading" data-testid="@measure.MeasureInfo.HtmlPrefix-heading">@measure.MeasureInfo.Name</h2>
+
+            <partial name="Measures/_Measure" model=@measure />
+        </section>
+    }
+</form>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}

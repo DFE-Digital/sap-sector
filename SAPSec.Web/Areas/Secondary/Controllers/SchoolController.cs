@@ -180,7 +180,7 @@ public class SchoolController : Controller
 
         PopulateViewData(response.School);
 
-        var model = new ViewModels.Ks4HeadlineMeasuresPageViewModel
+        var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School),
@@ -200,7 +200,7 @@ public class SchoolController : Controller
 
         PopulateViewData(response.School);
 
-        var model = new ViewModels.Ks4CoreSubjectsPageViewModel
+        var model = new ViewModels.School.Ks4CoreSubjectsPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Measures = [

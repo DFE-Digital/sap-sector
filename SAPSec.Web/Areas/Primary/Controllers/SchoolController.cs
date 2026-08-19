@@ -6,6 +6,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
+using SAPSec.Web.Areas.Primary.ViewModels.School;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;

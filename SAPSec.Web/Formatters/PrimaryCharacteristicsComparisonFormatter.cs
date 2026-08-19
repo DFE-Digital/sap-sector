@@ -1,21 +1,21 @@
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Web.Areas.Primary.ViewModels;
+using SAPSec.Web.Areas.Primary.ViewModels.Comparison;
 using System.Globalization;
 
 namespace SAPSec.Web.Formatters;
 
 public interface IPrimaryCharacteristicsComparisonFormatter
 {
-    IReadOnlyList<PrimarySimilarSchoolsComparisonViewModel.CharacteristicRow> BuildRows(
+    IReadOnlyList<SimilarityPageViewModel.CharacteristicRow> BuildRows(
         GetPrimaryCharacteristicsComparisonResponse response);
 }
 
 public sealed class PrimaryCharacteristicsComparisonFormatter : IPrimaryCharacteristicsComparisonFormatter
 {
-    public IReadOnlyList<PrimarySimilarSchoolsComparisonViewModel.CharacteristicRow> BuildRows(
+    public IReadOnlyList<SimilarityPageViewModel.CharacteristicRow> BuildRows(
         GetPrimaryCharacteristicsComparisonResponse response)
     {
-        return new List<PrimarySimilarSchoolsComparisonViewModel.CharacteristicRow>(9)
+        return new List<SimilarityPageViewModel.CharacteristicRow>(9)
         {
             new()
             {

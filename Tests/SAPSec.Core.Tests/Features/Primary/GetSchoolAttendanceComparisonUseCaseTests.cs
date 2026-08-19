@@ -10,18 +10,18 @@ public class GetSchoolAttendanceComparisonUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryAbsenceRepository _absenceRepo;
-    private readonly GetSchoolAttendanceComparisonUseCase _sut;
+    private readonly GetComparisonAttendanceMeasuresUseCase _sut;
 
     public GetSchoolAttendanceComparisonUseCaseTests()
     {
         _establishmentRepo = new();
         _absenceRepo = new(_establishmentRepo);
-        _sut = new GetSchoolAttendanceComparisonUseCase(
+        _sut = new GetComparisonAttendanceMeasuresUseCase(
             _establishmentRepo,
             _absenceRepo);
     }
 
-    private static GetSchoolAttendanceComparisonRequest Request(
+    private static GetComparisonAttendanceMeasuresRequest Request(
         string urn,
         string similarSchoolUrn,
         Dictionary<string, string>? filterBy = null) =>
