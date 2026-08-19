@@ -85,6 +85,14 @@ real DSI/Postgres errors instead of the bypass.
    npm run test:loadtest:quick
    ```
 
+## Path C - authenticated pages against real data (test/review, not the fixture)
+
+Path B uses JSON fixture data, not real Postgres data. If you need real
+school data, sign in once manually (as a dedicated test/service account,
+completing MFA) and reuse that session instead - see
+[Authenticated pages against a real environment](README.md#authenticated-pages-against-a-real-environment)
+in the main README for the full steps.
+
 ## Other scenarios
 
 Once the `quick` smoke test looks good, swap it for a heavier one:

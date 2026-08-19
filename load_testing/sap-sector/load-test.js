@@ -10,6 +10,7 @@ import { signInRedirectJourney } from './journeys/sign-in-redirect.js'
 import { schoolSearchJourney } from './journeys/school-search.js'
 import { secondarySchoolJourney, primarySchoolJourney } from './journeys/school-overview.js'
 import { comparePerformanceJourney } from './journeys/compare-performance.js'
+import { hasSessionCookie } from './utils/auth.js'
 import { quickTestScenario } from './scenarios/quick-test.js'
 import { baselineScenario } from './scenarios/baseline.js'
 import { peakSurgeScenario } from './scenarios/peak-surge.js'
@@ -64,12 +65,14 @@ export default function (data) {
 
   // School search/comparison sits behind DfE Sign-in (OpenID Connect) and
   // can't be scripted against a real deployment without user credentials.
-  // Against the "loadtest" environment (an instance you run yourself with
-  // ASPNETCORE_ENVIRONMENT=LoadTest - see README.md) auth is bypassed and
-  // JSON-backed test data is available, so the authenticated pages are
-  // included in the journey mix. Every other environment sticks to the
-  // anonymous-only mix.
-  if (environment.name === 'loadtest') {
+  // The authenticated journeys run in two cases:
+  //   - "loadtest" environment: an instance you run yourself with
+  //     ASPNETCORE_ENVIRONMENT=LoadTest (see README.md), auth bypassed.
+  //   - Any environment when SESSION_COOKIE is set: a real session obtained
+  //     by manually signing in once (through MFA) as a dedicated test/service
+  //     account and replaying that cookie - see utils/auth.js.
+  // Every other case sticks to the anonymous-only mix.
+  if (environment.name === 'loadtest' || hasSessionCookie()) {
     group('SAP Sector Authenticated User Journey', function () {
       if (journeyChoice < 0.4) {
         // 40% - search for a school

@@ -15,20 +15,27 @@ New to this? See **[RUNNING_LOCALLY.md](RUNNING_LOCALLY.md)** for a quick-start 
 - `/health`, `/healthcheck` - monitoring/liveness probes
 - `/auth/signin` - checked only as a redirect boundary (302 to DfE Sign-in), never followed
 
-**Authenticated pages** (run only against a `loadtest`-mode instance - see below):
+**Authenticated pages**:
 
 - `/find-a-school`, `/find-a-school/search`, `/find-a-school/suggest` - school search
 - `/school/secondary/{urn}` and sub-pages (`ks4-headline-measures`, `attendance`, `view-similar-schools`)
 - `/school/primary/{urn}` and sub-pages (`ks2`, `attendance`, `view-similar-schools`)
 - `/ComparePerformance`
 
-School search/comparison sits behind DfE Sign-in (OpenID Connect), which can't
-be scripted against a real deployment without user credentials - so these
-pages are never exercised against local/review/test/production. Instead the
-app has a `LoadTest` environment mode (added for this purpose, see
-[How the `LoadTest` mode works](#how-the-loadtest-mode-works)) that swaps in a
-test auth bypass and JSON-backed fixture data, and can only be run on an
-instance you start yourself.
+School search/comparison sits behind DfE Sign-in (OpenID Connect + MFA),
+which can't be scripted end-to-end - a login step can't complete an MFA
+challenge automatically. Two ways to exercise these pages instead:
+
+- **`loadtest`-mode instance** (see [How the `LoadTest` mode works](#how-the-loadtest-mode-works)):
+  an app instance you run yourself with a test auth bypass and JSON-backed
+  fixture data. No login of any kind needed. Only works on an instance you
+  start yourself, never a shared deployment.
+- **Session-cookie reuse against a real environment** (see
+  [Authenticated pages against a real environment](#authenticated-pages-against-a-real-environment)):
+  sign in once, manually, through a real browser as a dedicated test/service
+  account (completing MFA as normal), then replay that session across the
+  load test. Works against `test` or a review app with real data - useful
+  when you need results from real infrastructure, not just the JSON fixture.
 
 ## Setup
 
@@ -107,6 +114,58 @@ When `ENVIRONMENT=loadtest`, `load-test.js` swaps in the authenticated
 journey mix (search, secondary/primary school pages, compare performance)
 instead of the anonymous one - see
 [How the `LoadTest` mode works](#how-the-loadtest-mode-works).
+
+## Authenticated pages against a real environment
+
+For search/school pages/compare performance results against real
+infrastructure (real Postgres data, real 2-pod capacity, the actual WAF) -
+not the `LoadTest` mode's JSON fixture - reuse a real DfE Sign-in session
+instead of bypassing auth:
+
+1. **Get a dedicated test/service DSI account first**, if one doesn't
+   already exist - never use a real school leader's account for this. Sort
+   this with whoever manages the DSI client for this service before doing
+   anything else.
+
+2. **Sign in once, manually, through a real browser** against the target
+   environment (e.g. `test`), completing MFA as normal.
+
+3. **Copy the session cookie.** In DevTools: Application (Chrome) or Storage
+   (Firefox) > Cookies > find `SAPSec.Auth` > copy its value. This is a live
+   credential-equivalent to a password - never commit it, never paste it
+   into chat, PRs, or logs.
+
+4. **Set it in `.env`:**
+
+   ```
+   SESSION_COOKIE=<paste the value here>
+   ```
+
+5. **Run the load test** against the same environment you signed into:
+
+   ```bash
+   cd load_testing
+   npm run test:test-env:quick
+   ```
+
+   Any scenario/environment combination works the same way - `load-test.js`
+   switches to the authenticated journey mix whenever `SESSION_COOKIE` is
+   set, regardless of which environment it's pointed at (see
+   `sap-sector/utils/auth.js`).
+
+The session uses sliding expiration, so it stays alive for the length of a
+run as long as requests keep flowing - but it will eventually expire and
+need refreshing (repeat steps 2-4) for a later run.
+
+**The URN pools in `sap-sector/data/school-urns.js` were only verified
+against `LoadTest` mode's JSON fixture data.** Against a real environment
+those URNs may not exist, may 404, or may belong to different schools -
+re-verify (or replace with known-good real URNs) before trusting results
+from a real-environment authenticated run.
+
+This still generates real load against shared infrastructure, so the same
+rules apply as any other real-environment run - see
+[Running against the test environment](#running-against-the-test-environment).
 
 ## Running against a PR review app
 
@@ -200,8 +259,10 @@ target `environment` (`review` or `test`) when triggering it manually; for
 `review` you also need to supply the PR number. It only covers the anonymous
 journeys (same as running against `review`/`test` locally - see
 [What's covered](#whats-covered)); it doesn't run against `production`, and
-it doesn't set up a `LoadTest`-mode instance to exercise the authenticated
-pages. Reports are uploaded as a workflow artifact.
+it doesn't set a `SESSION_COOKIE` or set up a `LoadTest`-mode instance, so
+the authenticated pages aren't covered in CI (a live session cookie isn't
+something to store as a long-lived CI secret - it's tied to one human's
+sign-in and expires). Reports are uploaded as a workflow artifact.
 
 We deliberately didn't wire this into `pull_request`: `test` sits behind a
 rate-limited WAF shared with other traffic, and most PRs don't touch anything
@@ -253,7 +314,8 @@ load_testing/
 │   │   └── compare-performance.js   # authenticated (loadtest only)
 │   ├── scenarios/          # load shapes (quick/baseline/peak-surge/stress)
 │   └── utils/
-│       └── checks.js       # response time + content assertions, custom metrics
+│       ├── checks.js       # response time + content assertions, custom metrics
+│       └── auth.js         # SESSION_COOKIE handling for real-environment auth
 └── shared/
     └── utils/
         └── common-helpers.js
