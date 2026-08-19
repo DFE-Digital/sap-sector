@@ -96,20 +96,17 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest")
+        // TEMPORARY: unconditionally bypassing DfE Sign-in for coordinated load
+        // testing against the shared test environment - see docs/testing/008-load-tests.md.
+        // This branch is never merged; DSI auth (AddDsiAuthentication) is restored
+        // before any merge to main.
+        builder.Services.AddAuthentication(options =>
         {
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "TestScheme";
-                options.DefaultAuthenticateScheme = "TestScheme";
-                options.DefaultChallengeScheme = "TestScheme";
-            })
-            .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
-        }
-        else
-        {
-            builder.Services.AddDsiAuthentication(builder.Configuration);
-        }
+            options.DefaultScheme = "TestScheme";
+            options.DefaultAuthenticateScheme = "TestScheme";
+            options.DefaultChallengeScheme = "TestScheme";
+        })
+        .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
 
         builder.Services.AddAuthorization(options =>
         {
@@ -170,7 +167,9 @@ public class Program
         // k6 load tests locally without a Postgres database - it swaps in the same
         // JSON-file-backed repositories used by the integration test suite. It must
         // never be used for the shared review/test/production environments, which
-        // continue to use AddPostgresqlDependencies() above.
+        // continue to use AddPostgresqlDependencies() above. The test environment
+        // keeps this (real Postgres data) even while auth is bypassed above, so
+        // authenticated load tests exercise real data.
         if (builder.Environment.EnvironmentName == "LoadTest")
         {
             builder.Services.AddJsonDependencies();
