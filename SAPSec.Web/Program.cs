@@ -6,11 +6,14 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Services;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -119,6 +122,11 @@ public class Program
         // testing against the shared test environment - see docs/testing/008-load-tests.md.
         // This branch is never merged; DSI auth (AddDsiAuthentication) is restored
         // before any merge to main.
+        //
+        // AddDsiAuthentication() (now skipped) also registered IHttpContextAccessor,
+        // IUserService, and the DSI API HttpClient - those are still needed by
+        // AuthController/UserController/DsiAuthorizationHandler regardless of which
+        // auth scheme is active, so they're restored explicitly here.
         builder.Services.AddAuthentication(options =>
         {
             options.DefaultScheme = "TestScheme";
@@ -126,6 +134,20 @@ public class Program
             options.DefaultChallengeScheme = "TestScheme";
         })
         .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
+
+        builder.Services.Configure<DsiConfiguration>(builder.Configuration.GetSection("DsiConfiguration"));
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddHttpClient<IDsiClient, DsiApiService>((serviceProvider, client) =>
+        {
+            var dsiConfig = serviceProvider.GetRequiredService<IConfiguration>()
+                .GetSection("DsiConfiguration").Get<DsiConfiguration>();
+
+            client.BaseAddress = new Uri(dsiConfig?.ApiUri ?? "https://placeholder.invalid");
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+        builder.Services.AddScoped<IAuthorizationHandler, DsiAuthorizationHandler>();
 
         builder.Services.AddAuthorization(options =>
         {
