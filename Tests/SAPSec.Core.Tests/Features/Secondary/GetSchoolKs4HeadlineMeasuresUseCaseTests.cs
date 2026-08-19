@@ -129,49 +129,62 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
         ]);
     }
 
-    [Fact]
-    public async Task Attainment8_CurrentSchool_ContainsYearByYearValues()
+    [InlineData(MeasureSeriesType.CurrentSchool)]
+    [InlineData(MeasureSeriesType.SimilarSchoolsAverage)]
+    [InlineData(MeasureSeriesType.LASchoolsAverage)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
+    [Theory]
+    public async Task Attainment8_WhenNoPerformanceData_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School", x => x.Secondary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")),
+            Build.Establishment("100004", "Test School 4", x => x.Secondary().InLA("001")));
 
-        _performanceRepo.SetupEstablishmentPerformance(
-            Build.Ks4Performance.Establishment("100001", x => x.WithAttainment8(current: "107.2", prev: "106.3", prev2: "105.1")));
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
 
         var response = await _sut.Execute(Request("100001"));
 
         response.Attainment8.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
-            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, 107.2m, 106.3m, 105.1m));
+            .FirstOrDefault(s => s.SeriesType == seriesType)
+            .Should().Be(new MeasureSeries(seriesType, null, null, null));
     }
 
-    [Fact]
-    public async Task Attainment8_CurrentSchool_WhenCurrentSchoolHasNoPerformanceData_ContainsNullValues()
+    [InlineData(MeasureSeriesType.CurrentSchool)]
+    [InlineData(MeasureSeriesType.SimilarSchoolsAverage)]
+    [InlineData(MeasureSeriesType.LASchoolsAverage)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
+    [Theory]
+    public async Task Attainment8_WhenEmptyValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School", x => x.Secondary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")),
+            Build.Establishment("100004", "Test School 4", x => x.Secondary().InLA("001")));
 
-        var response = await _sut.Execute(Request("100001"));
-
-        response.Attainment8.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
-            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null));
-    }
-
-    [Fact]
-    public async Task Attainment8_CurrentSchool_WhenEmptyValues_ContainsNulls()
-    {
-        _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School", x => x.Secondary()));
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
-            Build.Ks4Performance.Establishment("100001", x => x.WithAttainment8(current: "", prev: "", prev2: "")));
+            Build.Ks4Performance.Establishment("100001", x => x.WithAttainment8(current: "", prev: "", prev2: "")),
+            Build.Ks4Performance.Establishment("100002", x => x.WithAttainment8(current: "", prev: "", prev2: "")),
+            Build.Ks4Performance.Establishment("100003", x => x.WithAttainment8(current: "", prev: "", prev2: "")),
+            Build.Ks4Performance.Establishment("100004", x => x.WithAttainment8(current: "", prev: "", prev2: "")));
+
+        _performanceRepo.SetupLAPerformance(
+            Build.Ks4Performance.LA("001", x => x.WithAttainment8(current: "", prev: "", prev2: "")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks4Performance.England(x => x.WithAttainment8(current: "", prev: "", prev2: "")));
 
         var response = await _sut.Execute(Request("100001"));
 
         response.Attainment8.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
-            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null));
+            .FirstOrDefault(s => s.SeriesType == seriesType)
+            .Should().Be(new MeasureSeries(seriesType, null, null, null));
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
@@ -206,6 +219,42 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
         response.Attainment8.Series
             .FirstOrDefault(s => s.SeriesType == seriesType)
             .Should().Be(new MeasureSeries(seriesType, null, null, null));
+    }
+
+    [InlineData(MeasureSeriesType.CurrentSchool, 81.0, 80.0, 79.0)]
+    [InlineData(MeasureSeriesType.SimilarSchoolsAverage, 70.0, 65.0, 82.5)]
+    [InlineData(MeasureSeriesType.LASchoolsAverage, 71.0, 70.0, 69.0)]
+    [InlineData(MeasureSeriesType.EnglandSchoolsAverage, 61.0, 60.0, 59.0)]
+    [Theory]
+    public async Task Attainment8_ContainsYearByYearValues(MeasureSeriesType seriesType, double? current, double? prev, double? prev2)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Secondary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment("100001", x => x.WithAttainment8(current: "81", prev: "80", prev2: "79")),
+            Build.Ks4Performance.Establishment("100002", x => x.WithAttainment8(current: "80", prev: "70", prev2: "85")),
+            Build.Ks4Performance.Establishment("100003", x => x.WithAttainment8(current: "60", prev: "60", prev2: "80")));
+
+        _performanceRepo.SetupLAPerformance(
+            Build.Ks4Performance.LA("001", x => x.WithAttainment8(current: "71", prev: "70", prev2: "69")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks4Performance.England(x => x.WithAttainment8(current: "61", prev: "60", prev2: "59")));
+
+        var response = await _sut.Execute(Request("100001"));
+
+        var series = response.Attainment8.Series
+            .FirstOrDefault(s => s.SeriesType == seriesType);
+
+        series.Should().NotBeNull();
+        series.Should().Be(
+            new MeasureSeries(seriesType, (decimal?)current, (decimal?)prev, (decimal?)prev2));
     }
 
     [Fact]
@@ -264,60 +313,6 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
         response.Attainment8.Series
             .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
             .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
-    }
-
-    [Fact]
-    public async Task Attainment8_SimilarSchoolsAverage_ContainsYearByYearValues()
-    {
-        _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()),
-            Build.Establishment("100003", "Test School 3", x => x.Secondary()));
-
-        _similarSchoolsRepo.SetupGroups(
-            Build.SecondaryGroup("100001", ["100002", "100003"]));
-
-        _performanceRepo.SetupEstablishmentPerformance(
-            Build.Ks4Performance.Establishment("100002", x => x.WithAttainment8(current: "106.4", prev: "103.1", prev2: "101.2")),
-            Build.Ks4Performance.Establishment("100003", x => x.WithAttainment8(current: "104.0", prev: "102.3", prev2: "99.8")));
-
-        var response = await _sut.Execute(Request("100001"));
-
-        response.Attainment8.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.SimilarSchoolsAverage)
-            .Should().Be(new MeasureSeries(MeasureSeriesType.SimilarSchoolsAverage, 105.2m, 102.7m, 100.5m));
-    }
-
-    [Fact]
-    public async Task Attainment8_LASchoolsAverage_ContainsYearByYearValues()
-    {
-        _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary().InLA("001")));
-
-        _performanceRepo.SetupLAPerformance(
-            Build.Ks4Performance.LA("001", x => x.WithAttainment8(current: "106.2", prev: "105.4", prev2: "104.1")));
-
-        var response = await _sut.Execute(Request("100001"));
-
-        response.Attainment8.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
-            .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, 106.2m, 105.4m, 104.1m));
-    }
-
-    [Fact]
-    public async Task Attainment8_EnglandSchoolsAverage_ContainsYearByYearValues()
-    {
-        _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()));
-
-        _performanceRepo.SetupEnglandPerformance(
-            Build.Ks4Performance.England(x => x.WithAttainment8(current: "107.4", prev: "106.6", prev2: "105.8")));
-
-        var response = await _sut.Execute(Request("100001"));
-
-        response.Attainment8.Series
-            .FirstOrDefault(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage)
-            .Should().Be(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, 107.4m, 106.6m, 105.8m));
     }
 
     [Fact]
@@ -523,6 +518,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "", prev: "", prev2: "")),
             Build.Ks4Performance.Establishment("100002", x => x.WithEngMaths49(current: "", prev: "", prev2: "")),
             Build.Ks4Performance.Establishment("100003", x => x.WithEngMaths49(current: "", prev: "", prev2: "")),
             Build.Ks4Performance.Establishment("100004", x => x.WithEngMaths49(current: "", prev: "", prev2: "")));
@@ -560,6 +556,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "x", prev: "y2", prev2: "3z")),
             Build.Ks4Performance.Establishment("100002", x => x.WithEngMaths49(current: "x", prev: "y2", prev2: "3z")),
             Build.Ks4Performance.Establishment("100003", x => x.WithEngMaths49(current: "x", prev: "y2", prev2: "3z")),
             Build.Ks4Performance.Establishment("100004", x => x.WithEngMaths49(current: "x", prev: "y2", prev2: "3z")));
@@ -645,6 +642,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "", prev: "70", prev2: "")),
             Build.Ks4Performance.Establishment("100002", x => x.WithEngMaths49(current: "", prev: "70", prev2: "")),
             Build.Ks4Performance.Establishment("100003", x => x.WithEngMaths49(current: "80", prev: "", prev2: "")),
             Build.Ks4Performance.Establishment("100004", x => x.WithEngMaths49(current: "60", prev: "60", prev2: "")));
@@ -1032,6 +1030,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
 
         _destinationsRepo.SetupEstablishmentDestinations(
+            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "", prev: "", prev2: "")),
             Build.Ks4Destinations.Establishment("100002", x => x.WithAllDest(current: "", prev: "", prev2: "")),
             Build.Ks4Destinations.Establishment("100003", x => x.WithAllDest(current: "", prev: "", prev2: "")),
             Build.Ks4Destinations.Establishment("100004", x => x.WithAllDest(current: "", prev: "", prev2: "")));
@@ -1069,6 +1068,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.SecondaryGroup("100001", ["100002", "100003", "100004"]));
 
         _destinationsRepo.SetupEstablishmentDestinations(
+            Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "x", prev: "y2", prev2: "3z")),
             Build.Ks4Destinations.Establishment("100002", x => x.WithAllDest(current: "x", prev: "y2", prev2: "3z")),
             Build.Ks4Destinations.Establishment("100003", x => x.WithAllDest(current: "x", prev: "y2", prev2: "3z")),
             Build.Ks4Destinations.Establishment("100004", x => x.WithAllDest(current: "x", prev: "y2", prev2: "3z")));

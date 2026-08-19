@@ -6,6 +6,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
+using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
@@ -32,7 +33,7 @@ public class SimilarSchoolsComparisonController(
         Similarity(urn, similarSchoolUrn);
 
     [HttpGet]
-    [Route("Similarity")]
+    [Route("similarity")]
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
     {
         var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
@@ -41,13 +42,13 @@ public class SimilarSchoolsComparisonController(
             new GetPrimaryCharacteristicsComparisonRequest(urn, similarSchoolUrn));
         model.CharacteristicsRows = primaryCharacteristicsComparisonFormatter.BuildRows(characteristicsResponse);
 
-        ViewData["ComparisonSchool"] = model;
+        ViewData[ViewDataKeys.ComparisonSchool] = model;
         return View("Similarity", model);
     }
 
     [HttpGet]
     [Route("ks2")]
-    public async Task<IActionResult> Ks2(string urn, string similarSchoolUrn)
+    public async Task<IActionResult> Ks2PerformanceMeasures(string urn, string similarSchoolUrn)
     {
         var (model, currentSchool, similarSchool) = await BuildBaseModelAsync(urn, similarSchoolUrn);
 
@@ -62,7 +63,7 @@ public class SimilarSchoolsComparisonController(
         model.MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.MeetingExpectedStandardGps, currentSchool, similarSchool);
         model.AchievedHigherStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AchievedHigherStandardGps, currentSchool, similarSchool);
 
-        ViewData["ComparisonSchool"] = model;
+        ViewData[ViewDataKeys.ComparisonSchool] = model;
         return View(model);
     }
 
@@ -78,7 +79,7 @@ public class SimilarSchoolsComparisonController(
 
         model.Absence = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.Absence, currentSchool, similarSchool);
 
-        ViewData["ComparisonSchool"] = model;
+        ViewData[ViewDataKeys.ComparisonSchool] = model;
         return View(model);
     }
 
@@ -89,7 +90,7 @@ public class SimilarSchoolsComparisonController(
         var response = await getPrimarySimilarSchoolDetailsUseCase.Execute(
             new GetPrimarySimilarSchoolDetailsRequest(urn, similarSchoolUrn));
 
-        ViewData["ComparisonSchool"] = new PrimarySimilarSchoolsComparisonViewModel
+        ViewData[ViewDataKeys.ComparisonSchool] = new PrimarySimilarSchoolsComparisonViewModel
         {
             Urn = urn,
             SimilarSchoolUrn = similarSchoolUrn,

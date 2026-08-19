@@ -1,11 +1,13 @@
-﻿﻿@using SAPSec.Core.Model
+﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
 @using SAPSec.Core.Constants
 @using SAPSec.Core.Extensions
+
 @model SAPSec.Core.Model.SchoolDetails
 @{
     Layout = "_Layout";
-    ViewData["Title"] = $"School details";
+    ViewData[ViewDataKeys.Title] = $"School details";
 }
 
 <span class="govuk-caption-xl">@Model.Name</span>

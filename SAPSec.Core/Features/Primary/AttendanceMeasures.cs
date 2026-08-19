@@ -40,7 +40,6 @@ internal static class AttendanceMeasures
                 availableFilters,
                 currentSchool,
                 similarSchool,
-                [],
                 fieldSelector);
         }
 

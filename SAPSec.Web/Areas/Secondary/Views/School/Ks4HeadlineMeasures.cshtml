@@ -5,12 +5,12 @@
 @model SAPSec.Web.Areas.Secondary.ViewModels.Ks4HeadlineMeasuresPageViewModel
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "KS4 headline performance measures";
+    ViewData[ViewDataKeys.Title] = "KS4 headline performance measures";
 }
 
 <div class="app-school-page">
     <span class="govuk-caption-xl">@Model.School.Name</span>
-    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+    <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
     <p class="govuk-body">
         Compare this school's KS4 headline performance measures with:

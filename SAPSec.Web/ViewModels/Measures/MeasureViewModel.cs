@@ -35,6 +35,11 @@ public record MeasureViewModel(
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview);
 
+    public static MeasureViewModel FromSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
+        => FromMeasure(measure, schoolInfo, similarSchool,
+            urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Overview);
+
     private static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,

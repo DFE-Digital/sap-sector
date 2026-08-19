@@ -1,9 +1,9 @@
-using SAPSec.Web.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.ViewModels;
 
-public class Ks2MeasuresPageViewModel
+public class Ks2PerformanceMeasuresPageViewModel
 {
     public required SchoolInfoViewModel School { get; set; }
 

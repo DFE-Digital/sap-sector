@@ -51,7 +51,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngLang49(current: "81", prev: "80", prev2: "79")),
             Build.Ks4Performance.Establishment("100002", x => x.WithEngLang49(current: "71", prev: "70", prev2: "69")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithEngLang49(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithEngLang49(current: "71", prev: "70", prev2: "69")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithEngLang49(current: "101", prev: "100", prev2: "99")));
@@ -85,7 +85,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngLang49(current: "80.99", prev: "80.3", prev2: "78.9")),
             Build.Ks4Performance.Establishment("100002", x => x.WithEngLang49(current: "70.6", prev: "70.3", prev2: "69.1")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithEngLang49(current: "71.1", prev: "70.2", prev2: "69.3")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithEngLang49(current: "71.1", prev: "70.2", prev2: "69.3")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithEngLang49(current: "101.31", prev: "99.52", prev2: "99.49")));
@@ -295,7 +295,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngLit49(current: "81", prev: "80", prev2: "79")),
             Build.Ks4Performance.Establishment("100002", x => x.WithEngLit49(current: "71", prev: "70", prev2: "69")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithEngLit49(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithEngLit49(current: "71", prev: "70", prev2: "69")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithEngLit49(current: "101", prev: "100", prev2: "99")));
@@ -539,7 +539,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithMaths49(current: "81", prev: "80", prev2: "79")),
             Build.Ks4Performance.Establishment("100002", x => x.WithMaths49(current: "71", prev: "70", prev2: "69")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithMaths49(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithMaths49(current: "71", prev: "70", prev2: "69")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithMaths49(current: "101", prev: "100", prev2: "99")));
@@ -783,7 +783,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithCombSci49(current: "81", prev: "80", prev2: "79")),
             Build.Ks4Performance.Establishment("100002", x => x.WithCombSci49(current: "71", prev: "70", prev2: "69")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithCombSci49(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithCombSci49(current: "71", prev: "70", prev2: "69")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithCombSci49(current: "101", prev: "100", prev2: "99")));
@@ -1027,7 +1027,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithBio49(current: "81", prev: "80", prev2: "79")),
             Build.Ks4Performance.Establishment("100002", x => x.WithBio49(current: "71", prev: "70", prev2: "69")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithBio49(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithBio49(current: "71", prev: "70", prev2: "69")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithBio49(current: "101", prev: "100", prev2: "99")));
@@ -1271,7 +1271,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithChem49(current: "81", prev: "80", prev2: "79")),
             Build.Ks4Performance.Establishment("100002", x => x.WithChem49(current: "71", prev: "70", prev2: "69")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithChem49(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithChem49(current: "71", prev: "70", prev2: "69")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithChem49(current: "101", prev: "100", prev2: "99")));
@@ -1515,7 +1515,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithPhysics49(current: "81", prev: "80", prev2: "79")),
             Build.Ks4Performance.Establishment("100002", x => x.WithPhysics49(current: "71", prev: "70", prev2: "69")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithPhysics49(current: "71", prev: "70", prev2: "69")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithPhysics49(current: "71", prev: "70", prev2: "69")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithPhysics49(current: "101", prev: "100", prev2: "99")));
@@ -1549,7 +1549,7 @@ public class Ks4CoreSubjectsPageIntegrationTests(
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithPhysics49(current: "80.99", prev: "80.3", prev2: "78.9")),
             Build.Ks4Performance.Establishment("100002", x => x.WithPhysics49(current: "70.6", prev: "70.3", prev2: "69.1")),
-            Build.Ks4Performance.Establishment("100002", x => x.WithPhysics49(current: "71.1", prev: "70.2", prev2: "69.3")));
+            Build.Ks4Performance.Establishment("100003", x => x.WithPhysics49(current: "71.1", prev: "70.2", prev2: "69.3")));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithPhysics49(current: "101.31", prev: "99.52", prev2: "99.49")));

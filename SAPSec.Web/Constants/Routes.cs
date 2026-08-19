@@ -74,13 +74,10 @@ public static class Routes
             public string Overview => _basePath;
             public string Similarity => $"{_basePath}/similarity";
             public string KS4HeadlineMeasures => $"{_basePath}/ks4-headline-measures";
-            public string KS4HeadlineMeasuresData => $"{_basePath}/ks4-headline-measures/data";
             public string KS4CoreSubjects => $"{_basePath}/ks4-core-subjects";
-            public string KS4CoreSubjectsData => $"{_basePath}/ks4-core-subjects/data";
             public string Attendance => $"{_basePath}/attendance";
             public string AttendanceData => $"{_basePath}/attendance-data";
             public string SchoolDetails => $"{_basePath}/school-details";
-            public string KS4DestinationsData => $"{_basePath}/ks4-destinations/data";
         }
     }
 }

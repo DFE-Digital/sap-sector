@@ -47,6 +47,8 @@ public static class DependenciesExtensions
         services.AddSingleton<IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse>, GetPrimarySimilarSchoolDetailsUseCase>();
         services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresRequest, Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresResponse>, GetSchoolKs4HeadlineMeasuresUseCase>();
         services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolKs4CoreSubjectsRequest, Core.Features.Secondary.GetSchoolKs4CoreSubjectsResponse>, GetSchoolKs4CoreSubjectsUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolComparisonKs4HeadlineMeasuresRequest, Core.Features.Secondary.GetSchoolComparisonKs4HeadlineMeasuresResponse>, GetSchoolComparisonKs4HeadlineMeasuresUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolComparisonKs4CoreSubjectsRequest, Core.Features.Secondary.GetSchoolComparisonKs4CoreSubjectsResponse>, GetSchoolComparisonKs4CoreSubjectsUseCase>();
 
         services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
         services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);

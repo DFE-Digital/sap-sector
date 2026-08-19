@@ -1,11 +1,11 @@
 @using SAPSec.Web.ViewModels
 @using System.Linq
+@using SAPSec.Web.Areas.Shared.ViewModels
 @using SAPSec.Web.Constants
-
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var comparisonModel = ViewData[ViewDataKeys.ComparisonSchool] as SimilarSchoolsComparisonViewModel;
+    var comparisonModel = ViewData[ViewDataKeys.ComparisonLayout] as ComparisonLayoutModel;
 
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
 

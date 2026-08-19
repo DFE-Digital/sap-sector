@@ -5,6 +5,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.Secondary;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
+using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -228,14 +229,14 @@ public class SchoolController : Controller
 
     private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
     {
-        ViewData["SchoolDetails"] = school;
+        ViewData[ViewDataKeys.SchoolDetails] = school;
 
         if (Url is null)
         {
             return;
         }
 
-        ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreateSecondary(
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             school.Urn,
             ControllerContext.ActionDescriptor.ActionName);

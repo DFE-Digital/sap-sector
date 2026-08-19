@@ -27,7 +27,7 @@ internal static class Ks2PerformanceMeasures
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 
@@ -39,7 +39,6 @@ internal static class Ks2PerformanceMeasures
                 availableFilters,
                 currentSchool,
                 similarSchool,
-                similarSchools,
                 fieldSelector);
         }
 
@@ -123,7 +122,7 @@ internal static class Ks2PerformanceMeasures
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 
@@ -135,7 +134,6 @@ internal static class Ks2PerformanceMeasures
                 availableFilters,
                 currentSchool,
                 similarSchool,
-                similarSchools,
                 fieldSelector);
         }
 
@@ -226,7 +224,7 @@ internal static class Ks2PerformanceMeasures
                     x => x?.EnglandPerformance?.ReadingScaledScore_Tot_Cohort_Eng_Previous2_Num));
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             return Measure.ForSchoolComparison(
                 Ks2ReadingScore.Key,
@@ -236,7 +234,6 @@ internal static class Ks2PerformanceMeasures
                 [],
                 currentSchool,
                 similarSchool,
-                similarSchools,
                 new MeasureFieldSelector<Ks2PerformanceData>(
                     x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Current_Num,
                     x => x?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Previous_Num,
@@ -274,7 +271,7 @@ internal static class Ks2PerformanceMeasures
                     x => x?.EnglandPerformance?.MathsScaledScore_Tot_Cohort_Eng_Previous2_Num));
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             return Measure.ForSchoolComparison(
                 Ks2MathsScore.Key,
@@ -284,7 +281,6 @@ internal static class Ks2PerformanceMeasures
                 [],
                 currentSchool,
                 similarSchool,
-                similarSchools,
                 new MeasureFieldSelector<Ks2PerformanceData>(
                     x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Current_Num,
                     x => x?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Previous_Num,
@@ -322,7 +318,7 @@ internal static class Ks2PerformanceMeasures
                     x => x?.EnglandPerformance?.GpsExpected_Tot_Cohort_Eng_Previous2_Num));
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             return Measure.ForSchoolComparison(
                 Ks2ExpectedGps.Key,
@@ -332,7 +328,6 @@ internal static class Ks2PerformanceMeasures
                 [],
                 currentSchool,
                 similarSchool,
-                similarSchools,
                 new MeasureFieldSelector<Ks2PerformanceData>(
                     x => x?.EstablishmentPerformance?.GpsExpected_Tot_Cohort_Est_Current_Num,
                     x => x?.EstablishmentPerformance?.GpsExpected_Tot_Cohort_Est_Previous_Num,
@@ -370,7 +365,7 @@ internal static class Ks2PerformanceMeasures
                     x => x?.EnglandPerformance?.GpsHigher_Tot_Cohort_Eng_Previous2_Num));
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, IEnumerable<SchoolData<Ks2PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolData<Ks2PerformanceData> currentSchool, SchoolData<Ks2PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             return Measure.ForSchoolComparison(
                 Ks2HigherGps.Key,
@@ -380,7 +375,6 @@ internal static class Ks2PerformanceMeasures
                 [],
                 currentSchool,
                 similarSchool,
-                similarSchools,
                 new MeasureFieldSelector<Ks2PerformanceData>(
                     x => x?.EstablishmentPerformance?.GpsHigher_Tot_Cohort_Est_Current_Num,
                     x => x?.EstablishmentPerformance?.GpsHigher_Tot_Cohort_Est_Previous_Num,

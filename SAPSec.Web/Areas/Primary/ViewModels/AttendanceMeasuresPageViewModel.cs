@@ -1,4 +1,4 @@
-using SAPSec.Web.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.ViewModels;

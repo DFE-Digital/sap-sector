@@ -28,10 +28,10 @@
     };
 }
 
-<div class="app-measure-chart-container app-measure-chart-container--school-headline">
+<div class="app-measure-chart-container">
     @if (hasAnyData)
     {
-          <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
+          <canvas id="@Model.MeasureInfo.HtmlPrefix-current-year-chart"
                   data-testid="@Model.MeasureInfo.HtmlPrefix-current-year-chart"
                   class="js-chart js-chart--school-measure-bar"
                   data-type="bar"

@@ -1,6 +1,6 @@
 using SAPSec.Core.Features.SchoolInfo;
 
-namespace SAPSec.Web.ViewModels;
+namespace SAPSec.Web.Areas.Shared.ViewModels;
 
 public record SchoolLayoutModel(string Urn, string Name)
 {

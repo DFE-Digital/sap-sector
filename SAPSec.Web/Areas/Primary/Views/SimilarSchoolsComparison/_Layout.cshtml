@@ -4,10 +4,8 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 
-    var comparisonModel = ViewData["ComparisonSchool"] as PrimarySimilarSchoolsComparisonViewModel;
-
+    var comparisonModel = ViewData[ViewDataKeys.ComparisonSchool] as PrimarySimilarSchoolsComparisonViewModel;
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
-
     string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
 }
 

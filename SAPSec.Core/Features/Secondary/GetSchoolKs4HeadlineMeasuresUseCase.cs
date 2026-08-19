@@ -24,8 +24,8 @@ public class GetSchoolKs4HeadlineMeasuresUseCase(
             similarSchoolsRepository,
             destinationsRepository);
 
-        var (currentSchoolPerformance, similarSchoolsPerformance) = await performance.GetSimilarSchoolsData(request.Urn);
-        var (currentSchoolDestinations, similarSchoolsDestinations) = await destinations.GetSimilarSchoolsData(request.Urn);
+        var (currentSchoolPerformance, similarSchoolsPerformance) = await performance.GetData(request.Urn);
+        var (currentSchoolDestinations, similarSchoolsDestinations) = await destinations.GetData(request.Urn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 

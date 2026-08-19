@@ -26,32 +26,26 @@ public class GetSchoolKs2PerformanceComparisonUseCase(
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchoolComparison(
                 currentSchoolData,
                 similarSchoolData,
-                [],
                 filterBy),
             Ks2PerformanceMeasures.AchievedHigherStandardRwm.ForSchoolComparison(
                 currentSchoolData,
                 similarSchoolData,
-                [],
                 filterBy),
             Ks2PerformanceMeasures.AverageScaledScoreReading.ForSchoolComparison(
                 currentSchoolData,
                 similarSchoolData,
-                [],
                 filterBy),
             Ks2PerformanceMeasures.AverageScaledScoreMaths.ForSchoolComparison(
                 currentSchoolData,
                 similarSchoolData,
-                [],
                 filterBy),
             Ks2PerformanceMeasures.MeetingExpectedStandardGps.ForSchoolComparison(
                 currentSchoolData,
                 similarSchoolData,
-                [],
                 filterBy),
             Ks2PerformanceMeasures.AchievedHigherStandardGps.ForSchoolComparison(
                 currentSchoolData,
                 similarSchoolData,
-                [],
                 filterBy));
     }
 }

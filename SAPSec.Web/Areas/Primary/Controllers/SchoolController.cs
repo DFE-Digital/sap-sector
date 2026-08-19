@@ -6,6 +6,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -50,7 +51,7 @@ public class SchoolController(
 
         PopulateViewData(response.School);
 
-        var model = new Ks2MeasuresPageViewModel
+        var model = new Ks2PerformanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School),

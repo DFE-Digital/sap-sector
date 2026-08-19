@@ -9,7 +9,7 @@ using Xunit;
 namespace SAPSec.Test.EndToEnd;
 
 [Collection("EndToEndTestsCollection")]
-public class SimilarSchoolsComparisonKs2PageEndToEndTests(EndToEndTestsFixture fixture)
+public class SchoolComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
     : EndToEndTests(fixture)
 {
     private const string MeetingExpectedStandardHeaderText = "Meeting expected standard in reading, writing and maths";

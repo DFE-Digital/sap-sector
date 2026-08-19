@@ -3,12 +3,12 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Secondary;
 
-public class SecondarySimilarSchoolsPerformanceDataProvider(
+public class SecondarySimilarSchoolsDestinationsDataProvider(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
-    IKs4PerformanceRepository performanceRepository)
+    IKs4DestinationsRepository destinationsRepository)
 {
-    public async Task<SimilarSchoolsData<Ks4PerformanceData>> GetData(string currentSchoolUrn)
+    public async Task<SimilarSchoolsData<Ks4DestinationsData>> GetData(string currentSchoolUrn)
     {
         var similarSchoolUrns = (await similarSchoolsRepository.GetGroupAsync(currentSchoolUrn))
             .Select(g => g.NeighbourURN)
@@ -27,21 +27,21 @@ public class SecondarySimilarSchoolsPerformanceDataProvider(
 
         var currentSchool = schools[currentSchoolUrn];
 
-        var performances = (await performanceRepository.GetByUrnsAsync(schools.Keys))
+        var performances = (await destinationsRepository.GetByUrnsAsync(schools.Keys))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
-        var currentSchoolData = new SchoolData<Ks4PerformanceData>(
+        var currentSchoolData = new SchoolData<Ks4DestinationsData>(
             currentSchool,
             performances[currentSchoolUrn]);
 
         var similarSchoolsData = similarSchoolUrns
             .Where(schools.ContainsKey)
-            .Select(urn => new SchoolData<Ks4PerformanceData>(
+            .Select(urn => new SchoolData<Ks4DestinationsData>(
                 schools[urn],
                 performances.TryGetValue(urn, out var p) ? p : null))
             .ToList();
 
-        return new SimilarSchoolsData<Ks4PerformanceData>(
+        return new SimilarSchoolsData<Ks4DestinationsData>(
             currentSchoolData,
             similarSchoolsData);
     }

@@ -18,7 +18,7 @@ public class GetSchoolKs4CoreSubjectsUseCase(
             similarSchoolsRepository,
             performanceRepository);
 
-        var (currentSchoolPerformance, similarSchoolsPerformance) = await performance.GetSimilarSchoolsData(request.Urn);
+        var (currentSchoolPerformance, similarSchoolsPerformance) = await performance.GetData(request.Urn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
