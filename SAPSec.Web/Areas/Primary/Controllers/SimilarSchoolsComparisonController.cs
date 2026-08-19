@@ -7,6 +7,7 @@ using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Filters;
+using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
@@ -20,7 +21,10 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class SimilarSchoolsComparisonController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase,
-    IUseCase<GetSchoolKs2PerformanceComparisonRequest, GetSchoolKs2PerformanceComparisonResponse> getSchoolKs2PerformanceComparisonUseCase)
+    IUseCase<GetSchoolKs2PerformanceComparisonRequest, GetSchoolKs2PerformanceComparisonResponse> getSchoolKs2PerformanceComparisonUseCase,
+    GetPrimaryCharacteristicsComparison getPrimaryCharacteristicsComparison,
+    IPrimaryCharacteristicsComparisonFormatter primaryCharacteristicsComparisonFormatter,
+    IUseCase<GetSchoolAttendanceComparisonRequest, GetSchoolAttendanceComparisonResponse> getSchoolAttendanceComparisonUseCase)
     : Controller
 {
     [HttpGet]
@@ -32,6 +36,11 @@ public class SimilarSchoolsComparisonController(
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
     {
         var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
+
+        var characteristicsResponse = await getPrimaryCharacteristicsComparison.Execute(
+            new GetPrimaryCharacteristicsComparisonRequest(urn, similarSchoolUrn));
+        model.CharacteristicsRows = primaryCharacteristicsComparisonFormatter.BuildRows(characteristicsResponse);
+
         ViewData["ComparisonSchool"] = model;
         return View("Similarity", model);
     }
@@ -46,18 +55,12 @@ public class SimilarSchoolsComparisonController(
         var comparisonResponse = await getSchoolKs2PerformanceComparisonUseCase.Execute(
             new GetSchoolKs2PerformanceComparisonRequest(urn, similarSchoolUrn, filters));
 
-        model.MeetingExpectedStandardRwm = MeasureViewModel.FromMeasure(
-            comparisonResponse.MeetingExpectedStandardRwm, currentSchool, similarSchool);
-        model.AchievedHigherStandardRwm = MeasureViewModel.FromMeasure(
-            comparisonResponse.AchievedHigherStandardRwm, currentSchool, similarSchool);
-        model.AverageScaledScoreReading = MeasureViewModel.FromMeasure(
-            comparisonResponse.AverageScaledScoreReading, currentSchool, similarSchool);
-        model.AverageScaledScoreMaths = MeasureViewModel.FromMeasure(
-            comparisonResponse.AverageScaledScoreMaths, currentSchool, similarSchool);
-        model.MeetingExpectedStandardGps = MeasureViewModel.FromMeasure(
-            comparisonResponse.MeetingExpectedStandardGps, currentSchool, similarSchool);
-        model.AchievedHigherStandardGps = MeasureViewModel.FromMeasure(
-            comparisonResponse.AchievedHigherStandardGps, currentSchool, similarSchool);
+        model.MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.MeetingExpectedStandardRwm, currentSchool, similarSchool);
+        model.AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AchievedHigherStandardRwm, currentSchool, similarSchool);
+        model.AverageScaledScoreReading = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AverageScaledScoreReading, currentSchool, similarSchool);
+        model.AverageScaledScoreMaths = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AverageScaledScoreMaths, currentSchool, similarSchool);
+        model.MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.MeetingExpectedStandardGps, currentSchool, similarSchool);
+        model.AchievedHigherStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.AchievedHigherStandardGps, currentSchool, similarSchool);
 
         ViewData["ComparisonSchool"] = model;
         return View(model);
@@ -67,7 +70,14 @@ public class SimilarSchoolsComparisonController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
-        var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
+        var (model, currentSchool, similarSchool) = await BuildBaseModelAsync(urn, similarSchoolUrn);
+
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var comparisonResponse = await getSchoolAttendanceComparisonUseCase.Execute(
+            new GetSchoolAttendanceComparisonRequest(urn, similarSchoolUrn, filters));
+
+        model.Absence = MeasureViewModel.FromPrimaryComparisonMeasure(comparisonResponse.Absence, currentSchool, similarSchool);
+
         ViewData["ComparisonSchool"] = model;
         return View(model);
     }

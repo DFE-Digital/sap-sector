@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
 using SAPSec.Web.Constants;
 using Xunit;

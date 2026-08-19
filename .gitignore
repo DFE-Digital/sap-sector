@@ -513,3 +513,8 @@ wwwroot/**/*.min.js
 # k6 load test output
 load_testing/*-summary.json
 load_testing/*-report.html
+SAPData/DataMap/SourceFiles
+SAPData/DataMap/CleanedFiles
+SAPData/Sql
+!SAPData/Sql/00_cleanup.sql
+!SAPData/Sql/run_all.sql

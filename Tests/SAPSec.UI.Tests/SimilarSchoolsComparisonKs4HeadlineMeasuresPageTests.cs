@@ -4,6 +4,7 @@ using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using System.Text.Json;
 using Xunit;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 namespace SAPSec.UI.Tests.Deprecated;
 

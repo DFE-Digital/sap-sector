@@ -3,7 +3,7 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Test.Common.InMemory;
 
-public class InMemoryKs4PerformanceRepository : IKs4PerformanceRepository
+public class InMemoryKs4PerformanceRepository(IEstablishmentRepository establishmentRepository) : IKs4PerformanceRepository
 {
     private List<EstablishmentPerformance> _establishment = new();
     private List<LAPerformance> _la = new();
@@ -31,24 +31,31 @@ public class InMemoryKs4PerformanceRepository : IKs4PerformanceRepository
         _england = [];
     }
 
-    public Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
-        => Task.FromResult(GetByUrn(urn));
-
-    private Ks4PerformanceData? GetByUrn(string urn)
+    public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)
     {
-        var establishment = _establishment.FirstOrDefault(x => x.Id == urn);
-        var la = _la.FirstOrDefault(x => x.Id == urn);
-        var england = _england.FirstOrDefault(x => x.Id == urn);
+        var establishment = await establishmentRepository.GetEstablishmentAsync(urn);
+        var ep = _establishment.FirstOrDefault(x => x.Id == urn);
+        var la = _la.FirstOrDefault(x => x.Id == establishment?.LAId);
+        var england = _england.FirstOrDefault(x => x.Id == "National");
 
         return establishment is null && la is null && england is null
             ? null
             : new Ks4PerformanceData(
                 urn,
-                establishment,
+                ep,
                 la,
                 england);
     }
 
-    public Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)
-        => Task.FromResult((IReadOnlyCollection<Ks4PerformanceData>)urns.Select(GetByUrn).Where(x => x is not null).ToList());
+    public async Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns)
+    {
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
+
+        return establishments.Select(e => new Ks4PerformanceData(
+                e.URN,
+                _establishment.FirstOrDefault(x => x.Id == e.URN),
+                _la.FirstOrDefault(x => x.Id == e.LAId),
+                _england.FirstOrDefault(x => x.Id == "National")))
+            .ToList();
+    }
 }

@@ -7,9 +7,7 @@
 @{
     var chartData = new
     {
-        labels = Model.MeasureInfo.DataType is MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage
-            ? SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear
-            : SAPSec.Web.ViewModels.AcademicYearLabelConfig.YearByYear,
+        labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatYearByYear(Model.MeasureInfo.Year),
         datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
             new {
                 label = x.First,
@@ -32,12 +30,15 @@
     {
         MeasureDataType.Score => (0, 30, 90),
         MeasureDataType.ScaledScore => (80, 20, 120),
+        MeasureDataType.OverallAbsencePercentage => (0, 1, 10),
+        MeasureDataType.PersistentAbsencePercentage => (0, 5, 30),
         _ => (0, 25, 100)
     };
 }
 
 <div class="app-measure-chart-container app-measure-chart-container--school-headline">
     <canvas id="@Model.MeasureInfo.HtmlPrefix-school-yearbyyear-chart"
+            data-testid="@Model.MeasureInfo.HtmlPrefix-year-by-year-chart"
             class="js-chart js-chart--school-measure-line"
             data-type="line"
             data-axis-min="@axisMin"

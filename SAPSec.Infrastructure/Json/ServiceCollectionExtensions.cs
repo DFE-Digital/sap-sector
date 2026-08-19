@@ -32,8 +32,6 @@ public static class ServiceCollectionExtensions
         services.AddJsonFile<SimilarSchoolsPrimaryValuesEntry>(JsonDataSource.Generated);
         services.AddJsonFile<SimilarSchoolsSecondaryGroupsEntry>(JsonDataSource.Generated);
         services.AddJsonFile<SimilarSchoolsSecondaryValuesEntry>(JsonDataSource.Generated);
-        services.AddJsonFile<SimilarSchoolsSecondaryStandardDeviationsEntry>(JsonDataSource.Generated);
-
         services.AddJsonFile<KS2.Performance.EstablishmentPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<KS2.Performance.LAPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<KS2.Performance.EnglandPerformance>(JsonDataSource.PrimarySchools);
