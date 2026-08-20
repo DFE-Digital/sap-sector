@@ -13,6 +13,9 @@
     var clarityId = analytics.ClarityId;
     var loadAnalytics = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
     var canonicalUrl = Context.Request.GetCanonicalUrl();
+    var skipNavigationTargetId = ViewData["SkipNavigationTargetId"]?.ToString();
+    var skipNavigationText = ViewData["SkipNavigationText"]?.ToString() ?? "Skip to navigation";
+    var skipLinkTargetId = ViewData["SkipLinkTargetId"]?.ToString() ?? "main-content";
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
@@ -80,7 +83,11 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
         document.body.className = ((document.body.className) ? document.body.className + ' js-enabled' : 'js-enabled');
     </script>
 
-<a href="#main-content" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
+@if (!string.IsNullOrWhiteSpace(skipNavigationTargetId))
+{
+    <a href="#@skipNavigationTargetId" class="govuk-skip-link" data-module="govuk-skip-link">@skipNavigationText</a>
+}
+<a href="#@skipLinkTargetId" class="govuk-skip-link" data-module="govuk-skip-link">Skip to main content</a>
 @await Component.InvokeAsync("Cookies")
 <header class="govuk-header" data-module="govuk-header">
 <div class="govuk-header__container govuk-width-container">
