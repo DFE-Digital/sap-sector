@@ -444,8 +444,8 @@ erDiagram
 
     v_establishment {
         text URN PK "GIAS urn"
-        text LAESTAB AK "la_code || establishmentnumber"
-        text UKPRN AK
+        text LAESTAB "AK, la_code + establishmentnumber, not guaranteed unique"
+        text UKPRN "AK"
         text LAId FK "assumed = EES old_la_code"
         text RegionId FK "no target view exists"
         text TrustId FK "assumed = group_uid, UNVERIFIED"
@@ -486,7 +486,7 @@ erDiagram
 
     v_establishment_group_links {
         text group_uid PK
-        text group_id AK
+        text group_id "AK"
         text group_name
         text group_type
         text group_status
@@ -677,6 +677,9 @@ The three England views are deliberately not connected. There is no join column.
 flowchart TD
     GIAS["GIAS
     Get Information About Schools"]
+    OFSTED["Ofsted
+    inspection outcomes
+    arrives via departmental datasets"]
     EES["EES
     Explore Education Statistics"]
 
@@ -691,8 +694,11 @@ flowchart TD
         v_establishment_workforce
         v_establishment_destinations
         v_establishment_subject_entries
-        v_la_* and v_england_*
-        v_similar_schools_*"]
+        v_la_* and v_england_*"]
+        SIMILAR["Similar schools
+        v_similar_schools_primary_*
+        v_similar_schools_secondary_*
+        matching inputs and neighbour lists"]
         VIEWJSON["JSON file per view
         written by run-all.sql
         build and test time only"]
@@ -737,12 +743,16 @@ flowchart TD
     Razor pages and view models"]
 
     GIAS -->|CSV export| RAW
+    OFSTED -.->|indirect, see defect 7| RAW
     EES -->|CSV export| RAW
     RAW -->|GenerateViews.cs| VIEWS
+    RAW -->|GenerateViews.cs| SIMILAR
     VIEWS -->|run-all.sql| VIEWJSON
+    SIMILAR -->|run-all.sql| VIEWJSON
     VIEWJSON --> GEN
     GEN -->|generates| DTO
     VIEWS -->|Dapper, read only| REPO
+    SIMILAR -->|Dapper, read only| REPO
     KS2JSON -->|read from disk| JSONREPO
     REPO --> DTO
     JSONREPO --> DTO
@@ -754,16 +764,9 @@ flowchart TD
     RAW -.->|no constraints| X1["referential integrity
     enforced nowhere"]
     VIEWS -.->|no unique indexes| X1
+    SIMILAR -.->|no unique indexes| X1
     KS2JSON -.->|flat files| X1
 ```
-
-Three things to take from this.
-
-The dotted branch is the first. There are three places integrity could be enforced and it is enforced at none of them. Unique indexes on the views are the cheapest fix and would validate every key claim in section 8 at build time.
-
-The DtoGenerator branch is the second. It runs at build time, not at runtime, and it is what keeps the DTOs in step with the views. Because the JSON is written by the same SQL that builds the views, the DTO shape follows the view shape automatically. The catch is that somebody has to rerun the generator when a view changes, and nothing fails if they forget.
-
-The KS2 branch is the third. It is the only path that does not come from the database at runtime, and updated KS2 data needs a redeploy rather than a pipeline run. This is interim and KS2 is expected to move onto views like everything else.
 
 ---
 
@@ -831,107 +834,3 @@ The KS2 branch is the third. It is the only path that does not come from the dat
 | `test_establishments_urns` | test scaffold |
 | `test_establishments_urns_import` | test scaffold, unlogged |
 
-Exclusions and SEN are loaded and go nowhere. Either wire them up or drop them, because right now the schema advertises features that do not exist.
-
----
-
-## 12. Known defects
-
-### Defect 1, destinations key is wrong
-
-`v_establishment_destinations` builds its id set from `school_laestab`, joins to establishments on `LAESTAB`, then outputs `e."URN" AS "Id"`.
-
-```sql
-SELECT e."URN" AS "Id", ...
-FROM all_ids a
-LEFT JOIN src_1 ON src_1."Id" = a."Id"
-LEFT JOIN src_2 ON src_2."Id" = a."Id"
-LEFT JOIN src_3 ON src_3."Id" = a."Id"
-LEFT JOIN v_establishment e ON e."LAESTAB" = a."Id"
-```
-
-Any EES LAESTAB with no GIAS match produces a row with `Id` null. `LAESTAB` is a text concatenation, is not unique in GIAS, and gets reused when schools close and reopen, so duplicates fan the join out. Every other establishment view keys on URN.
-
-Fix by resolving LAESTAB to URN inside the CTE, deciding explicitly what happens to unmatched rows, and keying the view on URN like its siblings.
-
-### Defect 2, geography views have no geographic level filter
-
-None of the six LA and England views has a `WHERE` clause. `v_england_absence` groups by `geographic_level` on a source table that holds national, regional and LA rows, so it emits one row per level rather than one England row. `v_la_absence` groups by `old_la_code` on the same table, so the non LA rows collapse into a group under a blank code.
-
-The application presumably filters at read time. That filter belongs in the view.
-
-### Defect 3, child rows can exist without a parent
-
-The generated pattern is `all_ids` built from the EES source, then `LEFT JOIN v_establishment`. The EES side drives. A school in the absence file but not in GIAS still appears, with null `LAId` and null `LAName`, and will render as a school with no local authority.
-
-### Defect 4, no unique indexes
-
-All 21 views are materialised and none has a unique index. `REFRESH MATERIALIZED VIEW CONCURRENTLY` will fail on every one of them, so every refresh takes an exclusive lock. Adding the indexes also turns section 8 from documentation into something the database checks.
-
-### Defect 5, KS2 performance is not in the database
-
-No `Rwm`, `GpsExpected` or scaled score column appears in any of the 21 views. `v_establishment_performance` is KS4 only. The only KS2 data in the database is prior attainment inside the similar schools inputs, `ks2_mrp` and `readmat_average`.
-
-The KS2 the application shows comes from JSON files instead, `establishment_performance.json`, `la_performance.json` and `england_performance.json`, packaged into the deployment artefact and read by `JsonKs2PerformanceRepository`. This is a known interim arrangement rather than an oversight, and KS2 is expected to move onto views in the same way as KS4.
-
-Two things follow while it stays as it is. Updated KS2 data needs a redeploy, not a pipeline run. And the KS2 JSON files sit outside every guarantee in this document, because nothing here describes their shape, their keys or where they are generated. That is worth documenting wherever those files are produced.
-
-### Defect 6, three URN spellings unioned as text
-
-`v_establishment_performance` aliases `school_urn`, `urn` and `unique_reference_number__urn_` to `Id` across nine sources and unions them. Any whitespace or leading zero difference between files produces two ids for one school and the union will not notice.
-
-### Defect 7, no Ofsted data in the model
-
-The High-Level Design says Ofsted inspection data is relied on indirectly and feeds the similar schools comparison. Nothing in this model holds it. No view carries an inspection judgement or inspection date, and none of the similar schools matching inputs in section 7 is an Ofsted measure.
-
-The four `t_2026_01_13_off_sen_*` raw tables may be the ones in question, given the `off` prefix, but they are read by no view and are listed here as SEN data. Either they are Ofsted and are not wired up, or Ofsted genuinely is not part of the model and the HLD claim needs correcting.
-
-This one is a documentation question rather than a database fault, but it should be settled before an assessment, because the two documents currently disagree.
-
-### Checks to run
-
-None of the above can be settled from DDL alone. Run these.
-
-```sql
--- 1. Is URN actually unique
-SELECT count(*), count(DISTINCT "URN") FROM v_establishment;
-
--- 2. Is LAESTAB unique, defect 1 depends on it
-SELECT "LAESTAB", count(*) FROM v_establishment
-GROUP BY "LAESTAB" HAVING count(*) > 1;
-
--- 3. How many destinations rows have a null key
-SELECT count(*) FROM v_establishment_destinations WHERE "Id" IS NULL;
-
--- 4. What is actually in the England views, defect 2
-SELECT "Id", count(*) FROM v_england_absence GROUP BY "Id";
-
--- 5. Does the GIAS LA code match the EES old LA code
-SELECT count(*) FROM v_establishment e
-LEFT JOIN v_la_absence l ON l."Id" = e."LAId"
-WHERE l."Id" IS NULL;
-
--- 6. Orphan schools per EES view, defect 3
-SELECT count(*) FROM v_establishment_absence a
-LEFT JOIN v_establishment e ON e."URN" = a."Id"
-WHERE e."URN" IS NULL;
-
--- 7. Does TrustId match group_uid or group_id
-SELECT
-  count(*) FILTER (WHERE g.group_uid IS NOT NULL)  AS matched_by_uid,
-  count(*) FILTER (WHERE g2.group_id IS NOT NULL)  AS matched_by_id
-FROM v_establishment e
-LEFT JOIN v_establishment_group_links g  ON g.group_uid = e."TrustId"
-LEFT JOIN v_establishment_group_links g2 ON g2.group_id = e."TrustId"
-WHERE e."TrustId" IS NOT NULL AND e."TrustId" <> '';
-
--- 8. Are the off_sen tables Ofsted or SEN, defect 7
-SELECT table_name, column_name
-FROM information_schema.columns
-WHERE table_name LIKE 't_2026_01_13_off_sen%'
-ORDER BY table_name, ordinal_position;
-```
-
-Query 7 decides which group column is the real join. Until it runs, that relationship stays marked unverified on the diagram.
-
-Query 8 settles defect 7. If those tables carry inspection judgements then Ofsted is loaded but unused, and if they carry SEN counts then the HLD needs correcting instead.

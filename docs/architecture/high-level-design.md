@@ -159,8 +159,6 @@ What follows from that:
 
 **Read models are generated rather than hand-written.** A JSON description of each view's shape is produced, and the read model is generated from that serialised structure. This keeps the model in step with the views the pipeline produces.
 
-**Relationships are resolved in the data layer, not at runtime.** Because the query surface is a set of materialised views, the joins and relationships are already worked out when the view is built. The application does not walk an object graph to put a page together.
-
 **Schema change is a pipeline concern.** A change to the shape of the data is made in the pipeline metadata, which flows through to regenerated SQL, refreshed views and regenerated read models. There is no runtime migration step in the application.
 
 Why it is done this way:
@@ -275,7 +273,7 @@ Curated data is then shaped into materialised views, which are the query surface
 
 ### Note on Ofsted
 
-The service does not integrate directly with Ofsted systems. Ofsted inspection data is relied on indirectly. It comes through upstream departmental datasets and feeds the similar schools comparison journey. Ofsted is therefore an upstream data dependency rather than a runtime integration, and changes to how Ofsted publish or structure judgements will affect comparison outputs.
+The service does not integrate directly with Ofsted systems. Ofsted data is relied on indirectly. It comes through upstream departmental datasets and feeds the similar schools comparison journey. Ofsted is therefore an upstream data dependency rather than a runtime integration, and changes to how Ofsted publish or structure judgements will affect comparison outputs.
 
 ---
 
@@ -300,7 +298,7 @@ Below it are the two data stores the service uses:
 
 Down the right-hand side are the platform and operational dependencies: StatusCake for monitoring, Azure Blob Storage for data protection keys, and DfE Analytics for usage events.
 
-The SAPData pipeline sits at the bottom. It loads and transforms external sources including GIAS, Ofsted inspection data and education statistics, and it owns the database structure.
+The SAPData pipeline sits at the bottom. It loads and transforms external sources including GIAS, Ofsted data and education statistics, and it owns the database structure.
 
 ---
 
@@ -325,8 +323,7 @@ flowchart TB
 
     gias[GIAS]
     ees[Education Statistics / Performance Datasets]
-    ofsted[Ofsted Inspection Data]
-    similar[Similar Schools / Derived Datasets]
+    ofsted[Similar Schools / Derived Datasets]
 
     monitor[Monitoring / Health / Ops]
     analytics[Analytics Services]
@@ -349,7 +346,7 @@ flowchart TB
 
 ### Context explanation
 
-SAP Sector sits in the middle. Users reach it through DfE Sign-in. Upstream education datasets, including Ofsted inspection outcomes which are consumed indirectly, feed the platform through the data pipeline. Monitoring and analytics sit outside the core system boundary but are still operational dependencies.
+SAP Sector sits in the middle. Users reach it through DfE Sign-in. Upstream education datasets, including Ofsted data which are consumed indirectly, feed the platform through the data pipeline. Monitoring and analytics sit outside the core system boundary but are still operational dependencies.
 
 ---
 
