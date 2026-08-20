@@ -742,7 +742,7 @@ flowchart TD
     Razor pages and view models"]
 
     GIAS -->|CSV export| RAW
-    OFSTED -.->|indirect, see defect 7| RAW
+    OFSTED -.->| CSV export|RAW
     EES -->|CSV export| RAW
     RAW -->|GenerateViews.cs| VIEWS
     RAW -->|GenerateViews.cs| SIMILAR
