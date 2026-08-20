@@ -22,7 +22,13 @@ public static class DfeAnalyticsExtensions
             services.AddScoped<ICustomEventService, CustomEventService>();
         }
 
-        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest") && !isLocalDevelopment)
+        // TEMPORARY: "Test" added here alongside the auth bypass in Program.cs -
+        // real DfE Analytics (Dfe.Analytics.AspNetCore.DfeAnalyticsMiddleware)
+        // throws "BigQueryClient has not been configured" on every request,
+        // including /healthcheck, when valid GCP credentials aren't available.
+        // Also avoids polluting real test analytics with synthetic load-test
+        // traffic. Revert alongside the Program.cs auth bypass before merge.
+        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest" or "Test") && !isLocalDevelopment)
         {
             services.AddDfeAnalytics().AddAspNetCoreIntegration(options =>
             {
@@ -34,7 +40,13 @@ public static class DfeAnalyticsExtensions
 
     public static void UseAnalytics(this WebApplication app, IWebHostEnvironment environment)
     {
-        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest") && !isLocalDevelopment)
+        // TEMPORARY: "Test" added here alongside the auth bypass in Program.cs -
+        // real DfE Analytics (Dfe.Analytics.AspNetCore.DfeAnalyticsMiddleware)
+        // throws "BigQueryClient has not been configured" on every request,
+        // including /healthcheck, when valid GCP credentials aren't available.
+        // Also avoids polluting real test analytics with synthetic load-test
+        // traffic. Revert alongside the Program.cs auth bypass before merge.
+        if (environment.EnvironmentName is not ("UITests" or "IntegrationTests" or "EndToEndTests" or "AccessibilityTests" or "LoadTest" or "Test") && !isLocalDevelopment)
         {
             app.UseDfeAnalytics();
         }
