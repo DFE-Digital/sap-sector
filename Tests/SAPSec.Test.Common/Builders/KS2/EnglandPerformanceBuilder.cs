@@ -1,6 +1,6 @@
 using SAPSec.Data.Dto.KS2.Performance;
 
-namespace SAPSec.Test.Common.Builders;
+namespace SAPSec.Test.Common.Builders.KS2;
 
 public class EnglandPerformanceBuilder()
 {

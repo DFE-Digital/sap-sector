@@ -2,8 +2,9 @@ using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Primary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Services;
@@ -30,7 +31,6 @@ public static class DependenciesExtensions
 
         // Use cases
         services.AddSingleton<GetKs4HeadlineMeasures>();
-        services.AddSingleton<GetSchoolKs4HeadlineMeasures>();
         services.AddSingleton<GetSchoolKs4CoreSubjects>();
         services.AddSingleton<GetFilteredSchoolKs4CoreSubject>();
         services.AddSingleton<GetAttendanceMeasures>();
@@ -45,6 +45,8 @@ public static class DependenciesExtensions
         services.AddSingleton<IUseCase<GetSchoolAttendanceComparisonRequest, GetSchoolAttendanceComparisonResponse>, GetSchoolAttendanceComparisonUseCase>();
         services.AddSingleton<IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>, FindPrimarySimilarSchoolsUseCase>();
         services.AddSingleton<IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse>, GetPrimarySimilarSchoolDetailsUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresRequest, Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresResponse>, GetSchoolKs4HeadlineMeasuresUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolKs4CoreSubjectsRequest, Core.Features.Secondary.GetSchoolKs4CoreSubjectsResponse>, GetSchoolKs4CoreSubjectsUseCase>();
 
         services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
         services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);

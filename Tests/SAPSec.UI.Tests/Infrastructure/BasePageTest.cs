@@ -1,7 +1,8 @@
 ﻿using Microsoft.Playwright;
 using Microsoft.Playwright.Xunit;
+using SAPSec.UI.Tests.Infrastructure;
 
-namespace SAPSec.UI.Tests.Infrastructure;
+namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 public abstract class BasePageTest : PageTest
 {
@@ -12,8 +13,11 @@ public abstract class BasePageTest : PageTest
     {
         _fixture = fixture;
 
-        //Uncomment to run tests in headed mode
-        //Environment.SetEnvironmentVariable("HEADED", "1");
+        if (System.Diagnostics.Debugger.IsAttached)
+        {
+            // Run in headed mode when debugging
+            Environment.SetEnvironmentVariable("HEADED", "1");
+        }
     }
 
     public override BrowserNewContextOptions ContextOptions()

@@ -24,7 +24,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = Ks2Int(response.Ks2AverageScore.CurrentSchoolValue),
             SimilarSchoolValue = Ks2Int(response.Ks2AverageScore.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.Ks2AverageScore.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.Ks2AverageScore.Similarity
         },
         new()
         {
@@ -32,7 +32,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = IntN0(response.PupilCount.CurrentSchoolValue),
             SimilarSchoolValue = IntN0(response.PupilCount.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.PupilCount.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.PupilCount.Similarity
         },
         new()
         {
@@ -40,7 +40,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = Percent1dp(response.PupilStabilityRate.CurrentSchoolValue),
             SimilarSchoolValue = Percent1dp(response.PupilStabilityRate.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.PupilStabilityRate.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.PupilStabilityRate.Similarity
         },
         new()
         {
@@ -48,7 +48,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = Percent1dp(response.PupilPremiumEligibilityPercentage.CurrentSchoolValue),
             SimilarSchoolValue = Percent1dp(response.PupilPremiumEligibilityPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.PupilPremiumEligibilityPercentage.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.PupilPremiumEligibilityPercentage.Similarity
         },
         new()
         {
@@ -56,7 +56,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = Dec3dp(response.AverageIdaciScore.CurrentSchoolValue),
             SimilarSchoolValue = Dec3dp(response.AverageIdaciScore.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.AverageIdaciScore.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.AverageIdaciScore.Similarity
         },
         new()
         {
@@ -64,7 +64,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = PolarText(response.Polar4Quintile.CurrentSchoolValue),
             SimilarSchoolValue = PolarText(response.Polar4Quintile.SimilarSchoolValue),
             IsNumeric = false,
-            Similarity = response.Polar4Quintile.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.Polar4Quintile.Similarity
         },
         new()
         {
@@ -72,7 +72,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = Percent1dp(response.PupilsWithEhcPlanPercentage.CurrentSchoolValue),
             SimilarSchoolValue = Percent1dp(response.PupilsWithEhcPlanPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.PupilsWithEhcPlanPercentage.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.PupilsWithEhcPlanPercentage.Similarity
         },
         new()
         {
@@ -80,7 +80,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = Percent1dp(response.PupilsWithSenSupportPercentage.CurrentSchoolValue),
             SimilarSchoolValue = Percent1dp(response.PupilsWithSenSupportPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.PupilsWithSenSupportPercentage.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.PupilsWithSenSupportPercentage.Similarity
         },
         new()
         {
@@ -88,7 +88,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             CurrentSchoolValue = Percent1dp(response.PupilsWithEalPercentage.CurrentSchoolValue),
             SimilarSchoolValue = Percent1dp(response.PupilsWithEalPercentage.SimilarSchoolValue),
             IsNumeric = true,
-            Similarity = response.PupilsWithEalPercentage.Similarity.GetValueOrDefault(SchoolSimilarity.NotSimilar)
+            Similarity = response.PupilsWithEalPercentage.Similarity
         }
     }.AsReadOnly();
 }

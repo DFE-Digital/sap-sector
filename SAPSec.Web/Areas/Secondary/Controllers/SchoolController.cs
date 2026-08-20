@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.Secondary;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 using System.Globalization;
-using static SAPSec.Web.ViewModels.Ks4HeadlineMeasuresPageViewModel;
 
 namespace SAPSec.Web.Areas.Secondary.Controllers;
 
@@ -23,26 +24,23 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
 public class SchoolController : Controller
 {
-    private readonly GetSchoolKs4HeadlineMeasures _getSchoolKs4HeadlineMeasures;
-    private readonly GetSchoolKs4CoreSubjects _getSchoolKs4CoreSubjects;
-    private readonly GetFilteredSchoolKs4CoreSubject _getFilteredSchoolKs4CoreSubject;
+    private readonly IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> _getSchoolKs4HeadlineMeasuresUseCase;
+    private readonly IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> _getSchoolKs4CoreSubjectsUseCase;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
     private readonly IFeatureFlagService _featureFlagService;
     private readonly IRequestSchoolAccessor _requestSchoolAccessor;
     private readonly ILogger<SchoolController> _logger;
 
     public SchoolController(
-        GetSchoolKs4HeadlineMeasures getSchoolKs4HeadlineMeasures,
-        GetSchoolKs4CoreSubjects getSchoolKs4CoreSubjects,
-        GetFilteredSchoolKs4CoreSubject getFilteredSchoolKs4CoreSubject,
+        IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
+        IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> getSchoolKs4CoreSubjectsUseCase,
         GetAttendanceMeasures getAttendanceMeasures,
         IFeatureFlagService featureFlagService,
         IRequestSchoolAccessor requestSchoolAccessor,
         ILogger<SchoolController> logger)
     {
-        _getSchoolKs4HeadlineMeasures = getSchoolKs4HeadlineMeasures;
-        _getSchoolKs4CoreSubjects = getSchoolKs4CoreSubjects;
-        _getFilteredSchoolKs4CoreSubject = getFilteredSchoolKs4CoreSubject;
+        _getSchoolKs4HeadlineMeasuresUseCase = getSchoolKs4HeadlineMeasuresUseCase;
+        _getSchoolKs4CoreSubjectsUseCase = getSchoolKs4CoreSubjectsUseCase;
         _getAttendanceMeasures = getAttendanceMeasures;
         _featureFlagService = featureFlagService;
         _requestSchoolAccessor = requestSchoolAccessor;
@@ -176,224 +174,56 @@ public class SchoolController : Controller
     [Route("ks4-headline-measures")]
     public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
     {
-        var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(response.SchoolDetails);
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await _getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
 
-        return View(BuildKs4HeadlineMeasuresViewModel(response));
-    }
+        PopulateViewData(response.School);
 
-    [HttpGet]
-    [Route("ks4-headline-measures/data")]
-    public async Task<IActionResult> Ks4HeadlineMeasuresData(string urn, string grade = "4")
-    {
-        var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
-        var model = BuildKs4HeadlineMeasuresViewModel(response);
-        var gradeFilter = SchoolKs4EngMathsSelection.ParseFilter(grade);
-        var selectedEngMaths = SchoolKs4EngMathsSelection.From(response, gradeFilter);
-
-        return Json(new
+        var model = new ViewModels.Ks4HeadlineMeasuresPageViewModel
         {
-            grade = SchoolKs4EngMathsSelection.ToFilterValue(gradeFilter),
-            bar = new decimal?[]
-            {
-                selectedEngMaths.YearByYear.School.Current,
-                selectedEngMaths.YearByYear.SimilarSchools.Current,
-                selectedEngMaths.YearByYear.LocalAuthority.Current,
-                selectedEngMaths.YearByYear.England.Current
-            },
-            line = new
-            {
-                thisSchool = SeriesToArray(selectedEngMaths.YearByYear.School),
-                similarSchools = SeriesToArray(selectedEngMaths.YearByYear.SimilarSchools),
-                localAuthority = SeriesToArray(selectedEngMaths.YearByYear.LocalAuthority),
-                england = SeriesToArray(selectedEngMaths.YearByYear.England)
-            },
-            table = new
-            {
-                thisSchool = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.School.Current)
-                },
-                similarSchools = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.SimilarSchools.Current)
-                },
-                localAuthority = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.LocalAuthority.Current)
-                },
-                england = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedEngMaths.YearByYear.England.Current)
-                }
-            },
-            topPerformers = selectedEngMaths.TopPerformers
-                .Select(x => new
-                {
-                    x.Rank,
-                    x.Urn,
-                    x.Name,
-                    x.IsCurrentSchool,
-                    DisplayValue = Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(x.Value)
-                })
-        });
-    }
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School),
+            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School),
+            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School)
+        };
 
-    [HttpGet]
-    [Route("ks4-destinations/data")]
-    public async Task<IActionResult> Ks4DestinationsData(string urn, string destination = "all")
-    {
-        var response = await _getSchoolKs4HeadlineMeasures.Execute(new GetSchoolKs4HeadlineMeasuresRequest(urn));
-        var model = BuildKs4HeadlineMeasuresViewModel(response);
-        var destinationFilter = SchoolKs4DestinationsSelection.ParseFilter(destination);
-        var selectedDestinations = SchoolKs4DestinationsSelection.From(response, destinationFilter);
-
-        return Json(new
-        {
-            destination = SchoolKs4DestinationsSelection.ToFilterValue(destinationFilter),
-            bar = new decimal?[]
-            {
-                selectedDestinations.YearByYear.School.Current,
-                selectedDestinations.YearByYear.SimilarSchools.Current,
-                selectedDestinations.YearByYear.LocalAuthority.Current,
-                selectedDestinations.YearByYear.England.Current
-            },
-            line = new
-            {
-                thisSchool = SeriesToArray(selectedDestinations.YearByYear.School),
-                similarSchools = SeriesToArray(selectedDestinations.YearByYear.SimilarSchools),
-                localAuthority = SeriesToArray(selectedDestinations.YearByYear.LocalAuthority),
-                england = SeriesToArray(selectedDestinations.YearByYear.England)
-            },
-            table = new
-            {
-                thisSchool = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.School.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.School.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.School.Current)
-                },
-                similarSchools = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.SimilarSchools.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.SimilarSchools.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.SimilarSchools.Current)
-                },
-                localAuthority = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.LocalAuthority.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.LocalAuthority.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.LocalAuthority.Current)
-                },
-                england = new[]
-                {
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.England.Previous2),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.England.Previous),
-                    Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(selectedDestinations.YearByYear.England.Current)
-                }
-            },
-            topPerformers = selectedDestinations.TopPerformers
-                .Select(x => new
-                {
-                    x.Rank,
-                    x.Urn,
-                    x.Name,
-                    x.IsCurrentSchool,
-                    DisplayValue = Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent(x.Value)
-                })
-        });
+        return View(model);
     }
 
     [HttpGet]
     [Route("ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
-        var response = await _getSchoolKs4CoreSubjects.Execute(new GetSchoolKs4CoreSubjectsRequest(urn));
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(response.SchoolDetails);
-        return View(BuildKs4CoreSubjectsViewModel(response));
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await _getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
+
+        PopulateViewData(response.School);
+
+        var model = new ViewModels.Ks4CoreSubjectsPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Measures = [
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School),
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School),
+                MeasureViewModel.FromSecondaryMeasure(response.Maths, response.School),
+                MeasureViewModel.FromSecondaryMeasure(response.CombinedScience, response.School),
+                MeasureViewModel.FromSecondaryMeasure(response.Biology, response.School),
+                MeasureViewModel.FromSecondaryMeasure(response.Chemistry, response.School),
+                MeasureViewModel.FromSecondaryMeasure(response.Physics, response.School)
+            ]
+        };
+
+        return View(model);
     }
 
-    [HttpGet]
-    [Route("ks4-core-subjects/data")]
-    public async Task<IActionResult> Ks4CoreSubjectsData(string urn, string subject = "english-language", string grade = "4")
+    private void PopulateViewData(SchoolInfo currentSchool)
     {
-        GetFilteredSchoolKs4CoreSubjectResponse filteredSubject;
-        try
-        {
-            filteredSubject = await _getFilteredSchoolKs4CoreSubject.Execute(new GetFilteredSchoolKs4CoreSubjectRequest(urn, subject, grade));
-        }
-        catch (ArgumentOutOfRangeException)
-        {
-            return BadRequest(new { error = "Invalid KS4 core subjects filter." });
-        }
-
-        var selectedSubject = filteredSubject.Selection;
-
-        return Json(new
-        {
-            subject = filteredSubject.Subject.ToSubjectValue(),
-            grade = filteredSubject.Grade.ToFilterValue(),
-            bar = new decimal?[]
-            {
-                selectedSubject.YearByYear.School.Current,
-                selectedSubject.YearByYear.SimilarSchools.Current,
-                selectedSubject.YearByYear.LocalAuthority.Current,
-                selectedSubject.YearByYear.England.Current
-            },
-            line = new
-            {
-                thisSchool = SeriesToArray(selectedSubject.YearByYear.School),
-                similarSchools = SeriesToArray(selectedSubject.YearByYear.SimilarSchools),
-                localAuthority = SeriesToArray(selectedSubject.YearByYear.LocalAuthority),
-                england = SeriesToArray(selectedSubject.YearByYear.England)
-            },
-            table = new
-            {
-                thisSchool = new[]
-                {
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.School.Current)
-                },
-                similarSchools = new[]
-                {
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.SimilarSchools.Current)
-                },
-                localAuthority = new[]
-                {
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.LocalAuthority.Current)
-                },
-                england = new[]
-                {
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Previous2),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Previous),
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(selectedSubject.YearByYear.England.Current)
-                }
-            },
-            topPerformers = selectedSubject.TopPerformers
-                .Select(x => new
-                {
-                    x.Rank,
-                    x.Urn,
-                    x.Name,
-                    x.IsCurrentSchool,
-                    DisplayValue = Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value)
-                })
-        });
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
+            Url,
+            currentSchool.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
     }
 
     private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
@@ -410,125 +240,6 @@ public class SchoolController : Controller
             school.Urn,
             ControllerContext.ActionDescriptor.ActionName);
     }
-
-    private static decimal?[] SeriesToArray(Ks4HeadlineMeasureSeries series) =>
-        [series.Previous2, series.Previous, series.Current];
-
-    private static Ks4HeadlineMeasuresPageViewModel BuildKs4HeadlineMeasuresViewModel(
-        GetSchoolKs4HeadlineMeasuresResponse response)
-    {
-        var defaultEngMaths = SchoolKs4EngMathsSelection.From(response, SchoolKs4GradeFilter.Grade4);
-        var defaultDestinations = SchoolKs4DestinationsSelection.From(response, SchoolKs4DestinationFilter.All);
-
-        return new()
-        {
-            SchoolDetails = response.SchoolDetails,
-            SimilarSchoolsCount = response.SimilarSchoolsCount,
-            SchoolAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SchoolValue,
-            SimilarSchoolsAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.SimilarSchoolsValue,
-            LocalAuthorityAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.LocalAuthorityValue,
-            EnglandAttainment8ThreeYearAverage = response.Attainment8ThreeYearAverage.EnglandValue,
-            Attainment8TopPerformers = MapTopPerformers(response.Attainment8TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayValue),
-            SchoolAttainment8YearByYear = response.Attainment8YearByYear.School,
-            SimilarSchoolsAttainment8YearByYear = response.Attainment8YearByYear.SimilarSchools,
-            LocalAuthorityAttainment8YearByYear = response.Attainment8YearByYear.LocalAuthority,
-            EnglandAttainment8YearByYear = response.Attainment8YearByYear.England,
-            SchoolEngMathsThreeYearAverage = defaultEngMaths.ThreeYearAverage.SchoolValue,
-            SimilarSchoolsEngMathsThreeYearAverage = defaultEngMaths.ThreeYearAverage.SimilarSchoolsValue,
-            LocalAuthorityEngMathsThreeYearAverage = defaultEngMaths.ThreeYearAverage.LocalAuthorityValue,
-            EnglandEngMathsThreeYearAverage = defaultEngMaths.ThreeYearAverage.EnglandValue,
-            EngMathsTopPerformers = MapTopPerformers(defaultEngMaths.TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent),
-            SchoolEngMathsYearByYear = defaultEngMaths.YearByYear.School,
-            SimilarSchoolsEngMathsYearByYear = defaultEngMaths.YearByYear.SimilarSchools,
-            LocalAuthorityEngMathsYearByYear = defaultEngMaths.YearByYear.LocalAuthority,
-            EnglandEngMathsYearByYear = defaultEngMaths.YearByYear.England,
-            SchoolDestinationsThreeYearAverage = defaultDestinations.ThreeYearAverage.SchoolValue,
-            SimilarSchoolsDestinationsThreeYearAverage = defaultDestinations.ThreeYearAverage.SimilarSchoolsValue,
-            LocalAuthorityDestinationsThreeYearAverage = defaultDestinations.ThreeYearAverage.LocalAuthorityValue,
-            EnglandDestinationsThreeYearAverage = defaultDestinations.ThreeYearAverage.EnglandValue,
-            DestinationsTopPerformers = MapTopPerformers(defaultDestinations.TopPerformers, Ks4HeadlineMeasuresPageViewModel.DisplayWholePercent),
-            SchoolDestinationsYearByYear = defaultDestinations.YearByYear.School,
-            SimilarSchoolsDestinationsYearByYear = defaultDestinations.YearByYear.SimilarSchools,
-            LocalAuthorityDestinationsYearByYear = defaultDestinations.YearByYear.LocalAuthority,
-            EnglandDestinationsYearByYear = defaultDestinations.YearByYear.England
-        };
-    }
-
-    private static IReadOnlyList<TopPerformerRow> MapTopPerformers(
-        IReadOnlyList<Ks4TopPerformer> topPerformers,
-        Func<decimal?, string> formatter) =>
-        topPerformers
-            .Select(x => new TopPerformerRow(x.Rank, x.Urn, x.Name, x.Value, formatter(x.Value), x.IsCurrentSchool))
-            .ToList()
-            .AsReadOnly();
-
-    private static Ks4CoreSubjectsPageViewModel BuildKs4CoreSubjectsViewModel(
-        GetSchoolKs4CoreSubjectsResponse response)
-    {
-        var defaultEnglishLanguage = SchoolKs4CoreSubjectSelection.From(
-            response,
-            SchoolKs4CoreSubject.EnglishLanguage,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-        var defaultEnglishLiterature = SchoolKs4CoreSubjectSelection.From(
-            response,
-            SchoolKs4CoreSubject.EnglishLiterature,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-        var defaultBiology = SchoolKs4CoreSubjectSelection.From(
-            response,
-            SchoolKs4CoreSubject.Biology,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-        var defaultChemistry = SchoolKs4CoreSubjectSelection.From(
-            response,
-            SchoolKs4CoreSubject.Chemistry,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-        var defaultPhysics = SchoolKs4CoreSubjectSelection.From(
-            response,
-            SchoolKs4CoreSubject.Physics,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-        var defaultMaths = SchoolKs4CoreSubjectSelection.From(
-            response,
-            SchoolKs4CoreSubject.Maths,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-        var defaultCombinedScienceDoubleAward = SchoolKs4CoreSubjectSelection.From(
-            response,
-            SchoolKs4CoreSubject.CombinedScienceDoubleAward,
-            SchoolKs4CoreSubjectGradeFilter.Grade4);
-
-        return new()
-        {
-            SchoolDetails = response.SchoolDetails,
-            SimilarSchoolsCount = response.SimilarSchoolsCount,
-            EnglishLanguage = MapCoreSubjectSection(defaultEnglishLanguage),
-            EnglishLiterature = MapCoreSubjectSection(defaultEnglishLiterature),
-            Biology = MapCoreSubjectSection(defaultBiology),
-            Chemistry = MapCoreSubjectSection(defaultChemistry),
-            Physics = MapCoreSubjectSection(defaultPhysics),
-            Maths = MapCoreSubjectSection(defaultMaths),
-            CombinedScienceDoubleAward = MapCoreSubjectSection(defaultCombinedScienceDoubleAward)
-        };
-    }
-
-    private static Ks4CoreSubjectsPageViewModel.SubjectSection MapCoreSubjectSection(
-        SchoolKs4CoreSubjectSelection selection) =>
-        new(
-            selection.ThreeYearAverage.SchoolValue,
-            selection.ThreeYearAverage.SimilarSchoolsValue,
-            selection.ThreeYearAverage.LocalAuthorityValue,
-            selection.ThreeYearAverage.EnglandValue,
-            selection.TopPerformers
-                .Select(x => new Ks4CoreSubjectsPageViewModel.TopPerformerRow(
-                    x.Rank,
-                    x.Urn,
-                    x.Name,
-                    x.Value,
-                    Ks4CoreSubjectsPageViewModel.DisplayWholePercent(x.Value),
-                    x.IsCurrentSchool))
-                .ToList()
-                .AsReadOnly(),
-            selection.YearByYear.School,
-            selection.YearByYear.SimilarSchools,
-            selection.YearByYear.LocalAuthority,
-            selection.YearByYear.England);
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
     {

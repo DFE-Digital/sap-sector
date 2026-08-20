@@ -3,22 +3,13 @@
 
 @model MeasureViewModel
 
-@{
-    var currentYear = Model.MeasureInfo.DataType switch
-    {
-        MeasureDataType.Score or MeasureDataType.ScaledScore => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs2,
-        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentAttendance,
-        _ => SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4
-    };
-}
-
 <partial name="Measures/_Filters" model=@Model.MeasureInfo />
 
 <div id="@Model.MeasureInfo.HtmlPrefix">
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
         <tab-content id="charts" name="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="@currentYear" active="true">
+                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year">

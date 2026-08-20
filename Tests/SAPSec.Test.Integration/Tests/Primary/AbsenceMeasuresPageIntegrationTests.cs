@@ -2,6 +2,7 @@
 using FluentAssertions;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -52,7 +53,7 @@ public class AbsenceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task Absence_TableView_ValuesRoundTo2DecimalPlaces()
+    public async Task Attendance_TableView_ValuesRoundTo2DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -78,21 +79,47 @@ public class AbsenceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task MeetingExpectedStandardRwm_SubjectFilter_HasExpectedOptions()
+    public async Task Attendance_OverallAbsence_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
 
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Attendance, HttpStatusCode.OK);
 
-        var filter = page.ElementWithTestIdShouldExist("expected-rwm-subject-filter");
-        filter.ChildTrimmedTextContent().Should().Equal(["Reading, writing and maths", "Reading", "Writing", "Maths"]);
+        var currentYearChart = page.ElementWithTestIdShouldExist("absence-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "1"),
+            ("axis-max", "10"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "1"),
+            ("axis-max", "10"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+    }
+
+    [Fact]
+    public async Task Attendance_TypeFilter_HasExpectedOptions()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Attendance, HttpStatusCode.OK);
+
+        var filter = page.ElementWithTestIdShouldExist("absence-type-filter");
+        filter.ChildTrimmedTextContent().Should().Equal(["Overall absence", "Persistent absence"]);
     }
 
     [InlineData("Overall absence", new[] { "7.20%", "7.10%", "7.00%" }, new[] { "7.30%", "7.20%", "7.10%" }, new[] { "7.10%", "7.20%", "7.30%" })]
     [InlineData("Persistent absence", new[] { "6.00%", "6.10%", "6.20%" }, new[] { "5.90%", "6.00%", "6.10%" }, new[] { "6.10%", "6.20%", "6.30%" })]
     [Theory]
-    public async Task Absence_TypeFilter_UpdatesTableViewWithTypeValues(string filterOption, string[] currentSchool, string[] la, string[] england)
+    public async Task Attendance_TypeFilter_UpdatesTableViewWithTypeValues(string filterOption, string[] currentSchool, string[] la, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -129,4 +156,35 @@ public class AbsenceMeasuresPageIntegrationTests(
             ["Schools in England average", .. england]);
     }
 
+    [Fact]
+    public async Task Attendance_PersistentAbsence_ChartSettings()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Attendance, HttpStatusCode.OK);
+
+        var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("absence-type-filter");
+        filter.SelectOption("Persistent absence");
+
+        var submitButton = page.ElementWithTestIdShouldExist<IHtmlButtonElement>("absence-type-filter-submit");
+        var newPage = await page.SubmitContainingFormAsync(submitButton);
+
+        var currentYearChart = newPage.ElementWithTestIdShouldExist("absence-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "5"),
+            ("axis-max", "30"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+
+        var yearByYearChart = newPage.ElementWithTestIdShouldExist("absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "5"),
+            ("axis-max", "30"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+    }
 }

@@ -4,13 +4,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
-using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Areas.Secondary.Controllers;
@@ -55,27 +53,19 @@ public class SchoolControllerTests
             _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
-        var getSchoolKs4HeadlineMeasures = new GetSchoolKs4HeadlineMeasures(
-            _ks4PerformanceRepositoryMock.Object,
-            _ks4DestinationsRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
+        var getSchoolKs4HeadlineMeasuresUseCase = new GetSchoolKs4HeadlineMeasuresUseCase(
             _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
-        var getSchoolKs4CoreSubjects = new GetSchoolKs4CoreSubjects(
+            _similarSchoolsRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
+            _ks4DestinationsRepositoryMock.Object);
+        var getSchoolKs4CoreSubjectsUseCase = new GetSchoolKs4CoreSubjectsUseCase(
             _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
-        var getFilteredSchoolKs4CoreSubject = new GetFilteredSchoolKs4CoreSubject(
-            _ks4PerformanceRepositoryMock.Object,
-            _schoolDetailsServiceMock.Object,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
+            _similarSchoolsRepositoryMock.Object,
+            _ks4PerformanceRepositoryMock.Object);
 
         _sut = new SchoolController(
-            getSchoolKs4HeadlineMeasures,
-            getSchoolKs4CoreSubjects,
-            getFilteredSchoolKs4CoreSubject,
+            getSchoolKs4HeadlineMeasuresUseCase,
+            getSchoolKs4CoreSubjectsUseCase,
             getAttendanceMeasures,
             _featureFlagServiceMock.Object,
             _requestSchoolAccessorMock.Object,
@@ -151,118 +141,6 @@ public class SchoolControllerTests
 
         var viewResult = result.Should().BeOfType<ViewResult>().Subject;
         viewResult.ViewName.Should().BeNull();
-    }
-
-    #endregion
-
-    #region KS4 Headline Measures Tests
-
-    [Fact]
-    public async Task Ks4HeadlineMeasures_ValidUrn_ReturnsViewWithExpectedModel()
-    {
-        var urn = "123456";
-        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
-
-        _requestSchoolAccessorMock
-            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
-            .ReturnsAsync(schoolDetails);
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(schoolDetails);
-
-        _similarSchoolsRepositoryMock
-            .Setup(x => x.GetGroupAsync(urn))
-            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
-
-        _ks4PerformanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4PerformanceData(urn, null, null, null));
-
-        _ks4DestinationsRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4DestinationsData(urn, null, null, null));
-
-        var result = await _sut.Ks4HeadlineMeasures(urn);
-
-        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
-        viewResult.Model.Should().BeOfType<ViewModels.Ks4HeadlineMeasuresPageViewModel>();
-    }
-
-    #endregion
-
-    #region KS4 Core Subjects Tests
-
-    [Fact]
-    public async Task Ks4CoreSubjects_ValidUrn_ReturnsViewWithExpectedModel()
-    {
-        var urn = "123456";
-        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
-
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(schoolDetails);
-        _similarSchoolsRepositoryMock
-            .Setup(x => x.GetGroupAsync(urn))
-            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
-
-        _ks4PerformanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4PerformanceData(urn, new EstablishmentPerformance(), new LAPerformance(), new EnglandPerformance()));
-
-        var result = await _sut.Ks4CoreSubjects(urn);
-
-        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
-        viewResult.Model.Should().BeOfType<ViewModels.Ks4CoreSubjectsPageViewModel>();
-    }
-
-    [Fact]
-    public async Task Ks4CoreSubjectsData_ValidUrn_ReturnsPayload()
-    {
-        var urn = "123456";
-        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
-
-        _schoolDetailsServiceMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(schoolDetails);
-        _similarSchoolsRepositoryMock
-            .Setup(x => x.GetGroupAsync(urn))
-            .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
-
-        _ks4PerformanceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(urn))
-            .ReturnsAsync(new Ks4PerformanceData(
-                urn,
-                new EstablishmentPerformance
-                {
-                    EngLang49_Sum_Est_Current_Pct = "52",
-                    EngLang49_Sum_Est_Previous_Pct = "51",
-                    EngLang49_Sum_Est_Previous2_Pct = "50"
-                },
-                new LAPerformance
-                {
-                    EngLang49_Tot_LA_Current_Pct = "60",
-                    EngLang49_Tot_LA_Previous_Pct = "59",
-                    EngLang49_Tot_LA_Previous2_Pct = "58"
-                },
-                new EnglandPerformance
-                {
-                    EngLang49_Tot_Eng_Current_Pct = "61",
-                    EngLang49_Tot_Eng_Previous_Pct = "60",
-                    EngLang49_Tot_Eng_Previous2_Pct = "59"
-                }));
-
-        var result = await _sut.Ks4CoreSubjectsData(urn, "english-language", "4");
-
-        var json = result.Should().BeOfType<JsonResult>().Subject;
-        json.Value.Should().NotBeNull();
-    }
-
-    [Fact]
-    public async Task Ks4CoreSubjectsData_InvalidFilter_ReturnsBadRequest()
-    {
-        var result = await _sut.Ks4CoreSubjectsData("123456", "unknown-subject", "4");
-
-        result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     #endregion

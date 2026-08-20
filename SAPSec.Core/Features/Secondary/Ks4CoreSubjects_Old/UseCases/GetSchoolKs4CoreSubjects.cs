@@ -1,10 +1,10 @@
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+namespace SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
 
 public class GetSchoolKs4CoreSubjects(
     IKs4PerformanceRepository repository,
@@ -265,7 +265,7 @@ public class GetSchoolKs4CoreSubjects(
 
     private static SchoolKs4CoreSubjectsGradeSelections BuildGradeSelections(
         Ks4PerformanceData? schoolData,
-        Model.SchoolDetails schoolDetails,
+        SchoolDetails schoolDetails,
         IEnumerable<SimilarSchoolMeasure> similarSchools,
         SubjectFieldSelectors englishLanguageSelectors,
         SubjectFieldSelectors englishLiteratureSelectors,
@@ -349,7 +349,7 @@ public record SchoolKs4CoreSubjectsGradeSelections(
     SchoolKs4CoreSubjectSelection CombinedScienceDoubleAward);
 
 public record GetSchoolKs4CoreSubjectsResponse(
-    Model.SchoolDetails SchoolDetails,
+    SchoolDetails SchoolDetails,
     int SimilarSchoolsCount,
     SchoolKs4CoreSubjectsGradeSelections Grade4AndAbove,
     SchoolKs4CoreSubjectsGradeSelections Grade5AndAbove,
