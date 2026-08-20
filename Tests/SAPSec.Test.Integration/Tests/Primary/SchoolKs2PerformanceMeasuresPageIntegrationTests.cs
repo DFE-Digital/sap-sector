@@ -10,7 +10,7 @@ using Xunit.Abstractions;
 
 namespace SAPSec.Test.Integration.Tests.Primary;
 
-public class Ks2PerformanceMeasuresPageIntegrationTests(
+public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {

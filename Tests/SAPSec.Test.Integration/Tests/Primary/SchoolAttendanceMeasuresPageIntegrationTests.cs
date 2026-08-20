@@ -10,12 +10,12 @@ using Xunit.Abstractions;
 
 namespace SAPSec.Test.Integration.Tests.Primary;
 
-public class AbsenceMeasuresPageIntegrationTests(
+public class SchoolAttendanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     [Fact]
-    public async Task Attendance_MeasureExistsOnPage()
+    public async Task Absence_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -27,7 +27,7 @@ public class AbsenceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task Attendance_TableView_ShouldShowCorrectValues()
+    public async Task Absence_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -53,7 +53,7 @@ public class AbsenceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task Attendance_TableView_ValuesRoundTo2DecimalPlaces()
+    public async Task Absence_TableView_ValuesRoundTo2DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -79,7 +79,7 @@ public class AbsenceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task Attendance_OverallAbsence_ChartSettings()
+    public async Task Absence_OverallAbsence_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -105,7 +105,7 @@ public class AbsenceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task Attendance_TypeFilter_HasExpectedOptions()
+    public async Task Absence_TypeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -119,7 +119,7 @@ public class AbsenceMeasuresPageIntegrationTests(
     [InlineData("Overall absence", new[] { "7.20%", "7.10%", "7.00%" }, new[] { "7.30%", "7.20%", "7.10%" }, new[] { "7.10%", "7.20%", "7.30%" })]
     [InlineData("Persistent absence", new[] { "6.00%", "6.10%", "6.20%" }, new[] { "5.90%", "6.00%", "6.10%" }, new[] { "6.10%", "6.20%", "6.30%" })]
     [Theory]
-    public async Task Attendance_TypeFilter_UpdatesTableViewWithTypeValues(string filterOption, string[] currentSchool, string[] la, string[] england)
+    public async Task Absence_TypeFilter_UpdatesTableViewWithTypeValues(string filterOption, string[] currentSchool, string[] la, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
@@ -157,7 +157,7 @@ public class AbsenceMeasuresPageIntegrationTests(
     }
 
     [Fact]
-    public async Task Attendance_PersistentAbsence_ChartSettings()
+    public async Task Absence_PersistentAbsence_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
