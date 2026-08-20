@@ -222,12 +222,10 @@ The supporting data platform sits under `SAPData/`.
 The pipeline:
 
 1. acquires raw source files from upstream data sources
-2. computes hashes to work out whether the data has changed
-3. exits early where nothing has changed
-4. cleans and normalises the source data
-5. generates SQL from metadata and source structures
-6. runs that SQL to create or refresh tables and materialised views
-7. supports the application and search on the other side
+2. exits early where nothing has changed
+3. cleans and normalises the source data
+4. generates SQL from metadata and source structures
+5. runs that SQL to create or refresh tables and materialised views
 
 It follows a raw, staging and curated model, with a deterministic SQL generation process.
 
@@ -336,7 +334,7 @@ flowchart TB
     gias --> sap
     ees --> sap
     ofsted --> sap
-    similar --> sap
+
 
     sap --> analytics
     monitor --> sap
@@ -376,7 +374,7 @@ flowchart TB
 
     ext --> pipeline
     pipeline -->|owns schema and writes| pg
-    pipeline --> search
+    
 
     maintenance -. failover / maintenance .- web
 ```
@@ -419,7 +417,6 @@ flowchart LR
     
 
     pipeline --> pg
-    pipeline --> search
 
     web -->|read only| pg
     web -->|read only| search
@@ -488,7 +485,6 @@ These are the journeys and operational flows the service supports. The step-by-s
 - a clear split between the data platform and the runtime service
 - schema change is metadata-driven and deterministic
 - testing covers unit, integration, UI, end-to-end and accessibility levels
-- the repository holds architecture and developer guidance to keep things consistent
 
 ### 10.5 Observability
 
@@ -504,7 +500,6 @@ These are the journeys and operational flows the service supports. The step-by-s
 - the data pipeline owns the schema and all writes, and the application is read-only
 - the application queries materialised views rather than base tables, so query patterns are limited to what the views provide
 - read models are generated from serialised view structures rather than written by hand
-- search currently runs on a separate Lucene index, so search schema changes need a reindex until the move to PostgreSQL full-text search is done
 - the service is authenticated throughout
 - upstream dataset availability and quality, including Ofsted publication cycles, affect what the service can show
 - the repository holds both runtime service code and data pipeline concerns

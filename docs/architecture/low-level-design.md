@@ -147,7 +147,7 @@ This traces `GET /school/primary/{urn}/ks2`, which is the most representative fl
 ```
 [Authorize]               → DSI cookie valid? proceed | absent → 401
 [RequireFeatureFlag]      → flag on? proceed | off → 404
-[RequireSchoolPhase]      → Primary/All-through URN? proceed
+[RequireSchoolPhase]      → Primary URN? redirect to PrimarySchool(urn).Overview
                           → Secondary URN? redirect to SecondarySchool(urn).Overview
                           → not found? → 404
 
