@@ -7,10 +7,12 @@ for how to run it.
 
 ## Status
 
-Draft for service assessment (raised by Robert Rees). Scenarios and journeys
-are built and verified locally, plus one real (unplanned) production result
-under stress - see
-[Real result: stress scenario against production](#real-result-stress-scenario-against-production-unplanned).
+Draft for service assessment (raised by Robert Rees). A valid `stress` run
+against the deployed `test` environment with real authentication and real
+data - see
+[Real result: authenticated stress scenario against test (valid)](#real-result-authenticated-stress-scenario-against-test-valid).
+The app handled 150 concurrent authenticated users cleanly.
+
 The operating targets below are still proposed starting points, not yet
 signed off. See [Open actions](#open-actions).
 
@@ -22,18 +24,12 @@ The application runs on Azure Kubernetes Service (AKS):
   `rate_limit_max` is **300 on test** and **1000 on production**, with
   `block_ip: true` on repeat offenders
   (`terraform/domains/environment_domains/config/{test,production}.tfvars.json`).
-  This is a real, already-in-place traffic-shedding mechanism, confirmed by a
-  real (unplanned) production run - see
-  [Real result: stress scenario against production](#real-result-stress-scenario-against-production-unplanned).
+  This is a real, already-in-place traffic-shedding mechanism.
   **Correction:** we previously described this as "req/s." That was an
   unverified assumption - the actual rule lives in a vendored Terraform
   module (`./vendor/modules/domains`) not present in this checkout, so its
-  real time window is unconfirmed. The production run below sustained only
-  ~34 achieved req/s on average yet was still heavily shed, which is hard to
-  reconcile with a literal 1000-per-second reading - the real window is very
-  likely longer than one second (e.g. per-minute). Needs confirming with
-  whoever owns the `domains` module before this is stated as fact anywhere
-  else.
+  real time window is unconfirmed. Needs confirming with whoever owns the
+  `domains` module before this is stated as fact anywhere else.
 - Health probes on `/healthcheck` (liveness/readiness).
 - A **fixed replica count of 2 pods** in both test and production
   (`terraform/application/config/{test,production}.tfvars.json`). We did not
@@ -94,71 +90,98 @@ well under threshold.
 review or test deployment. Local results don't reflect the real 2-pod
 capacity, real database latency, or the WAF sitting in front of test/production.
 
-### Real result: stress scenario against production (unplanned)
+### Real result: authenticated stress scenario against test (valid)
 
-An unplanned `stress` run was executed directly against production
-(`https://get-school-improvement-insights.education.gov.uk`) on 2026-08-12,
-outside the coordination process this doc recommends (see
-[Running against the test environment](../../load_testing/README.md#running-against-the-test-environment)).
-It's included here because the result is genuinely useful evidence for the
-"maximum load before collapse or traffic shedding" question, and because
-transparency about how it was produced matters for how it should be read.
+A `stress` run on 2026-08-20 against the deployed `test` environment, with
+real authentication and real data. The numbers below can be cited.
 
-**Provenance note**: the run's recorded `environment.name` is `"local"` even
-though the target was production - it was fired via a `LOCAL_URL` override
-rather than the built-in `production` environment, so it bypassed the
-intentional guardrail of production not being wired to an npm script. This
-is a process gap worth closing (e.g. making the tooling refuse to run
-against a real host unless `ENVIRONMENT=production` is explicit), not just a
-one-off mistake.
+**What changed to make this work:**
+
+- The deployed `test` environment was temporarily built from this branch
+  with DfE Sign-in bypassed at the code level (`SAPSec.Web/Program.cs` -
+  `AutoAuthenticationHandler` used unconditionally instead of real DSI OIDC)
+  rather than via a session cookie. Every request auto-authenticates
+  regardless of what's sent - no MFA, no chunked-cookie handling, no
+  session-expiry risk. **This is a temporary, never-merged state of `test`**
+  - it disables real authentication for anyone using the shared environment
+    while deployed this way, and must be reverted before any merge to `main`.
+- Getting this deployed uncovered two real regressions introduced by
+  deleting the DSI authentication wiring wholesale rather than swapping just
+  the auth scheme: `AddDsiAuthentication()` also registered
+  `IHttpContextAccessor`, `IUserService`, and the DSI API `HttpClient` (used
+  by `AuthController`/`UserController`/`DsiAuthorizationHandler` regardless
+  of login scheme) - restored explicitly. And real DfE Analytics
+  (`Dfe.Analytics.AspNetCore.DfeAnalyticsMiddleware`) was still active for
+  the `"Test"` environment name and threw `BigQueryClient has not been
+  configured` on every request including `/healthcheck`, which is what was
+  actually blocking the Kubernetes rollout from completing (`1 out of 2 new
+  replicas have been updated...` for ~10 minutes then timing out) - fixed by
+  adding `"Test"` to the same skip-list as the other test environments.
+- Target: `test`'s direct backend origin
+  (`get-school-improvement-insights-test.test.teacherservices.cloud`),
+  bypassing Front Door/WAF - a team-cleared arrangement.
+- A quick smoke test was run first and confirmed genuine authentication
+  (100% status/content checks passed, including "contains expected
+  content") before committing to the full 9-minute run.
 
 **What happened:**
 
-- The scenario ran to completion (not manually stopped) - measured duration
-  540.8s (~9.0 min), matching the `stress` script's full ramp exactly, and
-  peaked at the target 150 VUs.
-- **83.08% of all HTTP requests failed** (15,247 of 18,353). Both the
-  `http_req_failed` and our custom `sap_sector_error_rate` thresholds
-  (rate < 1%) failed - k6 itself reported the run as failed.
-- The failures were rejections, not application errors: every "no server
-  errors (5xx)" check passed across every journey (429 is a 4xx), while
-  "status is expected" (200) failed 80-84% of the time. The service did not
-  error - requests were turned away before reaching it.
-- When a request did get through, it was fast: p95 31.4ms overall (p95
-  41.6ms restricted to successful requests only), max 355ms. This is a
-  reasonably strong signal that the application pods themselves were never
-  actually stressed - the WAF appears to have absorbed the excess load
-  before it reached the app.
-- The failure rate was **uniform across every journey tested** - health
-  checks (18.4-18.5% success), homepage (17.2% / 16.2% in the two branches
-  that exercise it), static pages (16.3-16.8%), sign-in redirect (15.9%) all
-  land in the same narrow 16-18.5% band. That points to broad (likely
-  per-IP or per-connection) rate limiting rather than anything route-specific.
+- Ran to completion: 9m 5s, matching the scripted duration, peaked at the
+  target 150 VUs (dipping to a minimum of 83 during the ramp, per
+  `vus_max`).
+- **24,421 requests, all succeeded at the HTTP level** - `http_req_failed`
+  0.00%.
+- Our combined status+latency metric (`sap_sector_error_rate`) stayed well
+  under its 1% threshold: **0.14% overall** (36 of 24,421).
+- **99.95% of all checks passed** (88,110 of 88,146), including content
+  checks - confirming real authenticated pages with real data were being
+  exercised throughout, not a redirect loop like the invalid attempt.
+- Response times degraded gracefully with load rather than collapsing:
+  overall avg 193ms, median 95ms, p90 452ms, p95 687ms, max 6.66s (a single
+  outlier).
 
-| Metric | Value |
-|---|---|
-| Total requests | 18,353 |
-| Requests failed | 15,247 (83.08%) |
-| Checks passed | 42,655 / 71,755 (59.45%) |
-| Peak VUs | 150 |
-| Test duration | 540.8s (full scripted run) |
-| p95 response time (successful requests) | 41.6ms |
-| `http_req_duration` p95 < 3000ms threshold | Passed |
-| `http_req_failed` rate < 1% threshold | **Failed** |
+**Time-resolved detail** (30-second buckets from the CSV export; VUs is the
+scenario's target at that point):
 
-**What this data can't tell us** (aggregate summary only, no per-request
-timestamps):
+| Elapsed | VUs | Requests | p50 | p95 | max | Error rate |
+|---|---|---|---|---|---|---|
+| 0s | 28 | 263 | 56ms | 360ms | 1,384ms | 0.0% |
+| 30s | 48 | 555 | 47ms | 232ms | 449ms | 0.0% |
+| 60s | 61 | 767 | 57ms | 256ms | 777ms | 0.0% |
+| 90s | 74 | 958 | 53ms | 253ms | 485ms | 0.0% |
+| 120s | 86 | 1,087 | 59ms | 304ms | 598ms | 0.0% |
+| 150s | 99 | 1,270 | 61ms | 316ms | 933ms | 0.0% |
+| 180s | 107 | 1,414 | 70ms | 377ms | 1,000ms | 0.0% |
+| 210s | 116 | 1,534 | 80ms | 436ms | 931ms | 0.0% |
+| 240s | 124 | 1,588 | 79ms | 556ms | 1,862ms | 0.0% |
+| 270s | 132 | 1,722 | 89ms | 440ms | 1,084ms | 0.0% |
+| 300s | 141 | 1,817 | 104ms | 630ms | 1,569ms | 0.0% |
+| 330s | 149 | 1,867 | 127ms | 898ms | 1,911ms | 0.0% |
+| 360s | 150 | 1,957 | 125ms | 856ms | 2,176ms | 0.0% |
+| 390s | 150 | 1,906 | 127ms | 868ms | 1,785ms | 0.0% |
+| 420s | 150 | 1,819 | 167ms | 963ms | 2,382ms | 0.0% |
+| 450s | 150 | 1,907 | 129ms | 906ms | 1,678ms | 0.0% |
+| 480s | 96 | 1,400 | 153ms | 1,545ms | 6,669ms | 2.6% |
+| 510s | 11 | 584 | 94ms | 411ms | 2,643ms | 0.0% |
+| 540s | 1 | 6 | 68ms | 356ms | 356ms | 0.0% |
 
-- The exact elapsed-time onset of shedding - can't say "it started failing
-  at minute N." A future run would need `k6 run --out csv=results.csv` (or
-  similar time-series output) instead of just the default summary to answer
-  that precisely.
-- The real WAF rate-limit window/duration - see the correction under
-  [Hosting model](#hosting-model).
-- App-level metrics (CPU/memory on the 2 production pods) during the run -
-  would confirm whether the app was genuinely shielded by the WAF or partly
-  stressed itself. Needs Azure Monitor/Application Insights access, which
-  wasn't available when writing this up.
+**Reading it**: error rate is a genuine **0.0% for the entire ramp-up and
+the entire 150-VU sustained window** (t=0 through t=450s). The only
+non-zero error window (2.6% at t=480s) falls during ramp-*down*, as VUs
+drop from 150 to 96 - consistent with a handful of in-flight requests being
+torn down mid-response rather than the app failing under peak load. Latency
+increases smoothly and predictably as load increases (p50 ~55ms at 28 VUs
+to ~125-167ms sustained at 150 VUs; p95 ~250-360ms to ~860-960ms) - no
+cliff, no runaway tail latency, no sustained spike. **At 150 concurrent
+authenticated users, this app does not show signs of being close to a
+breaking point** - the `stress` scenario's ceiling wasn't high enough to
+find one.
+
+**Still open**: this only tells us the app is healthy up to 150 VUs, not
+where it actually breaks. A higher-intensity run (above 150) and CPU/memory
+metrics for the pods during it would be needed to find the real ceiling.
+Raw per-request time-series (421,454 rows) saved locally as
+`load_testing/stress-test-timeseries.csv` - gitignored, not committed.
 
 ## Operating targets (proposed - needs sign-off)
 
@@ -169,7 +192,7 @@ Per Robert Rees' service assessment ask, four targets:
 | Guaranteed load | TBC | Needs real user-base sizing - number of schools in scope × a plausible concurrent-access percentage. Not yet estimated. |
 | Expected load | ~10 concurrent users | School leaders checking in during work hours; likely genuinely low given the tool's scope. Matches the `baseline` scenario. |
 | Target peak load | ~50 concurrent users | Speculative "surge" event (e.g. results day, start of term). No confirmed trigger event has been identified yet - this is a guess, not a target. |
-| Maximum load before collapse / shedding | Bounded by the Front Door WAF (`rate_limit_max` 300 on test / 1000 on production, unit unconfirmed - see [Hosting model](#hosting-model)), then IP-blocked | Real infra ceiling, not app-level, and now backed by an actual (if unplanned) production result: under a 150-VU stress run, 83.08% of requests were shed at the edge while the ~17% that got through stayed fast (p95 41.6ms) - see [Real result](#real-result-stress-scenario-against-production-unplanned). The app itself was likely never stressed; the WAF did the shedding. |
+| Maximum load before collapse / shedding | Not yet found. Bounded first by the Front Door WAF (`rate_limit_max` 300 on test / 1000 on production, unit unconfirmed), but **the app itself handled 150 concurrent authenticated users cleanly (0.14% error rate, graceful latency growth, no failure onset)** - the highest level tested so far, not a breaking point. | Test direct-origin, WAF bypassed, real auth (2026-08-20) - 99.95% checks passed, 0.0% error rate through the full 150-VU sustained window - see [Real result: test, valid](#real-result-authenticated-stress-scenario-against-test-valid). Need a higher-intensity scenario to actually find the ceiling. |
 
 **Note for the assessment conversation**: given the service's actual
 audience (school leaders, business hours, no public/mass-market traffic),
@@ -180,25 +203,30 @@ number to fill the gap.
 
 ## Open actions
 
-1. Confirm the autoscaling question with the platform/infra team, and
+1. **`test` currently has no real authentication for anyone using it** -
+   it's running a temporary build with DfE Sign-in bypassed at the code
+   level (see [Real result: test, valid](#real-result-authenticated-stress-scenario-against-test-valid)).
+   **Revert this deployment back to a normal build as soon as load testing
+   is done.** This is live right now, not a historical item - the longer it
+   stays deployed, the bigger the exposure window.
+2. **Find the actual breaking point.** 150 VUs wasn't enough to stress the
+   app - it needs a higher-intensity scenario (a new scenario above `stress`,
+   or a longer sustain at higher VUs) to find where it actually starts to
+   fail. Do this **before** reverting the temporary deployment (item 1), or
+   it'll need redeploying.
+3. Pull CPU/memory metrics for the pods during a higher-intensity run, to
+   see what's actually being consumed even though nothing failed yet. Needs
+   Azure Monitor/Application Insights access.
+4. Confirm the autoscaling question with the platform/infra team, and
    correct either this doc or the main README (they currently disagree).
-2. Confirm the actual WAF rate-limit window/duration with whoever owns the
+5. Confirm the actual WAF rate-limit window/duration with whoever owns the
    `domains` Terraform module, and correct the unit claim once known.
-3. Size the real user base (schools in scope) to replace "TBC" and the
+6. Size the real user base (schools in scope) to replace "TBC" and the
    other proposed numbers with defensible ones.
-4. Run `baseline` and `peak-surge` against `test` (or a review app), through
-   the intended coordinated process this time, and record real results here.
-5. Re-run `stress` with a time-series output (`--out csv=...`) to pin down
-   exactly when shedding starts, ideally against `test` rather than
-   production.
-6. Pull CPU/memory metrics for the 2 production pods during the 2026-08-12
-   run, if still available in Azure Monitor, to confirm the app was shielded
-   rather than partly stressed.
-7. Get the four operating target numbers - or the decision to deprioritise
+7. Run `baseline` and `peak-surge` against `test` for completeness (results
+   should be uneventful given the `stress` result, but worth recording).
+8. Get the four operating target numbers - or the decision to deprioritise
    some of them - signed off by the service owner.
-8. Decide and close the process gap that let a `stress` run reach production
-   unlabelled and uncoordinated (see the provenance note under
-   [Real result](#real-result-stress-scenario-against-production-unplanned)).
 
 ## How to run it
 
