@@ -59,7 +59,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Index" || currentAction == "Similarity")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(comparisonModel.Urn).SimilarSchoolComparison(comparisonModel.SimilarSchoolUrn)"
+                               href="@Routes.PrimarySchool(comparisonModel.Urn).Comparison(comparisonModel.SimilarSchoolUrn).Similarity"
                                aria-current="@(currentAction == "Index" || currentAction == "Similarity" ? "page" : null)">
                                 Similarity
                             </a>
@@ -67,7 +67,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Ks2")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(comparisonModel.Urn).SimilarSchoolComparisonKs2(comparisonModel.SimilarSchoolUrn)"
+                               href="@Routes.PrimarySchool(comparisonModel.Urn).Comparison(comparisonModel.SimilarSchoolUrn).Ks2"
                                aria-current="@(currentAction == "Ks2" ? "page" : null)">
                                 KS2
                             </a>
@@ -75,7 +75,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Attendance")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(comparisonModel.Urn).SimilarSchoolComparisonAttendance(comparisonModel.SimilarSchoolUrn)"
+                               href="@Routes.PrimarySchool(comparisonModel.Urn).Comparison(comparisonModel.SimilarSchoolUrn).Attendance"
                                aria-current="@(currentAction == "Attendance" ? "page" : null)">
                                 Attendance
                             </a>
@@ -83,7 +83,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "SchoolDetails")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(comparisonModel.Urn).SimilarSchoolComparisonSchoolDetails(comparisonModel.SimilarSchoolUrn)"
+                               href="@Routes.PrimarySchool(comparisonModel.Urn).Comparison(comparisonModel.SimilarSchoolUrn).SchoolDetails"
                                aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
                                 School details
                             </a>

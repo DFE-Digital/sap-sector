@@ -1,5 +1,6 @@
 ﻿using Deque.AxeCore.Playwright;
 using FluentAssertions;
+using Microsoft.Playwright;
 using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
@@ -16,14 +17,14 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.Accessibility),
         new(Routes.FindASchool()),
 
-        new(Routes.PrimarySchool("100749").Overview),
-        new(Routes.PrimarySchool("100749").KS2, HasH3Headings: true),
-        new(Routes.PrimarySchool("100749").Attendance, HasH3Headings: true),
-        new(Routes.PrimarySchool("100749").ViewSimilarSchools),
-        new(Routes.PrimarySchool("100749").SimilarSchoolComparison("100134")),
-        new(Routes.PrimarySchool("100749").SimilarSchoolComparisonSchoolDetails("100134")),
-        new(Routes.PrimarySchool("100749").SchoolDetails),
-        new(Routes.PrimarySchool("100749").WhatIsASimilarSchool),
+        new(Routes.PrimarySchool("100171").Overview),
+        new(Routes.PrimarySchool("100171").KS2, HasH3Headings: true),
+        new(Routes.PrimarySchool("100171").Attendance, HasH3Headings: true),
+        new(Routes.PrimarySchool("100171").ViewSimilarSchools),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Overview),
+        new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
+        new(Routes.PrimarySchool("100171").SchoolDetails),
+        new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
 
         new(Routes.SecondarySchool("100182").Overview),
         new(Routes.SecondarySchool("100182").KS4HeadlineMeasures, HasH3Headings: true),
@@ -31,7 +32,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
         // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
-        new(Routes.SecondarySchool("100182").SimilarSchoolComparison("136555"), AllowHorizontalScroll: true),
+        new(Routes.SecondarySchool("100182").Comparison("136555").Overview, AllowHorizontalScroll: true),
         new(Routes.SecondarySchool("100182").Comparison("136555").SchoolDetails),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),

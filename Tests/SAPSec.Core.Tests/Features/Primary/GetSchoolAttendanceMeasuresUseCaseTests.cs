@@ -4,7 +4,6 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 using static SAPSec.Core.Constants.Measures;
-using static SAPSec.Core.Constants.Measures.Primary;
 
 namespace SAPSec.Core.Tests.Features.Primary;
 
@@ -100,8 +99,8 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "", previous: "", previous2: "")));
 
-       _absenceRepo.SetupLAAbsence(
-            Build.Absence.LA("001", x => x.WithOverallAbsencePrimary(current: "", previous: "", previous2: "")));
+        _absenceRepo.SetupLAAbsence(
+             Build.Absence.LA("001", x => x.WithOverallAbsencePrimary(current: "", previous: "", previous2: "")));
 
         _absenceRepo.SetupEnglandAbsence(
             Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "", previous: "", previous2: "")));

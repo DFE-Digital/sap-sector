@@ -4,6 +4,7 @@ using Microsoft.Playwright;
 using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 namespace SAPSec.UI.Tests.Deprecated.AccessibilityTests;
 
