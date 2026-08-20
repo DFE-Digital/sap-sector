@@ -114,27 +114,35 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
+        builder.Services.AddAuthentication(options =>
         {
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "TestScheme";
-                options.DefaultAuthenticateScheme = "TestScheme";
-                options.DefaultChallengeScheme = "TestScheme";
-            })
-            .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
-        }
-        else
-        {
-            builder.Services.AddDsiAuthentication(builder.Configuration);
-        }
+            options.DefaultScheme = "TestScheme";
+            options.DefaultAuthenticateScheme = "TestScheme";
+            options.DefaultChallengeScheme = "TestScheme";
+        })
+        .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
 
-        builder.Services.AddAuthorization(options =>
-        {
-            options.FallbackPolicy = new AuthorizationPolicyBuilder()
-                .RequireAuthenticatedUser()
-                .Build();
-        });
+        ////if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
+        ////{
+        ////    builder.Services.AddAuthentication(options =>
+        ////    {
+        ////        options.DefaultScheme = "TestScheme";
+        ////        options.DefaultAuthenticateScheme = "TestScheme";
+        ////        options.DefaultChallengeScheme = "TestScheme";
+        ////    })
+        ////    .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
+        ////}
+        ////else
+        ////{
+        ////    builder.Services.AddDsiAuthentication(builder.Configuration);
+        ////}
+
+        //builder.Services.AddAuthorization(options =>
+        //{
+        //    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        //        .RequireAuthenticatedUser()
+        //        .Build();
+        //});
 
         builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 
