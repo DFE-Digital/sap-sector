@@ -678,8 +678,7 @@ flowchart TD
     GIAS["GIAS
     Get Information About Schools"]
     OFSTED["Ofsted
-    inspection outcomes
-    arrives via departmental datasets"]
+    Similar Schools data"]
     EES["EES
     Explore Education Statistics"]
 
