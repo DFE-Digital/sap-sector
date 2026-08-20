@@ -1,0 +1,57 @@
+﻿using J2N.Collections.Generic.Extensions;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
+using SAPSec.Core.Interfaces.Services;
+using SAPSec.Test.Common.Authentication;
+using SAPSec.Test.Common.FeatureFlags;
+using SAPSec.Web;
+using SAPSec.Web.Services;
+
+namespace SAPSec.Test.Integration.Setup;
+
+public abstract class IntegrationTestsWebApplicationFactory : WebApplicationFactory<Program>
+{
+    public IntegrationTestsWebApplicationFactory()
+    {
+        // Use HTTPS base address in TestServer to avoid invalid redirect port resolution.
+        ClientOptions.BaseAddress = new Uri("https://localhost");
+    }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseUrls("http://127.0.0.1:0", "https://127.0.0.1:0");
+
+        builder.UseEnvironment("IntegrationTests");
+
+        var configuration = new ConfigurationBuilder()
+            .AddTestDsiConfiguration()
+            .Build();
+
+        builder
+            // This configuration is used during the creation of the application
+            // (e.g. BEFORE WebApplication.CreateBuilder(args) is called in Program.cs).
+            .UseConfiguration(configuration)
+            .ConfigureAppConfiguration(configurationBuilder =>
+            {
+                configurationBuilder.AddTestDsiConfiguration();
+            })
+            .ConfigureServices(services =>
+            {
+                // Add or replace any services that the application needs during testing.
+                services.AddTestDsiDependencies();
+                services.AddScoped<ICustomEventService, NoOpCustomEventService>();
+                services.RemoveAll<IFeatureFlagService>();
+                services.AddSingleton<FeatureFlagService>();
+                services.AddSingleton<IFeatureFlagService>(provider =>
+                    new MockFeatureFlagService(provider.GetRequiredService<FeatureFlagService>()));
+
+                ConfigureServices(services);
+            });
+    }
+
+    protected abstract IServiceCollection ConfigureServices(IServiceCollection services);
+}

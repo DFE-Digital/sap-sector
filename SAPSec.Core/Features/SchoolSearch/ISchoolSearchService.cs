@@ -1,4 +1,4 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Features.SchoolSearch;
 

@@ -1,0 +1,26 @@
+﻿@using SAPSec.Web.ViewModels.Measures
+
+@model MeasureInfoViewModel
+
+@if (Model.Filters.Any())
+{
+    <div class="app-measure-filter-row">
+        @foreach (var filter in Model.Filters)
+        {
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-!-font-weight-bold" for="@filter.Key-select">@filter.Name</label>
+                <select class="govuk-select"
+                        id="@filter.Key-select"
+                        name="@filter.Key"
+                        data-measure-filter-target-id="@Model.HtmlPrefix"
+                        data-testid="@filter.Key-filter">
+                        @foreach (var option in filter.Options)
+                        {
+                            <option value="@option.Key" selected=@option.Selected>@option.Name</option>
+                        }
+                </select>
+                <button type="submit" class="govuk-button" data-module="govuk-button" data-testid="@filter.Key-filter-submit">Apply</button>
+            </div>
+        }
+    </div>
+}

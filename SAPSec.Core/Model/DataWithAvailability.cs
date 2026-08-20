@@ -57,6 +57,18 @@ public sealed record DataWithAvailability<T>
     public T GetValueOrDefault(T defaultValue)
         => HasValue && Value is not null ? Value : defaultValue;
 
+    public static bool operator <(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) < 0;
+
+    public static bool operator >(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) > 0;
+
+    public static bool operator <=(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) <= 0;
+
+    public static bool operator >=(DataWithAvailability<T>? x, DataWithAvailability<T>? y)
+        => Comparer.Compare(x, y) >= 0;
+
     #endregion
 
     public static readonly DataWithAvailabilityComparer Comparer = new DataWithAvailabilityComparer();
@@ -203,6 +215,39 @@ public static class DataWithAvailability
         }
 
         return Available(value);
+    }
+
+    /// <summary>
+    /// Maps a string value to DataWithAvailability, handling GIAS special codes.
+    /// </summary>
+    public static DataWithAvailability<string> FromStringWithCodes(string? code, string? name)
+    {
+        if (string.IsNullOrWhiteSpace(code))
+        {
+            return NotAvailable<string>();
+        }
+
+        if (EesDataCodes.IsRedacted(code))
+        {
+            return Redacted<string>();
+        }
+
+        if (EesDataCodes.IsNotApplicable(code))
+        {
+            return NotApplicable<string>();
+        }
+
+        if (EesDataCodes.IsNotAvailable(code))
+        {
+            return NotAvailable<string>();
+        }
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return NotAvailable<string>();
+        }
+
+        return Available(name);
     }
 
     /// <summary>

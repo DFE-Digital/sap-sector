@@ -1,17 +1,19 @@
-using System;
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SimilarSchoolComparisonPath = "/school/108088/view-similar-schools/137621/SchoolDetails";
+    private static readonly string SimilarSchoolComparisonPath =
+        Routes.SecondarySchool("108088").Comparison("137621").SchoolDetails;
 
     #region Page Load Tests
 
@@ -30,7 +32,7 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         await Page.GotoAsync(SimilarSchoolComparisonPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var mainSchoolName = Page.Locator("span.govuk-caption-l");
+        var mainSchoolName = Page.Locator("span.govuk-caption-xl");
         var isMainVisible = await mainSchoolName.IsVisibleAsync();
 
         isMainVisible.Should().BeTrue("Main school name caption should be visible");
@@ -137,7 +139,7 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         (await activeTab.TextContentAsync()).Should().Contain("School details");
 
         var ariaCurrent = await activeTab.GetAttributeAsync("aria-current");
-        ariaCurrent.Should().Be("true", "Active tab should have aria-current='true'");
+        ariaCurrent.Should().Be("page", "Active tab should have aria-current='page'");
     }
 
     [Fact]
@@ -149,7 +151,7 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         var similarityTab = Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')");
         await similarityTab.ClickAsync();
 
-        var heading = Page.Locator("h1.govuk-heading-l");
+        var heading = Page.Locator("h2.govuk-heading-l");
         await heading.WaitForAsync();
         (await heading.TextContentAsync()).Should().Contain("How these schools compare");
 
@@ -168,24 +170,28 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("a.govuk-service-navigation__link:has-text('Similarity')").ClickAsync();
-        var heading = Page.Locator("h1.govuk-heading-l");
+
+        var heading = Page.Locator("h2.govuk-heading-l");
         await heading.WaitForAsync();
+
         var table = Page.Locator("table.govuk-table");
         await table.WaitForAsync();
 
         var headerCells = table.Locator("thead th");
         (await headerCells.CountAsync()).Should().Be(3, "Similarity table should have 3 columns");
         (await headerCells.Nth(0).TextContentAsync()).Should().Contain("Characteristic");
+        (await headerCells.AllTextContentsAsync()).Should().NotContain(text => text.Contains("Similarity"));
 
         var firstRow = table.Locator("tbody tr.govuk-table__row").First;
         (await firstRow.CountAsync()).Should().Be(1);
 
         var cells = firstRow.Locator("th, td");
-        (await cells.CountAsync()).Should().Be(3, "Row should have characteristic + 2 value cells");
+        (await cells.CountAsync()).Should().Be(3, "Row should have characteristic and 2 value cells");
 
         (await cells.Nth(0).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
         (await cells.Nth(1).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
         (await cells.Nth(2).TextContentAsync()).Should().NotBeNullOrWhiteSpace();
+        (await table.Locator(".govuk-tag").CountAsync()).Should().Be(0, "Similarity tags should be removed");
     }
 
     #endregion
@@ -228,28 +234,28 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
     {
         await Page.GotoAsync(SimilarSchoolComparisonPath, new() { WaitUntil = WaitUntilState.DOMContentLoaded });
 
-    
+
         await Page.WaitForSelectorAsync("#map", new() { State = WaitForSelectorState.Attached, Timeout = 15000 });
 
         var map = Page.Locator("#map");
 
-    
+
         (await map.CountAsync()).Should().Be(1, "Map container should exist");
 
-    
+
         var mapMode = await map.GetAttributeAsync("data-map-mode");
         mapMode.Should().Be("compare");
 
         (await map.GetAttributeAsync("data-fixed-zoom")).Should().Be("14");
 
-    
+
         (await map.GetAttributeAsync("role")).Should().Be("region");
         (await map.GetAttributeAsync("aria-label")).Should().Be("Map of schools");
 
         var loading = map.Locator(".map-loading");
         (await loading.CountAsync()).Should().BeGreaterThanOrEqualTo(0);
 
-    
+
         if (await loading.CountAsync() > 0)
         {
             (await loading.First.TextContentAsync()).Should().Contain("Loading map");

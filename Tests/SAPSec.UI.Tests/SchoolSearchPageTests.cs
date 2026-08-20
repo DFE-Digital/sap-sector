@@ -1,9 +1,11 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
@@ -96,8 +98,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("/find-a-school/search");
         Page.Url.Should().Contain("query=Test");
-        Page.Url.Should().Contain("secondaryOnly", "search now preserves hidden secondary-only filter");
-        Page.Url.Should().Contain("similarSchoolsOnly", "search now preserves hidden similar-schools-only filter");
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        await Page.Locator("input[name='__Query']").FillAsync("147788");
+        await Page.Locator("input[name='__Query']").FillAsync("105574");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -146,9 +146,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788/school-details");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").SchoolDetails);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(SchoolSearchPath);
 
-        await Page.Locator("input[name='__Query']").FillAsync("Bradfield School");
+        await Page.Locator("input[name='__Query']").FillAsync("Loreto High School Chorlton");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -165,9 +165,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").Overview);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     #endregion
@@ -295,7 +295,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("373\\4017");
+        await Page.Locator("input[name='__Query']").FillAsync("352\\4753");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -304,9 +304,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788/school-details");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").SchoolDetails);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     [Fact]
@@ -436,7 +436,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(SchoolSearchResultsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("147788");
+        await Page.Locator("input[name='__Query']").FillAsync("105574");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -445,9 +445,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.ClickAsync("text=School details");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("school/147788/school-details");
+        Page.Url.Should().Contain(Routes.SecondarySchool("105574").SchoolDetails);
         var schoolName = await Page.Locator(".govuk-caption-xl").TextContentAsync();
-        schoolName.Should().Contain("Bradfield School");
+        schoolName.Should().Contain("Loreto High School Chorlton");
     }
 
     [Fact]

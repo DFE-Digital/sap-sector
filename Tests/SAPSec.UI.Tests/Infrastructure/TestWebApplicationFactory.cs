@@ -2,21 +2,15 @@
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model;
-using SAPSec.Core.Model.KS4.Performance;
-using SAPSec.Core.Interfaces.Repositories;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Infrastructure.Repositories.Json;
-using SAPSec.Infrastructure.Repositories;
-using SAPSec.UI.Tests.Mocks;
+using SAPSec.Core.Authentication;
+using SAPSec.Infrastructure.Json;
+using SAPSec.UI.Tests.TestData;
 using SAPSec.Web;
 
-namespace SAPSec.UI.Tests.Infrastructure;
+namespace SAPSec.UI.Tests.Deprecated.Infrastructure;
 
 public class TestWebApplicationFactory : WebApplicationFactory<Program>
 {
@@ -33,18 +27,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
         builder.UseContentRoot(webProjectPath);
         builder.UseWebRoot(Path.Combine(webProjectPath, "wwwroot"));
 
-        var testDataFilePath = GetTestDataFilePath();
-        var configurationValues = CreateConfigurationValues(testDataFilePath);
-        var configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(configurationValues)
-            .Build();
-
         builder
-            .UseConfiguration(configuration)
-            .ConfigureAppConfiguration(configurationBuilder =>
-            {
-                configurationBuilder.AddInMemoryCollection(configurationValues);
-            })
             .ConfigureServices(services =>
             {
                 services.RemoveAll<IUserService>();
@@ -52,17 +35,7 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 services.AddScoped<IUserService, MockUserService>();
                 services.AddScoped<IDsiClient, MockDsiClient>();
 
-                services.RemoveAll<IEstablishmentRepository>();
-                services.RemoveAll<ISimilarSchoolsSecondaryRepository>();
-
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsRow>, JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
-                services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
-                services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
-                services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
-
-                services.AddScoped<IEstablishmentRepository, JsonEstablishmentRepository>();
-                services.AddScoped<ISimilarSchoolsSecondaryRepository, JsonSimilarSchoolsSecondaryRepository>();
-                
+                services.AddJsonDependencies();
             });
     }
 
@@ -147,34 +120,6 @@ public class TestWebApplicationFactory : WebApplicationFactory<Program>
                 $"Could not find SAPSec.Web. Searched: {string.Join(", ", possiblePaths)}");
 
         return _cachedWebProjectPath;
-    }
-
-    private static string GetTestDataFilePath()
-    {
-        // First try test project's TestData folder
-        var testProjectPath = Path.Combine(
-            AppContext.BaseDirectory,
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(testProjectPath))
-        {
-            return testProjectPath;
-        }
-
-        // Try web project's TestData folder
-        var webProjectPath = Path.Combine(
-            GetWebProjectPath(),
-            "TestData",
-            "Establishments-UI-Test-Data.csv");
-
-        if (File.Exists(webProjectPath))
-        {
-            return webProjectPath;
-        }
-
-        throw new FileNotFoundException(
-            $"Test data file not found. Searched:\n- {testProjectPath}\n- {webProjectPath}");
     }
 
     #endregion

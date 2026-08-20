@@ -1,14 +1,17 @@
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SimilarSchoolsPath = "/school/108088/view-similar-schools";
+    private static readonly string SimilarSchoolsPath = Routes.SecondarySchool("108088").ViewSimilarSchools;
+    private static readonly string NoResultsSimilarSchoolsPath = $"{Routes.SecondarySchool("108088").ViewSimilarSchools}?ur=doesnotexist";
 
     [Fact]
     public async Task SimilarSchoolsPage_LoadsSuccessfully()
@@ -26,7 +29,7 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
         await Page.GotoAsync(SimilarSchoolsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var filterForm = Page.Locator("#similar-schools-filter-form");
+        var filterForm = Page.Locator("#app-filter-panel");
         var count = await filterForm.CountAsync();
 
         count.Should().Be(1, "Filter form should be present");
@@ -134,5 +137,67 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
         var type = await schoolsData.GetAttributeAsync("type");
 
         type.Should().Be("application/json", "Schools data should have correct type attribute");
+    }
+
+    [Fact]
+    public async Task ClickFilterToggle_ExpandsFilterPanel()
+    {
+        await Page.SetViewportSizeAsync(375, 667);
+        await Page.GotoAsync(SimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var filterToggle = Page.Locator("[data-module='app-filter-toggle']");
+        await filterToggle.ClickAsync();
+
+        var filterPanel = Page.Locator("#app-filter-panel");
+        var hasVisibleClass = await filterPanel.EvaluateAsync<bool>("el => el.classList.contains('app-filter-panel--visible')");
+
+        hasVisibleClass.Should().BeTrue("Filter panel should be visible after clicking the filter toggle");
+    }
+
+    [Fact]
+    public async Task ClickFilterSectionToggle_TogglesFilterSectionExpandedState()
+    {
+        await Page.SetViewportSizeAsync(375, 667);
+        await Page.GotoAsync(SimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var filterToggle = Page.Locator("[data-module='app-filter-toggle']");
+        await filterToggle.ClickAsync();
+
+        var sectionToggle = Page.Locator(".app-filter-section__toggle").First;
+        var initiallyExpanded = await sectionToggle.GetAttributeAsync("aria-expanded");
+
+        await sectionToggle.ClickAsync();
+
+        var expandedAfterClick = await sectionToggle.GetAttributeAsync("aria-expanded");
+        expandedAfterClick.Should().NotBe(initiallyExpanded, "Clicking a filter section toggle should flip its expanded state");
+    }
+
+    [Fact]
+    public async Task SimilarSchoolsPage_NoResults_HidesMapToggle()
+    {
+        await Page.GotoAsync(NoResultsSimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var toggleLink = Page.Locator("#toggleViewLink");
+        var toggleWrap = Page.Locator("#toggleWrap");
+        var mapView = Page.Locator("#mapView");
+
+        (await toggleLink.CountAsync()).Should().Be(0);
+        (await toggleWrap.CountAsync()).Should().Be(0);
+        (await mapView.CountAsync()).Should().Be(0);
+    }
+
+    [Fact]
+    public async Task SimilarSchoolsPage_NoResults_ShowsExpectedMessage()
+    {
+        await Page.GotoAsync(NoResultsSimilarSchoolsPath);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        var message = Page.Locator("p.govuk-body").Filter(new() { HasText = "There are no schools that match your search." });
+
+        (await message.CountAsync()).Should().Be(1);
+        (await message.First.IsVisibleAsync()).Should().BeTrue();
     }
 }

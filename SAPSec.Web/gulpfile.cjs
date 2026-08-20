@@ -28,6 +28,10 @@ const buildSass = () =>
         .pipe(sourcemaps.write("./"))
         .pipe(gulp.dest("wwwroot/css"));
 
+const watchSass = () =>
+    gulp
+        .watch(["AssetSrc/scss/*.scss"], buildSass);
+
 const copyStaticAssets = () =>
     gulp
         .src(["node_modules/govuk-frontend/dist/govuk/assets/**/*"], {
@@ -123,6 +127,16 @@ const copyStaticAssets = () =>
                 .src(["AssetSrc/js/*"], {encoding: false})
                 .pipe(gulp.dest("wwwroot/js/"))
         )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/chart.js/dist/chart.umd.js"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
+        .on("end", () =>
+            gulp
+                .src(["node_modules/chartjs-plugin-datalabels/dist/chartjs-plugin-datalabels.min.js"])
+                .pipe(gulp.dest("wwwroot/js/"))
+        )
         // --- Leaflet ---
         .on("end", () =>
             gulp
@@ -161,9 +175,20 @@ const copyStaticAssets = () =>
                 .pipe(gulp.dest("wwwroot/css/"))
         );
 
+const watchStaticAssets = () =>
+    gulp
+        .watch(["AssetSrc/js/*"], copyStaticAssets);
+
 gulp.task("build-fe", () => {
     return async.series([
         (next) => buildSass().on("end", next),
         (next) => copyStaticAssets().on("end", next)
+    ]);
+});
+
+gulp.task("watch-fe", () => {
+    return async.parallel([
+        (next) => watchSass().on("end", next),
+        (next) => watchStaticAssets().on("end", next)
     ]);
 });

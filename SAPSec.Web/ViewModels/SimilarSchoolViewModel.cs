@@ -6,9 +6,11 @@
 /// - v_similar_schools_secondary_values (ks2_rp, ks2_mp, pp_perc, etc.)
 /// - v_establishment (establishment_name, street, town, county, postcode, etc.)
 /// </summary>
-public class SimilarSchoolViewModel
+public class SimilarSchoolViewModel : ISimilarSchoolRowViewModel
 {
     public string UrnRaw { get; set; } = string.Empty;
+    public string LocalAuthorityName { get; set; } = string.Empty;
+    public string ComparisonUrl { get; set; } = string.Empty;
 
     // From v_similar_schools_secondary_groups
     public int Urn { get; set; }
@@ -27,7 +29,6 @@ public class SimilarSchoolViewModel
     public double? PercentSchSupport { get; set; }
     public int? NumberOfPupils { get; set; }
     public double? PercentStatementOrEhp { get; set; }
-    public double? Att8Scr { get; set; }
 
     // From v_establishment (for the neighbour)
     public string EstablishmentName { get; set; } = string.Empty;
@@ -47,7 +48,7 @@ public class SimilarSchoolViewModel
     public int? SchoolCapacity { get; set; }
     public double? OverallAbsenceRate { get; set; }
     public double? PersistentAbsenceRate { get; set; }
-    
+
     public string? Latitude { get; set; }
     public string? Longitude { get; set; }
     public string SortMetricName { get; set; } = "Attainment 8";
@@ -62,4 +63,14 @@ public class SimilarSchoolViewModel
             return string.Join(", ", parts);
         }
     }
+
+    string ISimilarSchoolRowViewModel.Urn => UrnRaw;
+    string ISimilarSchoolRowViewModel.Name => EstablishmentName;
+    string ISimilarSchoolRowViewModel.LocalAuthorityName => LocalAuthorityName;
+    string ISimilarSchoolRowViewModel.ComparisonUrl => ComparisonUrl;
+    string ISimilarSchoolRowViewModel.FullAddress => FullAddress;
+    string? ISimilarSchoolRowViewModel.Latitude => Latitude;
+    string? ISimilarSchoolRowViewModel.Longitude => Longitude;
+    string ISimilarSchoolRowViewModel.SortMetricName => SortMetricName;
+    string ISimilarSchoolRowViewModel.SortMetricDisplayValue => SortMetricDisplayValue;
 }

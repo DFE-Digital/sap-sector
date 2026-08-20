@@ -1,7 +1,305 @@
-﻿@using SAPSec.Web.Constants
+@using SAPSec.Web.Constants
 @{
     ViewData[ViewDataKeys.Title] = PageTitles.Cookies;
+    var returnUrl = ViewData["CookieReturnUrl"] as string ?? Url.Content("~/");
 }
 
-<h1 class="govuk-heading-xl">How cookies are used on this service</h1>
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Url.Action("Index", "SchoolSearch")">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
 
+<div class="govuk-notification-banner govuk-notification-banner--success"
+     role="alert"
+     aria-labelledby="cookie-settings-success-title"
+     data-module="govuk-notification-banner"
+     id="cookie-settings-success-banner"
+     hidden
+     tabindex="-1">
+    <div class="govuk-notification-banner__header">
+        <h2 class="govuk-notification-banner__title" id="cookie-settings-success-title">
+            Success
+        </h2>
+    </div>
+    <div class="govuk-notification-banner__content">
+        <p class="govuk-notification-banner__heading">
+            You've set your cookie preferences.
+            <a class="govuk-notification-banner__link" href="@returnUrl">Go back to the page you were looking at</a>.
+        </p>
+    </div>
+</div>
+
+<h1 class="govuk-heading-xl">Cookies</h1>
+
+<p class="govuk-body">
+    Cookies are small files saved on your phone, tablet or computer when you visit a website.
+</p>
+
+<p class="govuk-body">
+    We use cookies to make this site work and collect information about how you use our service.
+</p>
+
+<h2 class="govuk-heading-l">Cookie settings</h2>
+
+<p class="govuk-body">
+    We use strictly necessary cookies to make the service work. We also use additional cookies to measure how you use the service or let us save your preferences.
+</p>
+
+<h2 class="govuk-heading-l">Additional cookies settings</h2>
+
+<h3 class="govuk-heading-m">Measuring website usage</h3>
+
+<p class="govuk-body">
+    We use cookies to measure how you use the service. These cookies collect information about:
+</p>
+
+<ul class="govuk-list govuk-list--bullet">
+    <li>the pages you visit</li>
+    <li>how long you spend on each page</li>
+    <li>what you select while using the service</li>
+    <li>any errors you see while using the service</li>
+</ul>
+
+<p class="govuk-body">
+    Google Analytics sets cookies that help us understand how the service is being used, so we can improve it.
+</p>
+
+<div class="govuk-inset-text">
+    We do not allow Google to use or share our analytics data.
+</div>
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-visually-hidden">Google Analytics cookies</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Purpose</th>
+            <th scope="col" class="govuk-table__header">Expires</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>_ga</code></td>
+            <td class="govuk-table__cell">Used to distinguish users.</td>
+            <td class="govuk-table__cell">2 years</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>_ga_&lt;id&gt;</code></td>
+            <td class="govuk-table__cell">Used to persist session state.</td>
+            <td class="govuk-table__cell">2 years</td>
+        </tr>
+    </tbody>
+</table>
+
+<p class="govuk-body">
+    Microsoft Clarity sets cookies that help us understand how people navigate and use the service.
+</p>
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-visually-hidden">Microsoft Clarity cookies</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Purpose</th>
+            <th scope="col" class="govuk-table__header">Expires</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>_clck</code></td>
+            <td class="govuk-table__cell">Saves your unique ID so that Clarity can track your visits across pages on this site.</td>
+            <td class="govuk-table__cell">1 year</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>_clsk</code></td>
+            <td class="govuk-table__cell">Connects multiple page views during a single visit into a single session recording.</td>
+            <td class="govuk-table__cell">1 day</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 class="govuk-heading-l">Essential cookies</h2>
+
+<p class="govuk-body">
+    We use essential cookies to remember your cookie settings. We do not need to ask permission to use them.
+</p>
+
+<table class="govuk-table">
+    <caption class="govuk-table__caption govuk-visually-hidden">Essential cookies</caption>
+    <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+            <th scope="col" class="govuk-table__header">Name</th>
+            <th scope="col" class="govuk-table__header">Purpose</th>
+            <th scope="col" class="govuk-table__header">Expires</th>
+        </tr>
+    </thead>
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>@LayoutConstants.CookieSettingsName</code></td>
+            <td class="govuk-table__cell">Saves your cookie preferences so the banner does not reappear</td>
+            <td class="govuk-table__cell">1 year</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>.SAPSec.Session</code></td>
+            <td class="govuk-table__cell">Keeps your session active while using the service</td>
+            <td class="govuk-table__cell">After 1 hour of inactivity</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>SAPSec.Auth</code></td>
+            <td class="govuk-table__cell">Keeps you signed in after login</td>
+            <td class="govuk-table__cell">After 1 hour of inactivity (resets with activity)</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>.AspNetCore.Correlation.*</code></td>
+            <td class="govuk-table__cell">Helps complete the secure sign-in process</td>
+            <td class="govuk-table__cell">After sign in</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>.AspNetCore.OpenIdConnect.Nonce.*</code></td>
+            <td class="govuk-table__cell">Protects the sign-in process from tampering</td>
+            <td class="govuk-table__cell">After sign in</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <td class="govuk-table__cell"><code>.AspNetCore.Antiforgery.*</code></td>
+            <td class="govuk-table__cell">Protects forms from malicious attacks</td>
+            <td class="govuk-table__cell">When you close your browser</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 class="govuk-heading-l">Do you want to accept additional cookies?</h2>
+
+<form id="cookie-settings-form">
+    <div class="govuk-form-group">
+        <fieldset class="govuk-fieldset">
+            <legend class="govuk-visually-hidden">Do you want to accept additional cookies?</legend>
+            <div class="govuk-radios" data-module="govuk-radios">
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input"
+                           id="analytics-cookies-yes"
+                           name="analytics-cookies"
+                           type="radio"
+                           value="enabled">
+                    <label class="govuk-label govuk-radios__label" for="analytics-cookies-yes">
+                        Yes, use additional cookies
+                    </label>
+                </div>
+                <div class="govuk-radios__item">
+                    <input class="govuk-radios__input"
+                           id="analytics-cookies-no"
+                           name="analytics-cookies"
+                           type="radio"
+                           value="disabled">
+                    <label class="govuk-label govuk-radios__label" for="analytics-cookies-no">
+                        No, do not use additional cookies
+                    </label>
+                </div>
+            </div>
+        </fieldset>
+    </div>
+
+    <button type="submit" class="govuk-button" data-module="govuk-button">
+        Save changes
+    </button>
+</form>
+
+@section Scripts {
+    <script add-nonce="true">
+        (function () {
+            var cookieName = "@LayoutConstants.CookieSettingsName";
+            var saveForm = document.getElementById("cookie-settings-form");
+            var radios = document.getElementsByName("analytics-cookies");
+            var successBanner = document.getElementById("cookie-settings-success-banner");
+
+            function getCookie(name) {
+                var cookies = document.cookie ? document.cookie.split("; ") : [];
+
+                for (var i = 0; i < cookies.length; i++) {
+                    var parts = cookies[i].split("=");
+                    var key = parts.shift();
+                    var value = parts.join("=");
+
+                    if (key === name) {
+                        return decodeURIComponent(value);
+                    }
+                }
+
+                return null;
+            }
+
+            function setCookie(name, value) {
+                document.cookie = name + "=" + value + "; path=/; max-age=" + (60 * 60 * 24 * 365) + "; secure";
+            }
+
+            function expireCookie(name) {
+                document.cookie = name + "=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+            }
+
+            function clearAdditionalCookies() {
+                var cookies = document.cookie ? document.cookie.split("; ") : [];
+
+                expireCookie("_ga");
+                expireCookie("_gid");
+                expireCookie("_clck");
+                expireCookie("_clsk");
+
+                for (var i = 0; i < cookies.length; i++) {
+                    var name = cookies[i].split("=")[0];
+
+                    if (name.indexOf("_ga_") === 0 || name.indexOf("_dc_gtm_") === 0) {
+                        expireCookie(name);
+                    }
+                }
+            }
+
+            function setSelectedValue(value) {
+                for (var i = 0; i < radios.length; i++) {
+                    radios[i].checked = radios[i].value === value;
+                }
+            }
+
+            function hideCookiesBanner() {
+                var cookiesBanner = document.getElementById("cookies-banner");
+                if (cookiesBanner) {
+                    cookiesBanner.setAttribute("hidden", "hidden");
+                }
+            }
+
+            function showSuccessBanner() {
+                successBanner.removeAttribute("hidden");
+                successBanner.scrollIntoView();
+                successBanner.focus();
+            }
+
+            var currentValue = getCookie(cookieName);
+            setSelectedValue(currentValue === "enabled" ? "enabled" : "disabled");
+
+            saveForm.addEventListener("submit", function (event) {
+                event.preventDefault();
+
+                var selectedValue = "disabled";
+
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) {
+                        selectedValue = radios[i].value;
+                    }
+                }
+
+                var analyticsEnabled = selectedValue === "enabled";
+                setCookie(cookieName, selectedValue);
+
+                if (!analyticsEnabled) {
+                    clearAdditionalCookies();
+                }
+
+                hideCookiesBanner();
+                showSuccessBanner();
+            });
+        })();
+    </script>
+}

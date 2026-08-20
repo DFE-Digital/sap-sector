@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
 using SAPSec.Web.Constants;
 using Xunit;
 
-namespace SAPSec.UI.Tests.AccessibilityTests;
+namespace SAPSec.UI.Tests.Deprecated.AccessibilityTests;
 
 [Collection("UITestsCollection")]
 public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
@@ -27,7 +28,7 @@ public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.GotoAsync(AccessibilityPath);
 
         var pageTitle = await Page.TitleAsync();
-        pageTitle.Should().Contain(PageTitles.PrivacyPolicy);
+        pageTitle.Should().Be($"{PageTitles.AccessibilityStatement} - {LayoutConstants.ServiceName} - GOV.UK");
     }
 
     [Fact]
@@ -40,6 +41,17 @@ public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         heading.Should().NotBeNull();
         headingText.Should().Contain("Accessibility statement");
+    }
+
+    [Fact]
+    public async Task AccessibilityPage_HasHomeBreadcrumb()
+    {
+        await Page.GotoAsync(AccessibilityPath);
+
+        var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
+
+        (await breadcrumb.CountAsync()).Should().Be(1);
+        (await breadcrumb.First.GetAttributeAsync("href")).Should().Be("/find-a-school");
     }
 
     [Fact]

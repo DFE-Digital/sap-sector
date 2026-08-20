@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SAPSec.Core\SAPSec.Core.csproj" />
+    <ProjectReference Include="..\SAPSec.Test.Common\SAPSec.Test.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

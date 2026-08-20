@@ -5,32 +5,32 @@ namespace SAPSec.Core.Features.SimilarSchools.Sorting;
 
 public class SimilarSchoolsSorting(string sortBy)
 {
-    public IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<decimal>>> Sort(IEnumerable<SimilarSchool> items)
+    public IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<string>>> Sort(IEnumerable<SimilarSchool> items)
     {
-        return sortBy switch
+        return sortBy.ToLowerInvariant() switch
         {
-            "EngMat" => Sort(items, "EngMat", "English and maths GCSEs (Grade 5 and above)",
+            "engmat" => Sort(items, "EngMat", "English and maths GCSEs (Grade 5 and above)",
                 i => i.EnglishMathsGcseGrade5AndAbovePercentage),
 
-            "EngLan" => Sort(items, "EngLan", "English language GCSE (Grade 5 and above)",
+            "englang" => Sort(items, "EngLang", "English language GCSE (Grade 5 and above)",
                 i => i.EnglishLanguageGcseGrade5AndAbovePercentage),
 
-            "EngLit" => Sort(items, "EngLit", "English literature GCSE (Grade 5 and above)",
+            "englit" => Sort(items, "EngLit", "English literature GCSE (Grade 5 and above)",
                 i => i.EnglishLiteratureGcseGrade5AndAbovePercentage),
 
-            "Mat" => Sort(items, "Mat", "Mathematics GCSE (Grade 5 and above)",
+            "maths" => Sort(items, "Maths", "Mathematics GCSE (Grade 5 and above)",
                 i => i.MathsGcseGrade5AndAbovePercentage),
 
-            "CombSci" => Sort(items, "CombSci", "Combined science (double award) GCSE (Grade 5-5 and above)",
-                i => i.CombinedSciencGcseGrade55AndAbovePercentage),
+            "combsci" => Sort(items, "CombSci", "Combined science (double award) GCSE (Grade 5-5 and above)",
+                i => i.CombinedScienceGcseGrade55AndAbovePercentage),
 
-            "Bio" => Sort(items, "Bio", "Biology GCSE (Grade 5 and above)",
+            "bio" => Sort(items, "Bio", "Biology GCSE (Grade 5 and above)",
                 i => i.BiologyGcseGrade5AndAbovePercentage),
 
-            "Chem" => Sort(items, "Chem", "Chemistry GCSE (Grade 5 and above)",
+            "chem" => Sort(items, "Chem", "Chemistry GCSE (Grade 5 and above)",
                 i => i.ChemistryGcseGrade5AndAbovePercentage),
 
-            "Phys" => Sort(items, "Phys", "Physics GCSE (Grade 5 and above)",
+            "phys" => Sort(items, "Phys", "Physics GCSE (Grade 5 and above)",
                 i => i.PhysicsGcseGrade5AndAbovePercentage),
 
             _ => Sort(items, "Att8", "Attainment 8",
@@ -38,23 +38,37 @@ public class SimilarSchoolsSorting(string sortBy)
         };
     }
 
-    private IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<decimal>>> Sort(IEnumerable<SimilarSchool> items, string sortKey, string sortName, Func<SimilarSchool, DataWithAvailability<decimal>> property) =>
-        items
-            .Select(item => new SortedItem<SimilarSchool, DataWithAvailability<decimal>>(
-                item,
-                new SortOptionValue<DataWithAvailability<decimal>>(sortKey, sortName, property(item))))
-            .OrderByDescending(i => i.Value.Value, DataWithAvailability<decimal>.Comparer);
+    private IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<string>>> Sort(IEnumerable<SimilarSchool> items, string sortKey, string sortName, Func<SimilarSchool, DataWithAvailability<decimal>> property) =>
+        SimilarSchoolsSortEngine.Sort(
+            items,
+            sortKey,
+            sortName,
+            property,
+            i => i.Name,
+            sortKey.ToLowerInvariant() == "att8" ? "0.0" : "0.0\\%",
+            decimalPlaces: 1);
 
     public IEnumerable<SortOption> GetPossibleOptions(string sortBy)
     {
-        yield return new("Att8", "Attainment 8", string.IsNullOrWhiteSpace(sortBy) || sortBy == "Att8");
-        yield return new("EngMat", "English and maths GCSEs (Grade 5 and above)", sortBy == "EngMat");
-        yield return new("EngLan", "English language GCSE (Grade 5 and above)", sortBy == "EngLan");
-        yield return new("EngLit", "English literature GCSE (Grade 5 and above)", sortBy == "EngLit");
-        yield return new("Mat", "Mathematics GCSE (Grade 5 and above)", sortBy == "Mat");
-        yield return new("CombSci", "Combined science (double award) GCSE (Grade 5-5 and above)", sortBy == "CombSci");
-        yield return new("Bio", "Biology GCSE (Grade 5 and above)", sortBy == "Bio");
-        yield return new("Chem", "Chemistry GCSE (Grade 5 and above)", sortBy == "Chem");
-        yield return new("Phys", "Physics GCSE (Grade 5 and above)", sortBy == "Phys");
+        var att8Selected = !new[] {
+            "engmat",
+            "englang",
+            "englit",
+            "maths",
+            "combsci",
+            "bio",
+            "chem",
+            "phys",
+        }.Contains(sortBy.ToLowerInvariant());
+
+        yield return new("Att8", "Attainment 8", att8Selected);
+        yield return new("EngMat", "English and maths GCSEs (Grade 5 and above)", sortBy.ToLowerInvariant() == "engmat");
+        yield return new("EngLang", "English language GCSE (Grade 5 and above)", sortBy.ToLowerInvariant() == "englang");
+        yield return new("EngLit", "English literature GCSE (Grade 5 and above)", sortBy.ToLowerInvariant() == "englit");
+        yield return new("Maths", "Mathematics GCSE (Grade 5 and above)", sortBy.ToLowerInvariant() == "maths");
+        yield return new("CombSci", "Combined science (double award) GCSE (Grade 5-5 and above)", sortBy.ToLowerInvariant() == "combsci");
+        yield return new("Bio", "Biology GCSE (Grade 5 and above)", sortBy.ToLowerInvariant() == "bio");
+        yield return new("Chem", "Chemistry GCSE (Grade 5 and above)", sortBy.ToLowerInvariant() == "chem");
+        yield return new("Phys", "Physics GCSE (Grade 5 and above)", sortBy.ToLowerInvariant() == "phys");
     }
 }

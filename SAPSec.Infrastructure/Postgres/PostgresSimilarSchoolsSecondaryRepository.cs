@@ -1,0 +1,71 @@
+using Dapper;
+using Microsoft.Extensions.Logging;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
+using SAPSec.Data.Repositories;
+
+namespace SAPSec.Infrastructure.Postgres;
+
+public class PostgresSimilarSchoolsSecondaryRepository : ISimilarSchoolsSecondaryRepository
+{
+    private readonly ILogger<PostgresSimilarSchoolsSecondaryRepository> _logger;
+    private readonly NpgsqlDataSourceFactory _factory;
+
+    public PostgresSimilarSchoolsSecondaryRepository(ILogger<PostgresSimilarSchoolsSecondaryRepository> logger, NpgsqlDataSourceFactory factory)
+    {
+        _logger = logger;
+        _factory = factory;
+    }
+
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn)
+    {
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        const string sql = """
+            SELECT *
+            FROM public.v_similar_schools_secondary_groups 
+            WHERE "URN" = @urn
+        """;
+
+        var results = await conn.QueryAsync<SimilarSchoolsSecondaryGroupsEntry>(sql, new { urn });
+
+        return results
+            .ToList()
+            .AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns)
+    {
+        if (!urns.Any())
+        {
+            return [];
+        }
+
+        const string sql = """
+            SELECT *
+            FROM public.v_similar_schools_secondary_values
+            WHERE "URN" = ANY(@urns);
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+
+        var results = await conn.QueryAsync<SimilarSchoolsSecondaryValuesEntry>(sql, new { urns = urns.ToArray() });
+
+        return results
+            .ToList()
+            .AsReadOnly();
+    }
+
+    public async Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet()
+    {
+        const string sql = """
+            SELECT
+                DISTINCT "URN" 
+            FROM v_similar_schools_secondary_values;
+        """;
+
+        using var conn = await _factory.Create().OpenConnectionAsync();
+        var result = await conn.QueryAsync<string>(sql);
+
+        return result.ToList();
+    }
+}

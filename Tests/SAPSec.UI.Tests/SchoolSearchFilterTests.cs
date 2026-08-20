@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
     : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>

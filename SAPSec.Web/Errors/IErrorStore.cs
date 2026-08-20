@@ -11,19 +11,19 @@ public interface IErrorStore
 
 public class InMemoryErrorStore : IErrorStore
 {
-    private readonly ConcurrentDictionary<string, string> _store = new();
+    private readonly ConcurrentDictionary<string, string> _repository = new();
 
     public string Add(Exception ex)
     {
         var id = Guid.NewGuid().ToString("N");
-        _store[id] = BuildExceptionDetails(ex);
+        _repository[id] = BuildExceptionDetails(ex);
         return id;
     }
 
     public string? Get(string id)
     {
         if (string.IsNullOrEmpty(id)) return null;
-        return _store.TryGetValue(id, out var details) ? details : null;
+        return _repository.TryGetValue(id, out var details) ? details : null;
     }
 
     private static string BuildExceptionDetails(Exception ex)

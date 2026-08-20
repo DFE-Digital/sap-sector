@@ -1,36 +1,31 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using SAPSec.Core.Configuration;
+using SAPSec.Core.Authentication;
+using SAPSec.Core.Constants;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using SmartBreadcrumbs.Attributes;
 
 namespace SAPSec.Web.Controllers;
 
-public class HomeController(IOptions<DfeSignInSettings> configuration, IWebHostEnvironment environment) : Controller
+[AllowAnonymous]
+public class HomeController(
+    IOptions<DfeSignInSettings> configuration,
+    IWebHostEnvironment environment,
+    IFeatureFlagService featureFlagService) : Controller
 {
     [DefaultBreadcrumb(PageTitles.ServiceHome)]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         var startNowUrl = environment.IsProduction() ? configuration.Value.SignInUri : Url.Action("Index", "SchoolSearch", null);
+        var enablePrimarySchools = await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
 
-        return View(new HomeViewModel { StartNowUri = startNowUrl });
-    }
-
-    [HttpGet]
-    [Route("/Home/StatusCode")]
-    public IActionResult StatusCode(int code)
-    {
-        if (code == 403)
+        return View(new HomeViewModel
         {
-            return RedirectToAction("AccessDenied", "Auth");
-        }
-
-        if (code == 404)
-        {
-            return View("NotFound");
-        }
-
-        return View("Error");
+            StartNowUri = startNowUrl,
+            EnablePrimarySchools = enablePrimarySchools
+        });
     }
 }

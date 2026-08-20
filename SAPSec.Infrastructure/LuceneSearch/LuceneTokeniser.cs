@@ -1,5 +1,4 @@
 ﻿using Lucene.Net.Analysis.TokenAttributes;
-using SAPSec.Infrastructure.Entities;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
 

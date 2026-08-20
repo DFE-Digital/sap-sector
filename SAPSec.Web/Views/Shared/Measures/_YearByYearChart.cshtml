@@ -1,0 +1,57 @@
+@using System.Text.Json
+@using SAPSec.Core.Features.Measures
+@using SAPSec.Web.ViewModels.Measures
+
+@model YearByYearChartViewModel
+
+@{
+    var chartData = new
+    {
+        labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatYearByYear(Model.MeasureInfo.Year),
+        datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
+            new {
+                label = x.First,
+                data = new decimal?[] {
+                    x.Second.Previous2,
+                    x.Second.Previous,
+                    x.Second.Current
+                }
+            })
+            .ToArray()
+    };
+    var decimals = Model.MeasureInfo.DataType switch
+    {
+        MeasureDataType.Score => 1,
+        MeasureDataType.ScaledScore => 1,
+        MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
+        _ => 0
+    };
+    var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
+    {
+        MeasureDataType.Score => (0, 30, 90),
+        MeasureDataType.ScaledScore => (80, 20, 120),
+        MeasureDataType.OverallAbsencePercentage => (0, 1, 10),
+        MeasureDataType.PersistentAbsencePercentage => (0, 5, 30),
+        _ => (0, 25, 100)
+    };
+}
+
+<div class="app-measure-chart-container app-measure-chart-container--school-headline">
+    <canvas id="@Model.MeasureInfo.HtmlPrefix-school-yearbyyear-chart"
+            data-testid="@Model.MeasureInfo.HtmlPrefix-year-by-year-chart"
+            class="js-chart js-chart--school-measure-line"
+            data-type="line"
+            data-axis-min="@axisMin"
+            data-axis-step="@axisStep"
+            data-axis-max="@axisMax"
+            data-axis-auto-skip="false"
+            data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage ? "%" : "")"
+            data-show-x-grid="true"
+            data-show-legend="true"
+            data-show-datalabels="false"
+            data-label-decimals="@decimals"
+            data-tooltip-decimals="@decimals"
+            data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
+            @if (Model.MeasureInfo.YearByYearColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.YearByYearColors))'</text> }>
+    </canvas>
+</div>

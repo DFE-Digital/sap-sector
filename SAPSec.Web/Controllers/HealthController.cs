@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using SAPSec.Web.Domain;
 
 namespace SAPSec.Web.Controllers
@@ -6,6 +7,7 @@ namespace SAPSec.Web.Controllers
     [ApiController]
     [Produces("application/json")]
     [Route("[controller]")]
+    [AllowAnonymous]
     public class HealthController(
         ILogger<HealthController> logger,
         IWebHostEnvironment environment) : ControllerBase

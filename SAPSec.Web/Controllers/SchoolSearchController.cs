@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Routing;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Data.Dto;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
+using System.Text.RegularExpressions;
 
 namespace SAPSec.Web.Controllers;
 
@@ -12,8 +13,7 @@ namespace SAPSec.Web.Controllers;
 [Route("find-a-school")]
 public class SchoolSearchController(
     ILogger<SchoolSearchController> logger,
-    ISchoolSearchService _searchService,
-    ISimilarSchoolsSecondaryRepository? _similarSchoolsSecondaryRepository = null) : Controller
+    ISchoolSearchService _searchService) : Controller
 {
     private const int PageSize = 10;
     public const string Hint = "Search by name or school ID";
@@ -34,26 +34,22 @@ public class SchoolSearchController(
                 return View(searchQueryViewModel);
             }
 
-            if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
+            var schoolNumber = SchoolNumberFrom(searchQueryViewModel);
+            if (string.IsNullOrWhiteSpace(schoolNumber))
             {
                 var routeValues = BuildSearchRouteValues(
-                    searchQueryViewModel.Query,
-                    searchQueryViewModel.SecondaryOnly,
-                    searchQueryViewModel.SimilarSchoolsOnly);
+                    searchQueryViewModel.Query);
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
+            var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
-                return RedirectToAction("Index", "School", new
-                {
-                    school?.URN
-                });
+                return RedirectToSchool(school);
             }
 
-            ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
-            return View(searchQueryViewModel);
+            return RedirectToAction("Search", BuildSearchRouteValues(
+                searchQueryViewModel.Query));
         }
     }
 
@@ -62,16 +58,20 @@ public class SchoolSearchController(
     public async Task<IActionResult> Search(
         [FromQuery] string? query,
         [FromQuery] string[]? localAuthorities,
-        [FromQuery] int page = 1,
-        [FromQuery] bool? secondaryOnly = null,
-        [FromQuery] bool? similarSchoolsOnly = null)
+        [FromQuery] int page = 1)
     {
-        var applySecondaryOnly = secondaryOnly ?? false;
-        var applySimilarSchoolsOnly = similarSchoolsOnly ?? false;
-
-        using (logger.BeginScope(new { query, secondaryOnly = applySecondaryOnly, similarSchoolsOnly = applySimilarSchoolsOnly, page }))
+        using (logger.BeginScope(new { query, page }))
         {
             if (page < 1) page = 1;
+
+            if (IsSchoolNumberCandidate(query))
+            {
+                var school = await _searchService.SearchByNumberAsync(query!.Trim());
+                if (!string.IsNullOrWhiteSpace(school?.URN))
+                {
+                    return RedirectToSchool(school);
+                }
+            }
 
             var results = await _searchService.SearchAsync(query ?? string.Empty);
 
@@ -88,7 +88,7 @@ public class SchoolSearchController(
 
                 if (exactMatches.Count == 1 && !string.IsNullOrWhiteSpace(exactMatches[0].URN))
                 {
-                    return RedirectToAction("Index", "School", new { urn = exactMatches[0].URN });
+                    return RedirectToSchool(exactMatches[0]);
                 }
             }
 
@@ -106,30 +106,9 @@ public class SchoolSearchController(
                     .ToList();
             }
 
-            if (applySecondaryOnly)
-            {
-                results = results
-                    .Where(s => IsSecondaryPhase(s.PhaseOfEducationName))
-                    .ToList();
-            }
-
-            if (applySimilarSchoolsOnly)
-            {
-                var withSimilarSchools = await Task.WhenAll(results.Select(async s => new
-                {
-                    School = s,
-                    HasSimilarSchools = await HasSimilarSchoolsAsync(s.URN)
-                }));
-
-                results = withSimilarSchools
-                    .Where(x => x.HasSimilarSchools)
-                    .Select(x => x.School)
-                    .ToList();
-            }
-
             if (results.Count == 1 && (localAuthorities == null || localAuthorities.Length == 0))
             {
-                return RedirectToAction("Index", "School", new { results[0].URN });
+                return RedirectToSchool(results[0]);
             }
 
             var totalResults = results.Count;
@@ -142,7 +121,7 @@ public class SchoolSearchController(
             var totalPages = (int)Math.Ceiling((double)totalResults / PageSize);
             if (page > totalPages && totalPages > 0)
             {
-                var routeValues = BuildSearchRouteValues(query, applySecondaryOnly, applySimilarSchoolsOnly);
+                var routeValues = BuildSearchRouteValues(query);
                 routeValues["localAuthorities"] = localAuthorities;
                 routeValues["page"] = totalPages;
                 return RedirectToAction("Search", routeValues);
@@ -156,6 +135,7 @@ public class SchoolSearchController(
                 LocalAuthority = s.LANAme,
                 Latitude = s.Latitude,
                 Longitude = s.Longitude,
+                SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
                 Address = string.Join(", ", new[]
                 {
                     s.AddressStreet,
@@ -170,8 +150,6 @@ public class SchoolSearchController(
                 Query = query ?? string.Empty,
                 LocalAuthorities = allLocalAuthorities,
                 SelectedLocalAuthorities = localAuthorities ?? Array.Empty<string>(),
-                SecondaryOnly = applySecondaryOnly,
-                SimilarSchoolsOnly = applySimilarSchoolsOnly,
                 CurrentPage = page,
                 PageSize = PageSize,
                 TotalResults = totalResults,
@@ -182,6 +160,7 @@ public class SchoolSearchController(
                     LocalAuthority = s.LANAme,
                     Latitude = s.Latitude,
                     Longitude = s.Longitude,
+                    SchoolUrl = BuildSchoolUrl(s.URN, s.PhaseOfEducationName),
                     Address = string.Join(", ", new[]
                     {
                         s.AddressStreet,
@@ -205,35 +184,27 @@ public class SchoolSearchController(
             {
                 return View(new SchoolSearchResultsViewModel
                 {
-                    Query = searchQueryViewModel.Query,
-                    SecondaryOnly = searchQueryViewModel.SecondaryOnly,
-                    SimilarSchoolsOnly = searchQueryViewModel.SimilarSchoolsOnly
+                    Query = searchQueryViewModel.Query
                 });
             }
 
-            if (string.IsNullOrWhiteSpace(searchQueryViewModel.Urn))
+            var schoolNumber = SchoolNumberFrom(searchQueryViewModel);
+            if (string.IsNullOrWhiteSpace(schoolNumber))
             {
                 var routeValues = BuildSearchRouteValues(
-                    searchQueryViewModel.Query,
-                    searchQueryViewModel.SecondaryOnly,
-                    searchQueryViewModel.SimilarSchoolsOnly);
+                    searchQueryViewModel.Query);
                 return RedirectToAction("Search", routeValues);
             }
 
-            var school = await _searchService.SearchByNumberAsync(searchQueryViewModel.Urn);
+            var school = await _searchService.SearchByNumberAsync(schoolNumber);
             if (!string.IsNullOrWhiteSpace(school?.URN))
             {
-                return RedirectToAction("Index", "School", new
-                {
-                    school.URN
-                });
+                return RedirectToSchool(school);
             }
 
             ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
             var fallbackRouteValues = BuildSearchRouteValues(
-                searchQueryViewModel.Query,
-                searchQueryViewModel.SecondaryOnly,
-                searchQueryViewModel.SimilarSchoolsOnly);
+                searchQueryViewModel.Query);
             return RedirectToAction("Search", fallbackRouteValues);
         }
     }
@@ -249,42 +220,36 @@ public class SchoolSearchController(
         }
     }
 
-    private static bool IsSecondaryPhase(string? phaseOfEducationName) =>
-        !string.IsNullOrWhiteSpace(phaseOfEducationName) &&
-        phaseOfEducationName.Contains("secondary", StringComparison.InvariantCultureIgnoreCase);
-
     private static RouteValueDictionary BuildSearchRouteValues(
-        string? query,
-        bool secondaryOnly,
-        bool similarSchoolsOnly)
+        string? query)
     {
         var routeValues = new RouteValueDictionary
         {
             ["query"] = query
         };
 
-        routeValues["secondaryOnly"] = secondaryOnly;
-        routeValues["similarSchoolsOnly"] = similarSchoolsOnly;
-
         return routeValues;
     }
 
-    private async Task<bool> HasSimilarSchoolsAsync(string urn)
-    {
-        if (_similarSchoolsSecondaryRepository is null)
-        {
-            return true;
-        }
+    private static string? SchoolNumberFrom(SchoolSearchQueryViewModel searchQueryViewModel) =>
+        !string.IsNullOrWhiteSpace(searchQueryViewModel.Urn)
+            ? searchQueryViewModel.Urn.Trim()
+            : IsSchoolNumberCandidate(searchQueryViewModel.Query)
+                ? searchQueryViewModel.Query.Trim()
+                : null;
 
-        try
-        {
-            var similarSchoolUrns = await _similarSchoolsSecondaryRepository.GetSimilarSchoolUrnsAsync(urn);
-            return similarSchoolUrns.Any();
-        }
-        catch (Exception ex)
-        {
-            logger.LogDebug(ex, "Unable to fetch similar school URNs for search result URN {Urn}", urn);
-            return false;
-        }
-    }
+    private static bool IsSchoolNumberCandidate(string? value) =>
+        !string.IsNullOrWhiteSpace(value) &&
+        Regex.IsMatch(value.Trim(), @"^(\d+|\d+[\\/]\d+)$");
+
+    private RedirectResult RedirectToSchool(Establishment school) =>
+        Redirect(BuildSchoolUrl(school.URN, school.PhaseOfEducationName));
+
+    private RedirectResult RedirectToSchool(SchoolSearchResult school) =>
+        Redirect(BuildSchoolUrl(school.URN, school.PhaseOfEducationName));
+
+    private static string BuildSchoolUrl(string urn, string? phaseOfEducationName) =>
+        PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
+            ? Routes.PrimarySchool(urn).Overview
+            : Routes.SecondarySchool(urn).Overview;
 }

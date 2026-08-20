@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SAPSec.Web.Constants;
+using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Controllers;
 
 [Controller]
 [Route("error")]
+[AllowAnonymous]
 public class ErrorController : Controller
 {
     [HttpGet]
@@ -12,7 +15,8 @@ public class ErrorController : Controller
     public IActionResult Problem()
     {
         ViewData[ViewDataKeys.UseJsBackLink] = true;
-        return View();
+
+        return View(ErrorModel);
     }
 
     [HttpGet]
@@ -25,9 +29,15 @@ public class ErrorController : Controller
         return statusCode switch
         {
             401 => View("AccessDenied"),
-            404 => View("NotFound"),
+            404 => View("NotFound", ErrorModel),
             403 => View("AccessDenied"),
-            _ => View("Problem")
+            _ => View("Problem", ErrorModel)
         };
     }
+
+    private ErrorViewModel ErrorModel => new()
+    {
+        ErrorCode = HttpContext.TraceIdentifier,
+        ErrorMessage = HttpContext.Items.TryGetValue("ErrorMessage", out object? o) && o is string message ? message : null
+    };
 }

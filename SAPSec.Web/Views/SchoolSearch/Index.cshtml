@@ -7,11 +7,8 @@
 
 @await Html.PartialAsync("_SchoolSearchQuery", new SchoolSearchQueryViewModel
 {
-    Query = Model.Query,
-    SecondaryOnly = Model.SecondaryOnly,
-    SimilarSchoolsOnly = Model.SimilarSchoolsOnly
+    Query = Model.Query
 })
-
 
 @await Html.PartialAsync("_SchoolSearchSuggest", new SchoolSearchSuggesterViewModel
 {

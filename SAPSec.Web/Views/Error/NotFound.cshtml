@@ -12,5 +12,18 @@
         <p class="govuk-body">
             If you pasted the web address, check you copied the entire address.
         </p>
+
+        @if (Model.ShowErrorCode)
+        {
+            <p class="govuk-body">
+                <strong>Error code:</strong> <code>@Model.ErrorCode</code>
+            </p>
+        }
+        @if (Model.ShowErrorMessage)
+        {
+            <p class="govuk-body">
+                <strong>Error message:</strong> <code class="govuk-body">@Model.ErrorMessage</code>
+            </p>
+        }
     </div>
 </div>

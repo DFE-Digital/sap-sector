@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using SAPSec.UI.Tests.Deprecated.Infrastructure;
+using Xunit;
 
 namespace SAPSec.UI.Tests.Infrastructure;
 

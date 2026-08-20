@@ -1,15 +1,15 @@
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Data.Repositories;
+using static SAPSec.Core.Features.SimilarSchools.CharacteristicValueRounding;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class GetCharacteristicsComparison(
-    ISimilarSchoolsSecondaryRepository repository)
+public class GetCharacteristicsComparison(ISimilarSchoolsSecondaryRepository repository)
 {
     public async Task<GetCharacteristicsComparisonResponse> Execute(GetCharacteristicsComparisonRequest request)
     {
         var urns = new[] { request.CurrentSchoolUrn, request.SimilarSchoolUrn };
 
-        var values = await repository.GetSecondaryValuesByUrnsAsync(urns);
+        var values = SimilarSchoolsSecondaryValues.FromData(await repository.GetValuesByUrnsAsync(urns));
 
         var current = values.FirstOrDefault(v => v.Urn == request.CurrentSchoolUrn);
         if (current is null)
@@ -19,14 +19,62 @@ public class GetCharacteristicsComparison(
         if (similar is null)
             throw new NotFoundException($"No characteristics found for URN {request.SimilarSchoolUrn}");
 
-        return new(current, similar);
+        return new GetCharacteristicsComparisonResponse
+        {
+            CurrentSchoolUrn = request.CurrentSchoolUrn,
+            SimilarSchoolUrn = request.SimilarSchoolUrn,
+            Ks2AverageScore = Build(
+                RoundWholeNumber(current.Ks2AverageScore),
+                RoundWholeNumber(similar.Ks2AverageScore)),
+            PupilPremiumEligibilityPercentage = Build(
+                RoundToOneDecimalPlace(current.PupilPremiumEligibilityPercentage),
+                RoundToOneDecimalPlace(similar.PupilPremiumEligibilityPercentage)),
+            PupilsWithEalPercentage = Build(
+                RoundToOneDecimalPlace(current.PupilsWithEalPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithEalPercentage)),
+            Polar4Quintile = Build(
+                RoundInt(current.Polar4Quintile),
+                RoundInt(similar.Polar4Quintile)),
+            PupilCount = Build(
+                RoundInt(current.PupilCount),
+                RoundInt(similar.PupilCount)),
+            PupilStabilityRate = Build(
+                RoundToOneDecimalPlace(current.PupilStabilityRate),
+                RoundToOneDecimalPlace(similar.PupilStabilityRate)),
+            AverageIdaciScore = Build(
+                RoundToThreeDecimalPlaces(current.AverageIdaciScore),
+                RoundToThreeDecimalPlaces(similar.AverageIdaciScore)),
+            PupilsWithSenSupportPercentage = Build(
+                RoundToOneDecimalPlace(current.PupilsWithSenSupportPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithSenSupportPercentage)),
+            PupilsWithEhcPlanPercentage = Build(
+                RoundToOneDecimalPlace(current.PupilsWithEhcPlanPercentage),
+                RoundToOneDecimalPlace(similar.PupilsWithEhcPlanPercentage))
+        };
     }
+
+    private static SchoolComparisonValue<decimal> Build(decimal current, decimal similar) =>
+        new(current, similar);
+
+    private static SchoolComparisonValue<int> Build(int current, int similar) =>
+        new(current, similar);
 }
 
 public record GetCharacteristicsComparisonRequest(
     string CurrentSchoolUrn,
     string SimilarSchoolUrn);
 
-public record GetCharacteristicsComparisonResponse(
-    SimilarSchoolsSecondaryValues CurrentSchool,
-    SimilarSchoolsSecondaryValues SimilarSchool);
+public record GetCharacteristicsComparisonResponse
+{
+    public required string CurrentSchoolUrn { get; init; }
+    public required string SimilarSchoolUrn { get; init; }
+    public required SchoolComparisonValue<decimal> Ks2AverageScore { get; init; }
+    public required SchoolComparisonValue<decimal> PupilPremiumEligibilityPercentage { get; init; }
+    public required SchoolComparisonValue<decimal> PupilsWithEalPercentage { get; init; }
+    public required SchoolComparisonValue<int> Polar4Quintile { get; init; }
+    public required SchoolComparisonValue<int> PupilCount { get; init; }
+    public required SchoolComparisonValue<decimal> PupilStabilityRate { get; init; }
+    public required SchoolComparisonValue<decimal> AverageIdaciScore { get; init; }
+    public required SchoolComparisonValue<decimal> PupilsWithSenSupportPercentage { get; init; }
+    public required SchoolComparisonValue<decimal> PupilsWithEhcPlanPercentage { get; init; }
+}

@@ -2,10 +2,11 @@
 using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class HomePageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)

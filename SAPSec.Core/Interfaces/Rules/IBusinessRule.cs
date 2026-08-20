@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Model;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Interfaces.Rules;
 

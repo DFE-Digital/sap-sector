@@ -1,17 +1,18 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
     private readonly WebApplicationSetupFixture _fixture = fixture;
 
-    private const string SchoolDetailsPath = "/school/147788/school-details";
-    private const string SchoolSearchPath = "/search-for-a-school";
+    private static readonly string SchoolDetailsPath = Routes.SecondarySchool("108088").SchoolDetails;
 
     #region Page Load Tests
 
@@ -36,7 +37,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         isVisible.Should().BeTrue("School name caption should be visible");
 
         var nameText = await schoolName.TextContentAsync();
-        nameText.Should().Contain("Bradfield School");
+        nameText.Should().Contain("Wetherby High School");
     }
 
     [Fact]
@@ -100,8 +101,8 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await backLink.ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        // Page.Url.Should().Contain("search-for-a-school");
-        Page.Url.Should().Contain("SchoolHome");
+        var url = new Uri(Page.Url);
+        url.AbsolutePath.Should().Be("/find-a-school");
     }
 
     #endregion
@@ -204,7 +205,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         var content = await Page.ContentAsync();
 
-        content.Should().Contain("URN: 147788");
+        content.Should().Contain("URN: 108088");
     }
 
     [Fact]
@@ -290,7 +291,6 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Admissions policy field should be visible");
     }
-    
 
     [Fact]
     public async Task SchoolDetails_DisplaysNurseryProvisionField()
@@ -303,7 +303,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Nursery provision field should be visible");
     }
-    
+
     [Fact]
     public async Task SchoolDetails_DisplaysSixthFormField()
     {
@@ -315,6 +315,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Sixth form field should be visible");
     }
+
     [Fact]
     public async Task SchoolDetails_DisplaysSENUnitField()
     {
@@ -326,7 +327,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("SEN unit field should be visible");
     }
-    
+
     [Fact]
     public async Task SchoolDetails_DisplaysResourcedprovisionField()
     {
@@ -338,7 +339,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Resourced provision field should be visible");
     }
-    
+
     [Fact]
     public async Task SchoolDetails_DisplaysReligiousCharacterField()
     {
@@ -350,9 +351,9 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
         isVisible.Should().BeTrue("Religious character field should be visible");
     }
-    
-    
-    
+
+
+
 
     #endregion
 
@@ -455,7 +456,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         var ofstedLink = Page.Locator("a[href*='reports.ofsted.gov.uk']");
         var href = await ofstedLink.GetAttributeAsync("href");
 
-        href.Should().Contain("147788");
+        href.Should().Contain("108088");
     }
 
     [Fact]
@@ -529,7 +530,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
 
     #region No Available Data Tests
 
-    [Fact]
+    [Fact(Skip = "TODO: Find a school with missing data")]
     public async Task SchoolDetails_ShowsNoAvailableData_WhenFieldIsEmpty()
     {
         await Page.GotoAsync(SchoolDetailsPath);
@@ -589,7 +590,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
     [Fact]
     public async Task SchoolDetails_NonExistentUrn_Shows404()
     {
-        var response = await Page.GotoAsync("/school/999999");
+        var response = await Page.GotoAsync(Routes.SecondarySchool("999999").Overview);
 
         response!.Status.Should().Be(404);
     }

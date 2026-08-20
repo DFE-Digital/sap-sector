@@ -167,7 +167,7 @@ Custom DfE header with:
 
 The application implements strict Content Security Policy headers for security:
 - Nonce-based script execution
-- Restricted external domains (Google Analytics, Microsoft Clarity, Application Insights)
+- Restricted external domains (Google Tag Manager and Microsoft Clarity)
 - Protection against XSS and injection attacks
 - Font and style restrictions
 

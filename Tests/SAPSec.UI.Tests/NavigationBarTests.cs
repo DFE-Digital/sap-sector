@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture), IClassFixture<WebApplicationSetupFixture>
 {
@@ -124,7 +125,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         await Page.GotoAsync(_fixture.BaseUrl);
 
         // Act
-        var signOutLink = Page.Locator("a[href*='Auth/SignOutCallback']");
+        var signOutLink = Page.Locator("a[href*='auth/signout']");
 
         // Assert - Check if element exists (may not be visible if not authenticated)
         var count = await signOutLink.CountAsync();
@@ -484,10 +485,13 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         await Page.GotoAsync(_fixture.BaseUrl);
 
         // Act
+        var footerCrown = Page.Locator(".govuk-footer__crown");
         var crownCopyrightLink = Page.Locator(".govuk-footer__copyright-logo");
+        var footerCrownVisible = await footerCrown.IsVisibleAsync();
         var isVisible = await crownCopyrightLink.IsVisibleAsync();
 
         // Assert
+        footerCrownVisible.Should().BeTrue("Footer crown should be visible");
         isVisible.Should().BeTrue("Crown copyright link should be visible");
     }
 
@@ -511,6 +515,19 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
             var isVisible = await phaseBanner.IsVisibleAsync();
             isVisible.Should().BeTrue("Phase banner should be visible");
         }
+    }
+
+    [Fact]
+    public async Task PhaseBanner_HasCorrectLink()
+    {
+        // Arrange
+        await Page.GotoAsync(_fixture.BaseUrl);
+
+        // Act
+        var giveFeedbackLink = Page.Locator("a.govuk-link[href='https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-QBBClDaMHtAsZDhksQEJa5UQUZHRzRSV1RMMTg2TElGV1ZYNENPTk9SRCQlQCN0PWcu']");
+
+        //Assert
+        (await giveFeedbackLink.IsVisibleAsync()).Should().BeTrue();
     }
 
     #endregion

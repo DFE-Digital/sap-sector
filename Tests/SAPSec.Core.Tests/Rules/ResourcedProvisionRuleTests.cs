@@ -1,10 +1,6 @@
 ﻿using SAPSec.Core.Model;
 using SAPSec.Core.Rules;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Rules;
 
@@ -12,13 +8,15 @@ public class ResourcedProvisionRuleTests
 {
     private readonly ResourcedProvisionRule _sut = new();
 
-    [Fact]
-    public void Evaluate_ContainsResourcedProvision_ReturnsTrue()
+    [Theory]
+    [InlineData("Resourced provision")]
+    [InlineData("Resourced provision and SEN unit")]
+    public void Evaluate_HasResourcedProvision_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = "Has resourced provision"
+            ResourcedProvisionName = resourceProvision
         };
 
         // Act
@@ -30,16 +28,14 @@ public class ResourcedProvisionRuleTests
     }
 
     [Theory]
-    [InlineData(null)]
-    [InlineData("")]
     [InlineData("Not applicable")]
-    [InlineData("None")]
-    public void Evaluate_NoProvision_ReturnsFalse(string? provision)
+    [InlineData("SEN unit")]
+    public void Evaluate_NoResourcedProvision_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = provision
+            ResourcedProvisionName = resourceProvision
         };
 
         // Act
@@ -50,20 +46,21 @@ public class ResourcedProvisionRuleTests
         result.Value.Should().BeFalse();
     }
 
-    [Fact]
-    public void Evaluate_OnlySenUnit_ReturnsFalse()
+    [Theory]
+    [InlineData("")]
+    public void Evaluate_NotAvailable_ReturnsExpected(string resourceProvision)
     {
         // Arrange
         var establishment = new Establishment
         {
-            ResourcedProvision = "Has SEN unit"
+            ResourcedProvisionName = resourceProvision
         };
 
         // Act
         var result = _sut.Evaluate(establishment);
 
         // Assert
-        result.IsAvailable.Should().BeTrue();
-        result.Value.Should().BeFalse();
+        // Assert
+        result.Availability.Should().Be(DataAvailabilityStatus.NotAvailable);
     }
 }

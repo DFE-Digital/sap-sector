@@ -1,83 +1,114 @@
-using Moq;
-using SAPSec.Core;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
+using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
 
 public class GetCharacteristicsComparisonTests
 {
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _repo = new();
+    private readonly InMemorySimilarSchoolsSecondaryRepository _repo = new();
 
-    private GetCharacteristicsComparison CreateSut() => new(_repo.Object);
+    private GetCharacteristicsComparison CreateSut() => new(_repo);
 
     [Fact]
-    public async Task Execute_ReturnsCurrentAndSimilarValues()
+    public async Task Execute_ReturnsRoundedComparisonValues()
     {
-        var current = new SimilarSchoolsSecondaryValues { Urn = "123456", Ks2ReadingScore = 1m, Ks2MathsScore = 2m };
-        var similar = new SimilarSchoolsSecondaryValues { Urn = "654321", Ks2ReadingScore = 3m, Ks2MathsScore = 4m };
+        const string currentUrn = "100001";
+        const string similarUrn = "100002";
 
-        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(
-                u => u.Contains("123456") && u.Contains("654321"))))
-            .ReturnsAsync(new List<SimilarSchoolsSecondaryValues> { current, similar });
+        _repo.SetupValues(
+            BuildValues(
+                currentUrn,
+                ks2Avg: "113.5",
+                eal: "19.44",
+                polar4Quintile: "1.4",
+                stability: "90.04",
+                idaci: "0.1305",
+                senSupport: "10.94",
+                pupilCount: "100.5",
+                ehcp: "2.14"),
+            BuildValues(
+                similarUrn,
+                ks2Avg: "114.4",
+                eal: "19.36",
+                polar4Quintile: "2.6",
+                stability: "91.66",
+                idaci: "0.1314",
+                senSupport: "11.04",
+                pupilCount: "102.5",
+                ehcp: "3.26"));
 
-        var sut = CreateSut();
+        var result = await CreateSut().Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn));
 
-        var result = await sut.Execute(new GetCharacteristicsComparisonRequest("123456", "654321"));
-
-        Assert.Same(current, result.CurrentSchool);
-        Assert.Same(similar, result.SimilarSchool);
+        Assert.Equal(114m, result.Ks2AverageScore.CurrentSchoolValue);
+        Assert.Equal(114m, result.Ks2AverageScore.SimilarSchoolValue);
+        Assert.Equal(19.4m, result.PupilsWithEalPercentage.CurrentSchoolValue);
+        Assert.Equal(19.4m, result.PupilsWithEalPercentage.SimilarSchoolValue);
+        Assert.Equal(1, result.Polar4Quintile.CurrentSchoolValue);
+        Assert.Equal(3, result.Polar4Quintile.SimilarSchoolValue);
+        Assert.Equal(90.0m, result.PupilStabilityRate.CurrentSchoolValue);
+        Assert.Equal(91.7m, result.PupilStabilityRate.SimilarSchoolValue);
+        Assert.Equal(0.131m, result.AverageIdaciScore.CurrentSchoolValue);
+        Assert.Equal(0.131m, result.AverageIdaciScore.SimilarSchoolValue);
+        Assert.Equal(10.9m, result.PupilsWithSenSupportPercentage.CurrentSchoolValue);
+        Assert.Equal(11.0m, result.PupilsWithSenSupportPercentage.SimilarSchoolValue);
+        Assert.Equal(101, result.PupilCount.CurrentSchoolValue);
+        Assert.Equal(103, result.PupilCount.SimilarSchoolValue);
+        Assert.Equal(2.1m, result.PupilsWithEhcPlanPercentage.CurrentSchoolValue);
+        Assert.Equal(3.3m, result.PupilsWithEhcPlanPercentage.SimilarSchoolValue);
+        Assert.Null(result.Ks2AverageScore.Similarity);
+        Assert.Null(result.PupilPremiumEligibilityPercentage.Similarity);
+        Assert.Null(result.PupilsWithEalPercentage.Similarity);
     }
 
     [Fact]
-    public async Task Execute_ComputesKs2AverageScore()
+    public async Task Execute_ThrowsNotFound_WhenCurrentSchoolMissing()
     {
-        var current = new SimilarSchoolsSecondaryValues { Urn = "123456", Ks2ReadingScore = 104.5m, Ks2MathsScore = 105.5m };
-        var similar = new SimilarSchoolsSecondaryValues { Urn = "654321", Ks2ReadingScore = 103.0m, Ks2MathsScore = 101.0m };
+        const string currentUrn = "100001";
+        const string similarUrn = "100002";
 
-        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.Is<IEnumerable<string>>(
-                u => u.Contains("123456") && u.Contains("654321"))))
-            .ReturnsAsync(new List<SimilarSchoolsSecondaryValues> { current, similar });
+        _repo.SetupValues(BuildValues(similarUrn, ks2Avg: "120"));
 
-        var sut = CreateSut();
-
-        var result = await sut.Execute(new GetCharacteristicsComparisonRequest("123456", "654321"));
-
-        Assert.Equal(105.0m, result.CurrentSchool.Ks2AverageScore);
-        Assert.Equal(102.0m, result.SimilarSchool.Ks2AverageScore);
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => CreateSut().Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn)));
     }
 
     [Fact]
-    public async Task Execute_ThrowsWhenCurrentSchoolMissing()
+    public async Task Execute_ThrowsNotFound_WhenSimilarSchoolMissing()
     {
-        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(new List<SimilarSchoolsSecondaryValues>
-            {
-                new SimilarSchoolsSecondaryValues { Urn = "654321" }
-            });
+        const string currentUrn = "100001";
+        const string similarUrn = "100002";
 
-        var sut = CreateSut();
+        _repo.SetupValues(BuildValues(currentUrn, ks2Avg: "100"));
 
-        var ex = await Assert.ThrowsAsync<NotFoundException>(() =>
-            sut.Execute(new GetCharacteristicsComparisonRequest("123456", "654321")));
-
-        Assert.Contains("123456", ex.Message);
+        await Assert.ThrowsAsync<NotFoundException>(
+            () => CreateSut().Execute(new GetCharacteristicsComparisonRequest(currentUrn, similarUrn)));
     }
 
-    [Fact]
-    public async Task Execute_ThrowsWhenSimilarSchoolMissing()
+    private static SimilarSchoolsSecondaryValuesEntry BuildValues(
+        string urn,
+        string ks2Avg,
+        string pp = "0",
+        string eal = "0",
+        string polar4Quintile = "0",
+        string stability = "0",
+        string idaci = "0",
+        string senSupport = "0",
+        string pupilCount = "0",
+        string ehcp = "0")
     {
-        _repo.Setup(r => r.GetSecondaryValuesByUrnsAsync(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(new List<SimilarSchoolsSecondaryValues>
-            {
-                new SimilarSchoolsSecondaryValues { Urn = "123456" }
-            });
-
-        var sut = CreateSut();
-
-        var ex = await Assert.ThrowsAsync<NotFoundException>(() =>
-            sut.Execute(new GetCharacteristicsComparisonRequest("123456", "654321")));
-
-        Assert.Contains("654321", ex.Message);
+        return new SimilarSchoolsSecondaryValuesEntry
+        {
+            URN = urn,
+            KS2MRP = ks2Avg,
+            PPPerc = pp,
+            PercentEAL = eal,
+            Polar4QuintilePupils = polar4Quintile,
+            PStability = stability,
+            IdaciPupils = idaci,
+            PercentSchSupport = senSupport,
+            NumberOfPupils = pupilCount,
+            PercentageStatementOrEHP = ehcp
+        };
     }
 }

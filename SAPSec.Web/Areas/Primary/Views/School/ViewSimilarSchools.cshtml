@@ -1,0 +1,110 @@
+@using SAPSec.Web.ViewModels
+@model ISimilarSchoolsPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "View similar schools";
+    var hasVisibleResults = Model.SimilarSchools.Any();
+}
+<link rel="stylesheet" href="~/css/leaflet.css"/>
+<link rel="stylesheet" href="~/css/MarkerCluster.css"/>
+
+@if (Model.ValidationErrors.Any())
+{
+    <div class="govuk-error-summary" data-module="govuk-error-summary">
+        <div role="alert">
+            <h2 class="govuk-error-summary__title">
+                There is a problem
+            </h2>
+            <div class="govuk-error-summary__body">
+                <ul class="govuk-list govuk-error-summary__list">
+                    @foreach (var error in Model.ValidationErrors)
+                    {
+                        <li>
+                            @{
+                                var key = !error.Key.EndsWith("_f") && !error.Key.EndsWith("_t")
+                                    ? error.Key + "_f"
+                                    : error.Key;
+                            }
+                            <a href="#@(key)">@error.Message</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+}
+
+<span class="govuk-caption-xl">@Model.SchoolName</span>
+<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+<p class="govuk-body">
+    We've identified <strong>50</strong> similar @(Model.PhaseLabel) phase schools (including all-throughs). Select a school to compare futher and connect with for support. You can also refine the results by applying filters.
+</p>
+<p class="govuk-body">
+    Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">how DfE identifies what a similar school is</a>.
+</p>
+
+<div class="govuk-grid-row app-similar-schools-content">
+    <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsFilter.cshtml" model="Model" />
+
+    <div class="govuk-grid-column-two-thirds app-filter__results-column">
+        @if (hasVisibleResults)
+        {
+            <div id="toggleWrap" class="results-toggle-wrap">
+                <a href="#" id="toggleViewLink"
+                   class="govuk-link govuk-link--no-visited-state toggle-view-link"
+                   data-view="list">
+                    <span class="toggle-icon toggle-icon--map" aria-hidden="true">
+                        <svg width="16" height="20" viewBox="0 0 16 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M8 0C10.1217 0 12.1569 0.821939 13.6572 2.28516C15.1574 3.74836 16 5.73349 16 7.80273C15.9999 13.2707 11.149 17.7918 9.00195 19.5254C8.69354 19.7744 8.53924 19.8991 8.30957 19.9629C8.1312 20.0124 7.86887 20.0123 7.69043 19.9629C7.46118 19.8992 7.30533 19.7735 6.99805 19.5254C4.85092 17.7917 0 13.2697 0 7.80176C8.16397e-05 5.73261 0.842604 3.74829 2.34277 2.28516C3.84304 0.821971 5.87831 3.56645e-05 8 0ZM8 5C6.34331 5 5.00026 6.34337 5 8C5 9.65685 6.34315 11 8 11C9.65665 10.9998 11 9.65671 11 8C10.9997 6.34351 9.65649 5.00024 8 5Z"
+                                fill="#0B0C0C"/>
+                        </svg>
+                    </span>
+
+                    <span class="toggle-icon toggle-icon--list" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="16" height="4" fill="#0B0C0C"/>
+                            <rect y="6" width="16" height="4" fill="#0B0C0C"/>
+                            <rect y="12" width="16" height="4" fill="#0B0C0C"/>
+                        </svg>
+                    </span>
+
+                    <span class="toggle-text">View on map</span>
+                </a>
+            </div>
+        }
+
+        <div id="listView">
+            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsResults.cshtml" model="Model" />
+            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsPagination.cshtml" model="Model" />
+        </div>
+
+        @if (hasVisibleResults)
+        {
+            <div id="mapView" class="govuk-!-display-none">
+                <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsMap.cshtml" model="Model" />
+            </div>
+        }
+    </div>
+</div>
+
+<script add-nonce="true">
+    (function () {
+        var sortSelect = document.getElementById('sort-by');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function () {
+                var form = document.getElementById('app-filter-panel');
+                if (form) form.submit();
+            });
+        }
+    })();
+</script>
+
+@section Scripts {
+    <script src="~/js/similar-schools-filter.js"></script>
+    <script src="~/js/school-search-toggle.js"></script>
+    <script src="~/js/map-schools.js"></script>
+    <script src="~/js/leaflet.js"></script>
+    <script src="~/js/leaflet.markercluster.js"></script>
+}

@@ -1,29 +1,53 @@
-﻿using SAPSec.Core.Features.Filtering;
+﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
-public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filterValues, SimilarSchool currentSchool)
+public class SimilarSchoolsFilters(CaseInsensitiveDictionary<IEnumerable<string>> filterValues, SimilarSchool currentSchool)
 {
-    private Dictionary<string, ISimilarSchoolsFilter> _filters = new List<ISimilarSchoolsFilter>
+    private CaseInsensitiveDictionary<ISimilarSchoolsFilter> _filters = new ISimilarSchoolsFilter[]
     {
-        new SimilarSchoolsDistanceFilter(currentSchool),
-        new SimilarSchoolsUrbanRuralFilter(currentSchool),
-    }.ToDictionary(f => f.Key, StringComparer.InvariantCultureIgnoreCase);
+        new SimilarSchoolsDistanceFilter("dist", "Distance", filterValues, currentSchool),
+        new SimilarSchoolsReferenceDataFilter("reg", "Region", filterValues, currentSchool, s => s.Region),
+        new SimilarSchoolsReferenceDataFilter("ur", "Urban or rural", filterValues, currentSchool, s => s.UrbanRural),
+        new SimilarSchoolsReferenceDataFilter("st", "School type", filterValues, currentSchool, s => s.TypeOfEstablishment),
+        new SimilarSchoolsReferenceDataFilter("poe", "Phase of education", filterValues, currentSchool, s => s.PhaseOfEducation),
+        new SimilarSchoolsSchoolCapacityInUseFilter("sciu", "School capacity in use", filterValues, currentSchool),
+        new SimilarSchoolsNurseryProvisionFilter("np", "Nursery provision", filterValues, currentSchool),
+        new SimilarSchoolsReferenceDataFilter("sf", "Sixth form", filterValues, currentSchool, s => s.OfficialSixthForm),
+        new SimilarSchoolsReferenceDataFilter("ap", "Admissions policy", filterValues, currentSchool, s => s.AdmissionsPolicy),
+        new SimilarSchoolsGovernanceStructureFilter("gs", "Governance structure", filterValues, currentSchool),
+        new SimilarSchoolsTypeOfSpecialistProvisionFilter("sp", "Type of specialist provision", filterValues, currentSchool),
+        new SimilarSchoolsReferenceDataFilter("goe", "Gender of entry", filterValues, currentSchool, s => s.Gender),
+        new SimilarSchoolsOverallAbsenceRateFilter("oar", "Overall absence rate", filterValues, currentSchool),
+        new SimilarSchoolsPersistentAbsenceRateFilter("par", "Persistent absence rate", filterValues, currentSchool)
+    }.ToDictionary(x => x.Key).AsCaseInsensitive();
+
+    public IReadOnlyCollection<ValidationError> Validate()
+    {
+        var errors = new List<ValidationError>();
+
+        foreach (var filter in _filters.Values.OfType<SimilarSchoolsNumericRangeFilter>())
+        {
+            if (filter.IsApplied)
+            {
+                errors.AddRange(filter.Validate());
+            }
+        }
+
+        return errors;
+    }
 
     public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
     {
         var filteredItems = items;
-        foreach (var (key, values) in filterValues)
+
+        foreach (var filter in _filters.Values)
         {
-            if (_filters.ContainsKey(key))
+            if (filter.IsApplied)
             {
-                filteredItems = _filters[key] switch
-                {
-                    ISimilarSchoolsMultiValueFilter mvf => mvf.Filter(filteredItems, values),
-                    ISimilarSchoolsSingleValueFilter svf => svf.Filter(filteredItems, values.LastOrDefault()),
-                    _ => filteredItems
-                };
+                filteredItems = filter.Filter(filteredItems);
             }
         }
 
@@ -36,16 +60,10 @@ public class SimilarSchoolsFilters(IDictionary<string, IEnumerable<string>> filt
 
         foreach (var (key, filter) in _filters)
         {
-            var values = filterValues.ContainsKey(key) ? filterValues[key] : [];
-
-            if (filter is ISimilarSchoolsMultiValueFilter mvf)
+            var availableFilter = filter.AsAvailableFilter(items);
+            if (availableFilter is not null)
             {
-                availableFilters.Add(mvf.AsAvailableFilter(items, values));
-            }
-
-            if (filter is ISimilarSchoolsSingleValueFilter svf)
-            {
-                availableFilters.Add(svf.AsAvailableFilter(items, values.LastOrDefault()));
+                availableFilters.Add(availableFilter);
             }
         }
 

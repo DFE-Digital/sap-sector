@@ -1,27 +1,55 @@
 ﻿using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
 public class GetSimilarSchoolDetails(
-    ISimilarSchoolsSecondaryRepository repository,
-    ISchoolDetailsService schoolDetailsService)
+    IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    ISchoolDetailsService schoolDetailsService,
+    IKs4PerformanceRepository performanceRepository,
+    IAbsenceRepository absenceRepository)
 {
     public async Task<GetSimilarSchoolDetailsResponse> Execute(GetSimilarSchoolDetailsRequest request)
     {
         // TODO: Validate SimilarSchoolUrn actually belongs in similar schools group for current school
-        var (currentSchool, similarSchools) = await repository.GetSimilarSchoolsGroupAsync(request.CurrentSchoolUrn);
-        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
+        var groups = await similarSchoolsRepository.GetGroupAsync(request.CurrentSchoolUrn);
+        var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
+        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
+        var performance = await performanceRepository.GetByUrnsAsync(urns);
+        var absence = await absenceRepository.GetByUrnsAsync(urns);
 
-        var similarSchool = similarSchools.Single(s => s.URN == request.SimilarSchoolUrn);
+        var schools =
+            from e in establishments
+            join p in performance on e.URN equals p.Urn into perf
+            join a in absence on e.URN equals a.Urn into abs
+            select SimilarSchool.FromData(e, perf.FirstOrDefault()?.EstablishmentPerformance, abs.FirstOrDefault()?.EstablishmentAbsence);
+
+        var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
+        var similarSchool = schools.FirstOrDefault(s => s.URN == request.SimilarSchoolUrn);
+
+        if (currentSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.CurrentSchoolUrn}");
+        }
+
+        if (similarSchool is null)
+        {
+            throw new NotFoundException($"School not found with URN: {request.SimilarSchoolUrn}");
+        }
+
+        var similarSchoolDetails = await schoolDetailsService.GetByUrnAsync(request.SimilarSchoolUrn);
 
         return new(
             currentSchool.Name,
             // TODO: Validate coordinates exist
-            CoordinateConverter.Convert(currentSchool.Coordinates!),
-            CoordinateConverter.Convert(similarSchool.Coordinates!),
-            currentSchool.Coordinates!.DistanceMiles(similarSchool.Coordinates!),
+            currentSchool.Coordinates is null ? null : CoordinateConverter.Convert(currentSchool.Coordinates),
+            similarSchool.Coordinates is null ? null : CoordinateConverter.Convert(similarSchool.Coordinates),
+            currentSchool.Coordinates is null || similarSchool.Coordinates is null
+                ? null
+                : currentSchool.Coordinates.DistanceMiles(similarSchool.Coordinates),
             similarSchoolDetails
         );
     }
@@ -33,7 +61,7 @@ public record GetSimilarSchoolDetailsRequest(
 
 public record GetSimilarSchoolDetailsResponse(
     string SchoolName,
-    GeographicCoordinates CurrentSchoolCoordinates,
-    GeographicCoordinates SimilarSchoolCoordinates,
-    double DistanceMiles,
-    SchoolDetails SimilarSchoolDetails);
+    GeographicCoordinates? CurrentSchoolCoordinates,
+    GeographicCoordinates? SimilarSchoolCoordinates,
+    double? DistanceMiles,
+    Model.SchoolDetails SimilarSchoolDetails);

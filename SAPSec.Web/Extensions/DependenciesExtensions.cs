@@ -1,47 +1,61 @@
-﻿using SAPSec.Core.Features.SchoolSearch;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Primary;
+using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SchoolSearch;
+using SAPSec.Core.Features.Secondary;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Repositories;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
-using SAPSec.Core.Model.KS4.Performance;
 using SAPSec.Core.Services;
-using SAPSec.Web.Formatters;
+using SAPSec.Core.UseCases;
+using SAPSec.Data.Dto.KS2.Performance;
+using SAPSec.Data.Repositories;
+using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
-using SAPSec.Infrastructure.Repositories.Json;
+using SAPSec.Web.Formatters;
+using SAPSec.Web.Services;
 using System.Diagnostics.CodeAnalysis;
 
-namespace SAPSec.Web.Extensions
+namespace SAPSec.Web.Extensions;
+
+[ExcludeFromCodeCoverage]
+public static class DependenciesExtensions
 {
-    [ExcludeFromCodeCoverage]
-    public static class DependenciesExtensions
+    public static void AddDependencies(this IServiceCollection services)
     {
-        public static void AddDependencies(this IServiceCollection services)
-        {
-            // JSON files
-            services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryGroupsRow>, JsonFile<SimilarSchoolsSecondaryGroupsRow>>();
-            services.AddSingleton<IJsonFile<SimilarSchoolsSecondaryValuesRow>, JsonFile<SimilarSchoolsSecondaryValuesRow>>();
-            services.AddSingleton<IJsonFile<Establishment>, JsonFile<Establishment>>();
-            services.AddSingleton<IJsonFile<EstablishmentPerformance>, JsonFile<EstablishmentPerformance>>();
-            services.AddSingleton<IJsonFile<Lookup>, JsonFile<Lookup>>();
+        services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
+        services.AddScoped<ISchoolSearchService, SchoolSearchService>();
+        services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
+        services.AddScoped<IRequestSchoolAccessor, RequestSchoolAccessor>();
 
-            services.AddSingleton<IEstablishmentService, EstablishmentService>();
+        // Use cases
+        services.AddSingleton<GetKs4HeadlineMeasures>();
+        services.AddSingleton<GetSchoolKs4CoreSubjects>();
+        services.AddSingleton<GetFilteredSchoolKs4CoreSubject>();
+        services.AddSingleton<GetAttendanceMeasures>();
+        services.AddSingleton<FindSimilarSchools>();
+        services.AddSingleton<GetSimilarSchoolDetails>();
+        services.AddSingleton<GetCharacteristicsComparison>();
+        services.AddSingleton<GetPrimaryCharacteristicsComparison>();
+        services.AddSingleton<IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>, GetSchoolInfoUseCase>();
+        services.AddSingleton<IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>, GetSchoolKs2PerformanceMeasuresUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Primary.GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse>, GetSchoolAttendanceMeasuresUseCase>();
+        services.AddSingleton<IUseCase<GetSchoolKs2PerformanceComparisonRequest, GetSchoolKs2PerformanceComparisonResponse>, GetSchoolKs2PerformanceComparisonUseCase>();
+        services.AddSingleton<IUseCase<GetSchoolAttendanceComparisonRequest, GetSchoolAttendanceComparisonResponse>, GetSchoolAttendanceComparisonUseCase>();
+        services.AddSingleton<IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>, FindPrimarySimilarSchoolsUseCase>();
+        services.AddSingleton<IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse>, GetPrimarySimilarSchoolDetailsUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresRequest, Core.Features.Secondary.GetSchoolKs4HeadlineMeasuresResponse>, GetSchoolKs4HeadlineMeasuresUseCase>();
+        services.AddSingleton<IUseCase<Core.Features.Secondary.GetSchoolKs4CoreSubjectsRequest, Core.Features.Secondary.GetSchoolKs4CoreSubjectsResponse>, GetSchoolKs4CoreSubjectsUseCase>();
 
-            services.AddSingleton<ILookupRepository, LookupRepository>();
-            services.AddSingleton<ILookupService, LookupService>();
+        services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
+        services.AddJsonFile<EstablishmentPerformance>(JsonDataSource.PrimarySchools);
+        services.AddJsonFile<LAPerformance>(JsonDataSource.PrimarySchools);
+        services.AddJsonFile<EnglandPerformance>(JsonDataSource.PrimarySchools);
+        services.AddSingleton<IKs2PerformanceRepository, JsonKs2PerformanceRepository>();
 
-            services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
-            services.AddSingleton<ISchoolSearchService, SchoolSearchService>();
-
-            // Register SchoolDetailsService with explicit rule dependencies
-            services.AddSingleton<ISchoolDetailsService, SchoolDetailsService>();
-
-            services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
-
-            // Use cases
-            services.AddSingleton<FindSimilarSchools>();
-            services.AddSingleton<GetSimilarSchoolDetails>();
-            services.AddSingleton<GetCharacteristicsComparison>();
-        }
+        // Formatters
+        services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
+        services.AddSingleton<IPrimaryCharacteristicsComparisonFormatter, PrimaryCharacteristicsComparisonFormatter>();
     }
 }

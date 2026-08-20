@@ -1,22 +1,27 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using GovUk.Frontend.AspNetCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.FeatureManagement;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Infrastructure.LuceneSearch;
+using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
+using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
+using SAPSec.Web.Services;
 using SAPSec.Web.Setup;
+using Serilog;
 using SmartBreadcrumbs.Extensions;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using GovUk.Frontend.AspNetCore;
-using Npgsql;
-using SAPSec.Infrastructure.Extensions;
 
 namespace SAPSec.Web;
 
@@ -26,7 +31,27 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+        var sentrySettings = SentryConfiguration.GetSettings(builder.Configuration);
+
+        builder.WebHost.UseSentry((context, options) =>
+        {
+            if (!SentryConfiguration.IsEnabled(sentrySettings))
+            {
+                options.Dsn = "";
+                return;
+            }
+
+            options.Dsn = sentrySettings.Dsn;
+            options.Environment = SentryConfiguration.GetEnvironmentName(context.Configuration, context.HostingEnvironment.EnvironmentName);
+            options.Debug = sentrySettings.Debug;
+            options.SendDefaultPii = false;
+            options.AttachStacktrace = true;
+            options.MinimumBreadcrumbLevel = SentryConfiguration.GetMinimumBreadcrumbLevel(sentrySettings);
+            options.MinimumEventLevel = SentryConfiguration.GetMinimumEventLevel(sentrySettings);
+        });
+
+        builder.Host.UseSerilog((ctx, config) => config.ReadFrom.Configuration(ctx.Configuration));
+
         builder.Services.AddGovUkFrontend(options =>
         {
             options.Rebrand = true;
@@ -40,6 +65,35 @@ public class Program
             });
 
         builder.Services.AddRazorPages();
+        builder.Services.AddAntiforgery(options =>
+        {
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        });
+        builder.Services.AddFeatureManagement();
+        builder.Services.AddSingleton<IFeatureFlagService, FeatureFlagService>();
+        builder.Services.Configure<CustomEventLocations>(builder.Configuration.GetSection("CustomEventLocations"));
+        builder.Services.Configure<AnalyticsSettings>(builder.Configuration.GetSection("Analytics"));
+
+        builder.Services.PostConfigure<AnalyticsSettings>(options =>
+        {
+            var environmentName = builder.Configuration["ENVIRONMENT_NAME"] ?? builder.Environment.EnvironmentName;
+            var analyticsEnvironment = IsProductionEnvironment(environmentName) ? "production" : "test";
+
+            if (options.GoogleTagManagerIds?.TryGetValue(analyticsEnvironment, out var googleTagManagerId) == true)
+            {
+                options.GoogleTagManagerId = googleTagManagerId;
+            }
+
+            if (options.GoogleTagManagerAdditionals?.TryGetValue(analyticsEnvironment, out var googleTagManagerAdditional) == true)
+            {
+                options.GoogleTagManagerAdditional = googleTagManagerAdditional;
+            }
+
+            if (options.ClarityIds?.TryGetValue(analyticsEnvironment, out var clarityId) == true)
+            {
+                options.ClarityId = clarityId;
+            }
+        });
 
         builder.Services.AddBreadcrumbs(Assembly.GetExecutingAssembly(), options =>
         {
@@ -60,7 +114,7 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests")
+        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
         {
             builder.Services.AddAuthentication(options =>
             {
@@ -75,6 +129,14 @@ public class Program
             builder.Services.AddDsiAuthentication(builder.Configuration);
         }
 
+        builder.Services.AddAuthorization(options =>
+        {
+            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
+
+        builder.Services.AddDfeAnalyticsDependencies(builder.Environment);
 
         builder.Services.AddDistributedMemoryCache();
 
@@ -83,7 +145,7 @@ public class Program
             options.IdleTimeout = TimeSpan.FromHours(1);
             options.Cookie.HttpOnly = true;
             options.Cookie.IsEssential = true;
-            options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
             options.Cookie.Name = ".SAPSec.Session";
         });
@@ -91,8 +153,7 @@ public class Program
         builder.Services.Configure<CookiePolicyOptions>(options =>
         {
             options.CheckConsentNeeded = _ => false;
-            options.MinimumSameSitePolicy = SameSiteMode.Lax;
-            options.Secure = CookieSecurePolicy.SameAsRequest;
+            options.Secure = CookieSecurePolicy.Always;
         });
 
         builder.Services.AddLogging(logging =>
@@ -115,43 +176,51 @@ public class Program
 
         builder.Services.AddHealthChecks();
 
-
         var establishmentsCsvPath = builder.Configuration["Establishments:CsvPath"];
 
-
-
-
         // Add relevant dependencies for Lucene Search, implementation through SearchService.
-        var enableLuceneStartupIndexBuilder =
-            builder.Configuration.GetValue("Lucene:EnableStartupIndexBuilder", true);
-        builder.Services.AddLuceneDependencies(enableLuceneStartupIndexBuilder);
+        builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
         builder.Services.AddDependencies();
 
-        //builder.Services.AddInfrastructureDependencies(csvPath: establishmentsCsvPath);
+        // Add custom error handler for NotFoundExceptions
+        builder.Services.AddProblemDetails();
+        builder.Services.AddExceptionHandler<NotFoundExceptionHandler>();
 
         var app = builder.Build();
 
-        if (app.Environment.IsDevelopment())
+        var isDevelopment = app.Environment.IsDevelopment();
+
+        // Set up error handling
+        // Note: The order of these lines is important!
+        // 1. Status code pages (used by later exception handlers)
+        app.UseStatusCodePagesWithReExecute("/error/{0}");
+        if (isDevelopment)
         {
+            // 2a. Developer exception page
+            // Note: Comes first otherwise it will absorb NotFoundExceptions too which we don't want
             app.UseDeveloperExceptionPage(new DeveloperExceptionPageOptions { SourceCodeLineCount = 1 });
+
+            // 3a. Exception handler to "use" the NotFoundExceptionHandler we registered above
+            // Note: empty configure block is necessary to trigger our custom exception handler
+            // but without triggering the custom error page which would happen if a path was provided
+            // (which would replace the developer exception page!)
+            app.UseExceptionHandler(o => { });
         }
         else
         {
-            app.UseMiddleware<NotFoundExceptionMiddleware>();
-            app.UseExceptionHandler("/Home/Error");
+            // 2b. Custom error page for exceptions
+            app.UseExceptionHandler("/error/500");
+        }
+
+        if (!isDevelopment)
+        {
             app.UseHsts();
         }
         app.UseForwardedHeaders();
-
-        app.UseStatusCodePagesWithReExecute("/error/{0}");
-
-
-        app.UseMiddleware<SecurityHeadersMiddleware>();
-
-
+        app.UseMiddleware<SecurityHeadersMiddleware>(app.Environment);
         app.UseHttpsRedirection();
 
         var provider = new FileExtensionContentTypeProvider
@@ -184,24 +253,43 @@ public class Program
         });
 
         app.UseRouting();
+        app.UseCookiePolicy();
 
         app.UseSession();
-        
+
         app.UseGovUkFrontend();
 
         app.UseAuthentication();
 
         app.UseAuthorization();
 
-        app.MapHealthChecks("/healthcheck");
+        app.MapHealthChecks("/healthcheck").AllowAnonymous();
+
+        app.UseAnalytics(app.Environment);
 
         app.MapControllers();
         app.MapRazorPages();
+
+        app.MapControllerRoute(
+          name: "Areas",
+          pattern: "{area:exists}/{controller=School}/{action=Index}/{id?}");
 
         app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
         app.Run();
+    }
+
+    private static bool IsProductionEnvironment(string? environmentName)
+    {
+        if (string.IsNullOrWhiteSpace(environmentName))
+        {
+            return false;
+        }
+
+        return environmentName.Equals("production", StringComparison.OrdinalIgnoreCase)
+               || environmentName.Equals("prod", StringComparison.OrdinalIgnoreCase)
+               || environmentName.Equals("pd", StringComparison.OrdinalIgnoreCase);
     }
 }

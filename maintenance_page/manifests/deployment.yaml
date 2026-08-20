@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: get-school-improvement-insights-maintenance
+  labels:
+    app: get-school-improvement-insights-maintenance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: get-school-improvement-insights-maintenance
+  template:
+    metadata:
+      labels:
+        app: get-school-improvement-insights-maintenance
+    spec:
+      containers:
+      - name: maintenance-page
+        image: ghcr.io/dfe-digital/sap-sector-maintenance:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        readinessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 2
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /
+            port: http
+          initialDelaySeconds: 5
+          periodSeconds: 10

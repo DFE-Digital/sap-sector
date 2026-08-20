@@ -1,0 +1,49 @@
+@using SAPSec.Core.Model
+@using SAPSec.Web.ViewModels
+
+@model SAPSec.Web.Areas.Primary.ViewModels.AttendanceMeasuresPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Attendance measures";
+}
+
+<div class="app-school-page">
+    <span class="govuk-caption-xl">@Model.School.Name</span>
+    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+    <p class="govuk-body">
+        Compare this school's attendance measures with:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>the local authority average</li>
+        <li>the national average</li>
+    </ul>
+
+    <p class="govuk-body">
+        Find out <a href="@Routes.PrimarySchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE defines what a similar school is</a>.
+    </p>
+
+    <form action="" method="get">
+        <partial name="_AttendanceInfo" />
+
+        <section class="app-measure-section" aria-labelledby="attendance-heading">
+            <h2 class="govuk-heading-m" id="attendance-heading" data-testid="attendance-heading">Attendance</h2>
+            <partial name="Measures/_Measure" model=@Model.Absence />
+        </section>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}

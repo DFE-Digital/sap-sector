@@ -1,0 +1,31 @@
+﻿@using SAPSec.Core.Features.Measures
+@using SAPSec.Web.ViewModels.Measures
+
+@model MeasureViewModel
+
+<partial name="Measures/_Filters" model=@Model.MeasureInfo />
+
+<div id="@Model.MeasureInfo.HtmlPrefix">
+    <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
+        <tab-content id="charts" name="Charts">
+            <content-toggle>
+                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" active="true">
+                    <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
+                </toggle-content>
+                <toggle-content id="year-by-year" name="Year by year">
+                    <partial name="Measures/_YearByYearChart" model=@Model.YearByYear />
+                </toggle-content>
+            </content-toggle>
+        </tab-content>
+
+        <tab-content id="table-view" name="Table">
+            <partial name="Measures/_Table" model=@Model.Table />
+        </tab-content>
+        @if (Model.TopPerformers is not null)
+        {
+            <tab-content id="top-performers" name="Top performers">
+                <partial name="Measures/_TopPerformers" model=@Model.TopPerformers />
+            </tab-content>
+        }
+    </tabbed-view>
+</div>

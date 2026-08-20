@@ -1,9 +1,10 @@
 ﻿using FluentAssertions;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
 using SAPSec.Web.Constants;
 using Xunit;
 
-namespace SAPSec.UI.Tests;
+namespace SAPSec.UI.Tests.Deprecated;
 
 [Collection("UITestsCollection")]
 public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
@@ -46,23 +47,23 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
 
         // Check favicon.ico
         var faviconIco = await Page.Locator("link[rel='icon'][sizes='48x48']").GetAttributeAsync("href");
-        faviconIco.Should().Be("/assets/images/favicon.ico");
+        faviconIco.Should().Be("/assets/rebrand/images/favicon.ico");
 
         // Check favicon.svg
         var href = await Page.Locator("link[rel='icon'][href$='.svg']").GetAttributeAsync("href");
         var type = await Page.Locator("link[rel='icon'][href$='.svg']").GetAttributeAsync("type");
-        href.Should().Be("/assets/images/favicon.svg");
+        href.Should().Be("/assets/rebrand/images/favicon.svg");
         type.Should().Be("image/svg+xml");
 
         // Check mask-icon
         var maskIconHref = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("href");
         var maskIconColor = await Page.Locator("link[rel='mask-icon']").GetAttributeAsync("color");
-        maskIconHref.Should().Be("/assets/images/govuk-icon-mask.svg");
+        maskIconHref.Should().Be("/assets/rebrand/images/govuk-icon-mask.svg");
         maskIconColor.Should().Be("#0b0c0c");
 
         // Check apple-touch-icon
         var appleIcon = await Page.Locator("link[rel='apple-touch-icon']").GetAttributeAsync("href");
-        appleIcon.Should().Be("/assets/images/govuk-icon-180.png");
+        appleIcon.Should().Be("/assets/rebrand/images/govuk-icon-180.png");
 
         // Check manifest
         var manifest = await Page.Locator("link[rel='manifest']").GetAttributeAsync("href");
@@ -106,6 +107,18 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
     #region Footer Tests
 
     [Fact]
+    public async Task Layout_HasSupportAndFeedbackLinks()
+    {
+        await Page.GotoAsync(HomePagePath);
+
+        var reportProblemLink = Page.Locator("a.govuk-footer__link[href='mailto:schoolinsights.support@education.gov.uk']");
+        var giveFeedbackLink = Page.Locator("a.govuk-footer__link[href='https://forms.cloud.microsoft/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-QBBClDaMHtAsZDhksQEJa5UQUZHRzRSV1RMMTg2TElGV1ZYNENPTk9SRCQlQCN0PWcu']");
+
+        (await reportProblemLink.IsVisibleAsync()).Should().BeTrue();
+        (await giveFeedbackLink.IsVisibleAsync()).Should().BeTrue();
+    }
+
+    [Fact]
     public async Task Layout_HasFooterWithCorrectLinks()
     {
         await Page.GotoAsync(HomePagePath);
@@ -114,7 +127,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
         {
             { "Cookies", "/cookies" },
             { "Accessibility", "/accessibility" },
-            { "Terms of use", "/terms-of-use" },
+            { "Terms and conditions", "/terms-and-conditions" },
             { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" }
         };
 
@@ -124,12 +137,22 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
             (await link.IsVisibleAsync()).Should().BeTrue();
             (await link.GetAttributeAsync("href")).Should().Be(expectedHref);
         }
+
+        var supportText = Page.Locator("footer.govuk-footer").GetByText("Report a problem with this site to:");
+        (await supportText.IsVisibleAsync()).Should().BeTrue();
+
+        var supportEmailLink = Page.Locator($"a.govuk-footer__link[href='mailto:{LayoutConstants.SupportEmail}']");
+        (await supportEmailLink.IsVisibleAsync()).Should().BeTrue();
+        (await supportEmailLink.TextContentAsync()).Should().Be(LayoutConstants.SupportEmail);
     }
 
     [Fact]
     public async Task Layout_HasCrownCopyrightAndOpenGovernmentLicence()
     {
         await Page.GotoAsync(HomePagePath);
+
+        var footerCrown = Page.Locator("svg.govuk-footer__crown");
+        (await footerCrown.IsVisibleAsync()).Should().BeTrue();
 
         // Crown copyright link
         var crownLink = Page.Locator("a.govuk-footer__copyright-logo");

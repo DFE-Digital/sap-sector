@@ -1,0 +1,53 @@
+@using SAPSec.Core.Model
+@using SAPSec.Web.ViewModels
+@using SAPSec.Web.Constants 
+
+@model SAPSec.Web.Areas.Secondary.ViewModels.Ks4CoreSubjectsPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "KS4 core subject GCSE results";
+}
+
+<div class="app-school-page">
+    <span class="govuk-caption-xl">@Model.School.Name</span>
+    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+
+    <p class="govuk-body">
+        Compare this school's GCSEs in KS4 core subjects with:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li><b>50</b> similar secondary phase schools (including all-throughs)</li>
+        <li>the local authority average</li>
+        <li>the national average</li>
+    </ul>
+
+    <p class="govuk-body">
+        Find out <a href="@Routes.SecondarySchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE defines what a similar school is</a>.
+    </p>
+
+    <form action="" method="get">
+        @foreach (var measure in Model.Measures)
+        {
+            <section class="app-measure-section" aria-labelledby="@measure.MeasureInfo.HtmlPrefix-heading">
+                <h2 class="govuk-heading-m" id="@measure.MeasureInfo.HtmlPrefix-heading" data-testid="@measure.MeasureInfo.HtmlPrefix-heading">@measure.MeasureInfo.Name</h2>
+
+                <partial name="Measures/_Measure" model=@measure />
+            </section>
+        }
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/chart.umd.js" asp-append-version="true" add-nonce="true"></script>
+    <script src="~/js/chartjs-plugin-datalabels.min.js" asp-append-version="true" add-nonce="true"></script>
+    <script type="module" add-nonce="true">
+        import * as MeasureFilters from '/js/measure-filters.js'
+        import * as ChartFactory from '/js/chart-factory.js'
+        import * as ContentToggle from '/js/content-toggle.js'
+
+        MeasureFilters.initAll();
+        ChartFactory.initAll();
+        ContentToggle.initAll();
+    </script>
+}

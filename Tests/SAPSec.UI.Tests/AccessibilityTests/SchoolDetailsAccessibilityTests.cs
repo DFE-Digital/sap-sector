@@ -1,15 +1,17 @@
+using Deque.AxeCore.Playwright;
 using FluentAssertions;
 using Microsoft.Playwright;
+using SAPSec.Web.Constants;
 using SAPSec.UI.Tests.Infrastructure;
-using Deque.AxeCore.Playwright;
 using Xunit;
+using SAPSec.UI.Tests.Deprecated.Infrastructure;
 
-namespace SAPSec.UI.Tests.AccessibilityTests;
+namespace SAPSec.UI.Tests.Deprecated.AccessibilityTests;
 
 [Collection("UITestsCollection")]
 public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolDetailsPath = "/school/147788/school-details";
+    private static readonly string SchoolDetailsPath = Routes.SecondarySchool("105574").SchoolDetails;
 
     private async Task NavigateToSchoolDetailsAsync()
     {

@@ -1,3 +1,4 @@
 ---
-EXAMPLE_KEY: example value 1
-Lucene__EnableStartupIndexBuilder: "true"
+ASPNETCORE_ENVIRONMENT: "Development"
+FeatureManagement__EnablePrimarySchools: "true"
+reset_review_db: "false"
