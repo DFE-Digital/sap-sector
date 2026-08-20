@@ -45,8 +45,8 @@
                   data-bar-percentage="1"
                   data-bar-thickness="50"
                   data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage? "%" : "")"
-                  data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                  @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
+                  data-chart="@Html.Raw(JsonSerializer.Serialize(chartData).Replace("\"", "&quot;"))"
+                  data-colors="@Html.Raw(JsonSerializer.Serialize(Model.Colors).Replace("\"", "&quot;"))">
            </canvas>
     }
     else

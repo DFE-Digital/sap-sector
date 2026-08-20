@@ -1,6 +1,5 @@
 ﻿using Deque.AxeCore.Playwright;
 using FluentAssertions;
-using Microsoft.Playwright;
 using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
@@ -21,21 +20,28 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.PrimarySchool("100171").KS2, HasH3Headings: true),
         new(Routes.PrimarySchool("100171").Attendance, HasH3Headings: true),
         new(Routes.PrimarySchool("100171").ViewSimilarSchools),
-        new(Routes.PrimarySchool("100171").Comparison("150318").Overview),
-        new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
         new(Routes.PrimarySchool("100171").SchoolDetails),
         new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Overview),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Similarity),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Ks2),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Attendance),
+        new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
 
         new(Routes.SecondarySchool("100182").Overview),
         new(Routes.SecondarySchool("100182").KS4HeadlineMeasures, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").KS4CoreSubjects, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
-        // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
-        new(Routes.SecondarySchool("100182").Comparison("136555").Overview, AllowHorizontalScroll: true),
-        new(Routes.SecondarySchool("100182").Comparison("136555").SchoolDetails),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),
+        // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
+        new(Routes.SecondarySchool("100182").Comparison("136555").Overview, AllowHorizontalScroll: true),
+        new(Routes.SecondarySchool("100182").Comparison("136555").Similarity, AllowHorizontalScroll: true),
+        new(Routes.SecondarySchool("100182").Comparison("136555").KS4HeadlineMeasures),
+        new(Routes.SecondarySchool("100182").Comparison("136555").KS4CoreSubjects),
+        new(Routes.SecondarySchool("100182").Comparison("136555").Attendance),
+        new(Routes.SecondarySchool("100182").Comparison("136555").SchoolDetails),
         
         // TODO: Fill out with all pages from service
     ];
@@ -192,7 +198,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     }
 
     [Theory]
-    [MemberData(nameof(AllPagesWithH3Headings))]
+    [MemberData(nameof(AllPagesIncludngH3Headings))]
     public async Task AllPages_HaveSemanticHTMLStructure(string path, bool hasH3Headings)
     {
         await NavigateTo(path);
@@ -581,7 +587,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         return data;
     }
 
-    public static TheoryData<string, bool> AllPagesWithH3Headings()
+    public static TheoryData<string, bool> AllPagesIncludngH3Headings()
     {
         var data = new TheoryData<string, bool>();
         foreach (var (path, hasH3Headings, _) in AllPagePaths)

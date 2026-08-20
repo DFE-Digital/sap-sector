@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using FluentAssertions;
+using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -102,6 +103,23 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "2"),
             ("tooltip-decimals", "2"));
+    }
+
+    [Fact]
+    public async Task Absence_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Attendance, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("absence-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]

@@ -6,6 +6,8 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var layout = ViewData[ViewDataKeys.ComparisonLayout] as ComparisonLayoutModel;
+    ViewData[ViewDataKeys.Title] = layout!.SimilarSchoolName;
+
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
     string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
 }
@@ -48,7 +50,7 @@
         </span>
 
         <h1 class="govuk-heading-xl">
-            @layout.SimilarSchoolName
+            @ViewData[ViewDataKeys.Title]
         </h1>
 
         <div class="govuk-service-navigation compare-nav">

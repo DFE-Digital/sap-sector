@@ -3,7 +3,6 @@
 @model SAPSec.Web.ViewModels.SimilarSchoolsComparisonViewModel
 @{
     Layout = "_LayoutOld";
-    ViewData[ViewDataKeys.Title] = $"Attendance compared to {Model.SimilarSchoolName}";
     var attendanceYearLabels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.AttendanceYearByYear;
     var currentAttendanceYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentAttendance;
     var initialBarData = new
@@ -26,13 +25,14 @@
     var attendanceDataEndpoint = Routes.SecondarySchool(Model.Urn).Comparison(Model.SimilarSchoolUrn).AttendanceData;
 }
 
-<h1 class="govuk-heading-l">Attendance measures</h1>
+<h2 class="govuk-heading-l">Attendance measures</h2>
+
 <p class="govuk-body">
     How @Model.Name compares with @Model.SimilarSchoolName based on attendance measures.
 </p>
 
 <section aria-labelledby="attendance-heading" class="app-measure-section">
-    <h2 class="govuk-heading-m" id="attendance-heading">Attendance</h2>
+    <h2 class="govuk-heading-m" id="attendance-heading">Attendance measures</h2>
 
     <div class="app-measure-filter-row">
         <div class="govuk-form-group">

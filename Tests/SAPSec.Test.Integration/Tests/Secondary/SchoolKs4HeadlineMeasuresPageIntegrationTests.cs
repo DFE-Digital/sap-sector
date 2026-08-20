@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using FluentAssertions;
+using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -177,6 +178,23 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Attainment8_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("attainment8-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("attainment8-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    [Fact]
     public async Task EnglishMaths_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -347,6 +365,23 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task EnglishMaths_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("eng-maths-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("eng-maths-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]
@@ -585,6 +620,23 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task Destinations_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("destinations-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("destinations-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]

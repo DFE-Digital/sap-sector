@@ -1,63 +1,47 @@
 using AngleSharp.Dom;
 using FluentAssertions;
-using SAPSec.Core.Constants;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
-using System.Net;
 using Xunit.Abstractions;
 
-namespace SAPSec.Test.Integration.Tests.Primary;
+namespace SAPSec.Test.Integration.Tests.Secondary;
 
 public class AllPagesIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
-    private static readonly PageTestCase[] PrimaryPages = [
-        new(Routes.PrimarySchool("100001").Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
-        new(Routes.PrimarySchool("100001").KS2, "KS2 performance measures", NavigationText: "KS2"),
-        new(Routes.PrimarySchool("100001").Attendance, "Attendance measures", NavigationText: "Attendance"),
-        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
-        new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
-        new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Overview, "Test School 2", IsInNavigation: false),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Similarity, "Test School 2", IsInNavigation: false),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Ks2, "Test School 2", IsInNavigation: false),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Attendance, "Test School 2", IsInNavigation: false),
-        new(Routes.PrimarySchool("100001").Comparison("100002").SchoolDetails, "Test School 2", IsInNavigation: false)
+    private static readonly PageTestCase[] SecondaryPages = [
+        new(Routes.SecondarySchool("100001").Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
+        new(Routes.SecondarySchool("100001").KS4HeadlineMeasures, "KS4 headline performance measures", NavigationText: "KS4 headline measures"),
+        new(Routes.SecondarySchool("100001").KS4CoreSubjects, "KS4 core subject GCSE results", NavigationText: "KS4 core subjects"),
+        new(Routes.SecondarySchool("100001").Attendance, "Attendance measures", NavigationText: "Attendance"),
+        new(Routes.SecondarySchool("100001").ViewSimilarSchools, "View similar schools"),
+        new(Routes.SecondarySchool("100001").SchoolDetails, "School details"),
+        new(Routes.SecondarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
+        new(Routes.SecondarySchool("100001").Comparison("100002").Overview, "Test School 2", IsInNavigation: false),
+        new(Routes.SecondarySchool("100001").Comparison("100002").Similarity, "Test School 2", IsInNavigation: false),
+        new(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, "Test School 2", IsInNavigation: false),
+        new(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, "Test School 2", IsInNavigation: false),
+        new(Routes.SecondarySchool("100001").Comparison("100002").Attendance, "Test School 2", IsInNavigation: false),
+        new(Routes.SecondarySchool("100001").Comparison("100002").SchoolDetails, "Test School 2", IsInNavigation: false)
     ];
 
     public override Task InitializeAsync()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")),
-            Build.Establishment("100003", "Test School 3", x => x.Open().Primary().InLA("003")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().Secondary().InLA("003")));
 
-        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
-            Build.PrimaryGroup("100001", ["100002", "100003"]));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002", "100003"]));
 
-        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
-            Build.PrimaryValues("100001", "100002", "100003"));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues("100001", "100002", "100003"));
 
         return base.InitializeAsync();
-    }
-
-    public override Task DisposeAsync()
-    {
-        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
-
-        return base.DisposeAsync();
-    }
-
-    [Theory]
-    [MemberData(nameof(AllPages))]
-    public async Task AllPages_WhenPrimarySchoolsFeatureFlagDisabled_ReturnNotFound(string path)
-    {
-        Fixture.FeatureFlagService.Override(FeatureFlags.EnablePrimarySchools, false);
-
-        await Fixture.RequestPageAsync(path, HttpStatusCode.NotFound);
     }
 
     [Theory]
@@ -87,11 +71,11 @@ public class AllPagesIntegrationTests(
 
         var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
 
-        if (path.StartsWith(Routes.PrimarySchool("100001").Comparison("100002").Overview))
+        if (path.StartsWith(Routes.SecondarySchool("100001").Comparison("100002").Overview))
         {
             navigationItems.Should().SatisfyRespectively(
                 n => n.ShouldLinkTo("Home", Routes.FindASchool()),
-                n => n.ShouldLinkTo("View similar schools", Routes.PrimarySchool("100001").ViewSimilarSchools));
+                n => n.ShouldLinkTo("View similar schools", Routes.SecondarySchool("100001").ViewSimilarSchools));
         }
         else
         {
@@ -108,7 +92,7 @@ public class AllPagesIntegrationTests(
 
         var navigationItems = page.QuerySelectorAll(".app-side-navigation__item a");
 
-        var navigationAssertions = PrimaryPages
+        var navigationAssertions = SecondaryPages
             .Where(p => p.IsInNavigation)
             .Select(p => new Action<IElement>(n => n.ShouldLinkTo(p.NavigationText ?? p.Heading, p.Path)))
             .ToArray();
@@ -135,26 +119,26 @@ public class AllPagesIntegrationTests(
     [Fact]
     public async Task OverviewPage_ContainsWhatIsASimilarSchoolLink()
     {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Overview);
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Overview);
 
         var link = page.QuerySelector(".app-body-container-with-side-navigation a");
         link.Should().NotBeNull();
-        link.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").WhatIsASimilarSchool);
+        link.GetAttribute("href").Should().Be(Routes.SecondarySchool("100001").WhatIsASimilarSchool);
     }
 
     [Fact]
     public async Task WhatIsASimilarSchoolPage_ContainsViewSimilarSchoolsLink()
     {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").WhatIsASimilarSchool);
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").WhatIsASimilarSchool);
 
         var links = page.QuerySelectorAll(".app-body-container-with-side-navigation a");
-        links.Should().Contain(l => l.GetAttribute("href") == Routes.PrimarySchool("100001").ViewSimilarSchools);
+        links.Should().Contain(l => l.GetAttribute("href") == Routes.SecondarySchool("100001").ViewSimilarSchools);
     }
 
     public static TheoryData<string> AllPages()
     {
         var data = new TheoryData<string>();
-        foreach (var page in PrimaryPages)
+        foreach (var page in SecondaryPages)
         {
             data.Add(page.Path);
         }
@@ -165,7 +149,7 @@ public class AllPagesIntegrationTests(
     public static TheoryData<string> AllPagesWithSideNavigation()
     {
         var data = new TheoryData<string>();
-        foreach (var page in PrimaryPages)
+        foreach (var page in SecondaryPages)
         {
             if (page.IsInNavigation)
             {
@@ -179,7 +163,7 @@ public class AllPagesIntegrationTests(
     public static TheoryData<string, string> AllPagesInNavigation()
     {
         var data = new TheoryData<string, string>();
-        foreach (var page in PrimaryPages)
+        foreach (var page in SecondaryPages)
         {
             if (page.IsInNavigation)
             {
@@ -193,7 +177,7 @@ public class AllPagesIntegrationTests(
     public static TheoryData<string, string, bool> AllPagesWithPageHeadings()
     {
         var data = new TheoryData<string, string, bool>();
-        foreach (var page in PrimaryPages)
+        foreach (var page in SecondaryPages)
         {
             data.Add(page.Path, page.Heading, page.IsOverviewPage);
         }

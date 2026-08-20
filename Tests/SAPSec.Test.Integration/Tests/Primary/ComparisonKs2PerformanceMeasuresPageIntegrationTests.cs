@@ -1,6 +1,7 @@
 using AngleSharp.Html.Dom;
 using FluentAssertions;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -144,11 +145,11 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950");
 
         var yearByYearChart = page.ElementWithTestIdShouldExist("expected-rwm-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
     }
 
     [Fact]
@@ -294,11 +295,11 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950");
 
         var yearByYearChart = page.ElementWithTestIdShouldExist("higher-rwm-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
     }
 
     [Fact]
@@ -444,11 +445,11 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950");
 
         var yearByYearChart = page.ElementWithTestIdShouldExist("reading-score-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
     }
 
     [Fact]
@@ -543,11 +544,11 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950");
 
         var yearByYearChart = page.ElementWithTestIdShouldExist("maths-score-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
     }
 
     [Fact]
@@ -645,11 +646,11 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950");
 
         var yearByYearChart = page.ElementWithTestIdShouldExist("expected-gps-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
     }
 
     [Fact]
@@ -747,10 +748,10 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950");
 
         var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
-            .WhoseValue.Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
     }
 }

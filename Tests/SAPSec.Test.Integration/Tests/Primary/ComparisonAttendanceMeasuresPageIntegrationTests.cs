@@ -1,8 +1,10 @@
 using AngleSharp.Html.Dom;
 using FluentAssertions;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using Xunit.Abstractions;
@@ -43,21 +45,6 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
 
         var filter = page.ElementWithTestIdShouldExist("absence-type-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Overall absence", "Persistent absence"]);
-    }
-
-    [Fact]
-    public async Task Absence_Charts_UseCorrectSchoolColours()
-    {
-        var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
-
-        var barChart = page.ElementWithTestIdShouldExist("absence-current-year-chart");
-        barChart.Should().NotBeNull();
-        barChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#2a1950\"]");
-
-        var lineChart = page.ElementWithTestIdShouldExist("absence-year-by-year-chart");
-        lineChart.Should().NotBeNull();
-        lineChart!.GetAttribute("data-colors").Should().Be("[\"#ca357c\",\"#2a1950\",\"#4b9b7d\"]");
     }
 
     [Fact]
@@ -114,5 +101,74 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
             ["Test School 1", "8.20%", "1.24%", "2.27%"],
             ["Test School 2", "1.40%", "1.30%", "1.24%"],
             ["Schools in England average", "2.20%", "2.24%", "3.20%"]);
+    }
+
+    [Fact]
+    public async Task Absence_OverallAbsence_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("absence-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "1"),
+            ("axis-max", "10"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "1"),
+            ("axis-max", "10"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+    }
+
+    [Fact]
+    public async Task Absence_PersistentAbsence_ChartSettings()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+
+        var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("absence-type-filter");
+        filter.SelectOption("Persistent absence");
+
+        var submitButton = page.ElementWithTestIdShouldExist<IHtmlButtonElement>("absence-type-filter-submit");
+        var newPage = await page.SubmitContainingFormAsync(submitButton);
+
+        var currentYearChart = newPage.ElementWithTestIdShouldExist("absence-current-year-chart");
+        currentYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "5"),
+            ("axis-max", "30"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+
+        var yearByYearChart = newPage.ElementWithTestIdShouldExist("absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().Contain(
+            ("axis-min", "0"),
+            ("axis-step", "5"),
+            ("axis-max", "30"),
+            ("axis-auto-skip", "false"),
+            ("label-decimals", "2"),
+            ("tooltip-decimals", "2"));
+    }
+
+    [Fact]
+    public async Task Absence_Charts_UseCorrectSchoolColours()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("absence-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("absence-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
     }
 }

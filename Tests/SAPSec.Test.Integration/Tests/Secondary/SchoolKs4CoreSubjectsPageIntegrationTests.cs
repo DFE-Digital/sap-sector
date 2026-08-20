@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using FluentAssertions;
+using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -196,6 +197,23 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task EnglishLanguage_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("eng-lang-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("eng-lang-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]
@@ -443,6 +461,23 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task EnglishLiterature_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("eng-lit-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("eng-lit-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    [Fact]
     public async Task EnglishLiterature_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -684,6 +719,23 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task Maths_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("maths-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("maths-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]
@@ -931,6 +983,23 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task CombinedScience_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("comb-sci-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("comb-sci-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    [Fact]
     public async Task CombinedScience_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -1172,6 +1241,23 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("bio-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("bio-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]
@@ -1419,6 +1505,23 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Chemistry_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("chem-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("chem-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    [Fact]
     public async Task Chemistry_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -1660,6 +1763,23 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task Physics_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("phys-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("phys-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]

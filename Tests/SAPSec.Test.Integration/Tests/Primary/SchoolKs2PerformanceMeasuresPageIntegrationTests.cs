@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using FluentAssertions;
+using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
@@ -197,6 +198,23 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]
@@ -443,6 +461,23 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AchievedHigherStandardRwm_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-rwm-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    [Fact]
     public async Task AchievedHigherStandardRwm_SubjectFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -652,6 +687,23 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("reading-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    [Fact]
     public async Task AverageScaledScoreMaths_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -788,6 +840,23 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("maths-score-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 
     [Fact]
@@ -930,6 +999,23 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardGps_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("expected-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    [Fact]
     public async Task AchievedHigherStandardGps_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -1066,5 +1152,22 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_Charts_UseCorrectSchoolColours()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
+        currentYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#2a1950", "#2a1950");
+
+        var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
+        yearByYearChart.Dataset.Should().ContainKey("colors")
+            .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
     }
 }
