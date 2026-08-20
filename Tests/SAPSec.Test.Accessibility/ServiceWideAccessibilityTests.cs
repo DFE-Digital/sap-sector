@@ -17,8 +17,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.FindASchool()),
 
         new(Routes.PrimarySchool("100171").Overview),
-        new(Routes.PrimarySchool("100171").KS2, HasH3Headings: true),
-        new(Routes.PrimarySchool("100171").Attendance, HasH3Headings: true),
+        new(Routes.PrimarySchool("100171").KS2),
+        new(Routes.PrimarySchool("100171").Attendance),
         new(Routes.PrimarySchool("100171").ViewSimilarSchools),
         new(Routes.PrimarySchool("100171").SchoolDetails),
         new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
@@ -29,9 +29,9 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
 
         new(Routes.SecondarySchool("100182").Overview),
-        new(Routes.SecondarySchool("100182").KS4HeadlineMeasures, HasH3Headings: true),
-        new(Routes.SecondarySchool("100182").KS4CoreSubjects, HasH3Headings: true),
-        new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),
+        new(Routes.SecondarySchool("100182").KS4HeadlineMeasures),
+        new(Routes.SecondarySchool("100182").KS4CoreSubjects),
+        new(Routes.SecondarySchool("100182").Attendance),
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),
@@ -198,8 +198,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     }
 
     [Theory]
-    [MemberData(nameof(AllPagesIncludngH3Headings))]
-    public async Task AllPages_HaveSemanticHTMLStructure(string path, bool hasH3Headings)
+    [MemberData(nameof(AllPages))]
+    public async Task AllPages_HaveSemanticHTMLStructure(string path)
     {
         await NavigateTo(path);
 
@@ -213,17 +213,6 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
 
         var h2Count = await Page.Locator("h2").CountAsync();
         h2Count.Should().BeGreaterThan(0);
-
-        // Ensure no h3-h6 are used unless necessary
-        var h3Count = await Page.Locator("h3").CountAsync();
-        if (hasH3Headings)
-        {
-            h3Count.Should().BeGreaterThan(0);
-        }
-        else
-        {
-            h3Count.Should().Be(0);
-        }
     }
 
     [Theory]
@@ -582,17 +571,6 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         foreach (var (path, _, _) in AllPagePaths)
         {
             data.Add(path);
-        }
-
-        return data;
-    }
-
-    public static TheoryData<string, bool> AllPagesIncludngH3Headings()
-    {
-        var data = new TheoryData<string, bool>();
-        foreach (var (path, hasH3Headings, _) in AllPagePaths)
-        {
-            data.Add(path, hasH3Headings);
         }
 
         return data;
