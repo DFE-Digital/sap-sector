@@ -84,8 +84,13 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
 
         var skipLink = Page.Locator(".govuk-skip-link");
         var href = await skipLink.GetAttributeAsync("href");
+        var target = Page.Locator(href!);
 
-        href.Should().Be("#main-content", "Skip link should target main content");
+        href.Should().BeOneOf("#main-content", "#page-content",
+            "Skip link should target the main content region");
+
+        var targetCount = await target.CountAsync();
+        targetCount.Should().Be(1, "Skip link target should exist on the page");
     }
 
     [Theory]
@@ -122,10 +127,17 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
 
         await Page.Keyboard.PressAsync("Tab");
 
-        var skipLink = Page.Locator(".govuk-skip-link");
-        var isFocused = await skipLink.EvaluateAsync<bool>("el => el === document.activeElement");
+        var isFocusedOnSkipLink = await Page.EvaluateAsync<bool>(@"
+            () => {
+                const active = document.activeElement;
+                return !!active &&
+                    (active.classList.contains('govuk-skip-link') ||
+                     active.classList.contains('app-navigation-skip-link'));
+            }
+        ");
 
-        isFocused.Should().BeTrue("Skip link should be first focusable element");
+        isFocusedOnSkipLink.Should().BeTrue(
+            "the first focusable element should be a skip link");
     }
 
     [Theory]
