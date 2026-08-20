@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Secondary;
+using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Services;
 using SAPSec.Data.Dto;

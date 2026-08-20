@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Secondary;
+using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
@@ -84,15 +84,15 @@ public class ComparisonController : Controller
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await _getKs4HeadlineMeasuresUseCase.Execute(new(urn, similarSchoolUrn, filters));
 
-        ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(response.School, response.SimilarSchool);
+        ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(response.CurrentSchool, response.SimilarSchool);
 
         var model = new ViewModels.Comparison.Ks4HeadlineMeasuresPageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
             SimilarSchool = SchoolInfoViewModel.FromSchoolInfo(response.SimilarSchool),
-            Attainment8 = MeasureViewModel.FromSecondaryComparisonMeasure(response.Attainment8, response.School, response.SimilarSchool),
-            EnglishMaths = MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishMaths, response.School, response.SimilarSchool),
-            Destinations = MeasureViewModel.FromSecondaryComparisonMeasure(response.Destinations, response.School, response.SimilarSchool)
+            Attainment8 = MeasureViewModel.FromSecondaryComparisonMeasure(response.Attainment8, response.CurrentSchool, response.SimilarSchool),
+            EnglishMaths = MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishMaths, response.CurrentSchool, response.SimilarSchool),
+            Destinations = MeasureViewModel.FromSecondaryComparisonMeasure(response.Destinations, response.CurrentSchool, response.SimilarSchool)
         };
 
         return View(model);
@@ -107,20 +107,20 @@ public class ComparisonController : Controller
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await _getKs4CoreSubjectsUseCase.Execute(new(urn, similarSchoolUrn, filters));
 
-        ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(response.School, response.SimilarSchool);
+        ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(response.CurrentSchool, response.SimilarSchool);
 
         var model = new ViewModels.Comparison.Ks4CoreSubjectsPageViewModel
         {
-            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
             SimilarSchool = SchoolInfoViewModel.FromSchoolInfo(response.SimilarSchool),
             Measures = [
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLanguage, response.School, response.SimilarSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLiterature, response.School, response.SimilarSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Maths, response.School, response.SimilarSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.CombinedScience, response.School, response.SimilarSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Biology, response.School, response.SimilarSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Chemistry, response.School, response.SimilarSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Physics, response.School, response.SimilarSchool)
+                MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLanguage, response.CurrentSchool, response.SimilarSchool),
+                MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLiterature, response.CurrentSchool, response.SimilarSchool),
+                MeasureViewModel.FromSecondaryComparisonMeasure(response.Maths, response.CurrentSchool, response.SimilarSchool),
+                MeasureViewModel.FromSecondaryComparisonMeasure(response.CombinedScience, response.CurrentSchool, response.SimilarSchool),
+                MeasureViewModel.FromSecondaryComparisonMeasure(response.Biology, response.CurrentSchool, response.SimilarSchool),
+                MeasureViewModel.FromSecondaryComparisonMeasure(response.Chemistry, response.CurrentSchool, response.SimilarSchool),
+                MeasureViewModel.FromSecondaryComparisonMeasure(response.Physics, response.CurrentSchool, response.SimilarSchool)
             ]
         };
 
