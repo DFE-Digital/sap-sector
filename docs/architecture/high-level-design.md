@@ -157,11 +157,7 @@ What follows from that:
 
 **There is no ORM and no EF Core code-first model.** The application does not use entity tracking, lazy loading, navigation properties or EF-managed migrations. Some EF Core elements exist in the codebase, but the data access path does not depend on them.
 
-**Read models are generated rather than hand-written.** The pipeline's SQL scripts write out a JSON file per view. `SAPSec.DtoGenerator` reads those JSON files and generates the C# DTOs from them. So the shape of a DTO is derived from the shape of the view, rather than being kept in step by hand.
-
-The JSON files themselves are needed anyway, because the automated tests use them as fixtures. Generating the DTOs from files that already exist is simpler than opening a database connection and reading catalogue metadata to do the same job.
-
-Note that these JSON files are a build-time and test-time artefact. They are not how the running application gets its data. The one exception is KS2 performance, which is served from JSON at runtime as an interim arrangement. See section 5.5.
+**Read models are generated rather than hand-written.** A JSON description of each view's shape is produced, and the read model is generated from that serialised structure. This keeps the model in step with the views the pipeline produces.
 
 **Relationships are resolved in the data layer, not at runtime.** Because the query surface is a set of materialised views, the joins and relationships are already worked out when the view is built. The application does not walk an object graph to put a page together.
 
@@ -173,11 +169,6 @@ Why it is done this way:
 - pre-shaped materialised views give predictable query performance for detail and comparison pages, which would otherwise need wide multi-table joins
 - generating the schema deterministically from metadata makes data refreshes repeatable and auditable
 - keeping writes out of the runtime removes a class of runtime failure, and means application deployment does not depend on data refresh
-- generating the DTOs from the views is more accurate than the alternative the team started with, which was keeping the JSON files and the DTOs in step with the views by hand
-
-On why not EF Core. Moving to it would mean replacing Dapper as well, which is a lot of work for a read-only service that does not need change tracking, migrations or a mapped object graph. The generated DTO approach gets the same accuracy for far less code.
-
-The known weakness is that someone has to remember to run the generator when a view changes. That is a real risk, though it is much the same risk as remembering to regenerate EF models, with the difference that EF can warn when its models have drifted from the local database. Worth considering a build check that fails when the generated DTOs do not match the current views.
 
 The view definitions, the generated model structure and the query patterns are in the [LLD](./low-level-design.md) and the [ERD](./entity-relationship-diagram.md).
 
@@ -212,11 +203,7 @@ Comes from DfE Sign-in:
 
 ### 5.5 Generated and packaged data files
 
-There are two different sets of JSON files in the repository and they do different jobs.
-
-**Build-time and test-time.** The pipeline's SQL scripts write one JSON file per view. These feed `SAPSec.DtoGenerator`, which generates the C# DTOs, and they are used as fixtures by the automated tests. The running application does not read them. See section 5.1.
-
-**Runtime.** KS2 performance is served from JSON files that are packaged into the deployment artefact and read on each request. This is interim. It means updated KS2 data needs a redeploy rather than a pipeline run. Everything else is read live from PostgreSQL.
+The repository also holds generated and packaged data assets used at runtime, including the JSON structures that read models are generated from. See section 5.1.
 
 ### 5.6 Operational and supporting data
 
@@ -279,11 +266,10 @@ Curated data is then shaped into materialised views, which are the query surface
 | Data source             | Data domain                       | Example fields                                          | Stored in                     | Downstream use          | Cadence             |
 | ----------------------- | --------------------------------- | ------------------------------------------------------- | ----------------------------- | ----------------------- | ------------------- |
 | GIAS                    | Establishment metadata            | URN, address, governance, phase, trust, local authority | PostgreSQL                    | Search, detail pages    | Daily or scheduled  |
-| Performance datasets    | Attainment and comparison metrics | Attainment 8, Progress 8, subject measures              | PostgreSQL                    | Detail and comparison   | Periodic            |
-| Destinations datasets   | Destination outcomes              | education, employment, apprenticeships                  | PostgreSQL                    | Detail and comparison   | Periodic            |
-| Absence datasets        | Attendance and absence            | absence %, authorised %, unauthorised %                 | PostgreSQL                    | Detail and comparison   | Periodic            |
-| Ofsted                  | Inspection outcomes               | inspection judgements, inspection dates                 | PostgreSQL                    | Similar schools, detail | Periodic            |
-| Similar schools data    | Comparative cohorts               | groupings, peer metrics, derived values                 | PostgreSQL, generated assets  | Comparison              | Periodic            |
+| EES                     | Attainment and comparison metrics | Attainment 8, Progress 8, subject measures              | PostgreSQL                    | Detail and comparison   | Periodic            |
+| EES                     | Destination outcomes              | education, employment, apprenticeships                  | PostgreSQL                    | Detail and comparison   | Periodic            |
+| EES                     | Attendance and absence            | absence %, authorised %, unauthorised %                 | PostgreSQL                    | Detail and comparison   | Periodic            |
+| Ofsted                  | Comparative cohorts               | groupings, peer metrics, derived values                 | PostgreSQL, generated assets  | Comparison              | Periodic            |
 | Derived search data     | Search index data                 | normalised names, compound lookups, indexed fields      | Search index                  | Search                  | Rebuilt when needed |
 | DSI authentication data | Identity and access context       | user identifiers, claims, roles                         | Runtime and session context   | Access control          | Runtime             |
 
@@ -421,11 +407,9 @@ This one focuses on how external data gets into the platform and is then used by
 ```mermaid
 flowchart LR
     gias[GIAS]
-    perf[Performance Datasets]
-    dest[Destinations Datasets]
-    abs[Absence Datasets]
-    ofsted[Ofsted Inspection Data]
-    sim[Similar Schools Data]
+    perf[EES]    
+    ofsted[Ofsted]
+    
 
     pipeline[SAPData ETL / SQL Generation]
     pg[(PostgreSQL + Materialised Views)]
@@ -434,10 +418,8 @@ flowchart LR
 
     gias --> pipeline
     perf --> pipeline
-    dest --> pipeline
-    abs --> pipeline
     ofsted --> pipeline
-    sim --> pipeline
+    
 
     pipeline --> pg
     pipeline --> search
@@ -537,7 +519,7 @@ These are the journeys and operational flows the service supports. The step-by-s
 
 ### Architecture documents
 
-- [`docs/architecture/001-overview.md`](./001-overview.md)
+- [`docs/architecture/overview.md`](./overview.md)
 - [`docs/architecture/low-level-design.md`](./low-level-design.md)
 - [`docs/architecture/entity-relationship-diagram.md`](./entity-relationship-diagram.md)
 - [`docs/adrs/`](../adrs/)
@@ -586,7 +568,7 @@ These are the journeys and operational flows the service supports. The step-by-s
 
 **GIAS.** Get Information About Schools, a government dataset holding school and establishment information.
 
-**Ofsted.** The Office for Standards in Education, Children's Services and Skills. Inspection outcomes come in indirectly through upstream datasets and feed the similar schools comparison.
+**Ofsted.** The Office for Standards in Education, Children's Services and Skills. 
 
 **Performance datasets.** Education performance and statistical datasets used to enrich the service.
 
