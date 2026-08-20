@@ -545,6 +545,10 @@
   text-decoration: none;
 }
 
+.app-navigation-skip-link {
+  @extend .govuk-skip-link;
+}
+
 .app-side-navigation__button {
   display: none;
   font-family: Helvetica, Arial, sans-serif;
