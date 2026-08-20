@@ -619,3 +619,10 @@ internal static class Ks4CoreSubjects
         }
     }
 }
+                    x => x?.EnglandPerformance?.CombSci49_Tot_Eng_Previous2_Pct)
+            };
+
+            return (availableFilters, fieldSelector);
+        }
+    }
+}
