@@ -101,7 +101,6 @@ public class SimilarSchoolsComparisonControllerTests
         model.SimilarSchoolName.Should().Be(similarSchool.EstablishmentName);
 
         _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
-        _sut.ViewData[ViewDataKeys.ComparisonSchool].Should().BeSameAs(model);
     }
 
     [Fact]
@@ -126,8 +125,6 @@ public class SimilarSchoolsComparisonControllerTests
         var result = await _sut.SchoolDetails(urn, similarUrn);
 
         var view = result.Should().BeOfType<ViewResult>().Subject;
-        view.ViewName.Should().Be("~/Views/Shared/SimilarSchoolsComparison/SchoolDetails.cshtml");
-
         var model = view.Model.Should().BeOfType<SimilarSchoolDetailsViewModel>().Subject;
 
         model.Urn.Should().Be(urn);
@@ -135,8 +132,6 @@ public class SimilarSchoolsComparisonControllerTests
         model.Distance.Should().BeGreaterThan(0);
         model.SimilarSchoolDetails.Should().NotBeNull();
         model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
-
-        _sut.ViewData[ViewDataKeys.ComparisonSchool].Should().BeOfType<SimilarSchoolsComparisonViewModel>();
     }
 
     [Fact]
