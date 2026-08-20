@@ -2,7 +2,7 @@
 
 > Physical data model for `DFE-Digital/sap-sector`. Describes what the PostgreSQL database actually contains, rebuilt from the pgAdmin DDL dump and the 21 materialised view definitions.
 >
-> This is the physical model. For the model of what the data means, see `logical-data-model.md`.
+> This is the physical model.
 
 For the system boundary and data flows, see the [High-Level Design](./high-level-design.md). For how the application reads these views, see the [Low-Level Design](./low-level-design.md).
 
