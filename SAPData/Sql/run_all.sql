@@ -27,7 +27,6 @@
 \ir 50_v_similar_schools_primary_groups.sql
 \ir 50_v_similar_schools_primary_values.sql
 \ir 50_v_similar_schools_secondary_groups.sql
-\ir 50_v_similar_schools_secondary_values_national_sd.sql
 \ir 50_v_similar_schools_secondary_values.sql
 \ir 60_similar_schools_indexes.sql
 \ir 60_test_establishments_urns.sql
@@ -50,5 +49,4 @@
 \ir 70_v_similar_schools_primary_groups.sql
 \ir 70_v_similar_schools_primary_values.sql
 \ir 70_v_similar_schools_secondary_groups.sql
-\ir 70_v_similar_schools_secondary_values_national_sd.sql
 \ir 70_v_similar_schools_secondary_values.sql
