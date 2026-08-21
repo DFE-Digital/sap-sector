@@ -3,7 +3,6 @@
 **Repository:** `DFE-Digital/sap-sector`
 **Author:** Hari Dupati
 **Last updated:** 2026-08-20
-**Status:** Draft
 **Relates to:** `docs/architecture/high-level-design.md`
 
 ---
