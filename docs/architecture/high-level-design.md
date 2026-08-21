@@ -5,7 +5,6 @@
 **Repository:** `DFE-Digital/sap-sector`
 **Author:** Hari Dupati
 **Last updated:** 2026-08-20
-**Status:** Draft
 
 ---
 
@@ -155,7 +154,7 @@ The pipeline owns the schema. The application only reads.
 
 What follows from that:
 
-**There is no ORM and no EF Core code-first model.** The application does not use entity tracking, lazy loading, navigation properties or EF-managed migrations. Some EF Core elements exist in the codebase, but the data access path does not depend on them.
+**There is no ORM and no EF Core code-first model.** The application does not use entity tracking, lazy loading, navigation properties or EF-managed migrations.
 
 **Read models are generated rather than hand-written.** A JSON description of each view's shape is produced, and the read model is generated from that serialised structure. This keeps the model in step with the views the pipeline produces.
 
@@ -431,7 +430,7 @@ The service reads from two places:
 - PostgreSQL for authoritative structured data, through materialised views
 - the search index for search
 
-Both are populated by the pipeline, and both are read-only as far as the application is concerned. Moving search onto PostgreSQL full-text search, as described in section 5.3, would take the second store out of this diagram.
+Both are read-only as far as the application is concerned. Moving search onto PostgreSQL full-text search, as described in section 5.3, would take the second store out of this diagram.
 
 ---
 
