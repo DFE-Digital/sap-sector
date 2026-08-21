@@ -1,9 +1,10 @@
 @model SAPSec.Web.ViewModels.SchoolSideNavigationViewModel
 
-<div class="app-side-navigation-container">
+<div class="app-side-navigation-container" id="school-navigation" tabindex="-1">
     <nav class="app-side-navigation"
-         aria-label="Side"
+         aria-label="School navigation"
          role="navigation">
+        <a href="#page-content" class="app-side-navigation__skip-link">Skip to main content</a>
         <button class="app-side-navigation__button"
                 data-label-hide="Hide navigation"
                 data-label-show="Show navigation"
