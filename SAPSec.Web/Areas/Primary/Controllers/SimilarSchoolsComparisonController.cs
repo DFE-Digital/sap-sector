@@ -32,7 +32,7 @@ public class SimilarSchoolsComparisonController(
         Similarity(urn, similarSchoolUrn);
 
     [HttpGet]
-    [Route("Similarity")]
+    [Route("compare-similarity")]
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
     {
         var (model, _, _) = await BuildBaseModelAsync(urn, similarSchoolUrn);
@@ -46,7 +46,7 @@ public class SimilarSchoolsComparisonController(
     }
 
     [HttpGet]
-    [Route("ks2")]
+    [Route("compare-ks2")]
     public async Task<IActionResult> Ks2(string urn, string similarSchoolUrn)
     {
         var (model, currentSchool, similarSchool) = await BuildBaseModelAsync(urn, similarSchoolUrn);
@@ -67,7 +67,7 @@ public class SimilarSchoolsComparisonController(
     }
 
     [HttpGet]
-    [Route("attendance")]
+    [Route("compare-attendance")]
     public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
         var (model, currentSchool, similarSchool) = await BuildBaseModelAsync(urn, similarSchoolUrn);
@@ -83,7 +83,7 @@ public class SimilarSchoolsComparisonController(
     }
 
     [HttpGet]
-    [Route("school-details")]
+    [Route("compare-school-details")]
     public async Task<IActionResult> SchoolDetails(string urn, string similarSchoolUrn)
     {
         var response = await getPrimarySimilarSchoolDetailsUseCase.Execute(
