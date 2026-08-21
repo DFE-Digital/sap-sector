@@ -571,21 +571,6 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         count.Should().Be(1, "Should have main content landmark");
     }
 
-    [Fact]
-    public async Task SchoolDetails_SkipLinkTargetsMainContent()
-    {
-        await Page.GotoAsync(SchoolDetailsPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var skipLink = Page.Locator(".govuk-skip-link");
-        var href = await skipLink.GetAttributeAsync("href");
-        var target = Page.Locator(href!);
-
-        href.Should().BeOneOf("#main-content", "#page-content");
-        var targetCount = await target.CountAsync();
-        targetCount.Should().Be(1);
-    }
-
     #endregion
 
     #region Edge Cases

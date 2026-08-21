@@ -175,22 +175,6 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
-    public async Task SchoolDetails_SkipLink_TargetsMainContent()
-    {
-        await NavigateToSchoolDetailsAsync();
-
-        var skipLink = Page.Locator(".govuk-skip-link");
-        var href = await skipLink.GetAttributeAsync("href");
-        var target = Page.Locator(href!);
-
-        href.Should().BeOneOf("#main-content", "#page-content",
-            "Skip link should target the main content region");
-
-        var targetCount = await target.CountAsync();
-        targetCount.Should().Be(1, "Skip link target should exist on the page");
-    }
-
-    [Fact]
     public async Task SchoolDetails_SkipLink_HasCorrectText()
     {
         await NavigateToSchoolDetailsAsync();

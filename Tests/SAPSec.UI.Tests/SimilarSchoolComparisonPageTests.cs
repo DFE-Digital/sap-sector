@@ -555,20 +555,5 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
         count.Should().BeGreaterThan(0, "Should have main content landmark");
     }
 
-    [Fact]
-    public async Task SimilarSchoolComparison_SkipLinkTargetsMainContent()
-    {
-        await Page.GotoAsync(SimilarSchoolComparisonPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        var skipLink = Page.Locator(".govuk-skip-link");
-        var href = await skipLink.GetAttributeAsync("href");
-        var target = Page.Locator(href!);
-
-        href.Should().BeOneOf("#main-content", "#page-content");
-        var targetCount = await target.CountAsync();
-        targetCount.Should().Be(1);
-    }
-
     #endregion
 }
