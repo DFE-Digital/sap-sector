@@ -1,4 +1,4 @@
-# Entity Relationship Diagram, SAP Sector
+# Logical Data Model, SAP Sector
 
 > Physical data model for `DFE-Digital/sap-sector`. Describes what the PostgreSQL database actually contains, rebuilt from the pgAdmin DDL dump and the 21 materialised view definitions.
 >
