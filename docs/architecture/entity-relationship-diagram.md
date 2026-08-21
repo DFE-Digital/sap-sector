@@ -19,7 +19,6 @@ For the system boundary and data flows, see the [High-Level Design](./high-level
 9. [Full ERD](#9-full-erd)
 10. [Data flow](#10-data-flow)
 11. [Raw tables](#11-raw-tables)
-12. [Known defects](#12-known-defects)
 
 ---
 
@@ -77,9 +76,6 @@ GIAS / EES CSV files
 
 The JSON files are a build-time artefact, not a runtime data path. The application reads the views directly through Dapper. The DTOs it maps those rows onto are generated from the JSON, so the DTO shape follows the view shape rather than being maintained by hand.
 
-KS2 performance is the one exception. There is no KS2 view in the database at all. KS2 is served from JSON packaged into the deployment artefact and read by `JsonKs2PerformanceRepository` at runtime. See defect 5 and section 15 of the [LLD](./low-level-design.md).
-
-Referential integrity is enforced at exactly zero points in that chain. The views are the only place it could be added cheaply, via unique indexes, and it has not been.
 
 ---
 
@@ -114,10 +110,6 @@ Two things this scheme hides.
 | performance, all three geographies | 202425 | 202324 | 202223 |
 | destinations, all three geographies | 202223 | 202122 | not present |
 | workforce | 202425 | not present | not present |
-
-Adding a year is a schema change plus a code change plus a JSON contract change, every time.
-
-**The source vocabulary is inconsistent and the views normalise it silently.** The raw breakdown values include `Boys` and `Male`, `Girls` and `Female`, `Not disadvantaged` and `Not known to be disadvantaged`. Different years use different words for the same group. The `CASE` expressions in the views flatten all of that into `Boy`, `Grl` and `NDi`. If a new file uses a fourth spelling the column silently goes null.
 
 ---
 
@@ -214,7 +206,6 @@ Trusts, federations and other GIAS groups.
 | `EstablishmentName`, `EstablishmentNumber`, `EstablishmentStatusName`, `EstablishmentTypeGroupName`, `PhaseOfEducationName`, `TypeOfEstablishmentName` | duplicates of `v_establishment` |
 | `CloseDate` | not present on `v_establishment` |
 
-Twelve of the fourteen columns are duplicates. This should be two columns, `Id` and `MainEmail`, plus `CloseDate` promoted onto `v_establishment` where it belongs.
 
 ### 4.5 v_establishment_absence
 
@@ -233,7 +224,6 @@ Twelve of the fourteen columns are duplicates. This should be two columns, `Id` 
 | `Auth_Tot_Est_Current_Pct` | authorised, current year only |
 | `UnAuth_Tot_Est_Current_Pct` | unauthorised, current year only |
 
-The EES side drives the join. A school present in the absence file but absent from GIAS still produces a row, with null `LAId` and null `LAName`. See defect 3.
 
 ### 4.6 v_establishment_workforce
 
@@ -264,8 +254,6 @@ Source tables are `t_202425_performance_t_b402b7e022`, `t_202324_performance_t_3
 
 Three different source columns are aliased to `Id` across those nine, `school_urn`, `urn` and `unique_reference_number__urn_`. They are unioned as text, so any leading zero or whitespace difference between files produces two distinct ids for one school.
 
-**There is no KS2 data in this view or in any other view.** No `Rwm`, `GpsExpected` or scaled score column exists anywhere in the 21 views. See defect 5.
-
 ### 4.8 v_establishment_destinations
 
 > Three source tables unioned on `school_laestab`, then left joined to `v_establishment` on `LAESTAB`. 126 columns. Periods 202223 and 202122.
@@ -278,8 +266,6 @@ Three different source columns are aliased to `Id` across those nine, `school_ur
 | `Education_*` | 30 | |
 | `Employment_*` | 30 | |
 | `Apprentice_*` | 30 | |
-
-This is the only establishment view that joins on something other than URN. See defect 1, it is the most serious thing in this document.
 
 ### 4.9 v_establishment_subject_entries
 
@@ -339,7 +325,7 @@ Same column families as `v_establishment_performance` with `LA` in the geography
 
 ## 6. England views
 
-All three group by `geographic_level`, with no `WHERE` clause. This matters, see defect 2. Treat the id as a geography label, not as a constant.
+All three group by `geographic_level`, with no `WHERE` clause.
 
 ### 6.1 v_england_absence
 
@@ -649,7 +635,7 @@ erDiagram
     v_establishment ||--o| v_establishment_absence : "URN to Id, EES drives"
     v_establishment ||--o| v_establishment_workforce : "URN to Id, EES drives"
     v_establishment ||--o| v_establishment_performance : "URN to Id, EES drives"
-    v_establishment ||--o| v_establishment_destinations : "LAESTAB to Id, DEFECT 1"
+    v_establishment ||--o| v_establishment_destinations : "LAESTAB to Id"
     v_establishment ||--o{ v_establishment_links : "URN to urn"
     v_establishment ||--o{ v_establishment_links : "URN to linkurn"
     v_establishment ||--o{ v_establishment_subject_entries : "URN to school_urn"
