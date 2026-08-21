@@ -88,6 +88,7 @@ public static class Measures
             public const string Name = "Achieved a higher standard in grammar, punctuation and spelling";
         }
     }
+
     public static class Secondary
     {
         public static class Ks4Attainment8
@@ -149,8 +150,203 @@ public static class Measures
                 }
             }
         }
-    }
 
+        public static class Ks4EnglishLanguage
+        {
+            public const string Key = "eng-lang";
+            public const string Name = "English language";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4EnglishLanguage.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade4AndAbove = "4";
+                        public const string Grade5AndAbove = "5";
+                        public const string Grade7AndAbove = "7";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade4AndAbove, "Grade 4 and above"),
+                            new(Grade5AndAbove, "Grade 5 and above"),
+                            new(Grade7AndAbove, "Grade 7 and above")
+                        ];
+                    }
+                }
+            }
+        }
+
+        public static class Ks4EnglishLiterature
+        {
+            public const string Key = "eng-lit";
+            public const string Name = "English literature";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4EnglishLiterature.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade4AndAbove = "4";
+                        public const string Grade5AndAbove = "5";
+                        public const string Grade7AndAbove = "7";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade4AndAbove, "Grade 4 and above"),
+                            new(Grade5AndAbove, "Grade 5 and above"),
+                            new(Grade7AndAbove, "Grade 7 and above")
+                        ];
+                    }
+                }
+            }
+        }
+
+        public static class Ks4Biology
+        {
+            public const string Key = "bio";
+            public const string Name = "Biology";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4Biology.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade4AndAbove = "4";
+                        public const string Grade5AndAbove = "5";
+                        public const string Grade7AndAbove = "7";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade4AndAbove, "Grade 4 and above"),
+                            new(Grade5AndAbove, "Grade 5 and above"),
+                            new(Grade7AndAbove, "Grade 7 and above")
+                        ];
+                    }
+                }
+            }
+        }
+
+        public static class Ks4Chemistry
+        {
+            public const string Key = "chem";
+            public const string Name = "Chemistry";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4Chemistry.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade4AndAbove = "4";
+                        public const string Grade5AndAbove = "5";
+                        public const string Grade7AndAbove = "7";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade4AndAbove, "Grade 4 and above"),
+                            new(Grade5AndAbove, "Grade 5 and above"),
+                            new(Grade7AndAbove, "Grade 7 and above")
+                        ];
+                    }
+                }
+            }
+        }
+
+        public static class Ks4Physics
+        {
+            public const string Key = "phys";
+            public const string Name = "Physics";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4Physics.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade4AndAbove = "4";
+                        public const string Grade5AndAbove = "5";
+                        public const string Grade7AndAbove = "7";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade4AndAbove, "Grade 4 and above"),
+                            new(Grade5AndAbove, "Grade 5 and above"),
+                            new(Grade7AndAbove, "Grade 7 and above")
+                        ];
+                    }
+                }
+            }
+        }
+
+        public static class Ks4Maths
+        {
+            public const string Key = "maths";
+            public const string Name = "Maths";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4Maths.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade4AndAbove = "4";
+                        public const string Grade5AndAbove = "5";
+                        public const string Grade7AndAbove = "7";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade4AndAbove, "Grade 4 and above"),
+                            new(Grade5AndAbove, "Grade 5 and above"),
+                            new(Grade7AndAbove, "Grade 7 and above")
+                        ];
+                    }
+                }
+            }
+        }
+
+        public static class Ks4CombinedScience
+        {
+            public const string Key = "comb-sci";
+            public const string Name = "Combined science (double award)";
+
+            public static class Filters
+            {
+                public static class Grade
+                {
+                    public const string Key = $"{Ks4CombinedScience.Key}-grade";
+                    public const string Name = "Grade";
+
+                    public static class Values
+                    {
+                        public const string Grade44AndAbove = "44";
+                        public const string Grade55AndAbove = "55";
+                        public const string Grade77AndAbove = "77";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(Grade44AndAbove, "Grade 4-4 and above"),
+                            new(Grade55AndAbove, "Grade 5-5 and above"),
+                            new(Grade77AndAbove, "Grade 7-7 and above")
+                        ];
+                    }
+                }
+            }
+        }
+    }
 
     public static class Absence
     {

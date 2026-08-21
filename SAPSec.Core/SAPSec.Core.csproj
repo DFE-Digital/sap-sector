@@ -35,4 +35,8 @@
     <ProjectReference Include="..\Data\SAPSec.Data\SAPSec.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Secondary\Ks4CoreSubjects\" />
+  </ItemGroup>
+
 </Project>
