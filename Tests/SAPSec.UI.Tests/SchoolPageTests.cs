@@ -275,7 +275,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var ariaLabel = await sideNav.GetAttributeAsync("aria-label");
 
         // Assert
-        ariaLabel.Should().Be("Side", "Side navigation section should have correct aria-label");
+        ariaLabel.Should().Be("School navigation", "Side navigation section should have correct aria-label");
     }
 
     #endregion

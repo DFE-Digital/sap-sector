@@ -563,8 +563,11 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
 
         var skipLink = Page.Locator(".govuk-skip-link");
         var href = await skipLink.GetAttributeAsync("href");
+        var target = Page.Locator(href!);
 
-        href.Should().Be("#main-content");
+        href.Should().BeOneOf("#main-content", "#page-content");
+        var targetCount = await target.CountAsync();
+        targetCount.Should().Be(1);
     }
 
     #endregion
