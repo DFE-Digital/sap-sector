@@ -88,7 +88,7 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSearchResults();
 
-        var isVisible = await IsElementVisible(Selectors.ApplyFiltersButton);
+        var isVisible = await Page.Locator(Selectors.ApplyFiltersButton).First.IsVisibleAsync();
 
         isVisible.Should().BeTrue("Apply filters button should be visible");
     }
@@ -98,9 +98,52 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
     {
         await NavigateToSearchResults();
 
-        var text = await GetElementText(Selectors.ApplyFiltersButton);
+        var text = await Page.Locator(Selectors.ApplyFiltersButton).First.TextContentAsync() ?? string.Empty;
 
         text.Should().Contain("Apply filters", "Button should say 'Apply filters'");
+    }
+
+    [Fact]
+    public async Task Filter_HasApplyButtonsAtTopAndBottom()
+    {
+        await NavigateToSearchResults();
+
+        var count = await GetElementCount(Selectors.ApplyFiltersButton);
+
+        count.Should().Be(2, "Filters box should have an Apply filters button at both the top and bottom");
+    }
+
+    [Fact]
+    public async Task Filter_BottomApplyButtonHasCorrectText()
+    {
+        await NavigateToSearchResults();
+
+        if (!await HasFilterCheckboxes()) return;
+
+        var text = await Page.Locator(Selectors.ApplyFiltersButton).Last.TextContentAsync() ?? string.Empty;
+
+        text.Should().Contain("Apply filters", "Bottom button should say 'Apply filters'");
+    }
+
+    [Fact]
+    public async Task Filter_TabOrder_LastLocalAuthorityCheckboxMovesToBottomApplyButton()
+    {
+        await NavigateToSearchResults();
+
+        if (!await ExpandFilterSection()) return;
+        if (!await HasFilterCheckboxes()) return;
+
+        var checkboxes = Page.Locator(Selectors.FilterCheckbox);
+        var checkboxCount = await checkboxes.CountAsync();
+        if (checkboxCount == 0) return;
+
+        await checkboxes.Nth(checkboxCount - 1).FocusAsync();
+        await Page.Keyboard.PressAsync("Tab");
+
+        var bottomApplyButton = Page.Locator(Selectors.ApplyFiltersButton).Last;
+        var isFocused = await bottomApplyButton.EvaluateAsync<bool>("el => el === document.activeElement");
+
+        isFocused.Should().BeTrue("Tabbing from the last Local authority checkbox should focus the bottom Apply filters button");
     }
 
     #endregion

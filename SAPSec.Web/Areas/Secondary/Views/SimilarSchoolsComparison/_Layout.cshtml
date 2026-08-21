@@ -66,10 +66,10 @@
                 <nav aria-label="Compare sections" class="govuk-service-navigation__wrapper">
                     <ul class="govuk-service-navigation__list">
 
-                        <li class="govuk-service-navigation__item @active(currentAction == "Index")">
+                        <li class="govuk-service-navigation__item @active(currentAction == "Index" || currentAction == "Similarity")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.SecondarySchool(comparisonModel!.Urn).Comparison(comparisonModel.SimilarSchoolUrn).Overview"
-                               aria-current="@(currentAction == "Index" ? "page" : null)">
+                               href="@Routes.SecondarySchool(comparisonModel!.Urn).Comparison(comparisonModel.SimilarSchoolUrn).Similarity"
+                               aria-current="@(currentAction == "Index" || currentAction == "Similarity" ? "page" : null)">
                                 Similarity
                             </a>
                         </li>
