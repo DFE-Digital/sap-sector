@@ -1,0 +1,23 @@
+{
+  "name": "sap-sector-load-tests",
+  "version": "1.0.0",
+  "description": "k6 load testing for the SAP Sector (School Account Profile) service",
+  "scripts": {
+    "test:quick": "k6 run --env SCENARIO=quick --env ENVIRONMENT=local sap-sector/load-test.js",
+    "test:baseline": "k6 run --env SCENARIO=baseline --env ENVIRONMENT=local sap-sector/load-test.js",
+    "test:peak": "k6 run --env SCENARIO=peak-surge --env ENVIRONMENT=local sap-sector/load-test.js",
+    "test:stress": "k6 run --env SCENARIO=stress --env ENVIRONMENT=local sap-sector/load-test.js",
+    "test:review:quick": "k6 run --env SCENARIO=quick --env ENVIRONMENT=review sap-sector/load-test.js",
+    "test:review:baseline": "k6 run --env SCENARIO=baseline --env ENVIRONMENT=review sap-sector/load-test.js",
+    "test:test-env:quick": "k6 run --env SCENARIO=quick --env ENVIRONMENT=test sap-sector/load-test.js",
+    "test:test-env:baseline": "k6 run --env SCENARIO=baseline --env ENVIRONMENT=test sap-sector/load-test.js",
+    "test:loadtest:quick": "k6 run --env SCENARIO=quick --env ENVIRONMENT=loadtest sap-sector/load-test.js",
+    "test:loadtest:baseline": "k6 run --env SCENARIO=baseline --env ENVIRONMENT=loadtest sap-sector/load-test.js",
+    "test:loadtest:peak": "k6 run --env SCENARIO=peak-surge --env ENVIRONMENT=loadtest sap-sector/load-test.js",
+    "test:loadtest:stress": "k6 run --env SCENARIO=stress --env ENVIRONMENT=loadtest sap-sector/load-test.js",
+    "grafana:login": "k6 cloud login --token $K6_CLOUD_API_TOKEN"
+  },
+  "keywords": ["k6", "load-testing", "sap-sector", "dfe"],
+  "author": "DfE Digital - SAP Sector Team",
+  "license": "MIT"
+}

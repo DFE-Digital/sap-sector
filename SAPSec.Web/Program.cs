@@ -6,10 +6,14 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
+using SAPSec.Core.Authentication;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.Services;
+using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
+using SAPSec.Web.Authorization;
 using SAPSec.Web.Configuration;
 using SAPSec.Web.Extensions;
 using SAPSec.Web.Middleware;
@@ -114,20 +118,36 @@ public class Program
 
         builder.AddDataProtectionServices();
 
-        if (builder.Environment.EnvironmentName is "IntegrationTests" or "UITests" or "EndToEndTests" or "AccessibilityTests")
+        // TEMPORARY: unconditionally bypassing DfE Sign-in for coordinated load
+        // testing against the shared test environment - see docs/testing/008-load-tests.md.
+        // This branch is never merged; DSI auth (AddDsiAuthentication) is restored
+        // before any merge to main.
+        //
+        // AddDsiAuthentication() (now skipped) also registered IHttpContextAccessor,
+        // IUserService, and the DSI API HttpClient - those are still needed by
+        // AuthController/UserController/DsiAuthorizationHandler regardless of which
+        // auth scheme is active, so they're restored explicitly here.
+        builder.Services.AddAuthentication(options =>
         {
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = "TestScheme";
-                options.DefaultAuthenticateScheme = "TestScheme";
-                options.DefaultChallengeScheme = "TestScheme";
-            })
-            .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
-        }
-        else
+            options.DefaultScheme = "TestScheme";
+            options.DefaultAuthenticateScheme = "TestScheme";
+            options.DefaultChallengeScheme = "TestScheme";
+        })
+        .AddScheme<AuthenticationSchemeOptions, AutoAuthenticationHandler>("TestScheme", null);
+
+        builder.Services.Configure<DsiConfiguration>(builder.Configuration.GetSection("DsiConfiguration"));
+        builder.Services.AddHttpContextAccessor();
+        builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddHttpClient<IDsiClient, DsiApiService>((serviceProvider, client) =>
         {
-            builder.Services.AddDsiAuthentication(builder.Configuration);
-        }
+            var dsiConfig = serviceProvider.GetRequiredService<IConfiguration>()
+                .GetSection("DsiConfiguration").Get<DsiConfiguration>();
+
+            client.BaseAddress = new Uri(dsiConfig?.ApiUri ?? "https://placeholder.invalid");
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+            client.Timeout = TimeSpan.FromSeconds(30);
+        });
+        builder.Services.AddScoped<IAuthorizationHandler, DsiAuthorizationHandler>();
 
         builder.Services.AddAuthorization(options =>
         {
@@ -183,6 +203,19 @@ public class Program
 
         // Service and Repo depencencies.
         builder.Services.AddPostgresqlDependencies();
+
+        // LoadTest is a dedicated, explicitly-opted-into environment name for running
+        // k6 load tests locally without a Postgres database - it swaps in the same
+        // JSON-file-backed repositories used by the integration test suite. It must
+        // never be used for the shared review/test/production environments, which
+        // continue to use AddPostgresqlDependencies() above. The test environment
+        // keeps this (real Postgres data) even while auth is bypassed above, so
+        // authenticated load tests exercise real data.
+        if (builder.Environment.EnvironmentName == "LoadTest")
+        {
+            builder.Services.AddJsonDependencies();
+        }
+
         builder.Services.AddDependencies();
 
         // Add custom error handler for NotFoundExceptions
