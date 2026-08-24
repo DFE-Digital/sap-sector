@@ -58,7 +58,6 @@ public record Measure(
         IEnumerable<MeasureAvailableFilter> availableFilters,
         SchoolData<T> currentSchool,
         SchoolData<T> similarSchool,
-        IEnumerable<SchoolData<T>> similarSchools,
         MeasureFieldSelector<T> fieldSelector)
     {
         return new Measure(

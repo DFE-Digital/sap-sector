@@ -1,13 +1,14 @@
 @using SAPSec.Core.Model
+@using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers
 @model SchoolDetails
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "What is a similar school?";
+    ViewData[ViewDataKeys.Title] = "What is a similar school?";
 }
 
 <span class="govuk-caption-xl">@Model.Name</span>
-<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+<h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body">
     The DfE has identified a group of <strong>50</strong> similar secondary phase schools (including all-throughs) by
