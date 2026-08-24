@@ -174,6 +174,9 @@ public class Ks4HeadlineMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"triangle\"");
+        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rect\"");
+        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rectRot\"");
     }
 
     [Fact]

@@ -53,6 +53,7 @@ public record MeasureViewModel(
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
             measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
+            measure.Series.Select(s => ResolveSeriesPointStyle(s.SeriesType)),
             isComparison ? ComparisonChartColors : null,
             isComparison ? ComparisonYearByYearColors : null);
 
@@ -115,6 +116,17 @@ public record MeasureViewModel(
            _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
        };
 
+    private static string ResolveSeriesPointStyle(MeasureSeriesType seriesType) =>
+        seriesType switch
+        {
+            MeasureSeriesType.CurrentSchool => "triangle",
+            MeasureSeriesType.SimilarSchool => "circle",
+            MeasureSeriesType.SimilarSchoolsAverage => "circle",
+            MeasureSeriesType.LASchoolsAverage => "rect",
+            MeasureSeriesType.EnglandSchoolsAverage => "rectRot",
+            _ => "circle"
+        };
+
     private static MeasureAvailableFilterViewModel MapAvailableFilter(MeasureAvailableFilter availableFilter) =>
         new(availableFilter.Key, availableFilter.Name, availableFilter.Options.Select(o => new MeasureFilterOptionViewModel(o.Key, o.Name, o.Count, o.Selected)));
 }
@@ -126,6 +138,7 @@ public record MeasureInfoViewModel(
     MeasureDataType DataType,
     IEnumerable<MeasureAvailableFilterViewModel> Filters,
     IEnumerable<string> Labels,
+    IEnumerable<string> YearByYearPointStyles,
     IEnumerable<string>? ChartColors = null,
     IEnumerable<string>? YearByYearColors = null);
 

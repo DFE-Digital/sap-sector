@@ -78,4 +78,29 @@ public class SimilarSchoolsComparisonKs4CoreSubjectsPageTests(WebApplicationSetu
         englishLanguageTickLabels.Should().NotBeEmpty();
         englishLanguageTickLabels.Should().OnlyContain(label => label != null && label.EndsWith("%"));
     }
+
+    [Fact]
+    public async Task Ks4CoreSubjectsComparison_YearByYearChartsUseExpectedPointStyles()
+    {
+        await Page.GotoAsync(Path);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await ToggleFirstChartGroupToYearByYearAsync();
+
+        var lineCharts = Page.Locator("canvas[id$='-comparison-yearbyyear-chart'][data-type='line']");
+        await Expect(lineCharts).ToHaveCountAsync(7);
+
+        for (var index = 0; index < await lineCharts.CountAsync(); index++)
+        {
+            var chart = lineCharts.Nth(index);
+            var pointStyles = await chart.EvaluateAsync<string[]>(@"
+                el => {
+                    const chart = window.Chart && window.Chart.getChart(el);
+                    return chart?.data?.datasets?.map(dataset => dataset.pointStyle) ?? [];
+                }
+            ");
+
+            pointStyles.Should().Equal("triangle", "circle", "rectRot");
+        }
+    }
 }

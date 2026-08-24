@@ -1,5 +1,6 @@
 
 const datasetColorKeys = ['school', 'similarSchools', 'localAuthority', 'england'];
+const supportedPointStyles = new Set(['triangle', 'circle', 'rect', 'rectRot']);
 
 const CHART_CONFIG = {
     defaults: {
@@ -430,6 +431,7 @@ function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
         const marker = document.createElement('span');
         marker.className = 'app-chart-tooltip__marker';
         marker.style.backgroundColor = point.dataset.borderColor || point.dataset.backgroundColor || CHART_CONFIG.fallbacks.legendBoxColor;
+        applyMarkerStyle(marker, point.dataset.pointStyle);
 
         const label = document.createElement('span');
         label.className = 'app-chart-tooltip__label';
@@ -737,6 +739,7 @@ function buildDatasets(type, chartData, colorConfig, barOptions) {
         return chartData.datasets.map((ds, i) => {
             const keyedColor = colorConfig.byKey[datasetColorKeys[i]];
             const color = ds.borderColor || keyedColor || colorConfig.palette[i] || colorConfig.byKey.fallback;
+            const pointStyle = normalizePointStyle(ds.pointStyle);
             return {
                 label: ds.label,
                 data: ds.data,
@@ -747,7 +750,9 @@ function buildDatasets(type, chartData, colorConfig, barOptions) {
                 pointRadius: ds.pointRadius ?? CHART_CONFIG.line.series.pointRadius,
                 pointHoverRadius: ds.pointHoverRadius ?? CHART_CONFIG.line.series.pointHoverRadius,
                 pointBackgroundColor: ds.pointBackgroundColor || color,
-                ...ds
+                ...ds,
+                pointStyle,
+                pointHoverStyle: ds.pointHoverStyle || pointStyle
             };
         });
     }
@@ -954,6 +959,14 @@ function wrapLabel(label, maxChars) {
     return lines;
 }
 
+function normalizePointStyle(pointStyle) {
+    return supportedPointStyles.has(pointStyle) ? pointStyle : 'circle';
+}
+
+function applyMarkerStyle(marker, pointStyle) {
+    marker.classList.add('app-chart-marker', `app-chart-marker--${normalizePointStyle(pointStyle)}`);
+}
+
 function buildVerticalLegend(chart, container) {
     container.innerHTML = '';
 
@@ -970,6 +983,7 @@ function buildVerticalLegend(chart, container) {
         const box = document.createElement('span');
         box.classList.add('app-chart-legend__box');
         box.style.backgroundColor = ds.backgroundColor || ds.borderColor || CHART_CONFIG.fallbacks.legendBoxColor;
+        applyMarkerStyle(box, ds.pointStyle);
 
         const label = document.createElement('span');
         label.classList.add('app-chart-legend__label');

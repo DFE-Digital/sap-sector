@@ -80,4 +80,35 @@ public class SimilarSchoolsComparisonKs4HeadlineMeasuresPageTests(WebApplication
         (max - min).Should().BeLessThan(90d);
         ticks.Should().HaveCountGreaterThan(1);
     }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasuresComparison_YearByYear_UsesExpectedPointStyles()
+    {
+        await Page.GotoAsync(Path);
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await ToggleChartViewAsync(0);
+        await ToggleChartViewAsync(1);
+        await ToggleChartViewAsync(2);
+
+        var lineChartSelectors = new[]
+        {
+            "#ks4-attainment8-comparison-yearbyyear-chart",
+            "#eng-maths-comparison-yearbyyear-chart",
+            "#destinations-comparison-yearbyyear-chart"
+        };
+
+        foreach (var selector in lineChartSelectors)
+        {
+            var chart = Page.Locator(selector);
+            var pointStyles = await chart.EvaluateAsync<string[]>(@"
+                el => {
+                    const chart = window.Chart && window.Chart.getChart(el);
+                    return chart?.data?.datasets?.map(dataset => dataset.pointStyle) ?? [];
+                }
+            ");
+
+            pointStyles.Should().Equal("triangle", "circle", "rectRot");
+        }
+    }
 }

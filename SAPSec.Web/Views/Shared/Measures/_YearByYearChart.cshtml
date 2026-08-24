@@ -5,16 +5,20 @@
 @model YearByYearChartViewModel
 
 @{
+    var labels = Model.MeasureInfo.Labels.ToArray();
+    var pointStyles = Model.MeasureInfo.YearByYearPointStyles.ToArray();
+    var series = Model.Series.ToArray();
     var chartData = new
     {
         labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatYearByYear(Model.MeasureInfo.Year),
-        datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
+        datasets = labels.Select((label, index) =>
             new {
-                label = x.First,
+                label,
+                pointStyle = index < pointStyles.Length ? pointStyles[index] : "circle",
                 data = new decimal?[] {
-                    x.Second.Previous2,
-                    x.Second.Previous,
-                    x.Second.Current
+                    series[index].Previous2,
+                    series[index].Previous,
+                    series[index].Current
                 }
             })
             .ToArray()

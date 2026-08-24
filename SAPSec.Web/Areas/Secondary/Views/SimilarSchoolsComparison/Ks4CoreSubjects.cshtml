@@ -8,6 +8,9 @@
     var ks4CurrentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentKs4;
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
     var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
+    const string schoolPointStyle = "triangle";
+    const string similarSchoolPointStyle = "circle";
+    const string englandPointStyle = "rectRot";
     bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
     decimal? RoundWholePercent(decimal? value) => value.HasValue
         ? Math.Round(value.Value, 0, MidpointRounding.AwayFromZero)
@@ -123,6 +126,7 @@
                 borderWidth = 2,
                 pointRadius = 4,
                 pointHoverRadius = 5,
+                pointStyle = schoolPointStyle,
                 tension = 0,
                 data = new decimal?[]
                 {
@@ -137,6 +141,7 @@
                 borderWidth = 2,
                 pointRadius = 4,
                 pointHoverRadius = 5,
+                pointStyle = similarSchoolPointStyle,
                 tension = 0,
                 data = new decimal?[]
                 {
@@ -151,6 +156,7 @@
                 borderWidth = 2,
                 pointRadius = 4,
                 pointHoverRadius = 5,
+                pointStyle = englandPointStyle,
                 tension = 0,
                 data = new decimal?[]
                 {

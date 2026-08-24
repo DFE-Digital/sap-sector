@@ -10,6 +10,9 @@
     var destinationsCurrentYear = SAPSec.Web.ViewModels.AcademicYearLabelConfig.CurrentDestinations;
     var chartColors = new[] { "#ca357c", "#2a1950", "#2a1950" };
     var yearByYearColors = new[] { "#ca357c", "#2a1950", "#4b9b7d" };
+    const string schoolPointStyle = "triangle";
+    const string similarSchoolPointStyle = "circle";
+    const string englandPointStyle = "rectRot";
     bool HasAnyData(IEnumerable<decimal?> values) => values.Any(v => v.HasValue);
 }
 
@@ -107,6 +110,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = schoolPointStyle,
                                     tension = 0,
                                     data = new decimal[]
                                     {
@@ -121,6 +125,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = similarSchoolPointStyle,
                                     tension = 0,
                                     data = new decimal[]
                                     {
@@ -137,6 +142,7 @@
                                     backgroundColor = yearByYearColors[2],
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = englandPointStyle,
                                     tension = 0,
                                     data = new decimal[]
                                     {
@@ -295,6 +301,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = schoolPointStyle,
                                     tension = 0,
                                     data = new decimal?[]
                                     {
@@ -309,6 +316,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = similarSchoolPointStyle,
                                     tension = 0,
                                     data = new decimal?[]
                                     {
@@ -323,6 +331,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = englandPointStyle,
                                     tension = 0,
                                     data = new decimal?[]
                                     {
@@ -493,6 +502,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = schoolPointStyle,
                                     tension = 0,
                                     data = new decimal?[]
                                     {
@@ -507,6 +517,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = similarSchoolPointStyle,
                                     tension = 0,
                                     data = new decimal?[]
                                     {
@@ -521,6 +532,7 @@
                                     borderWidth = 2,
                                     pointRadius = 4,
                                     pointHoverRadius = 5,
+                                    pointStyle = englandPointStyle,
                                     tension = 0,
                                     data = new decimal?[]
                                     {

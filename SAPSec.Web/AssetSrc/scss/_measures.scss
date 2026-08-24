@@ -207,7 +207,6 @@ $app-measure-color-track: #f3f2f1;
 }
 
 .app-chart-legend__box {
-  border-radius: 50%;
   display: inline-block;
   flex: 0 0 14px;
   height: 14px;
@@ -255,10 +254,28 @@ $app-measure-color-track: #f3f2f1;
 }
 
 .app-chart-tooltip__marker {
-  border-radius: 50%;
   display: block;
   height: 14px;
   width: 14px;
+}
+
+.app-chart-marker--circle {
+  border-radius: 50%;
+}
+
+.app-chart-marker--rect {
+  border-radius: 0;
+}
+
+.app-chart-marker--triangle {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
+}
+
+.app-chart-marker--rectRot {
+  border-radius: 0;
+  transform: rotate(45deg) scale(0.85);
+  transform-origin: center;
 }
 
 .app-chart-tooltip__label,

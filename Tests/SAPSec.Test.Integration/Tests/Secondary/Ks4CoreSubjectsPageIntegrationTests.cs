@@ -1172,6 +1172,10 @@ public class Ks4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"triangle\"");
+        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"circle\"");
+        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rect\"");
+        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rectRot\"");
     }
 
     [Fact]
