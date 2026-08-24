@@ -2,7 +2,7 @@
 
 **Status**: accepted
 **Deciders**: Dan Murfitt
-**Date**: 11-2026 (November)
+**Date**: 11-2025 (November)
 
 Technical Story: [description | ticket/issue URL] <!-- optional -->
 
