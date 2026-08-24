@@ -125,16 +125,6 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
         content.Should().Contain("opens in new tab");
     }
 
-    [Fact]
-    public async Task DIAGNOSTIC_Urn131103_ShowsEmail()
-    {
-        var response = await fixture.Client.GetAsync(Routes.PrimarySchool("131103").SchoolDetails);
-        var content = await response.Content.ReadAsStringAsync();
-
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("pdavid13@suttonmail.org");
-    }
-
     private static void AssertInOrder(string content, params string[] expectedText)
     {
         var currentIndex = -1;
