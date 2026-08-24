@@ -180,14 +180,14 @@ Held in PostgreSQL:
 
 ### 5.3 Search data and direction of travel
 
-Search currently runs on a Lucene index, which holds:
+Search currently runs on a Lucene index. The index is built by the web application itself, a hosted background service reads establishments from PostgreSQL at startup and writes them into an in-memory Lucene directory. Each replica therefore holds its own copy and rebuilds it on every pod start. Nothing is persisted to disk or to a shared store. The index holds:
 
 - normalised search terms
 - indexed school names
 - lookup-friendly derived fields
 - search-optimised document structures
 
-The plan is to retire the separate Lucene index and move to PostgreSQL full-text search, in line with what SAP Public are doing. That removes a second data store and the reindexing that goes with it, and puts everything on one query surface. Lucene should be read as the current implementation rather than the target.
+The plan is to retire the separate Lucene index and move to PostgreSQL full-text search, in line with what SAP Public are doing. That removes the per-replica memory cost, the startup rebuild, and the possibility of replicas diverging, and puts everything on one query surface. Lucene should be read as the current implementation rather than the target.
 
 ### 5.4 Identity and access data
 
@@ -197,6 +197,10 @@ Comes from DfE Sign-in:
 - claims
 - role and authorization context
 - session-related security information
+
+None of this is written to the database. Identity is carried in the OIDC cookie authentication scheme, which is configured to save tokens. Per-session state, currently the selected organisation, is held in server-side session backed by an in-process distributed memory cache, with the cookie carrying only the session identifier. The session cookie is HttpOnly, Secure, SameSite=Lax, with a one-hour idle timeout.
+
+Because the session cache is in-process rather than shared, session state does not travel between replicas. This is a known constraint of running two replicas without a shared cache and should be revisited alongside the search work.
 
 ### 5.5 Generated and packaged data files
 
@@ -209,6 +213,7 @@ The repository also holds generated and packaged data assets used at runtime, in
 - deployment metadata
 - pipeline outputs
 - data protection keys for distributed hosting
+- usage and behavioural analytics, sent to three separate destinations (see section 6.5)
 
 ---
 
@@ -243,7 +248,7 @@ SAP Sector uses several external datasets covering schools, performance, destina
 
 These are ingested through the pipeline and transformed into a consistent form before being loaded into PostgreSQL, which is the authoritative store for the service.
 
-Curated data is then shaped into materialised views, which are the query surface for the application. Selected fields are also used to build the search index.
+Curated data is then shaped into materialised views, which are the query surface for the application. The pipeline's only write target is PostgreSQL; the search index is built separately by the application from that data.
 
 ## 6.3 High-level data flow summary
 
@@ -251,10 +256,11 @@ Curated data is then shaped into materialised views, which are the query surface
 - source files are mapped, cleaned, normalised and transformed
 - processed data is loaded into PostgreSQL
 - materialised views are built to serve the application's query patterns
-- derived search structures are created for the search index
 - the web application issues read-only queries against materialised views
-- the web application queries the search index for search journeys
+- at startup the web application reads establishments from PostgreSQL and builds its in-memory search index
+- the web application queries that index for search journeys
 - monitoring and operations services watch the running platform
+- usage events are emitted to analytics destinations, both server-side and from the browser
 
 ## 6.4 Summary table of data sources and logical domains
 
@@ -265,8 +271,23 @@ Curated data is then shaped into materialised views, which are the query surface
 | EES                     | Destination outcomes              | education, employment, apprenticeships                  | PostgreSQL                    | Detail and comparison   | Periodic            |
 | EES                     | Attendance and absence            | absence %, authorised %, unauthorised %                 | PostgreSQL                    | Detail and comparison   | Periodic            |
 | Ofsted                  | Comparative cohorts               | groupings, peer metrics, derived values                 | PostgreSQL, generated assets  | Comparison              | Periodic            |
-| Derived search data     | Search index data                 | normalised names, compound lookups, indexed fields      | Search index                  | Search                  | Rebuilt when needed |
+| Derived search data     | Search index data                 | normalised names, compound lookups, indexed fields      | In-memory index, per replica  | Search                  | Rebuilt at pod start |
 | DSI authentication data | Identity and access context       | user identifiers, claims, roles                         | Runtime and session context   | Access control          | Runtime             |
+
+## 6.5 Analytics and third-party data flows
+
+Usage data leaves the service through three separate routes. They are listed here because they have different owners, different consent positions and different data protection implications.
+
+| Destination | Direction | What is sent | Consent | Notes |
+| --- | --- | --- | --- | --- |
+| DfE Analytics to Google BigQuery | Server-side, from the application | Request-level web events, plus custom link-click events posted back from the browser and forwarded by the application | Not consent-gated | `/healthcheck` is excluded. Disabled in local development and in the UITests, IntegrationTests, EndToEndTests and AccessibilityTests environments. A custom event suppresses the corresponding web request event to avoid double counting |
+| Google Analytics, via Google Tag Manager | Client-side, from the user's browser | Standard GA page and interaction data | Loaded only when the `cookie_policy` cookie is set to `enabled` | Container ID is environment-specific |
+| Microsoft Clarity | Client-side, from the user's browser | Session recording and interaction heatmaps | Loaded only when the `cookie_policy` cookie is set to `enabled`, and initialised with `ad_Storage: denied`, `analytics_Storage: granted` | This is behavioural recording on an authenticated service and should be reflected in the data protection position |
+
+The cookies page documents the cookies each of these sets, and integration tests assert that the Google Tag Manager and Clarity tags are absent when consent has not been given.
+
+
+---
 
 ### Note on Ofsted
 
@@ -288,12 +309,9 @@ At the top are the main sector-facing user groups: school users, trust leads and
 
 The runtime application is hosted in Azure Kubernetes Service and is shown as a single web application. How it is layered internally is an implementation concern and is covered in the [LLD](./low-level-design.md).
 
-Below it are the two data stores the service uses:
+Below it is PostgreSQL, the authoritative database, queried read-only through materialised views. The Lucene search index is drawn inside the AKS boundary because it is an in-process, in-memory structure that the application builds for itself at startup, not a separate data store.
 
-- PostgreSQL, the authoritative database, queried read-only through materialised views
-- the search index, which supports search journeys
-
-Down the right-hand side are the platform and operational dependencies: StatusCake for monitoring, Azure Blob Storage for data protection keys, and DfE Analytics for usage events.
+Down the right-hand side are the platform and operational dependencies: StatusCake for monitoring, Azure Blob Storage for data protection keys, the three analytics destinations described in section 6.5, and OpenStreetMap for map tiles.
 
 The SAPData pipeline sits at the bottom. It loads and transforms external sources including GIAS, Ofsted data and education statistics, and it owns the database structure.
 
@@ -358,18 +376,20 @@ flowchart TB
 
     subgraph aks[Azure Kubernetes Service]
         web[Web Application]
+        search[Lucene index - in memory, per replica]
         maintenance[Maintenance Page]
     end
 
     pg[(PostgreSQL)]
-    search[(Search Index)]
     pipeline[SAPData Pipeline]
     ext[External Datasets]
+    analytics[Analytics - BigQuery, GA, Clarity]
 
     user --> dsi
     dsi --> web
     web -->|read only| pg
-    web -->|read only| search
+    web -->|builds at startup, then queries| search
+    web -.->|usage events| analytics
 
     ext --> pipeline
     pipeline -->|owns schema and writes| pg
@@ -407,7 +427,7 @@ flowchart LR
 
     pipeline[SAPData ETL / SQL Generation]
     pg[(PostgreSQL + Materialised Views)]
-    search[(Search Index)]
+    search[Lucene index - in memory]
     web[SAP Sector Web App]
 
     gias --> pipeline
@@ -418,19 +438,16 @@ flowchart LR
     pipeline --> pg
 
     web -->|read only| pg
-    web -->|read only| search
+    web -->|builds at startup, then queries| search
 ```
 
 *Figure 4. High-level data flow diagram.*
 
 ### Data flow explanation
 
-The service reads from two places:
+The service reads from one place: PostgreSQL, through materialised views. That access is read-only. Search is served from an in-memory Lucene index that the application builds for itself from the same PostgreSQL data at startup, so it is derived rather than a second source of truth.
 
-- PostgreSQL for authoritative structured data, through materialised views
-- the search index for search
-
-Both are read-only as far as the application is concerned. Moving search onto PostgreSQL full-text search, as described in section 5.3, would take the second store out of this diagram.
+Moving search onto PostgreSQL full-text search, as described in section 5.3, would remove the index from this diagram entirely.
 
 ---
 
@@ -489,14 +506,17 @@ These are the journeys and operational flows the service supports. The step-by-s
 
 - structured logging through Serilog and logit.io
 - monitoring and health endpoints
-- analytics integration for service insight and behaviour tracking
+- analytics integration for service insight and behaviour tracking, across three destinations (see section 6.5)
+
+The `/healthcheck` endpoint currently reports only that the application is running and that the static content directory is present. It does not test PostgreSQL connectivity or confirm that the search index has been built, so a replica can pass its readiness probe while search is still empty. Extending the health endpoint to cover its dependencies is an open item.
 
 ---
 
 ## 11. Assumptions and constraints
 
 - PostgreSQL is the authoritative structured data store
-- the data pipeline owns the schema and all writes, and the application is read-only
+- the data pipeline owns the schema and all writes to PostgreSQL, and the application is read-only against it; every Dapper call in the infrastructure layer is a query, with no insert, update or delete path
+- the only thing the application writes is its own in-memory search index, which does not survive a restart
 - the application queries materialised views rather than base tables, so query patterns are limited to what the views provide
 - read models are generated from serialised view structures rather than written by hand
 - the service is authenticated throughout
