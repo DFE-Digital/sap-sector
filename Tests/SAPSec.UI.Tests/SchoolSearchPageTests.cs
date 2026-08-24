@@ -144,7 +144,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         Page.Url.Should().Contain("/school/105574");
         Page.Url.Should().Contain(Routes.SecondarySchool("105574").Overview);
-        
+
     }
 
     #endregion
@@ -388,12 +388,12 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
         isNumericValue.Should().Be("123\\456");
     }
-    
+
 
     [Fact]
     public async Task SchoolSearchResults_NumericSearch_ValidResults_RedirectsToSchoolDetailPage()
     {
-        await Page.GotoAsync(SchoolSearchResultsPath);
+        await Page.GotoAsync(SchoolSearchPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("input[name='__Query']").FillAsync("105574");
