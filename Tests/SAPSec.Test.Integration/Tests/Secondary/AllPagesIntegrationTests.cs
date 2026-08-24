@@ -70,7 +70,7 @@ public class AllPagesIntegrationTests(
 
         var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
 
-        if (path.StartsWith(Routes.SecondarySchool("100001").Comparison("100002").Similarity))
+        if (path.StartsWith(Routes.SecondarySchool("100001").Comparison("100002").BasePath))
         {
             navigationItems.Should().SatisfyRespectively(
                 n => n.ShouldLinkTo("Home", Routes.FindASchool()),
