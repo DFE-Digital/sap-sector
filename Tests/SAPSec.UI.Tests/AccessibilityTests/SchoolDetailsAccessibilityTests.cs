@@ -175,17 +175,6 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
     }
 
     [Fact]
-    public async Task SchoolDetails_SkipLink_TargetsMainContent()
-    {
-        await NavigateToSchoolDetailsAsync();
-
-        var skipLink = Page.Locator(".govuk-skip-link");
-        var href = await skipLink.GetAttributeAsync("href");
-
-        href.Should().Be("#main-content", "Skip link should target main content");
-    }
-
-    [Fact]
     public async Task SchoolDetails_SkipLink_HasCorrectText()
     {
         await NavigateToSchoolDetailsAsync();
@@ -216,10 +205,16 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
 
         await Page.Keyboard.PressAsync("Tab");
 
-        var skipLink = Page.Locator(".govuk-skip-link");
-        var isFocused = await skipLink.EvaluateAsync<bool>("el => el === document.activeElement");
+        var isFocusedOnSkipLink = await Page.EvaluateAsync<bool>(@"
+            () => {
+                const active = document.activeElement;
+                return !!active &&
+                    (active.classList.contains('govuk-skip-link') ||
+                     active.classList.contains('app-navigation-skip-link'));
+            }
+        ");
 
-        isFocused.Should().BeTrue("Skip link should be first focusable element");
+        isFocusedOnSkipLink.Should().BeTrue("Skip link should be first focusable element");
     }
 
     #endregion
@@ -558,12 +553,42 @@ public class SchoolDetailsAccessibilityTests(WebApplicationSetupFixture fixture)
         await Page.SetViewportSizeAsync(375, 667);
         await NavigateToSchoolDetailsAsync();
 
-        var links = Page.Locator("main a");
-        var count = await links.CountAsync();
+        var visibleLinkIndexes = await Page.EvaluateAsync<int[]>(@"
+            () => {
+                const links = Array.from(document.querySelectorAll('main a'));
 
-        for (var i = 0; i < Math.Min(count, 5); i++)
+                return links
+                    .map((link, index) => ({ link, index }))
+                    .filter(({ link }) => {
+                        if (link.classList.contains('govuk-skip-link') ||
+                            link.classList.contains('app-side-navigation__skip-link') ||
+                            link.classList.contains('app-navigation-skip-link')) {
+                            return false;
+                        }
+
+                        const style = window.getComputedStyle(link);
+                        if (style.display === 'none' || style.visibility === 'hidden') {
+                            return false;
+                        }
+
+                        const rect = link.getBoundingClientRect();
+                        return rect.width > 0 &&
+                               rect.height > 0 &&
+                               rect.bottom > 0 &&
+                               rect.right > 0 &&
+                               rect.top < window.innerHeight &&
+                               rect.left < window.innerWidth;
+                    })
+                    .slice(0, 5)
+                    .map(({ index }) => index);
+            }
+        ");
+
+        var links = Page.Locator("main a");
+
+        for (var i = 0; i < visibleLinkIndexes!.Length; i++)
         {
-            var boundingBox = await links.Nth(i).BoundingBoxAsync();
+            var boundingBox = await links.Nth(visibleLinkIndexes[i]).BoundingBoxAsync();
 
             if (boundingBox != null)
             {

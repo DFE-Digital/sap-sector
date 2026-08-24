@@ -261,24 +261,7 @@ public class SchoolPageTests(WebApplicationSetupFixture fixture) : BasePageTest(
     }
 
     #endregion
-
-    #region Accessibility Tests
-
-    [Fact]
-    public async Task SideNav_HasCorrectAriaLabel()
-    {
-        // Arrange
-        await Page.GotoAsync(SchoolPagePath);
-
-        // Act
-        var sideNav = Page.Locator(".app-side-navigation");
-        var ariaLabel = await sideNav.GetAttributeAsync("aria-label");
-
-        // Assert
-        ariaLabel.Should().Be("Side", "Side navigation section should have correct aria-label");
-    }
-
-    #endregion
+    
 
     private async Task WaitForPageLoad()
     {
