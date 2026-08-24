@@ -167,9 +167,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").Comparison("100004").Overview,
-            Routes.PrimarySchool("100001").Comparison("100003").Overview,
-            Routes.PrimarySchool("100001").Comparison("100002").Overview
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity
         ]);
     }
 
@@ -410,9 +410,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").Comparison("100004").Overview,
-            Routes.PrimarySchool("100001").Comparison("100003").Overview,
-            Routes.PrimarySchool("100001").Comparison("100002").Overview
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity
         ]);
     }
 
@@ -619,9 +619,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerformersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").Comparison("100004").Overview,
-            Routes.PrimarySchool("100001").Comparison("100002").Overview,
-            Routes.PrimarySchool("100001").Comparison("100003").Overview
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity
         ]);
     }
 
@@ -758,9 +758,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerformersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").Comparison("100004").Overview,
-            Routes.PrimarySchool("100001").Comparison("100002").Overview,
-            Routes.PrimarySchool("100001").Comparison("100003").Overview
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity
         ]);
     }
 
@@ -897,9 +897,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").Comparison("100002").Overview,
-            Routes.PrimarySchool("100001").Comparison("100003").Overview,
-            Routes.PrimarySchool("100001").Comparison("100004").Overview
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity
         ]);
     }
 
@@ -1036,9 +1036,9 @@ public class Ks2PerformanceMeasuresPageIntegrationTests(
             .Select(l => l.GetAttribute("href"));
 
         topPerfomersLinks.Should().BeEquivalentTo([
-            Routes.PrimarySchool("100001").Comparison("100002").Overview,
-            Routes.PrimarySchool("100001").Comparison("100003").Overview,
-            Routes.PrimarySchool("100001").Comparison("100004").Overview
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100003").Similarity,
+            Routes.PrimarySchool("100001").Comparison("100004").Similarity
         ]);
     }
 

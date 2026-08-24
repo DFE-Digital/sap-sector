@@ -2,6 +2,316 @@
     let initialised = false;
     let mapInstance = null;
 
+    function getFocusablePopupElements(marker) {
+        const popupEl = marker.getPopup()?.getElement();
+        if (!popupEl) {
+            return { popupEl: null, nameLink: null, closeButton: null };
+        }
+
+        return {
+            popupEl,
+            nameLink: popupEl.querySelector(".popup-name[href]"),
+            closeButton: popupEl.querySelector(".leaflet-popup-close-button"),
+        };
+    }
+
+    function getVisibleMapItems(host) {
+        return Array.from(host.querySelectorAll("[data-map-focusable='true']"))
+            .filter((element) => element.isConnected)
+            .filter((element) => {
+                const rect = element.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+            })
+            .sort((left, right) => {
+                const leftGroup = left.dataset.mapFocusGroup || "marker";
+                const rightGroup = right.dataset.mapFocusGroup || "marker";
+
+                // Keep markers in visual order and leave zoom controls until last so
+                // tabbing follows the map content before the supporting controls.
+                if (leftGroup !== rightGroup) {
+                    return leftGroup === "control" ? 1 : -1;
+                }
+
+                if (leftGroup === "control") {
+                    return 0;
+                }
+
+                const leftRect = left.getBoundingClientRect();
+                const rightRect = right.getBoundingClientRect();
+                const topDiff = leftRect.top - rightRect.top;
+
+                if (Math.abs(topDiff) > 8) {
+                    return topDiff;
+                }
+
+                return leftRect.left - rightRect.left;
+            });
+    }
+
+    function focusAdjacentMapItem(host, currentElement, direction) {
+        const items = getVisibleMapItems(host);
+        const currentIndex = items.indexOf(currentElement);
+
+        if (currentIndex === -1) {
+            return false;
+        }
+
+        const nextItem = items[currentIndex + direction];
+        if (!nextItem) {
+            return false;
+        }
+
+        nextItem.focus();
+        return true;
+    }
+
+    function focusPopupStart(marker) {
+        const { nameLink, closeButton } = getFocusablePopupElements(marker);
+        const target = nameLink || closeButton;
+
+        if (!target) return false;
+
+        target.focus();
+        return true;
+    }
+
+    function closePopupAndFocus(marker, focusTarget) {
+        marker.closePopup();
+
+        if (!focusTarget) {
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            focusTarget.focus();
+        });
+    }
+
+    function syncMarkerExpandedState(markerState) {
+        const element = markerState.marker.getElement?.();
+        if (!element) {
+            return;
+        }
+
+        element.setAttribute("aria-expanded", markerState.marker.isPopupOpen() ? "true" : "false");
+    }
+
+    function enhancePopupFocus(host, markerState) {
+        const { marker, school } = markerState;
+        const { popupEl, nameLink, closeButton } = getFocusablePopupElements(marker);
+
+        if (!popupEl || popupEl.dataset.focusManaged === "true") {
+            return;
+        }
+
+        // Leaflet popups are not part of the normal page tab order, so we wire the
+        // popup contents into the same keyboard flow as the markers.
+        popupEl.dataset.focusManaged = "true";
+
+        if (closeButton) {
+            closeButton.setAttribute("aria-label", `Close ${school.name || "school"} popover`);
+            closeButton.addEventListener("click", () => {
+                markerState.restoreFocusOnClose = true;
+            });
+        }
+
+        popupEl.addEventListener("keydown", (event) => {
+            if (event.key !== "Escape") return;
+
+            markerState.restoreFocusOnClose = true;
+            marker.closePopup();
+            event.preventDefault();
+        });
+
+        if (nameLink) {
+            nameLink.addEventListener("keydown", (event) => {
+                if (event.key !== "Tab") return;
+
+                // Shift+Tab from the first popup item should close the popup and
+                // return focus to the marker that opened it.
+                if (event.shiftKey) {
+                    event.preventDefault();
+                    closePopupAndFocus(marker, marker.getElement?.());
+                    return;
+                }
+
+                if (closeButton) {
+                    event.preventDefault();
+                    closeButton.focus();
+                    return;
+                }
+
+                const markerElement = marker.getElement?.();
+                if (!markerElement) return;
+
+                // Tabbing past the popup should continue to the next visible map
+                // item instead of dropping focus out of the map unexpectedly.
+                if (focusAdjacentMapItem(host, markerElement, 1)) {
+                    event.preventDefault();
+                    marker.closePopup();
+                }
+            });
+        }
+
+        if (closeButton) {
+            closeButton.addEventListener("keydown", (event) => {
+                if (event.key !== "Tab") return;
+
+                if (event.shiftKey) {
+                    if (nameLink) {
+                        event.preventDefault();
+                        nameLink.focus();
+                        return;
+                    }
+
+                    event.preventDefault();
+                    closePopupAndFocus(marker, marker.getElement?.());
+                    return;
+                }
+
+                const markerElement = marker.getElement?.();
+                if (!markerElement) return;
+
+                if (focusAdjacentMapItem(host, markerElement, 1)) {
+                    event.preventDefault();
+                    marker.closePopup();
+                }
+            });
+        }
+    }
+
+    function enhanceMarkerFocus(host, markerState) {
+        const { marker, school } = markerState;
+        const element = marker.getElement?.();
+
+        if (!element || element.dataset.focusManaged === "true") {
+            syncMarkerExpandedState(markerState);
+            return;
+        }
+
+        element.dataset.focusManaged = "true";
+        element.dataset.mapFocusable = "true";
+        element.dataset.mapFocusGroup = "marker";
+        element.tabIndex = 0;
+        element.setAttribute("role", "button");
+        element.setAttribute("aria-haspopup", "dialog");
+        element.setAttribute("aria-label", school.name ? `Open ${school.name} on map` : "Open school on map");
+        syncMarkerExpandedState(markerState);
+
+        element.addEventListener("keydown", (event) => {
+            // Markers are rendered as images by Leaflet, so we promote them to
+            // keyboard-operable buttons and move focus into the popup on open.
+            if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+
+                if (!marker.isPopupOpen()) {
+                    marker.openPopup();
+                }
+
+                requestAnimationFrame(() => {
+                    focusPopupStart(marker);
+                });
+
+                return;
+            }
+
+            if (event.key !== "Tab") return;
+
+            const direction = event.shiftKey ? -1 : 1;
+            if (!focusAdjacentMapItem(host, element, direction)) {
+                return;
+            }
+
+            if (marker.isPopupOpen()) {
+                marker.closePopup();
+            }
+
+            event.preventDefault();
+        });
+    }
+
+    function enhanceClusterFocus(host) {
+        host.querySelectorAll(".marker-cluster").forEach((element) => {
+            if (element.dataset.focusManaged === "true") {
+                return;
+            }
+
+            element.dataset.focusManaged = "true";
+            element.dataset.mapFocusable = "true";
+            element.dataset.mapFocusGroup = "marker";
+            element.tabIndex = 0;
+            element.setAttribute("role", "button");
+
+            const count = element.textContent?.trim();
+            element.setAttribute(
+                "aria-label",
+                count ? `Open map cluster containing ${count} schools` : "Open map cluster"
+            );
+
+            element.addEventListener("keydown", (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    element.click();
+                    return;
+                }
+
+                if (event.key !== "Tab") return;
+
+                const direction = event.shiftKey ? -1 : 1;
+                if (!focusAdjacentMapItem(host, element, direction)) {
+                    return;
+                }
+
+                event.preventDefault();
+            });
+        });
+    }
+
+    function enhanceZoomControlFocus(host) {
+        host.querySelectorAll(".leaflet-control-zoom a").forEach((element) => {
+            if (element.dataset.focusManaged === "true") {
+                return;
+            }
+
+            element.dataset.focusManaged = "true";
+            element.dataset.mapFocusable = "true";
+            element.dataset.mapFocusGroup = "control";
+
+            if (!element.getAttribute("aria-label")) {
+                const zoomLabel = element.classList.contains("leaflet-control-zoom-in")
+                    ? "Zoom in"
+                    : element.classList.contains("leaflet-control-zoom-out")
+                        ? "Zoom out"
+                        : (element.getAttribute("title") || "").trim();
+
+                if (zoomLabel) {
+                    element.setAttribute("aria-label", zoomLabel);
+                }
+            }
+
+            element.addEventListener("keydown", (event) => {
+                if (event.key !== "Tab") return;
+
+                const direction = event.shiftKey ? -1 : 1;
+                if (!focusAdjacentMapItem(host, element, direction)) {
+                    return;
+                }
+
+                event.preventDefault();
+            });
+        });
+    }
+
+    function refreshMapAccessibility(host, markerStates) {
+        markerStates.forEach((markerState) => {
+            enhanceMarkerFocus(host, markerState);
+            syncMarkerExpandedState(markerState);
+        });
+
+        enhanceClusterFocus(host);
+        enhanceZoomControlFocus(host);
+    }
+
     function parseSchools(host) {
         const el = document.getElementById("schools-data");
         const schoolsJson = el ? el.textContent : "[]";
@@ -21,7 +331,7 @@
                         la: s.la ?? "",
                         lat,
                         lon,
-                        url: s.url ,
+                        url: s.url,
                         isComparedSchool: Boolean(s.isComparedSchool),
                     };
                 })
@@ -64,8 +374,6 @@
     `;
     }
 
-
-
     function renderSchoolList(schools) {
         const listEl = document.getElementById("schoolList");
         if (!listEl) return;
@@ -96,7 +404,6 @@
     `;
     }
 
-
     function initMap() {
         const host = document.getElementById("map");
         if (!host) return;
@@ -123,7 +430,7 @@
         const mode = (host.dataset.mapMode || "all").toLowerCase();
         const useClusters = mode !== "compare";
 
-        // Create map
+        // Create the Leaflet map once the host is visible and data is available.
         mapInstance = L.map(host, { scrollWheelZoom: true }).setView(
             [schools[0].lat, schools[0].lon],
             fixedZoom
@@ -138,7 +445,7 @@
         let clusters = null;
 
         if (useClusters) {
-            // Cluster group: blue circles with numbers
+            // Cluster schools in non-compare mode so dense areas stay navigable.
             clusters = L.markerClusterGroup({
                 showCoverageOnHover: false,
                 spiderfyOnMaxZoom: true,
@@ -160,7 +467,6 @@
             mapInstance.addLayer(clusters);
         }
 
-        
         const blueSchoolIcon = L.icon({
             iconUrl: "/assets/images/marker-school.svg",
             iconSize: [20, 25],
@@ -175,22 +481,49 @@
             popupAnchor: [0, -22],
         });
 
-
-        const markers = []; // collect markers for bounds when NOT clustering
+        const markers = [];
+        const markerStates = [];
 
         for (const s of schools) {
             const ll = L.latLng(s.lat, s.lon);
-            
-            // const m = L.marker(ll, { icon: schoolIcon }).bindPopup(popupHtml(s));
 
             let iconToUse = blueSchoolIcon;
 
-            // If compare page (no clusters) and this is the main school → pink
+            // Compare mode renders the selected school in pink because clustering is off.
             if (!useClusters) {
                 iconToUse = s.isComparedSchool ? blueSchoolIcon : pinkSchoolIcon;
             }
 
             const m = L.marker(ll, { icon: iconToUse }).bindPopup(popupHtml(s));
+            const markerState = {
+                marker: m,
+                school: s,
+                restoreFocusOnClose: false,
+            };
+            markerStates.push(markerState);
+
+            m.on("add", () => {
+                enhanceMarkerFocus(host, markerState);
+            });
+
+            m.on("popupopen", () => {
+                enhanceMarkerFocus(host, markerState);
+                enhancePopupFocus(host, markerState);
+                syncMarkerExpandedState(markerState);
+            });
+
+            m.on("popupclose", () => {
+                syncMarkerExpandedState(markerState);
+
+                if (!markerState.restoreFocusOnClose) {
+                    return;
+                }
+
+                markerState.restoreFocusOnClose = false;
+                requestAnimationFrame(() => {
+                    marker.getElement?.()?.focus();
+                });
+            });
 
             if (useClusters) {
                 clusters.addLayer(m);
@@ -212,8 +545,23 @@
             });
         }
 
-        // Ensure correct render after toggle
-        setTimeout(() => mapInstance?.invalidateSize(true), 0);
+        const refresh = () => {
+            mapInstance?.invalidateSize(true);
+            refreshMapAccessibility(host, markerStates);
+        };
+
+        // Recalculate layout and focus order after map movement or cluster changes.
+        mapInstance.on("zoomend moveend", () => {
+            requestAnimationFrame(refresh);
+        });
+
+        if (clusters) {
+            clusters.on("animationend spiderfied unspiderfied", () => {
+                requestAnimationFrame(refresh);
+            });
+        }
+
+        setTimeout(refresh, 0);
 
         initialised = true;
     }

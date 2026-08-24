@@ -2,7 +2,7 @@ using SAPSec.Core.Interfaces.Services;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+namespace SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
 
 public class GetFilteredSchoolKs4CoreSubject(
     IKs4PerformanceRepository repository,

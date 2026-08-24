@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects.UseCases;
+using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
 using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.Constants;
@@ -57,7 +57,7 @@ public class SimilarSchoolsComparisonController : Controller
         Similarity(urn, similarSchoolUrn);
 
     [HttpGet]
-    [Route("similarity")]
+    [Route("compare-similarity")]
     public async Task<IActionResult> Similarity(
         string urn,
         string similarSchoolUrn)
@@ -73,7 +73,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("ks4-headline-measures")]
+    [Route("compare-ks4-headline-measures")]
     public async Task<IActionResult> Ks4HeadlineMeasures(
         string urn,
         string similarSchoolUrn)
@@ -284,7 +284,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("ks4-core-subjects")]
+    [Route("compare-ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(
         string urn,
         string similarSchoolUrn)
@@ -394,7 +394,7 @@ public class SimilarSchoolsComparisonController : Controller
             : null;
 
     [HttpGet]
-    [Route("attendance")]
+    [Route("compare-attendance")]
     public async Task<IActionResult> Attendance(
         string urn,
         string similarSchoolUrn)
@@ -478,7 +478,7 @@ public class SimilarSchoolsComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("school-details")]
+    [Route("compare-school-details")]
     public async Task<IActionResult> SchoolDetails(
         string urn,
         string similarSchoolUrn)
