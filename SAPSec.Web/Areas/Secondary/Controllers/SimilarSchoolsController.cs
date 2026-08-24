@@ -137,7 +137,7 @@ public class SimilarSchoolsController : Controller
             UrbanOrRural = school.UrbanRural.Name,
             SortMetricName = result.SortValue.Name,
             SortMetricDisplayValue = result.SortValue.Value.Display(),
-            ComparisonUrl = Routes.SecondarySchool(currentSchoolUrn).Comparison(school.URN).Overview
+            ComparisonUrl = Routes.SecondarySchool(currentSchoolUrn).Comparison(school.URN).Similarity
         };
     }
 }

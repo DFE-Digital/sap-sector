@@ -4,6 +4,13 @@
 @using SAPSec.Web.ViewModels
 @{
     var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
+    if (navigation is not null)
+    {
+        ViewData[ViewDataKeys.SkipNavigationTargetId] = "school-navigation";
+        ViewData[ViewDataKeys.SkipNavigationText] = "Skip to school navigation";
+    }
+
+    ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
 }
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,7 +31,7 @@
         @await Component.InvokeAsync("SchoolSideNavigation", navigation)
     }
 
-    <div class="app-body-container-with-side-navigation">
+    <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
         @RenderBody()
     </div>
 </div>

@@ -18,4 +18,7 @@ public static class ViewDataKeys
     public const string StartItem = nameof(StartItem);
     public const string EndItem = nameof(EndItem);
     public const string IsLastInGroup = nameof(IsLastInGroup);
+    public const string SkipNavigationTargetId = nameof(SkipNavigationTargetId);
+    public const string SkipNavigationText = nameof(SkipNavigationText);
+    public const string SkipLinkTargetId = nameof(SkipLinkTargetId);
 }

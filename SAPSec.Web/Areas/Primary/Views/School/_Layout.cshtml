@@ -5,9 +5,16 @@
 @using SAPSec.Web.ViewModels
 
 @{
-    Layout = "~/Views/Shared/_Layout.cshtml";
     var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
     var layout = ViewData[ViewDataKeys.SchoolLayout] as SchoolLayoutModel;
+    if (navigation is not null)
+    {
+        ViewData[ViewDataKeys.SkipNavigationTargetId] = "school-navigation";
+        ViewData[ViewDataKeys.SkipNavigationText] = "Skip to school navigation";
+    }
+
+    ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 @section Breadcrumbs {
@@ -26,7 +33,7 @@
         @await Component.InvokeAsync("SchoolSideNavigation", navigation)
     }
 
-    <div class="app-body-container-with-side-navigation">
+    <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
         @RenderBody()
     </div>
 </div>

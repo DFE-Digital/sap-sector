@@ -54,13 +54,7 @@ public class ComparisonController : Controller
     }
 
     [HttpGet]
-    public Task<IActionResult> Index(
-        string urn,
-        string similarSchoolUrn) =>
-        Similarity(urn, similarSchoolUrn);
-
-    [HttpGet]
-    [Route("similarity")]
+    [Route("compare-similarity")]
     public async Task<IActionResult> Similarity(
         string urn,
         string similarSchoolUrn)
@@ -76,7 +70,7 @@ public class ComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("ks4-headline-measures")]
+    [Route("compare-ks4-headline-measures")]
     public async Task<IActionResult> Ks4HeadlineMeasures(
         string urn,
         string similarSchoolUrn)
@@ -99,7 +93,7 @@ public class ComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("ks4-core-subjects")]
+    [Route("compare-ks4-core-subjects")]
     public async Task<IActionResult> Ks4CoreSubjects(
     string urn,
     string similarSchoolUrn)
@@ -128,7 +122,7 @@ public class ComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("attendance")]
+    [Route("compare-attendance")]
     public async Task<IActionResult> Attendance(
         string urn,
         string similarSchoolUrn)
@@ -212,7 +206,7 @@ public class ComparisonController : Controller
     }
 
     [HttpGet]
-    [Route("school-details")]
+    [Route("compare-school-details")]
     public async Task<IActionResult> SchoolDetails(
         string urn,
         string similarSchoolUrn)

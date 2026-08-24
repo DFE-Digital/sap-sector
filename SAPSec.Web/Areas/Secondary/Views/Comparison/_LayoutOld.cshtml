@@ -4,6 +4,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["SkipLinkTargetId"] = "page-content";
 
     var layout = ViewData[ViewDataKeys.ComparisonSchool] as SimilarSchoolsComparisonViewModel;
     ViewData[ViewDataKeys.Title] = layout.SimilarSchoolName;
@@ -48,7 +49,7 @@
     </div>
 
     @* MAIN CONTENT *@
-    <div class="app-body-container-with-side-navigation">
+    <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
             <span class="govuk-caption-xl">
                 @layout.Name
             </span>
@@ -67,10 +68,10 @@
                 <nav aria-label="Compare sections" class="govuk-service-navigation__wrapper">
                     <ul class="govuk-service-navigation__list">
 
-                        <li class="govuk-service-navigation__item @active(currentAction == "Index")">
+                        <li class="govuk-service-navigation__item @active(currentAction == "Index" || currentAction == "Similarity")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.SecondarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).Overview"
-                               aria-current="@(currentAction == "Index" ? "page" : null)">
+                               href="@Routes.SecondarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).Similarity"
+                               aria-current="@(currentAction == "Index" || currentAction == "Similarity" ? "page" : null)">
                                 Similarity
                             </a>
                         </li>

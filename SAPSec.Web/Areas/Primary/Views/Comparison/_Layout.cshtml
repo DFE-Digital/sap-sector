@@ -4,6 +4,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["SkipLinkTargetId"] = "page-content";
 
     var layout = ViewData[ViewDataKeys.ComparisonLayout] as ComparisonLayoutModel;
     ViewData[ViewDataKeys.Title] = layout!.SimilarSchoolName;
@@ -39,7 +40,7 @@
     </div>
 
     @* MAIN CONTENT *@
-    <div class="app-body-container-with-side-navigation">
+    <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
         <span class="govuk-caption-xl">
             @layout!.Name
         </span>

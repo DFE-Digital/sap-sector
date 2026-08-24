@@ -30,11 +30,7 @@ public class ComparisonController(
     : Controller
 {
     [HttpGet]
-    public Task<IActionResult> Index(string urn, string similarSchoolUrn) =>
-        Similarity(urn, similarSchoolUrn);
-
-    [HttpGet]
-    [Route("similarity")]
+    [Route("compare-similarity")]
     public async Task<IActionResult> Similarity(string urn, string similarSchoolUrn)
     {
         var currentSchool = (await getSchoolInfoUseCase.Execute(new GetSchoolInfoRequest(urn))).School;
@@ -62,7 +58,7 @@ public class ComparisonController(
     }
 
     [HttpGet]
-    [Route("ks2")]
+    [Route("compare-ks2")]
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn, string similarSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
@@ -94,7 +90,7 @@ public class ComparisonController(
     }
 
     [HttpGet]
-    [Route("attendance")]
+    [Route("compare-attendance")]
     public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
@@ -121,7 +117,7 @@ public class ComparisonController(
     }
 
     [HttpGet]
-    [Route("school-details")]
+    [Route("compare-school-details")]
     public async Task<IActionResult> SchoolDetails(string urn, string similarSchoolUrn)
     {
         var response = await getPrimarySimilarSchoolDetailsUseCase.Execute(

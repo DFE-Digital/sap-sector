@@ -86,8 +86,7 @@ public class AllPagesIntegrationTests(
         var page = await Fixture.RequestPageAsync(path);
 
         var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
-
-        if (path.StartsWith(Routes.PrimarySchool("100001").Comparison("100002").Overview))
+        if (path.StartsWith(Routes.PrimarySchool("100001").Comparison("100002").BasePath))
         {
             navigationItems.Should().SatisfyRespectively(
                 n => n.ShouldLinkTo("Home", Routes.FindASchool()),
