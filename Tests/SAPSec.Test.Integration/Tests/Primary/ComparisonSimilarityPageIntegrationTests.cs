@@ -65,7 +65,7 @@ public class ComparisonSimilarityPageIntegrationTests(
             });
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Overview);
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Similarity);
 
         var table = page.QuerySelector("table.govuk-table") as IHtmlTableElement;
         table.Should().NotBeNull();
@@ -87,7 +87,7 @@ public class ComparisonSimilarityPageIntegrationTests(
     public async Task Similarity_LinksToWhatIsASimilarSchoolPage()
     {
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Overview);
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Similarity);
 
         var link = page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("what-is-a-similar-school-link");
 

@@ -30,7 +30,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         await Page.GetByText("View similar schools", new() { Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).ViewSimilarSchools);
         await Page.GetByText("The Hurlingham Academy", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).Overview);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).Similarity);
         await Page.GetByText("KS4 headline measures", new() { Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).KS4HeadlineMeasures);
     }

@@ -72,7 +72,7 @@ public class SimilarSchoolsComparisonControllerTests
     }
 
     [Fact]
-    public async Task Index_ReturnsView_WithMappedModel_AndSetsViewData()
+    public async Task Similarity_ReturnsView_WithMappedModel_AndSetsViewData()
     {
         var urn = "145327";
         var similarUrn = "142075";
@@ -90,7 +90,7 @@ public class SimilarSchoolsComparisonControllerTests
         SetupAbsence();
         SetupPerfomance();
 
-        var result = await _sut.Index(urn, similarUrn);
+        var result = await _sut.Similarity(urn, similarUrn);
 
         var view = result.Should().BeOfType<ViewResult>().Subject;
         var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;

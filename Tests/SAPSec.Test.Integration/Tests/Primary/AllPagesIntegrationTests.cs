@@ -21,7 +21,6 @@ public class AllPagesIntegrationTests(
         new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
         new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
         new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Overview, "Test School 2", IsInNavigation: false),
         new(Routes.PrimarySchool("100001").Comparison("100002").Similarity, "Test School 2", IsInNavigation: false),
         new(Routes.PrimarySchool("100001").Comparison("100002").Ks2, "Test School 2", IsInNavigation: false),
         new(Routes.PrimarySchool("100001").Comparison("100002").Attendance, "Test School 2", IsInNavigation: false),

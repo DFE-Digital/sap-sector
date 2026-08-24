@@ -90,7 +90,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
         var schoolLinks = schools.GetByRole(AriaRole.Link);
         await schoolLinks.Nth(0).ClickAsync();
 
-        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Overview));
+        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Similarity));
 
         await Page.GoBackAsync();
 
@@ -202,7 +202,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
         var schoolLinks = schools.GetByRole(AriaRole.Link);
         await schoolLinks.Nth(0).ClickAsync();
 
-        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Overview));
+        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Similarity));
 
         await Page.GoBackAsync();
 
@@ -354,7 +354,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
 
         await schools.GetByRole(AriaRole.Link).Nth(0).ClickAsync();
 
-        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Overview));
+        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Similarity));
     }
 
     [Fact]
@@ -403,7 +403,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
 
         await schools.GetByRole(AriaRole.Link).Nth(0).ClickAsync();
 
-        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Overview));
+        await Expect(Page).ToHaveURLAsync(new Regex(PrimarySchoolRoute.Comparison(UrlPattern).Similarity));
     }
 
     private async Task<ILocator> GetSection(string headerText)
