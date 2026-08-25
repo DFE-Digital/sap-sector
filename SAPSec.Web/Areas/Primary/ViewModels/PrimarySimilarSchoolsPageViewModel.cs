@@ -2,6 +2,7 @@ using SAPSec.Core;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.Model;
+using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;
 using System.Globalization;
@@ -146,7 +147,7 @@ public class PrimarySimilarSchoolsPageViewModel : ISimilarSchoolsPageViewModel
                 row.SimilarSchool.LocalAuthority.Name,
                 row.Rank,
                 row.Distance,
-                Routes.PrimarySchool(currentSchoolUrn).Comparison(row.SimilarSchool.URN).Overview,
+                Routes.PrimarySchool(currentSchoolUrn).Comparison(row.SimilarSchool.URN).Similarity,
                 BuildFullAddress(row.SimilarSchool.Address.Street, row.SimilarSchool.Address.Town, row.SimilarSchool.Address.Postcode),
                 row.Coordinates?.Latitude.ToString(CultureInfo.InvariantCulture),
                 row.Coordinates?.Longitude.ToString(CultureInfo.InvariantCulture),

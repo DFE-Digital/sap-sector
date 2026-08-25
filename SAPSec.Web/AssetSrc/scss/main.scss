@@ -516,6 +516,39 @@
   }
 }
 
+.app-side-navigation__skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.app-side-navigation__skip-link:focus {
+  position: static;
+  display: inline-block;
+  width: auto;
+  height: auto;
+  margin-bottom: govuk-spacing(3);
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  padding: govuk-spacing(2);
+  outline: 3px solid transparent;
+  background-color: govuk-colour("yellow");
+  box-shadow: 0 4px 0 govuk-colour("black");
+  color: govuk-colour("black");
+  text-decoration: none;
+}
+
+.app-navigation-skip-link {
+  @extend .govuk-skip-link;
+}
+
 .app-side-navigation__button {
   display: none;
   font-family: Helvetica, Arial, sans-serif;

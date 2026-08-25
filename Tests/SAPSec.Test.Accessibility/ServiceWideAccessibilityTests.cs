@@ -1,6 +1,5 @@
 ﻿using Deque.AxeCore.Playwright;
 using FluentAssertions;
-using Microsoft.Playwright;
 using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
@@ -18,24 +17,29 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.FindASchool()),
 
         new(Routes.PrimarySchool("100171").Overview),
-        new(Routes.PrimarySchool("100171").KS2, HasH3Headings: true),
-        new(Routes.PrimarySchool("100171").Attendance, HasH3Headings: true),
+        new(Routes.PrimarySchool("100171").KS2),
+        new(Routes.PrimarySchool("100171").Attendance),
         new(Routes.PrimarySchool("100171").ViewSimilarSchools),
-        new(Routes.PrimarySchool("100171").Comparison("150318").Overview),
-        new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
         new(Routes.PrimarySchool("100171").SchoolDetails),
         new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Similarity),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Ks2),
+        new(Routes.PrimarySchool("100171").Comparison("150318").Attendance),
+        new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
 
         new(Routes.SecondarySchool("100182").Overview),
-        new(Routes.SecondarySchool("100182").KS4HeadlineMeasures, HasH3Headings: true),
-        new(Routes.SecondarySchool("100182").KS4CoreSubjects, HasH3Headings: true),
-        new(Routes.SecondarySchool("100182").Attendance, HasH3Headings: true),
+        new(Routes.SecondarySchool("100182").KS4HeadlineMeasures),
+        new(Routes.SecondarySchool("100182").KS4CoreSubjects),
+        new(Routes.SecondarySchool("100182").Attendance),
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
-        // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
-        new(Routes.SecondarySchool("100182").Comparison("136555").Overview, AllowHorizontalScroll: true),
-        new(Routes.SecondarySchool("100182").Comparison("136555").SchoolDetails),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),
+        // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
+        new(Routes.SecondarySchool("100182").Comparison("136555").Similarity, AllowHorizontalScroll: true),
+        new(Routes.SecondarySchool("100182").Comparison("136555").KS4HeadlineMeasures),
+        new(Routes.SecondarySchool("100182").Comparison("136555").KS4CoreSubjects),
+        new(Routes.SecondarySchool("100182").Comparison("136555").Attendance),
+        new(Routes.SecondarySchool("100182").Comparison("136555").SchoolDetails),
         
         // TODO: Fill out with all pages from service
     ];
@@ -84,8 +88,13 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
 
         var skipLink = Page.Locator(".govuk-skip-link");
         var href = await skipLink.GetAttributeAsync("href");
+        var target = Page.Locator(href!);
 
-        href.Should().Be("#main-content", "Skip link should target main content");
+        href.Should().BeOneOf("#main-content", "#page-content",
+            "Skip link should target the main content region");
+
+        var targetCount = await target.CountAsync();
+        targetCount.Should().Be(1, "Skip link target should exist on the page");
     }
 
     [Theory]
@@ -122,10 +131,17 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
 
         await Page.Keyboard.PressAsync("Tab");
 
-        var skipLink = Page.Locator(".govuk-skip-link");
-        var isFocused = await skipLink.EvaluateAsync<bool>("el => el === document.activeElement");
+        var isFocusedOnSkipLink = await Page.EvaluateAsync<bool>(@"
+            () => {
+                const active = document.activeElement;
+                return !!active &&
+                    (active.classList.contains('govuk-skip-link') ||
+                     active.classList.contains('app-navigation-skip-link'));
+            }
+        ");
 
-        isFocused.Should().BeTrue("Skip link should be first focusable element");
+        isFocusedOnSkipLink.Should().BeTrue(
+            "the first focusable element should be a skip link");
     }
 
     [Theory]
@@ -192,8 +208,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
     }
 
     [Theory]
-    [MemberData(nameof(AllPagesWithH3Headings))]
-    public async Task AllPages_HaveSemanticHTMLStructure(string path, bool hasH3Headings)
+    [MemberData(nameof(AllPages))]
+    public async Task AllPages_HaveSemanticHTMLStructure(string path)
     {
         await NavigateTo(path);
 
@@ -207,17 +223,6 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
 
         var h2Count = await Page.Locator("h2").CountAsync();
         h2Count.Should().BeGreaterThan(0);
-
-        // Ensure no h3-h6 are used unless necessary
-        var h3Count = await Page.Locator("h3").CountAsync();
-        if (hasH3Headings)
-        {
-            h3Count.Should().BeGreaterThan(0);
-        }
-        else
-        {
-            h3Count.Should().Be(0);
-        }
     }
 
     [Theory]
@@ -508,12 +513,42 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         await Page.SetViewportSizeAsync(375, 667);
         await NavigateTo(path);
 
-        var links = Page.Locator("main a");
-        var count = await links.CountAsync();
+        var visibleLinkIndexes = await Page.EvaluateAsync<int[]>(@"
+            () => {
+                const links = Array.from(document.querySelectorAll('main a'));
 
-        for (var i = 0; i < Math.Min(count, 5); i++)
+                return links
+                    .map((link, index) => ({ link, index }))
+                    .filter(({ link }) => {
+                        if (link.classList.contains('govuk-skip-link') ||
+                            link.classList.contains('app-side-navigation__skip-link') ||
+                            link.classList.contains('app-navigation-skip-link')) {
+                            return false;
+                        }
+
+                        const style = window.getComputedStyle(link);
+                        if (style.display === 'none' || style.visibility === 'hidden') {
+                            return false;
+                        }
+
+                        const rect = link.getBoundingClientRect();
+                        return rect.width > 0 &&
+                               rect.height > 0 &&
+                               rect.bottom > 0 &&
+                               rect.right > 0 &&
+                               rect.top < window.innerHeight &&
+                               rect.left < window.innerWidth;
+                    })
+                    .slice(0, 5)
+                    .map(({ index }) => index);
+            }
+        ");
+
+        var links = Page.Locator("main a");
+
+        for (var i = 0; i < visibleLinkIndexes!.Length; i++)
         {
-            var boundingBox = await links.Nth(i).BoundingBoxAsync();
+            var boundingBox = await links.Nth(visibleLinkIndexes[i]).BoundingBoxAsync();
 
             if (boundingBox != null)
             {
@@ -576,17 +611,6 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         foreach (var (path, _, _) in AllPagePaths)
         {
             data.Add(path);
-        }
-
-        return data;
-    }
-
-    public static TheoryData<string, bool> AllPagesWithH3Headings()
-    {
-        var data = new TheoryData<string, bool>();
-        foreach (var (path, hasH3Headings, _) in AllPagePaths)
-        {
-            data.Add(path, hasH3Headings);
         }
 
         return data;

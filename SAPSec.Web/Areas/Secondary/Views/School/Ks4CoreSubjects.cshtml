@@ -2,15 +2,15 @@
 @using SAPSec.Web.ViewModels
 @using SAPSec.Web.Constants 
 
-@model SAPSec.Web.Areas.Secondary.ViewModels.Ks4CoreSubjectsPageViewModel
+@model SAPSec.Web.Areas.Secondary.ViewModels.School.Ks4CoreSubjectsPageViewModel
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "KS4 core subject GCSE results";
+    ViewData[ViewDataKeys.Title] = "KS4 core subject GCSE results";
 }
 
 <div class="app-school-page">
     <span class="govuk-caption-xl">@Model.School.Name</span>
-    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+    <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
     <p class="govuk-body">
         Compare this school's GCSEs in KS4 core subjects with:

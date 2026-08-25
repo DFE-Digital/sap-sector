@@ -173,6 +173,8 @@ public class Program
         builder.Services.Configure<RazorViewEngineOptions>(options =>
         {
             options.ViewLocationFormats.Add("/{0}.cshtml");
+            options.AreaViewLocationFormats.Add("/Areas/Shared/Views/{1}/{0}.cshtml");
+            options.AreaViewLocationFormats.Add("/Areas/Shared/Views/{0}.cshtml");
         });
 
         builder.Services.Configure<RequestLocalizationOptions>(options =>

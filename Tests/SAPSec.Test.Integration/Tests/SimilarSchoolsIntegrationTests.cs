@@ -96,9 +96,9 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        GetCanvasMarkup(content, "ks4-attainment8-comparison-chart").Should().Contain("data-label-decimals=\"1\"");
-        GetCanvasMarkup(content, "eng-maths-comparison-chart").Should().Contain("data-label-decimals=\"0\"");
-        GetCanvasMarkup(content, "destinations-comparison-chart").Should().Contain("data-label-decimals=\"0\"");
+        GetCanvasMarkup(content, "attainment8-current-year-chart").Should().Contain("data-label-decimals=\"1\"");
+        GetCanvasMarkup(content, "eng-maths-current-year-chart").Should().Contain("data-label-decimals=\"0\"");
+        GetCanvasMarkup(content, "destinations-current-year-chart").Should().Contain("data-label-decimals=\"0\"");
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        GetCanvasMarkup(content, "ks4-attainment8-comparison-yearbyyear-chart").Should().Contain("data-axis-auto-skip=\"false\"");
+        GetCanvasMarkup(content, "attainment8-year-by-year-chart").Should().Contain("data-axis-auto-skip=\"false\"");
     }
 
     private static string GetCanvasMarkup(string content, string id)

@@ -1,15 +1,16 @@
 @using SAPSec.Core.Model
+@using SAPSec.Web.Constants;
 @using SAPSec.Web.ViewModels
 
-@model SAPSec.Web.Areas.Primary.ViewModels.AttendanceMeasuresPageViewModel
+@model SAPSec.Web.Areas.Primary.ViewModels.School.AttendanceMeasuresPageViewModel
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Attendance measures";
+    ViewData[ViewDataKeys.Title] = "Attendance measures";
 }
 
 <div class="app-school-page">
     <span class="govuk-caption-xl">@Model.School.Name</span>
-    <h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+    <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
     <p class="govuk-body">
         Compare this school's attendance measures with:
