@@ -139,7 +139,6 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        Page.Url.Should().Contain("/school/105574");
         Page.Url.Should().Contain(Routes.SecondarySchool("105574").Overview);
 
     }
@@ -693,7 +692,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     [Fact]
     public async Task SchoolSuggest_EmptyQuery_ReturnsSuccessfully()
     {
-        var response = await Page.GotoAsync($"{Routes.FindASchoolSuggest}?queryPart=");
+        var response = await Page.GotoAsync(Routes.FindASchoolSuggest(""));
 
         response!.Status.Should().Be(200);
         var contentType = response.Headers["content-type"];
@@ -703,7 +702,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     [Fact]
     public async Task SchoolSuggest_SpecialCharacters_HandledCorrectly()
     {
-        var response = await Page.GotoAsync($"{Routes.FindASchoolSuggest}?queryPart=St.%20Mary's");
+        var response = await Page.GotoAsync(Routes.FindASchoolSuggest("St. Mary's"));
 
         response!.Status.Should().Be(200);
     }
@@ -711,7 +710,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     [Fact]
     public async Task SchoolSuggest_ReturnsJsonArray()
     {
-        var response = await Page.GotoAsync($"{Routes.FindASchoolSuggest}?queryPart=School");
+        var response = await Page.GotoAsync(Routes.FindASchoolSuggest("School"));
 
         response!.Status.Should().Be(200);
 

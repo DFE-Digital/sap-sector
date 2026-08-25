@@ -3,7 +3,7 @@
         inputElementId,
         targetElementId,
         documentKey,
-        exclude
+        suggestUrl,
     } = options;
 
     let abortController = new AbortController();
@@ -12,13 +12,8 @@
         const params = new URLSearchParams({
             queryPart: query,
         });
-        if (exclude) {
-            exclude.forEach((e) => {
-                params.append("exclude", e);
-            });
-        }
 
-        const res = await fetch("@Routes.FindASchoolSuggest" + params.toString(), {
+        const res = await fetch(suggestUrl + '?' + params.toString(), {
             redirect: "manual",
             method: "GET",
             headers: {

@@ -8,7 +8,7 @@ using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.ViewModels;
 
-namespace SAPSec.Web.Tests.Controllers;
+namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class SchoolSearchControllerTests
 {
@@ -79,7 +79,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(""))
             .ReturnsAsync([]);
 
-        var result = (await _controller.Index()) as ViewResult;
+        var result = await _controller.Index() as ViewResult;
 
         result.Should().NotBeNull();
         result.Model.Should().NotBeNull();
@@ -167,7 +167,7 @@ public class SchoolSearchControllerTests
         _mockSearchService.Setup(s => s.SearchAsync(string.Empty))
             .ReturnsAsync(new List<SchoolSearchResult>());
 
-        var result = await _controller.Index((string?)null, null, 1);
+        var result = await _controller.Index(null, null, 1);
 
         result.Should().BeOfType<ViewResult>();
 
@@ -1092,7 +1092,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Index(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
@@ -1108,7 +1108,7 @@ public class SchoolSearchControllerTests
         var result = await _controller.Index(viewModel);
 
         var redirectResult = result.Should().BeOfType<RedirectResult>().Subject;
-        redirectResult.Url.Should().Be("/school/123456");
+        redirectResult.Url.Should().Be(Routes.SecondarySchool("123456").Overview);
     }
 
     [Fact]
