@@ -107,9 +107,9 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
 
         var lineChartSelectors = new[]
         {
-            "#attainment8-school-yearbyyear-chart",
-            "#eng-maths-school-yearbyyear-chart",
-            "#destinations-school-yearbyyear-chart"
+            "#attainment8-year-by-year-chart",
+            "#eng-maths-year-by-year-chart",
+            "#destinations-year-by-year-chart"
         };
 
         foreach (var selector in lineChartSelectors)
