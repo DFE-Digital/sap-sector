@@ -175,9 +175,12 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
-        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"triangle\"");
-        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rect\"");
-        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rectRot\"");
+        yearByYearChart.Dataset.Should().ContainKey("chart")
+            .WhoseValue.Should().Contain("\"pointStyle\":\"triangle\"");
+        yearByYearChart.Dataset.Should().ContainKey("chart")
+            .WhoseValue.Should().Contain("\"pointStyle\":\"rect\"");
+        yearByYearChart.Dataset.Should().ContainKey("chart")
+            .WhoseValue.Should().Contain("\"pointStyle\":\"rectRot\"");
     }
 
     [Fact]

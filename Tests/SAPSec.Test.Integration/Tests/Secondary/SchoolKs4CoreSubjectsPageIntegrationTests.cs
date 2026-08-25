@@ -1241,10 +1241,14 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
-        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"triangle\"");
-        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"circle\"");
-        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rect\"");
-        yearByYearChart.GetAttribute("data-chart").Should().Contain("\"pointStyle\":\"rectRot\"");
+        yearByYearChart.Dataset.Should().ContainKey("chart")
+            .WhoseValue.Should().Contain("\"pointStyle\":\"triangle\"");
+        yearByYearChart.Dataset.Should().ContainKey("chart")
+            .WhoseValue.Should().Contain("\"pointStyle\":\"circle\"");
+        yearByYearChart.Dataset.Should().ContainKey("chart")
+            .WhoseValue.Should().Contain("\"pointStyle\":\"rect\"");
+        yearByYearChart.Dataset.Should().ContainKey("chart")
+            .WhoseValue.Should().Contain("\"pointStyle\":\"rectRot\"");
     }
 
     [Fact]
