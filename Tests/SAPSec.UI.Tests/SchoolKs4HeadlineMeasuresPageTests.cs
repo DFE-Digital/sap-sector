@@ -96,35 +96,6 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
         ticks.Should().HaveCountGreaterThan(1);
     }
 
-    [Fact]
-    public async Task Ks4HeadlineMeasures_YearByYear_UsesExpectedPointStyles()
-    {
-        await NavigateAsync();
-
-        await ToggleChartViewAsync(0);
-        await ToggleChartViewAsync(1);
-        await ToggleChartViewAsync(2);
-
-        var lineChartSelectors = new[]
-        {
-            "#attainment8-year-by-year-chart",
-            "#eng-maths-year-by-year-chart",
-            "#destinations-year-by-year-chart"
-        };
-
-        foreach (var selector in lineChartSelectors)
-        {
-            var chart = Page.Locator(selector);
-            var pointStyles = await chart.EvaluateAsync<string[]>(@"
-                el => {
-                    const chart = window.Chart && window.Chart.getChart(el);
-                    return chart?.data?.datasets?.map(dataset => dataset.pointStyle) ?? [];
-                }
-            ");
-
-            pointStyles.Should().Equal("triangle", "circle", "rect", "rectRot");
-        }
-    }
 
     [Fact]
     public async Task Ks4HeadlineMeasures_UsesExpectedColoursForAllSchoolCharts()

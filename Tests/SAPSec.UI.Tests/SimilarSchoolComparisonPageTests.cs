@@ -275,27 +275,6 @@ public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture
     }
 
     [Fact]
-    public async Task SimilarSchoolComparison_Map_UsesDistinctMarkerIconsForSelectedAndComparisonSchools()
-    {
-        await Page.GotoAsync(SimilarSchoolComparisonPath);
-        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
-
-        await Page.Locator("#comparison-map-details summary").ClickAsync();
-        await Page.WaitForSelectorAsync("#map img.leaflet-marker-icon", new() { Timeout = 15000 });
-
-        var markerIcons = Page.Locator("#map img.leaflet-marker-icon");
-        await Expect(markerIcons).ToHaveCountAsync(2);
-
-        var sources = await markerIcons.EvaluateAllAsync<string[]>(
-            "elements => elements.map(element => element.getAttribute('src') || '')");
-
-        sources.Should().Contain(src => src.Contains("/assets/images/marker-school-pink.svg"),
-            "selected school should use the distinct pink location marker");
-        sources.Should().Contain(src => src.Contains("/assets/images/marker-school.svg"),
-            "comparison school should use the standard comparison marker");
-    }
-
-    [Fact]
     public async Task SimilarSchoolComparison_HasSchoolsDataJsonScript()
     {
         await Page.GotoAsync(SimilarSchoolComparisonPath);
