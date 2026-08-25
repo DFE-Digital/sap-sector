@@ -5,6 +5,7 @@ using SAPData.Models;
 using SAPSec.Data.Common;
 using System.Globalization;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SAPData;
 
@@ -66,7 +67,7 @@ internal class Program
             var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
             var logicalKeysToRebuild = rebuildAllRawTables
                 ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
-                : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
+                : ResolveDatedRebuildKeys(LoadLogicalKeysToRebuild(rawTablesToRebuildPath), rawInputDir);
             WriteCleanupSql(
                 Path.Combine(sqlDir, "00_cleanup.sql"),
                 logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
@@ -239,6 +240,59 @@ internal class Program
 
         Console.WriteLine($"Loaded {keys.Count} raw table key(s) to rebuild.");
         return keys;
+    }
+
+    /// <summary>
+    /// Rebuild-list entries can use a "YYYYmmDD" placeholder (e.g. "edubasealldataYYYYmmDD") so the
+    /// config doesn't need editing every time GIAS ships a newly-dated extract. This resolves each
+    /// placeholder entry against the dated source file actually present in the input directory, so
+    /// the logical key matches what GenerateRawTables will process. An entry with no matching file
+    /// is left as-is (and therefore won't match anything downstream) so it's obvious in the logs that
+    /// it was skipped rather than silently rebuilding the wrong table.
+    /// </summary>
+    private static HashSet<string> ResolveDatedRebuildKeys(HashSet<string> configuredKeys, string rawInputDir)
+    {
+        const string placeholder = "YYYYmmDD";
+
+        if (!configuredKeys.Any(k => k.Contains(placeholder, StringComparison.OrdinalIgnoreCase)))
+        {
+            return configuredKeys;
+        }
+
+        var availableLogicalKeys = Directory.Exists(rawInputDir)
+            ? Directory.GetFiles(rawInputDir, "*.csv")
+                .Select(csvPath => Path.GetFileNameWithoutExtension(csvPath))
+                .Select(fileKey => fileKey.StartsWith("manual_", StringComparison.OrdinalIgnoreCase)
+                    ? fileKey["manual_".Length..]
+                    : fileKey)
+                .ToList()
+            : new List<string>();
+
+        var resolved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var configuredKey in configuredKeys)
+        {
+            if (!configuredKey.Contains(placeholder, StringComparison.OrdinalIgnoreCase))
+            {
+                resolved.Add(configuredKey);
+                continue;
+            }
+
+            var pattern = "^" + Regex.Escape(configuredKey).Replace(placeholder, @"\d{8}") + "$";
+            var match = availableLogicalKeys.FirstOrDefault(k => Regex.IsMatch(k, pattern, RegexOptions.IgnoreCase));
+
+            if (match is null)
+            {
+                Console.WriteLine($"WARNING: Rebuild entry '{configuredKey}' has no matching dated source file in {rawInputDir}. This table will NOT be rebuilt this run.");
+                resolved.Add(configuredKey);
+                continue;
+            }
+
+            Console.WriteLine($"Resolved dated rebuild entry '{configuredKey}' -> '{match}'.");
+            resolved.Add(match);
+        }
+
+        return resolved;
     }
 
     private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables)
