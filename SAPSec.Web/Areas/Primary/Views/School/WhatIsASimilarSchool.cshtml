@@ -1,14 +1,16 @@
 ﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Areas.Shared.ViewModels
 @using SAPSec.Web.ViewModels
+@using SAPSec.Web.Constants;
 
 @model SchoolInfoViewModel
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "What is a similar school?";
+    ViewData[ViewDataKeys.Title] = "What is a similar school?";
 }
 
 <span class="govuk-caption-xl">@Model.Name</span>
-<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+<h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body">
     The DfE has identified a group of <strong>50</strong> similar primary phase schools (including all-throughs) by comparing schools against criteria based on characteristics such as levels of disadvantage, SEN support, prior attainment, and pupil numbers.

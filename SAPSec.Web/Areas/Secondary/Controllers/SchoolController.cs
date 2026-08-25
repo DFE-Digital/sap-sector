@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Core.Features.Secondary;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
+using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -179,7 +180,7 @@ public class SchoolController : Controller
 
         PopulateViewData(response.School);
 
-        var model = new ViewModels.Ks4HeadlineMeasuresPageViewModel
+        var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School),
@@ -199,7 +200,7 @@ public class SchoolController : Controller
 
         PopulateViewData(response.School);
 
-        var model = new ViewModels.Ks4CoreSubjectsPageViewModel
+        var model = new ViewModels.School.Ks4CoreSubjectsPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Measures = [
@@ -228,14 +229,14 @@ public class SchoolController : Controller
 
     private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
     {
-        ViewData["SchoolDetails"] = school;
+        ViewData[ViewDataKeys.SchoolDetails] = school;
 
         if (Url is null)
         {
             return;
         }
 
-        ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreateSecondary(
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             school.Urn,
             ControllerContext.ActionDescriptor.ActionName);

@@ -36,8 +36,8 @@
     };
 }
 
-<div class="app-measure-chart-container app-measure-chart-container--school-headline">
-    <canvas id="@Model.MeasureInfo.HtmlPrefix-school-yearbyyear-chart"
+<div class="app-measure-chart-container">
+    <canvas id="@Model.MeasureInfo.HtmlPrefix-year-by-year-chart"
             data-testid="@Model.MeasureInfo.HtmlPrefix-year-by-year-chart"
             class="js-chart js-chart--school-measure-line"
             data-type="line"
@@ -51,7 +51,7 @@
             data-show-datalabels="false"
             data-label-decimals="@decimals"
             data-tooltip-decimals="@decimals"
-            data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-            @if (Model.MeasureInfo.YearByYearColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.YearByYearColors))'</text> }>
+            data-chart="@Html.Raw(JsonSerializer.Serialize(chartData).Replace("\"", "&quot;"))"
+            data-colors="@Html.Raw(JsonSerializer.Serialize(Model.Colors).Replace("\"", "&quot;"))">
     </canvas>
 </div>
