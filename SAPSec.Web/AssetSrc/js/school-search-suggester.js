@@ -1,0 +1,196 @@
+﻿export default function Suggester(options) {
+    const {
+        inputElementId,
+        targetElementId,
+        documentKey,
+        exclude
+    } = options;
+
+    let abortController = new AbortController();
+
+    const handleSuggest = async (query) => {
+        const params = new URLSearchParams({
+            queryPart: query,
+        });
+        if (exclude) {
+            exclude.forEach((e) => {
+                params.append("exclude", e);
+            });
+        }
+
+        const res = await fetch("@Routes.FindASchoolSuggest" + params.toString(), {
+            redirect: "manual",
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            signal: abortController.signal,
+        });
+
+        const response = (await res.json());
+        if (!response.error) {
+            return response;
+        }
+
+        return [];
+    };
+
+    const suggestHighlightRegex = /\*([^*]+)\*/g;
+
+    const templates = {
+        inputValue: itemFormatter,
+        suggestion: (item) => {
+            console.log('Suggestion item:', JSON.stringify(item, null, 2));
+            if (item?.name) {
+                const schoolName = item.name.replace(suggestHighlightRegex, "<strong>$1</strong>");
+                const locationParts = [];
+                if (item.town) {
+                    locationParts.push(item.town);
+                }
+                if (item.addressStreet) {
+                    locationParts.push(item.addressStreet);
+                }
+                if (item.addressPostcode) {
+                    locationParts.push(item.addressPostcode);
+                }
+                if (locationParts.length > 0) {
+                    const location = locationParts.join(', ');
+                    return `<span class="autocomplete__option-name">${schoolName}</span>
+                            <span class="autocomplete__option-hint">(${location})</span>`;
+                }
+                return item.name.replace(suggestHighlightRegex, "<b>$1</b>");
+            } else {
+                return "";
+            }
+        },
+    };
+
+    function itemFormatter(item) {
+        return item?.name ? item.name.replace(suggestHighlightRegex, "$1") : "";
+    }
+
+    function valueFormatter(item) {
+        console.log(item);
+        if (!item?.school) {
+            return "";
+        }
+
+        return (item.school[documentKey]) ?? "";
+    }
+
+    function onConfirm(item) {
+        const targetElement = document.getElementById(targetElementId);
+
+        if (targetElement) {
+            targetElement.value = valueFormatter(item);
+        }
+
+        if (inputElement) {
+            inputElement.value = itemFormatter(item);
+        }
+    }
+
+    const numericRegex = /^\d+\\*\/*\d+$/; // match for all number or number[/or\]number format
+
+    // debounce and/or cancel ongoing suggestions to prevent excessive requests
+    let suggesting = false;
+    const source = debounce(
+        (query, populateResults) => {
+            const trimmedQuery = query.trim();
+
+            if (suggesting) {
+                abortController.abort("Query updated");
+                abortController = new AbortController();
+            }
+
+            if (trimmedQuery.length < 3) {
+                populateResults([]);
+                return;
+            }
+
+            const targetElement = document.getElementById(targetElementId);
+
+            if (numericRegex.test(trimmedQuery)) {
+                if (targetElement) {
+                    targetElement.value = inputElement.value;
+                }
+                populateResults([]);
+                return;
+            } else if (targetElement) {
+                targetElement.value = "";
+            }
+
+            suggesting = true;
+            handleSuggest(trimmedQuery)
+                .then((results) => {
+                    populateResults(results);
+                })
+                .catch((e) => {
+                    if (e.name !== "AbortError") {
+                        throw e;
+                    }
+                })
+                .finally(() => {
+                    suggesting = false;
+                });
+        },
+        300
+    );
+
+    const inputElement = document.getElementById(inputElementId);
+    if (inputElement) {
+        // create a placeholder element to render the autocomplete within
+        const autoCompleteElement = document.createElement("div");
+        const id = `__${inputElementId}`;
+        inputElement.parentNode?.insertBefore(autoCompleteElement, inputElement);
+
+        // create a hidden element to store the selected item ID
+        const targetElement = document.createElement("input");
+        targetElement.id = targetElementId;
+        targetElement.name = targetElementId;
+        targetElement.type = "hidden";
+        inputElement.parentNode?.insertBefore(targetElement, inputElement);
+
+        accessibleAutocomplete({
+            element: autoCompleteElement,
+            id,
+            name: id,
+            defaultValue: inputElement.value ?? "",
+            autoselect: false,
+            displayMenu: "overlay",
+            minLength: 3,
+            showAllValues: false,
+            showNoOptionsFound: false,
+            confirmOnBlur: false,
+            source,
+            templates,
+            onConfirm,
+            inputClasses: "govuk-input-autocomplete",
+        });
+
+        inputElement.type = "hidden";
+
+        autoCompleteElement.addEventListener("keydown", (e) => {
+            // submit form automatically on pressing the Enter Key, whether an item has been selected or not
+            if (e.key === "Enter") {
+                autoCompleteElement.closest("form")?.submit();
+            }
+        });
+
+        autoCompleteElement.addEventListener("input", (e) => {
+            // keep the original input in sync with autocomplete input
+            const target = e.target;
+            let value = target.value?.toString();
+            if (value === "0") {
+                value = target.innerText;
+            }
+
+            inputElement.value = value;
+
+            // clear any previously selected school
+            if (e.key !== "Enter") {
+                targetElement.value = "";
+            }
+        });
+    }
+}

@@ -149,8 +149,6 @@ public class SchoolSearchController(
     {
         using (logger.BeginScope(new { searchQueryViewModel }))
         {
-            ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(searchQueryViewModel.Urn);
-
             if (!ModelState.IsValid)
             {
                 return View(new SchoolSearchResultsViewModel
@@ -174,7 +172,7 @@ public class SchoolSearchController(
                 return RedirectToSchool(school);
             }
 
-            ModelState.AddModelError("Query", "We could not find any schools matching your search criteria");
+            ModelState.AddModelError("Query", NoResultsErrorMessage);
             var fallbackRouteValues = BuildSearchRouteValues(
                 searchQueryViewModel.Query);
 

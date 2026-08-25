@@ -70,13 +70,19 @@
 
     </div>
 </div>
-@await Html.PartialAsync("_SchoolSearchSuggest", new SchoolSearchSuggesterViewModel
-{
-    InputElementId = nameof(Model.Query),
-    TargetElementId = nameof(Model.Urn),
-    IdFieldName = "urn"
-})
+
 @section Scripts {
+    <script type="text/javascript" src="/js/accessible-autocomplete.min.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="/js/lodash.debounce/index.js" asp-append-version="true"></script>
+    <script type="module" add-nonce="true">
+        import Suggester from '/js/school-search-suggester.js'
+
+        Suggester({
+            inputElementId: "@nameof(Model.Query)",
+            targetElementId: "@nameof(Model.Urn)",
+            documentKey: "urn"
+        });
+    </script>
     <script src="~/js/school-search-toggle.js"></script>
     <script src="~/js/map-schools.js"></script>
     <script src="~/js/leaflet.js"></script>
