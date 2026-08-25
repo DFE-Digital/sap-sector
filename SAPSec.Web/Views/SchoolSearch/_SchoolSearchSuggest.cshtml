@@ -24,7 +24,7 @@
                 });
             }
 
-            const res = await fetch("/find-a-school/suggest?" + params.toString(), {
+            const res = await fetch("@Routes.FindASchoolSuggest" + params.toString(), {
                 redirect: "manual",
                 method: "GET",
                 headers: {

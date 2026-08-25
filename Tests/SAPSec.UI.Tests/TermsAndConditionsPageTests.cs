@@ -9,7 +9,7 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class TermsAndConditionsPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string TermsAndConditionsPath = "/terms-and-conditions";
+    private const string TermsAndConditionsPath = Routes.TermsAndConditions;
 
     #region View Rendering Tests
 
@@ -51,7 +51,7 @@ public class TermsAndConditionsPageTests(WebApplicationSetupFixture fixture) : B
         var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
 
         (await breadcrumb.CountAsync()).Should().Be(1);
-        (await breadcrumb.First.GetAttributeAsync("href")).Should().Be("/find-a-school");
+        (await breadcrumb.First.GetAttributeAsync("href")).Should().Be(Routes.FindASchool());
     }
 
     [Fact]

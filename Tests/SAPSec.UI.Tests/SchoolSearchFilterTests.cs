@@ -2,6 +2,7 @@
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
@@ -662,25 +663,25 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
 
     private async Task NavigateToSearchResults(string query = "School")
     {
-        await Page.GotoAsync($"{Paths.SchoolSearchResults}?query={query}");
+        await Page.GotoAsync(Routes.FindASchool(query));
         await WaitForNavigation();
     }
 
     private async Task NavigateToSearchResultsWithNoResults()
     {
-        await Page.GotoAsync($"{Paths.SchoolSearchResults}?query={TestData.NonExistentQuery}");
+        await Page.GotoAsync(Routes.FindASchool(TestData.NonExistentQuery));
         await WaitForNavigation();
     }
 
     private async Task NavigateToSearchResultsWithFilter(string localAuthority)
     {
-        await Page.GotoAsync($"{Paths.SchoolSearchResults}?query=School&localAuthorities={localAuthority}");
+        await Page.GotoAsync(Routes.FindASchool("School", localAuthorities: [localAuthority]));
         await WaitForNavigation();
     }
 
     private async Task NavigateToSearchResultsWithMultipleFilters()
     {
-        await Page.GotoAsync($"{Paths.SchoolSearchResults}?query=School&localAuthorities=Leeds&localAuthorities=Bradford");
+        await Page.GotoAsync(Routes.FindASchool("School", localAuthorities: ["Leeds", "Bradford"]));
         await WaitForNavigation();
     }
 
@@ -812,11 +813,6 @@ public class SchoolSearchFilterTests(WebApplicationSetupFixture fixture)
     #endregion
 
     #region Constants
-
-    private static class Paths
-    {
-        public const string SchoolSearchResults = "/find-a-school";
-    }
 
     private static class TestData
     {

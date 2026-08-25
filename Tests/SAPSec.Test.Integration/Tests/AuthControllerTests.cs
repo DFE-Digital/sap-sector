@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using SAPSec.Test.Integration.Setup;
+using SAPSec.Web.Constants;
 using System.Net;
 
 namespace SAPSec.Test.Integration.Tests;
@@ -73,7 +74,7 @@ public class AuthControllerIntegrationTests(JsonRepositoryIntegrationTestFixture
     }
 
     [Theory]
-    [InlineData("/find-a-school")]
+    [InlineData(Routes.FindASchoolBasePath)]
     public async Task GetSignIn_WithVariousReturnUrls_ReturnsValidResponse(string returnUrl)
     {
         var response = await fixture.Client.GetAsync($"{ExpectedRoutes.SignIn}?returnUrl={Uri.EscapeDataString(returnUrl)}");

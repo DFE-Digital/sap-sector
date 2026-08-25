@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
@@ -9,14 +10,12 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolSearchResultsPath = "/find-a-school";
-
     #region Toggle Button Tests
 
     [Fact]
     public async Task ToggleButton_IsVisible_WhenResultsExist()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleWrap = Page.Locator("#toggleWrap");
@@ -32,7 +31,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleButton_IsNotVisible_WhenNoResults()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleWrap = Page.Locator("#toggleWrap");
@@ -44,7 +43,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleButton_HasCorrectInitialText()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleText = Page.Locator(".toggle-text");
@@ -56,7 +55,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleButton_HasCorrectDataAttribute()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleLink = Page.Locator("#toggleViewLink");
@@ -68,7 +67,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleButton_HasMapIcon_Initially()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mapIcon = Page.Locator(".toggle-icon--map");
@@ -80,7 +79,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleButton_HasListIcon_Initially()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var listIcon = Page.Locator(".toggle-icon--list");
@@ -96,7 +95,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ListView_IsVisible_Initially()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var listView = Page.Locator("#listView");
@@ -108,7 +107,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapView_IsHidden_Initially()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mapView = Page.Locator("#mapView");
@@ -120,7 +119,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ClickToggle_ShowsMapView()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleLink = Page.Locator("#toggleViewLink");
@@ -136,7 +135,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ClickToggle_HidesListView()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleLink = Page.Locator("#toggleViewLink");
@@ -152,7 +151,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ClickToggleTwice_ReturnsToListView()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleLink = Page.Locator("#toggleViewLink");
@@ -174,7 +173,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleButton_ChangesText_WhenSwitchingToMap()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleLink = Page.Locator("#toggleViewLink");
@@ -194,7 +193,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapView_ContainsMapElement()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var map = Page.Locator("#map");
@@ -206,7 +205,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapView_HasAriaLabel()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var map = Page.Locator("#map");
@@ -218,7 +217,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapView_HasRoleRegion()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var map = Page.Locator("#map");
@@ -230,7 +229,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapView_HasFixedZoomAttribute()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var map = Page.Locator("#map");
@@ -246,7 +245,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapCount_DisplaysCorrectly()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mapCount = Page.Locator("#mapCount");
@@ -258,7 +257,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapCount_ShowsTotalSchools()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mapCount = Page.Locator("#mapCount");
@@ -271,7 +270,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapCount_HasCorrectCssClass()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mapCount = Page.Locator("#mapCount");
@@ -287,7 +286,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task SchoolsData_JsonExists()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var schoolsData = Page.Locator("#schools-data");
@@ -299,7 +298,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task SchoolsData_HasCorrectType()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var schoolsData = Page.Locator("#schools-data");
@@ -311,7 +310,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task SchoolsData_ContainsValidJson()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var schoolsData = Page.Locator("#schools-data");
@@ -328,7 +327,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task MapBarActions_ElementExists()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mapBarActions = Page.Locator("#mapBarActions");
@@ -344,7 +343,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleLink_IsKeyboardAccessible()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleLink = Page.Locator("#toggleViewLink");
@@ -357,7 +356,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleLink_HasNoVisitedState()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var toggleLink = Page.Locator("#toggleViewLink");
@@ -369,7 +368,7 @@ public class SchoolSearchMapToggleTests(WebApplicationSetupFixture fixture) : Ba
     [Fact]
     public async Task ToggleIcons_HaveAriaHidden()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var mapIcon = Page.Locator(".toggle-icon--map");

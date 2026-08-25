@@ -66,25 +66,5 @@
 }
 
 @functions {
-    string BuildPageUrl(int page)
-    {
-        var queryParams = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(Model.Query))
-        {
-            queryParams.Add($"query={Uri.EscapeDataString(Model.Query)}");
-        }
-
-        queryParams.Add($"page={page}");
-
-        if (Model.LocalAuthorities != null)
-        {
-            foreach (var la in Model.LocalAuthorities)
-            {
-                queryParams.Add($"localAuthorities={Uri.EscapeDataString(la)}");
-            }
-        }
-
-        return $"/find-a-school?{string.Join("&", queryParams)}";
-    }
+    string BuildPageUrl(int page) => Routes.FindASchool(Model.Query, page.ToString(), Model.LocalAuthorities);
 }

@@ -99,7 +99,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetIndex_WithSpecialCharacters_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync(Routes.FindASchool("St.%20Mary%27s%20%26%20School"));
+        var response = await fixture.Client.GetAsync(Routes.FindASchool("St. Mary's & School"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -125,7 +125,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetIndex_WithSingle_Match_RedirectsToSchoolPage()
     {
-        var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool("Notre%20Dame%20High%20School%20Norwich"));
+        var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool("Notre Dame High School Norwich"));
 
         response.StatusCode.Should().Be(HttpStatusCode.Redirect);
         response.Headers.Location!.ToString().Should().Contain(Routes.SecondarySchool("137913").Overview);
@@ -385,7 +385,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetSuggest_WithValidQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
+        var response = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("Test"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType?.MediaType.Should().Be("application/json");
@@ -394,7 +394,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetSuggest_ReturnsJsonArray()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=School");
+        var response = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("School"));
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -407,7 +407,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetSuggest_WithEmptyQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=");
+        var response = await fixture.Client.GetAsync(Routes.FindASchoolSuggest(""));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -415,7 +415,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetSuggest_WithoutQueryParameter_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/suggest");
+        var response = await fixture.Client.GetAsync(Routes.FindASchoolSuggest());
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -423,7 +423,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetSuggest_WithSpecialCharacters_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=St.%20Mary%27s");
+        var response = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("St. Mary's"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -431,7 +431,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetSuggest_WithShortQuery_ReturnsSuccess()
     {
-        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=A");
+        var response = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("A"));
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -441,7 +441,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 
-        var response = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test", cts.Token);
+        var response = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("Test"), cts.Token);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -449,9 +449,9 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [Fact]
     public async Task GetSuggest_MultipleConsecutiveCalls_ReturnsConsistently()
     {
-        var response1 = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
-        var response2 = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
-        var response3 = await fixture.Client.GetAsync("/find-a-school/suggest?queryPart=Test");
+        var response1 = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("Test"));
+        var response2 = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("Test"));
+        var response3 = await fixture.Client.GetAsync(Routes.FindASchoolSuggest("Test"));
 
         response1.StatusCode.Should().Be(HttpStatusCode.OK);
         response2.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -469,7 +469,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         {
             Routes.FindASchool(),
             Routes.FindASchool("Test"),
-            "/find-a-school/suggest?queryPart=Test"
+            Routes.FindASchoolSuggest("Test")
         };
 
         foreach (var endpoint in endpoints)
@@ -524,7 +524,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     [InlineData("St. Mary's")]
     public async Task GetIndex_WithVariousQueries_ReturnsSuccess(string query)
     {
-        var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool(Uri.EscapeDataString(query)));
+        var response = await fixture.NonRedirectingClient.GetAsync(Routes.FindASchool(query));
 
         response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.Redirect, HttpStatusCode.Found);
     }
@@ -534,7 +534,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
     {
         var maliciousQuery = "<script>alert('xss')</script>";
 
-        var response = await fixture.Client.GetAsync(Routes.FindASchool(Uri.EscapeDataString(maliciousQuery)));
+        var response = await fixture.Client.GetAsync(Routes.FindASchool(maliciousQuery));
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
