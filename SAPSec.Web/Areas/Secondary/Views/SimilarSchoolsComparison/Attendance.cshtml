@@ -19,9 +19,9 @@
             labels = attendanceYearLabels,
         datasets = new object[]
         {
-            new { label = Model.Name, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5, pointStyle = schoolPointStyle },
-            new { label = Model.SimilarSchoolName, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5, pointStyle = similarSchoolPointStyle },
-            new { label = "Schools in England average", data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5, pointStyle = englandPointStyle }
+            new { label = Model.Name, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 5, pointHoverRadius = 6, pointStyle = schoolPointStyle },
+            new { label = Model.SimilarSchoolName, data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 5, pointHoverRadius = 6, pointStyle = similarSchoolPointStyle },
+            new { label = "Schools in England average", data = Array.Empty<decimal?>(), tension = 0, borderWidth = 2, pointRadius = 5, pointHoverRadius = 6, pointStyle = englandPointStyle }
         }
     };
     var chartColors = new[] { "#d53880", "#2a1950", "#2a1950" };

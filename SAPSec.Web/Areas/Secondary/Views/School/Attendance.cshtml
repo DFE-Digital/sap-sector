@@ -26,9 +26,9 @@
         labels = Model.AcademicYears,
         datasets = new object[]
         {
-            new { label = Model.SchoolName, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5, pointStyle = schoolPointStyle },
-            new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5, pointStyle = localAuthorityPointStyle },
-            new { label = Model.EnglandLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Current }, tension = 0, borderWidth = 2, pointRadius = 4, pointHoverRadius = 5, pointStyle = englandPointStyle }
+            new { label = Model.SchoolName, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.School.Current }, tension = 0, borderWidth = 2, pointRadius = 5, pointHoverRadius = 6, pointStyle = schoolPointStyle },
+            new { label = Model.LocalAuthorityLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.LocalAuthority.Current }, tension = 0, borderWidth = 2, pointRadius = 5, pointHoverRadius = 6, pointStyle = localAuthorityPointStyle },
+            new { label = Model.EnglandLabel, data = new decimal?[] { Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous2, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Previous, Model.AttendanceMeasures.OverallAbsenceYearByYear.England.Current }, tension = 0, borderWidth = 2, pointRadius = 5, pointHoverRadius = 6, pointStyle = englandPointStyle }
         }
     };
     var chartColors = new[] { "#D53780", "#2a1950", "#2a1950" };

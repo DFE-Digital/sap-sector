@@ -29,8 +29,8 @@ const CHART_CONFIG = {
         },
         series: {
             tension: 0.2,
-            pointRadius: 4,
-            pointHoverRadius: 5
+            pointRadius: 5,
+            pointHoverRadius: 6
         },
         datalabels: {
             anchor: 'end',
