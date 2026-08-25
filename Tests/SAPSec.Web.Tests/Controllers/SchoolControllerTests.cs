@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
-using SAPSec.Core.Features.Secondary;
+using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -12,6 +12,7 @@ using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Areas.Secondary.Controllers;
+using SAPSec.Web.Constants;
 using SAPSec.Web.Services;
 using System.Text.Json;
 
@@ -109,7 +110,7 @@ public class SchoolControllerTests
 
         await _sut.Index(urn);
 
-        _sut.ViewData["BreadcrumbNode"].Should().NotBeNull();
+        _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
     }
 
     [Fact]

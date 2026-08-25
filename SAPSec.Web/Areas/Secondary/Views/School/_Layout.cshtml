@@ -1,15 +1,16 @@
 @using SAPSec.Core.Model
+@using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
 @{
-    var navigation = ViewData["SchoolNavigation"] as SchoolSideNavigationViewModel;
+    var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
     if (navigation is not null)
     {
-        ViewData["SkipNavigationTargetId"] = "school-navigation";
-        ViewData["SkipNavigationText"] = "Skip to school navigation";
+        ViewData[ViewDataKeys.SkipNavigationTargetId] = "school-navigation";
+        ViewData[ViewDataKeys.SkipNavigationText] = "Skip to school navigation";
     }
 
-    ViewData["SkipLinkTargetId"] = "page-content";
+    ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
 }
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";

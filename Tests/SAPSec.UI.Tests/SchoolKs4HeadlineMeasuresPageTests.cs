@@ -17,7 +17,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
     {
         await Page.GotoAsync(Path, new PageGotoOptions { WaitUntil = WaitUntilState.DOMContentLoaded });
         await Expect(Page.GetByRole(AriaRole.Heading, new() { Name = "KS4 headline performance measures" })).ToBeVisibleAsync();
-        await Expect(Page.Locator("#attainment8-school-chart")).ToBeVisibleAsync();
+        await Expect(Page.Locator("#attainment8-current-year-chart")).ToBeVisibleAsync();
     }
 
     private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
@@ -41,8 +41,8 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
     {
         await NavigateAsync();
 
-        var barChart = Page.Locator("#attainment8-school-chart");
-        var lineChart = Page.Locator("#attainment8-school-yearbyyear-chart");
+        var barChart = Page.Locator("#attainment8-current-year-chart");
+        var lineChart = Page.Locator("#attainment8-year-by-year-chart");
 
         await Expect(barChart).ToBeVisibleAsync();
         await ToggleChartViewAsync();
@@ -72,7 +72,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
         await NavigateAsync();
 
         await ToggleChartViewAsync();
-        var lineChart = Page.Locator("#attainment8-school-yearbyyear-chart");
+        var lineChart = Page.Locator("#attainment8-year-by-year-chart");
         await Expect(lineChart).ToBeVisibleAsync();
 
         var axis = await lineChart.EvaluateAsync<JsonElement>(@"
@@ -133,9 +133,9 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
 
         var barChartSelectors = new[]
         {
-            "#attainment8-school-chart",
-            "#eng-maths-school-chart",
-            "#destinations-school-chart"
+            "#attainment8-current-year-chart",
+            "#eng-maths-current-year-chart",
+            "#destinations-current-year-chart"
         };
 
         foreach (var selector in barChartSelectors)
@@ -157,9 +157,9 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
 
         var lineChartSelectors = new[]
         {
-            "#attainment8-school-yearbyyear-chart",
-            "#eng-maths-school-yearbyyear-chart",
-            "#destinations-school-yearbyyear-chart"
+            "#attainment8-year-by-year-chart",
+            "#eng-maths-year-by-year-chart",
+            "#destinations-year-by-year-chart"
         };
 
         foreach (var selector in lineChartSelectors)

@@ -1,5 +1,6 @@
 @using SAPSec.Core.Features.Filtering
 @using SAPSec.Core.Features.SimilarSchools.UseCases
+@using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers;
 
 @model SimilarSchoolsAvailableFilter
@@ -17,7 +18,7 @@
         _ => (false, false)
     };
     var isExpanded = hasSelection || hasErrors ? "true" : "false";
-    var isLastInGroup = ViewData["IsLastInGroup"] as bool? ?? false;
+    var isLastInGroup = ViewData[ViewDataKeys.IsLastInGroup] as bool? ?? false;
     var sectionClasses = isLastInGroup ? "app-filter-section" : "app-filter-section app-filter-section--divider";
 }
 

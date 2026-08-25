@@ -1,0 +1,124 @@
+@using SAPSec.Web.ViewModels
+@using System.Linq
+@using SAPSec.Web.Constants
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["SkipLinkTargetId"] = "page-content";
+
+    var layout = ViewData[ViewDataKeys.ComparisonSchool] as SimilarSchoolsComparisonViewModel;
+    ViewData[ViewDataKeys.Title] = layout.SimilarSchoolName;
+
+    var currentAction = (string?)ViewContext.RouteData.Values["action"];
+
+    var routeValues = new Dictionary<string, object>
+    {
+        ["area"] = "Secondary",
+        ["urn"] = layout.Urn,
+        ["similarSchoolUrn"] = layout.SimilarSchoolUrn
+    };
+
+    var isKs4HeadlineMeasures = string.Equals(currentAction, "Ks4HeadlineMeasures", StringComparison.OrdinalIgnoreCase);
+    string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
+}
+
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile school-comparison-breadcrumb" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Routes.FindASchool()">Home</a>
+            </li>
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link"
+                   href="@Routes.SecondarySchool(layout.Urn).ViewSimilarSchools">
+                    View similar schools
+                </a>
+            </li>
+        </ol>
+    </nav>
+}
+
+<div class="govuk-grid-row  @(isKs4HeadlineMeasures ? "app-measure-headline-mobile-layout" : "")">
+
+    @* LEFT: back link *@
+    <div class="app-side-navigation-container">
+        <a class="govuk-back-link"
+           href="@Routes.SecondarySchool(layout.Urn).ViewSimilarSchools">
+            Back
+        </a>
+    </div>
+
+    @* MAIN CONTENT *@
+    <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
+            <span class="govuk-caption-xl">
+                @layout.Name
+            </span>
+
+        <span
+            class="govuk-caption-m govuk-!-font-size-24 govuk-!-font-weight-bold govuk-!-padding-top-1 govuk-!-padding-bottom-1">
+                Comparing to
+            </span>
+
+        <h1 class="govuk-heading-xl">
+            @ViewData[ViewDataKeys.Title]
+        </h1>
+
+        <div class="govuk-service-navigation compare-nav">
+            <div class="govuk-service-navigation__container">
+                <nav aria-label="Compare sections" class="govuk-service-navigation__wrapper">
+                    <ul class="govuk-service-navigation__list">
+
+                        <li class="govuk-service-navigation__item @active(currentAction == "Similarity")">
+                            <a class="govuk-service-navigation__link"
+                               href="@Routes.SecondarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).Similarity"
+                               aria-current="@(currentAction == "Similarity" ? "page" : null)">
+                                Similarity
+                            </a>
+                        </li>
+
+                        <li class="govuk-service-navigation__item @active(currentAction == "Ks4HeadlineMeasures")">
+                            <a class="govuk-service-navigation__link"
+                               href="@Routes.SecondarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).KS4HeadlineMeasures"
+                               aria-current="@(currentAction == "Ks4HeadlineMeasures" ? "page" : null)">
+                                KS4 headline measures
+                            </a>
+                        </li>
+
+                        <li class="govuk-service-navigation__item @active(currentAction == "Ks4CoreSubjects")">
+                            <a class="govuk-service-navigation__link"
+                               href="@Routes.SecondarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).KS4CoreSubjects"
+                               aria-current="@(currentAction == "Ks4CoreSubjects" ? "page" : null)">
+                                KS4 core subjects
+                            </a>
+                        </li>
+
+                        <li class="govuk-service-navigation__item @active(currentAction == "Attendance")">
+                            <a class="govuk-service-navigation__link"
+                               href="@Routes.SecondarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).Attendance"
+                               aria-current="@(currentAction == "Attendance" ? "page" : null)">
+                                Attendance
+                            </a>
+                        </li>
+
+                        <li class="govuk-service-navigation__item @active(currentAction == "SchoolDetails")">
+                            <a class="govuk-service-navigation__link"
+                               href="@Routes.SecondarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).SchoolDetails"
+                               aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
+                                School details
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </div>
+
+        <div class="govuk-!-margin-top-9">
+            @RenderBody()
+        </div>
+
+    </div>
+</div>
+
+
+@await RenderSectionAsync("Scripts", required: false)

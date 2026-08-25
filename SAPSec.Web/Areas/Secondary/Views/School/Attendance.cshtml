@@ -1,8 +1,9 @@
 ﻿@using System.Text.Json
+@using SAPSec.Web.Constants;
 @model SAPSec.Web.ViewModels.SchoolAttendancePageViewModel
 @{
     Layout = "_Layout";
-    ViewData["Title"] = "Attendance measures";
+    ViewData[ViewDataKeys.Title] = "Attendance measures";
     const string schoolPointStyle = "triangle";
     const string localAuthorityPointStyle = "rect";
     const string englandPointStyle = "rectRot";
@@ -38,7 +39,7 @@
 }
 
 <span class="govuk-caption-xl">@Model.SchoolName</span>
-<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+<h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body">
     Compare this school's attendance measures with:

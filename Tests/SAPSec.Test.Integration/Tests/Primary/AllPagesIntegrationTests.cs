@@ -14,15 +14,17 @@ public class AllPagesIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
-    private const string PrimarySchoolUrn = "100001";
-
     private static readonly PageTestCase[] PrimaryPages = [
-        new(Routes.PrimarySchool(PrimarySchoolUrn).Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).KS2, "KS2 performance measures", NavigationText: "KS2"),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).Attendance, "Attendance measures", NavigationText: "Attendance"),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools, "View similar schools"),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).SchoolDetails, "School details"),
-        new(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool, "What is a similar school?")
+        new(Routes.PrimarySchool("100001").Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
+        new(Routes.PrimarySchool("100001").KS2, "KS2 performance measures", NavigationText: "KS2"),
+        new(Routes.PrimarySchool("100001").Attendance, "Attendance measures", NavigationText: "Attendance"),
+        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
+        new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
+        new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
+        new(Routes.PrimarySchool("100001").Comparison("100002").Similarity, "Test School 2", IsInNavigation: false),
+        new(Routes.PrimarySchool("100001").Comparison("100002").Ks2, "Test School 2", IsInNavigation: false),
+        new(Routes.PrimarySchool("100001").Comparison("100002").Attendance, "Test School 2", IsInNavigation: false),
+        new(Routes.PrimarySchool("100001").Comparison("100002").SchoolDetails, "Test School 2", IsInNavigation: false)
     ];
 
     public override Task InitializeAsync()
@@ -34,6 +36,9 @@ public class AllPagesIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
             Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues("100001", "100002", "100003"));
 
         return base.InitializeAsync();
     }
@@ -80,7 +85,17 @@ public class AllPagesIntegrationTests(
         var page = await Fixture.RequestPageAsync(path);
 
         var navigationItems = page.QuerySelectorAll(".govuk-breadcrumbs__list-item a");
-        navigationItems.Should().SatisfyRespectively(n => n.ShouldLinkTo("Home", Routes.FindASchool()));
+        if (path.StartsWith(Routes.PrimarySchool("100001").Comparison("100002").BasePath))
+        {
+            navigationItems.Should().SatisfyRespectively(
+                n => n.ShouldLinkTo("Home", Routes.FindASchool()),
+                n => n.ShouldLinkTo("View similar schools", Routes.PrimarySchool("100001").ViewSimilarSchools));
+        }
+        else
+        {
+            navigationItems.Should().SatisfyRespectively(
+                n => n.ShouldLinkTo("Home", Routes.FindASchool()));
+        }
     }
 
     [Theory]
@@ -118,20 +133,20 @@ public class AllPagesIntegrationTests(
     [Fact]
     public async Task OverviewPage_ContainsWhatIsASimilarSchoolLink()
     {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool(PrimarySchoolUrn).Overview);
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Overview);
 
         var link = page.QuerySelector(".app-body-container-with-side-navigation a");
         link.Should().NotBeNull();
-        link.GetAttribute("href").Should().Be(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool);
+        link.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").WhatIsASimilarSchool);
     }
 
     [Fact]
     public async Task WhatIsASimilarSchoolPage_ContainsViewSimilarSchoolsLink()
     {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool(PrimarySchoolUrn).WhatIsASimilarSchool);
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").WhatIsASimilarSchool);
 
         var links = page.QuerySelectorAll(".app-body-container-with-side-navigation a");
-        links.Should().Contain(l => l.GetAttribute("href") == Routes.PrimarySchool(PrimarySchoolUrn).ViewSimilarSchools);
+        links.Should().Contain(l => l.GetAttribute("href") == Routes.PrimarySchool("100001").ViewSimilarSchools);
     }
 
     public static TheoryData<string> AllPages()
