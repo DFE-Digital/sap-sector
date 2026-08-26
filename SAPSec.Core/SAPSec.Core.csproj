@@ -7,13 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Features\Secondary\Ks4HeadlineMeasures\**" />
+    <Compile Remove="Features\Measures\Secondary\Ks4CoreSubjects\**" />
+    <Compile Remove="Features\Measures\Secondary\Ks4HeadlineMeasures\**" />
     <Compile Remove="Model\KS4\**" />
     <Compile Remove="Model\Search\**" />
-    <EmbeddedResource Remove="Features\Secondary\Ks4HeadlineMeasures\**" />
+    <EmbeddedResource Remove="Features\Measures\Secondary\Ks4CoreSubjects\**" />
+    <EmbeddedResource Remove="Features\Measures\Secondary\Ks4HeadlineMeasures\**" />
     <EmbeddedResource Remove="Model\KS4\**" />
     <EmbeddedResource Remove="Model\Search\**" />
-    <None Remove="Features\Secondary\Ks4HeadlineMeasures\**" />
+    <None Remove="Features\Measures\Secondary\Ks4CoreSubjects\**" />
+    <None Remove="Features\Measures\Secondary\Ks4HeadlineMeasures\**" />
     <None Remove="Model\KS4\**" />
     <None Remove="Model\Search\**" />
   </ItemGroup>
@@ -33,10 +36,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Data\SAPSec.Data\SAPSec.Data.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\Secondary\Ks4CoreSubjects\" />
   </ItemGroup>
 
 </Project>

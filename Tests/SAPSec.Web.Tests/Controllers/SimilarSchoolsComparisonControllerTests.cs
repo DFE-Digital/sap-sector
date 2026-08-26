@@ -4,9 +4,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Features.Secondary.Ks4CoreSubjects_Old.UseCases;
-using SAPSec.Core.Features.Secondary.Ks4HeadlineMeasures_Old.UseCases;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
@@ -24,12 +22,12 @@ namespace SAPSec.Web.Tests.Deprecated.Controllers;
 public class SimilarSchoolsComparisonControllerTests
 {
     private readonly Mock<IEstablishmentRepository> _establishmentRepositoryMock = new();
-    private readonly Mock<ISimilarSchoolsSecondaryRepository> _repoMock = new();
+    private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock = new();
     private readonly Mock<IAbsenceRepository> _absenceRepositoryMock = new();
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock = new();
-    private readonly Mock<ILogger<SimilarSchoolsComparisonController>> _loggerMock = new();
-    private readonly SimilarSchoolsComparisonController _sut;
+    private readonly Mock<ILogger<ComparisonController>> _loggerMock = new();
+    private readonly ComparisonController _sut;
 
     public SimilarSchoolsComparisonControllerTests()
     {
@@ -38,51 +36,43 @@ public class SimilarSchoolsComparisonControllerTests
             new Mock<ILogger<SchoolDetailsService>>().Object);
         var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
             _establishmentRepositoryMock.Object,
-            _repoMock.Object,
+            _similarSchoolsRepositoryMock.Object,
             schoolDetailsService,
             _ks4PerformanceRepositoryMock.Object,
             _absenceRepositoryMock.Object);
-        var ks4UseCase = new GetKs4HeadlineMeasures(
-            _ks4PerformanceRepositoryMock.Object,
-            _ks4DestinationsRepositoryMock.Object,
-            schoolDetailsService);
-        var ks4CoreSubjectsUseCase = new GetSchoolKs4CoreSubjects(
-            _ks4PerformanceRepositoryMock.Object,
-            schoolDetailsService,
+        var ks4HeadlineMeasuresUseCase = new GetComparisonKs4HeadlineMeasuresUseCase(
             _establishmentRepositoryMock.Object,
-            _repoMock.Object);
-        var filteredKs4CoreSubjectsUseCase = new GetFilteredSchoolKs4CoreSubject(
             _ks4PerformanceRepositoryMock.Object,
-            schoolDetailsService,
+            _ks4DestinationsRepositoryMock.Object);
+        var ks4CoreSubjectsUseCase = new GetComparisonKs4CoreSubjectsUseCase(
             _establishmentRepositoryMock.Object,
-            _repoMock.Object);
+            _ks4PerformanceRepositoryMock.Object);
         var attendanceUseCase = new GetAttendanceMeasures(
             _absenceRepositoryMock.Object,
             _establishmentRepositoryMock.Object,
-            _repoMock.Object);
+            _similarSchoolsRepositoryMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
-            _repoMock.Object);
+            _similarSchoolsRepositoryMock.Object);
 
-        _repoMock
+        _similarSchoolsRepositoryMock
             .Setup(r => r.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
         var characteristicsFormatter = new CharacteristicsComparisonFormatter();
 
-        _sut = new SimilarSchoolsComparisonController(
+        _sut = new ComparisonController(
             getSimilarSchoolDetails,
             attendanceUseCase,
+            ks4HeadlineMeasuresUseCase,
             ks4CoreSubjectsUseCase,
-            filteredKs4CoreSubjectsUseCase,
-            ks4UseCase,
             getCharacteristicsComparison,
             characteristicsFormatter,
             _loggerMock.Object);
     }
 
     [Fact]
-    public async Task Index_ReturnsView_WithMappedModel_AndSetsViewData()
+    public async Task Similarity_ReturnsView_WithMappedModel_AndSetsViewData()
     {
         var urn = "145327";
         var similarUrn = "142075";
@@ -100,7 +90,7 @@ public class SimilarSchoolsComparisonControllerTests
         SetupAbsence();
         SetupPerfomance();
 
-        var result = await _sut.Index(urn, similarUrn);
+        var result = await _sut.Similarity(urn, similarUrn);
 
         var view = result.Should().BeOfType<ViewResult>().Subject;
         var model = view.Model.Should().BeOfType<SimilarSchoolsComparisonViewModel>().Subject;
@@ -111,7 +101,6 @@ public class SimilarSchoolsComparisonControllerTests
         model.SimilarSchoolName.Should().Be(similarSchool.EstablishmentName);
 
         _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
-        _sut.ViewData["ComparisonSchool"].Should().BeSameAs(model);
     }
 
     [Fact]
@@ -136,8 +125,6 @@ public class SimilarSchoolsComparisonControllerTests
         var result = await _sut.SchoolDetails(urn, similarUrn);
 
         var view = result.Should().BeOfType<ViewResult>().Subject;
-        view.ViewName.Should().Be("~/Views/Shared/SimilarSchoolsComparison/SchoolDetails.cshtml");
-
         var model = view.Model.Should().BeOfType<SimilarSchoolDetailsViewModel>().Subject;
 
         model.Urn.Should().Be(urn);
@@ -145,8 +132,6 @@ public class SimilarSchoolsComparisonControllerTests
         model.Distance.Should().BeGreaterThan(0);
         model.SimilarSchoolDetails.Should().NotBeNull();
         model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
-
-        _sut.ViewData["ComparisonSchool"].Should().BeOfType<SimilarSchoolsComparisonViewModel>();
     }
 
     [Fact]
@@ -254,7 +239,7 @@ public class SimilarSchoolsComparisonControllerTests
         _establishmentRepositoryMock
             .Setup(r => r.GetEstablishmentAsync(similarUrn))
             .ReturnsAsync(similarSchool);
-        _repoMock
+        _similarSchoolsRepositoryMock
             .Setup(r => r.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(group.Select(g => new SimilarSchoolsSecondaryGroupsEntry { URN = currentUrn, NeighbourURN = g.URN }).ToList());
 
@@ -299,7 +284,7 @@ public class SimilarSchoolsComparisonControllerTests
             }
         };
 
-        _repoMock
+        _similarSchoolsRepositoryMock
             .Setup(r => r.GetValuesByUrnsAsync(
                 It.Is<IEnumerable<string>>(u => u.Contains(currentUrn) && u.Contains(similarUrn))))
             .ReturnsAsync(values);

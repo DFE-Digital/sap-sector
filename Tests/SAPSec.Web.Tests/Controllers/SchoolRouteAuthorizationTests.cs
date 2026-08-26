@@ -13,7 +13,7 @@ public class SchoolRouteAuthorizationTests
     [Theory]
     [InlineData(typeof(SecondarySchoolController))]
     [InlineData(typeof(SimilarSchoolsController))]
-    [InlineData(typeof(SimilarSchoolsComparisonController))]
+    [InlineData(typeof(ComparisonController))]
     public void SchoolRouteController_RequiresAuthorization(Type controllerType)
     {
         controllerType.GetCustomAttributes(typeof(AuthorizeAttribute), inherit: true)
@@ -23,7 +23,7 @@ public class SchoolRouteAuthorizationTests
     [Theory]
     [InlineData(typeof(SecondarySchoolController), ExpectedSchoolPhase.Secondary)]
     [InlineData(typeof(SimilarSchoolsController), ExpectedSchoolPhase.Secondary)]
-    [InlineData(typeof(SimilarSchoolsComparisonController), ExpectedSchoolPhase.Secondary)]
+    [InlineData(typeof(ComparisonController), ExpectedSchoolPhase.Secondary)]
     [InlineData(typeof(PrimarySchoolController), ExpectedSchoolPhase.Primary)]
     public void SchoolRouteController_UsesExpectedSchoolPhaseFilter(
         Type controllerType,
