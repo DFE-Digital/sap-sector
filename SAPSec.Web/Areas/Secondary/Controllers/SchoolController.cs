@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
@@ -54,7 +55,7 @@ public class SchoolController : Controller
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -64,7 +65,7 @@ public class SchoolController : Controller
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(school);
         return View(school);
     }
 
@@ -74,8 +75,21 @@ public class SchoolController : Controller
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(school);
         return View(school);
+    }
+
+    [HttpGet]
+    [Route("rise-resources")]
+    public async Task<IActionResult> RiseResources(string urn)
+    {
+        // Minimal action to render the RISE resources view. Populate view data so
+        // the shared layout and side navigation can render correctly.
+        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
+        await SetSchoolViewDataAsync(school);
+
+        return View();
     }
 
     [HttpGet]
@@ -85,7 +99,7 @@ public class SchoolController : Controller
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
         var attendanceMeasures = await _getAttendanceMeasures.Execute(new(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(school);
         return View(new SchoolAttendancePageViewModel
         {
             SchoolDetails = school,
@@ -178,7 +192,7 @@ public class SchoolController : Controller
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await _getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
         {
@@ -198,7 +212,7 @@ public class SchoolController : Controller
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await _getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4CoreSubjectsPageViewModel
         {
@@ -217,17 +231,29 @@ public class SchoolController : Controller
         return View(model);
     }
 
-    private void PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(SchoolInfo currentSchool)
     {
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+
+        var includeRise = false;
+        try
+        {
+            includeRise = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+        }
+        catch
+        {
+            includeRise = false;
+        }
+
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             currentSchool.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+            ControllerContext.ActionDescriptor.ActionName,
+            includeRise);
     }
 
-    private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
+    private async Task SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
     {
         ViewData[ViewDataKeys.SchoolDetails] = school;
 
@@ -236,10 +262,21 @@ public class SchoolController : Controller
             return;
         }
 
+        var includeRise = false;
+        try
+        {
+            includeRise = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+        }
+        catch
+        {
+            includeRise = false;
+        }
+
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             school.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+            ControllerContext.ActionDescriptor.ActionName,
+            includeRise);
     }
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)

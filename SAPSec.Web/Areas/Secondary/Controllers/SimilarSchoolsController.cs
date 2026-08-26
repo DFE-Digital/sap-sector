@@ -5,6 +5,7 @@ using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.ViewModels;
 
 namespace SAPSec.Web.Areas.Secondary.Controllers;
@@ -42,10 +43,18 @@ public class SimilarSchoolsController : Controller
         ViewData[ViewDataKeys.SchoolDetails] = school;
         if (Url is not null)
         {
+            var featureFlagService = HttpContext.RequestServices.GetService<IFeatureFlagService>();
+            var includeRise = false;
+            if (featureFlagService is not null)
+            {
+                includeRise = await featureFlagService.IsEnabledAsync(Core.Constants.FeatureFlags.EnableRiseResources);
+            }
+
             ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
                 Url,
                 school?.Urn ?? urn,
-                nameof(ViewSimilarSchools));
+                nameof(ViewSimilarSchools),
+                includeRise);
         }
 
         var filterBy = BuildCoreFilters(Request.Query);
