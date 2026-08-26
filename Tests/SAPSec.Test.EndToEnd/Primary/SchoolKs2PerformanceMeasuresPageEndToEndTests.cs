@@ -7,7 +7,7 @@ using SAPSec.Web.Constants;
 using System.Text.RegularExpressions;
 using Xunit;
 
-namespace SAPSec.Test.EndToEnd;
+namespace SAPSec.Test.EndToEnd.Primary;
 
 [Collection("EndToEndTestsCollection")]
 public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
@@ -133,14 +133,14 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
 
         List<IEnumerable<string>> subjectValues = [];
 
-        subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        subjectValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Reading", "Writing", "Maths" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Subject" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            subjectValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         subjectValues.Should().AllBeDifferent();
@@ -245,14 +245,14 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
 
         List<IEnumerable<string>> subjectValues = [];
 
-        subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        subjectValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Reading", "Writing", "Maths" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Subject" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            subjectValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         subjectValues.Should().AllBeDifferent();

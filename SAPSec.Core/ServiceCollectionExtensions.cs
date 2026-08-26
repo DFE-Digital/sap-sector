@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
@@ -26,11 +25,10 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>, FindPrimarySimilarSchoolsUseCase>();
         services.AddSingleton<IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse>, GetPrimarySimilarSchoolDetailsUseCase>();
         services.AddSingleton<IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse>, GetSchoolKs4HeadlineMeasuresUseCase>();
-        services.AddSingleton<IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse>, GetSchoolKs4CoreSubjectsUseCase>();
+        services.AddSingleton<IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse>, GetSchoolKs4CoreSubjectsMeasuresUseCase>();
         services.AddSingleton<IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse>, GetComparisonKs4HeadlineMeasuresUseCase>();
-        services.AddSingleton<IUseCase<GetComparisonKs4CoreSubjectsRequest, GetComparisonKs4CoreSubjectsResponse>, GetComparisonKs4CoreSubjectsUseCase>();
+        services.AddSingleton<IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse>, GetComparisonKs4CoreSubjectsMeasuresUseCase>();
 
-        services.AddSingleton<GetAttendanceMeasures>();
         services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<GetSimilarSchoolDetails>();
         services.AddSingleton<GetCharacteristicsComparison>();

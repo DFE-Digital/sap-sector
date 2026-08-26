@@ -1,83 +1,26 @@
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Test.Common.Builders;
-using SAPSec.Test.Common.InMemory;
 using static SAPSec.Core.Constants.Measures;
 
 namespace SAPSec.Core.Tests.Features.Measures.Attendance;
 
-public class GetSchoolAttendanceComparisonUseCaseTests
+public partial class GetComparisonAttendanceMeasuresUseCaseTests
 {
-    private readonly InMemoryEstablishmentRepository _establishmentRepo;
-    private readonly InMemoryAbsenceRepository _absenceRepo;
-    private readonly GetComparisonAttendanceMeasuresUseCase _sut;
-
-    public GetSchoolAttendanceComparisonUseCaseTests()
-    {
-        _establishmentRepo = new();
-        _absenceRepo = new(_establishmentRepo);
-        _sut = new GetComparisonAttendanceMeasuresUseCase(
-            _establishmentRepo,
-            _absenceRepo);
-    }
-
     [Fact]
-    public async Task WhenCurrentSchoolDoesNotExist_ThrowsNotFoundException()
+    public async Task Secondary_Absence_ContainsYearByYearValuesForCurrentAndSimilarSchool()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
-
-        var act = async () => await _sut.Execute(Request("999999", "100002"));
-
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage("*999999*");
-    }
-
-    [Fact]
-    public async Task WhenSimilarSchoolDoesNotExist_ThrowsNotFoundException()
-    {
-        _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()));
-
-        var act = async () => await _sut.Execute(Request("100001", "999999"));
-
-        await act.Should().ThrowAsync<NotFoundException>()
-            .WithMessage("*999999*");
-    }
-
-    [Fact]
-    public async Task Absence_ShouldContainExpectedMeasureSeries()
-    {
-        _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
-
-        var response = await _sut.Execute(Request("100001", "100002"));
-
-        var seriesTypes = response.Absence.Series.Select(s => s.SeriesType);
-
-        seriesTypes.Should().BeEquivalentTo([
-            MeasureSeriesType.CurrentSchool,
-            MeasureSeriesType.SimilarSchool,
-            MeasureSeriesType.EnglandSchoolsAverage
-        ]);
-    }
-
-    [Fact]
-    public async Task Absence_ContainsYearByYearValuesForCurrentAndSimilarSchool()
-    {
-        _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")),
             Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "6.10", previous: "6.20", previous2: "6.30")));
 
         _absenceRepo.SetupEnglandAbsence(
-            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "6.10", previous: "6.90", previous2: "5.45")));
+            Build.Absence.England(x => x.WithOverallAbsenceSecondary(current: "6.10", previous: "6.90", previous2: "5.45")));
 
-        var response = await _sut.Execute(Request("100001", "100002"));
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002"));
         var series = response.Absence.Series;
 
         series.Should().BeEquivalentTo([
@@ -88,16 +31,16 @@ public class GetSchoolAttendanceComparisonUseCaseTests
     }
 
     [Fact]
-    public async Task Absence_WhenNoAbsenceDataForSimilarSchool_ContainsNullValues()
+    public async Task Secondary_Absence_WhenNoAbsenceDataForSimilarSchool_ContainsNullValues()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")));
 
-        var response = await _sut.Execute(Request("100001", "100002"));
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002"));
         var series = response.Absence.Series
             .First(s => s.SeriesType == MeasureSeriesType.SimilarSchool);
 
@@ -108,13 +51,13 @@ public class GetSchoolAttendanceComparisonUseCaseTests
     [InlineData(MeasureSeriesType.SimilarSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
-    public async Task Absence_WhenNoAbsenceData_ContainsNullValues(MeasureSeriesType seriesType)
+    public async Task Secondary_Absence_WhenNoAbsenceData_ContainsNullValues(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
-        var response = await _sut.Execute(Request("100001", "100002"));
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002"));
 
         var series = response.Absence.Series
             .FirstOrDefault(s => s.SeriesType == seriesType);
@@ -128,20 +71,20 @@ public class GetSchoolAttendanceComparisonUseCaseTests
     [InlineData(MeasureSeriesType.SimilarSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
-    public async Task Absence_WhenEmptyValues_ContainsNulls(MeasureSeriesType seriesType)
+    public async Task Secondary_Absence_WhenEmptyValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "", previous: "", previous2: "")),
             Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "", previous: "", previous2: "")));
 
         _absenceRepo.SetupEnglandAbsence(
-            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "", previous: "", previous2: "")));
+            Build.Absence.England(x => x.WithOverallAbsenceSecondary(current: "", previous: "", previous2: "")));
 
-        var response = await _sut.Execute(Request("100001", "100002"));
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002"));
 
         var series = response.Absence.Series
             .FirstOrDefault(s => s.SeriesType == seriesType);
@@ -155,20 +98,20 @@ public class GetSchoolAttendanceComparisonUseCaseTests
     [InlineData(MeasureSeriesType.SimilarSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
-    public async Task Absence_WhenInvalidValues_ContainsNulls(MeasureSeriesType seriesType)
+    public async Task Secondary_Absence_WhenInvalidValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "x", previous: "y2", previous2: "3z")),
             Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "x", previous: "y2", previous2: "3z")));
 
         _absenceRepo.SetupEnglandAbsence(
-            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "x", previous: "y2", previous2: "3z")));
+            Build.Absence.England(x => x.WithOverallAbsenceSecondary(current: "x", previous: "y2", previous2: "3z")));
 
-        var response = await _sut.Execute(Request("100001", "100002"));
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002"));
 
         var series = response.Absence.Series
             .FirstOrDefault(s => s.SeriesType == seriesType);
@@ -179,16 +122,16 @@ public class GetSchoolAttendanceComparisonUseCaseTests
     }
 
     [Fact]
-    public async Task FilterBy_IgnoresInvalidFilterKeys()
+    public async Task Secondary_Absence_FilterBy_IgnoresInvalidFilterKeys()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "18", previous: "75", previous2: "80")));
 
-        var response = await _sut.Execute(Request("100001", "100002", new()
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002", new()
         {
             ["xxx"] = "1",
             [Absence.Filters.Type.Key] = Absence.Filters.Type.Values.Overall,
@@ -199,11 +142,11 @@ public class GetSchoolAttendanceComparisonUseCaseTests
     }
 
     [Fact]
-    public async Task Absence_FilterBy_Type_WhenMissingEmptyOrInvalidValuesForSelectedSubject_ContainsNullValues()
+    public async Task Secondary_Absence_FilterBy_Type_WhenMissingEmptyOrInvalidValuesForSelectedSubject_ContainsNullValues()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x
@@ -215,10 +158,10 @@ public class GetSchoolAttendanceComparisonUseCaseTests
 
         _absenceRepo.SetupEnglandAbsence(
             Build.Absence.England(x => x
-                .WithOverallAbsencePrimary(current: "81", previous: "80", previous2: "79")
-                .WithPersistentAbsencePrimary(current: "", previous: "", previous2: "")));
+                .WithOverallAbsenceSecondary(current: "81", previous: "80", previous2: "79")
+                .WithPersistentAbsenceSecondary(current: "", previous: "", previous2: "")));
 
-        var response = await _sut.Execute(Request("100001", "100002", new()
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002", new()
         {
             [Absence.Filters.Type.Key] = Absence.Filters.Type.Values.Persistent
         }));
@@ -238,12 +181,12 @@ public class GetSchoolAttendanceComparisonUseCaseTests
     [InlineData("", 8.00, 6.10, 6.10)]
     [InlineData("xyz", 8.00, 6.10, 6.10)]
     [Theory]
-    public async Task Absence_FilterBy_Type_ContainsCurrentYearValuesForSelectedType(
+    public async Task Secondary_Absence_FilterBy_Type_ContainsCurrentYearValuesForSelectedType(
         string type, double currentSchool, double similarSchool, double england)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Primary()),
-            Build.Establishment("100002", "Test School 2", x => x.Primary()));
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
 
         _absenceRepo.SetupEstablishmentAbsence(
             Build.Absence.Establishment("100001", x => x
@@ -255,10 +198,10 @@ public class GetSchoolAttendanceComparisonUseCaseTests
 
         _absenceRepo.SetupEnglandAbsence(
             Build.Absence.England(x => x
-                .WithOverallAbsencePrimary(current: "6.10", previous: "6.90", previous2: "5.45")
-                .WithPersistentAbsencePrimary(current: "3.20", previous: "2.24", previous2: "2.20")));
+                .WithOverallAbsenceSecondary(current: "6.10", previous: "6.90", previous2: "5.45")
+                .WithPersistentAbsenceSecondary(current: "3.20", previous: "2.24", previous2: "2.20")));
 
-        var response = await _sut.Execute(Request("100001", "100002", new()
+        var response = await _sut.Execute(Request(MeasurePhase.Secondary, "100001", "100002", new()
         {
             [Absence.Filters.Type.Key] = type
         }));
@@ -269,11 +212,4 @@ public class GetSchoolAttendanceComparisonUseCaseTests
         series.First(s => s.SeriesType == MeasureSeriesType.SimilarSchool).Current.Should().Be((decimal?)similarSchool);
         series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage).Current.Should().Be((decimal?)england);
     }
-
-    private static GetComparisonAttendanceMeasuresRequest Request(
-        string urn,
-        string similarSchoolUrn,
-        Dictionary<string, string>? filterBy = null) =>
-            new(MeasurePhase.Primary, urn, similarSchoolUrn, filterBy);
-
 }

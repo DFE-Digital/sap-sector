@@ -2,21 +2,18 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Services;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Areas.Secondary.Controllers;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
-using System.Text.Json;
 
 namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
@@ -45,16 +42,12 @@ public class SimilarSchoolsComparisonControllerTests
             _establishmentRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object);
-        var ks4CoreSubjectsUseCase = new GetComparisonKs4CoreSubjectsUseCase(
+        var ks4CoreSubjectsUseCase = new GetComparisonKs4CoreSubjectsMeasuresUseCase(
             _establishmentRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object);
         var attendanceMeasuresUseCase = new GetComparisonAttendanceMeasuresUseCase(
             _establishmentRepositoryMock.Object,
             _absenceRepositoryMock.Object);
-        var attendanceUseCase = new GetAttendanceMeasures(
-            _absenceRepositoryMock.Object,
-            _establishmentRepositoryMock.Object,
-            _similarSchoolsRepositoryMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(
             _similarSchoolsRepositoryMock.Object);
@@ -67,7 +60,6 @@ public class SimilarSchoolsComparisonControllerTests
 
         _sut = new ComparisonController(
             getSimilarSchoolDetails,
-            attendanceUseCase,
             ks4HeadlineMeasuresUseCase,
             ks4CoreSubjectsUseCase,
             attendanceMeasuresUseCase,
@@ -171,54 +163,6 @@ public class SimilarSchoolsComparisonControllerTests
         model.CharacteristicsRows[0].SimilarSchoolValue.Should().NotBeNullOrWhiteSpace();
 
         model.CharacteristicsRows.All(row => row.Similarity is null).Should().BeTrue();
-    }
-
-    [Fact]
-    public async Task AttendanceData_ReturnsDefaultPayloadShape()
-    {
-        _establishmentRepositoryMock
-            .Setup(x => x.GetEstablishmentAsync(It.IsAny<string>()))
-            .ReturnsAsync(new Establishment { URN = "145327", LAId = "373" });
-
-        _absenceRepositoryMock
-            .Setup(x => x.GetByUrnAsync(It.IsAny<string>()))
-            .ReturnsAsync(new AbsenceData(
-                "145327",
-                new EstablishmentAbsence
-                {
-                    Abs_Tot_Est_Current_Pct = "5.0",
-                    Abs_Tot_Est_Previous_Pct = "5.2",
-                    Abs_Tot_Est_Previous2_Pct = "5.4",
-                    Abs_Persistent_Est_Current_Pct = "16.0",
-                    Abs_Persistent_Est_Previous_Pct = "16.3",
-                    Abs_Persistent_Est_Previous2_Pct = "16.7"
-                },
-                new LAAbsence(),
-                new EnglandAbsence
-                {
-                    Abs_Tot_Secondary_Eng_Current_Pct = "4.8",
-                    Abs_Tot_Secondary_Eng_Previous_Pct = "4.9",
-                    Abs_Tot_Secondary_Eng_Previous2_Pct = "5.0",
-                    Abs_Persistent_Secondary_Eng_Current_Pct = "15.6",
-                    Abs_Persistent_Secondary_Eng_Previous_Pct = "15.8",
-                    Abs_Persistent_Secondary_Eng_Previous2_Pct = "16.0"
-                }));
-
-        var result = await _sut.AttendanceData("145327", "142075");
-
-        var json = result.Should().BeOfType<JsonResult>().Subject;
-        var payload = JsonSerializer.Serialize(json.Value);
-        using var document = JsonDocument.Parse(payload);
-        var root = document.RootElement;
-
-        root.GetProperty("absenceType").GetString().Should().Be("overall");
-        root.GetProperty("bar").GetArrayLength().Should().Be(3);
-        root.GetProperty("years").GetArrayLength().Should().Be(3);
-
-        var table = root.GetProperty("table");
-        table.GetProperty("thisSchool").GetArrayLength().Should().Be(3);
-        table.GetProperty("similarSchool").GetArrayLength().Should().Be(3);
-        table.GetProperty("england").GetArrayLength().Should().Be(3);
     }
 
     private void SetupBaseDependencies(

@@ -7,7 +7,7 @@ using SAPSec.Web.Constants;
 using System.Text.RegularExpressions;
 using Xunit;
 
-namespace SAPSec.Test.EndToEnd;
+namespace SAPSec.Test.EndToEnd.Secondary;
 
 [Collection("EndToEndTestsCollection")]
 public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
@@ -181,14 +181,14 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -293,14 +293,14 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
 
         List<IEnumerable<string>> subjectValues = [];
 
-        subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        subjectValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Education", "Employment and apprenticeships" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Destination" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            subjectValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            subjectValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         subjectValues.Should().AllBeDifferent();

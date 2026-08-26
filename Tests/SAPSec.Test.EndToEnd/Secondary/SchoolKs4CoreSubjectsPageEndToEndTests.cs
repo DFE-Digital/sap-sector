@@ -7,7 +7,7 @@ using SAPSec.Web.Constants;
 using System.Text.RegularExpressions;
 using Xunit;
 
-namespace SAPSec.Test.EndToEnd;
+namespace SAPSec.Test.EndToEnd.Secondary;
 
 [Collection("EndToEndTestsCollection")]
 public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
@@ -135,14 +135,14 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -247,14 +247,14 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -359,14 +359,14 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -471,14 +471,14 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5-5 and above", "Grade 7-7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -583,14 +583,14 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -695,14 +695,14 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -807,14 +807,14 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();

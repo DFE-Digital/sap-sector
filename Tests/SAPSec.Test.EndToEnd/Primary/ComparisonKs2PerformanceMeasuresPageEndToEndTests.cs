@@ -6,7 +6,7 @@ using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
 using Xunit;
 
-namespace SAPSec.Test.EndToEnd;
+namespace SAPSec.Test.EndToEnd.Primary;
 
 [Collection("EndToEndTestsCollection")]
 public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)

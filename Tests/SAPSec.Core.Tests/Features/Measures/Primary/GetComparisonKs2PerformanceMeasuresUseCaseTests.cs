@@ -6,13 +6,13 @@ using static SAPSec.Core.Constants.Measures.Primary;
 
 namespace SAPSec.Core.Tests.Features.Measures.Primary;
 
-public class GetSchoolKs2PerformanceComparisonUseCaseTests
+public class GetComparisonKs2PerformanceMeasuresUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryKs2PerformanceRepository _performanceRepo;
     private readonly GetComparisonKs2PerformanceMeasuresUseCase _sut;
 
-    public GetSchoolKs2PerformanceComparisonUseCaseTests()
+    public GetComparisonKs2PerformanceMeasuresUseCaseTests()
     {
         _establishmentRepo = new();
         _performanceRepo = new(_establishmentRepo);

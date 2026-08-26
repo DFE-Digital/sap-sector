@@ -4,16 +4,14 @@ using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
-using System.Text.RegularExpressions;
 using Xunit;
 
-namespace SAPSec.Test.EndToEnd;
+namespace SAPSec.Test.EndToEnd.Secondary;
 
 [Collection("EndToEndTestsCollection")]
-public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
+public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     : EndToEndTests(fixture)
 {
-    private const string UrlPattern = @"\d{6}";
     private const string EnglishLanguageHeaderText = "English language";
     private const string EnglishLiteratureHeaderText = "English literature";
     private const string MathsHeaderText = "Maths";
@@ -23,7 +21,7 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     private const string PhysicsHeaderText = "Physics";
 
     private const string Urn = "100052";
-    private static readonly Routes.Secondary SecondarySchoolRoute = Routes.SecondarySchool(Urn);
+    private const string SimilarSchoolUrn = "141617";
 
     public override async Task InitializeAsync()
     {
@@ -31,9 +29,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await NavigateTo(Routes.FindASchool());
         await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(Urn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.Overview);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Overview);
+        await Page.GetByText("View similar schools", new() { Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).ViewSimilarSchools);
+        await Page.GetByText("The Hurlingham Academy", new() { Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).Similarity);
         await Page.GetByText("KS4 core subjects", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.KS4CoreSubjects);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).KS4CoreSubjects);
     }
 
     [Fact]
@@ -74,38 +76,6 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     }
 
     [Fact]
-    public async Task EnglishLanguage_ViewAndNavigateToTopPerfomers()
-    {
-        var section = await GetSection(EnglishLanguageHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomersTab.ClickAsync();
-
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
-
-        var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Similarity));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
-
-        await section.GetByText("See all similar schools").ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.ViewSimilarSchools);
-    }
-
-    [Fact]
     public async Task EnglishLanguage_ViewTableView()
     {
         var section = await GetSection(EnglishLanguageHeaderText);
@@ -115,13 +85,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
+        await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
+        await Expect(previous).ToBePercentageValuesHavingCount(3);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToBePercentageValuesHavingCount(4);
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
@@ -135,14 +105,14 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -186,38 +156,6 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     }
 
     [Fact]
-    public async Task EnglishLiterature_ViewAndNavigateToTopPerfomers()
-    {
-        var section = await GetSection(EnglishLiteratureHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomersTab.ClickAsync();
-
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
-
-        var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Similarity));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
-
-        await section.GetByText("See all similar schools").ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.ViewSimilarSchools);
-    }
-
-    [Fact]
     public async Task EnglishLiterature_ViewTableView()
     {
         var section = await GetSection(EnglishLiteratureHeaderText);
@@ -227,13 +165,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
+        await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
+        await Expect(previous).ToBePercentageValuesHavingCount(3);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToBePercentageValuesHavingCount(4);
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
@@ -247,14 +185,14 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -298,38 +236,6 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     }
 
     [Fact]
-    public async Task Maths_ViewAndNavigateToTopPerfomers()
-    {
-        var section = await GetSection(MathsHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomersTab.ClickAsync();
-
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
-
-        var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Similarity));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
-
-        await section.GetByText("See all similar schools").ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.ViewSimilarSchools);
-    }
-
-    [Fact]
     public async Task Maths_ViewTableView()
     {
         var section = await GetSection(MathsHeaderText);
@@ -339,13 +245,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
+        await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
+        await Expect(previous).ToBePercentageValuesHavingCount(3);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToBePercentageValuesHavingCount(4);
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
@@ -359,14 +265,14 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -410,38 +316,6 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     }
 
     [Fact]
-    public async Task CombinedScience_ViewAndNavigateToTopPerfomers()
-    {
-        var section = await GetSection(CombinedScienceHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomersTab.ClickAsync();
-
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
-
-        var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Similarity));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
-
-        await section.GetByText("See all similar schools").ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.ViewSimilarSchools);
-    }
-
-    [Fact]
     public async Task CombinedScience_ViewTableView()
     {
         var section = await GetSection(CombinedScienceHeaderText);
@@ -451,13 +325,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
+        await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
+        await Expect(previous).ToBePercentageValuesHavingCount(3);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToBePercentageValuesHavingCount(4);
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
@@ -471,14 +345,14 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5-5 and above", "Grade 7-7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -522,38 +396,6 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     }
 
     [Fact]
-    public async Task Biology_ViewAndNavigateToTopPerfomers()
-    {
-        var section = await GetSection(BiologyHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomersTab.ClickAsync();
-
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
-
-        var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Similarity));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
-
-        await section.GetByText("See all similar schools").ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.ViewSimilarSchools);
-    }
-
-    [Fact]
     public async Task Biology_ViewTableView()
     {
         var section = await GetSection(BiologyHeaderText);
@@ -563,13 +405,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
+        await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
+        await Expect(previous).ToBePercentageValuesHavingCount(3);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToBePercentageValuesHavingCount(4);
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
@@ -583,14 +425,14 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -634,38 +476,6 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     }
 
     [Fact]
-    public async Task Chemistry_ViewAndNavigateToTopPerfomers()
-    {
-        var section = await GetSection(ChemistryHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomersTab.ClickAsync();
-
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
-
-        var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Similarity));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
-
-        await section.GetByText("See all similar schools").ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.ViewSimilarSchools);
-    }
-
-    [Fact]
     public async Task Chemistry_ViewTableView()
     {
         var section = await GetSection(ChemistryHeaderText);
@@ -675,13 +485,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
+        await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
+        await Expect(previous).ToBePercentageValuesHavingCount(3);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToBePercentageValuesHavingCount(4);
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
@@ -695,14 +505,14 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();
@@ -746,38 +556,6 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
     }
 
     [Fact]
-    public async Task Physics_ViewAndNavigateToTopPerfomers()
-    {
-        var section = await GetSection(PhysicsHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
-        await topPerfomersTab.ClickAsync();
-
-        var table = section.GetByRole(AriaRole.Table);
-        await Expect(table).ToBeVisibleAsync();
-
-        var values = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(values).ToBePercentageValuesHavingCount(3);
-
-        var schools = await table.GetTableColumnAsync("School");
-        await Expect(schools).ToHaveCountAsync(3);
-
-        var schoolLinks = schools.GetByRole(AriaRole.Link);
-        await schoolLinks.Nth(0).ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(new Regex(SecondarySchoolRoute.Comparison(UrlPattern).Similarity));
-
-        await Page.GoBackAsync();
-
-        await Expect(section).ToBeVisibleAsync();
-        await Expect(topPerfomersTab).ToBeVisibleAsync();
-        await topPerfomersTab.ClickAsync();
-
-        await section.GetByText("See all similar schools").ClickAsync();
-
-        await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.ViewSimilarSchools);
-    }
-
-    [Fact]
     public async Task Physics_ViewTableView()
     {
         var section = await GetSection(PhysicsHeaderText);
@@ -787,13 +565,13 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
         await Expect(table).ToBeVisibleAsync();
 
         var previous2 = await table.GetTableColumnAsync("2022 to 2023");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
+        await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
         var previous = await table.GetTableColumnAsync("2023 to 2024");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
+        await Expect(previous).ToBePercentageValuesHavingCount(3);
 
         var current = await table.GetTableColumnAsync("2024 to 2025");
-        await Expect(current).ToBePercentageValuesHavingCount(4);
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
@@ -807,14 +585,14 @@ public class Ks4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture)
 
         List<IEnumerable<string>> gradeValues = [];
 
-        gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+        gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
         foreach (var subject in new[] { "Grade 5 and above", "Grade 7 and above" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Grade" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
 
-            gradeValues.Add(await (table.GetCells()).AllTrimmedTextContentsAsync());
+            gradeValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
         }
 
         gradeValues.Should().AllBeDifferent();

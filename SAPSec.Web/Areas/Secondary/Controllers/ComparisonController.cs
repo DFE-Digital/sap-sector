@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
@@ -23,9 +22,8 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary, "urn", "similarSchoolUrn")]
 public class ComparisonController(
     GetSimilarSchoolDetails getSimilarSchoolDetails,
-    GetAttendanceMeasures getAttendanceMeasures,
     IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
-    IUseCase<GetComparisonKs4CoreSubjectsRequest, GetComparisonKs4CoreSubjectsResponse> getKs4CoreSubjectsUseCase,
+    IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
     IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     GetCharacteristicsComparison getCharacteristicsComparison,
     ICharacteristicsComparisonFormatter characteristicsFormatter,
@@ -124,90 +122,6 @@ public class ComparisonController(
         };
 
         return View(model);
-    }
-
-    [HttpGet]
-    [Route("compare-attendance-old")]
-    public async Task<IActionResult> AttendanceOld(
-        string urn,
-        string similarSchoolUrn)
-    {
-        var modelResult = await TryBuildBaseModelAsync(urn, similarSchoolUrn);
-        if (modelResult.Result != null)
-            return modelResult.Result;
-
-        SetComparisonSchoolViewData(modelResult.Model!);
-        return View(modelResult.Model);
-    }
-
-    [HttpGet]
-    [Route("attendance-data")]
-    public async Task<IActionResult> AttendanceData(
-        string urn,
-        string similarSchoolUrn,
-        string absenceType = "overall")
-    {
-        if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(similarSchoolUrn))
-        {
-            return BadRequest(new { error = "Missing route parameters." });
-        }
-
-        var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-
-        var thisSchoolAttendance = await getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(urn));
-        var similarSchoolAttendance = await getAttendanceMeasures.Execute(new GetAttendanceMeasuresRequest(similarSchoolUrn));
-
-        var isPersistentAbsence = normalizedAbsenceType == "persistent";
-        var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
-
-        var thisSchoolSeries = isPersistentAbsence
-            ? thisSchoolAttendance.PersistentAbsenceYearByYear.School
-            : thisSchoolAttendance.OverallAbsenceYearByYear.School;
-        var similarSchoolSeries = isPersistentAbsence
-            ? similarSchoolAttendance.PersistentAbsenceYearByYear.School
-            : similarSchoolAttendance.OverallAbsenceYearByYear.School;
-        var englandSeries = isPersistentAbsence
-            ? (thisSchoolAttendance.PersistentAbsenceYearByYear.England ?? similarSchoolAttendance.PersistentAbsenceYearByYear.England)
-            : (thisSchoolAttendance.OverallAbsenceYearByYear.England ?? similarSchoolAttendance.OverallAbsenceYearByYear.England);
-
-        return Json(new
-        {
-            absenceType = normalizedAbsenceType,
-            years = yearLabels,
-            bar = new decimal?[]
-            {
-                thisSchoolSeries.Current,
-                similarSchoolSeries.Current,
-                englandSeries?.Current
-            },
-            line = new
-            {
-                thisSchool = new decimal?[] { thisSchoolSeries.Previous2, thisSchoolSeries.Previous, thisSchoolSeries.Current },
-                similarSchool = new decimal?[] { similarSchoolSeries.Previous2, similarSchoolSeries.Previous, similarSchoolSeries.Current },
-                england = new decimal?[] { englandSeries?.Previous2, englandSeries?.Previous, englandSeries?.Current }
-            },
-            table = new
-            {
-                thisSchool = new[]
-                {
-                    DisplayPercentNullable(thisSchoolSeries.Previous2),
-                    DisplayPercentNullable(thisSchoolSeries.Previous),
-                    DisplayPercentNullable(thisSchoolSeries.Current)
-                },
-                similarSchool = new[]
-                {
-                    DisplayPercentNullable(similarSchoolSeries.Previous2),
-                    DisplayPercentNullable(similarSchoolSeries.Previous),
-                    DisplayPercentNullable(similarSchoolSeries.Current)
-                },
-                england = new[]
-                {
-                    DisplayPercentNullable(englandSeries?.Previous2),
-                    DisplayPercentNullable(englandSeries?.Previous),
-                    DisplayPercentNullable(englandSeries?.Current)
-                }
-            }
-        });
     }
 
     [HttpGet]

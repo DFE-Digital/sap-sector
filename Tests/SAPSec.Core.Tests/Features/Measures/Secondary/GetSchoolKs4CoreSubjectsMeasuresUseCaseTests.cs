@@ -7,19 +7,19 @@ using static SAPSec.Core.Constants.Measures.Secondary;
 
 namespace SAPSec.Core.Tests.Features.Measures.Secondary;
 
-public class GetSchoolKs4CoreSubjectsUseCaseTests
+public class GetSchoolKs4CoreSubjectsMeasuresUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
-    private readonly GetSchoolKs4CoreSubjectsUseCase _sut;
+    private readonly GetSchoolKs4CoreSubjectsMeasuresUseCase _sut;
 
-    public GetSchoolKs4CoreSubjectsUseCaseTests()
+    public GetSchoolKs4CoreSubjectsMeasuresUseCaseTests()
     {
         _establishmentRepo = new();
         _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
-        _sut = new GetSchoolKs4CoreSubjectsUseCase(
+        _sut = new GetSchoolKs4CoreSubjectsMeasuresUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
             _performanceRepo);
@@ -3812,6 +3812,6 @@ public class GetSchoolKs4CoreSubjectsUseCaseTests
         topPerformers.Select(tp => tp.Urn).Should().Equal(expected);
     }
 
-    private GetSchoolKs4CoreSubjectsRequest Request(string urn, Dictionary<string, string>? filterBy = null) =>
+    private GetSchoolKs4CoreSubjectsMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null) =>
             new(urn, filterBy ?? []);
 }

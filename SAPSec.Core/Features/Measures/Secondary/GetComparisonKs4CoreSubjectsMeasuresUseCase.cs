@@ -4,12 +4,12 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures.Secondary;
 
-public class GetComparisonKs4CoreSubjectsUseCase(
+public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
     IKs4PerformanceRepository performanceRepository)
-    : IUseCase<GetComparisonKs4CoreSubjectsRequest, GetComparisonKs4CoreSubjectsResponse>
+    : IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse>
 {
-    public async Task<GetComparisonKs4CoreSubjectsResponse> Execute(GetComparisonKs4CoreSubjectsRequest request)
+    public async Task<GetComparisonKs4CoreSubjectsMeasuresResponse> Execute(GetComparisonKs4CoreSubjectsMeasuresRequest request)
     {
         var performance = new ComparisonKs4PerformanceDataProvider(
             establishmentRepository,
@@ -54,12 +54,12 @@ public class GetComparisonKs4CoreSubjectsUseCase(
     }
 }
 
-public record GetComparisonKs4CoreSubjectsRequest(
+public record GetComparisonKs4CoreSubjectsMeasuresRequest(
     string CurrentSchoolUrn,
     string SimilarSchoolUrn,
     IDictionary<string, string>? FilterBy = null);
 
-public record GetComparisonKs4CoreSubjectsResponse(
+public record GetComparisonKs4CoreSubjectsMeasuresResponse(
     SchoolInfo.SchoolInfo CurrentSchool,
     SchoolInfo.SchoolInfo SimilarSchool,
     Measure EnglishLanguage,
