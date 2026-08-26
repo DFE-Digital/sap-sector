@@ -8,10 +8,11 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Authentication;
+using SAPSec.Web.Constants;
 using SAPSec.Web.Controllers;
 using System.Security.Claims;
 
-namespace SAPSec.Web.Tests.Controllers;
+namespace SAPSec.Web.Tests.Deprecated.Controllers;
 
 public class AuthControllerTests
 {
@@ -24,7 +25,7 @@ public class AuthControllerTests
 
     private static class ExpectedRoutes
     {
-        public const string DefaultReturnUrl = "/find-a-school";
+        public const string DefaultReturnUrl = Routes.FindASchoolBasePath;
         public const string HomeAction = "Index";
         public const string HomeController = "Home";
         public const string ErrorAction = "StatusCodeError";
@@ -334,7 +335,7 @@ public class AuthControllerTests
     [Theory]
     [InlineData("/local/path")]
     [InlineData("/dashboard")]
-    [InlineData("/find-a-school/search")]
+    [InlineData(Routes.FindASchoolBasePath)]
     public void SignIn_AuthenticatedUser_WithLocalUrl_RedirectsToLocalUrl(string localUrl)
     {
         _mockUserService.Setup(s => s.IsAuthenticated(It.IsAny<ClaimsPrincipal>())).Returns(true);
