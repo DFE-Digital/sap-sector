@@ -2,6 +2,7 @@
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
@@ -111,7 +112,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         var href = await serviceNameLink.GetAttributeAsync("href");
 
         // Assert
-        href.Should().Be("/find-a-school", "Service name should link to home page");
+        href.Should().Be(Routes.FindASchool(), "Service name should link to home page");
     }
 
     #endregion
@@ -338,7 +339,7 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
 
         // Assert
         var url = new Uri(Page.Url);
-        url.AbsolutePath.Should().Be("/find-a-school");
+        url.AbsolutePath.Should().Be(Routes.FindASchool());
     }
 
     [Fact]

@@ -1,10 +1,8 @@
-using System.Net;
-using System.Text.Json;
-using AngleSharp.Dom;
 using FluentAssertions;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
+using System.Net;
 
 namespace SAPSec.Test.Integration.Tests;
 
@@ -61,7 +59,7 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("href=\"/find-a-school\">Home</a>");
+        content.Should().Contain($"href=\"{Routes.FindASchool()}\">Home</a>");
     }
 
     [Fact]
