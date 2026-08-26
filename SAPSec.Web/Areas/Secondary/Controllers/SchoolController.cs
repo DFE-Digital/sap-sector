@@ -1,11 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -23,35 +25,18 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [Route("school/secondary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
-public class SchoolController : Controller
-{
-    private readonly IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> _getSchoolKs4HeadlineMeasuresUseCase;
-    private readonly IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> _getSchoolKs4CoreSubjectsUseCase;
-    private readonly GetAttendanceMeasures _getAttendanceMeasures;
-    private readonly IFeatureFlagService _featureFlagService;
-    private readonly IRequestSchoolAccessor _requestSchoolAccessor;
-    private readonly ILogger<SchoolController> _logger;
-
-    public SchoolController(
+public class SchoolController(
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> getSchoolKs4CoreSubjectsUseCase,
+        IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
         GetAttendanceMeasures getAttendanceMeasures,
-        IFeatureFlagService featureFlagService,
         IRequestSchoolAccessor requestSchoolAccessor,
-        ILogger<SchoolController> logger)
-    {
-        _getSchoolKs4HeadlineMeasuresUseCase = getSchoolKs4HeadlineMeasuresUseCase;
-        _getSchoolKs4CoreSubjectsUseCase = getSchoolKs4CoreSubjectsUseCase;
-        _getAttendanceMeasures = getAttendanceMeasures;
-        _featureFlagService = featureFlagService;
-        _requestSchoolAccessor = requestSchoolAccessor;
-        _logger = logger;
-    }
-
+        ILogger<SchoolController> logger) : Controller
+{
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
@@ -62,7 +47,7 @@ public class SchoolController : Controller
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
         return View(school);
@@ -72,7 +57,7 @@ public class SchoolController : Controller
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
         return View(school);
@@ -82,8 +67,26 @@ public class SchoolController : Controller
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        var attendanceMeasures = await _getAttendanceMeasures.Execute(new(urn));
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Secondary, urn, filters));
+
+        PopulateViewData(response.School);
+
+        var model = new AttendancePageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Absence = MeasureViewModel.FromPrimaryMeasure(response.Absence, response.School)
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    [Route("attendance-old")]
+    public async Task<IActionResult> AttendanceOld(string urn)
+    {
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var attendanceMeasures = await getAttendanceMeasures.Execute(new(urn));
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         SetSchoolViewDataAsync(school);
         return View(new SchoolAttendancePageViewModel
@@ -103,7 +106,7 @@ public class SchoolController : Controller
         }
 
         var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-        var response = await _getAttendanceMeasures.Execute(new(urn));
+        var response = await getAttendanceMeasures.Execute(new(urn));
         var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
         var isPersistentAbsence = normalizedAbsenceType == "persistent";
 
@@ -176,7 +179,7 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
+        var response = await getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
 
         PopulateViewData(response.School);
 
@@ -196,7 +199,7 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
+        var response = await getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
 
         PopulateViewData(response.School);
 

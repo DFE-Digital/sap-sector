@@ -1,6 +1,6 @@
 using SAPSec.Core.Features.SchoolInfo;
 
-namespace SAPSec.Web.Areas.Shared.ViewModels;
+namespace SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 
 public record ComparisonLayoutModel(string Urn, string Name, string SimilarSchoolUrn, string SimilarSchoolName)
 {

@@ -8,7 +8,7 @@ public class SchoolKs2PerformanceDataProvider(
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
     IKs2PerformanceRepository performanceRepository)
 {
-    public async Task<SimilarSchoolsData<Ks2PerformanceData>> GetSimilarSchoolsPerformance(string currentSchoolUrn)
+    public async Task<SimilarSchoolsData<Ks2PerformanceData>> GetData(string currentSchoolUrn)
     {
         var similarSchoolUrns = (await similarSchoolsRepository.GetGroupAsync(currentSchoolUrn))
             .Select(g => g.NeighbourURN)

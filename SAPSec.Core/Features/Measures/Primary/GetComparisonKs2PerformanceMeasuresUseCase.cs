@@ -15,7 +15,7 @@ public class GetComparisonKs2PerformanceMeasuresUseCase(
             establishmentRepository,
             performanceRepository);
 
-        var (currentSchoolData, similarSchoolData) = await dataProvider.GetComparisonPerformance(
+        var (currentSchoolData, similarSchoolData) = await dataProvider.GetData(
             request.CurrentSchoolUrn,
             request.SimilarSchoolUrn);
 

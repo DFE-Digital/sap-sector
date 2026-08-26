@@ -7,7 +7,7 @@ public class ComparisonKs2PerformanceDataProvider(
     IEstablishmentRepository establishmentRepository,
     IKs2PerformanceRepository performanceRepository)
 {
-    public async Task<(SchoolData<Ks2PerformanceData> CurrentSchool, SchoolData<Ks2PerformanceData> SimilarSchool)> GetComparisonPerformance(
+    public async Task<(SchoolData<Ks2PerformanceData> CurrentSchool, SchoolData<Ks2PerformanceData> SimilarSchool)> GetData(
         string currentSchoolUrn,
         string similarSchoolUrn)
     {

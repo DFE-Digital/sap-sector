@@ -1,11 +1,11 @@
 ﻿using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.Measures.Primary;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 using static SAPSec.Core.Constants.Measures;
 
-namespace SAPSec.Core.Tests.Features.Measures.Primary;
+namespace SAPSec.Core.Tests.Features.Measures.Attendance;
 
 public class GetSchoolAttendanceMeasuresUseCaseTests
 {
@@ -290,6 +290,8 @@ public class GetSchoolAttendanceMeasuresUseCaseTests
         ]);
     }
 
-    private GetSchoolAttendanceMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null) =>
-            new(urn, filterBy ?? []);
+    private GetSchoolAttendanceMeasuresRequest Request(
+        string urn,
+        Dictionary<string, string>? filterBy = null) =>
+            new(MeasurePhase.Primary, urn, filterBy ?? []);
 }

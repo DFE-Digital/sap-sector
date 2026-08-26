@@ -2,7 +2,7 @@ using SAPSec.Core.Extensions;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Measures.Primary;
+namespace SAPSec.Core.Features.Measures.Attendance;
 
 public class GetSchoolAttendanceMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
@@ -15,13 +15,14 @@ public class GetSchoolAttendanceMeasuresUseCase(
               absenceRepository,
               establishmentRepository);
 
-        var currentSchoolPerformance = await dataProvider.GetSchoolAttendance(request.Urn);
+        var currentSchoolPerformance = await dataProvider.GetData(request.Urn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolPerformance.SchoolInfo,
             AttendanceMeasures.Absence.ForSchool(
+                request.Phase,
                 currentSchoolPerformance,
                 filterBy));
     }
@@ -29,9 +30,10 @@ public class GetSchoolAttendanceMeasuresUseCase(
 }
 
 public record GetSchoolAttendanceMeasuresRequest(
-string Urn,
-IDictionary<string, string>? FilterBy = null);
+    MeasurePhase Phase,
+    string Urn,
+    IDictionary<string, string>? FilterBy = null);
 
 public record GetSchoolAttendanceMeasuresResponse(
-SchoolInfo.SchoolInfo School,
-Measure Absence);
+    SchoolInfo.SchoolInfo School,
+    Measure Absence);

@@ -1,13 +1,13 @@
 using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Measures.Primary;
+namespace SAPSec.Core.Features.Measures.Attendance;
 
 public class SchoolAbsenceDataProvider(
-    IAbsenceRepository attendanceRepository,
+    IAbsenceRepository absenceRepository,
     IEstablishmentRepository establishmentRepository)
 {
-    public async Task<SchoolData<AbsenceData>> GetSchoolAttendance(string currentSchoolUrn)
+    public async Task<SchoolData<AbsenceData>> GetData(string currentSchoolUrn)
     {
         var school = await establishmentRepository.GetEstablishmentAsync(currentSchoolUrn);
 
@@ -16,10 +16,10 @@ public class SchoolAbsenceDataProvider(
             throw new NotFoundException($"School not found with URN: {currentSchoolUrn}");
         }
 
-        var attendances = await attendanceRepository.GetByUrnAsync(school.URN);
+        var absence = await absenceRepository.GetByUrnAsync(school.URN);
 
         return new SchoolData<AbsenceData>(
             SchoolInfo.SchoolInfo.FromEstablishment(school),
-            attendances);
+            absence);
     }
 }

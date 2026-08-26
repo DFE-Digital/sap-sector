@@ -9,7 +9,7 @@ public class GetAttendanceMeasures(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository)
 {
-    public async Task<GetAttendanceMeasuresResponse> Execute(GetSchoolAttendanceMeasuresRequest request)
+    public async Task<GetAttendanceMeasuresResponse> Execute(GetAttendanceMeasuresRequest request)
     {
         var establishment = await establishmentRepository.GetEstablishmentAsync(request.Urn);
         if (establishment is null)
@@ -181,7 +181,7 @@ public class GetAttendanceMeasures(
         bool IsCurrentSchool);
 }
 
-public record GetSchoolAttendanceMeasuresRequest(string Urn);
+public record GetAttendanceMeasuresRequest(string Urn);
 
 public record AttendanceMeasureAverage(
     decimal? SchoolValue,

@@ -1,10 +1,10 @@
 using SAPSec.Core.Features.Measures;
-using SAPSec.Core.Features.Measures.Primary;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 using static SAPSec.Core.Constants.Measures;
 
-namespace SAPSec.Core.Tests.Features.Measures.Primary;
+namespace SAPSec.Core.Tests.Features.Measures.Attendance;
 
 public class GetSchoolAttendanceComparisonUseCaseTests
 {
@@ -20,12 +20,6 @@ public class GetSchoolAttendanceComparisonUseCaseTests
             _establishmentRepo,
             _absenceRepo);
     }
-
-    private static GetComparisonAttendanceMeasuresRequest Request(
-        string urn,
-        string similarSchoolUrn,
-        Dictionary<string, string>? filterBy = null) =>
-        new(urn, similarSchoolUrn, filterBy);
 
     [Fact]
     public async Task WhenCurrentSchoolDoesNotExist_ThrowsNotFoundException()
@@ -275,4 +269,11 @@ public class GetSchoolAttendanceComparisonUseCaseTests
         series.First(s => s.SeriesType == MeasureSeriesType.SimilarSchool).Current.Should().Be((decimal?)similarSchool);
         series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage).Current.Should().Be((decimal?)england);
     }
+
+    private static GetComparisonAttendanceMeasuresRequest Request(
+        string urn,
+        string similarSchoolUrn,
+        Dictionary<string, string>? filterBy = null) =>
+            new(MeasurePhase.Primary, urn, similarSchoolUrn, filterBy);
+
 }

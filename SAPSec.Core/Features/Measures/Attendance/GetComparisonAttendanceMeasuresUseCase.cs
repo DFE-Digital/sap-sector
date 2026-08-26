@@ -2,7 +2,7 @@ using SAPSec.Core.Extensions;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Measures.Primary;
+namespace SAPSec.Core.Features.Measures.Attendance;
 
 public class GetComparisonAttendanceMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
@@ -15,7 +15,7 @@ public class GetComparisonAttendanceMeasuresUseCase(
             establishmentRepository,
             absenceRepository);
 
-        var (currentSchoolData, similarSchoolData) = await dataProvider.GetComparisonAbsence(
+        var (currentSchoolData, similarSchoolData) = await dataProvider.GetData(
             request.CurrentSchoolUrn,
             request.SimilarSchoolUrn);
 
@@ -25,6 +25,7 @@ public class GetComparisonAttendanceMeasuresUseCase(
             currentSchoolData.SchoolInfo,
             similarSchoolData.SchoolInfo,
             AttendanceMeasures.Absence.ForSchoolComparison(
+                request.Phase,
                 currentSchoolData,
                 similarSchoolData,
                 filterBy));
@@ -32,6 +33,7 @@ public class GetComparisonAttendanceMeasuresUseCase(
 }
 
 public record GetComparisonAttendanceMeasuresRequest(
+    MeasurePhase Phase,
     string CurrentSchoolUrn,
     string SimilarSchoolUrn,
     IDictionary<string, string>? FilterBy = null);

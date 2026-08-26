@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
@@ -28,7 +29,6 @@ public class SchoolControllerTests
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
-    private readonly Mock<IFeatureFlagService> _featureFlagServiceMock;
     private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
@@ -45,10 +45,8 @@ public class SchoolControllerTests
         _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
         _ks4DestinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
-        _featureFlagServiceMock = new Mock<IFeatureFlagService>();
         _requestSchoolAccessorMock = new Mock<IRequestSchoolAccessor>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
-        _featureFlagServiceMock.Setup(x => x.IsEnabledAsync("EnablePrimarySchools")).ReturnsAsync(false);
 
         var getAttendanceMeasures = new GetAttendanceMeasures(
             _absenceRepositoryMock.Object,
@@ -63,12 +61,15 @@ public class SchoolControllerTests
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object);
+        var getSchoolAttendanceMeasuresUseCase = new GetSchoolAttendanceMeasuresUseCase(
+            _establishmentRepositoryMock.Object,
+            _absenceRepositoryMock.Object);
 
         _sut = new SchoolController(
             getSchoolKs4HeadlineMeasuresUseCase,
             getSchoolKs4CoreSubjectsUseCase,
+            getSchoolAttendanceMeasuresUseCase,
             getAttendanceMeasures,
-            _featureFlagServiceMock.Object,
             _requestSchoolAccessorMock.Object,
             _loggerMock.Object);
     }

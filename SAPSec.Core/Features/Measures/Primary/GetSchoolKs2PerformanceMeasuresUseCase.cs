@@ -17,7 +17,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
             similarSchoolsRepository,
             performanceRepository);
 
-        var (currentSchoolPerformance, similarSchoolsPerformance) = await dataProvider.GetSimilarSchoolsPerformance(request.Urn);
+        var (currentSchoolPerformance, similarSchoolsPerformance) = await dataProvider.GetData(request.Urn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
