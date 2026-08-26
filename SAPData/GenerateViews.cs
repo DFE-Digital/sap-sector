@@ -1080,6 +1080,26 @@ public sealed class GenerateViews
             conditions.Add(Condition(r.Filter5, r.Filter5Value));
         }
 
+        if (!string.IsNullOrWhiteSpace(r.Filter6))
+        {
+            conditions.Add(Condition(r.Filter6, r.Filter6Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter7))
+        {
+            conditions.Add(Condition(r.Filter7, r.Filter7Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter8))
+        {
+            conditions.Add(Condition(r.Filter8, r.Filter8Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter9))
+        {
+            conditions.Add(Condition(r.Filter9, r.Filter9Value));
+        }
+
         var whenClause = conditions.Count == 0 ? "TRUE" : string.Join(" AND ", conditions);
 
         return $"MAX(CASE WHEN {whenClause} THEN {BuildValueExpression(r)} END) AS \"{r.PropertyName}\"";
