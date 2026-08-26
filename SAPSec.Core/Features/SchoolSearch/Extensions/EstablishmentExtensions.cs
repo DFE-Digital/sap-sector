@@ -5,19 +5,40 @@ namespace SAPSec.Core.Features.SchoolSearch.Extensions;
 
 public static class EstablishmentExtensions
 {
-    public static bool CanIndexForSearch(this Establishment? establishment)
+    public static string SearchExclusionReason(this Establishment? establishment, bool primarySchoolsEnabled)
     {
         if (establishment == null)
         {
-            return false;
+            return "null_establishment";
         }
 
-        if (PhaseOfEducationValues.IsSearchableIndexPhaseId(establishment.PhaseOfEducationId))
+        if (!HasSearchablePhase(establishment, primarySchoolsEnabled))
         {
-            return true;
+            return "phase_not_searchable";
         }
 
-        return HasLegacySearchablePhaseName(establishment.PhaseOfEducationName);
+        if (IsSecondaryExcluded(establishment))
+        {
+            return "secondary_status_excluded";
+        }
+
+        if (HasMissingStatus(establishment))
+        {
+            return HasSecondaryPhase(establishment)
+                ? "included_missing_status_secondary"
+                : "missing_status_non_secondary";
+        }
+
+        return EstablishmentStatusValues.IsIncludedInSearch(
+            establishment.EstablishmentStatusId,
+            establishment.EstablishmentStatusName)
+            ? "included"
+            : "status_not_included";
+    }
+
+    public static bool CanIndexForSearch(this Establishment? establishment)
+    {
+        return establishment.SearchExclusionReason(primarySchoolsEnabled: true) is "included" or "included_missing_status_secondary";
     }
 
     public static bool CanSearch(this Establishment? establishment, bool primarySchoolsEnabled)

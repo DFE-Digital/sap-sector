@@ -14,7 +14,9 @@ public class EstablishmentExtensionsTests
         var result = new Establishment
         {
             PhaseOfEducationId = phaseId,
-            PhaseOfEducationName = phaseName
+            PhaseOfEducationName = phaseName,
+            EstablishmentStatusId = "1",
+            EstablishmentStatusName = "Open"
         }.CanIndexForSearch();
 
         result.Should().BeTrue();
@@ -42,10 +44,29 @@ public class EstablishmentExtensionsTests
     {
         var result = new Establishment
         {
-            PhaseOfEducationName = "All-through"
+            PhaseOfEducationName = "All-through",
+            EstablishmentStatusId = "1",
+            EstablishmentStatusName = "Open"
         }.CanIndexForSearch();
 
         result.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("2", "Primary")]
+    [InlineData("4", "Secondary")]
+    [InlineData("7", "All-through")]
+    public void CanIndexForSearch_WithClosedSearchablePhase_ReturnsFalse(string phaseId, string phaseName)
+    {
+        var result = new Establishment
+        {
+            PhaseOfEducationId = phaseId,
+            PhaseOfEducationName = phaseName,
+            EstablishmentStatusId = "2",
+            EstablishmentStatusName = "Closed"
+        }.CanIndexForSearch();
+
+        result.Should().BeFalse();
     }
 
     [Theory]
