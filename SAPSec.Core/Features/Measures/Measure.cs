@@ -1,5 +1,5 @@
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures;
 
@@ -18,9 +18,10 @@ public record Measure(
         int year,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
-        SchoolData<T> currentSchool,
-        IEnumerable<SchoolData<T>> similarSchools,
+        SchoolMeasureData<T> currentSchool,
+        IEnumerable<SchoolMeasureData<T>> similarSchools,
         MeasureFieldSelector<T> fieldSelector)
+        where T : class, IMeasureData
     {
         return new Measure(
             key,
@@ -38,8 +39,9 @@ public record Measure(
         int year,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
-        SchoolData<T> currentSchool,
+        SchoolMeasureData<T> currentSchool,
         MeasureFieldSelector<T> fieldSelector)
+        where T : class, IMeasureData
     {
         return new Measure(
             key,
@@ -56,9 +58,10 @@ public record Measure(
         int year,
         MeasureDataType dataType,
         IEnumerable<MeasureAvailableFilter> availableFilters,
-        SchoolData<T> currentSchool,
-        SchoolData<T> similarSchool,
+        SchoolMeasureData<T> currentSchool,
+        SchoolMeasureData<T> similarSchool,
         MeasureFieldSelector<T> fieldSelector)
+        where T : class, IMeasureData
     {
         return new Measure(
             key,

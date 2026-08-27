@@ -45,7 +45,6 @@
     <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryGroupsEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryValuesEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json" />
-    <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json" />
     <None Remove="Data\Files\PrimarySchools\EnglandPerformance.json" />
     <None Remove="Data\Files\PrimarySchools\EstablishmentPerformance.json" />
@@ -111,9 +110,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json">

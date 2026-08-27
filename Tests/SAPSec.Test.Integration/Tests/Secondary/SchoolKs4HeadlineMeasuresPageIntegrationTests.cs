@@ -51,6 +51,18 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Attainment8_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("attainment8-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task Attainment8_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -205,6 +217,18 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("eng-maths-heading");
         heading.TrimmedTextContent().Should().Be("Grade achieved in English and maths GCSEs");
+    }
+
+    [Fact]
+    public async Task EnglishMaths_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("eng-maths-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -464,6 +488,18 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Destinations_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("destinations-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task Destinations_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -705,6 +741,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
             ["Local authority schools average", .. la],
             ["Schools in England average", .. england]);
     }
+
     private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
     {
         var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
