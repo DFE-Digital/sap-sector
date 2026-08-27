@@ -128,6 +128,7 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -252,6 +253,7 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -429,6 +431,7 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -499,5 +502,15 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             ["Test School 1", .. currentSchool],
             ["Test School 2", .. similarSchools],
             ["Schools in England average", .. england]);
+    }
+
+    private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
+    {
+        var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
+
+        foreach (var pointStyle in pointStyles)
+        {
+            chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
+        }
     }
 }

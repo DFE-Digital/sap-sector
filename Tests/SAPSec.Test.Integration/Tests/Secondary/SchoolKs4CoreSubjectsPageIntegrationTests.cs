@@ -1936,6 +1936,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ["Local authority schools average", .. la],
             ["Schools in England average", .. england]);
     }
+
     private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
     {
         var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;

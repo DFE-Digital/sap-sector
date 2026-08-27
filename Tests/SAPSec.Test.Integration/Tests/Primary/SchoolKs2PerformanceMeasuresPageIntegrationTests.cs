@@ -210,6 +210,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -482,6 +483,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -720,6 +722,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -888,6 +891,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1056,6 +1060,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1224,6 +1229,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1241,5 +1247,15 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
         var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
             .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
+    {
+        var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
+
+        foreach (var pointStyle in pointStyles)
+        {
+            chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
+        }
     }
 }

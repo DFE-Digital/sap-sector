@@ -115,6 +115,7 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "2"),
             ("tooltip-decimals", "2"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "rect", "rectRot");
     }
 
     [Fact]
@@ -216,5 +217,16 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "2"),
             ("tooltip-decimals", "2"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "rect", "rectRot");
+    }
+
+    private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
+    {
+        var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
+
+        foreach (var pointStyle in pointStyles)
+        {
+            chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
+        }
     }
 }

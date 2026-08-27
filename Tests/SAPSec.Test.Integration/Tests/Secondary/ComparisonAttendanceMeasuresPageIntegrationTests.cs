@@ -127,6 +127,7 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "2"),
             ("tooltip-decimals", "2"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -157,6 +158,7 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "2"),
             ("tooltip-decimals", "2"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -172,5 +174,15 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
         var yearByYearChart = page.ElementWithTestIdShouldExist("absence-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
             .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
+    }
+
+    private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
+    {
+        var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
+
+        foreach (var pointStyle in pointStyles)
+        {
+            chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
+        }
     }
 }
