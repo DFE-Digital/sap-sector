@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SAPSec.Core.Features.SchoolSearch;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SAPSec.Infrastructure.LuceneSearch;
@@ -15,5 +16,6 @@ public static class LuceneExtensions
         services.AddSingleton<LuceneSynonymMapBuilder>();
         services.AddSingleton<LuceneTokeniser>();
         services.AddHostedService<StartupIndexBuilder>();
+        services.AddSingleton<ISchoolSearchIndexReader, LuceneShoolSearchIndexReader>();
     }
 }
