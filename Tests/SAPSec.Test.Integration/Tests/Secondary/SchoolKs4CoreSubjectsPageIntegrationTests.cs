@@ -197,6 +197,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -458,6 +459,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -719,6 +721,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -980,6 +983,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1241,6 +1245,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1502,6 +1507,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1763,6 +1769,7 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1851,5 +1858,14 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
             ["Similar schools average", .. similarSchools],
             ["Local authority schools average", .. la],
             ["Schools in England average", .. england]);
+    }
+    private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
+    {
+        var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
+
+        foreach (var pointStyle in pointStyles)
+        {
+            chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
+        }
     }
 }

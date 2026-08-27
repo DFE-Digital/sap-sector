@@ -8,15 +8,21 @@
     var chartData = new
     {
         labels = SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatYearByYear(Model.MeasureInfo.Year),
-        datasets = Model.MeasureInfo.Labels.Zip(Model.Series).Select(x =>
-            new {
-                label = x.First,
-                data = new decimal?[] {
-                    x.Second.Previous2,
-                    x.Second.Previous,
-                    x.Second.Current
-                }
-            })
+        datasets = Model.MeasureInfo.Labels.Zip(
+                Model.Series.Zip(
+                    Model.MeasureInfo.YearByYearPointStyles,
+                    (series, pointStyle) => new { series, pointStyle }),
+                (label, x) => new
+                {
+                    label,
+                    pointStyle = x.pointStyle,
+                    data = new decimal?[]
+                    {
+                        x.series.Previous2,
+                        x.series.Previous,
+                        x.series.Current
+                    }
+                })
             .ToArray()
     };
     var decimals = Model.MeasureInfo.DataType switch
