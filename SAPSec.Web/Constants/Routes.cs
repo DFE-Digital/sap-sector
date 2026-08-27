@@ -9,16 +9,36 @@ public static class Routes
     public const string SignIn = "/auth/signin";
     public const string Error = "/error";
     public const string AccessDenied = "/error/403";
+    public const string TermsAndConditions = "/terms-and-conditions";
 
-    public static string FindASchool(string? query = null, int? page = null)
+    public const string FindASchoolBasePath = "/find-a-school";
+    public static string FindASchool(string? query = null, string? page = null, string[]? localAuthorities = null)
     {
         var queryString =
-            (query is not null ? $"&query={query}" : "") +
-            (page is not null ? $"&page={page}" : "");
+            (query is not null ? $"&query={Uri.EscapeDataString(query)}" : "") +
+            (page is not null ? $"&page={Uri.EscapeDataString(page)}" : "");
+
+        if (localAuthorities is not null)
+        {
+            foreach (var la in localAuthorities)
+            {
+                queryString += $"&localAuthorities={Uri.EscapeDataString(la)}";
+            }
+        }
 
         var qs = queryString.Any() ? "?" + queryString.Substring(1) : "";
 
         return $"/find-a-school{qs}";
+    }
+
+    public static string FindASchoolSuggest(string? queryPart = null)
+    {
+        var queryString =
+            (queryPart is not null ? $"&queryPart={Uri.EscapeDataString(queryPart)}" : "");
+
+        var qs = queryString.Any() ? "?" + queryString.Substring(1) : "";
+
+        return $"/find-a-school/suggest{qs}";
     }
 
     public static string School(string urn, string? phaseOfEducationName) =>
