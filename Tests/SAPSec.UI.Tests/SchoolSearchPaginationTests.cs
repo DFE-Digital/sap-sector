@@ -2,6 +2,7 @@
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
@@ -9,14 +10,12 @@ namespace SAPSec.UI.Tests.Deprecated;
 [Collection("UITestsCollection")]
 public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private const string SchoolSearchResultsPath = "/find-a-school/search";
-
     #region Pagination Visibility Tests
 
     [Fact]
     public async Task Pagination_IsNotVisible_WhenNoResults()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=XYZNonExistentSchool999");
+        await Page.GotoAsync(Routes.FindASchool("XYZNonExistentSchool999"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var pagination = Page.Locator(".govuk-pagination");
@@ -28,7 +27,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_IsNotVisible_WhenSinglePage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=UniqueSchoolName");
+        await Page.GotoAsync(Routes.FindASchool("UniqueSchoolName"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var pagination = Page.Locator(".govuk-pagination");
@@ -45,7 +44,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_IsVisible_WhenMultiplePages()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var resultsCount = Page.Locator(".app-school-results-count").First;
@@ -130,7 +129,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_FirstPage_HasNoPreviewLink()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=1");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var pagination = Page.Locator(".govuk-pagination");
@@ -158,7 +157,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     public async Task Pagination_PreviousLink_HasCorrectText()
     {
         await Page.GotoAsync(
-            $"{SchoolSearchResultsPath}?query=School&page=2",
+            $"{Routes.FindASchool()}?query=School&page=2",
             new() { WaitUntil = WaitUntilState.DOMContentLoaded }
         );
 
@@ -193,7 +192,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_PreviousLink_HasRelPrev()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=2");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=2");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var prevLink = Page.Locator(".govuk-pagination__prev a");
@@ -210,7 +209,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_ClickNextPage_NavigatesToNextPage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=1");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var nextLink = Page.Locator(".govuk-pagination__next a");
@@ -225,7 +224,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_ClickPreviousPage_NavigatesToPreviousPage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=2");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=2");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var prevLink = Page.Locator(".govuk-pagination__prev a");
@@ -240,7 +239,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_ClickPageNumber_NavigatesToThatPage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=1");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var pageLink = Page.Locator(".govuk-pagination__item:not(.govuk-pagination__item--current) a").First;
@@ -256,7 +255,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_PreservesQueryOnNavigation()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=1");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var nextLink = Page.Locator(".govuk-pagination__next a");
@@ -271,7 +270,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_PreservesFiltersOnNavigation()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&localAuthorities=Leeds&page=1");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&localAuthorities=Leeds&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var nextLink = Page.Locator(".govuk-pagination__next a");
@@ -290,7 +289,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task ResultsCount_ShowsCorrectRange_OnFirstPage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=1");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var resultsCount = Page.Locator(".app-school-results-count").First;
@@ -303,7 +302,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task ResultsCount_ShowsCorrectRange_OnSecondPage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=2");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=2");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var resultsCount = Page.Locator(".app-school-results-count").First;
@@ -321,7 +320,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     public async Task Pagination_ShowsEllipsis_WhenManyPages()
     {
         // Navigate to a search with many results
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=5");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=5");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var ellipsis = Page.Locator(".govuk-pagination__item--ellipsis");
@@ -355,7 +354,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task PageTitle_DoesNotIncludePageNumber_OnFirstPage()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=1");
+        await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=1");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var title = await Page.TitleAsync();
@@ -369,7 +368,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_InvalidPageNumber_HandlesGracefully()
     {
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=999");
+        var response = await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=999");
 
         response!.Status.Should().Be(200, "Invalid page number should be handled gracefully");
     }
@@ -377,7 +376,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_NegativePageNumber_HandlesGracefully()
     {
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=-1");
+        var response = await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=-1");
 
         response!.Status.Should().Be(200, "Negative page number should be handled gracefully");
     }
@@ -385,7 +384,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_ZeroPageNumber_HandlesGracefully()
     {
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=0");
+        var response = await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=0");
 
         response!.Status.Should().Be(200, "Zero page number should be handled gracefully");
     }
@@ -393,7 +392,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
     [Fact]
     public async Task Pagination_NonNumericPageNumber_HandlesGracefully()
     {
-        var response = await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School&page=abc");
+        var response = await Page.GotoAsync($"{Routes.FindASchool()}?query=School&page=abc");
 
         response!.Status.Should().Be(200, "Non-numeric page number should be handled gracefully");
     }
@@ -404,7 +403,7 @@ public class SchoolSearchPaginationTests(WebApplicationSetupFixture fixture) : B
 
     private async Task NavigateToPageWithMultipleResults()
     {
-        await Page.GotoAsync($"{SchoolSearchResultsPath}?query=School");
+        await Page.GotoAsync(Routes.FindASchool("School"));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
     }
 
