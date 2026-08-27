@@ -1,14 +1,16 @@
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Measures.Secondary;
+namespace SAPSec.Core.Features.Measures;
 
-public class SchoolKs4PerformanceDataProvider(
+public class SimilarSchoolsMeasureDataProvider<T, TGroupsEntry, TValuesEntry>(
     IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
-    IKs4PerformanceRepository performanceRepository)
+    ISimilarSchoolsRepository<TGroupsEntry, TValuesEntry> similarSchoolsRepository,
+    IMeasureDataRepository<T> repository) : ISimilarSchoolsMeasureDataProvider<T>
+    where T : class, IMeasureData
+    where TGroupsEntry : ISimilarSchoolsGroupsEntry
+    where TValuesEntry : ISimilarSchoolsValuesEntry
 {
-    public async Task<SimilarSchoolsData<Ks4PerformanceData>> GetData(string currentSchoolUrn)
+    public async Task<SimilarSchoolsMeasureData<T>> GetData(string currentSchoolUrn)
     {
         var similarSchoolUrns = (await similarSchoolsRepository.GetGroupAsync(currentSchoolUrn))
             .Select(g => g.NeighbourURN)
@@ -27,22 +29,23 @@ public class SchoolKs4PerformanceDataProvider(
 
         var currentSchool = schools[currentSchoolUrn];
 
-        var performances = (await performanceRepository.GetByUrnsAsync(schools.Keys))
+        var performances = (await repository.GetByUrnsAsync(schools.Keys))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
-        var currentSchoolData = new SchoolData<Ks4PerformanceData>(
+        var currentSchoolData = new SchoolMeasureData<T>(
             currentSchool,
             performances[currentSchoolUrn]);
 
         var similarSchoolsData = similarSchoolUrns
             .Where(schools.ContainsKey)
-            .Select(urn => new SchoolData<Ks4PerformanceData>(
+            .Select(urn => new SchoolMeasureData<T>(
                 schools[urn],
                 performances.TryGetValue(urn, out var p) ? p : null))
             .ToList();
 
-        return new SimilarSchoolsData<Ks4PerformanceData>(
+        return new SimilarSchoolsMeasureData<T>(
             currentSchoolData,
             similarSchoolsData);
     }
 }
+

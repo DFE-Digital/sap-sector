@@ -7,6 +7,7 @@ using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
+using System.Net;
 using Xunit.Abstractions;
 
 namespace SAPSec.Test.Integration.Tests.Primary;
@@ -45,6 +46,18 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
 
         var filter = page.ElementWithTestIdShouldExist("absence-type-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Overall absence", "Persistent absence"]);
+    }
+
+    [Fact]
+    public async Task Absence_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Attendance, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("absence-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]

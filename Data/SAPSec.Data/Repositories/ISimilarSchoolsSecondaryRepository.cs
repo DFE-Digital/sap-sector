@@ -2,9 +2,6 @@
 
 namespace SAPSec.Data.Repositories;
 
-public interface ISimilarSchoolsSecondaryRepository
+public interface ISimilarSchoolsSecondaryRepository : ISimilarSchoolsRepository<SimilarSchoolsSecondaryGroupsEntry, SimilarSchoolsSecondaryValuesEntry>
 {
-    Task<IReadOnlyCollection<SimilarSchoolsSecondaryGroupsEntry>> GetGroupAsync(string urn);
-    Task<IReadOnlyCollection<SimilarSchoolsSecondaryValuesEntry>> GetValuesByUrnsAsync(IEnumerable<string> urns);
-    Task<IReadOnlyCollection<string>> GetAllUrnsInSimilarSchoolsDataSet();
 }

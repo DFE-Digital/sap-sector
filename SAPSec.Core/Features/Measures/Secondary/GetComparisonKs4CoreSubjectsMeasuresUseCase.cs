@@ -11,7 +11,7 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
 {
     public async Task<GetComparisonKs4CoreSubjectsMeasuresResponse> Execute(GetComparisonKs4CoreSubjectsMeasuresRequest request)
     {
-        var performance = new ComparisonKs4PerformanceDataProvider(
+        var performance = new ComparisonMeasureDataProvider<Ks4PerformanceData>(
             establishmentRepository,
             performanceRepository);
 

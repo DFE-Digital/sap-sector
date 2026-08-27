@@ -28,6 +28,18 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Absence_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Attendance, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("absence-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
     public async Task Absence_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(

@@ -39,6 +39,17 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task EnglishLanguage_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("eng-lang-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task EnglishLanguage_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -297,6 +308,17 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("eng-lit-heading");
         heading.TrimmedTextContent().Should().Be("English literature");
+    }
+
+    [Fact]
+    public async Task EnglishLiterature_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("eng-lit-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -561,6 +583,17 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Maths_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("maths-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task Maths_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -819,6 +852,17 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("comb-sci-heading");
         heading.TrimmedTextContent().Should().Be("Combined science (double award)");
+    }
+
+    [Fact]
+    public async Task CombinedScience_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("comb-sci-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -1083,6 +1127,17 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Biology_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("bio-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task Biology_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -1344,6 +1399,17 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Chemistry_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("chem-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task Chemistry_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -1602,6 +1668,17 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("phys-heading");
         heading.TrimmedTextContent().Should().Be("Physics");
+    }
+
+    [Fact]
+    public async Task Physics_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("phys-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]

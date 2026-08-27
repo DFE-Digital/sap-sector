@@ -11,9 +11,9 @@ public class GetSchoolAttendanceMeasuresUseCase(
 {
     public async Task<GetSchoolAttendanceMeasuresResponse> Execute(GetSchoolAttendanceMeasuresRequest request)
     {
-        var dataProvider = new SchoolAbsenceDataProvider(
-              absenceRepository,
-              establishmentRepository);
+        var dataProvider = new SchoolMeasureDataProvider<AbsenceData>(
+              establishmentRepository,
+              absenceRepository);
 
         var currentSchoolPerformance = await dataProvider.GetData(request.Urn);
 

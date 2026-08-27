@@ -40,6 +40,16 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Absence_Tabs()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.SecondarySchool(SecondarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+
+        var tabs = page.ElementWithTestIdShouldExist("absence-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
     public async Task Absence_TableView_ShowsOverallAbsenceValuesByDefault()
     {
         Fixture.AbsenceRepository.SetupEstablishmentAbsence(

@@ -1,5 +1,6 @@
 using SAPSec.Core.Extensions;
 using SAPSec.Core.UseCases;
+using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures.Primary;
@@ -12,7 +13,7 @@ public class GetSchoolKs2PerformanceMeasuresUseCase(
 {
     public async Task<GetSchoolKs2PerformanceMeasuresResponse> Execute(GetSchoolKs2PerformanceMeasuresRequest request)
     {
-        var dataProvider = new SchoolKs2PerformanceDataProvider(
+        var dataProvider = new SimilarSchoolsMeasureDataProvider<Ks2PerformanceData, SimilarSchoolsPrimaryGroupsEntry, SimilarSchoolsPrimaryValuesEntry>(
             establishmentRepository,
             similarSchoolsRepository,
             performanceRepository);

@@ -66,6 +66,19 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Attainment8_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("attainment8-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
     public async Task Attainment8_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -146,6 +159,19 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("eng-maths-heading");
         heading.TrimmedTextContent().Should().Be("Grade achieved in English and maths GCSEs");
+    }
+
+    [Fact]
+    public async Task EnglishMaths_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("eng-maths-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -310,6 +336,19 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("destinations-heading");
         heading.TrimmedTextContent().Should().Be("Staying in education or entering employment");
+    }
+
+    [Fact]
+    public async Task Destinations_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("destinations-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]

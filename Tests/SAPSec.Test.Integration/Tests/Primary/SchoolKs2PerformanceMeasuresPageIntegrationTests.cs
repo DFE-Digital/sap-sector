@@ -40,6 +40,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardRwm_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardRwm_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -297,6 +309,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("higher-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in reading, writing and maths");
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardRwm_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -560,6 +584,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -713,6 +749,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("maths-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in maths");
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("maths-score-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -872,6 +920,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardGps_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-gps-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardGps_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -1025,6 +1085,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("higher-gps-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in grammar, punctuation and spelling");
+    }
+
+    [Fact]
+    public async Task AMeetingExpectedStandardRwm_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]

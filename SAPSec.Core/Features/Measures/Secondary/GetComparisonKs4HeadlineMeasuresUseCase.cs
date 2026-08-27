@@ -12,11 +12,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCase(
 {
     public async Task<GetComparisonKs4HeadlineMeasuresResponse> Execute(GetComparisonKs4HeadlineMeasuresRequest request)
     {
-        var performance = new ComparisonKs4PerformanceDataProvider(
+        var performance = new ComparisonMeasureDataProvider<Ks4PerformanceData>(
             establishmentRepository,
             performanceRepository);
 
-        var destinations = new ComparisonKs4DestinationsDataProvider(
+        var destinations = new ComparisonMeasureDataProvider<Ks4DestinationsData>(
             establishmentRepository,
             destinationsRepository);
 

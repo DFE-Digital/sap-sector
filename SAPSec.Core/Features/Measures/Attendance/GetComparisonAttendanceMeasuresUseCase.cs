@@ -11,7 +11,7 @@ public class GetComparisonAttendanceMeasuresUseCase(
 {
     public async Task<GetComparisonAttendanceMeasuresResponse> Execute(GetComparisonAttendanceMeasuresRequest request)
     {
-        var dataProvider = new ComparisonAbsenceDataProvider(
+        var dataProvider = new ComparisonMeasureDataProvider<AbsenceData>(
             establishmentRepository,
             absenceRepository);
 

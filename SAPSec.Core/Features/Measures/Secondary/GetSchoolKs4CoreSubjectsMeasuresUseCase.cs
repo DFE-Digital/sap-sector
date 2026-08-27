@@ -1,5 +1,6 @@
 using SAPSec.Core.Extensions;
 using SAPSec.Core.UseCases;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures.Secondary;
@@ -12,7 +13,7 @@ public class GetSchoolKs4CoreSubjectsMeasuresUseCase(
 {
     public async Task<GetSchoolKs4CoreSubjectsMeasuresResponse> Execute(GetSchoolKs4CoreSubjectsMeasuresRequest request)
     {
-        var performance = new SchoolKs4PerformanceDataProvider(
+        var performance = new SimilarSchoolsMeasureDataProvider<Ks4PerformanceData, SimilarSchoolsSecondaryGroupsEntry, SimilarSchoolsSecondaryValuesEntry>(
             establishmentRepository,
             similarSchoolsRepository,
             performanceRepository);

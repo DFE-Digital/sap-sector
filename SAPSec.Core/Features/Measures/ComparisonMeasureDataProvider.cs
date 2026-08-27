@@ -1,13 +1,13 @@
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 
-namespace SAPSec.Core.Features.Measures.Primary;
+namespace SAPSec.Core.Features.Measures;
 
-public class ComparisonKs2PerformanceDataProvider(
+public class ComparisonMeasureDataProvider<T>(
     IEstablishmentRepository establishmentRepository,
-    IKs2PerformanceRepository performanceRepository)
+    IMeasureDataRepository<T> repository) : IComparisonMeasureDataProvider<T>
+    where T : class, IMeasureData
 {
-    public async Task<(SchoolData<Ks2PerformanceData> CurrentSchool, SchoolData<Ks2PerformanceData> SimilarSchool)> GetData(
+    public async Task<ComparisonMeasureData<T>> GetData(
         string currentSchoolUrn,
         string similarSchoolUrn)
     {
@@ -27,17 +27,17 @@ public class ComparisonKs2PerformanceDataProvider(
             throw new NotFoundException($"School not found with URN: {similarSchoolUrn}");
         }
 
-        var performances = (await performanceRepository.GetByUrnsAsync(urns))
+        var absence = (await repository.GetByUrnsAsync(urns))
             .ToDictionary(x => x.Urn, StringComparer.Ordinal);
 
-        var currentSchoolData = new SchoolData<Ks2PerformanceData>(
+        var currentSchoolData = new SchoolMeasureData<T>(
             schools[currentSchoolUrn],
-            performances.TryGetValue(currentSchoolUrn, out var currentPerformance) ? currentPerformance : null);
+            absence.TryGetValue(currentSchoolUrn, out var currentAbsence) ? currentAbsence : null);
 
-        var similarSchoolData = new SchoolData<Ks2PerformanceData>(
+        var similarSchoolData = new SchoolMeasureData<T>(
             schools[similarSchoolUrn],
-            performances.TryGetValue(similarSchoolUrn, out var similarPerformance) ? similarPerformance : null);
+            absence.TryGetValue(similarSchoolUrn, out var similarAbsence) ? similarAbsence : null);
 
-        return (currentSchoolData, similarSchoolData);
+        return new(currentSchoolData, similarSchoolData);
     }
 }

@@ -1,7 +1,6 @@
 ﻿using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures.Attendance;
@@ -12,7 +11,7 @@ internal static class AttendanceMeasures
     {
         public static Measure ForSchool(
             MeasurePhase phase,
-            SchoolData<AbsenceData> currentSchool,
+            SchoolMeasureData<AbsenceData> currentSchool,
             CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
@@ -29,8 +28,8 @@ internal static class AttendanceMeasures
 
         public static Measure ForSchoolComparison(
             MeasurePhase phase,
-            SchoolData<AbsenceData> currentSchool,
-            SchoolData<AbsenceData> similarSchool,
+            SchoolMeasureData<AbsenceData> currentSchool,
+            SchoolMeasureData<AbsenceData> similarSchool,
             CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
