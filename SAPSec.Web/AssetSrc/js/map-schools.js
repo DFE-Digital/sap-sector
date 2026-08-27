@@ -87,6 +87,20 @@
         });
     }
 
+    function getSchoolMarkerLabel(school) {
+        const parts = [];
+
+        parts.push(school.name || "School");
+
+        if (school.address) {
+            parts.push(school.address);
+        } else if (school.la) {
+            parts.push(school.la);
+        }
+
+        return `Open map marker for ${parts.join(", ")}`;
+    }
+
     function syncMarkerExpandedState(markerState) {
         const element = markerState.marker.getElement?.();
         if (!element) {
@@ -195,7 +209,10 @@
         element.tabIndex = 0;
         element.setAttribute("role", "button");
         element.setAttribute("aria-haspopup", "dialog");
-        element.setAttribute("aria-label", school.name ? `Open ${school.name} on map` : "Open school on map");
+        const markerLabel = getSchoolMarkerLabel(school);
+        element.setAttribute("aria-label", markerLabel);
+        element.setAttribute("title", markerLabel);
+        element.setAttribute("alt", markerLabel);
         syncMarkerExpandedState(markerState);
 
         element.addEventListener("keydown", (event) => {
@@ -243,10 +260,14 @@
             element.setAttribute("role", "button");
 
             const count = element.textContent?.trim();
-            element.setAttribute(
-                "aria-label",
-                count ? `Open map cluster containing ${count} schools` : "Open map cluster"
-            );
+            const clusterLabel = count
+                ? `Open map cluster containing ${count} schools`
+                : "Open map cluster";
+            element.setAttribute("aria-label", clusterLabel);
+            element.setAttribute("title", clusterLabel);
+            element.querySelectorAll("span").forEach((span) => {
+                span.setAttribute("aria-hidden", "true");
+            });
 
             element.addEventListener("keydown", (event) => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -457,7 +478,7 @@
                     if (count > 100) cls = "cluster-red";
 
                     return L.divIcon({
-                        html: `<div><span>${count}</span></div>`,
+                        html: `<div aria-hidden="true"><span aria-hidden="true">${count}</span></div>`,
                         className: `marker-cluster ${cls}`,
                         iconSize: L.point(40, 40),
                     });
@@ -494,7 +515,13 @@
                 iconToUse = s.isComparedSchool ? blueSchoolIcon : pinkSchoolIcon;
             }
 
-            const m = L.marker(ll, { icon: iconToUse }).bindPopup(popupHtml(s));
+            const markerLabel = getSchoolMarkerLabel(s);
+            const m = L.marker(ll, {
+                icon: iconToUse,
+                keyboard: true,
+                title: markerLabel,
+                alt: markerLabel,
+            }).bindPopup(popupHtml(s));
             const markerState = {
                 marker: m,
                 school: s,
