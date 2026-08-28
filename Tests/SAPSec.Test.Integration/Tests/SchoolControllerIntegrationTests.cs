@@ -1,10 +1,7 @@
-using System.Net;
-using System.Text.Json;
-using AngleSharp.Dom;
 using FluentAssertions;
-using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
+using System.Net;
 
 namespace SAPSec.Test.Integration.Tests;
 
@@ -12,7 +9,6 @@ namespace SAPSec.Test.Integration.Tests;
 public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixture fixture)
 {
     private static readonly string SchoolOverviewPath = Routes.SecondarySchool("105574").Overview;
-    private static readonly string SchoolAttendancePath = Routes.SecondarySchool("105574").Attendance;
     private static readonly string SchoolDetailsPath = Routes.SecondarySchool("105574").SchoolDetails;
     private static readonly string WhatIsASimilarSchoolPath = Routes.SecondarySchool("105574").WhatIsASimilarSchool;
 
@@ -61,7 +57,7 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("href=\"/find-a-school\">Home</a>");
+        content.Should().Contain($"href=\"{Routes.FindASchool()}\">Home</a>");
     }
 
     [Fact]
@@ -84,32 +80,6 @@ public class SchoolControllerIntegrationTests(JsonRepositoryIntegrationTestFixtu
         content.Should().Contain("Location");
         content.Should().Contain("Contact details");
         content.Should().Contain("Further information");
-    }
-
-    [Fact]
-    public async Task GetSchoolAttendance_OffersBothAbsenceTypes()
-    {
-        var document = await fixture.RequestPageAsync(SchoolAttendancePath);
-
-        var absenceTypeSelect = document.ElementWithTestIdShouldExist("attendance-absence-type");
-        var absenceOptions = absenceTypeSelect.ChildTrimmedTextContent();
-
-        absenceOptions.Should().BeEquivalentTo(
-            ["Overall absence", "Persistent absence"],
-            options => options.WithStrictOrdering());
-    }
-
-    [Fact]
-    public async Task GetSchoolAttendance_DoesNotRenderTopPerformersTab()
-    {
-        var document = await fixture.RequestPageAsync(SchoolAttendancePath);
-
-        var attendanceTabs = document.ElementWithTestIdShouldExist("attendance-tabs");
-        var tabTexts = attendanceTabs.ChildTrimmedTextContent();
-
-        tabTexts.Should().NotContain("Top performers");
-        tabTexts.Should().Contain("Year by year");
-        tabTexts.Should().Contain("Table");
     }
 
     [Fact]

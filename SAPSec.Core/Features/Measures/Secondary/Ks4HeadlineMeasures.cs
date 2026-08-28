@@ -1,7 +1,6 @@
 using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Data.Repositories;
 using static SAPSec.Core.Constants.Measures.Secondary;
 
@@ -11,7 +10,7 @@ internal static class Ks4HeadlineMeasures
 {
     public static class Attainment8
     {
-        public static Measure ForSchool(SchoolData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 
@@ -26,7 +25,7 @@ internal static class Ks4HeadlineMeasures
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks4PerformanceData> currentSchool, SchoolData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 
@@ -62,7 +61,7 @@ internal static class Ks4HeadlineMeasures
 
     public static class EnglishMaths
     {
-        public static Measure ForSchool(SchoolData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchool(SchoolMeasureData<Ks4PerformanceData> currentSchool, IEnumerable<SchoolMeasureData<Ks4PerformanceData>> similarSchools, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 
@@ -77,7 +76,7 @@ internal static class Ks4HeadlineMeasures
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks4PerformanceData> currentSchool, SchoolData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4PerformanceData> currentSchool, SchoolMeasureData<Ks4PerformanceData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 
@@ -138,7 +137,7 @@ internal static class Ks4HeadlineMeasures
 
     public static class Destinations
     {
-        public static Measure ForSchool(SchoolData<Ks4DestinationsData> currentSchool, IEnumerable<SchoolData<Ks4DestinationsData>> similarSchools, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchool(SchoolMeasureData<Ks4DestinationsData> currentSchool, IEnumerable<SchoolMeasureData<Ks4DestinationsData>> similarSchools, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 
@@ -153,7 +152,7 @@ internal static class Ks4HeadlineMeasures
                 fieldSelector);
         }
 
-        public static Measure ForSchoolComparison(SchoolData<Ks4DestinationsData> currentSchool, SchoolData<Ks4DestinationsData> similarSchool, CaseInsensitiveDictionary<string> filters)
+        public static Measure ForSchoolComparison(SchoolMeasureData<Ks4DestinationsData> currentSchool, SchoolMeasureData<Ks4DestinationsData> similarSchool, CaseInsensitiveDictionary<string> filters)
         {
             var (availableFilters, fieldSelector) = ResolveFilters(filters);
 

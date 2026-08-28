@@ -184,6 +184,8 @@ public class Program
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
+        builder.Services.AddUseCases();
+        builder.Services.AddServices();
         builder.Services.AddPostgresqlDependencies();
         builder.Services.AddDependencies();
 
