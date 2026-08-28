@@ -1,4 +1,4 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Production"
 FeatureManagement__EnablePrimarySchools: "false"
-FeatureManagement__EnableRiseResources: "true"
+FeatureManagement__EnableRiseResources: "false"
