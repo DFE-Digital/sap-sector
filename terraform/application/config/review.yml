@@ -1,5 +1,5 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Development"
 FeatureManagement__EnablePrimarySchools: "true"
-FeatureManagement__EnableRiseResources: "true"
+FeatureManagement__EnableRiseResources: "false"
 reset_review_db: "true"
