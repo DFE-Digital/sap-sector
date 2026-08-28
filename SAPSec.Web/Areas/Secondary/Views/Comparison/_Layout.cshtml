@@ -1,7 +1,8 @@
-@using SAPSec.Web.ViewModels
 @using System.Linq
 @using SAPSec.Web.Areas.Shared.ViewModels
+@using SAPSec.Web.Areas.Shared.ViewModels.Comparison
 @using SAPSec.Web.Constants
+@using SAPSec.Web.ViewModels
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
 
@@ -17,7 +18,6 @@
         ["similarSchoolUrn"] = layout.SimilarSchoolUrn
     };
 
-    var isKs4HeadlineMeasures = string.Equals(currentAction, "Ks4HeadlineMeasures", StringComparison.OrdinalIgnoreCase);
     string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
 }
 
@@ -37,7 +37,7 @@
     </nav>
 }
 
-<div class="govuk-grid-row  @(isKs4HeadlineMeasures ? "app-measure-headline-mobile-layout" : "")">
+<div class="govuk-grid-row app-comparison-pages">
 
     @* LEFT: back link *@
     <div class="app-side-navigation-container">

@@ -40,6 +40,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardRwm_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardRwm_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -198,6 +210,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -297,6 +310,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("higher-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in reading, writing and maths");
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardRwm_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -458,6 +483,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -557,6 +583,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in reading");
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -684,6 +722,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -713,6 +752,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("maths-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in maths");
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("maths-score-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -840,6 +891,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -869,6 +921,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("expected-gps-heading");
         heading.TrimmedTextContent().Should().Be("Meeting expected standard in grammar, punctuation and spelling");
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-gps-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -996,6 +1060,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1025,6 +1090,18 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var heading = page.ElementWithTestIdShouldExist("higher-gps-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in grammar, punctuation and spelling");
+    }
+
+    [Fact]
+    public async Task AMeetingExpectedStandardRwm_Tabs()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
     }
 
     [Fact]
@@ -1152,6 +1229,7 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rect", "rectRot");
     }
 
     [Fact]
@@ -1169,5 +1247,15 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
         var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
             .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#5694ca", "#4b9b7d");
+    }
+
+    private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
+    {
+        var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
+
+        foreach (var pointStyle in pointStyles)
+        {
+            chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
+        }
     }
 }

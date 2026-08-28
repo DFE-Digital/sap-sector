@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures;
 
@@ -8,9 +8,10 @@ namespace SAPSec.Core.Features.Measures;
 public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, decimal? Previous, decimal? Previous2)
 {
     internal static IReadOnlyCollection<MeasureSeries> ForSchool<T>(
-        SchoolData<T> currentSchool,
-        IEnumerable<SchoolData<T>> similarSchools,
-        MeasureFieldSelector<T> fieldSelector) => [
+        SchoolMeasureData<T> currentSchool,
+        IEnumerable<SchoolMeasureData<T>> similarSchools,
+        MeasureFieldSelector<T> fieldSelector)
+        where T : class, IMeasureData => [
             new MeasureSeries(
                 MeasureSeriesType.CurrentSchool,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),
@@ -20,7 +21,7 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
                 MeasureSeriesType.SimilarSchoolsAverage,
                 MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolCurrent(x.Data))),
                 MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious(x.Data))),
-                MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x.Data)))),            
+                MeasureHelper.Average(similarSchools.Select(x => fieldSelector.SchoolPrevious2(x.Data)))),
             new MeasureSeries(
                 MeasureSeriesType.LASchoolsAverage,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.LocalAuthorityCurrent(currentSchool.Data)),
@@ -35,8 +36,9 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
 
     //No similar schools average for attendance measures on school overview page
     internal static IReadOnlyCollection<MeasureSeries> ForSchoolAttendance<T>(
-        SchoolData<T> currentSchool,
-        MeasureFieldSelector<T> fieldSelector) => [
+        SchoolMeasureData<T> currentSchool,
+        MeasureFieldSelector<T> fieldSelector)
+        where T : class, IMeasureData => [
         new MeasureSeries(
                 MeasureSeriesType.CurrentSchool,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),
@@ -55,9 +57,10 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
     ];
 
     internal static IReadOnlyCollection<MeasureSeries> ForSchoolComparison<T>(
-        SchoolData<T> currentSchool,
-        SchoolData<T> similarSchool,
-        MeasureFieldSelector<T> fieldSelector) => [
+        SchoolMeasureData<T> currentSchool,
+        SchoolMeasureData<T> similarSchool,
+        MeasureFieldSelector<T> fieldSelector)
+        where T : class, IMeasureData => [
             new MeasureSeries(
                 MeasureSeriesType.CurrentSchool,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(currentSchool.Data)),
