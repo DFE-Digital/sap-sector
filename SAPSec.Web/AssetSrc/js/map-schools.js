@@ -261,7 +261,7 @@
 
             const count = element.textContent?.trim();
             const clusterLabel = count
-                ? `Open map cluster containing ${count} schools`
+                ? `Expand map cluster of ${count} schools`
                 : "Open map cluster";
             element.setAttribute("aria-label", clusterLabel);
             element.setAttribute("title", clusterLabel);
