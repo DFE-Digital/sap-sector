@@ -1,0 +1,19 @@
+@using SAPSec.Web.Constants
+@using SAPSec.Web.Areas.Shared.ViewModels
+@model RiseResourcesPageViewModel
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = PageTitles.RiseResources;
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.SchoolName))
+{
+    <span class="govuk-caption-xl">@Model.SchoolName</span>
+}
+
+<h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
+
+@if (!Model.Resources.Any())
+{    
+    <p class="govuk-body">No RISE resources are currently available for this school.</p>
+}

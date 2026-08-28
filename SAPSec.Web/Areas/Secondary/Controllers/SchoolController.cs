@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
@@ -29,6 +30,7 @@ public class SchoolController : Controller
     private readonly IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> _getSchoolKs4HeadlineMeasuresUseCase;
     private readonly IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> _getSchoolKs4CoreSubjectsUseCase;
     private readonly GetAttendanceMeasures _getAttendanceMeasures;
+    private readonly IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> _getRiseResourcesUseCase;
     private readonly IFeatureFlagService _featureFlagService;
     private readonly IRequestSchoolAccessor _requestSchoolAccessor;
     private readonly ILogger<SchoolController> _logger;
@@ -37,6 +39,7 @@ public class SchoolController : Controller
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> getSchoolKs4CoreSubjectsUseCase,
         GetAttendanceMeasures getAttendanceMeasures,
+        IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
         IFeatureFlagService featureFlagService,
         IRequestSchoolAccessor requestSchoolAccessor,
         ILogger<SchoolController> logger)
@@ -44,6 +47,7 @@ public class SchoolController : Controller
         _getSchoolKs4HeadlineMeasuresUseCase = getSchoolKs4HeadlineMeasuresUseCase;
         _getSchoolKs4CoreSubjectsUseCase = getSchoolKs4CoreSubjectsUseCase;
         _getAttendanceMeasures = getAttendanceMeasures;
+        _getRiseResourcesUseCase = getRiseResourcesUseCase;
         _featureFlagService = featureFlagService;
         _requestSchoolAccessor = requestSchoolAccessor;
         _logger = logger;
@@ -54,8 +58,7 @@ public class SchoolController : Controller
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
 
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
         return View(school);
     }
 
@@ -64,8 +67,7 @@ public class SchoolController : Controller
     public async Task<IActionResult> SchoolDetails(string urn)
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
         return View(school);
     }
 
@@ -74,22 +76,20 @@ public class SchoolController : Controller
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
         return View(school);
     }
 
     [HttpGet]
+    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
     [Route("rise-resources")]
     public async Task<IActionResult> RiseResources(string urn)
     {
-        // Minimal action to render the RISE resources view. Populate view data so
-        // the shared layout and side navigation can render correctly.
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
 
-        return View();
+        var riseResourcesResponse = await _getRiseResourcesUseCase.Execute(new(urn));
+        return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
     }
 
     [HttpGet]
@@ -98,8 +98,7 @@ public class SchoolController : Controller
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
         var attendanceMeasures = await _getAttendanceMeasures.Execute(new(urn));
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        await SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
         return View(new SchoolAttendancePageViewModel
         {
             SchoolDetails = school,
@@ -236,25 +235,16 @@ public class SchoolController : Controller
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
 
-        var includeRise = false;
-        try
-        {
-            includeRise = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
-        }
-        catch
-        {
-            includeRise = false;
-        }
-
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
-            includeRise);
+            await IsRiseResourcesEnabledAsync());
     }
 
-    private async Task SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
+    private async Task SetSchoolViewDataAsync(string urn, Core.Model.SchoolDetails school)
     {
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData[ViewDataKeys.SchoolDetails] = school;
 
         if (Url is null)
@@ -262,22 +252,16 @@ public class SchoolController : Controller
             return;
         }
 
-        var includeRise = false;
-        try
-        {
-            includeRise = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
-        }
-        catch
-        {
-            includeRise = false;
-        }
-
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             school.Urn,
             ControllerContext.ActionDescriptor.ActionName,
-            includeRise);
+            await IsRiseResourcesEnabledAsync());
     }
+
+    private async Task<bool> IsRiseResourcesEnabledAsync() =>
+        _featureFlagService is not null
+        && await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 
     private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
     {

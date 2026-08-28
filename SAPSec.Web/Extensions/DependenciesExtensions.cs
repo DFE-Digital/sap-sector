@@ -1,6 +1,7 @@
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -34,6 +35,7 @@ public static class DependenciesExtensions
         services.AddSingleton<GetCharacteristicsComparison>();
         services.AddSingleton<GetPrimaryCharacteristicsComparison>();
         services.AddSingleton<IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse>, GetSchoolInfoUseCase>();
+        services.AddSingleton<IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse>, GetRiseResourcesUseCase>();
         services.AddSingleton<IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse>, GetSchoolKs2PerformanceMeasuresUseCase>();
         services.AddSingleton<IUseCase<Core.Features.Measures.Primary.GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse>, GetSchoolAttendanceMeasuresUseCase>();
         services.AddSingleton<IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse>, GetComparisonKs2PerformanceMeasuresUseCase>();

@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
+using SAPSec.Core;
 using SAPSec.Core.Features.Attendance.UseCases;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
@@ -12,6 +14,7 @@ using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Areas.Secondary.Controllers;
+using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Services;
 using System.Text.Json;
@@ -63,11 +66,14 @@ public class SchoolControllerTests
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object);
+        var getRiseResourcesUseCase = new GetRiseResourcesUseCase(
+            _establishmentRepositoryMock.Object);
 
         _sut = new SchoolController(
             getSchoolKs4HeadlineMeasuresUseCase,
             getSchoolKs4CoreSubjectsUseCase,
             getAttendanceMeasures,
+            getRiseResourcesUseCase,
             _featureFlagServiceMock.Object,
             _requestSchoolAccessorMock.Object,
             _loggerMock.Object);
@@ -282,6 +288,83 @@ public class SchoolControllerTests
         root.GetProperty("table").TryGetProperty("similarSchools", out _).Should().BeFalse();
         root.GetProperty("topPerformers").GetArrayLength().Should().Be(3);
         root.GetProperty("topPerformers")[0].GetProperty("Name").GetString().Should().Be("Test Academy");
+    }
+
+    #endregion
+
+    #region RiseResources Tests
+
+    [Fact]
+    public async Task RiseResources_ValidUrn_ReturnsViewWithRiseResourcesPageViewModel()
+    {
+        var urn = "123456";
+
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
+            .ReturnsAsync(CreateTestSchoolDetails(urn, "Test Academy"));
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync(urn))
+            .ReturnsAsync(new Establishment { URN = urn, EstablishmentName = "Test Academy" });
+
+        var result = await _sut.RiseResources(urn);
+
+        var viewResult = result.Should().BeOfType<ViewResult>().Subject;
+        var model = viewResult.Model.Should().BeOfType<RiseResourcesPageViewModel>().Subject;
+        model.SchoolUrn.Should().Be(urn);
+        model.SchoolName.Should().Be("Test Academy");
+    }
+
+    [Fact]
+    public async Task RiseResources_ValidUrn_SetsBreadcrumbInViewData()
+    {
+        var urn = "123456";
+
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
+            .ReturnsAsync(CreateTestSchoolDetails(urn, "Test Academy"));
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync(urn))
+            .ReturnsAsync(new Establishment { URN = urn, EstablishmentName = "Test Academy" });
+
+        await _sut.RiseResources(urn);
+
+        _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task RiseResources_ValidUrn_SetsSchoolDetailsInViewData()
+    {
+        var urn = "123456";
+        var schoolDetails = CreateTestSchoolDetails(urn, "Test Academy");
+
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
+            .ReturnsAsync(schoolDetails);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync(urn))
+            .ReturnsAsync(new Establishment { URN = urn, EstablishmentName = "Test Academy" });
+
+        await _sut.RiseResources(urn);
+
+        _sut.ViewData[ViewDataKeys.SchoolDetails].Should().BeSameAs(schoolDetails);
+    }
+
+    [Fact]
+    public async Task RiseResources_WhenSchoolNotFound_ThrowsNotFoundException()
+    {
+        var urn = "999999";
+
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext>(), urn))
+            .ReturnsAsync(CreateTestSchoolDetails(urn, "Test Academy"));
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentAsync(urn))
+            .ReturnsAsync((Establishment?)null);
+
+        var act = async () => await _sut.RiseResources(urn);
+
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("*999999*");
     }
 
     #endregion

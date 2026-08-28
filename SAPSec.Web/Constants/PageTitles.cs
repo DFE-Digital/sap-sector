@@ -12,4 +12,5 @@ public static class PageTitles
     public const string ErrorAccessDenied = "Access denied";
     public const string FindOrganisationSchool = "Search for a school";
     public const string SchoolHome = "Your school";
+    public const string RiseResources = "RISE resources";
 }

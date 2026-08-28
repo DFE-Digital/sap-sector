@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Measures.Primary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
@@ -31,6 +32,8 @@ public class SchoolController(
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
     IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
+    IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
+    IFeatureFlagService featureFlagService,
     IRequestSchoolAccessor requestSchoolAccessor)
     : Controller
 {
@@ -131,15 +134,16 @@ public class SchoolController(
     }
 
     [HttpGet]
+    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
     [Route("rise-resources")]
     public async Task<IActionResult> RiseResources(string urn)
     {
-        // Minimal action to render the RISE resources view. Navigation and layout
-        // are populated so the left-hand navigation shows the tab when enabled.
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
-        await PopulateViewData(response.School);
+        var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
+        await PopulateViewData(schoolInfoResponse.School);
 
-        return View();
+        var riseResourcesResponse = await getRiseResourcesUseCase.Execute(new(urn));
+
+        return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
     }
 
     private async Task PopulateViewData(SchoolInfo currentSchool)
@@ -147,12 +151,8 @@ public class SchoolController(
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
 
-        var featureFlagService = HttpContext.RequestServices.GetService<IFeatureFlagService>();
-        var includeRise = false;
-        if (featureFlagService is not null)
-        {
-            includeRise = await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
-        }
+        var includeRise = featureFlagService is not null
+            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
