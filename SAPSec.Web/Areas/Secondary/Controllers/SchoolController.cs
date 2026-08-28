@@ -1,19 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
-using SAPSec.Core.Features.Attendance.UseCases;
+using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
-using System.Globalization;
 
 namespace SAPSec.Web.Areas.Secondary.Controllers;
 
@@ -25,38 +25,19 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [Route("school/secondary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
-public class SchoolController : Controller
-{
-    private readonly IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> _getSchoolKs4HeadlineMeasuresUseCase;
-    private readonly IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> _getSchoolKs4CoreSubjectsUseCase;
-    private readonly GetAttendanceMeasures _getAttendanceMeasures;
-    private readonly IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> _getRiseResourcesUseCase;
-    private readonly IFeatureFlagService _featureFlagService;
-    private readonly IRequestSchoolAccessor _requestSchoolAccessor;
-    private readonly ILogger<SchoolController> _logger;
-
-    public SchoolController(
+public class SchoolController(
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
-        IUseCase<GetSchoolKs4CoreSubjectsRequest, GetSchoolKs4CoreSubjectsResponse> getSchoolKs4CoreSubjectsUseCase,
-        GetAttendanceMeasures getAttendanceMeasures,
+        IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getSchoolKs4CoreSubjectsUseCase,
+        IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
         IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
-        IFeatureFlagService featureFlagService,
+        Core.Interfaces.Services.IFeatureFlagService featureFlagService,
         IRequestSchoolAccessor requestSchoolAccessor,
-        ILogger<SchoolController> logger)
-    {
-        _getSchoolKs4HeadlineMeasuresUseCase = getSchoolKs4HeadlineMeasuresUseCase;
-        _getSchoolKs4CoreSubjectsUseCase = getSchoolKs4CoreSubjectsUseCase;
-        _getAttendanceMeasures = getAttendanceMeasures;
-        _getRiseResourcesUseCase = getRiseResourcesUseCase;
-        _featureFlagService = featureFlagService;
-        _requestSchoolAccessor = requestSchoolAccessor;
-        _logger = logger;
-    }
-
+        ILogger<SchoolController> logger) : Controller
+{
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         await SetSchoolViewDataAsync(urn, school);
         return View(school);
@@ -66,7 +47,7 @@ public class SchoolController : Controller
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         await SetSchoolViewDataAsync(urn, school);
         return View(school);
     }
@@ -75,113 +56,9 @@ public class SchoolController : Controller
     [Route("what-is-a-similar-school")]
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
         await SetSchoolViewDataAsync(urn, school);
         return View(school);
-    }
-
-    [HttpGet]
-    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
-    [Route("rise-resources")]
-    public async Task<IActionResult> RiseResources(string urn)
-    {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        await SetSchoolViewDataAsync(urn, school);
-
-        var riseResourcesResponse = await _getRiseResourcesUseCase.Execute(new(urn));
-        return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
-    }
-
-    [HttpGet]
-    [Route("attendance")]
-    public async Task<IActionResult> Attendance(string urn)
-    {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
-        var attendanceMeasures = await _getAttendanceMeasures.Execute(new(urn));
-        await SetSchoolViewDataAsync(urn, school);
-        return View(new SchoolAttendancePageViewModel
-        {
-            SchoolDetails = school,
-            AttendanceMeasures = attendanceMeasures
-        });
-    }
-
-    [HttpGet]
-    [Route("attendance-data")]
-    public async Task<IActionResult> AttendanceData(string urn, string absenceType = "overall")
-    {
-        if (string.IsNullOrWhiteSpace(urn))
-        {
-            return BadRequest(new { error = "Missing route parameters." });
-        }
-
-        var normalizedAbsenceType = NormalizeAttendanceOption(absenceType, "overall", "persistent");
-        var response = await _getAttendanceMeasures.Execute(new(urn));
-        var yearLabels = AcademicYearLabelConfig.AttendanceYearByYear;
-        var isPersistentAbsence = normalizedAbsenceType == "persistent";
-
-        var selectedSchoolSeries = isPersistentAbsence
-            ? response.PersistentAbsenceYearByYear.School
-            : response.OverallAbsenceYearByYear.School;
-        var localAuthoritySeries = isPersistentAbsence
-            ? response.PersistentAbsenceYearByYear.LocalAuthority
-            : response.OverallAbsenceYearByYear.LocalAuthority;
-        var englandSeries = isPersistentAbsence
-            ? response.PersistentAbsenceYearByYear.England
-            : response.OverallAbsenceYearByYear.England;
-        var selectedSchoolCurrentValue = selectedSchoolSeries.Current;
-        var localAuthorityCurrentValue = localAuthoritySeries.Current;
-        var englandCurrentValue = englandSeries.Current;
-        var topPerformers = isPersistentAbsence
-            ? response.PersistentAbsenceTopPerformers
-            : response.OverallAbsenceTopPerformers;
-
-        return Json(new
-        {
-            absenceType = normalizedAbsenceType,
-            years = yearLabels,
-            bar = new decimal?[]
-            {
-                selectedSchoolCurrentValue,
-                localAuthorityCurrentValue,
-                englandCurrentValue
-            },
-            line = new
-            {
-                school = new decimal?[] { selectedSchoolSeries.Previous2, selectedSchoolSeries.Previous, selectedSchoolSeries.Current },
-                localAuthority = new decimal?[] { localAuthoritySeries.Previous2, localAuthoritySeries.Previous, localAuthoritySeries.Current },
-                england = new decimal?[] { englandSeries.Previous2, englandSeries.Previous, englandSeries.Current }
-            },
-            table = new
-            {
-                school = new[]
-                {
-                    DisplayPercentNullable(selectedSchoolSeries.Previous2),
-                    DisplayPercentNullable(selectedSchoolSeries.Previous),
-                    DisplayPercentNullable(selectedSchoolSeries.Current)
-                },
-                localAuthority = new[]
-                {
-                    DisplayPercentNullable(localAuthoritySeries.Previous2),
-                    DisplayPercentNullable(localAuthoritySeries.Previous),
-                    DisplayPercentNullable(localAuthoritySeries.Current)
-                },
-                england = new[]
-                {
-                    DisplayPercentNullable(englandSeries.Previous2),
-                    DisplayPercentNullable(englandSeries.Previous),
-                    DisplayPercentNullable(englandSeries.Current)
-                }
-            },
-            topPerformers = topPerformers.Select(x => new
-            {
-                x.Rank,
-                x.Urn,
-                x.Name,
-                x.IsCurrentSchool,
-                DisplayValue = SchoolAttendancePageViewModel.DisplayPercentNullable(x.Value)
-            })
-        });
     }
 
     [HttpGet]
@@ -189,7 +66,7 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
+        var response = await getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
 
         await PopulateViewData(response.School);
 
@@ -209,7 +86,7 @@ public class SchoolController : Controller
     public async Task<IActionResult> Ks4CoreSubjects(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await _getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
+        var response = await getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
 
         await PopulateViewData(response.School);
 
@@ -228,6 +105,36 @@ public class SchoolController : Controller
         };
 
         return View(model);
+    }
+
+    [HttpGet]
+    [Route("attendance")]
+    public async Task<IActionResult> Attendance(string urn)
+    {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Secondary, urn, filters));
+
+        await PopulateViewData(response.School);
+
+        var model = new AttendancePageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Absence = MeasureViewModel.FromPrimaryMeasure(response.Absence, response.School)
+        };
+
+        return View(model);
+    }
+
+    [HttpGet]
+    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [Route("rise-resources")]
+    public async Task<IActionResult> RiseResources(string urn)
+    {
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await SetSchoolViewDataAsync(urn, school);
+
+        var riseResourcesResponse = await getRiseResourcesUseCase.Execute(new(urn));
+        return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
     }
 
     private async Task PopulateViewData(SchoolInfo currentSchool)
@@ -260,23 +167,6 @@ public class SchoolController : Controller
     }
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
-        _featureFlagService is not null
-        && await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
-
-    private static string NormalizeAttendanceOption(string? requested, params string[] allowedValues)
-    {
-        if (string.IsNullOrWhiteSpace(requested))
-        {
-            return allowedValues[0];
-        }
-
-        return allowedValues.Contains(requested, StringComparer.OrdinalIgnoreCase)
-            ? requested.ToLowerInvariant()
-            : allowedValues[0];
-    }
-
-    private static string DisplayPercentNullable(decimal? value) =>
-        value.HasValue
-            ? value.Value.ToString("0.00", CultureInfo.InvariantCulture) + "%"
-            : "No available data";
+        featureFlagService is not null
+        && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 }

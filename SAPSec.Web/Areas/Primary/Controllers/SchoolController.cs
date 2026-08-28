@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
@@ -9,6 +11,7 @@ using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Areas.Primary.ViewModels.School;
 using SAPSec.Web.Areas.Shared.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
@@ -29,7 +32,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> ks2PerformanceMeasuresUseCase,
+    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
     IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
     IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
@@ -52,7 +55,7 @@ public class SchoolController(
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await ks2PerformanceMeasuresUseCase.Execute(new(urn, filters));
+        var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
 
         await PopulateViewData(response.School);
 
@@ -75,11 +78,11 @@ public class SchoolController(
     public async Task<IActionResult> Attendance(string urn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getAttendanceMeasuresUseCase.Execute(new(urn, filters));
+        var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Primary, urn, filters));
 
         await PopulateViewData(response.School);
 
-        var model = new AttendanceMeasuresPageViewModel
+        var model = new AttendancePageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Absence = MeasureViewModel.FromPrimaryMeasure(response.Absence, response.School)
