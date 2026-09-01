@@ -16,36 +16,69 @@
     }
 
     function getVisibleMapItems(host) {
-        return Array.from(host.querySelectorAll("[data-map-focusable='true']"))
+        const items = Array.from(host.querySelectorAll("[data-map-focusable='true']"))
             .filter((element) => element.isConnected)
             .filter((element) => {
                 const rect = element.getBoundingClientRect();
                 return rect.width > 0 && rect.height > 0;
-            })
-            .sort((left, right) => {
-                const leftGroup = left.dataset.mapFocusGroup || "marker";
-                const rightGroup = right.dataset.mapFocusGroup || "marker";
-
-                // Keep markers in visual order and leave zoom controls until last so
-                // tabbing follows the map content before the supporting controls.
-                if (leftGroup !== rightGroup) {
-                    return leftGroup === "control" ? 1 : -1;
-                }
-
-                if (leftGroup === "control") {
-                    return 0;
-                }
-
-                const leftRect = left.getBoundingClientRect();
-                const rightRect = right.getBoundingClientRect();
-                const topDiff = leftRect.top - rightRect.top;
-
-                if (Math.abs(topDiff) > 8) {
-                    return topDiff;
-                }
-
-                return leftRect.left - rightRect.left;
             });
+
+        const controls = [];
+        const markers = [];
+
+        items.forEach((element) => {
+            const group = element.dataset.mapFocusGroup || "marker";
+            if (group === "control") {
+                controls.push(element);
+                return;
+            }
+
+            markers.push({
+                element,
+                rect: element.getBoundingClientRect(),
+            });
+        });
+
+        const rows = [];
+        const verticalTolerance = 24;
+
+        markers
+            .sort((left, right) => left.rect.top - right.rect.top)
+            .forEach((item) => {
+                const centerY = item.rect.top + (item.rect.height / 2);
+
+                const matchingRow = rows.find((row) =>
+                    Math.abs(row.centerY - centerY) <= verticalTolerance
+                );
+
+                if (matchingRow) {
+                    matchingRow.items.push(item);
+                    matchingRow.centerY =
+                        (matchingRow.centerY * (matchingRow.items.length - 1) + centerY) /
+                        matchingRow.items.length;
+                    return;
+                }
+
+                rows.push({
+                    centerY,
+                    items: [item],
+                });
+            });
+
+        const orderedMarkers = rows
+            .sort((left, right) => left.centerY - right.centerY)
+            .flatMap((row, rowIndex) => {
+                const sortedRowItems = row.items
+                    .sort((left, right) => left.rect.left - right.rect.left);
+
+                if (rowIndex % 2 === 1) {
+                    sortedRowItems.reverse();
+                }
+
+                return sortedRowItems.map((item) => item.element);
+            });
+
+        return [...orderedMarkers, ...controls];
     }
 
     function focusAdjacentMapItem(host, currentElement, direction) {
