@@ -49,4 +49,14 @@ public class RiseResourcesPageIntegrationTests(
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
+
+    [Fact]
+    public async Task RiseResources_WithNonExistentUrn_ReturnsNotFound()
+    {
+        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+
+        var response = await Fixture.Client.GetAsync(Routes.PrimarySchool("999999").RiseResources);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
 }

@@ -9,17 +9,15 @@ public class GetRiseResourcesUseCase(
 {
     public async Task<GetRiseResourcesResponse> Execute(GetRiseResourcesRequest request)
     {
-        var establishment = await establishmentRepository.GetEstablishmentAsync(request.Urn) ?? throw new NotFoundException($"School with URN {request.Urn} was not found");
+        var dataProvider = new RiseResourcesDataProvider(establishmentRepository);
 
-        // TODO: Implement logic to fetch RISE resources from JSON or data source
-        // For now, return empty list to maintain contract
-        var resources = Array.Empty<RiseResource>();
+        var data = await dataProvider.GetRiseResourcesData(request.Urn);
 
         return new(
-            Urn: establishment.URN,
-            SchoolName: establishment.EstablishmentName,
-            Resources: resources,
-            LastUpdated: null);
+            Urn: data.Establishment.URN,
+            SchoolName: data.Establishment.EstablishmentName,
+            Resources: data.Resources,
+            LastUpdated: data.LastUpdated);
     }
 }
 
