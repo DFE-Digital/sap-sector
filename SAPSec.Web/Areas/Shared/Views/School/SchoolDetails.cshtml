@@ -158,7 +158,18 @@
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Email</dt>
-        <dd class="govuk-summary-list__value">@Model.Email.Display()</dd>
+        @if (Model.Email.IsAvailable)
+        {
+            <dd class="govuk-summary-list__value">
+                <a class="govuk-link" href="mailto:@Model.Email.Display()">
+                    @Model.Email.Display()
+                </a>
+            </dd>
+        }
+        else
+        {
+            <dd class="govuk-summary-list__value">@Model.Email.Display()</dd>
+        }
     </div>
 </dl>
 
