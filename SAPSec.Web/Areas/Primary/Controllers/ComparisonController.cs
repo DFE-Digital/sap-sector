@@ -1,12 +1,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels.Comparison;
-using SAPSec.Web.Areas.Shared.ViewModels;
+using SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Formatters;
@@ -23,10 +25,10 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 public class ComparisonController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase,
-    IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse> getSchoolKs2PerformanceComparisonUseCase,
+    IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
     GetPrimaryCharacteristicsComparison getPrimaryCharacteristicsComparison,
     IPrimaryCharacteristicsComparisonFormatter primaryCharacteristicsComparisonFormatter,
-    IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getSchoolAttendanceComparisonUseCase)
+    IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase)
     : Controller
 {
     [HttpGet]
@@ -62,7 +64,7 @@ public class ComparisonController(
     public async Task<IActionResult> Ks2PerformanceMeasures(string urn, string similarSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getSchoolKs2PerformanceComparisonUseCase.Execute(
+        var response = await getKs2PerformanceMeasuresUseCase.Execute(
             new GetComparisonKs2PerformanceMeasuresRequest(urn, similarSchoolUrn, filters));
 
         ViewData[ViewDataKeys.ComparisonLayout] = new ComparisonLayoutModel(
@@ -94,8 +96,7 @@ public class ComparisonController(
     public async Task<IActionResult> Attendance(string urn, string similarSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getSchoolAttendanceComparisonUseCase.Execute(
-            new GetComparisonAttendanceMeasuresRequest(urn, similarSchoolUrn, filters));
+        var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Primary, urn, similarSchoolUrn, filters));
 
         ViewData[ViewDataKeys.ComparisonLayout] = new ComparisonLayoutModel(
             response.CurrentSchool.Urn,

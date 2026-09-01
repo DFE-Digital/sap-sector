@@ -96,6 +96,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
         ticks.Should().HaveCountGreaterThan(1);
     }
 
+
     [Fact]
     public async Task Ks4HeadlineMeasures_UsesExpectedColoursForAllSchoolCharts()
     {

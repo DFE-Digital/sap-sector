@@ -70,6 +70,16 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardRwm_Tabs()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardRwm_TableView_ShouldShowCorrectValues()
     {
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
@@ -135,6 +145,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -220,6 +231,16 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AchievedHigherStandardRwm_Tabs()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
     public async Task AchievedHigherStandardRwm_TableView_ShouldShowCorrectValues()
     {
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
@@ -285,6 +306,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -370,6 +392,16 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_Tabs()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
     public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
     {
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
@@ -435,6 +467,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -466,6 +499,16 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
                 == "Information about average scaled score in maths");
         details.Should().NotBeNull();
         details!.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_Tabs()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var tabs = page.ElementWithTestIdShouldExist("reading-score-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -534,6 +577,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "1"),
             ("tooltip-decimals", "1"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -568,6 +612,16 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
         details!.QuerySelector(".govuk-details__summary-text")!.TrimmedTextContent()
             .Should().Be("Information about meeting the expected standard");
         details.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_Tabs()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var tabs = page.ElementWithTestIdShouldExist("maths-score-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -636,6 +690,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -670,6 +725,16 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
         details!.QuerySelector(".govuk-details__summary-text")!.TrimmedTextContent()
             .Should().Be("Information about achieving the higher standard");
         details.HasAttribute("open").Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_Tabs()
+    {
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-gps-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -738,6 +803,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
             ("axis-auto-skip", "false"),
             ("label-decimals", "0"),
             ("tooltip-decimals", "0"));
+        AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
     }
 
     [Fact]
@@ -753,5 +819,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
         var yearByYearChart = page.ElementWithTestIdShouldExist("higher-gps-year-by-year-chart");
         yearByYearChart.Dataset.Should().ContainKey("colors")
             .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#2a1950", "#4b9b7d");
+    }
+
+    private static void AssertYearByYearChartPointStyles(IHtmlElement yearByYearChart, params string[] pointStyles)
+    {
+        var chartData = yearByYearChart.Dataset.Should().ContainKey("chart").WhoseValue;
+
+        foreach (var pointStyle in pointStyles)
+        {
+            chartData.Should().Contain($"\"pointStyle\":\"{pointStyle}\"");
+        }
     }
 }

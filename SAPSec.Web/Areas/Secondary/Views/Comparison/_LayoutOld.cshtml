@@ -1,13 +1,14 @@
-@using SAPSec.Web.ViewModels
 @using System.Linq
+@using SAPSec.Web.Areas.Secondary.ViewModels
 @using SAPSec.Web.Constants
+@using SAPSec.Web.ViewModels
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     ViewData["SkipLinkTargetId"] = "page-content";
 
     var layout = ViewData[ViewDataKeys.ComparisonSchool] as SimilarSchoolsComparisonViewModel;
-    ViewData[ViewDataKeys.Title] = layout.SimilarSchoolName;
+    ViewData[ViewDataKeys.Title] = layout!.SimilarSchoolName;
 
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
 
@@ -18,7 +19,6 @@
         ["similarSchoolUrn"] = layout.SimilarSchoolUrn
     };
 
-    var isKs4HeadlineMeasures = string.Equals(currentAction, "Ks4HeadlineMeasures", StringComparison.OrdinalIgnoreCase);
     string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
 }
 
@@ -38,7 +38,7 @@
     </nav>
 }
 
-<div class="govuk-grid-row  @(isKs4HeadlineMeasures ? "app-measure-headline-mobile-layout" : "")">
+<div class="govuk-grid-row app-comparison-pages">
 
     @* LEFT: back link *@
     <div class="app-side-navigation-container">
