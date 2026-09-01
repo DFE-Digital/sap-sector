@@ -1,7 +1,4 @@
-using SAPSec.Core.Constants;
-using SAPSec.Core.Model;
-
-namespace SAPSec.Core.Extensions;
+namespace SAPSec.Core.Features.SchoolDetails;
 
 public static class SchoolDetailsExtensions
 {

@@ -1,7 +1,7 @@
 using SAPSec.Core.Collections;
-using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 

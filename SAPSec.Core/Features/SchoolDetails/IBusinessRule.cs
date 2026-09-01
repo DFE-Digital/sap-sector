@@ -1,7 +1,7 @@
-﻿using SAPSec.Core.Model;
+﻿using SAPSec.Core.Features.Availability;
 using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Interfaces.Rules;
+namespace SAPSec.Core.Features.SchoolDetails;
 
 /// <summary>
 /// Interface for business rules that determine a value from establishment data.

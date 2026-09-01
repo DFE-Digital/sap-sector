@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Core.Constants;
+﻿namespace SAPSec.Core.Features.SchoolDetails;
 
 /// <summary>
 /// TypeOfResourcedProvision field values and helper methods.

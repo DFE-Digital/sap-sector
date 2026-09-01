@@ -1,4 +1,4 @@
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 
 namespace SAPSec.Web.Services;
 

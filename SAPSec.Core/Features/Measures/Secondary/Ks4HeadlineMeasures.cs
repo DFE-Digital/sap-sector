@@ -2,7 +2,7 @@ using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Data.Repositories;
-using static SAPSec.Core.Constants.Measures.Secondary;
+using static SAPSec.Core.Features.Measures.Measures.Secondary;
 
 namespace SAPSec.Core.Features.Measures.Secondary;
 

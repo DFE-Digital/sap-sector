@@ -1,9 +1,7 @@
-﻿using SAPSec.Core.Constants;
-using SAPSec.Core.Interfaces.Rules;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Features.Availability;
 using SAPSec.Data.Dto;
 
-namespace SAPSec.Core.Rules;
+namespace SAPSec.Core.Features.SchoolDetails;
 
 /// <summary>
 /// Business rule: Determines if school has sixth form based on OfficialSixthFormId.

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
@@ -134,7 +135,7 @@ public class SchoolController(
             ControllerContext.ActionDescriptor.ActionName);
     }
 
-    private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
+    private void SetSchoolViewDataAsync(SchoolDetails school)
     {
         ViewData[ViewDataKeys.SchoolDetails] = school;
 

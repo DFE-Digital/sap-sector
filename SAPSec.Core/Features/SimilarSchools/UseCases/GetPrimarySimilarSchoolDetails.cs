@@ -1,6 +1,5 @@
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
@@ -37,4 +36,4 @@ public record GetPrimarySimilarSchoolDetailsResponse(
     GeographicCoordinates? CurrentSchoolCoordinates,
     GeographicCoordinates? SimilarSchoolCoordinates,
     double? DistanceMiles,
-    SchoolDetails SimilarSchoolDetails);
+    SchoolDetails.SchoolDetails SimilarSchoolDetails);

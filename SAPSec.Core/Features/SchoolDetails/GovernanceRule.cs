@@ -1,10 +1,9 @@
-﻿using SAPSec.Core.Constants;
-using SAPSec.Core.Interfaces.Rules;
+﻿using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 
 
-namespace SAPSec.Core.Rules;
+namespace SAPSec.Core.Features.SchoolDetails;
 /// <summary>
 /// Business rule: Determines governance structure based on establishment group type and trust membership.
 /// Single Responsibility: Only handles governance determination logic.
@@ -32,8 +31,8 @@ public sealed class GovernanceRule : IBusinessRule<GovernanceType>
             return DataWithAvailability.Available(GovernanceType.MultiAcademyTrust);
         }
 
-        if ((TrustSchoolFlagValues.IsSupportedByTrust(trustSchoolFlagId) || TrustSchoolFlagValues.IsNotSupportedByTrust(trustSchoolFlagId)) ||
-            (TrustSchoolFlagValues.IsNotApplicable(trustSchoolFlagId) && EstablishmentGroupTypeValues.IsLaMaintainedSchool(establishmentGroupTypeId)))
+        if (TrustSchoolFlagValues.IsSupportedByTrust(trustSchoolFlagId) || TrustSchoolFlagValues.IsNotSupportedByTrust(trustSchoolFlagId) ||
+            TrustSchoolFlagValues.IsNotApplicable(trustSchoolFlagId) && EstablishmentGroupTypeValues.IsLaMaintainedSchool(establishmentGroupTypeId))
         {
             return DataWithAvailability.Available(GovernanceType.LocalAuthorityMaintained);
         }

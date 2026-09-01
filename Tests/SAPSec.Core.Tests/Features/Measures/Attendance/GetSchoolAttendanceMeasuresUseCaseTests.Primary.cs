@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Features.Measures;
 using SAPSec.Test.Common.Builders;
-using static SAPSec.Core.Constants.Measures;
+using static SAPSec.Core.Features.Measures.Measures;
 
 namespace SAPSec.Core.Tests.Features.Measures.Attendance;
 

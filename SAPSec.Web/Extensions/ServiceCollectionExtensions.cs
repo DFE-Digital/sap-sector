@@ -1,11 +1,10 @@
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Services;
 using SAPSec.Core.UseCases;
 using System.Diagnostics.CodeAnalysis;
 

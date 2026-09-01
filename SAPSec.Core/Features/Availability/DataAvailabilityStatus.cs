@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SAPSec.Core.Model;
+namespace SAPSec.Core.Features.Availability;
 
 /// <summary>
 /// Indicates the availability status of a data field.

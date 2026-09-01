@@ -1,7 +1,7 @@
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Model;
 using SAPSec.Data.Repositories;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Features.Availability;
 
 namespace SAPSec.Core.Features.SimilarSchools.Sorting;
 

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using SAPSec.Core.Extensions;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Helpers;

@@ -1,7 +1,7 @@
 using SAPSec.Core;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Model;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Constants;
 using SAPSec.Web.ViewModels;

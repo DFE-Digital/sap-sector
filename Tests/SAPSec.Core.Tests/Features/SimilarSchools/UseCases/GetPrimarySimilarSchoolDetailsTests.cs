@@ -1,7 +1,6 @@
 using Moq;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Test.Common.InMemory;
 

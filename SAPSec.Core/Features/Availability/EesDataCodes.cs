@@ -1,7 +1,7 @@
-﻿namespace SAPSec.Core.Constants;
+﻿namespace SAPSec.Core.Features.Availability;
 
 /// <summary>
-/// GIAS special data codes indicating data availability/quality.
+/// EES has special data codes indicating data availability/quality.
 /// These codes appear in EES data fields to indicate special states.
 /// </summary>
 public static class EesDataCodes

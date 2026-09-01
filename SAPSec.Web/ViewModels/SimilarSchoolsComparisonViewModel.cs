@@ -1,5 +1,5 @@
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SimilarSchools;
-using SAPSec.Core.Model;
 using System.Globalization;
 
 namespace SAPSec.Web.ViewModels;
