@@ -18,8 +18,13 @@ public record BNGCoordinates(int Easting, int Northing)
         return false;
     }
 
-    public double DistanceMiles(BNGCoordinates other)
+    public double? DistanceMiles(BNGCoordinates? other)
     {
+        if (other is null)
+        {
+            return null;
+        }
+
         var e = (Easting - other.Easting) / 1000.0 * KilometersToMiles;
         var n = (Northing - other.Northing) / 1000.0 * KilometersToMiles;
 

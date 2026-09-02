@@ -15,50 +15,50 @@ public class GetComparisonKs2PerformanceMeasuresUseCase(
             establishmentRepository,
             performanceRepository);
 
-        var (currentSchoolData, similarSchoolData) = await dataProvider.GetData(
+        var (currentSchoolData, comparatorSchoolData) = await dataProvider.GetData(
             request.CurrentSchoolUrn,
-            request.SimilarSchoolUrn);
+            request.ComparatorSchoolUrn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolData.SchoolInfo,
-            similarSchoolData.SchoolInfo,
+            comparatorSchoolData.SchoolInfo,
             Ks2PerformanceMeasures.MeetingExpectedStandardRwm.ForSchoolComparison(
                 currentSchoolData,
-                similarSchoolData,
+                comparatorSchoolData,
                 filterBy),
             Ks2PerformanceMeasures.AchievedHigherStandardRwm.ForSchoolComparison(
                 currentSchoolData,
-                similarSchoolData,
+                comparatorSchoolData,
                 filterBy),
             Ks2PerformanceMeasures.AverageScaledScoreReading.ForSchoolComparison(
                 currentSchoolData,
-                similarSchoolData,
+                comparatorSchoolData,
                 filterBy),
             Ks2PerformanceMeasures.AverageScaledScoreMaths.ForSchoolComparison(
                 currentSchoolData,
-                similarSchoolData,
+                comparatorSchoolData,
                 filterBy),
             Ks2PerformanceMeasures.MeetingExpectedStandardGps.ForSchoolComparison(
                 currentSchoolData,
-                similarSchoolData,
+                comparatorSchoolData,
                 filterBy),
             Ks2PerformanceMeasures.AchievedHigherStandardGps.ForSchoolComparison(
                 currentSchoolData,
-                similarSchoolData,
+                comparatorSchoolData,
                 filterBy));
     }
 }
 
 public record GetComparisonKs2PerformanceMeasuresRequest(
     string CurrentSchoolUrn,
-    string SimilarSchoolUrn,
+    string ComparatorSchoolUrn,
     IDictionary<string, string>? FilterBy = null);
 
 public record GetComparisonKs2PerformanceMeasuresResponse(
     SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo SimilarSchool,
+    SchoolInfo.SchoolInfo ComparatorSchool,
     Measure MeetingExpectedStandardRwm,
     Measure AchievedHigherStandardRwm,
     Measure AverageScaledScoreReading,

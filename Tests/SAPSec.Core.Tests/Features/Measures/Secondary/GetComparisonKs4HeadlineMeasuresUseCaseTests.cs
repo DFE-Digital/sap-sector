@@ -83,11 +83,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
-        response.SimilarSchool.Urn.Should().Be("100002");
-        response.SimilarSchool.Name.Should().Be("Test School 2");
-        response.SimilarSchool.Address.Should().Be(
+        response.ComparatorSchool.Urn.Should().Be("100002");
+        response.ComparatorSchool.Name.Should().Be("Test School 2");
+        response.ComparatorSchool.Address.Should().Be(
             new Address("1 Test Street", "Testingbury", "Test Place", "Test Town", "TE57 1NG"));
-        response.SimilarSchool.LocalAuthority.Should().Be(
+        response.ComparatorSchool.LocalAuthority.Should().Be(
             new LocalAuthority("001", "Test LA"));
     }
 

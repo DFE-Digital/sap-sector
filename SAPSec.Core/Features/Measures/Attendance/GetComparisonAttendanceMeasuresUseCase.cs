@@ -15,19 +15,19 @@ public class GetComparisonAttendanceMeasuresUseCase(
             establishmentRepository,
             absenceRepository);
 
-        var (currentSchoolData, similarSchoolData) = await dataProvider.GetData(
+        var (currentSchoolData, comparatorSchoolData) = await dataProvider.GetData(
             request.CurrentSchoolUrn,
-            request.SimilarSchoolUrn);
+            request.ComparatorSchoolUrn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolData.SchoolInfo,
-            similarSchoolData.SchoolInfo,
+            comparatorSchoolData.SchoolInfo,
             AttendanceMeasures.Absence.ForSchoolComparison(
                 request.Phase,
                 currentSchoolData,
-                similarSchoolData,
+                comparatorSchoolData,
                 filterBy));
     }
 }
@@ -35,10 +35,10 @@ public class GetComparisonAttendanceMeasuresUseCase(
 public record GetComparisonAttendanceMeasuresRequest(
     MeasurePhase Phase,
     string CurrentSchoolUrn,
-    string SimilarSchoolUrn,
+    string ComparatorSchoolUrn,
     IDictionary<string, string>? FilterBy = null);
 
 public record GetComparisonAttendanceMeasuresResponse(
     SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo SimilarSchool,
+    SchoolInfo.SchoolInfo ComparatorSchool,
     Measure Absence);

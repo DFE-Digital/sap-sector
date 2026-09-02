@@ -6,12 +6,12 @@ using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolDetails.Comparison;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Areas.Secondary.Controllers;
-using SAPSec.Web.Constants;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 
@@ -32,12 +32,10 @@ public class SimilarSchoolsComparisonControllerTests
         var schoolDetailsService = new SchoolDetailsService(
             _establishmentRepositoryMock.Object,
             new Mock<ILogger<SchoolDetailsService>>().Object);
-        var getSimilarSchoolDetails = new GetSimilarSchoolDetails(
+        var getSimilarSchoolDetails = new GetSecondaryComparisonSchoolDetailsUseCase(
             _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object,
-            schoolDetailsService,
-            _ks4PerformanceRepositoryMock.Object,
-            _absenceRepositoryMock.Object);
+            schoolDetailsService);
         var ks4HeadlineMeasuresUseCase = new GetComparisonKs4HeadlineMeasuresUseCase(
             _establishmentRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object,
@@ -96,8 +94,6 @@ public class SimilarSchoolsComparisonControllerTests
         model.SimilarSchoolUrn.Should().Be(similarUrn);
         model.Name.Should().Be(currentSchool.EstablishmentName);
         model.SimilarSchoolName.Should().Be(similarSchool.EstablishmentName);
-
-        _sut.ViewData[ViewDataKeys.BreadcrumbNode].Should().NotBeNull();
     }
 
     [Fact]
@@ -124,11 +120,11 @@ public class SimilarSchoolsComparisonControllerTests
         var view = result.Should().BeOfType<ViewResult>().Subject;
         var model = view.Model.Should().BeOfType<SimilarSchoolDetailsViewModel>().Subject;
 
-        model.Urn.Should().Be(urn);
-        model.SimilarSchoolUrn.Should().Be(similarUrn);
+        model.CurrentSchoolUrn.Should().Be(urn);
+        model.ComparatorSchoolUrn.Should().Be(similarUrn);
         model.Distance.Should().BeGreaterThan(0);
-        model.SimilarSchoolDetails.Should().NotBeNull();
-        model.SimilarSchoolDetails!.Urn.Should().Be(similarUrn);
+        model.ComparatorSchoolDetails.Should().NotBeNull();
+        model.ComparatorSchoolDetails!.Urn.Should().Be(similarUrn);
     }
 
     [Fact]

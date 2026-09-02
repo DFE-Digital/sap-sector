@@ -5,7 +5,7 @@ using SAPSec.Data.Dto.SimilarSchools.Primary;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
 
-namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
+namespace SAPSec.Core.Tests.Features.SimilarSchools;
 
 public class FindPrimarySimilarSchoolsUseCaseTests
 {

@@ -2,7 +2,7 @@
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Test.Common.InMemory;
 
-namespace SAPSec.Core.Tests.Features.SimilarSchools.UseCases;
+namespace SAPSec.Core.Tests.Features.SimilarSchools;
 
 public class FindSimilarSchoolsTests
 {

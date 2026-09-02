@@ -9,16 +9,19 @@ namespace SAPSec.Test.Common.AngleSharp;
 public static class DocumentExtensions
 {
     public static IHtmlElement ElementWithTestIdShouldExist(this IDocument doc, string testId)
-    {
-        var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
-        el.Should().NotBeNull();
-        return el.Should().BeAssignableTo<IHtmlElement>().Subject;
-    }
+        => doc.ElementWithTestIdShouldExist<IHtmlElement>(testId);
 
     public static T ElementWithTestIdShouldExist<T>(this IDocument doc, string testId)
         where T : IHtmlElement
+        => doc.ElementShouldExist<T>($"[data-testid=\"{testId}\"]");
+
+    public static IHtmlElement ElementShouldExist(this IDocument doc, string selector)
+        => doc.ElementShouldExist<IHtmlElement>(selector);
+
+    public static T ElementShouldExist<T>(this IDocument doc, string selector)
+        where T : IHtmlElement
     {
-        var el = doc.QuerySelector($"[data-testid=\"{testId}\"]");
+        var el = doc.QuerySelector(selector);
         el.Should().NotBeNull();
         return el.Should().BeAssignableTo<T>().Subject;
     }

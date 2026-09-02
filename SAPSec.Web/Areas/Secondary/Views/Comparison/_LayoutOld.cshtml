@@ -5,7 +5,7 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["SkipLinkTargetId"] = "page-content";
+    ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
 
     var layout = ViewData[ViewDataKeys.ComparisonSchool] as SimilarSchoolsComparisonViewModel;
     ViewData[ViewDataKeys.Title] = layout!.SimilarSchoolName;

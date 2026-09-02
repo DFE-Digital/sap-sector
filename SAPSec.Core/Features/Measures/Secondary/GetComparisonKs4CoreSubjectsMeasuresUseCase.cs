@@ -15,40 +15,40 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
             establishmentRepository,
             performanceRepository);
 
-        var (currentSchoolPerformance, similarSchoolPerformance) = await performance.GetData(request.CurrentSchoolUrn, request.SimilarSchoolUrn);
+        var (currentSchoolPerformance, comparatorSchoolPerformance) = await performance.GetData(request.CurrentSchoolUrn, request.ComparatorSchoolUrn);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
 
         return new(
             currentSchoolPerformance.SchoolInfo,
-            similarSchoolPerformance.SchoolInfo,
+            comparatorSchoolPerformance.SchoolInfo,
             Ks4CoreSubjects.EnglishLanguage.ForSchoolComparison(
                 currentSchoolPerformance,
-                similarSchoolPerformance,
+                comparatorSchoolPerformance,
                 filterBy),
             Ks4CoreSubjects.EnglishLiterature.ForSchoolComparison(
                 currentSchoolPerformance,
-                similarSchoolPerformance,
+                comparatorSchoolPerformance,
                 filterBy),
             Ks4CoreSubjects.Maths.ForSchoolComparison(
                 currentSchoolPerformance,
-                similarSchoolPerformance,
+                comparatorSchoolPerformance,
                 filterBy),
             Ks4CoreSubjects.CombinedScience.ForSchoolComparison(
                 currentSchoolPerformance,
-                similarSchoolPerformance,
+                comparatorSchoolPerformance,
                 filterBy),
             Ks4CoreSubjects.Biology.ForSchoolComparison(
                 currentSchoolPerformance,
-                similarSchoolPerformance,
+                comparatorSchoolPerformance,
                 filterBy),
             Ks4CoreSubjects.Chemistry.ForSchoolComparison(
                 currentSchoolPerformance,
-                similarSchoolPerformance,
+                comparatorSchoolPerformance,
                 filterBy),
             Ks4CoreSubjects.Physics.ForSchoolComparison(
                 currentSchoolPerformance,
-                similarSchoolPerformance,
+                comparatorSchoolPerformance,
                 filterBy)
         );
     }
@@ -56,12 +56,12 @@ public class GetComparisonKs4CoreSubjectsMeasuresUseCase(
 
 public record GetComparisonKs4CoreSubjectsMeasuresRequest(
     string CurrentSchoolUrn,
-    string SimilarSchoolUrn,
+    string ComparatorSchoolUrn,
     IDictionary<string, string>? FilterBy = null);
 
 public record GetComparisonKs4CoreSubjectsMeasuresResponse(
     SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo SimilarSchool,
+    SchoolInfo.SchoolInfo ComparatorSchool,
     Measure EnglishLanguage,
     Measure EnglishLiterature,
     Measure Maths,
