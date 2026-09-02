@@ -13,7 +13,48 @@
 
 <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
-@if (!Model.Resources.Any())
-{    
-    <p class="govuk-body">No RISE resources are currently available for this school.</p>
+@if (!Model.HasResources)
+{
+    <p class="govuk-body" data-testid="rise-resources-empty">
+        No RISE resources are currently available for this school.
+    </p>
+}
+else
+{
+    @foreach (var category in Model.Categories)
+    {
+        if (!string.IsNullOrWhiteSpace(category.Name))
+        {
+            <h2 class="govuk-heading-l govuk-!-margin-top-8" data-testid="rise-resources-category">@category.Name</h2>
+        }
+
+        @foreach (var subCategory in category.SubCategories)
+        {
+            if (!string.IsNullOrWhiteSpace(subCategory.Name))
+            {
+                <h3 class="govuk-heading-m" data-testid="rise-resources-subcategory">@subCategory.Name</h3>
+            }
+
+            <ul class="govuk-list" data-testid="rise-resources-list">
+                @foreach (var resource in subCategory.Resources)
+                {
+                    <li class="govuk-!-margin-bottom-6" data-testid="rise-resource">
+                        @if (resource.HasLink)
+                        {
+                            <a class="govuk-link" href="@resource.Url" target="_blank" rel="noopener noreferrer" data-testid="rise-resource-title">@resource.Title (opens in new tab)</a>
+                        }
+                        else
+                        {
+                            <span data-testid="rise-resource-title">@resource.Title</span>
+                        }
+
+                        @if (!string.IsNullOrWhiteSpace(resource.Description))
+                        {
+                            <p class="govuk-body govuk-!-margin-top-1 govuk-!-margin-bottom-0">@resource.Description</p>
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    }
 }

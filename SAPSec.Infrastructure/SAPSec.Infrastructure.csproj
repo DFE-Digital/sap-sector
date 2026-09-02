@@ -136,4 +136,10 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="Data\Files\RiseResources\RiseResourceEntry.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>

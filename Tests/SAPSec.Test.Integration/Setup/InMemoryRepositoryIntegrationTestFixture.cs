@@ -27,6 +27,9 @@ public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
     public InMemoryAbsenceRepository AbsenceRepository =>
         (InMemoryAbsenceRepository)_factory.Services.GetRequiredService<IAbsenceRepository>();
 
+    public InMemoryRiseResourcesRepository RiseResourcesRepository =>
+        (InMemoryRiseResourcesRepository)_factory.Services.GetRequiredService<IRiseResourcesRepository>();
+
     protected override IntegrationTestsWebApplicationFactory CreateWebApplicationFactory() =>
         new InMemoryRepositoryIntegrationTestsWebApplicationFactory();
 
@@ -39,6 +42,7 @@ public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
         Ks4PerformanceRepository.ClearDown();
         Ks4DestinationsRepository.ClearDown();
         AbsenceRepository.ClearDown();
+        RiseResourcesRepository.ClearDown();
 
         await base.DisposeAsync();
     }

@@ -1,0 +1,31 @@
+[
+  {
+    "resourceTitle": "Reading, writing and maths: teaching sequences",
+    "resourceDescription": "Planning support for the primary reading, writing and maths curriculum.",
+    "resourceUrl": "https://www.gov.uk/government/collections/primary-curriculum-support",
+    "schoolPhases": [ "Primary", "All through" ],
+    "category": "Curriculum",
+    "subCategory": "Reading, writing and maths",
+    "mappingMeasures": [
+      "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in reading"
+    ]
+  },
+  {
+    "resourceTitle": "Improving attendance: guidance for schools",
+    "resourceDescription": "Working together to improve school attendance.",
+    "resourceUrl": "https://www.gov.uk/government/publications/working-together-to-improve-school-attendance",
+    "schoolPhases": [ "Primary", "Secondary", "All through" ],
+    "category": "Attendance",
+    "subCategory": "Whole-school approaches",
+    "mappingMeasures": [ "Overall absence rate; Persistent absence rate" ]
+  },
+  {
+    "resourceTitle": "Key stage 4: raising attainment in English and maths",
+    "resourceDescription": "Support for improving GCSE outcomes in English and maths.",
+    "resourceUrl": "https://www.gov.uk/government/collections/secondary-curriculum-support",
+    "schoolPhases": [ "Secondary", "All through" ],
+    "category": "Curriculum",
+    "subCategory": "English and maths",
+    "mappingMeasures": [ "Attainment 8; Grade 5 or above in English and maths GCSEs" ]
+  }
+]
