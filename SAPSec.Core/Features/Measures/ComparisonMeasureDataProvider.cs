@@ -2,10 +2,13 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures;
 
-public class ComparisonMeasureDataProvider<T>(
+public class ComparisonMeasureDataProvider<T, TGroupsEntry, TValuesEntry>(
     IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsRepository<TGroupsEntry, TValuesEntry> similarSchoolsRepository,
     IMeasureDataRepository<T> repository) : IComparisonMeasureDataProvider<T>
     where T : class, IMeasureData
+    where TGroupsEntry : ISimilarSchoolsGroupsEntry
+    where TValuesEntry : ISimilarSchoolsValuesEntry
 {
     public async Task<ComparisonMeasureData<T>> GetData(
         string currentSchoolUrn,
@@ -25,6 +28,13 @@ public class ComparisonMeasureDataProvider<T>(
         if (!schools.ContainsKey(comparatorSchoolUrn))
         {
             throw new NotFoundException($"School not found with URN: {comparatorSchoolUrn}");
+        }
+
+        var group = await similarSchoolsRepository.GetGroupAsync(currentSchoolUrn);
+
+        if (!group.Any(g => g.NeighbourURN == comparatorSchoolUrn))
+        {
+            throw new NotFoundException($"School with URN {comparatorSchoolUrn} is not in similar schools group for school with URN {currentSchoolUrn}");
         }
 
         var absence = (await repository.GetByUrnsAsync(urns))

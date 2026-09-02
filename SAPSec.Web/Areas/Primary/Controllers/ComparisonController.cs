@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
 using SAPSec.Core.Constants;
-using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
@@ -32,7 +31,7 @@ public class ComparisonController(
     IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
     GetPrimaryCharacteristicsComparison getPrimaryCharacteristicsComparison,
     IPrimaryCharacteristicsComparisonFormatter primaryCharacteristicsComparisonFormatter,
-    IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase)
+    IUseCase<GetPrimaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase)
     : Controller
 {
     [HttpGet]
@@ -90,7 +89,7 @@ public class ComparisonController(
     public async Task<IActionResult> Attendance(string urn, string comparatorSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Primary, urn, comparatorSchoolUrn, filters));
+        var response = await getAttendanceMeasuresUseCase.Execute(new(urn, comparatorSchoolUrn, filters));
 
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(
             response.CurrentSchool,

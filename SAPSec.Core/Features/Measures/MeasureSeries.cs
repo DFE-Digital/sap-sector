@@ -67,7 +67,7 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious(currentSchool.Data)),
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious2(currentSchool.Data))),
             new MeasureSeries(
-                MeasureSeriesType.SimilarSchool,
+                MeasureSeriesType.ComparatorSchool,
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolCurrent(similarSchool.Data)),
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious(similarSchool.Data)),
                 MeasureHelper.ParseNullableDecimal(fieldSelector.SchoolPrevious2(similarSchool.Data))),
@@ -82,7 +82,7 @@ public record MeasureSeries(MeasureSeriesType SeriesType, decimal? Current, deci
 public enum MeasureSeriesType
 {
     CurrentSchool,
-    SimilarSchool,
+    ComparatorSchool,
     SimilarSchoolsAverage,
     LASchoolsAverage,
     EnglandSchoolsAverage

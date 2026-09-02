@@ -53,7 +53,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse>, GetComparisonKs4CoreSubjectsMeasuresUseCase>();
 
         services.AddSingleton<IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse>, GetSchoolAttendanceMeasuresUseCase>();
-        services.AddSingleton<IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>, GetComparisonAttendanceMeasuresUseCase>();
+        services.AddSingleton<IUseCase<GetPrimaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>, GetPrimaryComparisonAttendanceMeasuresUseCase>();
+        services.AddSingleton<IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>, GetSecondaryComparisonAttendanceMeasuresUseCase>();
     }
 
     public static void AddServices(this IServiceCollection services)

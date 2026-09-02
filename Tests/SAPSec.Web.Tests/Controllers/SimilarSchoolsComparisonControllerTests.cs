@@ -38,13 +38,16 @@ public class SimilarSchoolsComparisonControllerTests
             schoolDetailsService);
         var ks4HeadlineMeasuresUseCase = new GetComparisonKs4HeadlineMeasuresUseCase(
             _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object,
             _ks4DestinationsRepositoryMock.Object);
         var ks4CoreSubjectsUseCase = new GetComparisonKs4CoreSubjectsMeasuresUseCase(
             _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object,
             _ks4PerformanceRepositoryMock.Object);
-        var attendanceMeasuresUseCase = new GetComparisonAttendanceMeasuresUseCase(
+        var attendanceMeasuresUseCase = new GetSecondaryComparisonAttendanceMeasuresUseCase(
             _establishmentRepositoryMock.Object,
+            _similarSchoolsRepositoryMock.Object,
             _absenceRepositoryMock.Object);
 
         var getCharacteristicsComparison = new GetCharacteristicsComparison(

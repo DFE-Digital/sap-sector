@@ -137,7 +137,7 @@ public class SchoolController(
     private void PopulateViewData(SchoolDetails currentSchool)
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
-        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName);

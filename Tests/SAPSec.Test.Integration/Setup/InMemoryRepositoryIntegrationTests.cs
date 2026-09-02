@@ -11,5 +11,11 @@ public abstract class InMemoryRepositoryIntegrationTests(
     protected ITestOutputHelper OutputHelper => outputHelper;
 
     public virtual Task InitializeAsync() => Task.CompletedTask;
-    public virtual Task DisposeAsync() => Task.CompletedTask;
+
+    public virtual Task DisposeAsync()
+    {
+        Fixture.ClearDownRepositories();
+
+        return Task.CompletedTask;
+    }
 }

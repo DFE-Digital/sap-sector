@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using AngleSharp.Html.Dom;
+using FluentAssertions;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
@@ -16,7 +17,7 @@ public class SchoolSchoolDetailsPageIntegrationTests(
     public async Task NonExistentUrn_ReturnsNotFound()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Test School", x => x.Open().Secondary()));
 
         await Fixture.RequestPageAsync(Routes.SecondarySchool("999999").SchoolDetails, HttpStatusCode.NotFound);
     }
@@ -25,13 +26,35 @@ public class SchoolSchoolDetailsPageIntegrationTests(
     public async Task CaptionAndHeading_DisplaysSchoolName()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Test School", x => x.Open().Secondary()));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").SchoolDetails, HttpStatusCode.OK);
 
         var heading = page.ElementShouldExist("h1.govuk-heading-xl");
         heading.TrimmedTextContent().Should().Be("School details");
+
         var caption = page.ElementShouldExist("span.govuk-caption-xl");
-        caption.TrimmedTextContent().Should().Be("Test School 1");
+        caption.TrimmedTextContent().Should().Be("Test School");
+    }
+
+    [Fact]
+    public async Task ContactDetailsSection_ContainsSchoolContactDetails()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School", x => x
+                .Open().Secondary()
+                .WithTelephone("01234 567890")
+                .WithWebsite("https://similar-school.example.com")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").SchoolDetails, HttpStatusCode.OK);
+
+        var website = page.ElementWithTestIdShouldExist("website")
+            .ChildElementShouldExist<IHtmlAnchorElement>("dd a");
+        website.TrimmedTextContent().Should().Be("https://similar-school.example.com (opens in new tab)");
+        website.Href.Should().Be("https://similar-school.example.com/");
+
+        var telephone = page.ElementWithTestIdShouldExist("telephone")
+            .ChildElementShouldExist("dd");
+        telephone.TrimmedTextContent().Should().Be("01234 567890");
     }
 }

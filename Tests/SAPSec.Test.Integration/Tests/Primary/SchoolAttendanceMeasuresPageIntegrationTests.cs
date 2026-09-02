@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using FluentAssertions;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
@@ -15,6 +16,13 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
+    public override Task DisposeAsync()
+    {
+        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
+
+        return base.DisposeAsync();
+    }
+
     [Fact]
     public async Task Absence_MeasureExistsOnPage()
     {

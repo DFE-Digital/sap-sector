@@ -1,18 +1,21 @@
 using SAPSec.Core.Extensions;
 using SAPSec.Core.UseCases;
+using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures.Attendance;
 
-public class GetComparisonAttendanceMeasuresUseCase(
+public class GetSecondaryComparisonAttendanceMeasuresUseCase(
     IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
     IAbsenceRepository absenceRepository)
-    : IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>
+    : IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>
 {
-    public async Task<GetComparisonAttendanceMeasuresResponse> Execute(GetComparisonAttendanceMeasuresRequest request)
+    public async Task<GetComparisonAttendanceMeasuresResponse> Execute(GetSecondaryComparisonAttendanceMeasuresRequest request)
     {
-        var dataProvider = new ComparisonMeasureDataProvider<AbsenceData>(
+        var dataProvider = new ComparisonMeasureDataProvider<AbsenceData, SimilarSchoolsSecondaryGroupsEntry, SimilarSchoolsSecondaryValuesEntry>(
             establishmentRepository,
+            similarSchoolsRepository,
             absenceRepository);
 
         var (currentSchoolData, comparatorSchoolData) = await dataProvider.GetData(
@@ -25,20 +28,14 @@ public class GetComparisonAttendanceMeasuresUseCase(
             currentSchoolData.SchoolInfo,
             comparatorSchoolData.SchoolInfo,
             AttendanceMeasures.Absence.ForSchoolComparison(
-                request.Phase,
+                MeasurePhase.Secondary,
                 currentSchoolData,
                 comparatorSchoolData,
                 filterBy));
     }
 }
 
-public record GetComparisonAttendanceMeasuresRequest(
-    MeasurePhase Phase,
+public record GetSecondaryComparisonAttendanceMeasuresRequest(
     string CurrentSchoolUrn,
     string ComparatorSchoolUrn,
     IDictionary<string, string>? FilterBy = null);
-
-public record GetComparisonAttendanceMeasuresResponse(
-    SchoolInfo.SchoolInfo CurrentSchool,
-    SchoolInfo.SchoolInfo ComparatorSchool,
-    Measure Absence);

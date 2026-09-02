@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
-using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
@@ -26,7 +25,7 @@ public class ComparisonController(
     IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSimilarSchoolDetailsUseCase,
     IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
     IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
-    IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
+    IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     GetCharacteristicsComparison getCharacteristicsComparison,
     ICharacteristicsComparisonFormatter characteristicsFormatter,
     ILogger<ComparisonController> logger) : Controller
@@ -102,7 +101,7 @@ public class ComparisonController(
     public async Task<IActionResult> Attendance(string urn, string comparatorSchoolUrn)
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
-        var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Secondary, urn, comparatorSchoolUrn, filters));
+        var response = await getAttendanceMeasuresUseCase.Execute(new(urn, comparatorSchoolUrn, filters));
 
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(
             response.CurrentSchool,
