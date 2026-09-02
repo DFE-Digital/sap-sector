@@ -19,7 +19,7 @@ internal static class AttendanceMeasures
             return Measure.ForSchoolAttendance(
                 Constants.Measures.Absence.Key,
                 Constants.Measures.Absence.Name,
-                2023,
+                2024,
                 measureDataType,
                 availableFilters,
                 currentSchool,
@@ -37,7 +37,7 @@ internal static class AttendanceMeasures
             return Measure.ForSchoolComparison(
                 Constants.Measures.Absence.Key,
                 Constants.Measures.Absence.Name,
-                2023,
+                2024,
                 measureDataType,
                 availableFilters,
                 currentSchool,
