@@ -59,7 +59,11 @@ function initialiseToggle(toggle, activeIndex) {
 
         title.textContent = activeName;
         button.textContent = "Show " + nextName.toLowerCase();
-        button.setAttribute("aria-pressed", index === 0 ? "false" : "true");
+      //  button.setAttribute("aria-pressed", index === 0 ? "false" : "true");
+        // button.setAttribute("aria-pressed", "true");
+        // const isPressed = button.getAttribute('aria-pressed') === 'true';
+        // button.setAttribute('aria-pressed', !isPressed);
+
         button.setAttribute("aria-label", index === 0 ? "Show " + activeName : "Show year by year");
 
         resizeCharts(activePanel);

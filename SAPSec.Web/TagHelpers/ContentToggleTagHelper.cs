@@ -50,7 +50,7 @@ public class ContentToggleTagHelper : TagHelper
         button.Attributes["type"] = "button";
         button.AddCssClass("govuk-button");
         button.AddCssClass("govuk-button--secondary");
-        button.Attributes["aria-pressed"] = activeIndex == 0 ? "false" : "true";
+      //  button.Attributes["aria-pressed"] = activeIndex == 0 ? "false" : "true";
         button.Attributes["data-module"] = "govuk-button";
         button.InnerHtml.Append($"Show {items[(activeIndex + 1) % items.Count].Name.ToLowerInvariant()}");
 
