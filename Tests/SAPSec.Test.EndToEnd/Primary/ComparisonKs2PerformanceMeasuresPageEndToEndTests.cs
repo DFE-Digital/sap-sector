@@ -19,16 +19,24 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     private const string MeetingExpectedStandardGpsHeaderText = "Meeting expected standard in grammar, punctuation and spelling";
     private const string AchievedHigherStandardGpsHeaderText = "Achieved a higher standard in grammar, punctuation and spelling";
 
-    private const string Urn = "101206";
-    private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool(Urn);
+    private const string CurrentSchoolUrn = "101206";
+    private const string CurrentSchoolName = "Grafton Primary School";
+    private const string ComparatorSchoolUrn = "101230";
+    private const string ComparatorSchoolName = "Roding Primary School";
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await NavigateTo(PrimarySchoolRoute.ViewSimilarSchools);
-
-        await Page.Locator(".app-school-result a").First.ClickAsync();
+        await NavigateTo(Routes.FindASchool());
+        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Overview);
+        await Page.GetByRole(AriaRole.Link, new() { Name = "View similar schools", Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools);
+        await Page.GetByRole(AriaRole.Link, new() { Name = ComparatorSchoolName, Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
         await Page.GetByRole(AriaRole.Link, new() { Name = "KS2", Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Ks2);
     }
 
     [Fact]
