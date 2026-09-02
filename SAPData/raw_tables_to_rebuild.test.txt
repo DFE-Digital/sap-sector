@@ -10,3 +10,18 @@ school-email-addresses-24-08-2026
 # Similar School Sources
 2026_07_03_neighbours_list_primary
 2026_07_03_matched_primary_schools_data
+
+# KS2 sources
+ks2_regional_local_authority_and_pupil_characteristics_2019_to_2025_revised
+ks2_school_attainment_data
+
+# Absence sources
+6_absence_3term_characteristics
+1_absence_3term_nat_reg_la
+1a_absence_3term_school
+oa_percent_3term_sch_202223_ccss
+oa_percent_3term_sch_202324_ccss
+oa_percent_3term_sch_202425_ccss
+pa_percent_3term_sch_202223_ccss
+pa_percent_3term_sch_202324_ccss
+pa_percent_3term_sch_202425_ccss
