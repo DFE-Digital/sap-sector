@@ -2,6 +2,10 @@
 
 Performance testing ensures the service remains responsive as data and usage grow.
 
+See [008-load-tests.md](008-load-tests.md) for the k6 load testing suite,
+scenarios, and proposed operating targets (drafted for the service
+assessment).
+
 ## Application performance
 
 Metrics monitored include:

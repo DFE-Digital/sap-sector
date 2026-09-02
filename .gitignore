@@ -510,6 +510,10 @@ wwwroot/**/*.min.js
 # Copilot files
 .github/copilot-instructions.md
 
+# k6 load test output
+load_testing/*-summary.json
+load_testing/*-report.html
+load_testing/*.csv
 SAPData/DataMap/SourceFiles
 SAPData/DataMap/CleanedFiles
 SAPData/Sql
