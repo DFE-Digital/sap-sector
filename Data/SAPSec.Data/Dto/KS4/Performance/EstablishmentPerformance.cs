@@ -26,6 +26,7 @@ public class EstablishmentPerformance
     public string Attainment8_Grl_Est_Previous_Num { get; set; } = string.Empty;
     public string Attainment8_Grl_Est_Previous2_Num { get; set; } = string.Empty;
     public string Attainment8_NDi_Est_Current_Num { get; set; } = string.Empty;
+    public string Attainment8_NDi_Est_Previous_Num { get; set; } = string.Empty;
     public string Attainment8_NDi_Est_Previous2_Num { get; set; } = string.Empty;
     public string Attainment8_NMo_Est_Current_Num { get; set; } = string.Empty;
     public string Attainment8_NMo_Est_Previous_Num { get; set; } = string.Empty;
@@ -251,9 +252,10 @@ public class EstablishmentPerformance
     public string EngMaths49_Grl_Est_Previous_Num { get; set; } = string.Empty;
     public string EngMaths49_Grl_Est_Previous_Pct { get; set; } = string.Empty;
     public string EngMaths49_Grl_Est_Previous2_Pct { get; set; } = string.Empty;
-    public string EngMaths49_Mob_Est_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths49_NDi_Est_Current_Num { get; set; } = string.Empty;
     public string EngMaths49_NDi_Est_Current_Pct { get; set; } = string.Empty;
+    public string EngMaths49_NDi_Est_Previous_Num { get; set; } = string.Empty;
+    public string EngMaths49_NDi_Est_Previous_Pct { get; set; } = string.Empty;
     public string EngMaths49_NMo_Est_Current_Num { get; set; } = string.Empty;
     public string EngMaths49_NMo_Est_Current_Pct { get; set; } = string.Empty;
     public string EngMaths49_NMo_Est_Previous_Num { get; set; } = string.Empty;
@@ -283,9 +285,10 @@ public class EstablishmentPerformance
     public string EngMaths59_Grl_Est_Previous_Num { get; set; } = string.Empty;
     public string EngMaths59_Grl_Est_Previous_Pct { get; set; } = string.Empty;
     public string EngMaths59_Grl_Est_Previous2_Pct { get; set; } = string.Empty;
-    public string EngMaths59_Mob_Est_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths59_NDi_Est_Current_Num { get; set; } = string.Empty;
     public string EngMaths59_NDi_Est_Current_Pct { get; set; } = string.Empty;
+    public string EngMaths59_NDi_Est_Previous_Num { get; set; } = string.Empty;
+    public string EngMaths59_NDi_Est_Previous_Pct { get; set; } = string.Empty;
     public string EngMaths59_NMo_Est_Current_Num { get; set; } = string.Empty;
     public string EngMaths59_NMo_Est_Current_Pct { get; set; } = string.Empty;
     public string EngMaths59_NMo_Est_Previous_Num { get; set; } = string.Empty;
@@ -367,6 +370,7 @@ public class EstablishmentPerformance
     public string Physics9_Sum_Est_Current_Num { get; set; } = string.Empty;
     public string Physics9_Sum_Est_Previous_Num { get; set; } = string.Empty;
     public string Physics9_Sum_Est_Previous2_Num { get; set; } = string.Empty;
+    public string Prog8_Tot_Est_Current_Num { get; set; } = string.Empty;
     public string Prog8_Tot_Est_Previous_Num { get; set; } = string.Empty;
     public string Prog8_Tot_Est_Previous2_Num { get; set; } = string.Empty;
 }
