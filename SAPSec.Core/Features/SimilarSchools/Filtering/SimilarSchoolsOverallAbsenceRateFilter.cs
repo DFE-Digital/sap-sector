@@ -1,5 +1,5 @@
 ﻿using SAPSec.Core.Collections;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.Availability;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 

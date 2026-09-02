@@ -1,11 +1,11 @@
 using SAPSec.Core.Extensions;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Model;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;

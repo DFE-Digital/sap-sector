@@ -4,10 +4,10 @@
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    ViewData["SkipLinkTargetId"] = "page-content";
+    ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
 
     var layout = ViewData[ViewDataKeys.ComparisonLayout] as ComparisonLayoutModel;
-    ViewData[ViewDataKeys.Title] = layout!.SimilarSchoolName;
+    ViewData[ViewDataKeys.Title] = layout!.ComparatorSchool.Name;
 
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
     string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
@@ -21,7 +21,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Routes.PrimarySchool(layout!.Urn).ViewSimilarSchools">
+                   href="@Routes.PrimarySchool(layout!.CurrentSchool.Urn).ViewSimilarSchools">
                     View similar schools
                 </a>
             </li>
@@ -34,7 +34,7 @@
     @* LEFT: back link *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Routes.PrimarySchool(layout!.Urn).ViewSimilarSchools">
+           href="@Routes.PrimarySchool(layout!.CurrentSchool.Urn).ViewSimilarSchools">
             Back
         </a>
     </div>
@@ -42,7 +42,7 @@
     @* MAIN CONTENT *@
     <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
         <span class="govuk-caption-xl">
-            @layout!.Name
+            @layout!.CurrentSchool.Name
         </span>
 
         <span
@@ -61,7 +61,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Index" || currentAction == "Similarity")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).Similarity"
+                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Similarity"
                                aria-current="@(currentAction == "Index" || currentAction == "Similarity" ? "page" : null)">
                                 Similarity
                             </a>
@@ -69,7 +69,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Ks2PerformanceMeasures")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).Ks2"
+                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Ks2"
                                aria-current="@(currentAction == "Ks2PerformanceMeasures" ? "page" : null)">
                                 KS2
                             </a>
@@ -77,7 +77,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Attendance")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).Attendance"
+                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Attendance"
                                aria-current="@(currentAction == "Attendance" ? "page" : null)">
                                 Attendance
                             </a>
@@ -85,7 +85,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "SchoolDetails")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.Urn).Comparison(layout.SimilarSchoolUrn).SchoolDetails"
+                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).SchoolDetails"
                                aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
                                 School details
                             </a>

@@ -38,8 +38,6 @@ public class SimilarSchoolsController : Controller
     {
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
 
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData[ViewDataKeys.SchoolDetails] = school;
         if (Url is not null)
         {
             ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(

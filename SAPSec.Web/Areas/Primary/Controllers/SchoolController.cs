@@ -4,6 +4,8 @@ using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
@@ -13,7 +15,6 @@ using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
-using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
@@ -29,20 +30,18 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
-    IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
-    IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
-    IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
-    IRequestSchoolAccessor requestSchoolAccessor)
+        IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+        IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
+        IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
+        IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
+        IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase)
     : Controller
 {
     [HttpGet]
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
-
         PopulateViewData(response.School);
-
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
@@ -112,13 +111,9 @@ public class SchoolController(
     [Route("school-details")]
     public async Task<IActionResult> SchoolDetails(string urn)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
-
-        PopulateViewData(response.School);
-
-        var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, urn);
-
-        return View(schoolDetails);
+        var response = await getSchoolDetailsUseCase.Execute(new(urn));
+        PopulateViewData(response.SchoolDetails);
+        return View(response.SchoolDetails);
     }
 
     [HttpGet]
@@ -126,16 +121,22 @@ public class SchoolController(
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
-
         PopulateViewData(response.School);
-
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
     private void PopulateViewData(SchoolInfo currentSchool)
     {
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
+            Url,
+            currentSchool.Urn,
+            ControllerContext.ActionDescriptor.ActionName);
+    }
+
+    private void PopulateViewData(SchoolDetails currentSchool)
+    {
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
             currentSchool.Urn,

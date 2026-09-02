@@ -3,13 +3,14 @@ using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
-using static SAPSec.Core.Constants.Measures.Secondary;
+using static SAPSec.Core.Features.Measures.Measures.Secondary;
 
 namespace SAPSec.Core.Tests.Features.Measures.Secondary;
 
 public class GetComparisonKs4HeadlineMeasuresUseCaseTests
 {
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
+    private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
     private readonly InMemoryKs4DestinationsRepository _destinationsRepo;
     private readonly GetComparisonKs4HeadlineMeasuresUseCase _sut;
@@ -17,10 +18,12 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public GetComparisonKs4HeadlineMeasuresUseCaseTests()
     {
         _establishmentRepo = new();
+        _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
         _destinationsRepo = new(_establishmentRepo);
         _sut = new GetComparisonKs4HeadlineMeasuresUseCase(
             _establishmentRepo,
+            _similarSchoolsRepo,
             _performanceRepo,
             _destinationsRepo);
     }
@@ -29,8 +32,8 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task WhenCurrentSchoolDoesNotExist_ThrowsNotFoundException()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
 
         var act = async () => await _sut.Execute(Request("999999", "100002"));
 
@@ -39,11 +42,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [Fact]
-    public async Task WhenSimilarSchoolDoesNotExist_ThrowsNotFoundException()
+    public async Task WhenComparatorSchoolDoesNotExist_ThrowsNotFoundException()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
 
         var act = async () => await _sut.Execute(Request("100001", "999999"));
 
@@ -52,19 +55,38 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task WhenComparatorSchoolIsNotInSimilarSchoolsGroupForCurrentSchool_ThrowsNotFoundException()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Current School"),
+            Build.Establishment("100002", "Comparator School"));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", []));
+
+        var act = async () => await _sut.Execute(Request("100001", "100002"));
+
+        await act.Should().ThrowAsync<NotFoundException>()
+            .WithMessage("*100002*");
+    }
+
+    [Fact]
     public async Task School_ShouldContainCurrentSchoolInfo()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x
+            Build.Establishment("100001", "Current School", x => x
                 .Secondary()
                 .WithAddress("1 Test Street", "Testingbury", "Test Place", "Test Town", "TE57 1NG")
                 .InLA("001", "Test LA")),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
         response.CurrentSchool.Urn.Should().Be("100001");
-        response.CurrentSchool.Name.Should().Be("Test School 1");
+        response.CurrentSchool.Name.Should().Be("Current School");
         response.CurrentSchool.Address.Should().Be(
             new Address("1 Test Street", "Testingbury", "Test Place", "Test Town", "TE57 1NG"));
         response.CurrentSchool.LocalAuthority.Should().Be(
@@ -72,22 +94,25 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [Fact]
-    public async Task School_ShouldContainSimilarSchoolInfo()
+    public async Task School_ShouldContainComparatorSchoolInfo()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x
                 .Secondary()
                 .WithAddress("1 Test Street", "Testingbury", "Test Place", "Test Town", "TE57 1NG")
                 .InLA("001", "Test LA")));
 
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
+
         var response = await _sut.Execute(Request("100001", "100002"));
 
-        response.SimilarSchool.Urn.Should().Be("100002");
-        response.SimilarSchool.Name.Should().Be("Test School 2");
-        response.SimilarSchool.Address.Should().Be(
+        response.ComparatorSchool.Urn.Should().Be("100002");
+        response.ComparatorSchool.Name.Should().Be("Comparator School");
+        response.ComparatorSchool.Address.Should().Be(
             new Address("1 Test Street", "Testingbury", "Test Place", "Test Town", "TE57 1NG"));
-        response.SimilarSchool.LocalAuthority.Should().Be(
+        response.ComparatorSchool.LocalAuthority.Should().Be(
             new LocalAuthority("001", "Test LA"));
     }
 
@@ -95,8 +120,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task FilterBy_IgnoresInvalidFilterKeys()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -129,8 +157,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task Attainment8_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
@@ -138,20 +169,23 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
 
         seriesTypes.Should().BeEquivalentTo([
             MeasureSeriesType.CurrentSchool,
-            MeasureSeriesType.SimilarSchool,
+            MeasureSeriesType.ComparatorSchool,
             MeasureSeriesType.EnglandSchoolsAverage
         ]);
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task Attainment8_WhenNoPerformanceData_ContainsNullValues(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
@@ -164,14 +198,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task Attainment8_WhenEmptyValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithAttainment8(current: "", prev: "", prev2: "")),
@@ -191,14 +228,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task Attainment8_WhenInvalidValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithAttainment8(current: "x", prev: "y2", prev2: "3z")),
@@ -215,14 +255,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool, 81.0, 80.0, 79.0)]
-    [InlineData(MeasureSeriesType.SimilarSchool, 71.0, 70.0, 69.0)]
+    [InlineData(MeasureSeriesType.ComparatorSchool, 71.0, 70.0, 69.0)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage, 61.0, 60.0, 59.0)]
     [Theory]
     public async Task Attainment8_ContainsYearByYearValues(MeasureSeriesType seriesType, double? current, double? prev, double? prev2)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithAttainment8(current: "81", prev: "80", prev2: "79")),
@@ -245,30 +288,36 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task EnglishMaths_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
-        response.CurrentSchool.Name.Should().Be("Test School 1");
+        response.CurrentSchool.Name.Should().Be("Current School");
         var seriesTypes = response.EnglishMaths.Series.Select(s => s.SeriesType);
 
         seriesTypes.Should().BeEquivalentTo([
             MeasureSeriesType.CurrentSchool,
-            MeasureSeriesType.SimilarSchool,
+            MeasureSeriesType.ComparatorSchool,
             MeasureSeriesType.EnglandSchoolsAverage
         ]);
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task EnglishMaths_WhenNoPerformanceData_ContainsNullValues(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
@@ -281,14 +330,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task EnglishMaths_WhenEmptyValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "", prev: "", prev2: "")),
@@ -308,14 +360,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task EnglishMaths_WhenInvalidValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "x", prev: "y2", prev2: "3z")),
@@ -335,14 +390,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool, 81.0, 80.0, 79.0)]
-    [InlineData(MeasureSeriesType.SimilarSchool, 71.0, 70.0, 69.0)]
+    [InlineData(MeasureSeriesType.ComparatorSchool, 71.0, 70.0, 69.0)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage, 61.0, 60.0, 59.0)]
     [Theory]
     public async Task EnglishMaths_ContainsYearByYearValues(MeasureSeriesType seriesType, double? current, double? prev, double? prev2)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "81", prev: "80", prev2: "79")),
@@ -367,8 +425,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task EnglishMaths_FilterBy_Grade_WhenMissingEmptyOrInvalidValuesForSelectedSubject_ContainsNullValues(string subject)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -393,7 +454,7 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
         series.Should().NotBeNull();
         series.Should().Equal(
             new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null),
-            new MeasureSeries(MeasureSeriesType.SimilarSchool, null, null, null),
+            new MeasureSeries(MeasureSeriesType.ComparatorSchool, null, null, null),
             new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
     }
 
@@ -406,8 +467,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task EnglishMaths_FilterBy_Grade_ContainsYearByYearValuesForSelectedSubject(string subject, double[] currentSchool, double[] similarSchools, double[] england)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _performanceRepo.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -432,7 +496,7 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
         series.Should().NotBeNull();
         series.Should().Equal([
             new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
-            new MeasureSeries(MeasureSeriesType.SimilarSchool, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
+            new MeasureSeries(MeasureSeriesType.ComparatorSchool, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
             new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
         ]);
     }
@@ -441,30 +505,36 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task Destinations_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
-        response.CurrentSchool.Name.Should().Be("Test School 1");
+        response.CurrentSchool.Name.Should().Be("Current School");
         var seriesTypes = response.Destinations.Series.Select(s => s.SeriesType);
 
         seriesTypes.Should().BeEquivalentTo([
             MeasureSeriesType.CurrentSchool,
-            MeasureSeriesType.SimilarSchool,
+            MeasureSeriesType.ComparatorSchool,
             MeasureSeriesType.EnglandSchoolsAverage
         ]);
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task Destinations_WhenNoPerformanceData_ContainsNullValues(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         var response = await _sut.Execute(Request("100001", "100002"));
 
@@ -477,14 +547,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task Destinations_WhenEmptyValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _destinationsRepo.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "", prev: "", prev2: "")),
@@ -504,14 +577,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool)]
-    [InlineData(MeasureSeriesType.SimilarSchool)]
+    [InlineData(MeasureSeriesType.ComparatorSchool)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage)]
     [Theory]
     public async Task Destinations_WhenInvalidValues_ContainsNulls(MeasureSeriesType seriesType)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _destinationsRepo.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "x", prev: "y2", prev2: "3z")),
@@ -531,14 +607,17 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(MeasureSeriesType.CurrentSchool, 81.0, 80.0, 79.0)]
-    [InlineData(MeasureSeriesType.SimilarSchool, 71.0, 70.0, 69.0)]
+    [InlineData(MeasureSeriesType.ComparatorSchool, 71.0, 70.0, 69.0)]
     [InlineData(MeasureSeriesType.EnglandSchoolsAverage, 61.0, 60.0, 59.0)]
     [Theory]
     public async Task Destinations_ContainsYearByYearValues(MeasureSeriesType seriesType, double? current, double? prev, double? prev2)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _destinationsRepo.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "81", prev: "80", prev2: "79")),
@@ -563,8 +642,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task Destinations_FilterBy_Subject_WhenMissingEmptyOrInvalidValuesForSelectedSubject_ContainsNullValues(string subject)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _destinationsRepo.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x
@@ -592,7 +674,7 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
         series.Should().NotBeNull();
         series.Should().Equal(
             new MeasureSeries(MeasureSeriesType.CurrentSchool, null, null, null),
-            new MeasureSeries(MeasureSeriesType.SimilarSchool, null, null, null),
+            new MeasureSeries(MeasureSeriesType.ComparatorSchool, null, null, null),
             new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
     }
 
@@ -606,8 +688,11 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     public async Task Destinations_FilterBy_Subject_ContainsYearByYearValuesForSelectedSubject(string subject, double[] currentSchool, double[] similarSchools, double[] england)
     {
         _establishmentRepo.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
 
         _destinationsRepo.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x
@@ -635,7 +720,7 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
         series.Should().NotBeNull();
         series.Should().Equal([
             new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]),
-            new MeasureSeries(MeasureSeriesType.SimilarSchool, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
+            new MeasureSeries(MeasureSeriesType.ComparatorSchool, (decimal?)similarSchools[0], (decimal?)similarSchools[1], (decimal?)similarSchools[2]),
             new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2])
         ]);
     }

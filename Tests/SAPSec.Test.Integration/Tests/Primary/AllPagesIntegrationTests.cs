@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using FluentAssertions;
 using SAPSec.Core.Constants;
 using SAPSec.Test.Common.AngleSharp;
@@ -105,6 +106,8 @@ public class AllPagesIntegrationTests(
         var page = await Fixture.RequestPageAsync(path);
 
         var navigationItems = page.QuerySelectorAll(".app-side-navigation__item a");
+
+        var hrefs = navigationItems.Cast<IHtmlAnchorElement>().Select(a => a.Href).ToArray();
 
         var navigationAssertions = PrimaryPages
             .Where(p => p.IsInNavigation)
