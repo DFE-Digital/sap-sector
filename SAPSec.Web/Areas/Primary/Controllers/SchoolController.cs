@@ -4,6 +4,7 @@ using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
@@ -14,6 +15,7 @@ using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
@@ -33,6 +35,8 @@ public class SchoolController(
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
     IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
     IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
+    IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
+    IFeatureFlagService featureFlagService,
     IRequestSchoolAccessor requestSchoolAccessor)
     : Controller
 {
@@ -41,7 +45,7 @@ public class SchoolController(
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
@@ -53,7 +57,7 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
@@ -76,7 +80,7 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Primary, urn, filters));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var model = new AttendancePageViewModel
         {
@@ -103,7 +107,7 @@ public class SchoolController(
             sortBy,
             page));
 
-        PopulateViewData(schoolInfoResponse.School);
+        await PopulateViewData(schoolInfoResponse.School);
 
         return View(PrimarySimilarSchoolsPageViewModel.FromResponse(response, Request.Query));
     }
@@ -114,7 +118,7 @@ public class SchoolController(
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, urn);
 
@@ -127,18 +131,36 @@ public class SchoolController(
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
     }
 
-    private void PopulateViewData(SchoolInfo currentSchool)
+    [HttpGet]
+    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [Route("rise-resources")]
+    public async Task<IActionResult> RiseResources(string urn)
+    {
+        var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
+        await PopulateViewData(schoolInfoResponse.School);
+
+        var riseResourcesResponse = await getRiseResourcesUseCase.Execute(new(urn));
+
+        return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
+    }
+
+    private async Task PopulateViewData(SchoolInfo currentSchool)
     {
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+
+        var includeRise = featureFlagService is not null
+            && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
             currentSchool.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+            ControllerContext.ActionDescriptor.ActionName,
+            includeRise);
     }
 }
