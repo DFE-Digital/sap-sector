@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Data.Repositories;
@@ -27,6 +28,7 @@ public class SchoolControllerTests
     private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
+    private readonly Mock<IFeatureFlagService>_featureFlagServiceMock;
 
     #endregion
 
@@ -42,6 +44,7 @@ public class SchoolControllerTests
         _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
         _requestSchoolAccessorMock = new Mock<IRequestSchoolAccessor>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
+        _featureFlagServiceMock = new Mock<IFeatureFlagService>();
 
         var getSchoolKs4HeadlineMeasuresUseCase = new GetSchoolKs4HeadlineMeasuresUseCase(
             _establishmentRepositoryMock.Object,
@@ -55,11 +58,15 @@ public class SchoolControllerTests
         var getSchoolAttendanceMeasuresUseCase = new GetSchoolAttendanceMeasuresUseCase(
             _establishmentRepositoryMock.Object,
             _absenceRepositoryMock.Object);
+        var getRiseResourcesUseCase = new GetRiseResourcesUseCase(
+            _establishmentRepositoryMock.Object);
 
         _sut = new SchoolController(
             getSchoolKs4HeadlineMeasuresUseCase,
             getSchoolKs4CoreSubjectsUseCase,
             getSchoolAttendanceMeasuresUseCase,
+            getRiseResourcesUseCase,
+            _featureFlagServiceMock.Object,
             _requestSchoolAccessorMock.Object,
             _loggerMock.Object);
     }
