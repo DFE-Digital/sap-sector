@@ -55,6 +55,21 @@ variable "enable_postgres_high_availability" {
   default     = false
   description = "Enable high availability for PostgreSQL (doubles cost)"
 }
+
+variable "redis_managed_cache_sku_name" { default = "Balanced_B1" }
+
+variable "redis_managed_queue_sku_name" { default = "Balanced_B1" }
+
+variable "redis_mode" {
+  description = "Whether to use Cache for Redis or Managed Redis"
+  type        = string
+  default     = "legacy" # or "managed"
+  validation {
+    condition     = contains(["managed", "legacy"], var.redis_mode)
+    error_message = "redis_mode must be either 'legacy' (Cache for Redis) or 'managed' (Managed Redis)."
+  }
+}
+
 variable "azure_maintenance_window" {
   type = object({
     day_of_week  = number
@@ -106,7 +121,15 @@ variable "storage_container_delete_retention_days" {
 
 locals {
   postgres_ssl_mode = var.enable_postgres_ssl ? "require" : "disable"
-
+  redis = {
+    legacy = {
+      cache_url = module.redis-cache.url
+    }
+    managed = {
+      cache_url = module.redis-managed-cache.url
+    }
+  }
+  selected_redis = local.redis[var.redis_mode]
 }
 
 variable "enable_logit" { default = true }
