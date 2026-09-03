@@ -21,8 +21,8 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     {
         logger.LogInformation("Start test");
         establishmentRepo.SetupEstablishments(
-            new() { URN = "100001", EstablishmentName = "Test School 1", PhaseOfEducationName = "Primary" },
-            new() { URN = "100002", EstablishmentName = "Test School 2", PhaseOfEducationName = "Secondary" }
+            new() { URN = "100001", EstablishmentName = "Test School 1", PhaseOfEducationName = "Primary", EstablishmentStatusId = "1", EstablishmentStatusName = "Open" },
+            new() { URN = "100002", EstablishmentName = "Test School 2", PhaseOfEducationName = "Secondary", EstablishmentStatusId = "1", EstablishmentStatusName = "Open" }
         );
 
         using var ctx = new LuceneIndexContext();
@@ -117,8 +117,8 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
                 if (!establishments.Any())
                 {
                     establishmentRepo.SetupEstablishments(
-                        new() { URN = "100001", EstablishmentName = "Test School 1", PhaseOfEducationName = "Primary" },
-                        new() { URN = "100002", EstablishmentName = "Test School 2", PhaseOfEducationName = "Secondary" }
+                        new() { URN = "100001", EstablishmentName = "Test School 1", PhaseOfEducationName = "Primary", EstablishmentStatusId = "1", EstablishmentStatusName = "Open" },
+                        new() { URN = "100002", EstablishmentName = "Test School 2", PhaseOfEducationName = "Secondary", EstablishmentStatusId = "1", EstablishmentStatusName = "Open" }
                     );
                 }
             }
@@ -143,10 +143,13 @@ public class StartupIndexBuilderTests(ITestOutputHelper output)
     {
         logger.LogInformation("Start test");
         establishmentRepo.SetupEstablishments(
-            new() { URN = "100001", EstablishmentName = "Test Primary 1", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2" },
-            new() { URN = "100002", EstablishmentName = "Test Secondary 2", PhaseOfEducationName = "Secondary", PhaseOfEducationId = "4" },
+            new() { URN = "100001", EstablishmentName = "Test Primary 1", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = "1", EstablishmentStatusName = "Open" },
+            new() { URN = "100002", EstablishmentName = "Test Secondary 2", PhaseOfEducationName = "Secondary", PhaseOfEducationId = "4", EstablishmentStatusId = "1", EstablishmentStatusName = "Open" },
             new() { URN = "100003", EstablishmentName = "Test Nursery 3", PhaseOfEducationName = "Nursery", PhaseOfEducationId = "1" },
-            new() { URN = "100004", EstablishmentName = "Test All Through 4", PhaseOfEducationName = "All-through", PhaseOfEducationId = "7" }
+            new() { URN = "100004", EstablishmentName = "Test All Through 4", PhaseOfEducationName = "All-through", PhaseOfEducationId = "7", EstablishmentStatusId = "1", EstablishmentStatusName = "Open" },
+            new() { URN = "100005", EstablishmentName = "Test Closed Secondary 5", PhaseOfEducationName = "Secondary", PhaseOfEducationId = "4", EstablishmentStatusId = "2", EstablishmentStatusName = "Closed" },
+            new() { URN = "100006", EstablishmentName = "Test Closed Primary 6", PhaseOfEducationName = "Primary", PhaseOfEducationId = "2", EstablishmentStatusId = "2", EstablishmentStatusName = "Closed" },
+            new() { URN = "100007", EstablishmentName = "Test Proposed Secondary 7", PhaseOfEducationName = "Secondary", PhaseOfEducationId = "4", EstablishmentStatusId = "4", EstablishmentStatusName = "Proposed to open" }
         );
 
         using var ctx = new LuceneIndexContext();
