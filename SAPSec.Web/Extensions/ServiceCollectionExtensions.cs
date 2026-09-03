@@ -1,6 +1,7 @@
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SchoolSearch;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -45,6 +46,9 @@ public static class ServiceCollectionExtensions
 
         services.AddSingleton<IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse>, GetSchoolAttendanceMeasuresUseCase>();
         services.AddSingleton<IUseCase<GetComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>, GetComparisonAttendanceMeasuresUseCase>();
+
+        // RISE Resources
+        services.AddSingleton<IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse>, GetRiseResourcesUseCase>();
     }
 
     public static void AddServices(this IServiceCollection services)
