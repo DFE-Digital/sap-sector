@@ -34,11 +34,11 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2023 to 2024" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2023 to 2024" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -72,13 +72,13 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2021 to 2022");
+        var previous2 = await table.GetTableColumnAsync("2022 to 2023");
         await Expect(previous2).ToBePercentageValuesHavingCount(3);
 
-        var previous = await table.GetTableColumnAsync("2022 to 2023");
+        var previous = await table.GetTableColumnAsync("2023 to 2024");
         await Expect(previous).ToBePercentageValuesHavingCount(3);
 
-        var current = await table.GetTableColumnAsync("2023 to 2024");
+        var current = await table.GetTableColumnAsync("2024 to 2025");
         await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
