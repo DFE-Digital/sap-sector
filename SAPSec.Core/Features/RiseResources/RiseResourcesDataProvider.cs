@@ -1,6 +1,5 @@
 using SAPSec.Core.Constants;
 using SAPSec.Data.Dto;
-using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.RiseResources;
@@ -9,9 +8,6 @@ internal class RiseResourcesDataProvider(
     IEstablishmentRepository establishmentRepository,
     IRiseResourcesRepository riseResourcesRepository)
 {
-    /// <summary>
-    /// Phases a resource may be tagged with that an all-through school should see.
-    /// </summary>
     private static readonly string[] AllThroughSchoolPhases =
     [
         PhaseOfEducationValues.Primary,
@@ -24,24 +20,43 @@ internal class RiseResourcesDataProvider(
         var establishment = await establishmentRepository.GetEstablishmentAsync(urn)
             ?? throw new NotFoundException($"School with URN {urn} was not found");
 
-        var entries = await riseResourcesRepository.GetAllAsync();
+        var document = await riseResourcesRepository.GetAsync();
 
-        var resources = entries
+        var applicableResources = document.ResourceEntries
             .Where(entry => AppliesToPhase(entry.SchoolPhases, establishment.PhaseOfEducationName))
-            .Select(Map)
             .ToList();
 
-        return new RiseResourcesSourceData(establishment, resources);
+        var descriptionByCategory = document.ResourceCategories
+            .GroupBy(category => category.Category, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.First().CategoryDescription, StringComparer.Ordinal);
+
+        var configuredOrderByCategory = document.ResourceCategories
+            .Select((category, index) => (category.Category, index))
+            .GroupBy(x => x.Category, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.First().index, StringComparer.Ordinal);
+
+        var categories = applicableResources
+            .GroupBy(entry => entry.Category ?? string.Empty)
+            // Listed categories first, in resourceCategories order; unlisted keep first-appearance order (stable sort).
+            .OrderBy(group => configuredOrderByCategory.TryGetValue(group.Key, out var order) ? order : int.MaxValue)
+            .Select(group => new RiseResourceCategory(
+                Name: group.Key,
+                Description: descriptionByCategory.TryGetValue(group.Key, out var description)
+                    ? NullIfBlank(description)
+                    : null,
+                Resources: [.. group.Select(Map)]))
+            .ToList();
+
+        return new RiseResourcesSourceData(establishment, categories);
     }
 
-    private static RiseResource Map(RiseResourceEntry entry) =>
+    private static RiseResource Map(Data.Dto.RiseResources.RiseResourceEntry entry) =>
         new(
             Title: entry.ResourceTitle,
             Description: NullIfBlank(entry.ResourceDescription),
             Url: NullIfBlank(entry.ResourceUrl),
-            Category: NullIfBlank(entry.Category),
             SubCategory: NullIfBlank(entry.SubCategory),
-            MappingMeasures: entry.MappingMeasures);
+            MappingMeasures: NullIfBlank(entry.MappingMeasures));
 
     private static bool AppliesToPhase(IReadOnlyList<string> resourcePhases, string schoolPhase)
     {
@@ -61,10 +76,10 @@ internal class RiseResourcesDataProvider(
     private static string NormalisePhase(string phase) =>
         phase.Trim().Replace("-", " ").ToLowerInvariant();
 
-    private static string? NullIfBlank(string value) =>
+    private static string? NullIfBlank(string? value) =>
         string.IsNullOrWhiteSpace(value) ? null : value;
 }
 
 internal record RiseResourcesSourceData(
     Establishment Establishment,
-    IReadOnlyList<RiseResource> Resources);
+    IReadOnlyList<RiseResourceCategory> Categories);

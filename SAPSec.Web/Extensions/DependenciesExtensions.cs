@@ -21,8 +21,8 @@ public static class DependenciesExtensions
         services.AddJsonFile<EnglandPerformance>(JsonDataSource.PrimarySchools);
         services.AddSingleton<IKs2PerformanceRepository, JsonKs2PerformanceRepository>();
 
-        // RISE resources content (JSON-only, GitHub-edited content per ADR-005)
-        services.AddJsonFile<RiseResourceEntry>(JsonDataSource.RiseResources);
+        // RISE resources
+        services.AddJsonFile<RiseResourcesDocument>(JsonDataSource.RiseResources);
         services.AddSingleton<IRiseResourcesRepository, JsonRiseResourcesRepository>();
 
         // Formatters

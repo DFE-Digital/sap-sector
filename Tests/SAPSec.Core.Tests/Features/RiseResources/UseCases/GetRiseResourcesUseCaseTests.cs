@@ -46,14 +46,13 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", PhaseOfEducationValues.Primary),
-            Entry("Secondary only", PhaseOfEducationValues.Secondary),
-            Entry("All phases", PhaseOfEducationValues.Primary, PhaseOfEducationValues.Secondary, "All through"));
+            Entry("Primary only", "Curriculum", PhaseOfEducationValues.Primary),
+            Entry("Secondary only", "Curriculum", PhaseOfEducationValues.Secondary),
+            Entry("All phases", "Curriculum", PhaseOfEducationValues.Primary, PhaseOfEducationValues.Secondary, "All through"));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
-        result.Resources.Select(r => r.Title)
-            .Should().BeEquivalentTo("Secondary only", "All phases");
+        Titles(result).Should().BeEquivalentTo("Secondary only", "All phases");
     }
 
     [Fact]
@@ -62,12 +61,12 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Primary()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", PhaseOfEducationValues.Primary),
-            Entry("Secondary only", PhaseOfEducationValues.Secondary));
+            Entry("Primary only", "Curriculum", PhaseOfEducationValues.Primary),
+            Entry("Secondary only", "Curriculum", PhaseOfEducationValues.Secondary));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
-        result.Resources.Select(r => r.Title).Should().BeEquivalentTo("Primary only");
+        Titles(result).Should().BeEquivalentTo("Primary only");
     }
 
     [Fact]
@@ -76,15 +75,37 @@ public class GetRiseResourcesUseCaseTests
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.AllThrough()));
         _riseResourcesRepo.SetupResources(
-            Entry("Primary only", PhaseOfEducationValues.Primary),
-            Entry("Secondary only", PhaseOfEducationValues.Secondary),
-            Entry("All through only", "All through"),
-            Entry("Untagged", "16 plus"));
+            Entry("Primary only", "Curriculum", PhaseOfEducationValues.Primary),
+            Entry("Secondary only", "Curriculum", PhaseOfEducationValues.Secondary),
+            Entry("All through only", "Curriculum", "All through"),
+            Entry("Untagged", "Curriculum", "16 plus"));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
-        result.Resources.Select(r => r.Title)
-            .Should().BeEquivalentTo("Primary only", "Secondary only", "All through only");
+        Titles(result).Should().BeEquivalentTo("Primary only", "Secondary only", "All through only");
+    }
+
+    [Fact]
+    public async Task Execute_OrdersCategoriesByResourceCategoriesConfiguration_AndAttachesDescriptions()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("123456", "Test School", x => x.Secondary()));
+        _riseResourcesRepo.SetupCategories(
+            Category("Wider school", "About the wider school."),
+            Category("Performance and attendance", "About performance."));
+        _riseResourcesRepo.SetupResources(
+            // File order lists a "Performance and attendance" resource first, but config order wins.
+            Entry("Attendance guidance", "Performance and attendance", PhaseOfEducationValues.Secondary),
+            Entry("Leadership guidance", "Wider school", PhaseOfEducationValues.Secondary),
+            Entry("Pastoral guidance", "Pupil characteristics", PhaseOfEducationValues.Secondary));
+
+        var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
+
+        // Listed categories in resourceCategories order, then the unlisted one.
+        result.Categories.Select(c => c.Name)
+            .Should().Equal("Wider school", "Performance and attendance", "Pupil characteristics");
+        result.Categories.Single(c => c.Name == "Wider school").Description.Should().Be("About the wider school.");
+        result.Categories.Single(c => c.Name == "Pupil characteristics").Description.Should().BeNull();
     }
 
     [Fact]
@@ -92,31 +113,40 @@ public class GetRiseResourcesUseCaseTests
     {
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
-        _riseResourcesRepo.SetupResources(new RiseResourceEntry
+        _riseResourcesRepo.SetupResources(new Data.Dto.RiseResources.RiseResourceEntry
         {
             ResourceTitle = "Improving attendance",
             ResourceDescription = "Guidance for schools",
             ResourceUrl = "https://example.gov.uk/attendance",
             SchoolPhases = [PhaseOfEducationValues.Secondary],
-            Category = "Attendance",
-            SubCategory = "Whole-school approaches",
-            MappingMeasures = ["Overall absence rate; Persistent absence rate"]
+            Category = "Performance and attendance",
+            SubCategory = "Attendance",
+            MappingMeasures = "Overall absence rate; Persistent absence rate"
         });
 
-        var resource = (await _sut.Execute(new GetRiseResourcesRequest("123456"))).Resources.Single();
+        var resource = Resources(await _sut.Execute(new GetRiseResourcesRequest("123456"))).Single();
 
         resource.Title.Should().Be("Improving attendance");
         resource.Description.Should().Be("Guidance for schools");
         resource.Url.Should().Be("https://example.gov.uk/attendance");
-        resource.Category.Should().Be("Attendance");
-        resource.SubCategory.Should().Be("Whole-school approaches");
-        resource.MappingMeasures.Should().BeEquivalentTo("Overall absence rate; Persistent absence rate");
+        resource.SubCategory.Should().Be("Attendance");
+        resource.MappingMeasures.Should().Be("Overall absence rate; Persistent absence rate");
     }
 
-    private static RiseResourceEntry Entry(string title, params string[] phases) =>
+    private static IEnumerable<Core.Features.RiseResources.RiseResource> Resources(GetRiseResourcesResponse response) =>
+        response.Categories.SelectMany(category => category.Resources);
+
+    private static IEnumerable<string> Titles(GetRiseResourcesResponse response) =>
+        Resources(response).Select(resource => resource.Title);
+
+    private static Data.Dto.RiseResources.RiseResourceEntry Entry(string title, string category, params string[] phases) =>
         new()
         {
             ResourceTitle = title,
+            Category = category,
             SchoolPhases = phases
         };
+
+    private static RiseResourceCategoryEntry Category(string name, string description) =>
+        new() { Category = name, CategoryDescription = description };
 }

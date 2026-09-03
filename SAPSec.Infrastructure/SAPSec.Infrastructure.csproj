@@ -137,7 +137,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Data\Files\RiseResources\RiseResourceEntry.json">
+    <Content Include="Data\Files\RiseResources\RiseResourcesDocument.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

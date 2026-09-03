@@ -3,16 +3,14 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Infrastructure.Json;
 
-/// <summary>
-/// Reads the RISE resources content file once at construction and serves it from memory.
-/// Registered as a singleton, so the file is parsed once per process. Fails fast
-/// (throws) on a missing or malformed file rather than serving an empty result.
-/// </summary>
-public class JsonRiseResourcesRepository(IJsonFile<RiseResourceEntry> riseResourcesFile) : IRiseResourcesRepository
+public class JsonRiseResourcesRepository(IJsonFile<RiseResourcesDocument> riseResourcesFile) : IRiseResourcesRepository
 {
-    public async Task<IReadOnlyCollection<RiseResourceEntry>> GetAllAsync()
+    public async Task<RiseResourcesDocument> GetAsync()
     {
-        var rows = await  riseResourcesFile.ReadAllAsync();
-        return [.. rows];
+        var documents = await riseResourcesFile.ReadAllAsync();
+
+        return documents.FirstOrDefault()
+            ?? throw new InvalidOperationException(
+                "RISE resources content is missing or could not be read.");
     }
 }

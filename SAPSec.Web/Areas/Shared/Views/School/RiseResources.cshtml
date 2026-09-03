@@ -13,6 +13,10 @@
 
 <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
+<p class="govuk-body" data-testid="rise-resources-intro">
+    Use these resources from RISE to help improve your school&rsquo;s performance.
+</p>
+
 @if (!Model.HasResources)
 {
     <p class="govuk-body" data-testid="rise-resources-empty">
@@ -21,11 +25,33 @@
 }
 else
 {
+    var namedCategories = Model.Categories.Where(category => !string.IsNullOrWhiteSpace(category.Name)).ToList();
+
+    if (namedCategories.Count > 0)
+    {
+        <nav aria-label="Contents" data-testid="rise-resources-contents">
+            <h2 class="govuk-heading-m">Contents</h2>
+            <ul class="govuk-list">
+                @foreach (var category in namedCategories)
+                {
+                    <li>
+                        <a class="govuk-link" href="#@category.Slug">@category.Name</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+
     @foreach (var category in Model.Categories)
     {
         if (!string.IsNullOrWhiteSpace(category.Name))
         {
-            <h2 class="govuk-heading-l govuk-!-margin-top-8" data-testid="rise-resources-category">@category.Name</h2>
+            <h2 class="govuk-heading-l govuk-!-margin-top-8" id="@category.Slug" tabindex="-1" data-testid="rise-resources-category">@category.Name</h2>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(category.Description))
+        {
+            <p class="govuk-body" data-testid="rise-resources-category-description">@category.Description</p>
         }
 
         @foreach (var subCategory in category.SubCategories)
@@ -41,7 +67,7 @@ else
                     <li class="govuk-!-margin-bottom-6" data-testid="rise-resource">
                         @if (resource.HasLink)
                         {
-                            <a class="govuk-link" href="@resource.Url" target="_blank" rel="noopener noreferrer" data-testid="rise-resource-title">@resource.Title (opens in new tab)</a>
+                            <a class="govuk-link" href="@resource.Url" data-testid="rise-resource-title">@resource.Title</a>
                         }
                         else
                         {

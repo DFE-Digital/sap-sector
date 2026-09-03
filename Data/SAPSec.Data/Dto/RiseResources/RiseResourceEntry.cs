@@ -11,5 +11,5 @@ public class RiseResourceEntry
     public IReadOnlyList<string> SchoolPhases { get; set; } = [];
     public string Category { get; set; } = string.Empty;
     public string SubCategory { get; set; } = string.Empty;
-    public IReadOnlyList<string> MappingMeasures { get; set; } = [];
+    public string MappingMeasures { get; set; } = string.Empty;
 }

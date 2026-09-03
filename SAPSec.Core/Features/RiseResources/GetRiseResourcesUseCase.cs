@@ -17,7 +17,7 @@ public class GetRiseResourcesUseCase(
         return new(
             Urn: data.Establishment.URN,
             SchoolName: data.Establishment.EstablishmentName,
-            Resources: data.Resources);
+            Categories: data.Categories);
     }
 }
 
@@ -26,12 +26,16 @@ public record GetRiseResourcesRequest(string Urn);
 public record GetRiseResourcesResponse(
     string Urn,
     string SchoolName,
+    IReadOnlyList<RiseResourceCategory> Categories);
+
+public record RiseResourceCategory(
+    string Name,
+    string? Description,
     IReadOnlyList<RiseResource> Resources);
 
 public record RiseResource(
     string Title,
     string? Description = null,
     string? Url = null,
-    string? Category = null,
     string? SubCategory = null,
-    IReadOnlyList<string>? MappingMeasures = null);
+    string? MappingMeasures = null);
