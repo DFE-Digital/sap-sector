@@ -212,6 +212,29 @@ public class SchoolSearchServiceTests
     }
 
     [Fact]
+    public async Task SearchAsync_IncludesPrimarySecondaryAndAllThroughSchools_WhenFeatureEnabled()
+    {
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(EnablePrimarySchoolsFeature))
+            .ReturnsAsync(true);
+        _indexReaderMock
+            .Setup(x => x.SearchAsync("school", It.IsAny<int>()))
+            .ReturnsAsync([(1, "Primary School"), (2, "Secondary School"), (3, "All-through School")]);
+        _establishmentRepositoryMock
+            .Setup(x => x.GetEstablishmentsAsync(It.IsAny<IEnumerable<string>>()))
+            .ReturnsAsync([
+                new Establishment { URN = "1", EstablishmentName = "Primary School", PhaseOfEducationId = "2", PhaseOfEducationName = "Primary", EstablishmentStatusId = "1" },
+                new Establishment { URN = "2", EstablishmentName = "Secondary School", PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary", EstablishmentStatusId = "1" },
+                new Establishment { URN = "3", EstablishmentName = "All-through School", PhaseOfEducationId = "7", PhaseOfEducationName = "All-through", EstablishmentStatusId = "1" }
+            ]);
+
+        var results = await _sut.SearchAsync("school");
+
+        results.Should().HaveCount(3);
+        results.Select(x => x.URN).Should().Contain(["1", "2", "3"]);
+    }
+
+    [Fact]
     public async Task SearchAsync_IncludesPrimarySchools_WhenFeatureEnabledAndStatusExistsOnEstablishment()
     {
         _featureFlagServiceMock
