@@ -8,6 +8,7 @@ const CHART_CONFIG = {
         maxDevicePixelRatio: 2,
         resizeDebounceMs: 100,
         labelWrapChars: 15,
+        mobileLabelWrapChars: 12,
         mobileBreakpoint: '(max-width: 40.0625em)'
     },
     legend: {
@@ -54,6 +55,10 @@ const CHART_CONFIG = {
             baseContainerHeight: 260,
             rowHeight: 70,
             lineHeight: 18
+        },
+        layout: {
+            leftPadding: 8,
+            mobileLeftPadding: 20
         },
         dataset: {
             borderWidth: 1,
@@ -196,6 +201,18 @@ function canBarFitLabel(ctx, axisSuffix) {
 
 function isMobileViewport() {
     return window.matchMedia(CHART_CONFIG.defaults.mobileBreakpoint).matches;
+}
+
+function getLabelWrapChars() {
+    return isMobileViewport()
+        ? CHART_CONFIG.defaults.mobileLabelWrapChars
+        : CHART_CONFIG.defaults.labelWrapChars;
+}
+
+function getBarChartLeftPadding() {
+    return isMobileViewport()
+        ? CHART_CONFIG.bar.layout.mobileLeftPadding
+        : CHART_CONFIG.bar.layout.leftPadding;
 }
 
 function isLargeEnoughForInsideLabel(value, ctx) {
@@ -820,10 +837,15 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                         font: fonts,
                         callback: function (value) {
                             const label = this.getLabelForValue(value);
-                            return wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars);
+                            return wrapLabel(label.toString(), getLabelWrapChars());
                         },
                         padding: CHART_CONFIG.bar.labels.yTickPadding
                     }
+                }
+            },
+            layout: {
+                padding: {
+                    left: getBarChartLeftPadding()
                 }
             },
             animation: false,
@@ -973,8 +995,9 @@ function resizeBarChartContainer(canvas, chartData) {
         return;
     }
 
+    const labelWrapChars = getLabelWrapChars();
     const maxWrappedLines = Math.max(...labels.map(label =>
-        wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars).length
+        wrapLabel(label.toString(), labelWrapChars).length
     ));
     const rowHeight = CHART_CONFIG.bar.labels.rowHeight
         + Math.max(0, maxWrappedLines - 2) * CHART_CONFIG.bar.labels.lineHeight;
