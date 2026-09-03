@@ -92,15 +92,20 @@ public class RiseResourcesPageIntegrationTests(
         var page = await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").RiseResources, HttpStatusCode.OK);
 
-        page.ElementWithTestIdShouldExist("rise-resources-contents")
-            .QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
-            .Should().Equal("Curriculum");
         page.ElementWithTestIdShouldExist("rise-resources-category-description")
             .TrimmedTextContent().Should().Be("Resources covering curriculum and teaching.");
 
-        page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
-            .Select(el => el.TrimmedTextContent())
+        var subCategoryHeadings = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']");
+        subCategoryHeadings.Select(el => el.TrimmedTextContent())
             .Should().Equal("Literacy", "Maths");
+        subCategoryHeadings[0].GetAttribute("id").Should().Be("literacy");
+        subCategoryHeadings[0].GetAttribute("tabindex").Should().Be("-1");
+
+        // Contents links point to each sub-category section, in the same order.
+        var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
+        contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+            .Should().Equal("Literacy", "Maths");
+        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#literacy");
 
         // Alphabetical within the sub-category; "All through" resource is included for a primary school.
         var literacyList = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")

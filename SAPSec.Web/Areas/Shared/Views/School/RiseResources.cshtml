@@ -25,17 +25,17 @@
 }
 else
 {
-    var namedCategories = Model.Categories.Where(category => !string.IsNullOrWhiteSpace(category.Name)).ToList();
+    var contentsEntries = Model.ContentsEntries.ToList();
 
-    if (namedCategories.Count > 0)
+    if (contentsEntries.Count > 0)
     {
         <nav aria-label="Contents" data-testid="rise-resources-contents">
             <h2 class="govuk-heading-m">Contents</h2>
-            <ul class="govuk-list">
-                @foreach (var category in namedCategories)
+            <ul class="govuk-list app-rise-contents">
+                @foreach (var subCategory in contentsEntries)
                 {
-                    <li>
-                        <a class="govuk-link" href="#@category.Slug">@category.Name</a>
+                    <li class="app-rise-contents__item">
+                        <a class="govuk-link" href="#@subCategory.Slug">@subCategory.Name</a>
                     </li>
                 }
             </ul>
@@ -46,7 +46,7 @@ else
     {
         if (!string.IsNullOrWhiteSpace(category.Name))
         {
-            <h2 class="govuk-heading-l govuk-!-margin-top-8" id="@category.Slug" tabindex="-1" data-testid="rise-resources-category">@category.Name</h2>
+            <h2 class="govuk-heading-l govuk-!-margin-top-8" data-testid="rise-resources-category">@category.Name</h2>
         }
 
         @if (!string.IsNullOrWhiteSpace(category.Description))
@@ -58,7 +58,7 @@ else
         {
             if (!string.IsNullOrWhiteSpace(subCategory.Name))
             {
-                <h3 class="govuk-heading-m" data-testid="rise-resources-subcategory">@subCategory.Name</h3>
+                <h3 class="govuk-heading-m govuk-!-margin-top-6" id="@subCategory.Slug" tabindex="-1" data-testid="rise-resources-subcategory">@subCategory.Name</h3>
             }
 
             <ul class="govuk-list" data-testid="rise-resources-list">
@@ -67,7 +67,7 @@ else
                     <li class="govuk-!-margin-bottom-6" data-testid="rise-resource">
                         @if (resource.HasLink)
                         {
-                            <a class="govuk-link" href="@resource.Url" data-testid="rise-resource-title">@resource.Title</a>
+                            <a class="govuk-link" href="@resource.Url" target="_blank" rel="noopener noreferrer" data-testid="rise-resource-title">@resource.Title</a>
                         }
                         else
                         {

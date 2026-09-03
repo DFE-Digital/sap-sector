@@ -97,27 +97,28 @@ public class RiseResourcesPageIntegrationTests(
         var page = await Fixture.RequestPageAsync(
             Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);
 
-        // Contents links + category headings: resourceCategories order first, then unlisted categories.
-        var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
-        contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+        // Category headings: resourceCategories order first, then the unlisted category.
+        page.QuerySelectorAll("[data-testid='rise-resources-category']")
+            .Select(el => el.TrimmedTextContent())
             .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
-        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#performance-and-attendance");
-
-        var categories = page.QuerySelectorAll("[data-testid='rise-resources-category']");
-        categories.Select(el => el.TrimmedTextContent())
-            .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
-        categories[0].GetAttribute("id").Should().Be("performance-and-attendance");
-        categories[0].GetAttribute("tabindex").Should().Be("-1");
 
         // Category description shown for listed categories, absent for the unlisted one.
-        var descriptions = page.QuerySelectorAll("[data-testid='rise-resources-category-description']")
-            .Select(el => el.TrimmedTextContent());
-        descriptions.Should().Equal("About performance and attendance.", "About the wider school.");
-
-        // Sub-categories follow content-file order within their category.
-        page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
+        page.QuerySelectorAll("[data-testid='rise-resources-category-description']")
             .Select(el => el.TrimmedTextContent())
+            .Should().Equal("About performance and attendance.", "About the wider school.");
+
+        // Sub-category headings follow content-file order within their category, and are anchor targets.
+        var subCategoryHeadings = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']");
+        subCategoryHeadings.Select(el => el.TrimmedTextContent())
             .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        subCategoryHeadings[0].GetAttribute("id").Should().Be("literacy");
+        subCategoryHeadings[0].GetAttribute("tabindex").Should().Be("-1");
+
+        // Contents links point to each sub-category section, in the same order.
+        var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
+        contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#literacy");
 
         // Resources within a sub-category: alphabetical by title; primary-only resource excluded.
         var literacyList = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")

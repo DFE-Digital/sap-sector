@@ -2,6 +2,22 @@ using SAPSec.Core.Features.RiseResources;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels;
 
+internal static class RiseResourceSlug
+{
+    public static string From(string value)
+    {
+        var slug = new string([.. value.Trim().ToLowerInvariant()
+            .Select(character => char.IsLetterOrDigit(character) ? character : '-')]);
+
+        while (slug.Contains("--"))
+        {
+            slug = slug.Replace("--", "-");
+        }
+
+        return slug.Trim('-');
+    }
+}
+
 public sealed class RiseResourceItemViewModel
 {
     public required string Title { get; init; }
@@ -15,6 +31,9 @@ public sealed class RiseResourceSubCategoryViewModel
 {
     public required string Name { get; init; }
     public IReadOnlyList<RiseResourceItemViewModel> Resources { get; init; } = [];
+
+    /// <summary>In-page anchor id for the "Contents" jump links.</summary>
+    public string Slug => RiseResourceSlug.From(Name);
 }
 
 public sealed class RiseResourceCategoryViewModel
@@ -23,19 +42,7 @@ public sealed class RiseResourceCategoryViewModel
     public string? Description { get; init; }
     public IReadOnlyList<RiseResourceSubCategoryViewModel> SubCategories { get; init; } = [];
 
-    public string Slug => Slugify(Name);
-
-    private static string Slugify(string value)
-    {
-        var slug = new string([.. value.Trim().ToLowerInvariant().Select(character => char.IsLetterOrDigit(character) ? character : '-')]);
-
-        while (slug.Contains("--"))
-        {
-            slug = slug.Replace("--", "-");
-        }
-
-        return slug.Trim('-');
-    }
+    public string Slug => RiseResourceSlug.From(Name);
 }
 
 public sealed class RiseResourcesPageViewModel
@@ -43,7 +50,17 @@ public sealed class RiseResourcesPageViewModel
     public required string SchoolUrn { get; init; }
     public required string SchoolName { get; init; }
 
+    /// <summary>
+    /// Categories in the order defined by the content file's <c>resourceCategories</c>.
+    /// Sub-categories follow content-file order; resource links within a sub-category are ordered
+    /// alphabetically by title.
+    /// </summary>
     public IReadOnlyList<RiseResourceCategoryViewModel> Categories { get; init; } = [];
+
+    /// <summary>Every sub-category across all categories, in display order — the "Contents" entries.</summary>
+    public IEnumerable<RiseResourceSubCategoryViewModel> ContentsEntries =>
+        Categories.SelectMany(category => category.SubCategories)
+            .Where(subCategory => !string.IsNullOrWhiteSpace(subCategory.Name));
 
     public bool HasResources => Categories.Count > 0;
 

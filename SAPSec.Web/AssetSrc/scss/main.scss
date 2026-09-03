@@ -3,6 +3,23 @@
 @import "school-map";
 @import "measures";
 
+// RISE resources "Contents" list — dash marker, matching the side-navigation sub-item style
+.app-rise-contents {
+  padding-left: 0;
+  list-style: none;
+}
+
+.app-rise-contents__item {
+  margin-bottom: govuk-spacing(2);
+
+  &::before {
+    content: "\2014"; // em dash
+    margin-right: govuk-spacing(2);
+    color: $govuk-secondary-text-colour;
+    font-weight: 700;
+  }
+}
+
 .govuk-input__suffix {
   &.govuk-input__suffix__button {
     border: 0;
