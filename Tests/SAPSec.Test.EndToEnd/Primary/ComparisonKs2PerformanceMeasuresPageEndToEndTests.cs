@@ -20,15 +20,16 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     private const string AchievedHigherStandardGpsHeaderText = "Achieved a higher standard in grammar, punctuation and spelling";
 
     private const string Urn = "101206";
+    // Most of this school's ranked similar schools have no characteristics data in the
+    // EndToEnd JSON fixture, which 404s the Similarity page the "KS2" nav link lives on.
+    // 101230 is a confirmed-good pairing (both schools have characteristics + KS2 data).
+    private const string SimilarSchoolUrn = "101230";
     private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool(Urn);
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await NavigateTo(PrimarySchoolRoute.ViewSimilarSchools);
-
-        await Page.Locator(".app-school-result a").First.ClickAsync();
-        await Page.GetByRole(AriaRole.Link, new() { Name = "KS2", Exact = true }).ClickAsync();
+        await NavigateTo(PrimarySchoolRoute.Comparison(SimilarSchoolUrn).Ks2);
     }
 
     [Fact]
