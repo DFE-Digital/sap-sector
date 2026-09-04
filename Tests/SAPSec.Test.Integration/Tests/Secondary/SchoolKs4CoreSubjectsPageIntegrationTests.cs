@@ -27,6 +27,20 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     }
 
     [Fact]
+    public async Task Ks4CoreSubjects_UsesStrongMarkupForSimilarSchoolsCount()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+
+        var similarSchoolsIntro = page.QuerySelector(".govuk-list.govuk-list--bullet li");
+        similarSchoolsIntro.Should().NotBeNull();
+        similarSchoolsIntro!.QuerySelector("strong")?.TextContent.Should().Be("50");
+        similarSchoolsIntro.QuerySelector("b").Should().BeNull();
+    }
+
+    [Fact]
     public async Task EnglishLanguage_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
