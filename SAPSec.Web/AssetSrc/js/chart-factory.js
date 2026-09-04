@@ -51,6 +51,7 @@ const CHART_CONFIG = {
         },
         labels: {
             yTickPadding: 10,
+            yAxisWidthPadding: 16,
             noDataOffset: 12,
             baseContainerHeight: 260,
             rowHeight: 70,
@@ -239,6 +240,7 @@ function getBarLabelAlignment(ctx, axisSuffix, barLabelAlign) {
 
     if (isMobileViewport()) {
         return isLargeEnoughForInsideLabel(ctx.dataset.data[ctx.dataIndex], ctx)
+            && canBarFitLabel(ctx, axisSuffix)
             ? CHART_CONFIG.bar.datalabels.defaultAlign
             : CHART_CONFIG.bar.datalabels.smallValueAlign;
     }
@@ -828,6 +830,9 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     }
                 },
                 y: {
+                    afterFit: function (scale) {
+                        scale.width += CHART_CONFIG.bar.labels.yAxisWidthPadding;
+                    },
                     grid: {
                         display: false,
                         drawBorder: false
@@ -1007,6 +1012,14 @@ function resizeBarChartContainer(canvas, chartData) {
     );
 
     container.style.height = `${height}px`;
+}
+
+function syncBarChartContainerHeight(chart) {
+    if (chart?.config?.type !== 'bar') {
+        return;
+    }
+
+    resizeBarChartContainer(chart.canvas, { labels: chart.data?.labels || [] });
 }
 
 function isYearByYearLineChart(canvas) {
@@ -1226,6 +1239,8 @@ function adjustChartResize() {
         resizeTimeout = setTimeout(() => {
             Object.values(charts).forEach(chart => {
                 const fontSizePx = gdsVars(chart.canvas).fontSize;
+
+                syncBarChartContainerHeight(chart);
 
                 if (chart.options.scales.x.ticks.font && typeof chart.options.scales.x.ticks.font !== 'function') {
                     chart.options.scales.x.ticks.font.size = fontSizePx;
