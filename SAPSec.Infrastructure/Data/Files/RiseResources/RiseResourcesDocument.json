@@ -226,31 +226,7 @@
         "category": "Performance and attendance",
         "subcategory": "Maths",
         "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths"
-      },
-      {
-        "resourceTitle": "Improving primary science (KS1–KS2)",
-        "resourceDescription": "EEF evidence-based guidance for effective primary science teaching.",
-        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/primary-science-ks1-ks2",
-        "schoolPhases": [
-          "Primary",
-          "All through"
-        ],
-        "category": "Performance and attendance",
-        "subcategory": "Science",
-        "mappingMeasures": ""
-      },
-      {
-        "resourceTitle": "Science in primary schools",
-        "resourceDescription": "NFER research insights on science teaching and provision in primary schools.",
-        "resourceUrl": "https://www.nfer.ac.uk/publications/science-in-primary-schools/",
-        "schoolPhases": [
-          "Primary",
-          "All through"
-        ],
-        "category": "Performance and attendance",
-        "subcategory": "Science",
-        "mappingMeasures": ""
-      },
+      },  
       {
         "resourceTitle": "Putting evidence to work in your classroom",
         "resourceDescription": "EEF guidance on applying evidence-informed approaches in classrooms.",

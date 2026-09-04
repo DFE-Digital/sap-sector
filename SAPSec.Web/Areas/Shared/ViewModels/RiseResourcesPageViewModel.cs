@@ -51,9 +51,8 @@ public sealed class RiseResourcesPageViewModel
     public required string SchoolName { get; init; }
 
     /// <summary>
-    /// Categories in the order defined by the content file's <c>resourceCategories</c>.
-    /// Sub-categories follow content-file order; resource links within a sub-category are ordered
-    /// alphabetically by title.
+    /// Categories and sub-categories in first-appearance order from the content file's
+    /// <c>resourceEntries</c>. Resource links within a sub-category are ordered alphabetically by title.
     /// </summary>
     public IReadOnlyList<RiseResourceCategoryViewModel> Categories { get; init; } = [];
 

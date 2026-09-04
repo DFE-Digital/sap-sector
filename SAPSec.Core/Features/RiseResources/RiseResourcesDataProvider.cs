@@ -1,5 +1,6 @@
 using SAPSec.Core.Constants;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.RiseResources;
@@ -26,31 +27,36 @@ internal class RiseResourcesDataProvider(
             .Where(entry => AppliesToPhase(entry.SchoolPhases, establishment.PhaseOfEducationName))
             .ToList();
 
-        var descriptionByCategory = document.ResourceCategories
+        var configuredCategories = document.ResourceCategories
             .GroupBy(category => category.Category, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => group.First().CategoryDescription, StringComparer.Ordinal);
-
-        var configuredOrderByCategory = document.ResourceCategories
-            .Select((category, index) => (category.Category, index))
-            .GroupBy(x => x.Category, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => group.First().index, StringComparer.Ordinal);
+            .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
 
         var categories = applicableResources
             .GroupBy(entry => entry.Category ?? string.Empty)
-            // Listed categories first, in resourceCategories order; unlisted keep first-appearance order (stable sort).
-            .OrderBy(group => configuredOrderByCategory.TryGetValue(group.Key, out var order) ? order : int.MaxValue)
-            .Select(group => new RiseResourceCategory(
-                Name: group.Key,
-                Description: descriptionByCategory.TryGetValue(group.Key, out var description)
-                    ? NullIfBlank(description)
-                    : null,
-                Resources: [.. group.Select(Map)]))
+            .Select(group => BuildCategory(group.Key, group, configuredCategories))
             .ToList();
 
         return new RiseResourcesSourceData(establishment, categories);
     }
 
-    private static RiseResource Map(Data.Dto.RiseResources.RiseResourceEntry entry) =>
+    private static RiseResourceCategory BuildCategory(
+        string name,
+        IEnumerable<RiseResourceEntry> entries,
+        IReadOnlyDictionary<string, RiseResourceCategoryEntry> configuredCategories)
+    {
+        configuredCategories.TryGetValue(name, out var configured);
+
+        // Sub-category order follows first appearance in resourceEntries.
+        var resources = entries
+            .GroupBy(entry => entry.SubCategory ?? string.Empty)
+            .SelectMany(group => group)
+            .Select(Map)
+            .ToList();
+
+        return new RiseResourceCategory(name, NullIfBlank(configured?.CategoryDescription), resources);
+    }
+
+    private static RiseResource Map(RiseResourceEntry entry) =>
         new(
             Title: entry.ResourceTitle,
             Description: NullIfBlank(entry.ResourceDescription),

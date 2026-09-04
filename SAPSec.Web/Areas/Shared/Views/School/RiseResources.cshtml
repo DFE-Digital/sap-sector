@@ -11,7 +11,7 @@
     <span class="govuk-caption-xl">@Model.SchoolName</span>
 }
 
-<h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
+<h1 class="govuk-heading-xl govuk-!-margin-bottom-6">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body" data-testid="rise-resources-intro">
     Use these resources from RISE to help improve your school&rsquo;s performance.
@@ -28,18 +28,21 @@ else
     var contentsEntries = Model.ContentsEntries.ToList();
 
     if (contentsEntries.Count > 0)
-    {
-        <nav aria-label="Contents" data-testid="rise-resources-contents">
-            <h2 class="govuk-heading-m">Contents</h2>
-            <ul class="govuk-list app-rise-contents">
-                @foreach (var subCategory in contentsEntries)
-                {
-                    <li class="app-rise-contents__item">
-                        <a class="govuk-link" href="#@subCategory.Slug">@subCategory.Name</a>
-                    </li>
-                }
-            </ul>
-        </nav>
+    {      
+        <aside class="part-navigation-container" role="complementary">
+            <nav aria-label="Contents" class="gem-c-contents-list govuk-!-margin-bottom-4 govuk-!-margin-top-8" data-testid="rise-resources-contents">
+                <h2 class="gem-c-contents-list__title">Contents</h2>
+                <ul class="gem-c-contents-list__list">
+                    @foreach (var subCategory in contentsEntries)
+                    {
+                        <li class="gem-c-contents-list__list-item gem-c-contents-list__list-item--dashed">
+                            <span class="gem-c-contents-list__list-item-dash" aria-hidden="true"></span>
+                            <a class="gem-c-contents-list__link govuk-link gem-print-force-link-styles" href="#@subCategory.Slug">@subCategory.Name</a>
+                        </li>
+                    }
+                </ul>
+            </nav>
+        </aside>
     }
 
     @foreach (var category in Model.Categories)

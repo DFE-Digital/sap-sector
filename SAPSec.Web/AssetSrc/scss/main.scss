@@ -3,20 +3,60 @@
 @import "school-map";
 @import "measures";
 
-// RISE resources "Contents" list — dash marker, matching the side-navigation sub-item style
-.app-rise-contents {
-  padding-left: 0;
-  list-style: none;
+.gem-c-contents-list {
+  @include govuk-font(19);
+  @include govuk-text-colour;
 }
 
-.app-rise-contents__item {
-  margin-bottom: govuk-spacing(2);
+.gem-c-contents-list__title {
+  @include govuk-font(19);
+  margin: 0 0 govuk-spacing(2);
+}
+
+.gem-c-contents-list__list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.gem-c-contents-list__list-item {
+  padding-top: govuk-spacing(2);
+  padding-bottom: govuk-spacing(2);
+  border-top: 1px solid $govuk-border-colour;
+
+  &:last-child {
+    border-bottom: 1px solid $govuk-border-colour;
+  }
+}
+
+.gem-c-contents-list__list-item--dashed {
+  padding: 0;
+  border-top: 0;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.gem-c-contents-list__list-item-dash {
+  margin-right: govuk-spacing(2);
+  color: $govuk-text-colour;
 
   &::before {
     content: "\2014"; // em dash
-    margin-right: govuk-spacing(2);
-    color: $govuk-secondary-text-colour;
-    font-weight: 700;
+  }
+}
+
+.gem-c-contents-list__link {
+  &,
+  &:link,
+  &:visited {
+    color: $govuk-link-colour;
+    text-decoration: none;
+  }
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 

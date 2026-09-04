@@ -86,7 +86,7 @@ public class GetRiseResourcesUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_OrdersCategoriesByResourceCategoriesConfiguration_AndAttachesDescriptions()
+    public async Task Execute_OrdersCategoriesByFirstAppearanceInResourceEntries_AndAttachesDescriptions()
     {
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
@@ -94,18 +94,37 @@ public class GetRiseResourcesUseCaseTests
             Category("Wider school", "About the wider school."),
             Category("Performance and attendance", "About performance."));
         _riseResourcesRepo.SetupResources(
-            // File order lists a "Performance and attendance" resource first, but config order wins.
             Entry("Attendance guidance", "Performance and attendance", PhaseOfEducationValues.Secondary),
             Entry("Leadership guidance", "Wider school", PhaseOfEducationValues.Secondary),
             Entry("Pastoral guidance", "Pupil characteristics", PhaseOfEducationValues.Secondary));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
-        // Listed categories in resourceCategories order, then the unlisted one.
         result.Categories.Select(c => c.Name)
-            .Should().Equal("Wider school", "Performance and attendance", "Pupil characteristics");
+            .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
         result.Categories.Single(c => c.Name == "Wider school").Description.Should().Be("About the wider school.");
         result.Categories.Single(c => c.Name == "Pupil characteristics").Description.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Execute_OrdersSubCategoriesByFirstAppearanceInResourceEntries()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("123456", "Test School", x => x.Secondary()));
+        _riseResourcesRepo.SetupCategories(
+            Category("Performance and attendance", "About performance."));
+        _riseResourcesRepo.SetupResources(
+            SubCategorised("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationValues.Secondary),
+            SubCategorised("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationValues.Secondary),
+            SubCategorised("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
+            SubCategorised("Science guide", "Performance and attendance", "Science", PhaseOfEducationValues.Secondary));
+
+        var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
+
+        result.Categories.Single().Resources
+            .Select(resource => resource.SubCategory)
+            .Distinct()
+            .Should().Equal("Maths", "Attendance", "Literacy", "Science");
     }
 
     [Fact]
@@ -113,7 +132,7 @@ public class GetRiseResourcesUseCaseTests
     {
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
-        _riseResourcesRepo.SetupResources(new Data.Dto.RiseResources.RiseResourceEntry
+        _riseResourcesRepo.SetupResources(new RiseResourceEntry
         {
             ResourceTitle = "Improving attendance",
             ResourceDescription = "Guidance for schools",
@@ -133,17 +152,27 @@ public class GetRiseResourcesUseCaseTests
         resource.MappingMeasures.Should().Be("Overall absence rate; Persistent absence rate");
     }
 
-    private static IEnumerable<Core.Features.RiseResources.RiseResource> Resources(GetRiseResourcesResponse response) =>
+    private static IEnumerable<RiseResource> Resources(GetRiseResourcesResponse response) =>
         response.Categories.SelectMany(category => category.Resources);
 
     private static IEnumerable<string> Titles(GetRiseResourcesResponse response) =>
         Resources(response).Select(resource => resource.Title);
 
-    private static Data.Dto.RiseResources.RiseResourceEntry Entry(string title, string category, params string[] phases) =>
+    private static RiseResourceEntry Entry(string title, string category, params string[] phases) =>
         new()
         {
             ResourceTitle = title,
             Category = category,
+            SchoolPhases = phases
+        };
+
+    private static RiseResourceEntry SubCategorised(
+        string title, string category, string subCategory, params string[] phases) =>
+        new()
+        {
+            ResourceTitle = title,
+            Category = category,
+            SubCategory = subCategory,
             SchoolPhases = phases
         };
 

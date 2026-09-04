@@ -86,7 +86,6 @@ public class RiseResourcesPageIntegrationTests(
             Category("Performance and attendance", "About performance and attendance."),
             Category("Wider school", "About the wider school."));
         Fixture.RiseResourcesRepository.SetupResources(
-            // Resource-file order is Wider school first, but resourceCategories order puts it second.
             Entry("Teaching maths fluency", "Wider school", "Curriculum and teaching", PhaseOfEducationValues.Secondary),
             Entry("Reading House", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
             Entry("Improving Literacy in KS2", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
@@ -97,30 +96,31 @@ public class RiseResourcesPageIntegrationTests(
         var page = await Fixture.RequestPageAsync(
             Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);
 
-        // Category headings: resourceCategories order first, then the unlisted category.
         page.QuerySelectorAll("[data-testid='rise-resources-category']")
             .Select(el => el.TrimmedTextContent())
-            .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
+            .Should().Equal("Wider school", "Performance and attendance", "Pupil characteristics");
 
-        // Category description shown for listed categories, absent for the unlisted one.
         page.QuerySelectorAll("[data-testid='rise-resources-category-description']")
             .Select(el => el.TrimmedTextContent())
-            .Should().Equal("About performance and attendance.", "About the wider school.");
+            .Should().Equal("About the wider school.", "About performance and attendance.");
 
-        // Sub-category headings follow content-file order within their category, and are anchor targets.
         var subCategoryHeadings = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']");
         subCategoryHeadings.Select(el => el.TrimmedTextContent())
-            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
-        subCategoryHeadings[0].GetAttribute("id").Should().Be("literacy");
+            .Should().Equal("Curriculum and teaching", "Literacy", "Attendance", "SEND");
+        subCategoryHeadings[0].GetAttribute("id").Should().Be("curriculum-and-teaching");
         subCategoryHeadings[0].GetAttribute("tabindex").Should().Be("-1");
 
-        // Contents links point to each sub-category section, in the same order.
         var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
+        contents.ClassList.Should().Contain("gem-c-contents-list");
+        contents.QuerySelector("h2.gem-c-contents-list__title")!.TrimmedTextContent().Should().Be("Contents");
+        contents.QuerySelectorAll(".gem-c-contents-list__list > li").Should().OnlyContain(
+            li => li.ClassList.Contains("gem-c-contents-list__list-item--dashed"));
+        contents.QuerySelectorAll("[aria-hidden='true']").Should().OnlyContain(
+            dash => dash.ClassList.Contains("gem-c-contents-list__list-item-dash"));
         contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
-            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
-        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#literacy");
+            .Should().Equal("Curriculum and teaching", "Literacy", "Attendance", "SEND");
+        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#curriculum-and-teaching");
 
-        // Resources within a sub-category: alphabetical by title; primary-only resource excluded.
         var literacyList = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
             .First(heading => heading.TrimmedTextContent() == "Literacy")
             .NextElementSibling;
@@ -128,9 +128,36 @@ public class RiseResourcesPageIntegrationTests(
             .Select(el => el.TrimmedTextContent())
             .Should().Equal("Improving Literacy in KS2", "Reading House");
 
-        // Link href is the configured URL (from JSON, not hard-coded).
         var link = literacyList.QuerySelector("a")!;
         link.GetAttribute("href").Should().Be("https://example.gov.uk/improving-literacy-in-ks2");
+    }
+
+    [Fact]
+    public async Task RiseResources_OrdersSubCategorySectionsAndContentsByFirstAppearanceInResourceEntries()
+    {
+        Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
+        Fixture.RiseResourcesRepository.SetupCategories(
+            Category("Performance and attendance", "About performance."),
+            Category("Wider school", "About the wider school."));
+        Fixture.RiseResourcesRepository.SetupResources(
+            Entry("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationValues.Secondary),
+            Entry("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationValues.Secondary),
+            Entry("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
+            Entry("Leadership guide", "Wider school", "Leadership and training", PhaseOfEducationValues.Secondary),
+            Entry("Curriculum guide", "Wider school", "Curriculum and teaching", PhaseOfEducationValues.Secondary));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);
+
+        var expected = new[] { "Maths", "Attendance", "Literacy", "Leadership and training", "Curriculum and teaching" };
+
+        page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
+            .Select(el => el.TrimmedTextContent())
+            .Should().Equal(expected);
+
+        page.ElementWithTestIdShouldExist("rise-resources-contents")
+            .QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
+            .Should().Equal(expected);
     }
 
     [Fact]
