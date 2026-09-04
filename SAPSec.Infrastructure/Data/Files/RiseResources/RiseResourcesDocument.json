@@ -1,0 +1,680 @@
+[
+  {
+    "resourceCategories": [
+      {
+        "category": "Performance and attendance",
+        "categoryDescription": "Resources linked to attendance and key areas of pupil performance, including literacy and maths."
+      },
+      {
+        "category": "Pupil characteristics",
+        "categoryDescription": "Resources linked to specific pupil groups, including disadvantaged pupils and pupils with SEND."
+      },
+      {
+        "category": "Wider school",
+        "categoryDescription": "Resources covering curriculum, teaching, leadership, and professional development."
+      }
+    ],
+    "resourceEntries": [
+      {
+        "resourceTitle": "The reading framework",
+        "resourceDescription": "DfE guidance for primary and secondary schools to meet existing expectations for teaching reading.",
+        "resourceUrl": "https://www.gov.uk/government/publications/the-reading-framework-teaching-the-foundations-of-literacy",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in reading"
+      },
+      {
+        "resourceTitle": "The writing framework",
+        "resourceDescription": "DfE writing framework outlining a common approach to teaching writing based on evidence and existing good practice.",
+        "resourceUrl": "https://www.gov.uk/government/publications/the-writing-framework",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; meeting expected standard in grammar, punctuation and spelling; Achieved a higher standard in grammar, punctuation and spelling"
+      },
+      {
+        "resourceTitle": "Choosing a validated phonics teaching programme",
+        "resourceDescription": "DfE validated effective systematic synthetic phonics (SSP) teaching programmes.",
+        "resourceUrl": "https://www.gov.uk/government/publications/choosing-a-phonics-teaching-programme/list-of-phonics-teaching-programmes",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; meeting expected standard in grammar, punctuation and spelling; Achieved a higher standard in grammar, punctuation and spelling"
+      },
+      {
+        "resourceTitle": "Preparing for literacy",
+        "resourceDescription": "EEF evidence-based guidance for literacy in early years settings.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/literacy-early-years",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; meeting expected standard in grammar, punctuation and spelling; Achieved a higher standard in grammar, punctuation and spelling"
+      },
+      {
+        "resourceTitle": "Improving literacy in KS2",
+        "resourceDescription": "EEF evidence-based strategies to improve literacy in Key Stage 2.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/literacy-ks2",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; meeting expected standard in grammar, punctuation and spelling; Achieved a higher standard in grammar, punctuation and spelling; Average scaled score in reading"
+      },
+      {
+        "resourceTitle": "Reading house",
+        "resourceDescription": "EEF framework outlining key components of effective reading development.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/reading-house",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in reading"
+      },
+      {
+        "resourceTitle": "The disciplinary literacy tree",
+        "resourceDescription": "EEF model explaining subject-specific literacy skills and how to teach them.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/the-disciplinary-literacy-tree",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; meeting expected standard in grammar, punctuation and spelling; Achieved a higher standard in grammar, punctuation and spelling; Average scaled score in reading"
+      },
+      {
+        "resourceTitle": "Teaching & learning toolkit",
+        "resourceDescription": "An accessible summary of education evidence from the EEF.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/teaching-learning-toolkit",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": "Progress score in reading, writing and maths; Attendance; Progress 8"
+      },
+      {
+        "resourceTitle": "English hubs",
+        "resourceDescription": "Network supporting schools to improve early reading and phonics.",
+        "resourceUrl": "https://englishhubs.net/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "English language; English literature; Attainment 8; Grade achieved in English and maths GCSEs; Meeting Expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in reading; Meeting expected standard in grammar, punctuation and spelling; Achieved a higher standard in grammar, punctuation and spelling"
+      },
+      {
+        "resourceTitle": "NPQ Leading literacy",
+        "resourceDescription": "Professional qualification to help teachers learn how to effectively teach and promote literacy.",
+        "resourceUrl": "https://www.gov.uk/guidance/leading-literacy-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "English language; English literature; Attainment 8; Grade achieved in English and maths GCSEs; Meeting Expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in reading; Meeting expected standard in grammar, punctuation and spelling; Achieved a higher standard in grammar, punctuation and spelling"
+      },
+      {
+        "resourceTitle": "Teaching for maths mastery",
+        "resourceDescription": "NCETM explain the rationale behind teaching for mastery and provide planning and assessment resources, case studies and interviews from schools involved in maths mastery projects.",
+        "resourceUrl": "https://www.ncetm.org.uk/teaching-for-mastery/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths; Attainment 8; Grade achieved in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "Maths hubs",
+        "resourceDescription": "Network supporting maths teaching improvement through collaboration and CPD.",
+        "resourceUrl": "https://www.ncetm.org.uk/maths-hubs/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths; Attainment 8; Grade achieved in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "In the classroom resources",
+        "resourceDescription": "NCETM classroom resources supporting mastery approaches in maths.",
+        "resourceUrl": "https://www.ncetm.org.uk/in-the-classroom/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths; Attainment 8; Grade achieved in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "Six resources for teaching and learning times tables",
+        "resourceDescription": "NCETM resources to support effective teaching of multiplication tables.",
+        "resourceUrl": "https://www.ncetm.org.uk/features/six-resources-for-teaching-and-learning-times-tables/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths; Attainment 8; Grade achieved in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "Maths mastery multiplication & division resources",
+        "resourceDescription": "NCETM materials supporting mastery teaching of multiplication and division.",
+        "resourceUrl": "https://www.ncetm.org.uk/teaching-for-mastery/mastery-materials/primary-mastery-professional-development/multiplication-and-division/",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths"
+      },
+      {
+        "resourceTitle": "Improving mathematics in KS2 & KS3",
+        "resourceDescription": "EEF evidence-based guidance to improve maths teaching in KS2–KS3.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/maths-ks-2-3",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths"
+      },
+      {
+        "resourceTitle": "NPQ Leading primary mathematics",
+        "resourceDescription": "Professional qualification to help teachers learn how to use mastery approaches and teach maths effectively.",
+        "resourceUrl": "https://www.gov.uk/guidance/leading-primary-mathematics-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths"
+      },  
+      {
+        "resourceTitle": "Putting evidence to work in your classroom",
+        "resourceDescription": "EEF guidance on applying evidence-informed approaches in classrooms.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/news/eef-blog-putting-evidence-to-work-in-your-classroom",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "A school’s guide to implementation",
+        "resourceDescription": "EEF guidance and accompanying resources to help educators effectively implement and embed evidence-informed approaches in line with their vision for improvement.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/implementation",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "Special educational needs in mainstream schools",
+        "resourceDescription": "EEF strategies for supporting pupils with SEND in mainstream settings.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/send",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Pupil characteristics",
+        "subcategory": "SEND",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "Making best use of teaching assistants",
+        "resourceDescription": "EEF rcommendations for effective deployment of teaching assistants.",
+        "resourceUrl": "https://eef.dev/education-evidence/guidance-reports/teaching-assistants",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "Improving behaviour in schools",
+        "resourceDescription": "EEF support for senior leaders in primary and secondary schools to make better-informed decisions about their behaviour strategies.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/behaviour",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "Working together to improve school attendance",
+        "resourceDescription": "DfE statutory guidance on how schools, academy trusts, governing bodies and local authorities should maintain high levels of school attendance.",
+        "resourceUrl": "https://www.gov.uk/government/publications/working-together-to-improve-school-attendance",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Attendance",
+        "mappingMeasures": "Attendance"
+      },
+      {
+        "resourceTitle": "Back into school - resources for families",
+        "resourceDescription": "Resources and advice from the Children's commissioner helping families to support children and young people back into school.",
+        "resourceUrl": "https://www.childrenscommissioner.gov.uk/back-into-school/resources-for-families/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Attendance",
+        "mappingMeasures": "Attendance"
+      },
+      {
+        "resourceTitle": "Children missing education",
+        "resourceDescription": "DfE statutory guidance for local authorities and schools on how they work together to identify and support children missing education (CME) to receive a suitable education.",
+        "resourceUrl": "https://www.gov.uk/government/publications/children-missing-education",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Attendance",
+        "mappingMeasures": "Attendance"
+      },
+      {
+        "resourceTitle": "RISE attendance improvement",
+        "resourceDescription": "DfE-compiled page of attendance resources and statutory guidance.",
+        "resourceUrl": "https://www.gov.uk/government/publications/rise-support-for-improving-attendance-in-schools/rise-attendance-improvement",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Attendance",
+        "mappingMeasures": "Attendance"
+      },
+      {
+        "resourceTitle": "Best practice recommendations and examples - supporting school attendance",
+        "resourceDescription": "EEF evidence-based recommendations and case studies for improving attendance.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/leadership-and-planning/supporting-attendance",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Attendance",
+        "mappingMeasures": "Attendance"
+      },
+      {
+        "resourceTitle": "Supporting all readers in secondary schools",
+        "resourceDescription": "A short course from the DfE to enable secondary school staff and leaders to support readers at all levels.",
+        "resourceUrl": "https://www.gov.uk/government/publications/supporting-all-readers-in-secondary-school",
+        "schoolPhases": [
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Attainment 8; English language; English Literature; Grade achieveed in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "Improving literacy in secondary schools",
+        "resourceDescription": "EEF practical strategies to improve literacy across the secondary curriculum.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/literacy-ks3-ks4",
+        "schoolPhases": [
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Literacy",
+        "mappingMeasures": "Attainment 8; English language; English Literature; Grade achieveed in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "Mathematics in KS3 & KS4",
+        "resourceDescription": "EEF effective approaches to teaching maths in key stages 3 and 4.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/evidence-reviews/Mathematics-in-Key-Stages-3-and-4",
+        "schoolPhases": [
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Attainment 8; Maths; Grade achieved in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "Advanced mathematics support programme (AMSP)",
+        "resourceDescription": "Government-funded initiative that aims to increase participation and support teaching for Core Maths, AS/A level Mathematics and Further Mathematics.",
+        "resourceUrl": "https://amsp.org.uk/",
+        "schoolPhases": [
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Maths",
+        "mappingMeasures": "Attainment 8; Maths; Grade achieved in English and maths GCSEs"
+      },
+      {
+        "resourceTitle": "Improving secondary science",
+        "resourceDescription": "EEF guidance report on the teaching of science at Key Stages 3 and 4.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/education-evidence/guidance-reports/science-ks3-ks4",
+        "schoolPhases": [
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Science",
+        "mappingMeasures": "Attainment 8; Combined science (double award); Biology; Chemistry; Physics"
+      },
+      {
+        "resourceTitle": "STEM Learning CPD",
+        "resourceDescription": "Professional development at STEM Learning to meet the needs of science teachers at all career stages.",
+        "resourceUrl": "https://www.stem.org.uk/cpd",
+        "schoolPhases": [
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Science",
+        "mappingMeasures": "Attainment 8; Combined science (double award); Biology; Chemistry; Physics"
+      },
+      {
+        "resourceTitle": "RISE attainment improvement",
+        "resourceDescription": "DfE-compiled page of attainment resources.",
+        "resourceUrl": "https://www.gov.uk/government/publications/rise-support-for-improving-attainment-in-schools/rise-attainment-improvement",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Pupil characteristics",
+        "subcategory": "Disadvantaged pupils",
+        "mappingMeasures": "Attainment 8"
+      },
+      {
+        "resourceTitle": "Teacher training and professional development",
+        "resourceDescription": "Government page on teacher training and professional development.",
+        "resourceUrl": "https://www.gov.uk/education/teacher-training-and-professional-development",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Leading teacher development",
+        "resourceDescription": "A course to help teachers learn how to become a teacher educator and successfully support teachers to expand their skills in their educational setting.",
+        "resourceUrl": "https://www.gov.uk/guidance/leading-teacher-development-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Leading teaching",
+        "resourceDescription": "Professional qualification to help teachers and middle educational leaders learn how to lead the teaching and learning of a subject, year group or phase.",
+        "resourceUrl": "https://www.gov.uk/guidance/leading-teaching-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Leading behaviour and culture",
+        "resourceDescription": "Professional qualification  to help teachers and educational leaders learn how to create a culture of good behaviour and high expectations in which staff and pupils thrive.",
+        "resourceUrl": "https://www.gov.uk/guidance/leading-behaviour-and-culture-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Senior leadership",
+        "resourceDescription": "Professional qualification to help teachers and leaders develop leadership knowledge and expertise to improve outcomes for teachers and pupils in their educational setting.",
+        "resourceUrl": "https://www.gov.uk/guidance/senior-leadership-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Headship",
+        "resourceDescription": "Professional qualification to help headteachers and leaders in educational settings develop the knowledge behind expert leadership and apply it to become outstanding headteachers.",
+        "resourceUrl": "https://www.gov.uk/guidance/headship-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Executive Leadership",
+        "resourceDescription": "Professional qualification to help educational leaders develop the expertise needed to be an outstanding leader, leading improvements across a group of educational settings or multi-academy trust.",
+        "resourceUrl": "https://www.gov.uk/guidance/executive-leadership-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Early years leadership",
+        "resourceDescription": "Professional qualification to help current or aspiring managers of nurseries develop expertise in leading early years education and staff and organisational management.",
+        "resourceUrl": "https://www.gov.uk/guidance/early-years-leadership-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "NPQ Special educational needs co-ordinator (SENCO)",
+        "resourceDescription": "The mandatory professional qualification  for special educational needs co-ordinators to learn how to effectively perform the SENCO role.",
+        "resourceUrl": "https://www.gov.uk/guidance/special-educational-needs-co-ordinators-national-professional-qualification",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Pupil characteristics",
+        "subcategory": "SEND",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "Find a teaching school hub",
+        "resourceDescription": "Get support with teacher training and professional development from school-led centres of excellence.",
+        "resourceUrl": "https://www.gov.uk/guidance/teaching-school-hubs",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "National Foundation for Educational Research – for schools",
+        "resourceDescription": "Suite of free and paid-for resources for assessment and improvement in schools, based on research and evidence.",
+        "resourceUrl": "https://www.nfer.ac.uk/for-schools/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "Using pupil premium: guidance for school leaders",
+        "resourceDescription": "DfE non-statutory guidance for effective pupil premium planning, spending and evaluation.",
+        "resourceUrl": "https://www.gov.uk/government/publications/pupil-premium/using-pupil-premium-guidance-for-school-leaders",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Pupil characteristics",
+        "subcategory": "Disadvantaged pupils",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "The EEF guide to the pupil premium",
+        "resourceDescription": "EEF evidence-based recommendations for maximising pupil premium impact.",
+        "resourceUrl": "https://educationendowmentfoundation.org.uk/using-pupil-premium",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Pupil characteristics",
+        "subcategory": "Disadvantaged pupils",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "Curriculum and assessment review",
+        "resourceDescription": "Independent review of the curriculum, assessment and qualifications system in England to ensure it is fit for purpose and meets the needs of children and young people.",
+        "resourceUrl": "https://www.gov.uk/government/groups/curriculum-and-assessment-review",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Leadership and training",
+        "mappingMeasures": ""
+      },
+      {
+        "resourceTitle": "RISE attendance best practice toolkit",
+        "resourceDescription": "DfE toolkit for schools providing a suite of adoptable practices, tools and resources which reflect the working together to improve school attendance guidance.",
+        "resourceUrl": "https://www.gov.uk/government/publications/rise-support-for-improving-attendance-in-schools/rise-attendance-improvement/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Attendance",
+        "mappingMeasures": "Attendance"
+      },
+      {
+        "resourceTitle": "Knowledge hubs",
+        "resourceDescription": "A toolkit offering councils practical advice on fulfilling their statutory duty to improve attendance, featuring proven approaches for supporting schools and vulnerable pupils. You will need to register on the local authority knowledge hub to access this.",
+        "resourceUrl": "https://www.khub.net/group/school-attendance/group-home",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Performance and attendance",
+        "subcategory": "Attendance",
+        "mappingMeasures": "Attendance"
+      },
+      {
+        "resourceTitle": "OAK National Academy teaching resources",
+        "resourceDescription": "Free, national curriculum-aligned resources designed by subject experts, openly available to support innovation.",
+        "resourceUrl": "https://www.thenational.academy/",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": "Attainment 8"
+      },
+      {
+        "resourceTitle": "OAK National Academy webinars",
+        "resourceDescription": "Expert-led webinars.",
+        "resourceUrl": "https://www.thenational.academy/webinars",
+        "schoolPhases": [
+          "Primary",
+          "Secondary",
+          "All through"
+        ],
+        "category": "Wider school",
+        "subcategory": "Curriculum and teaching",
+        "mappingMeasures": "Attainment 8"
+      }
+    ]
+  }
+]

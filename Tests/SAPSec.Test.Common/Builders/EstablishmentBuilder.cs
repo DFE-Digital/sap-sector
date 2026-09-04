@@ -33,6 +33,14 @@ public class EstablishmentBuilder(string urn, string name)
         return this;
     }
 
+    public EstablishmentBuilder AllThrough()
+    {
+        PhaseOfEducationId = PhaseOfEducationValues.AllThroughId;
+        PhaseOfEducationName = PhaseOfEducationValues.AllThrough;
+
+        return this;
+    }
+
     public EstablishmentBuilder Open()
     {
         EstablishmentStatusId = EstablishmentStatusValues.OpenId;

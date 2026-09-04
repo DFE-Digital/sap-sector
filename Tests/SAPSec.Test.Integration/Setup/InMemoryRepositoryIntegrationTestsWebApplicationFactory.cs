@@ -16,6 +16,7 @@ public class InMemoryRepositoryIntegrationTestsWebApplicationFactory : Integrati
         services.RemoveAll<IKs4PerformanceRepository>();
         services.RemoveAll<IKs4DestinationsRepository>();
         services.RemoveAll<IAbsenceRepository>();
+        services.RemoveAll<IRiseResourcesRepository>();
 
         services.AddSingleton<IEstablishmentRepository, InMemoryEstablishmentRepository>();
         services.AddSingleton<ISimilarSchoolsPrimaryRepository, InMemorySimilarSchoolsPrimaryRepository>();
@@ -24,6 +25,7 @@ public class InMemoryRepositoryIntegrationTestsWebApplicationFactory : Integrati
         services.AddSingleton<IKs4PerformanceRepository, InMemoryKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, InMemoryKs4DestinationsRepository>();
         services.AddSingleton<IAbsenceRepository, InMemoryAbsenceRepository>();
+        services.AddSingleton<IRiseResourcesRepository, InMemoryRiseResourcesRepository>();
 
         return services;
     }
