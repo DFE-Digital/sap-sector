@@ -31,6 +31,33 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks2ExpectedRwm.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
             }
         }
 
@@ -61,6 +88,33 @@ public static class Measures
                         ];
                     }
                 }
+
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks2HigherRwm.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
             }
         }
 
@@ -68,24 +122,144 @@ public static class Measures
         {
             public const string Key = "reading-score";
             public const string Name = "Average scaled score in reading";
+
+            public static class Filters
+            {
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks2ReadingScore.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
+            }
         }
 
         public static class Ks2MathsScore
         {
             public const string Key = "maths-score";
             public const string Name = "Average scaled score in maths";
+
+            public static class Filters
+            {
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks2MathsScore.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
+            }
         }
 
         public static class Ks2ExpectedGps
         {
             public const string Key = "expected-gps";
             public const string Name = "Meeting expected standard in grammar, punctuation and spelling";
+
+            public static class Filters
+            {
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks2ExpectedGps.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
+            }
         }
 
         public static class Ks2HigherGps
         {
             public const string Key = "higher-gps";
             public const string Name = "Achieved a higher standard in grammar, punctuation and spelling";
+
+            public static class Filters
+            {
+                public static class PupilCharacteristic
+                {
+                    public const string Key = $"{Ks2HigherGps.Key}-characteristic";
+                    public const string Name = "Pupil characteristic";
+
+                    public static class Values
+                    {
+                        public const string AllPupils = "tot";
+                        public const string Boys = "boy";
+                        public const string Girls = "grl";
+                        public const string Disadvantaged = "dis";
+                        public const string NonDisadvantaged = "ndi";
+                        public const string Eal = "eal";
+                        public const string NonMobile = "nmo";
+
+                        public static readonly FilterValueDefinition[] AllValues = [
+                            new(AllPupils, "All pupils"),
+                            new(Boys, "Boys"),
+                            new(Girls, "Girls"),
+                            new(Disadvantaged, "Disadvantaged pupils"),
+                            new(NonDisadvantaged, "Non-disadvantaged pupils"),
+                            new(Eal, "English as an additional language"),
+                            new(NonMobile, "Non-mobile pupils"),
+                        ];
+                    }
+                }
+            }
         }
     }
 

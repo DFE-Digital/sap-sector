@@ -69,7 +69,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(Routes.FindASchool());
 
-        await Page.Locator("input[name='__Query']").FillAsync("AB");
+        await Page.Locator("input[name='Query']").FillAsync("AB");
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -99,7 +99,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(Routes.FindASchool());
 
-        await Page.Locator("input[name='__Query']").FillAsync("123");
+        await Page.Locator("input[name='Query']").FillAsync("123");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -119,7 +119,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("105574");
+        await Page.Locator("input[name='Query']").FillAsync("105574");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -133,7 +133,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(Routes.FindASchool());
 
-        await Page.Locator("input[name='__Query']").FillAsync("Loreto High School Chorlton");
+        await Page.Locator("input[name='Query']").FillAsync("Loreto High School Chorlton");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -166,7 +166,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("Test School");
+        await Page.Locator("input[name='Query']").FillAsync("Test School");
         await Page.WaitForTimeoutAsync(100);
 
         var hiddenQueryValue = await Page.Locator("input[name='Query'][type='hidden']").InputValueAsync();
@@ -177,7 +177,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     public async Task SchoolSearch_Autocomplete_RendersSuggestion()
     {
         await Page.GotoAsync(Routes.FindASchool());
-        await Page.Locator("input[name='__Query']").FillAsync("School");
+        await Page.Locator("input[name='Query']").FillAsync("School");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.WaitForTimeoutAsync(800);
@@ -190,7 +190,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     public async Task SchoolSearch_Autocomplete_Suggestion_SelectsFirstSuggestion_And_Submit_RedirectsToSchoolPage()
     {
         await Page.GotoAsync(Routes.FindASchool());
-        await Page.Locator("input[name='__Query']").FillAsync("School");
+        await Page.Locator("input[name='Query']").FillAsync("School");
         await Page.WaitForTimeoutAsync(800);
 
         await Page.Locator(".autocomplete__option").First.ClickAsync();
@@ -208,7 +208,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("100");
+        await Page.Locator("input[name='Query']").FillAsync("100");
         await Page.WaitForTimeoutAsync(600);
 
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
@@ -221,10 +221,10 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("School");
+        await Page.Locator("input[name='Query']").FillAsync("School");
         await Page.WaitForTimeoutAsync(600);
 
-        await Page.Locator("input[name='__Query']").FillAsync("Test School");
+        await Page.Locator("input[name='Query']").FillAsync("Test School");
         await Page.WaitForTimeoutAsync(600);
 
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
@@ -237,7 +237,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("123/456");
+        await Page.Locator("input[name='Query']").FillAsync("123/456");
         await Page.WaitForTimeoutAsync(600);
 
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
@@ -250,7 +250,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("123\\456");
+        await Page.Locator("input[name='Query']").FillAsync("123\\456");
         await Page.WaitForTimeoutAsync(600);
 
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
@@ -263,7 +263,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("352\\4753");
+        await Page.Locator("input[name='Query']").FillAsync("352\\4753");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -278,8 +278,8 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("Test School");
-        await Page.Locator("input[name='__Query']").PressAsync("Enter");
+        await Page.Locator("input[name='Query']").FillAsync("Test School");
+        await Page.Locator("input[name='Query']").PressAsync("Enter");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         Page.Url.Should().Contain(Routes.FindASchool(), "Pressing Enter should submit the form");
@@ -320,7 +320,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("AB");
+        await Page.Locator("input[name='Query']").FillAsync("AB");
         await Page.WaitForTimeoutAsync(600);
 
         var suggestionMenu = Page.Locator(".autocomplete__menu");
@@ -338,7 +338,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var query = "Test School";
         await Page.GotoAsync(Routes.FindASchool(query));
 
-        var input = Page.Locator("input[name='__Query']");
+        var input = Page.Locator("input[name='Query']");
         var inputValue = await input.InputValueAsync();
 
         inputValue.Should().Be(query, "Previous search query should be populated in the form");
@@ -349,7 +349,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(Routes.FindASchool("School"));
 
-        await Page.Locator("input[name='__Query']").FillAsync("Another School");
+        await Page.Locator("input[name='Query']").FillAsync("Another School");
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -364,7 +364,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("123/456");
+        await Page.Locator("input[name='Query']").FillAsync("123/456");
         await Page.WaitForTimeoutAsync(600);
 
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
@@ -377,7 +377,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("123\\456");
+        await Page.Locator("input[name='Query']").FillAsync("123\\456");
         await Page.WaitForTimeoutAsync(600);
 
         var isNumericValue = await Page.Locator("input[name='Urn']").InputValueAsync();
@@ -391,7 +391,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("105574");
+        await Page.Locator("input[name='Query']").FillAsync("105574");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -507,7 +507,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         var errorLink = Page.Locator(".govuk-error-summary__list a");
         var href = await errorLink.GetAttributeAsync("href");
 
-        href.Should().Contain("#__Query", "Error summary link should point to search input");
+        href.Should().Contain("#Query", "Error summary link should point to search input");
     }
 
     [Fact]
@@ -593,7 +593,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool(searchQuery));
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var input = Page.Locator("input[name='__Query']");
+        var input = Page.Locator("input[name='Query']");
         var inputValue = await input.InputValueAsync();
 
         inputValue.Should().Be(searchQuery, "Search query should be preserved in input when no results");
@@ -605,7 +605,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        await Page.Locator("input[name='__Query']").FillAsync("999999");
+        await Page.Locator("input[name='Query']").FillAsync("999999");
         await Page.WaitForTimeoutAsync(600);
 
         await Page.Locator("button[name='Search']").ClickAsync();
@@ -642,7 +642,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
 
         var specialQuery = "wibbly wobbly primary & daycare (primary)";
-        await Page.Locator("input[name='__Query']").FillAsync(specialQuery);
+        await Page.Locator("input[name='Query']").FillAsync(specialQuery);
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -654,7 +654,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(Routes.FindASchool());
 
-        await Page.Locator("input[name='__Query']").FillAsync("123456");
+        await Page.Locator("input[name='Query']").FillAsync("123456");
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
@@ -667,7 +667,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         var longQuery = new string('A', 200);
 
-        await Page.Locator("input[name='__Query']").FillAsync(longQuery);
+        await Page.Locator("input[name='Query']").FillAsync(longQuery);
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 

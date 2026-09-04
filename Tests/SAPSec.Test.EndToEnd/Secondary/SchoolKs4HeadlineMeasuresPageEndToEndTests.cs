@@ -272,12 +272,8 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        var previous2 = await table.GetTableColumnAsync("2020 to 2021");
-        await Expect(previous2).ToBePercentageValuesHavingCount(4);
-
-        var previous = await table.GetTableColumnAsync("2021 to 2022");
-        await Expect(previous).ToBePercentageValuesHavingCount(4);
-
+        // Destinations data is only published for the current year in the source data -
+        // 2020 to 2021 and 2021 to 2022 (Previous/Previous2) are genuinely unavailable.
         var current = await table.GetTableColumnAsync("2022 to 2023");
         await Expect(current).ToBePercentageValuesHavingCount(4);
     }

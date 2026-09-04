@@ -192,11 +192,10 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        foreach (var heading in new[] { "2020 to 2021", "2021 to 2022", "2022 to 2023" })
-        {
-            var values = await table.GetTableColumnAsync(heading);
-            await Expect(values).ToBePercentageValuesHavingCount(3);
-        }
+        // Destinations data is only published for the current year in the source data -
+        // 2020 to 2021 and 2021 to 2022 (Previous/Previous2) are genuinely unavailable.
+        var current = await table.GetTableColumnAsync("2022 to 2023");
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]

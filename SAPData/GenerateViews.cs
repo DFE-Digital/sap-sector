@@ -60,16 +60,24 @@ public sealed class GenerateViews
         new("v_establishment_destinations", "Id", "LAESTAB", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
         new("v_establishment_performance", "Id", "URN", ViewRange.Establishment, "KS4_Performance", "EstablishmentPerformance"),
         new("v_establishment_workforce", "Id", "URN", ViewRange.Establishment, "Workforce", "EstablishmentWorkforce"),
+        new("v_establishment_ks2_performance", "Id", "URN", ViewRange.Establishment, "KS2_Performance", "EstablishmentPerformance"),
 
         new("v_england_absence", "Id", null, ViewRange.England, "PupilAbsence", "EnglandAbsence"),
         new("v_england_destinations", "Id", null, ViewRange.England, "KS4_Destinations", "EnglandDestinations"),
         new("v_england_performance", "Id", null, ViewRange.England, "KS4_Performance", "EnglandPerformance"),
+        new("v_england_ks2_performance", "Id", null, ViewRange.England, "KS2_Performance", "EnglandPerformance"),
 
         new("v_la_absence", "Id", null, ViewRange.LA, "PupilAbsence", "LAAbsence"),
         new("v_la_destinations", "Id", null, ViewRange.LA, "KS4_Destinations", "LADestinations"),
         new("v_la_performance", "Id", null, ViewRange.LA, "KS4_Performance", "LAPerformance"),
-        new("v_la_subject_entries", "old_la_code", null, ViewRange.LA, "KS4_Performance", "LASubjectEntries")
+        new("v_la_subject_entries", "old_la_code", null, ViewRange.LA, "KS4_Performance", "LASubjectEntries"),
+        new("v_la_ks2_performance", "Id", null, ViewRange.LA, "KS2_Performance", "LAPerformance")
     };
+
+    // KS2_Performance JSON snapshots are written alongside the existing (currently random-fill)
+    // PrimarySchools JSON files, so IKs2PerformanceRepository picks up real data with no DI changes.
+    private const string Ks2PerformanceType = "KS2_Performance";
+    private const string PrimarySchoolsSubfolder = "PrimarySchools";
 
     public GenerateViews(
         IReadOnlyList<DataMapRow> rows,
@@ -332,7 +340,10 @@ public sealed class GenerateViews
                 WriteSql("04", view.ViewName, sql);
             }
 
-            var modelFile = Path.Combine(_generatedJsonDir, $"{view.ModelName}.json");
+            var jsonOutputDir = view.Type == Ks2PerformanceType
+                ? Path.Combine(_jsonDir, PrimarySchoolsSubfolder)
+                : _generatedJsonDir;
+            var modelFile = Path.Combine(jsonOutputDir, $"{view.ModelName}.json");
 
             var establishmentFilterSubquery =
                 """
@@ -1078,6 +1089,26 @@ public sealed class GenerateViews
         if (!string.IsNullOrWhiteSpace(r.Filter5))
         {
             conditions.Add(Condition(r.Filter5, r.Filter5Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter6))
+        {
+            conditions.Add(Condition(r.Filter6, r.Filter6Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter7))
+        {
+            conditions.Add(Condition(r.Filter7, r.Filter7Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter8))
+        {
+            conditions.Add(Condition(r.Filter8, r.Filter8Value));
+        }
+
+        if (!string.IsNullOrWhiteSpace(r.Filter9))
+        {
+            conditions.Add(Condition(r.Filter9, r.Filter9Value));
         }
 
         var whenClause = conditions.Count == 0 ? "TRUE" : string.Join(" AND ", conditions);

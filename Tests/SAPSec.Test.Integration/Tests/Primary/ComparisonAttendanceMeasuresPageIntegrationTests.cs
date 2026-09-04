@@ -76,7 +76,7 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
             ["Test School 1", "7.91%", "8.05%", "8.00%"],
             ["Test School 2", "6.30%", "6.20%", "6.10%"],
             ["Schools in England average", "5.45%", "6.90%", "6.10%"]);
@@ -110,7 +110,7 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
             ["Test School 1", "8.20%", "1.24%", "2.27%"],
             ["Test School 2", "1.40%", "1.30%", "1.24%"],
             ["Schools in England average", "2.20%", "2.24%", "3.20%"]);

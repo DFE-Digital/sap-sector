@@ -43,7 +43,8 @@ public class JsonAbsenceRepository(
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandAbsence = (await englandAbsenceFile.ReadAllAsync()).FirstOrDefault();
+        var englandAbsence = (await englandAbsenceFile.ReadAllAsync())
+            .FirstOrDefault(x => string.Equals(x.Id, "National", StringComparison.Ordinal));
 
         var results = new List<AbsenceData>(requestedUrns.Length);
 
