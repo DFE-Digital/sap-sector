@@ -105,7 +105,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Restore dependencies
         run: dotnet restore
@@ -134,12 +134,12 @@ jobs:
           npm run build-fe
 
           echo "=== Copy wwwroot in SAPSec.UI.Tests ==="
-          mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot
-          cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net8.0/wwwroot/ || true
+          mkdir -p ../Tests/SAPSec.UI.Tests/bin/Debug/net10.0/wwwroot
+          cp -a ./wwwroot/. ../Tests/SAPSec.UI.Tests/bin/Debug/net10.0/wwwroot/ || true
 
           echo "=== Copy wwwroot in SAPSec.Integration.Tests ==="
-          mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot
-          cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net8.0/wwwroot/ || true
+          mkdir -p ../Tests/SAPSec.Integration.Tests/bin/Debug/net10.0/wwwroot
+          cp -a ./wwwroot/. ../Tests/SAPSec.Integration.Tests/bin/Debug/net10.0/wwwroot/ || true
 
       - name: Run All Tests with Coverage
         env:
