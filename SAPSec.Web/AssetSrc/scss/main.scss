@@ -34,10 +34,16 @@
 
 .govuk-input-autocomplete {
   width: 411px;
+  -webkit-text-fill-color: currentColor;
 
   @include govuk-media-query($from: tablet) {
     width: 586px;
   }
+}
+
+.autocomplete__input,
+.autocomplete__hint {
+  -webkit-text-fill-color: currentColor;
 }
 
 @media (forced-colors: active) {
