@@ -64,7 +64,7 @@ function initialiseToggle(toggle, activeIndex) {
         // const isPressed = button.getAttribute('aria-pressed') === 'true';
         // button.setAttribute('aria-pressed', !isPressed);
 
-        //button.setAttribute("aria-label", index === 0 ? "Show " + "Show year by year" : activeName);
+        button.setAttribute("aria-label", index === 0 ? "Show year by year" : "Show " + activeName);
 
         resizeCharts(activePanel);
     }
