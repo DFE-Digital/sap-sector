@@ -62,7 +62,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-This repository contains the **sector facing** service for the School Improvement Programme (SIP) / School Account Profile (SAP) project. It is a .NET 8 solution made up of an ASP.NET Core MVC web application, supporting class libraries for domain logic and infrastructure, and a data platform used to ingest and curate the underlying education datasets.
+This repository contains the **sector facing** service for the School Improvement Programme (SIP) / School Account Profile (SAP) project. It is a .NET 10 solution made up of an ASP.NET Core MVC web application, supporting class libraries for domain logic and infrastructure, and a data platform used to ingest and curate the underlying education datasets.
 
 The service is **authenticated by default**. Users sign in through **DfE Sign-in (DSI)**, and the application applies a fallback authorization policy so routes are protected unless explicitly opened. It supports sector users — schools, trusts and local authority users — across three main journeys:
 
@@ -92,7 +92,7 @@ The application uses the GOV.UK Design System and DfE Frontend for a consistent,
 
 | Concern | Technology |
 | --- | --- |
-| Runtime | .NET 8 / ASP.NET Core MVC |
+| Runtime | .NET 10 / ASP.NET Core MVC |
 | Frontend | GOV.UK Frontend 5.x, DfE Frontend 2.x, `GovUk.Frontend.AspNetCore`, Sass + Gulp |
 | Charts & maps | Chart.js, Leaflet + MarkerCluster, accessible-autocomplete |
 | Data access | PostgreSQL via Dapper + Npgsql |
@@ -164,7 +164,7 @@ sap-sector/
 
 ### Prerequisites
 
-- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - [Node.js 22.x](https://nodejs.org/) (Node 20+ is the minimum supported)
 - [PostgreSQL](https://www.postgresql.org/download/) — local install or container, with `psql` available
 - [Docker Desktop](https://www.docker.com/products/docker-desktop) (optional, for containerised development)
@@ -302,7 +302,7 @@ The application is then available at `http://localhost:3000`.
 The multi-stage build:
 
 1. **Assets stage** — Node 22 runs `npm ci --ignore-scripts` and `npm run build-fe`
-2. **Build stage** — .NET 8 SDK restores, builds and publishes `SAPSec.Web`
+2. **Build stage** — .NET 10 SDK restores, builds and publishes `SAPSec.Web`
 3. **Runtime stage** — ASP.NET Core 8 runtime image, patched base packages, non-root user, listening on port 3000
 
 > Note: a running container still needs a reachable PostgreSQL instance and DSI credentials supplied through environment variables.

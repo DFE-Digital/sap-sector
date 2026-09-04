@@ -9,10 +9,10 @@ public class SimilarSchoolsReferenceDataFilter(
     string name,
     CaseInsensitiveDictionary<IEnumerable<string>> filterValues,
     SimilarSchool currentSchool,
-    Func<SimilarSchool, ReferenceData> field) : SimilarSchoolsMultiValueFilter(key, name, filterValues, currentSchool)
+    Func<SimilarSchool, ReferenceData> selector) : SimilarSchoolsMultiValueFilter(key, name, filterValues, currentSchool)
 {
     protected override DataWithAvailability<string> CurrentSchoolValue
-        => DataWithAvailability.FromStringWithCodes(field(CurrentSchool).Id, field(CurrentSchool).Name);
+        => DataWithAvailability.FromStringWithCodes(selector(CurrentSchool).Id, selector(CurrentSchool).Name);
 
     protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
     {
@@ -21,11 +21,11 @@ public class SimilarSchoolsReferenceDataFilter(
             return items;
         }
 
-        return items.Where(i => values.Contains(field(i).Id, StringComparer.OrdinalIgnoreCase));
+        return items.Where(i => values.Contains(selector(i).Id, StringComparer.OrdinalIgnoreCase));
     }
 
     protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
-        items.GroupBy(field)
+        items.GroupBy(selector)
             .Where(f => !string.IsNullOrWhiteSpace(f.Key.Id) && f.Key.Id != "9")
             .Select(g => new FilterOption(
                 g.Key.Id,
