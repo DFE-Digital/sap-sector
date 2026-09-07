@@ -27,33 +27,71 @@ internal class RiseResourcesDataProvider(
             .Where(entry => AppliesToPhase(entry.SchoolPhases, establishment.PhaseOfEducationName))
             .ToList();
 
-        var configuredCategories = document.ResourceCategories
-            .GroupBy(category => category.Category, StringComparer.Ordinal)
-            .ToDictionary(group => group.Key, group => group.First(), StringComparer.Ordinal);
-
-        var categories = applicableResources
-            .GroupBy(entry => entry.Category ?? string.Empty)
-            .Select(group => BuildCategory(group.Key, group, configuredCategories))
-            .ToList();
+        var categories = BuildOrderedCategories(document.ResourceCategories, applicableResources);
 
         return new RiseResourcesSourceData(establishment, categories);
     }
 
-    private static RiseResourceCategory BuildCategory(
-        string name,
-        IEnumerable<RiseResourceEntry> entries,
-        IReadOnlyDictionary<string, RiseResourceCategoryEntry> configuredCategories)
+    private static IReadOnlyList<RiseResourceCategory> BuildOrderedCategories(
+        IReadOnlyList<RiseResourceCategoryEntry> configuredCategories,
+        IReadOnlyList<RiseResourceEntry> applicableResources)
     {
-        configuredCategories.TryGetValue(name, out var configured);
+        var resourcesByCategory = applicableResources
+            .GroupBy(entry => entry.Category ?? string.Empty, StringComparer.Ordinal)
+            .ToDictionary(
+                group => group.Key,
+                group => (IReadOnlyList<RiseResourceEntry>)[.. group],
+                StringComparer.Ordinal);
 
-        // Sub-category order follows first appearance in resourceEntries.
-        var resources = entries
-            .GroupBy(entry => entry.SubCategory ?? string.Empty)
-            .SelectMany(group => group)
-            .Select(Map)
-            .ToList();
+        var configuredByName = new Dictionary<string, RiseResourceCategoryEntry>(StringComparer.Ordinal);
+        foreach (var category in configuredCategories)
+        {
+            configuredByName.TryAdd(category.Category, category);
+        }
 
-        return new RiseResourceCategory(name, NullIfBlank(configured?.CategoryDescription), resources);
+        var orderedNames = configuredCategories
+            .Select(category => category.Category)
+            .Concat(applicableResources.Select(entry => entry.Category ?? string.Empty))
+            .Distinct(StringComparer.Ordinal);
+
+        var categories = new List<RiseResourceCategory>();
+
+        foreach (var name in orderedNames)
+        {
+            if (!resourcesByCategory.TryGetValue(name, out var categoryResources))
+            {
+                continue;
+            }
+
+            configuredByName.TryGetValue(name, out var configured);
+
+            var resources = OrderBySubCategory(categoryResources, configured?.SubCategories ?? [])
+                .Select(Map)
+                .ToList();
+
+            categories.Add(new RiseResourceCategory(
+                name,
+                NullIfBlank(configured?.CategoryDescription),
+                resources));
+        }
+
+        return categories;
+    }
+
+    private static IEnumerable<RiseResourceEntry> OrderBySubCategory(
+        IReadOnlyList<RiseResourceEntry> entries,
+        IReadOnlyList<string> configuredSubCategories)
+    {
+        var order = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (var index = 0; index < configuredSubCategories.Count; index++)
+        {
+            order.TryAdd(configuredSubCategories[index], index);
+        }
+
+        return entries.OrderBy(entry =>
+            order.TryGetValue(entry.SubCategory ?? string.Empty, out var configuredIndex)
+                ? configuredIndex
+                : int.MaxValue);
     }
 
     private static RiseResource Map(RiseResourceEntry entry) =>

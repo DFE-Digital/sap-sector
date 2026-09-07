@@ -50,13 +50,8 @@ public sealed class RiseResourcesPageViewModel
     public required string SchoolUrn { get; init; }
     public required string SchoolName { get; init; }
 
-    /// <summary>
-    /// Categories and sub-categories in first-appearance order from the content file's
-    /// <c>resourceEntries</c>. Resource links within a sub-category are ordered alphabetically by title.
-    /// </summary>
     public IReadOnlyList<RiseResourceCategoryViewModel> Categories { get; init; } = [];
 
-    /// <summary>Every sub-category across all categories, in display order — the "Contents" entries.</summary>
     public IEnumerable<RiseResourceSubCategoryViewModel> ContentsEntries =>
         Categories.SelectMany(category => category.SubCategories)
             .Where(subCategory => !string.IsNullOrWhiteSpace(subCategory.Name));

@@ -40,8 +40,8 @@ public class RiseResourcesPageIntegrationTests(
             SchoolPhases = phases
         };
 
-    private static RiseResourceCategoryEntry Category(string name, string description) =>
-        new() { Category = name, CategoryDescription = description };
+    private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>
+        new() { Category = name, CategoryDescription = description, SubCategories = subCategories };
 
     [Fact]
     public async Task RiseResources_WhenEnableRiseResourcesFeatureFlagEnabled_RendersHeaderAndIntro()
@@ -98,16 +98,16 @@ public class RiseResourcesPageIntegrationTests(
 
         page.QuerySelectorAll("[data-testid='rise-resources-category']")
             .Select(el => el.TrimmedTextContent())
-            .Should().Equal("Wider school", "Performance and attendance", "Pupil characteristics");
+            .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
 
         page.QuerySelectorAll("[data-testid='rise-resources-category-description']")
             .Select(el => el.TrimmedTextContent())
-            .Should().Equal("About the wider school.", "About performance and attendance.");
+            .Should().Equal("About performance and attendance.", "About the wider school.");
 
         var subCategoryHeadings = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']");
         subCategoryHeadings.Select(el => el.TrimmedTextContent())
-            .Should().Equal("Curriculum and teaching", "Literacy", "Attendance", "SEND");
-        subCategoryHeadings[0].GetAttribute("id").Should().Be("curriculum-and-teaching");
+            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        subCategoryHeadings[0].GetAttribute("id").Should().Be("literacy");
         subCategoryHeadings[0].GetAttribute("tabindex").Should().Be("-1");
 
         var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
@@ -118,8 +118,8 @@ public class RiseResourcesPageIntegrationTests(
         contents.QuerySelectorAll("[aria-hidden='true']").Should().OnlyContain(
             dash => dash.ClassList.Contains("gem-c-contents-list__list-item-dash"));
         contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
-            .Should().Equal("Curriculum and teaching", "Literacy", "Attendance", "SEND");
-        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#curriculum-and-teaching");
+            .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
+        contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#literacy");
 
         var literacyList = page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
             .First(heading => heading.TrimmedTextContent() == "Literacy")
@@ -133,13 +133,14 @@ public class RiseResourcesPageIntegrationTests(
     }
 
     [Fact]
-    public async Task RiseResources_OrdersSubCategorySectionsAndContentsByFirstAppearanceInResourceEntries()
+    public async Task RiseResources_OrdersSubCategorySectionsAndContentsBySubCategoryConfiguration()
     {
         Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
         Fixture.RiseResourcesRepository.SetupCategories(
-            Category("Performance and attendance", "About performance."),
-            Category("Wider school", "About the wider school."));
+            Category("Performance and attendance", "About performance.", "Literacy", "Maths", "Attendance"),
+            Category("Wider school", "About the wider school.", "Curriculum and teaching"));
         Fixture.RiseResourcesRepository.SetupResources(
+            // Resource-file order is deliberately not the display order.
             Entry("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationValues.Secondary),
             Entry("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationValues.Secondary),
             Entry("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
@@ -149,7 +150,8 @@ public class RiseResourcesPageIntegrationTests(
         var page = await Fixture.RequestPageAsync(
             Routes.SecondarySchool("100001").RiseResources, HttpStatusCode.OK);
 
-        var expected = new[] { "Maths", "Attendance", "Literacy", "Leadership and training", "Curriculum and teaching" };
+        // Listed sub-categories in configured order; "Leadership and training" is unlisted so trails.
+        var expected = new[] { "Literacy", "Maths", "Attendance", "Curriculum and teaching", "Leadership and training" };
 
         page.QuerySelectorAll("[data-testid='rise-resources-subcategory']")
             .Select(el => el.TrimmedTextContent())

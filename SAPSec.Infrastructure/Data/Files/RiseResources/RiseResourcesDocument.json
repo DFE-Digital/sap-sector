@@ -3,15 +3,29 @@
     "resourceCategories": [
       {
         "category": "Performance and attendance",
-        "categoryDescription": "Resources linked to attendance and key areas of pupil performance, including literacy and maths."
+        "categoryDescription": "Resources linked to attendance and key areas of pupil performance, including literacy and maths.",
+        "subCategories": [
+          "Literacy",
+          "Maths",
+          "Science",
+          "Attendance"
+        ]
       },
       {
         "category": "Pupil characteristics",
-        "categoryDescription": "Resources linked to specific pupil groups, including disadvantaged pupils and pupils with SEND."
+        "categoryDescription": "Resources linked to specific pupil groups, including disadvantaged pupils and pupils with SEND.",
+        "subCategories": [
+          "Disadvantaged pupils",
+          "SEND"
+        ]
       },
       {
         "category": "Wider school",
-        "categoryDescription": "Resources covering curriculum, teaching, leadership, and professional development."
+        "categoryDescription": "Resources covering curriculum, teaching, leadership, and professional development.",
+        "subCategories": [
+          "Curriculum and teaching",
+          "Leadership and training"
+        ]
       }
     ],
     "resourceEntries": [
@@ -226,7 +240,7 @@
         "category": "Performance and attendance",
         "subcategory": "Maths",
         "mappingMeasures": "Meeting expected standard in reading, writing and maths; Achieved a higher standard in reading, writing and maths; Average scaled score in maths"
-      },  
+      },
       {
         "resourceTitle": "Putting evidence to work in your classroom",
         "resourceDescription": "EEF guidance on applying evidence-informed approaches in classrooms.",

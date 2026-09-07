@@ -40,8 +40,8 @@ public class RiseResourcesPageIntegrationTests(
             SchoolPhases = phases
         };
 
-    private static RiseResourceCategoryEntry Category(string name, string description) =>
-        new() { Category = name, CategoryDescription = description };
+    private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>
+        new() { Category = name, CategoryDescription = description, SubCategories = subCategories };
 
     [Fact]
     public async Task RiseResources_WhenEnableRiseResourcesFeatureFlagEnabled_ReturnsOk()

@@ -86,7 +86,7 @@ public class GetRiseResourcesUseCaseTests
     }
 
     [Fact]
-    public async Task Execute_OrdersCategoriesByFirstAppearanceInResourceEntries_AndAttachesDescriptions()
+    public async Task Execute_OrdersCategoriesByConfiguration_ThenUnlistedByFirstAppearance_AndAttachesDescriptions()
     {
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
@@ -94,26 +94,29 @@ public class GetRiseResourcesUseCaseTests
             Category("Wider school", "About the wider school."),
             Category("Performance and attendance", "About performance."));
         _riseResourcesRepo.SetupResources(
+            // resourceEntries lists a "Performance and attendance" resource first, but config order wins.
             Entry("Attendance guidance", "Performance and attendance", PhaseOfEducationValues.Secondary),
             Entry("Leadership guidance", "Wider school", PhaseOfEducationValues.Secondary),
             Entry("Pastoral guidance", "Pupil characteristics", PhaseOfEducationValues.Secondary));
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
+        // Configured categories in resourceCategories order, then the unlisted one.
         result.Categories.Select(c => c.Name)
-            .Should().Equal("Performance and attendance", "Wider school", "Pupil characteristics");
+            .Should().Equal("Wider school", "Performance and attendance", "Pupil characteristics");
         result.Categories.Single(c => c.Name == "Wider school").Description.Should().Be("About the wider school.");
         result.Categories.Single(c => c.Name == "Pupil characteristics").Description.Should().BeNull();
     }
 
     [Fact]
-    public async Task Execute_OrdersSubCategoriesByFirstAppearanceInResourceEntries()
+    public async Task Execute_OrdersSubCategoriesByConfiguration_ThenUnlistedByFirstAppearance()
     {
         _establishmentRepo.SetupEstablishments(
             Build.Establishment("123456", "Test School", x => x.Secondary()));
         _riseResourcesRepo.SetupCategories(
-            Category("Performance and attendance", "About performance."));
+            Category("Performance and attendance", "About performance.", "Literacy", "Maths", "Attendance"));
         _riseResourcesRepo.SetupResources(
+            // File order: Maths, Attendance, Literacy, then an unlisted "Science".
             SubCategorised("Maths guide", "Performance and attendance", "Maths", PhaseOfEducationValues.Secondary),
             SubCategorised("Attendance guide", "Performance and attendance", "Attendance", PhaseOfEducationValues.Secondary),
             SubCategorised("Literacy guide", "Performance and attendance", "Literacy", PhaseOfEducationValues.Secondary),
@@ -124,7 +127,7 @@ public class GetRiseResourcesUseCaseTests
         result.Categories.Single().Resources
             .Select(resource => resource.SubCategory)
             .Distinct()
-            .Should().Equal("Maths", "Attendance", "Literacy", "Science");
+            .Should().Equal("Literacy", "Maths", "Attendance", "Science");
     }
 
     [Fact]
@@ -176,6 +179,6 @@ public class GetRiseResourcesUseCaseTests
             SchoolPhases = phases
         };
 
-    private static RiseResourceCategoryEntry Category(string name, string description) =>
-        new() { Category = name, CategoryDescription = description };
+    private static RiseResourceCategoryEntry Category(string name, string description, params string[] subCategories) =>
+        new() { Category = name, CategoryDescription = description, SubCategories = subCategories };
 }
