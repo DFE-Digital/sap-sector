@@ -46,7 +46,7 @@ public class SchoolController(
     {
         var response = await getSchoolDetailsUseCase.Execute(new(urn));
         PopulateViewData(response.SchoolDetails);
-        return View(response.SchoolDetails);
+        return View(SchoolDetailsViewModel.FromSchoolDetails(response.SchoolDetails));
     }
 
     [HttpGet]

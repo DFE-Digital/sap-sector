@@ -1,4 +1,3 @@
-using SAPSec.Core.Features.SchoolDetails;
 using System.Globalization;
 
 namespace SAPSec.Web.Areas.Shared.ViewModels.Comparison;
@@ -14,7 +13,7 @@ public class SchoolDetailsPageViewModel
     public double? ComparatorSchoolLatitude { get; init; }
     public double? ComparatorSchoolLongitude { get; init; }
     public double? Distance { get; init; }
-    public SchoolDetails? ComparatorSchoolDetails { get; init; }
+    public SchoolDetailsViewModel? ComparatorSchoolDetails { get; init; }
 
     public string DistanceDisplay =>
         Distance is double d

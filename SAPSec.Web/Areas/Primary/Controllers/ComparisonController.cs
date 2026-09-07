@@ -123,7 +123,7 @@ public class ComparisonController(
             ComparatorSchoolLatitude = response.ComparatorSchool.Coordinates?.Latitude,
             ComparatorSchoolLongitude = response.ComparatorSchool.Coordinates?.Longitude,
             Distance = response.DistanceMiles,
-            ComparatorSchoolDetails = response.ComparatorSchoolDetails
+            ComparatorSchoolDetails = SchoolDetailsViewModel.FromSchoolDetails(response.ComparatorSchoolDetails)
         };
 
         return View(model);
