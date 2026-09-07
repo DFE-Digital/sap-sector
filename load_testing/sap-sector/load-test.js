@@ -14,13 +14,13 @@ import { hasSessionCookie } from './utils/auth.js'
 import { quickTestScenario } from './scenarios/quick-test.js'
 import { baselineScenario } from './scenarios/baseline.js'
 import { peakSurgeScenario } from './scenarios/peak-surge.js'
-import { stressTestScenario } from './scenarios/stress-test.js'
+import { stressTestScenario, buildStepThresholds, applyStepTag } from './scenarios/stress-test.js'
 import { randomThinkTime } from '../shared/utils/common-helpers.js'
 
-function getSelectedScenario () {
-  const scenario = __ENV.SCENARIO || 'quick'
+const SCENARIO = __ENV.SCENARIO || 'quick'
 
-  switch (scenario) {
+function getSelectedScenario () {
+  switch (SCENARIO) {
     case 'baseline':
       return { sap_sector_baseline: baselineScenario }
     case 'peak-surge':
@@ -34,6 +34,15 @@ function getSelectedScenario () {
   }
 }
 
+// Per-step thresholds only apply to the stress staircase - they are what
+// materialise the per-load-level sub-metrics in the summary JSON. Adding them
+// to other scenarios would declare thresholds against tags never emitted.
+function getThresholds () {
+  const base = getConfig().thresholds
+  if (SCENARIO !== 'stress') return base
+  return Object.assign({}, base, buildStepThresholds(3000))
+}
+
 function resolveInsecureSkipTLSVerify () {
   try {
     return getEnvironment().insecureSkipTLSVerify || false
@@ -44,7 +53,7 @@ function resolveInsecureSkipTLSVerify () {
 
 export const options = {
   scenarios: getSelectedScenario(),
-  thresholds: getConfig().thresholds,
+  thresholds: getThresholds(),
   insecureSkipTLSVerify: resolveInsecureSkipTLSVerify(),
   tags: {
     service: 'sap-sector',
@@ -61,18 +70,28 @@ export function setup () {
 
 export default function (data) {
   const { environment, config } = data
+
+  // Stamps every metric this VU emits for the rest of the iteration with the
+  // staircase step it belongs to. One line here covers all journeys.
+  if (SCENARIO === 'stress') {
+    applyStepTag()
+  }
+
   const journeyChoice = Math.random()
 
   // School search/comparison sits behind DfE Sign-in (OpenID Connect) and
   // can't be scripted against a real deployment without user credentials.
-  // The authenticated journeys run in two cases:
+  // The authenticated journeys run in three cases:
   //   - "loadtest" environment: an instance you run yourself with
   //     ASPNETCORE_ENVIRONMENT=LoadTest (see README.md), auth bypassed.
   //   - Any environment when SESSION_COOKIE is set: a real session obtained
   //     by manually signing in once (through MFA) as a dedicated test/service
   //     account and replaying that cookie - see utils/auth.js.
+  //   - Any environment when AUTH_OFF=true: for an instance where sign-in has
+  //     been switched off at the deployment (e.g. an isolated test env). No
+  //     session is involved; the real service journeys just run directly.
   // Every other case sticks to the anonymous-only mix.
-  if (environment.name === 'loadtest' || hasSessionCookie()) {
+  if (environment.name === 'loadtest' || hasSessionCookie() || __ENV.AUTH_OFF === 'true') {
     group('SAP Sector Authenticated User Journey', function () {
       if (journeyChoice < 0.4) {
         // 40% - search for a school
