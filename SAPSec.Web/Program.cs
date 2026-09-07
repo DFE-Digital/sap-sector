@@ -109,7 +109,7 @@ public class Program
             options.ForwardedHeaders = ForwardedHeaders.XForwardedHost
                                      | ForwardedHeaders.XForwardedProto
                                      | ForwardedHeaders.XForwardedFor;
-            options.KnownNetworks.Clear();
+            options.KnownIPNetworks.Clear();
             options.KnownProxies.Clear();
         });
 

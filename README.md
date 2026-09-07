@@ -303,7 +303,7 @@ The multi-stage build:
 
 1. **Assets stage** — Node 22 runs `npm ci --ignore-scripts` and `npm run build-fe`
 2. **Build stage** — .NET 10 SDK restores, builds and publishes `SAPSec.Web`
-3. **Runtime stage** — ASP.NET Core 8 runtime image, patched base packages, non-root user, listening on port 3000
+3. **Runtime stage** — ASP.NET Core 10 runtime image, patched base packages, non-root user, listening on port 3000
 
 > Note: a running container still needs a reachable PostgreSQL instance and DSI credentials supplied through environment variables.
 
