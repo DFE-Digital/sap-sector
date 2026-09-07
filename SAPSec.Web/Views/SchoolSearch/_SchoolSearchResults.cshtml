@@ -1,9 +1,10 @@
+@using SAPSec.Web.Constants;
 @model SAPSec.Web.ViewModels.SchoolSearchResultViewModel[]
 
 @{
-    var startItem = ViewData["StartItem"] as int? ?? 1;
-    var endItem = ViewData["EndItem"] as int? ?? Model.Length;
-    var totalResults = ViewData["TotalResults"] as int? ?? Model.Length;
+    var startItem = ViewData[ViewDataKeys.StartItem] as int? ?? 1;
+    var endItem = ViewData[ViewDataKeys.EndItem] as int? ?? Model.Length;
+    var totalResults = ViewData[ViewDataKeys.TotalResults] as int? ?? Model.Length;
 }
 
 @if (Model.Length > 0)

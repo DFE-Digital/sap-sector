@@ -1,8 +1,9 @@
 @using SAPSec.Web.ViewModels
+@using SAPSec.Web.Constants;
 @model ISimilarSchoolsPageViewModel
 @{
     Layout = "~/Areas/Secondary/Views/School/_Layout.cshtml";
-    ViewData["Title"] = "View similar schools";
+    ViewData[ViewDataKeys.Title] = "View similar schools";
     var hasVisibleResults = Model.SimilarSchools.Any();
 }
 <link rel="stylesheet" href="~/css/leaflet.css"/>
@@ -40,7 +41,7 @@
 }
 
 <span class="govuk-caption-xl">@Model.SchoolName</span>
-<h1 class="govuk-heading-xl">@ViewData["Title"]</h1>
+<h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body">
     We've identified <strong>50</strong> similar @(Model.PhaseLabel) phase schools (including all-throughs).

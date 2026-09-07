@@ -1,17 +1,16 @@
 using FluentAssertions;
 using Microsoft.Playwright;
-using SAPSec.Web.Constants;
-using SAPSec.UI.Tests.Infrastructure;
-using Xunit;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
+using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
+using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
 
+// TODO: Delete or replace these with integration tests
 [Collection("UITestsCollection")]
 public class SimilarSchoolComparisonPageTests(WebApplicationSetupFixture fixture) : BasePageTest(fixture)
 {
-    private readonly WebApplicationSetupFixture _fixture = fixture;
-
     private static readonly string SimilarSchoolComparisonPath =
         Routes.SecondarySchool("108088").Comparison("137621").SchoolDetails;
 

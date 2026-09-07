@@ -68,10 +68,23 @@ Implemented in `SAPSec.Web/Middleware/SecurityHeadersMiddleware.cs`.
 - `Referrer-Policy` strict-origin-when-cross-origin
 - `X-XSS-Protection` 0, which correctly disables the legacy browser auditor
 - `Strict-Transport-Security` as described above
+- `Expect-CT` max-age 86400, enforce
+- `Arr-Disable-Session-Affinity` true
+
+The middleware returns early, without setting any of these headers or the Content Security
+Policy, for request paths beginning `/signin-oidc`, `/signout-callback-oidc`, `/auth`,
+`/home/error`, `/error` or `/health`. The comparison is a lowercased `StartsWith`, so `/health`
+also covers `/healthcheck` and `/error` covers every `/error/{code}` path.
 
 ## Content Security Policy
 
-Implemented in `SAPSec.Web/Helpers/CspHelper.cs`.
+Implemented in `SAPSec.Web/Helpers/CspHelper.cs`. `BuildPolicy` builds **two** policies and
+selects between them on `environment.IsProduction()`. `ASPNETCORE_ENVIRONMENT` is set per
+environment in `terraform/application/config/`, as `Production` for production, `Test` for the
+test environment and `Development` for review apps. Only production takes the first branch.
+Test, review apps and local development all take the second.
+
+Common to both policies:
 
 - The policy is nonce based. A fresh 32 byte nonce is generated per request from
   `RandomNumberGenerator`, so injected script without the current nonce will not execute
@@ -80,9 +93,35 @@ Implemented in `SAPSec.Web/Helpers/CspHelper.cs`.
 - `frame-ancestors` is none, giving clickjacking protection in browsers that ignore
   `X-Frame-Options`
 - `base-uri` is self, preventing base tag injection
-- `form-action` is restricted to self plus the correct DfE Sign-in OIDC host for the
-  environment
 - `style-src` is self with no unsafe-inline allowance
+- `font-src` is self plus data URIs
+- `script-src` is self plus the request nonce, Google Tag Manager, Google Analytics, Clarity
+  and `c.bing.com`
+- `img-src` is self plus data URIs, Google Tag Manager, Google Analytics, Clarity,
+  `c.bing.com` and `*.tile.openstreetmap.org` for map tiles
+
+Where the two policies differ:
+
+| Directive     | Production                                                                                     | Test, review apps and local development                                                                       |
+| ------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `form-action` | `'self'` plus `https://oidc.signin.education.gov.uk`                                             | `'self'` plus `https://test-oidc.signin.education.gov.uk` and `https://pp-oidc.signin.education.gov.uk`          |
+| `connect-src` | `'self'` plus Google Analytics, Clarity and `c.bing.com`                                         | The same, plus `https://*.visualstudio.com/`, `ws://localhost:*`, `wss://localhost:*` and `http://localhost:*`   |
+
+Points to note on the split:
+
+- `form-action` names one DfE Sign-in OIDC host per policy and the two sets do not overlap.
+  The production policy does not permit the test or pre-production DSI hosts, and the
+  non-production policy does not permit the production DSI host
+- The local development origins are in `connect-src`, not in `form-action`. Production
+  permits no localhost origin and no `*.visualstudio.com` origin in any directive
+- Because the branch tests `IsProduction()` only, the deployed test environment and review
+  apps serve the same `connect-src` as local development, including the localhost and
+  `*.visualstudio.com` origins
+
+`CspHelper.cs` records the reason for each of the non-obvious origins in trailing comments:
+`c.bing.com` is required by Clarity, `*.visualstudio.com` is used for Live Share in Visual
+Studio, `ws://localhost:*` and `http://localhost:*` are used by Browsersync, and
+`wss://localhost:*` is used by hot reload in Visual Studio.
 
 ## Input and output handling
 

@@ -11,10 +11,8 @@
         <span class="app-filter-toggle__hide">Hide filters</span>
     </button>
 
-    <form method="get" action="@Url.Action("Search", "SchoolSearch")" id="app-filter-panel" class="app-filter-panel @panelVisibleClass">
+    <form method="get" id="app-filter-panel" class="app-filter-panel @panelVisibleClass">
         <input type="hidden" name="query" value="@Model.Query" />
-        <input type="hidden" name="secondaryOnly" value="@Model.SecondaryOnly.ToString().ToLowerInvariant()" />
-        <input type="hidden" name="similarSchoolsOnly" value="@Model.SimilarSchoolsOnly.ToString().ToLowerInvariant()" />
 
         <div class="moj-filter app-filter">
             <div class="moj-filter__header app-filter__header">
@@ -39,12 +37,10 @@
                             @foreach (var la in Model.SelectedLocalAuthorities)
                             {
                                 var remainingFilters = Model.SelectedLocalAuthorities.Where(x => x != la).ToArray();
-                                var removeUrl = Url.Action("Search", "SchoolSearch", new
+                                var removeUrl = Url.Action("Index", "SchoolSearch", new
                                 {
                                     query = Model.Query,
                                     localAuthorities = remainingFilters,
-                                    secondaryOnly = Model.SecondaryOnly,
-                                    similarSchoolsOnly = Model.SimilarSchoolsOnly
                                 });
                                 <li>
                                     <a class="moj-filter__tag app-filter__tag" href="@removeUrl">
@@ -56,7 +52,7 @@
 
                         <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0 app-clear-filters-spacing">
                             <a class="govuk-link govuk-link--no-visited-state"
-                                href="@Url.Action("Search", "SchoolSearch", new { query = Model.Query, secondaryOnly = Model.SecondaryOnly, similarSchoolsOnly = Model.SimilarSchoolsOnly })">
+                                href="@Url.Action("Index", "SchoolSearch", new { query = Model.Query })">
                                 Clear filters
                             </a>
                         </p>

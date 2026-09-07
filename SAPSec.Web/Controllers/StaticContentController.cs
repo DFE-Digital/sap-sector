@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Controllers;
 
@@ -26,7 +27,7 @@ public class StaticContentController : Controller
     [Route("cookies")]
     public IActionResult Cookies([FromQuery] string? returnUrl = null)
     {
-        ViewData["CookieReturnUrl"] = GetSafeReturnUrl(returnUrl)
+        ViewData[ViewDataKeys.CookieReturnUrl] = GetSafeReturnUrl(returnUrl)
             ?? GetSafeReturnUrl(Request.Headers.Referer.ToString())
             ?? Url.Content("~/");
 

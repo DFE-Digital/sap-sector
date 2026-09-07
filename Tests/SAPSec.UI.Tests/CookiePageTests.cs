@@ -2,6 +2,7 @@ using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
 using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
@@ -17,7 +18,7 @@ public class CookiePageTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
 
         await Expect(breadcrumb).ToBeVisibleAsync();
-        (await breadcrumb.GetAttributeAsync("href")).Should().Be("/find-a-school");
+        (await breadcrumb.GetAttributeAsync("href")).Should().Be(Routes.FindASchool());
     }
 
     [Fact]

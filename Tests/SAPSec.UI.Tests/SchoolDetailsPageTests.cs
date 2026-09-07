@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using SAPSec.Web.Constants;
-using SAPSec.UI.Tests.Infrastructure;
-using Xunit;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
+using SAPSec.UI.Tests.Infrastructure;
+using SAPSec.Web.Constants;
+using Xunit;
 
 namespace SAPSec.UI.Tests.Deprecated;
 
@@ -102,7 +102,7 @@ public class SchoolDetailsPageTests(WebApplicationSetupFixture fixture) : BasePa
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         var url = new Uri(Page.Url);
-        url.AbsolutePath.Should().Be("/find-a-school");
+        url.AbsolutePath.Should().Be(Routes.FindASchool());
     }
 
     #endregion

@@ -81,14 +81,14 @@ $app-measure-color-track: #f3f2f1;
 }
 
 @media (max-width: 40.0625em) {
-  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link {
+  .app-width-container .app-comparison-pages .govuk-back-link {
     padding-left: 14px;
     margin-left: 0;
     color: #1d70b8;
   }
 
-  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link:visited,
-  .app-width-container .app-measure-headline-mobile-layout .govuk-back-link:hover {
+  .app-width-container .app-comparison-pages .govuk-back-link:visited,
+  .app-width-container .app-comparison-pages .govuk-back-link:hover {
     color: #1d70b8;
   }
 }
@@ -169,10 +169,6 @@ $app-measure-color-track: #f3f2f1;
   position: relative;
 }
 
-.app-measure-chart-container--school-headline {
-  height: 330px;
-}
-
 .app-measure-chart-container .js-chart {
   flex: 1 1 auto;
   min-height: 0;
@@ -207,7 +203,6 @@ $app-measure-color-track: #f3f2f1;
 }
 
 .app-chart-legend__box {
-  border-radius: 50%;
   display: inline-block;
   flex: 0 0 14px;
   height: 14px;
@@ -255,10 +250,28 @@ $app-measure-color-track: #f3f2f1;
 }
 
 .app-chart-tooltip__marker {
-  border-radius: 50%;
   display: block;
   height: 14px;
   width: 14px;
+}
+
+.app-chart-marker--circle {
+  border-radius: 50%;
+}
+
+.app-chart-marker--rect {
+  border-radius: 0;
+}
+
+.app-chart-marker--triangle {
+  border-radius: 0;
+  clip-path: polygon(50% 0, 0 100%, 100% 100%);
+}
+
+.app-chart-marker--rectRot {
+  border-radius: 0;
+  transform: rotate(45deg) scale(0.85);
+  transform-origin: center;
 }
 
 .app-chart-tooltip__label,
@@ -289,6 +302,11 @@ $app-measure-color-track: #f3f2f1;
   --chart-color-comparator: #27a0cc;
   --chart-color-england: #003c56;
   --chart-color-fallback: #6f777b;
+
+  &:focus-visible {
+    outline: 3px solid #ffdd00;
+    outline-offset: 3px;
+  }
 }
 
 .js-chart--school-measure-bar {

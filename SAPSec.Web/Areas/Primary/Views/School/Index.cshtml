@@ -1,16 +1,18 @@
 ﻿@using SAPSec.Core.Model
+@using SAPSec.Web.Areas.Shared.ViewModels
+@using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
 
 @model SchoolInfoViewModel
- @{
+@{
     Layout = "_Layout.cshtml";
-    ViewData["Title"] = Model.Name;
+    ViewData[ViewDataKeys.Title] = Model.Name;
 } 
 
 <div class="app-overview">
     <header class="app-overview__header">
-        <h1 class="govuk-heading-xl app-overview__title">@ViewData["Title"]</h1>
+        <h1 class="govuk-heading-xl app-overview__title">@ViewData[ViewDataKeys.Title]</h1>
         <p class="govuk-body-l app-overview__address">@Model.Address</p>
     </header>
 

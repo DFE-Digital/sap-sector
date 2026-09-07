@@ -13,9 +13,9 @@
     var clarityId = analytics.ClarityId;
     var loadAnalytics = Context.Request.Cookies[LayoutConstants.CookieSettingsName] == "enabled";
     var canonicalUrl = Context.Request.GetCanonicalUrl();
-    var skipNavigationTargetId = ViewData["SkipNavigationTargetId"]?.ToString();
-    var skipNavigationText = ViewData["SkipNavigationText"]?.ToString() ?? "Skip to navigation";
-    var skipLinkTargetId = ViewData["SkipLinkTargetId"]?.ToString() ?? "main-content";
+    var skipNavigationTargetId = ViewData[ViewDataKeys.SkipNavigationTargetId]?.ToString();
+    var skipNavigationText = ViewData[ViewDataKeys.SkipNavigationText]?.ToString() ?? "Skip to navigation";
+    var skipLinkTargetId = ViewData[ViewDataKeys.SkipLinkTargetId]?.ToString() ?? "main-content";
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
@@ -106,7 +106,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                 <span class="govuk-service-navigation__service-name">
                     @Html.TrackedAnchor(
                         TrackedLinks.ServiceBanner,
-                        "/find-a-school",
+                        Routes.FindASchool(),
                         LayoutConstants.ServiceName,
                         classes: new[] { "govuk-service-navigation__link" })
                 </span>

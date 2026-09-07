@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
 using SAPSec.Web.Authentication;
@@ -165,6 +166,8 @@ public class Program
         builder.Services.Configure<RazorViewEngineOptions>(options =>
         {
             options.ViewLocationFormats.Add("/{0}.cshtml");
+            options.AreaViewLocationFormats.Add("/Areas/Shared/Views/{1}/{0}.cshtml");
+            options.AreaViewLocationFormats.Add("/Areas/Shared/Views/{0}.cshtml");
         });
 
         builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -182,6 +185,8 @@ public class Program
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
+        builder.Services.AddUseCases();
+        builder.Services.AddServices();
         builder.Services.AddPostgresqlDependencies();
         builder.Services.AddDependencies();
 

@@ -6,7 +6,8 @@ namespace SAPSec.Test.Common.Playwright;
 
 public static class LocatorAssertionsExtensions
 {
-    private const string PercentageValuePattern = @"\d\d%";
+    private const string PercentageValuePattern = @"\d?\d%";
+    private const string NumericValuePattern = @"\d?\d\.\d";
 
     public static async Task ToBePercentageValuesHavingCount(this ILocatorAssertions assertions, int count)
     {
@@ -14,6 +15,14 @@ public static class LocatorAssertionsExtensions
         var locator = assertions.GetActualLocator();
         var values = await locator.AllTrimmedTextContentsAsync();
         values.Should().AllSatisfy(x => x.Should().MatchRegex(PercentageValuePattern));
+    }
+
+    public static async Task ToBeNumericValuesHavingCount(this ILocatorAssertions assertions, int count)
+    {
+        await assertions.ToHaveCountAsync(count);
+        var locator = assertions.GetActualLocator();
+        var values = await locator.AllTrimmedTextContentsAsync();
+        values.Should().AllSatisfy(x => x.Should().MatchRegex(NumericValuePattern));
     }
 
     private static ILocator GetActualLocator(this ILocatorAssertions assertions)

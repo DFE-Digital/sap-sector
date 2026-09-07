@@ -41,7 +41,7 @@ public class SimilarSchoolsComparisonIntegrationTests(JsonRepositoryIntegrationT
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("href=\"/find-a-school\">Home</a>");
+        content.Should().Contain($"href=\"{Routes.FindASchool()}\">Home</a>");
     }
 
     [Fact]

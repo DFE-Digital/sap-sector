@@ -27,7 +27,7 @@ public class TabbedViewTagHelper : TagHelper
 
         output.Content.AppendHtml(
         $"""
-            <ul class="govuk-tabs__list">
+            <ul class="govuk-tabs__list" data-testid="{HtmlPrefix}-tabs">
         """);
 
         foreach (var (tab, i) in tabContext.Tabs.Select((t, i) => (t, i)))
