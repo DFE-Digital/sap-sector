@@ -111,12 +111,12 @@ public class RiseResourcesPageIntegrationTests(
         subCategoryHeadings[0].GetAttribute("tabindex").Should().Be("-1");
 
         var contents = page.ElementWithTestIdShouldExist("rise-resources-contents");
-        contents.ClassList.Should().Contain("gem-c-contents-list");
-        contents.QuerySelector("h2.gem-c-contents-list__title")!.TrimmedTextContent().Should().Be("Contents");
-        contents.QuerySelectorAll(".gem-c-contents-list__list > li").Should().OnlyContain(
-            li => li.ClassList.Contains("gem-c-contents-list__list-item--dashed"));
+        contents.ClassList.Should().Contain("rise-resources-contents-list");
+        contents.QuerySelector("h2.rise-resources-contents-list__title")!.TrimmedTextContent().Should().Be("Contents");
+        contents.QuerySelectorAll(".rise-resources-contents-list__list > li").Should().OnlyContain(
+            li => li.ClassList.Contains("rise-resources-contents-list__list-item--dashed"));
         contents.QuerySelectorAll("[aria-hidden='true']").Should().OnlyContain(
-            dash => dash.ClassList.Contains("gem-c-contents-list__list-item-dash"));
+            dash => dash.ClassList.Contains("rise-resources-contents-list__list-item-dash"));
         contents.QuerySelectorAll("a").Select(a => a.TrimmedTextContent())
             .Should().Equal("Literacy", "Attendance", "Curriculum and teaching", "SEND");
         contents.QuerySelector("a")!.GetAttribute("href").Should().Be("#literacy");
