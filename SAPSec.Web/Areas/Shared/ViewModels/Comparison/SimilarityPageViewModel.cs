@@ -1,6 +1,6 @@
 using SAPSec.Core.Features.SimilarSchools;
 
-namespace SAPSec.Web.Areas.Primary.ViewModels.Comparison;
+namespace SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 
 public class SimilarityPageViewModel
 {

@@ -11,7 +11,6 @@ using SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Formatters;
-using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Secondary.Controllers;
@@ -21,14 +20,13 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary, "urn", "comparatorSchoolUrn")]
 public class ComparisonController(
-    [FromKeyedServices(ServiceKeys.Secondary)]
-    IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSimilarSchoolDetailsUseCase,
+    IUseCase<GetSecondaryComparisonSimilarityCharacteristicsRequest, GetSecondaryComparisonSimilarityCharacteristicsResponse> getSimilarityCharacteristicsUseCase,
     IUseCase<GetComparisonKs4HeadlineMeasuresRequest, GetComparisonKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
     IUseCase<GetComparisonKs4CoreSubjectsMeasuresRequest, GetComparisonKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
     IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
-    GetCharacteristicsComparison getCharacteristicsComparison,
-    ICharacteristicsComparisonFormatter characteristicsFormatter,
-    ILogger<ComparisonController> logger) : Controller
+    [FromKeyedServices(ServiceKeys.Secondary)]
+    IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSchoolDetailsUseCase,
+    ISecondaryCharacteristicsComparisonFormatter characteristicsFormatter) : Controller
 {
     [HttpGet]
     [Route("compare-similarity")]
@@ -36,12 +34,22 @@ public class ComparisonController(
         string urn,
         string comparatorSchoolUrn)
     {
-        var modelResult = await TryBuildBaseModelAsync(urn, comparatorSchoolUrn);
-        if (modelResult.Result != null)
-            return modelResult.Result;
+        var response = await getSimilarityCharacteristicsUseCase.Execute(new(urn, comparatorSchoolUrn));
 
-        SetComparisonSchoolViewData(modelResult.Model!);
-        return View("Similarity", modelResult.Model);
+        ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(
+            response.CurrentSchool,
+            response.ComparatorSchool);
+
+        var model = new SimilarityPageViewModel
+        {
+            Urn = urn,
+            SimilarSchoolUrn = comparatorSchoolUrn,
+            Name = response.CurrentSchool.Name,
+            SimilarSchoolName = response.ComparatorSchool.Name,
+            CharacteristicsRows = characteristicsFormatter.BuildRows(response.SimilarityCharacteristics)
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -125,13 +133,13 @@ public class ComparisonController(
         string urn,
         string comparatorSchoolUrn)
     {
-        var response = await getSimilarSchoolDetailsUseCase.Execute(new(urn, comparatorSchoolUrn));
+        var response = await getSchoolDetailsUseCase.Execute(new(urn, comparatorSchoolUrn));
 
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(
             response.CurrentSchool.School,
             response.ComparatorSchool.School);
 
-        var schoolDetailsModel = new SimilarSchoolDetailsViewModel
+        var schoolDetailsModel = new SchoolDetailsPageViewModel
         {
             CurrentSchoolUrn = urn,
             ComparatorSchoolUrn = comparatorSchoolUrn,
@@ -146,45 +154,5 @@ public class ComparisonController(
         };
 
         return View(schoolDetailsModel);
-    }
-
-    private async Task<(SimilarSchoolsComparisonViewModel? Model, IActionResult? Result)>
-        TryBuildBaseModelAsync(string urn, string comparatorSchoolUrn)
-    {
-        if (string.IsNullOrWhiteSpace(urn) || string.IsNullOrWhiteSpace(comparatorSchoolUrn))
-        {
-            logger.LogWarning(
-                "SimilarSchoolsComparison requested with invalid route params. urn='{Urn}', comparatorSchoolUrn='{SimilarUrn}'",
-                urn, comparatorSchoolUrn);
-
-            return (null, BadRequest());
-        }
-
-        var response = await getSimilarSchoolDetailsUseCase.Execute(new(urn, comparatorSchoolUrn));
-
-        var model = new SimilarSchoolsComparisonViewModel
-        {
-            Urn = urn,
-            SimilarSchoolUrn = comparatorSchoolUrn,
-            Name = response.CurrentSchool.School.Name,
-            SimilarSchoolName = response.ComparatorSchoolDetails.Name
-        };
-
-        model.CharacteristicsRows = await BuildCharacteristicRowsAsync(urn, comparatorSchoolUrn);
-        return (model, null);
-    }
-
-    private void SetComparisonSchoolViewData(SimilarSchoolsComparisonViewModel data)
-    {
-        ViewData[ViewDataKeys.ComparisonSchool] = data;
-    }
-
-    private async Task<IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow>>
-        BuildCharacteristicRowsAsync(string urn, string comparatorSchoolUrn)
-    {
-        var response = await getCharacteristicsComparison.Execute(
-            new GetCharacteristicsComparisonRequest(urn, comparatorSchoolUrn));
-
-        return characteristicsFormatter.BuildRows(response);
     }
 }

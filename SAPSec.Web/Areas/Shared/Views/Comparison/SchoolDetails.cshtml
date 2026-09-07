@@ -5,10 +5,11 @@
 @using SAPSec.Core.Extensions
 @using SAPSec.Core.Features.SchoolDetails
 @using SAPSec.Web.Areas.Secondary.ViewModels
+@using SAPSec.Web.Areas.Shared.ViewModels.Comparison
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
-@model SimilarSchoolDetailsViewModel
+@model SchoolDetailsPageViewModel
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = $"School details compared to {Model.ComparatorSchoolName}";
@@ -85,7 +86,7 @@
                     class="school-marker-icon"
                 />
                 <span class="govuk-!-margin-left-2">
-                @Model.CurrentSchoolName
+                @Model.ComparatorSchoolName
                 </span>
             </span>
         </div>

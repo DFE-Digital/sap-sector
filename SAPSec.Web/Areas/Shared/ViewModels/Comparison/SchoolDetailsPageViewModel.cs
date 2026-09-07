@@ -1,9 +1,9 @@
-using System.Globalization;
 using SAPSec.Core.Features.SchoolDetails;
+using System.Globalization;
 
-namespace SAPSec.Web.ViewModels;
+namespace SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 
-public class SimilarSchoolDetailsViewModel
+public class SchoolDetailsPageViewModel
 {
     public required string CurrentSchoolUrn { get; init; }
     public required string ComparatorSchoolUrn { get; init; }

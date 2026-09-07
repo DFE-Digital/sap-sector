@@ -1,75 +1,69 @@
-using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Web.Areas.Primary.ViewModels.Comparison;
+using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 using System.Globalization;
 
 namespace SAPSec.Web.Formatters;
 
-public interface IPrimaryCharacteristicsComparisonFormatter
-{
-    IReadOnlyList<SimilarityPageViewModel.CharacteristicRow> BuildRows(
-        GetPrimaryCharacteristicsComparisonResponse response);
-}
-
 public sealed class PrimaryCharacteristicsComparisonFormatter : IPrimaryCharacteristicsComparisonFormatter
 {
     public IReadOnlyList<SimilarityPageViewModel.CharacteristicRow> BuildRows(
-        GetPrimaryCharacteristicsComparisonResponse response)
+        PrimaryComparisonSimilarityCharacteristics characteristicts)
     {
         return new List<SimilarityPageViewModel.CharacteristicRow>(9)
         {
             new()
             {
                 Characteristic = "Combined average KS1 reading, writing and maths prior attainment",
-                CurrentSchoolValue = WholeNumber(response.Ks1PriorRwmAverage.CurrentSchoolValue),
-                SimilarSchoolValue = WholeNumber(response.Ks1PriorRwmAverage.SimilarSchoolValue)
+                CurrentSchoolValue = WholeNumber(characteristicts.Ks1PriorRwmAverage.CurrentSchoolValue),
+                SimilarSchoolValue = WholeNumber(characteristicts.Ks1PriorRwmAverage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Total number of pupils",
-                CurrentSchoolValue = IntN0(response.PupilCount.CurrentSchoolValue),
-                SimilarSchoolValue = IntN0(response.PupilCount.SimilarSchoolValue)
+                CurrentSchoolValue = IntN0(characteristicts.PupilCount.CurrentSchoolValue),
+                SimilarSchoolValue = IntN0(characteristicts.PupilCount.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Pupil stability rate",
-                CurrentSchoolValue = Percent1dp(response.PupilStabilityRate.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(response.PupilStabilityRate.SimilarSchoolValue)
+                CurrentSchoolValue = Percent1dp(characteristicts.PupilStabilityRate.CurrentSchoolValue),
+                SimilarSchoolValue = Percent1dp(characteristicts.PupilStabilityRate.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Eligibility for pupil premium",
-                CurrentSchoolValue = Percent1dp(response.PupilPremiumEligibilityPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(response.PupilPremiumEligibilityPercentage.SimilarSchoolValue)
+                CurrentSchoolValue = Percent1dp(characteristicts.PupilPremiumEligibilityPercentage.CurrentSchoolValue),
+                SimilarSchoolValue = Percent1dp(characteristicts.PupilPremiumEligibilityPercentage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Average IDACI score",
-                CurrentSchoolValue = Dec3dp(response.AverageIdaciScore.CurrentSchoolValue),
-                SimilarSchoolValue = Dec3dp(response.AverageIdaciScore.SimilarSchoolValue)
+                CurrentSchoolValue = Dec3dp(characteristicts.AverageIdaciScore.CurrentSchoolValue),
+                SimilarSchoolValue = Dec3dp(characteristicts.AverageIdaciScore.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Average POLAR4 quintile",
-                CurrentSchoolValue = PolarText(response.Polar4Quintile.CurrentSchoolValue),
-                SimilarSchoolValue = PolarText(response.Polar4Quintile.SimilarSchoolValue)
+                CurrentSchoolValue = PolarText(characteristicts.Polar4Quintile.CurrentSchoolValue),
+                SimilarSchoolValue = PolarText(characteristicts.Polar4Quintile.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Percentage of pupils with an EHC plan",
-                CurrentSchoolValue = Percent1dp(response.PupilsWithEhcPlanPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(response.PupilsWithEhcPlanPercentage.SimilarSchoolValue)
+                CurrentSchoolValue = Percent1dp(characteristicts.PupilsWithEhcPlanPercentage.CurrentSchoolValue),
+                SimilarSchoolValue = Percent1dp(characteristicts.PupilsWithEhcPlanPercentage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Percentage of pupils with SEN support",
-                CurrentSchoolValue = Percent1dp(response.PupilsWithSenSupportPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(response.PupilsWithSenSupportPercentage.SimilarSchoolValue)
+                CurrentSchoolValue = Percent1dp(characteristicts.PupilsWithSenSupportPercentage.CurrentSchoolValue),
+                SimilarSchoolValue = Percent1dp(characteristicts.PupilsWithSenSupportPercentage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Percentage of pupils with EAL",
-                CurrentSchoolValue = Percent1dp(response.PupilsWithEalPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(response.PupilsWithEalPercentage.SimilarSchoolValue)
+                CurrentSchoolValue = Percent1dp(characteristicts.PupilsWithEalPercentage.CurrentSchoolValue),
+                SimilarSchoolValue = Percent1dp(characteristicts.PupilsWithEalPercentage.ComparatorSchoolValue)
             }
         }.AsReadOnly();
     }

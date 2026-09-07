@@ -12,6 +12,7 @@ using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.SimilarSchools.Secondary;
 using SAPSec.Data.Repositories;
 using SAPSec.Web.Areas.Secondary.Controllers;
+using SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 using SAPSec.Web.Formatters;
 using SAPSec.Web.ViewModels;
 
@@ -24,7 +25,6 @@ public class SimilarSchoolsComparisonControllerTests
     private readonly Mock<IAbsenceRepository> _absenceRepositoryMock = new();
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock = new();
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock = new();
-    private readonly Mock<ILogger<ComparisonController>> _loggerMock = new();
     private readonly ComparisonController _sut;
 
     public SimilarSchoolsComparisonControllerTests()
@@ -50,23 +50,23 @@ public class SimilarSchoolsComparisonControllerTests
             _similarSchoolsRepositoryMock.Object,
             _absenceRepositoryMock.Object);
 
-        var getCharacteristicsComparison = new GetCharacteristicsComparison(
+        var getCharacteristicsComparison = new GetSecondaryComparisonSimilarityCharacteristicsUseCase(
+            _establishmentRepositoryMock.Object,
             _similarSchoolsRepositoryMock.Object);
 
         _similarSchoolsRepositoryMock
             .Setup(r => r.GetGroupAsync(It.IsAny<string>()))
             .ReturnsAsync(Array.Empty<SimilarSchoolsSecondaryGroupsEntry>());
 
-        var characteristicsFormatter = new CharacteristicsComparisonFormatter();
+        var characteristicsFormatter = new SecondaryCharacteristicsComparisonFormatter();
 
         _sut = new ComparisonController(
-            getSimilarSchoolDetails,
+            getCharacteristicsComparison,
             ks4HeadlineMeasuresUseCase,
             ks4CoreSubjectsUseCase,
             attendanceMeasuresUseCase,
-            getCharacteristicsComparison,
-            characteristicsFormatter,
-            _loggerMock.Object);
+            getSimilarSchoolDetails,
+            characteristicsFormatter);
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public class SimilarSchoolsComparisonControllerTests
         var result = await _sut.SchoolDetails(urn, similarUrn);
 
         var view = result.Should().BeOfType<ViewResult>().Subject;
-        var model = view.Model.Should().BeOfType<SimilarSchoolDetailsViewModel>().Subject;
+        var model = view.Model.Should().BeOfType<SchoolDetailsPageViewModel>().Subject;
 
         model.CurrentSchoolUrn.Should().Be(urn);
         model.ComparatorSchoolUrn.Should().Be(similarUrn);
