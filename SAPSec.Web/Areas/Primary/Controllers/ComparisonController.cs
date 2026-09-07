@@ -21,7 +21,6 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Route("school/primary/{urn}/view-similar-schools/{similarSchoolUrn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary, "urn", "similarSchoolUrn")]
-[RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class ComparisonController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetPrimarySimilarSchoolDetailsRequest, GetPrimarySimilarSchoolDetailsResponse> getPrimarySimilarSchoolDetailsUseCase,

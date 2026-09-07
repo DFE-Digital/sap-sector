@@ -1,5 +1,6 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Development"
 FeatureManagement__EnablePrimarySchools: "true"
+FeatureManagement__EnableAllThroughSchools: "false"
 FeatureManagement__EnableRiseResources: "true"
 reset_review_db: "false"

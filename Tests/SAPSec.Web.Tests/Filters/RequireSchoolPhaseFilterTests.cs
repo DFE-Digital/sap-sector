@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Moq;
+using SAPSec.Core.Constants;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
@@ -15,6 +17,17 @@ namespace SAPSec.Web.Tests.Filters;
 public class RequireSchoolPhaseFilterTests
 {
     private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock = new();
+    private readonly Mock<IFeatureFlagService> _featureFlagServiceMock = new();
+
+    public RequireSchoolPhaseFilterTests()
+    {
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .ReturnsAsync(true);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .ReturnsAsync(true);
+    }
 
     [Fact]
     public async Task SecondaryFilter_WithPrimarySchoolIndex_RedirectsToPrimaryPath()
@@ -89,6 +102,72 @@ public class RequireSchoolPhaseFilterTests
 
         result.Should().BeOfType<RedirectResult>()
             .Which.Url.Should().Be("/app" + Routes.SecondarySchool("123456").Overview);
+    }
+
+    [Fact]
+    public async Task PrimaryFilter_WithPrimarySchoolAndPrimaryFeatureDisabled_ReturnsNotFound()
+    {
+        var school = CreateSchoolDetails("123456", "Primary");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .ReturnsAsync(false);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Primary,
+            controller: "School",
+            action: "Index",
+            area: "Primary",
+            routeValues: [("urn", "123456")]);
+
+        result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task PrimaryFilter_WithAllThroughSchoolAndAllThroughFeatureDisabled_ReturnsNotFound()
+    {
+        var school = CreateSchoolDetails("123456", "All-through");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .ReturnsAsync(false);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Primary,
+            controller: "School",
+            action: "Index",
+            area: "Primary",
+            routeValues: [("urn", "123456")]);
+
+        result.Should().BeOfType<NotFoundResult>();
+    }
+
+    [Fact]
+    public async Task PrimaryFilter_WithAllThroughSchoolAndOnlyAllThroughFeatureEnabled_AllowsExecution()
+    {
+        var school = CreateSchoolDetails("123456", "All-through");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnablePrimarySchools))
+            .ReturnsAsync(false);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .ReturnsAsync(true);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.Primary,
+            controller: "School",
+            action: "Index",
+            area: "Primary",
+            routeValues: [("urn", "123456")]);
+
+        result.Should().BeNull();
     }
 
     [Fact]
@@ -217,6 +296,7 @@ public class RequireSchoolPhaseFilterTests
         var context = new ActionExecutingContext(actionContext, filters, actionArguments, controller: new object());
         var filter = new RequireSchoolPhaseFilter(
             _requestSchoolAccessorMock.Object,
+            _featureFlagServiceMock.Object,
             expectedSchoolPhase,
             routeValues.Select(x => x.Key).ToArray());
 

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Extensions;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.Model;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
@@ -9,6 +11,7 @@ namespace SAPSec.Web.Filters;
 
 public sealed class RequireSchoolPhaseFilter(
     IRequestSchoolAccessor requestSchoolAccessor,
+    IFeatureFlagService featureFlagService,
     ExpectedSchoolPhase expectedPhase,
     string[] routeParameterNames) : IAsyncActionFilter
 {
@@ -26,6 +29,12 @@ public sealed class RequireSchoolPhaseFilter(
             if (!MatchesExpectedPhase(school, expectedPhase))
             {
                 context.Result = TryBuildRedirectResult(context, school);
+                return;
+            }
+
+            if (!await IsFeatureEnabledForSchoolAsync(school, expectedPhase))
+            {
+                context.Result = new NotFoundResult();
                 return;
             }
         }
@@ -49,10 +58,30 @@ public sealed class RequireSchoolPhaseFilter(
     private static bool MatchesExpectedPhase(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
         => expectedPhase switch
         {
-            ExpectedSchoolPhase.Primary => school.IsPrimarySchool(),
+            ExpectedSchoolPhase.Primary => school.IsPrimarySchool() || school.IsAllThroughSchool(),
             ExpectedSchoolPhase.Secondary => school.IsSecondarySchool(),
             _ => false
         };
+
+    private async Task<bool> IsFeatureEnabledForSchoolAsync(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
+    {
+        if (expectedPhase != ExpectedSchoolPhase.Primary)
+        {
+            return true;
+        }
+
+        if (school.IsAllThroughSchool())
+        {
+            return await featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools);
+        }
+
+        if (school.IsPrimarySchool())
+        {
+            return await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+        }
+
+        return true;
+    }
 
     private IActionResult TryBuildRedirectResult(ActionExecutingContext context, SchoolDetails school)
     {

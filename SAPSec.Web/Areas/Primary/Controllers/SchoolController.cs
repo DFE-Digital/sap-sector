@@ -29,7 +29,6 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Route("school/primary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
-[RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SchoolController(
     IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
     IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
