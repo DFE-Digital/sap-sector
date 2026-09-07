@@ -30,14 +30,14 @@ else
     if (contentsEntries.Count > 0)
     {      
         <aside class="part-navigation-container" role="complementary">
-            <nav aria-label="Contents" class="gem-c-contents-list govuk-!-margin-bottom-4 govuk-!-margin-top-8" data-testid="rise-resources-contents">
-                <h2 class="gem-c-contents-list__title">Contents</h2>
-                <ol class="gem-c-contents-list__list">
+            <nav aria-label="Contents" class="rise-resources-contents-list govuk-!-margin-bottom-4 govuk-!-margin-top-8" data-testid="rise-resources-contents">
+                <h2 class="rise-resources-contents-list__title">Contents</h2>
+                <ol class="rise-resources-contents-list__list">
                     @foreach (var subCategory in contentsEntries)
                     {
-                        <li class="gem-c-contents-list__list-item gem-c-contents-list__list-item--dashed">
-                            <span class="gem-c-contents-list__list-item-dash" aria-hidden="true"></span>
-                            <a class="gem-c-contents-list__link govuk-link gem-print-force-link-styles" href="#@subCategory.Slug">@subCategory.Name</a>
+                        <li class="rise-resources-contents-list__list-item rise-resources-contents-list__list-item--dashed">
+                            <span class="rise-resources-contents-list__list-item-dash" aria-hidden="true"></span>
+                            <a class="rise-resources-contents-list__link govuk-link gem-print-force-link-styles" href="#@subCategory.Slug">@subCategory.Name</a>
                         </li>
                     }
                 </ol>
