@@ -545,6 +545,33 @@ public static class Measures
                     ];
                 }
             }
+
+            public static class PupilCharacteristic
+            {
+                public const string Key = $"{Absence.Key}-characteristic";
+                public const string Name = "Pupil characteristic";
+
+                public static class Values
+                {
+                    public const string AllPupils = "tot";
+                    public const string Boys = "boy";
+                    public const string Girls = "grl";
+                    public const string Fsm = "dis";
+                    public const string NonFsm = "ndi";
+                    public const string Eal = "eal";
+                    public const string Efl = "efl";
+
+                    public static readonly FilterValueDefinition[] AllValues = [
+                        new(AllPupils, "All pupils"),
+                        new(Boys, "Boys"),
+                        new(Girls, "Girls"),
+                        new(Fsm, "Ever6 FSM pupils"),
+                        new(NonFsm, "Non-Ever6 FSM pupils"),
+                        new(Eal, "English as an additional language"),
+                        new(Efl, "English as a first language"),
+                    ];
+                }
+            }
         }
     }
 
