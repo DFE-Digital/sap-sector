@@ -34,9 +34,30 @@
 
 .govuk-input-autocomplete {
   width: 411px;
+  -webkit-text-fill-color: currentColor;
 
   @include govuk-media-query($from: tablet) {
     width: 586px;
+  }
+}
+
+.autocomplete__input,
+.autocomplete__hint {
+  -webkit-text-fill-color: currentColor;
+}
+
+@media (forced-colors: active) {
+  .govuk-input-autocomplete,
+  .autocomplete__input {
+    color: FieldText;
+    background-color: Field;
+    -webkit-text-fill-color: FieldText;
+  }
+
+  .autocomplete__hint {
+    color: GrayText;
+    background-color: Field;
+    -webkit-text-fill-color: GrayText;
   }
 }
 
@@ -742,7 +763,11 @@
 }
 
 .app-side-navigation__link:focus {
+  outline: 3px solid transparent;
   color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow: 0 4px 0 #0b0c0c;
+  text-decoration: none;
 }
 
 @media (max-width: 40.0525em) {
@@ -978,12 +1003,17 @@
   }
 
   &:focus {
-    outline: 2px solid govuk-colour("blue");
-    outline-offset: 2px;
+    outline: 3px solid transparent;
+    color: govuk-colour("black");
+    background-color: govuk-colour("yellow");
+    box-shadow: 0 -2px govuk-colour("yellow"), 0 4px govuk-colour("black");
+    text-decoration: none;
   }
 
   &:focus:not(:focus-visible) {
-    outline: none; // Remove outline for mouse clicks, keep for keyboard
+    outline: none;
+    box-shadow: none;
+    background-color: transparent;
   }
 }
 
