@@ -1,13 +1,9 @@
-using SAPSec.Core.Features.SimilarSchools;
-
 namespace SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 
 public class SimilarityPageViewModel
 {
-    public required string Urn { get; set; }
-    public required string Name { get; set; }
-    public required string SimilarSchoolUrn { get; set; }
-    public required string SimilarSchoolName { get; set; }
+    public required SchoolInfoViewModel CurrentSchool { get; set; }
+    public required SchoolInfoViewModel ComparatorSchool { get; set; }
 
     public required IReadOnlyList<CharacteristicRow> CharacteristicsRows { get; set; }
 
@@ -15,9 +11,6 @@ public class SimilarityPageViewModel
     {
         public required string Characteristic { get; init; }
         public required string CurrentSchoolValue { get; init; }
-        public required string SimilarSchoolValue { get; init; }
-        public bool IsNumeric { get; init; }
-
-        public SchoolSimilarity? Similarity { get; init; }
+        public required string ComparatorSchoolValue { get; init; }
     }
 }

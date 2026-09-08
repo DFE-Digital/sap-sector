@@ -1,6 +1,6 @@
 using SAPSec.Core.Rounding;
 
-namespace SAPSec.Core.Features.SimilarSchools.UseCases;
+namespace SAPSec.Core.Features.SimilarSchools;
 
 public record SecondaryComparisonSimilarityCharacteristics
 {

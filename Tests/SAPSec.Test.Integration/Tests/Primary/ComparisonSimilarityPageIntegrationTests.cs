@@ -44,7 +44,7 @@ public class ComparisonSimilarityPageIntegrationTests(
             Routes.PrimarySchool("100001").Comparison("999999").Similarity, HttpStatusCode.NotFound);
     }
 
-    [Fact(Skip = "Not implemented yet")]
+    [Fact]
     public async Task Similarity_WhenComparatorSchoolIsNotInSimilarSchoolsGroupForCurrentSchool_ReturnsNotFound()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -53,7 +53,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", []))
-            .SetupValues(Build.PrimaryValues("100001", "100002"));
+            .SetupValues(Build.PrimaryValues(["100001", "100002"]));
 
         await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity, HttpStatusCode.NotFound);
@@ -68,7 +68,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
-            .SetupValues(Build.PrimaryValues("100002"));
+            .SetupValues(Build.PrimaryValues(["100002"]));
 
         await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity, HttpStatusCode.NotFound);
@@ -83,7 +83,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
-            .SetupValues(Build.PrimaryValues("100001"));
+            .SetupValues(Build.PrimaryValues(["100001"]));
 
         await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity, HttpStatusCode.NotFound);
@@ -155,7 +155,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
-            .SetupValues(Build.PrimaryValues("100001", "100002"));
+            .SetupValues(Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity);
@@ -163,5 +163,29 @@ public class ComparisonSimilarityPageIntegrationTests(
         var link = page.ElementWithTestIdShouldExist<IHtmlAnchorElement>("what-is-a-similar-school-link");
 
         link.PathName.Should().Be(Routes.PrimarySchool("100001").WhatIsASimilarSchool);
+    }
+
+    [Fact]
+    public async Task Similarity_HasSchoolsDataJsonScript()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
+            .SetupValues(Build.PrimaryValues(["100001", "100002"]));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("100001").Comparison("100002").Similarity);
+
+        var script = page.ElementShouldExist("script#schools-data[type='application/json']");
+
+        var json = script.TrimmedTextContent();
+        json.Should().NotBeNullOrWhiteSpace("schools-data script should contain JSON");
+        json!.Should().Contain("isMain");
+        json.Should().Contain("isComparedSchool");
+        json.Should().Contain("lat");
+        json.Should().Contain("lon");
     }
 }

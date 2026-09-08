@@ -1,5 +1,6 @@
-@using SAPSec.Web.Areas.Shared.ViewModels.Comparison
 @using SAPSec.Web.Constants
+@using SAPSec.Web.Areas.Shared.ViewModels.Comparison
+
 @model SimilarityPageViewModel
 @{
     Layout = "_Layout";
@@ -12,7 +13,7 @@
 </p>
 
 <p class="govuk-body">
-    Find out more about <a href="@Routes.SecondarySchool(Model.Urn).WhatIsASimilarSchool" class="govuk-link" data-testid="what-is-a-similar-school-link">
+    Find out more about <a href="@Routes.SecondarySchool(Model.CurrentSchool.Urn).WhatIsASimilarSchool" class="govuk-link" data-testid="what-is-a-similar-school-link">
         the characteristics to measure similarity.
     </a>
 </p>
@@ -22,8 +23,8 @@
         <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Characteristic</th>
-            <th scope="col" class="govuk-table__header">@Model.Name</th>
-            <th scope="col" class="govuk-table__header">@Model.SimilarSchoolName</th>
+            <th scope="col" class="govuk-table__header">@Model.CurrentSchool.Name</th>
+            <th scope="col" class="govuk-table__header">@Model.ComparatorSchool.Name</th>
         </tr>
         </thead>
 
@@ -33,7 +34,7 @@
             <tr class="govuk-table__row">
                 <th scope="row" class="govuk-table__header">@row.Characteristic</th>
                 <td class="govuk-table__cell">@row.CurrentSchoolValue</td>
-                <td class="govuk-table__cell">@row.SimilarSchoolValue</td>
+                <td class="govuk-table__cell">@row.ComparatorSchoolValue</td>
             </tr>
         }
         </tbody>

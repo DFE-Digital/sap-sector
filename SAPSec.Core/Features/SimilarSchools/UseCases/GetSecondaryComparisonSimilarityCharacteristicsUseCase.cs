@@ -26,6 +26,13 @@ public class GetSecondaryComparisonSimilarityCharacteristicsUseCase(
             throw new NotFoundException($"No school found with URN {request.ComparatorSchoolUrn}");
         }
 
+        var group = await similarSchoolsRepository.GetGroupAsync(request.CurrentSchoolUrn);
+
+        if (!group.Any(g => g.NeighbourURN == request.ComparatorSchoolUrn))
+        {
+            throw new NotFoundException($"School with URN {request.ComparatorSchoolUrn} is not in similar schools group for school with URN {request.ComparatorSchoolUrn}");
+        }
+
         var values = SimilarSchoolsSecondaryValues.FromData(await similarSchoolsRepository.GetValuesByUrnsAsync(urns))
             .ToDictionary(s => s.Urn);
 

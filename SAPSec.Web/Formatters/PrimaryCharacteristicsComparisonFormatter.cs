@@ -15,55 +15,55 @@ public sealed class PrimaryCharacteristicsComparisonFormatter : IPrimaryCharacte
             {
                 Characteristic = "Combined average KS1 reading, writing and maths prior attainment",
                 CurrentSchoolValue = WholeNumber(characteristicts.Ks1PriorRwmAverage.CurrentSchoolValue),
-                SimilarSchoolValue = WholeNumber(characteristicts.Ks1PriorRwmAverage.ComparatorSchoolValue)
+                ComparatorSchoolValue = WholeNumber(characteristicts.Ks1PriorRwmAverage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Total number of pupils",
                 CurrentSchoolValue = IntN0(characteristicts.PupilCount.CurrentSchoolValue),
-                SimilarSchoolValue = IntN0(characteristicts.PupilCount.ComparatorSchoolValue)
+                ComparatorSchoolValue = IntN0(characteristicts.PupilCount.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Pupil stability rate",
                 CurrentSchoolValue = Percent1dp(characteristicts.PupilStabilityRate.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(characteristicts.PupilStabilityRate.ComparatorSchoolValue)
+                ComparatorSchoolValue = Percent1dp(characteristicts.PupilStabilityRate.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Eligibility for pupil premium",
                 CurrentSchoolValue = Percent1dp(characteristicts.PupilPremiumEligibilityPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(characteristicts.PupilPremiumEligibilityPercentage.ComparatorSchoolValue)
+                ComparatorSchoolValue = Percent1dp(characteristicts.PupilPremiumEligibilityPercentage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Average IDACI score",
                 CurrentSchoolValue = Dec3dp(characteristicts.AverageIdaciScore.CurrentSchoolValue),
-                SimilarSchoolValue = Dec3dp(characteristicts.AverageIdaciScore.ComparatorSchoolValue)
+                ComparatorSchoolValue = Dec3dp(characteristicts.AverageIdaciScore.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Average POLAR4 quintile",
                 CurrentSchoolValue = PolarText(characteristicts.Polar4Quintile.CurrentSchoolValue),
-                SimilarSchoolValue = PolarText(characteristicts.Polar4Quintile.ComparatorSchoolValue)
+                ComparatorSchoolValue = PolarText(characteristicts.Polar4Quintile.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Percentage of pupils with an EHC plan",
                 CurrentSchoolValue = Percent1dp(characteristicts.PupilsWithEhcPlanPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(characteristicts.PupilsWithEhcPlanPercentage.ComparatorSchoolValue)
+                ComparatorSchoolValue = Percent1dp(characteristicts.PupilsWithEhcPlanPercentage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Percentage of pupils with SEN support",
                 CurrentSchoolValue = Percent1dp(characteristicts.PupilsWithSenSupportPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(characteristicts.PupilsWithSenSupportPercentage.ComparatorSchoolValue)
+                ComparatorSchoolValue = Percent1dp(characteristicts.PupilsWithSenSupportPercentage.ComparatorSchoolValue)
             },
             new()
             {
                 Characteristic = "Percentage of pupils with EAL",
                 CurrentSchoolValue = Percent1dp(characteristicts.PupilsWithEalPercentage.CurrentSchoolValue),
-                SimilarSchoolValue = Percent1dp(characteristicts.PupilsWithEalPercentage.ComparatorSchoolValue)
+                ComparatorSchoolValue = Percent1dp(characteristicts.PupilsWithEalPercentage.ComparatorSchoolValue)
             }
         }.AsReadOnly();
     }

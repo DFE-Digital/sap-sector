@@ -42,10 +42,8 @@ public class ComparisonController(
 
         var model = new SimilarityPageViewModel
         {
-            Urn = urn,
-            SimilarSchoolUrn = comparatorSchoolUrn,
-            Name = response.CurrentSchool.Name,
-            SimilarSchoolName = response.ComparatorSchool.Name,
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
+            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
             CharacteristicsRows = characteristicsFormatter.BuildRows(response.SimilarityCharacteristics)
         };
 
@@ -117,10 +115,8 @@ public class ComparisonController(
 
         var model = new AttendancePageViewModel
         {
-            Urn = response.CurrentSchool.Urn,
-            Name = response.CurrentSchool.Name,
-            SimilarSchoolUrn = response.ComparatorSchool.Urn,
-            SimilarSchoolName = response.ComparatorSchool.Name,
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
+            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
             Absence = MeasureViewModel.FromPrimaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
         };
 
@@ -141,10 +137,8 @@ public class ComparisonController(
 
         var schoolDetailsModel = new SchoolDetailsPageViewModel
         {
-            CurrentSchoolUrn = urn,
-            ComparatorSchoolUrn = comparatorSchoolUrn,
-            CurrentSchoolName = response.CurrentSchool.School.Name,
-            ComparatorSchoolName = response.ComparatorSchoolDetails.Name,
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool.School),
+            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool.School),
             CurrentSchoolLatitude = response.CurrentSchool.Coordinates?.Latitude,
             CurrentSchoolLongitude = response.CurrentSchool.Coordinates?.Longitude,
             ComparatorSchoolLatitude = response.ComparatorSchool.Coordinates?.Latitude,
