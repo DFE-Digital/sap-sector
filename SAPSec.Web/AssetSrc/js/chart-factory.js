@@ -8,6 +8,7 @@ const CHART_CONFIG = {
         maxDevicePixelRatio: 2,
         resizeDebounceMs: 100,
         labelWrapChars: 15,
+        mobileLabelWrapChars: 12,
         mobileBreakpoint: '(max-width: 40.0625em)'
     },
     legend: {
@@ -50,10 +51,15 @@ const CHART_CONFIG = {
         },
         labels: {
             yTickPadding: 10,
+            yAxisWidthPadding: 16,
             noDataOffset: 12,
             baseContainerHeight: 260,
             rowHeight: 70,
             lineHeight: 18
+        },
+        layout: {
+            leftPadding: 8,
+            mobileLeftPadding: 20
         },
         dataset: {
             borderWidth: 1,
@@ -198,6 +204,18 @@ function isMobileViewport() {
     return window.matchMedia(CHART_CONFIG.defaults.mobileBreakpoint).matches;
 }
 
+function getLabelWrapChars() {
+    return isMobileViewport()
+        ? CHART_CONFIG.defaults.mobileLabelWrapChars
+        : CHART_CONFIG.defaults.labelWrapChars;
+}
+
+function getBarChartLeftPadding() {
+    return isMobileViewport()
+        ? CHART_CONFIG.bar.layout.mobileLeftPadding
+        : CHART_CONFIG.bar.layout.leftPadding;
+}
+
 function isLargeEnoughForInsideLabel(value, ctx) {
     if (value === null || value === undefined || Number.isNaN(value)) {
         return false;
@@ -222,6 +240,7 @@ function getBarLabelAlignment(ctx, axisSuffix, barLabelAlign) {
 
     if (isMobileViewport()) {
         return isLargeEnoughForInsideLabel(ctx.dataset.data[ctx.dataIndex], ctx)
+            && canBarFitLabel(ctx, axisSuffix)
             ? CHART_CONFIG.bar.datalabels.defaultAlign
             : CHART_CONFIG.bar.datalabels.smallValueAlign;
     }
@@ -811,6 +830,9 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     }
                 },
                 y: {
+                    afterFit: function (scale) {
+                        scale.width += CHART_CONFIG.bar.labels.yAxisWidthPadding;
+                    },
                     grid: {
                         display: false,
                         drawBorder: false
@@ -820,10 +842,15 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                         font: fonts,
                         callback: function (value) {
                             const label = this.getLabelForValue(value);
-                            return wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars);
+                            return wrapLabel(label.toString(), getLabelWrapChars());
                         },
                         padding: CHART_CONFIG.bar.labels.yTickPadding
                     }
+                }
+            },
+            layout: {
+                padding: {
+                    left: getBarChartLeftPadding()
                 }
             },
             animation: false,
@@ -973,8 +1000,9 @@ function resizeBarChartContainer(canvas, chartData) {
         return;
     }
 
+    const labelWrapChars = getLabelWrapChars();
     const maxWrappedLines = Math.max(...labels.map(label =>
-        wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars).length
+        wrapLabel(label.toString(), labelWrapChars).length
     ));
     const rowHeight = CHART_CONFIG.bar.labels.rowHeight
         + Math.max(0, maxWrappedLines - 2) * CHART_CONFIG.bar.labels.lineHeight;
@@ -984,6 +1012,14 @@ function resizeBarChartContainer(canvas, chartData) {
     );
 
     container.style.height = `${height}px`;
+}
+
+function syncBarChartContainerHeight(chart) {
+    if (chart?.config?.type !== 'bar') {
+        return;
+    }
+
+    resizeBarChartContainer(chart.canvas, { labels: chart.data?.labels || [] });
 }
 
 function isYearByYearLineChart(canvas) {
@@ -1203,6 +1239,8 @@ function adjustChartResize() {
         resizeTimeout = setTimeout(() => {
             Object.values(charts).forEach(chart => {
                 const fontSizePx = gdsVars(chart.canvas).fontSize;
+
+                syncBarChartContainerHeight(chart);
 
                 if (chart.options.scales.x.ticks.font && typeof chart.options.scales.x.ticks.font !== 'function') {
                     chart.options.scales.x.ticks.font.size = fontSizePx;

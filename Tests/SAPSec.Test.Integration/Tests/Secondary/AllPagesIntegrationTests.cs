@@ -21,6 +21,7 @@ public class AllPagesIntegrationTests(
         new(Routes.SecondarySchool("100001").ViewSimilarSchools, "View similar schools"),
         new(Routes.SecondarySchool("100001").SchoolDetails, "School details"),
         new(Routes.SecondarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
+        new(Routes.SecondarySchool("100001").RiseResources, "RISE resources"),
         new(Routes.SecondarySchool("100001").Comparison("100002").Similarity, "How these schools compare", NavigationText: "Similarity"),
         new(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, "KS4 headline performance measures", NavigationText: "KS4 headline measures"),
         new(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, "KS4 core subject GCSE results", NavigationText: "KS4 core subjects"),

@@ -23,6 +23,7 @@ public class AllPagesIntegrationTests(
         new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
         new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
         new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
+        new(Routes.PrimarySchool("100001").RiseResources, "RISE resources"),
         new(Routes.PrimarySchool("100001").Comparison("100002").Similarity, "How these schools compare", NavigationText: "Similarity"),
         new(Routes.PrimarySchool("100001").Comparison("100002").Ks2, "KS2 performance measures", NavigationText: "KS2"),
         new(Routes.PrimarySchool("100001").Comparison("100002").Attendance, "Attendance measures", NavigationText: "Attendance"),

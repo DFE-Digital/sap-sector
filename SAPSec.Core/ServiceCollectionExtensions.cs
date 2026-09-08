@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
 using SAPSec.Core.Features.SchoolDetails.School;
@@ -87,6 +88,12 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<
             IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>,
             GetSecondaryComparisonAttendanceMeasuresUseCase>();
+        
+        // RISE Resources
+
+        services.AddSingleton<
+            IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse>,
+            GetRiseResourcesUseCase>();
     }
 
     public static void AddServices(this IServiceCollection services)
