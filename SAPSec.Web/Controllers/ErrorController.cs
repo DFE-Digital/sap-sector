@@ -37,7 +37,7 @@ public class ErrorController : Controller
 
     private ErrorViewModel ErrorModel => new()
     {
-        ErrorCode = HttpContext.TraceIdentifier,
-        ErrorMessage = HttpContext.Items.TryGetValue("ErrorMessage", out object? o) && o is string message ? message : null
+        ErrorCode = HttpContext.Items.TryGetValue("ErrorCode", out object? oc) && oc is string code ? code : null,
+        ErrorMessage = HttpContext.Items.TryGetValue("ErrorMessage", out object? om) && om is string message ? message : null
     };
 }

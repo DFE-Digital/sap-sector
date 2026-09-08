@@ -25,6 +25,7 @@ public sealed class NotFoundExceptionHandler(
             if (!hostEnvironment.IsProduction())
             {
                 context.Items["ErrorMessage"] = ex.Message;
+                context.Items["ErrorCode"] = context.TraceIdentifier;
             }
 
             // Mark as handled so it doesn't get treated as a 500 error

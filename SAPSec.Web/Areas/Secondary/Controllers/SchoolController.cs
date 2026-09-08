@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Measures;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Secondary;
+using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
@@ -27,6 +29,8 @@ public class SchoolController(
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getSchoolKs4CoreSubjectsUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
+        IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
+        Core.Interfaces.Services.IFeatureFlagService featureFlagService,
         IRequestSchoolAccessor requestSchoolAccessor,
         ILogger<SchoolController> logger) : Controller
 {
@@ -35,8 +39,7 @@ public class SchoolController(
     {
         var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
 
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
         return View(school);
     }
 
@@ -45,8 +48,7 @@ public class SchoolController(
     public async Task<IActionResult> SchoolDetails(string urn)
     {
         var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
         return View(school);
     }
 
@@ -55,8 +57,7 @@ public class SchoolController(
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
         var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
-        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        SetSchoolViewDataAsync(school);
+        await SetSchoolViewDataAsync(urn, school);
         return View(school);
     }
 
@@ -67,7 +68,7 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
         {
@@ -87,7 +88,7 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4CoreSubjectsPageViewModel
         {
@@ -113,7 +114,7 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Secondary, urn, filters));
 
-        PopulateViewData(response.School);
+        await PopulateViewData(response.School);
 
         var model = new AttendancePageViewModel
         {
@@ -124,18 +125,33 @@ public class SchoolController(
         return View(model);
     }
 
-    private void PopulateViewData(SchoolInfo currentSchool)
+    [HttpGet]
+    [RequireFeatureFlag(FeatureFlags.EnableRiseResources)]
+    [Route("rise-resources")]
+    public async Task<IActionResult> RiseResources(string urn)
+    {
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        await SetSchoolViewDataAsync(urn, school);
+
+        var riseResourcesResponse = await getRiseResourcesUseCase.Execute(new(urn));
+        return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
+    }
+
+    private async Task PopulateViewData(SchoolInfo currentSchool)
     {
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             currentSchool.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+            ControllerContext.ActionDescriptor.ActionName,
+            await IsRiseResourcesEnabledAsync());
     }
 
-    private void SetSchoolViewDataAsync(Core.Model.SchoolDetails school)
+    private async Task SetSchoolViewDataAsync(string urn, Core.Model.SchoolDetails school)
     {
+        ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
         ViewData[ViewDataKeys.SchoolDetails] = school;
 
         if (Url is null)
@@ -146,6 +162,11 @@ public class SchoolController(
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             school.Urn,
-            ControllerContext.ActionDescriptor.ActionName);
+            ControllerContext.ActionDescriptor.ActionName,
+            await IsRiseResourcesEnabledAsync());
     }
+
+    private async Task<bool> IsRiseResourcesEnabledAsync() =>
+        featureFlagService is not null
+        && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 }

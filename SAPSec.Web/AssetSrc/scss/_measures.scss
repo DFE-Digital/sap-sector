@@ -302,6 +302,11 @@ $app-measure-color-track: #f3f2f1;
   --chart-color-comparator: #27a0cc;
   --chart-color-england: #003c56;
   --chart-color-fallback: #6f777b;
+
+  &:focus-visible {
+    outline: 3px solid #ffdd00;
+    outline-offset: 3px;
+  }
 }
 
 .js-chart--school-measure-bar {
