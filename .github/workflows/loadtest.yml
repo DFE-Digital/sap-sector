@@ -1,0 +1,66 @@
+name: Load Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      scenario:
+        description: "Load test scenario"
+        required: true
+        type: choice
+        default: quick
+        options:
+          - quick
+          - baseline
+          - peak-surge
+          - stress
+      environment:
+        description: "Target environment"
+        required: true
+        type: choice
+        default: review
+        options:
+          - review
+          - test
+      pull-request-number:
+        description: "Pull request number (required for review environment)"
+        required: false
+        type: string
+
+jobs:
+  load-test:
+    name: Run k6 load test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+
+      - name: Validate inputs
+        if: ${{ inputs.environment == 'review' && inputs['pull-request-number'] == '' }}
+        run: |
+          echo "::error::pull-request-number is required when environment is 'review'"
+          exit 1
+
+      - name: Set up k6
+        uses: grafana/setup-k6@7af9007cf6ab08d712b18ed2ad067ae5c8ff441d # v0.0.1
+
+      - name: Run k6 load test
+        id: k6
+        working-directory: load_testing
+        env:
+          PR_NUMBER: ${{ inputs['pull-request-number'] }}
+        run: |
+          k6 run \
+            --env SCENARIO=${{ inputs.scenario }} \
+            --env ENVIRONMENT=${{ inputs.environment }} \
+            sap-sector/load-test.js
+
+      - name: Upload load test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sap-sector-load-test-report-${{ inputs.environment }}-${{ inputs.scenario }}
+          path: |
+            load_testing/sap-sector-load-test-summary.json
+            load_testing/sap-sector-load-test-report.html
+          retention-days: 14
