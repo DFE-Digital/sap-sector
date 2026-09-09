@@ -1,4 +1,5 @@
 using SAPSec.Data.Dto.KS2.Performance;
+using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Data.Repositories;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Web.Formatters;
@@ -19,6 +20,10 @@ public static class DependenciesExtensions
         services.AddJsonFile<LAPerformance>(JsonDataSource.PrimarySchools);
         services.AddJsonFile<EnglandPerformance>(JsonDataSource.PrimarySchools);
         services.AddSingleton<IKs2PerformanceRepository, JsonKs2PerformanceRepository>();
+
+        // RISE resources
+        services.AddJsonFile<RiseResourcesDocument>(JsonDataSource.RiseResources);
+        services.AddSingleton<IRiseResourcesRepository, JsonRiseResourcesRepository>();
 
         // Formatters
         services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();

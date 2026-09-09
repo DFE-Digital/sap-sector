@@ -25,6 +25,7 @@ public class SchoolControllerTests
     private readonly Mock<IKs4PerformanceRepository> _ks4PerformanceRepositoryMock;
     private readonly Mock<IKs4DestinationsRepository> _ks4DestinationsRepositoryMock;
     private readonly Mock<ISimilarSchoolsSecondaryRepository> _similarSchoolsRepositoryMock;
+    private readonly Mock<IRiseResourcesRepository> _riseResourcesRepositoryMock;
     private readonly Mock<IRequestSchoolAccessor> _requestSchoolAccessorMock;
     private readonly Mock<ILogger<SchoolController>> _loggerMock;
     private readonly SchoolController _sut;
@@ -42,6 +43,7 @@ public class SchoolControllerTests
         _ks4PerformanceRepositoryMock = new Mock<IKs4PerformanceRepository>();
         _ks4DestinationsRepositoryMock = new Mock<IKs4DestinationsRepository>();
         _similarSchoolsRepositoryMock = new Mock<ISimilarSchoolsSecondaryRepository>();
+        _riseResourcesRepositoryMock = new Mock<IRiseResourcesRepository>();
         _requestSchoolAccessorMock = new Mock<IRequestSchoolAccessor>();
         _loggerMock = new Mock<ILogger<SchoolController>>();
         _featureFlagServiceMock = new Mock<IFeatureFlagService>();
@@ -59,7 +61,8 @@ public class SchoolControllerTests
             _establishmentRepositoryMock.Object,
             _absenceRepositoryMock.Object);
         var getRiseResourcesUseCase = new GetRiseResourcesUseCase(
-            _establishmentRepositoryMock.Object);
+            _establishmentRepositoryMock.Object,
+            _riseResourcesRepositoryMock.Object);
 
         _sut = new SchoolController(
             getSchoolKs4HeadlineMeasuresUseCase,
