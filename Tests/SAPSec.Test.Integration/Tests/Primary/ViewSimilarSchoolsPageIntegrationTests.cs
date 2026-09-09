@@ -165,6 +165,7 @@ public class ViewSimilarSchoolsPageIntegrationTests(
         page.Title.Should().Contain("2 similar schools - View similar schools");
         page.QuerySelector("a[href=\"#similar-schools-results\"]")?.TextContent.Trim().Should().Be("Skip to search results");
         page.QuerySelector("#similar-schools-results").Should().NotBeNull();
+        page.QuerySelectorAll(".govuk-skip-link").Should().HaveCount(1);
 
         var filter = page.ElementWithTestIdShouldExist("primary-similar-schools-filter");
         filter.TextContent.Should().Contain("Filters");
