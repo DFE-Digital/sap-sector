@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -18,9 +18,9 @@
     <PackageReference Include="Lucene.Net" Version="4.8.0-beta00017" />
     <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00017" />
     <PackageReference Include="Lucene.Net.Highlighter" Version="4.8.0-beta00017" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.10" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Npgsql" Version="8.0.8" />
+    <PackageReference Include="Npgsql" Version="10.0.3" />
     <PackageReference Include="Sep" Version="0.11.5" />
   </ItemGroup>
 
@@ -45,7 +45,6 @@
     <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryGroupsEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsPrimaryValuesEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json" />
-    <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json" />
     <None Remove="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json" />
     <None Remove="Data\Files\PrimarySchools\EnglandPerformance.json" />
     <None Remove="Data\Files\PrimarySchools\EstablishmentPerformance.json" />
@@ -111,9 +110,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryGroupsEntry.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryStandardDeviationsEntry.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Files\Generated\SimilarSchoolsSecondaryValuesEntry.json">

@@ -51,7 +51,7 @@ public class AccessibilityPageTests(WebApplicationSetupFixture fixture) : BasePa
         var breadcrumb = Page.Locator(".govuk-breadcrumbs__link").Filter(new() { HasText = "Home" });
 
         (await breadcrumb.CountAsync()).Should().Be(1);
-        (await breadcrumb.First.GetAttributeAsync("href")).Should().Be("/find-a-school");
+        (await breadcrumb.First.GetAttributeAsync("href")).Should().Be(Routes.FindASchool());
     }
 
     [Fact]

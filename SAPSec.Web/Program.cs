@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.FeatureManagement;
 using SAPSec.Core.Authentication;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Services;
 using SAPSec.Infrastructure.Json;
 using SAPSec.Infrastructure.LuceneSearch;
 using SAPSec.Infrastructure.Postgres;
@@ -112,7 +111,7 @@ public class Program
             options.ForwardedHeaders = ForwardedHeaders.XForwardedHost
                                      | ForwardedHeaders.XForwardedProto
                                      | ForwardedHeaders.XForwardedFor;
-            options.KnownNetworks.Clear();
+            options.KnownIPNetworks.Clear();
             options.KnownProxies.Clear();
         });
 
@@ -185,6 +184,8 @@ public class Program
         builder.Services.Configure<RazorViewEngineOptions>(options =>
         {
             options.ViewLocationFormats.Add("/{0}.cshtml");
+            options.AreaViewLocationFormats.Add("/Areas/Shared/Views/{1}/{0}.cshtml");
+            options.AreaViewLocationFormats.Add("/Areas/Shared/Views/{0}.cshtml");
         });
 
         builder.Services.Configure<RequestLocalizationOptions>(options =>
@@ -202,6 +203,8 @@ public class Program
         builder.Services.AddLuceneDependencies();
 
         // Service and Repo depencencies.
+        builder.Services.AddUseCases();
+        builder.Services.AddServices();
         builder.Services.AddPostgresqlDependencies();
 
         // LoadTest is a dedicated, explicitly-opted-into environment name for running

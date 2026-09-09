@@ -17,8 +17,8 @@ public class SimilarSchoolsPageViewModel : ISimilarSchoolsPageViewModel
     public string WhatIsASimilarSchoolUrl { get; set; } = string.Empty;
     public List<SimilarSchoolViewModel> Schools { get; set; } = new();
     public List<SimilarSchoolViewModel> MapSchools { get; set; } = new();
-    public IReadOnlyCollection<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> FilterOptions { get; set; } = [];
-    public IReadOnlyCollection<SAPSec.Core.Features.Sorting.SortOption> SortOptions { get; set; } = [];
+    public IReadOnlyCollection<Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> FilterOptions { get; set; } = [];
+    public IReadOnlyCollection<Core.Features.Sorting.SortOption> SortOptions { get; set; } = [];
     public Dictionary<string, List<string>> CurrentFilters { get; set; } = new(StringComparer.InvariantCultureIgnoreCase);
     public List<SimilarSchoolsFilterGroupViewModel> FilterGroups { get; set; } = new();
     public List<SimilarSchoolsSelectedFilterTagViewModel> SelectedFilterTags { get; set; } = new();
@@ -29,7 +29,7 @@ public class SimilarSchoolsPageViewModel : ISimilarSchoolsPageViewModel
     public IReadOnlyCollection<ValidationError> ValidationErrors { get; set; } = [];
 
     public int TotalPages => (int)Math.Ceiling((double)TotalResults / PageSize);
-    public int ShowingFrom => TotalResults == 0 ? 0 : ((CurrentPage - 1) * PageSize) + 1;
+    public int ShowingFrom => TotalResults == 0 ? 0 : (CurrentPage - 1) * PageSize + 1;
     public int ShowingTo => Math.Min(CurrentPage * PageSize, TotalResults);
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
@@ -89,7 +89,7 @@ public class SimilarSchoolsPageViewModel : ISimilarSchoolsPageViewModel
 
 public record SimilarSchoolsFilterGroupViewModel(
     string Heading,
-    List<SAPSec.Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> Filters);
+    List<Core.Features.SimilarSchools.UseCases.SimilarSchoolsAvailableFilter> Filters);
 
 public record SimilarSchoolsSelectedFilterTagViewModel(
     string Label,

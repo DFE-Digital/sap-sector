@@ -28,10 +28,10 @@
     };
 }
 
-<div class="app-measure-chart-container app-measure-chart-container--school-headline">
+<div class="app-measure-chart-container">
     @if (hasAnyData)
     {
-          <canvas id="@Model.MeasureInfo.HtmlPrefix-school-chart"
+          <canvas id="@Model.MeasureInfo.HtmlPrefix-current-year-chart"
                   data-testid="@Model.MeasureInfo.HtmlPrefix-current-year-chart"
                   class="js-chart js-chart--school-measure-bar"
                   data-type="bar"
@@ -45,8 +45,8 @@
                   data-bar-percentage="1"
                   data-bar-thickness="50"
                   data-axis-suffix="@(Model.MeasureInfo.DataType is MeasureDataType.GradePercentage or MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage? "%" : "")"
-                  data-chart='@Html.Raw(JsonSerializer.Serialize(chartData))'
-                  @if (Model.MeasureInfo.ChartColors is not null) { <text>data-colors='@Html.Raw(JsonSerializer.Serialize(Model.MeasureInfo.ChartColors))'</text> }>
+                  data-chart="@Html.Raw(JsonSerializer.Serialize(chartData).Replace("\"", "&quot;"))"
+                  data-colors="@Html.Raw(JsonSerializer.Serialize(Model.Colors).Replace("\"", "&quot;"))">
            </canvas>
     }
     else

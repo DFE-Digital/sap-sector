@@ -1,44 +1,45 @@
-# SAP Sector  
+# SAP Sector
+
 ## High-Level Design (HLD)
 
-**Repository:** `DFE-Digital/sap-sector`  
-**Author:** Hari Dupati  
-**Last updated:** 2026-07-19  
-**Status:** Draft
+**Repository:** `DFE-Digital/sap-sector`
+**Author:** Hari Dupati
+**Last updated:** 2026-08-20
 
 ---
 
 ## Contents
 
-1. [Purpose](#1-purpose)  
-2. [Scope](#2-scope)  
-3. [Service overview](#3-service-overview)  
-4. [Users and user types](#4-users-and-user-types)  
-5. [Data and information types](#5-data-and-information-types)  
-6. [Data flows](#6-data-flows)  
-7. [High-level architecture diagram](#7-high-level-architecture-diagram)  
-8. [C4 system diagrams](#8-c4-system-diagrams)  
-9. [Interactions and key flows](#9-interactions-and-key-flows)  
-10. [Non-functional considerations](#10-non-functional-considerations)  
-11. [Assumptions and constraints](#11-assumptions-and-constraints)  
-12. [References](#12-references)  
-13. [Glossary](#13-glossary)  
+1. [Purpose](#1-purpose)
+2. [Scope](#2-scope)
+3. [Service overview](#3-service-overview)
+4. [Users and user types](#4-users-and-user-types)
+5. [Data and information types](#5-data-and-information-types)
+6. [Data flows](#6-data-flows)
+7. [High-level architecture diagram](#7-high-level-architecture-diagram)
+8. [C4 system diagrams](#8-c4-system-diagrams)
+9. [Interactions and key flows](#9-interactions-and-key-flows)
+10. [Non-functional considerations](#10-non-functional-considerations)
+11. [Assumptions and constraints](#11-assumptions-and-constraints)
+12. [References](#12-references)
+13. [Glossary](#13-glossary)
 
 ---
 
 ## 1. Purpose
 
-This High-Level Design (HLD) provides an overview of the **SAP Sector** service and the supporting data platform contained in the `DFE-Digital/sap-sector` repository.
+This document gives an overview of the SAP Sector service and the data platform that supports it, both of which live in the `DFE-Digital/sap-sector` repository.
 
-It explains:
+It covers:
 
-- the main system components
-- how users access the service
-- how data enters and moves through the platform
-- how the application is structured at a high level
-- the supporting operational and technical services required for the platform to run
+- the main components and where the system boundary sits
+- how users get access
+- how data enters the platform, how it is defined, and how it is retrieved
+- the operational and technical services the platform needs to run
 
-The aim is to give both technical and non-technical readers a clear understanding of the system boundary, architecture, data flows, and operational model.
+It stays above the level of code. Anything that describes .NET implementation structure, such as projects, layers, classes or method signatures, is in the [Low-Level Design (LLD)](./low-level-design.md).
+
+The aim is that both technical and non-technical readers can understand the system boundary, the architecture, the data flows and the operational model.
 
 ---
 
@@ -47,79 +48,85 @@ The aim is to give both technical and non-technical readers a clear understandin
 ### In scope
 
 - user types and access patterns
-- service components and responsibilities
-- application layers and dependencies
+- system components and what each is responsible for, at a logical level
+- data ownership, definition and access
 - primary data stores
-- search subsystem
+- the search subsystem and where it is heading
 - authentication and security boundaries
 - high-level interaction flows
-- data ingestion and supporting pipeline
+- data ingestion and the supporting pipeline
 - hosting and operational model
-- C4-style architectural views
+- C4 views at levels 1 and 2
 
 ### Out of scope
 
-- low-level design and class-level implementation
-- full database schema / detailed ERD
-- detailed Terraform or Kubernetes resource definitions
-- full CI/CD implementation detail
-- code-level API signatures and internal method design
+These are covered in the [LLD](./low-level-design.md) and the [ERD](./entity-relationship-diagram.md):
+
+- application project structure, layers and internal components
+- class-level implementation, patterns and API signatures
+- C4 level 3 component views
+- full database schema, materialised view definitions and the detailed ERD
+- Terraform and Kubernetes resource definitions
+- CI/CD implementation detail
 
 ---
 
 ## 3. Service overview
 
-SAP Sector is a **sector-facing school information service** built using **ASP.NET Core MVC on .NET 8**.
+SAP Sector is a sector-facing school information service.
 
-At a high level, the service enables authenticated users to:
+It lets authenticated users:
 
 - search for schools
 - view establishment information
 - view performance and related statistical information
 - compare schools using derived and curated data
 
-The repository contains both the application runtime and the supporting data-processing capabilities needed to provide this functionality.
+The repository holds both the application runtime and the data processing that supports it.
 
-The solution is structured into distinct logical areas:
+### Logical building blocks
 
-- **SAPSec.Web** – presentation layer and HTTP entry point
-- **SAPSec.Core** – business rules, domain logic, and abstractions
-- **SAPSec.Infrastructure** – persistence, search, and technical integrations
-- **SAPData** – data ingestion, SQL generation, and database-refresh pipeline
-- **Tests** – unit, integration, end-to-end, UI, and accessibility testing
-- **terraform** – infrastructure-as-code for deployment and hosting
-- **maintenance_page** – static maintenance/failover page
+| Building block        | Responsibility                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------- |
+| Web application       | Sector-facing entry point. Renders search, detail and comparison journeys. Read-only.          |
+| Data pipeline         | Acquires, normalises and loads external datasets. Owns and refreshes the database structure.   |
+| PostgreSQL            | Authoritative store for curated data, exposed to the application through materialised views.   |
+| Search index          | Derived index that supports search journeys. Currently Lucene, see section 5.3.                |
+| DfE Sign-in (DSI)     | Authentication and identity.                                                                   |
+| AKS                   | Container hosting and deployment.                                                              |
+
+How the web application and the pipeline are structured internally is in the [LLD](./low-level-design.md).
 
 ### Architectural summary
 
-- **Upstream data inputs** provide establishment and education-related datasets
-- **The data pipeline** downloads, normalises, and prepares data for use by the service
-- **PostgreSQL** acts as the authoritative data store
-- **Lucene** provides a derived search index
-- **ASP.NET Core MVC** delivers the user-facing application
-- **DfE Sign-in (DSI)** provides authentication
-- **AKS** provides cloud hosting and deployment infrastructure
+- upstream data inputs provide establishment and education-related datasets
+- the data pipeline downloads, normalises and prepares that data, and is the only thing that writes to the database
+- PostgreSQL is the authoritative data store
+- a derived search index supports search journeys
+- the web application delivers the user-facing experience and only reads data
+- DfE Sign-in provides authentication
+- AKS provides hosting and deployment
 
 ---
 
 ## 4. Users and user types
 
-The architecture and service design indicate the following main user groups:
+The main user groups are:
 
-- **School users**
-- **Trust leads**
-- **Local authority users**
-- **Operational/support users**
+- school users
+- trust leads
+- local authority users
+- operational and support users
 
 ### Authentication model
 
-Users access the platform through **DfE Sign-in (DSI)**.
+Users get to the platform through DfE Sign-in.
 
-The current application configuration applies a **fallback authorization policy requiring authenticated users** by default. This means the service should be treated as primarily authenticated, with only explicitly allowed endpoints exposed anonymously where needed.
+The application applies a fallback authorization policy that requires an authenticated user by default. The service should be treated as authenticated throughout, with only specific endpoints opened up anonymously where that is needed.
 
 ### Operational users
 
-Operational and engineering users interact with the service indirectly via:
+Operational and engineering users interact with the service indirectly, through:
 
 - deployment workflows
 - monitoring
@@ -132,48 +139,81 @@ Operational and engineering users interact with the service indirectly via:
 
 ## 5. Data and information types
 
-The service uses several different logical categories of data.
+### 5.1 Data ownership and access model
 
-### 5.1 Authoritative application data
+This section explains how data definition, persistence and retrieval work. The approach is different from most other services in the portfolio, so it is set out here rather than left to the LLD.
 
-Stored primarily in **PostgreSQL**, including:
+The pipeline owns the schema. The application only reads.
+
+| Concern           | Owned by           | Notes                                                                        |
+| ----------------- | ------------------ | ---------------------------------------------------------------------------- |
+| Schema definition | Data pipeline      | Tables and materialised views are generated deterministically from metadata.  |
+| Writes            | Data pipeline      | The application does no inserts, updates or deletes.                          |
+| Reads             | Web application    | Read-only queries issued through Dapper.                                      |
+| Query surface     | Materialised views | The application queries views, not base tables.                               |
+
+What follows from that:
+
+**There is no ORM and no EF Core code-first model.** The application does not use entity tracking, lazy loading, navigation properties or EF-managed migrations.
+
+**Read models are generated rather than hand-written.** A JSON description of each view's shape is produced, and the read model is generated from that serialised structure. This keeps the model in step with the views the pipeline produces.
+
+**Schema change is a pipeline concern.** A change to the shape of the data is made in the pipeline metadata, which flows through to regenerated SQL, refreshed views and regenerated read models. There is no runtime migration step in the application.
+
+Why it is done this way:
+
+- the workload is read-heavy and read-only, so ORM change tracking adds cost without giving anything back
+- pre-shaped materialised views give predictable query performance for detail and comparison pages, which would otherwise need wide multi-table joins
+- generating the schema deterministically from metadata makes data refreshes repeatable and auditable
+- keeping writes out of the runtime removes a class of runtime failure, and means application deployment does not depend on data refresh
+
+The view definitions, the generated model structure and the query patterns are in the [LLD](./low-level-design.md) and the [ERD](./entity-relationship-diagram.md).
+
+### 5.2 Authoritative application data
+
+Held in PostgreSQL:
 
 - school and establishment metadata
-- performance/statistical data
-- comparison-related data
+- performance and statistical data
+- comparison data
 - supporting reference information
 
-### 5.2 Derived search data
+### 5.3 Search data and direction of travel
 
-Stored in the **Lucene index**, including:
+Search currently runs on a Lucene index. The index is built by the web application itself, a hosted background service reads establishments from PostgreSQL at startup and writes them into an in-memory Lucene directory. Each replica therefore holds its own copy and rebuilds it on every pod start. Nothing is persisted to disk or to a shared store. The index holds:
 
 - normalised search terms
 - indexed school names
 - lookup-friendly derived fields
 - search-optimised document structures
 
-### 5.3 Identity and access data
+The plan is to retire the separate Lucene index and move to PostgreSQL full-text search, in line with what SAP Public are doing. That removes the per-replica memory cost, the startup rebuild, and the possibility of replicas diverging, and puts everything on one query surface. Lucene should be read as the current implementation rather than the target.
 
-Provided through **DfE Sign-in**, including:
+### 5.4 Identity and access data
+
+Comes from DfE Sign-in:
 
 - authenticated identity
 - claims
-- role or authorization context
+- role and authorization context
 - session-related security information
 
-### 5.4 Generated and packaged data files
+None of this is written to the database. Identity is carried in the OIDC cookie authentication scheme, which is configured to save tokens. Per-session state, currently the selected organisation, is held in server-side session backed by an in-process distributed memory cache, with the cookie carrying only the session identifier. The session cookie is HttpOnly, Secure, SameSite=Lax, with a one-hour idle timeout.
 
-The repository also contains generated or packaged data assets used by the application and infrastructure layer, including JSON files referenced by `SAPSec.Infrastructure`.
+Because the session cache is in-process rather than shared, session state does not travel between replicas. This is a known constraint of running two replicas without a shared cache and should be revisited alongside the search work.
 
-### 5.5 Operational and supporting data
+### 5.5 Generated and packaged data files
 
-Operational/supporting data includes:
+The repository also holds generated and packaged data assets used at runtime, including the JSON structures that read models are generated from. See section 5.1.
+
+### 5.6 Operational and supporting data
 
 - logs
 - health status information
 - deployment metadata
 - pipeline outputs
-- data protection keys for distributed hosting scenarios
+- data protection keys for distributed hosting
+- usage and behavioural analytics, sent to three separate destinations (see section 6.5)
 
 ---
 
@@ -181,19 +221,17 @@ Operational/supporting data includes:
 
 ## 6.1 Data pipeline
 
-The repository includes a substantial supporting data platform under `SAPData/`.
+The supporting data platform sits under `SAPData/`.
 
-At a high level, the pipeline:
+The pipeline:
 
 1. acquires raw source files from upstream data sources
-2. computes hashes to identify whether data has changed
-3. exits early where no changes are detected
-4. cleans and normalises source data
-5. generates SQL scripts using a .NET-based generator
-6. executes SQL to create or refresh the database structures
-7. supports downstream application and search capabilities
+2. exits early where nothing has changed
+3. cleans and normalises the source data
+4. generates SQL from metadata and source structures
+5. runs that SQL to create or refresh tables and materialised views
 
-The `SAPData` README describes a structured **raw → staging → curated** model and a deterministic SQL-generation process.
+It follows a raw, staging and curated model, with a deterministic SQL generation process.
 
 ### Key characteristics
 
@@ -202,50 +240,64 @@ The `SAPData` README describes a structured **raw → staging → curated** mode
 - auditable
 - SQL-first
 - restartable
-- suited for scheduled execution
+- suited to running on a schedule
 
 ## 6.2 Data flow model
 
-SAP Sector consumes multiple external datasets describing schools, performance, destinations, attendance, and related education metrics.
+SAP Sector uses several external datasets covering schools, performance, destinations, attendance, inspection outcomes and related education metrics.
 
-These datasets are ingested through a structured pipeline and transformed into a consistent form before being loaded into **PostgreSQL**, which acts as the authoritative repository for the service.
+These are ingested through the pipeline and transformed into a consistent form before being loaded into PostgreSQL, which is the authoritative store for the service.
 
-Selected fields are then used to build a **Lucene search index** so the web application can support fast and flexible search behaviour.
-
-The application uses:
-
-- **PostgreSQL** for authoritative detail and structured retrieval
-- **Lucene** for search-oriented access patterns
+Curated data is then shaped into materialised views, which are the query surface for the application. The pipeline's only write target is PostgreSQL; the search index is built separately by the application from that data.
 
 ## 6.3 High-level data flow summary
 
 - external datasets are downloaded or supplied to the pipeline
-- source files are mapped, cleaned, normalised, and transformed
+- source files are mapped, cleaned, normalised and transformed
 - processed data is loaded into PostgreSQL
-- derived search structures are created for Lucene
-- the web application queries Lucene for search scenarios
-- the web application queries PostgreSQL for authoritative detail and comparison data
-- monitoring and operations services observe the running platform
+- materialised views are built to serve the application's query patterns
+- the web application issues read-only queries against materialised views
+- at startup the web application reads establishments from PostgreSQL and builds its in-memory search index
+- the web application queries that index for search journeys
+- monitoring and operations services watch the running platform
+- usage events are emitted to analytics destinations, both server-side and from the browser
 
 ## 6.4 Summary table of data sources and logical domains
 
-| Data Source | Data Domain | Example Fields | Stored In | Downstream Use | Cadence |
-|---|---|---|---|---|---|
-| GIAS | Establishment metadata | URN, address, governance, phase, trust, local authority | PostgreSQL | Search, detail pages | Daily / scheduled |
-| Performance datasets | Attainment and comparison metrics | Attainment 8, Progress 8, subject measures | PostgreSQL | Detail and comparison | Periodic |
-| Destinations datasets | Destination outcomes | education, employment, apprenticeships | PostgreSQL | Detail and comparison | Periodic |
-| Absence datasets | Attendance/absence | absence %, authorised %, unauthorised % | PostgreSQL | Detail and comparison | Periodic |
-| Similar schools data | Comparative cohorts | groupings, peer metrics, derived values | PostgreSQL / generated assets | Comparison | Periodic |
-| Derived search data | Search index data | normalised names, compound lookups, indexed fields | Lucene | Search | Rebuilt when needed |
-| DSI authentication data | Identity/access context | user identifiers, claims, roles | Runtime/session context | Access control | Runtime |
+| Data source             | Data domain                       | Example fields                                          | Stored in                     | Downstream use          | Cadence             |
+| ----------------------- | --------------------------------- | ------------------------------------------------------- | ----------------------------- | ----------------------- | ------------------- |
+| GIAS                    | Establishment metadata            | URN, address, governance, phase, trust, local authority | PostgreSQL                    | Search, detail pages    | Daily or scheduled  |
+| EES                     | Attainment and comparison metrics | Attainment 8, Progress 8, subject measures              | PostgreSQL                    | Detail and comparison   | Periodic            |
+| EES                     | Destination outcomes              | education, employment, apprenticeships                  | PostgreSQL                    | Detail and comparison   | Periodic            |
+| EES                     | Attendance and absence            | absence %, authorised %, unauthorised %                 | PostgreSQL                    | Detail and comparison   | Periodic            |
+| Ofsted                  | Comparative cohorts               | groupings, peer metrics, derived values                 | PostgreSQL, generated assets  | Comparison              | Periodic            |
+| Derived search data     | Search index data                 | normalised names, compound lookups, indexed fields      | In-memory index, per replica  | Search                  | Rebuilt at pod start |
+| DSI authentication data | Identity and access context       | user identifiers, claims, roles                         | Runtime and session context   | Access control          | Runtime             |
+
+## 6.5 Analytics and third-party data flows
+
+Usage data leaves the service through three separate routes. They are listed here because they have different owners, different consent positions and different data protection implications.
+
+| Destination | Direction | What is sent | Consent | Notes |
+| --- | --- | --- | --- | --- |
+| DfE Analytics to Google BigQuery | Server-side, from the application | Request-level web events, plus custom link-click events posted back from the browser and forwarded by the application | Not consent-gated | `/healthcheck` is excluded. Disabled in local development and in the UITests, IntegrationTests, EndToEndTests and AccessibilityTests environments. A custom event suppresses the corresponding web request event to avoid double counting |
+| Google Analytics, via Google Tag Manager | Client-side, from the user's browser | Standard GA page and interaction data | Loaded only when the `cookie_policy` cookie is set to `enabled` | Container ID is environment-specific |
+| Microsoft Clarity | Client-side, from the user's browser | Session recording and interaction heatmaps | Loaded only when the `cookie_policy` cookie is set to `enabled`, and initialised with `ad_Storage: denied`, `analytics_Storage: granted` | This is behavioural recording on an authenticated service and should be reflected in the data protection position |
+
+The cookies page documents the cookies each of these sets, and integration tests assert that the Google Tag Manager and Clarity tags are absent when consent has not been given.
+
+
+---
+
+### Note on Ofsted
+
+The service does not integrate directly with Ofsted systems. Ofsted data is relied on indirectly. It comes through upstream departmental datasets and feeds the similar schools comparison journey. Ofsted is therefore an upstream data dependency rather than a runtime integration, and changes to how Ofsted publish or structure judgements will affect comparison outputs.
 
 ---
 
 ## 7. High-level architecture diagram
 
-The diagram below provides the primary stakeholder-friendly overview of the service. It shows the main user groups, the authentication boundary, the three main application layers, the search and persistence technologies, and the supporting external services and data pipeline.
-
-> Replace the path below with the final exported image location once added to the repository.
+The diagram below is the main stakeholder-facing view of the service. It shows the user groups, the authentication boundary, the hosted application, the search and persistence technologies, the supporting services and the data pipeline.
 
 ![SAP Sector High-Level Architecture](../_assets/HLD.png)
 
@@ -253,35 +305,27 @@ The diagram below provides the primary stakeholder-friendly overview of the serv
 
 ### Diagram explanation
 
-At the top of the architecture are the main sector-facing user groups: **school users**, **trust leads**, and **local authority users**. These users authenticate through **DfE Sign-in (DSI)** before reaching the application.
+At the top are the main sector-facing user groups: school users, trust leads and local authority users. They authenticate through DfE Sign-in before reaching the application.
 
-The runtime application is hosted in **Azure Kubernetes Service (AKS)** and is structured into three logical layers:
+The runtime application is hosted in Azure Kubernetes Service and is shown as a single web application. How it is layered internally is an implementation concern and is covered in the [LLD](./low-level-design.md).
 
-- **SAPSec.Web** – the ASP.NET Core MVC web layer containing controllers, views, and view models
-- **SAPSec.Core** – the business logic layer containing application services, domain entities, and interfaces
-- **SAPSec.Infrastructure** – the persistence and integration layer containing repositories, search services, and external integrations
+Below it is PostgreSQL, the authoritative database, queried read-only through materialised views. The Lucene search index is drawn inside the AKS boundary because it is an in-process, in-memory structure that the application builds for itself at startup, not a separate data store.
 
-Below these layers sit the main technical dependencies:
+Down the right-hand side are the platform and operational dependencies: StatusCake for monitoring, Azure Blob Storage for data protection keys, the three analytics destinations described in section 6.5, and OpenStreetMap for map tiles.
 
-- **PostgreSQL** as the primary authoritative database
-- **Lucene** as the derived search index
-- **data protection key storage** for secure distributed operation
-
-The architecture also includes the **SAPData ETL pipeline**, which loads and transforms external data sources such as **GIAS** and education statistics datasets for downstream use by the service.
-
-Supporting integrations such as analytics and monitoring sit around the application and provide operational visibility and reporting capability.
+The SAPData pipeline sits at the bottom. It loads and transforms external sources including GIAS, Ofsted data and education statistics, and it owns the database structure.
 
 ---
 
 ## 8. C4 system diagrams
 
-This section provides C4-style views of the system at different levels of abstraction.
+This section gives C4 views at levels 1 and 2. The level 3 component view is in the [LLD](./low-level-design.md), because it describes implementation structure.
 
 ---
 
-## 8.1 C4 Level 1 – System Context
+## 8.1 C4 Level 1, system context
 
-The system context view shows SAP Sector in its wider ecosystem, including users, authentication, upstream data sources, and external supporting services.
+The context view shows SAP Sector in its wider setting, including users, authentication, upstream data sources and external supporting services.
 
 ```mermaid
 flowchart TB
@@ -294,7 +338,7 @@ flowchart TB
 
     gias[GIAS]
     ees[Education Statistics / Performance Datasets]
-    similar[Similar Schools / Derived Datasets]
+    ofsted[Similar Schools / Derived Datasets]
 
     monitor[Monitoring / Health / Ops]
     analytics[Analytics Services]
@@ -306,23 +350,24 @@ flowchart TB
 
     gias --> sap
     ees --> sap
-    similar --> sap
+    ofsted --> sap
+
 
     sap --> analytics
     monitor --> sap
 ```
 
-*Figure 2. C4 Level 1 – System Context.*
+*Figure 2. C4 level 1, system context.*
 
 ### Context explanation
 
-This view shows SAP Sector as the central service. Users reach it through DfE Sign-in, while upstream educational datasets feed the platform through its supporting data processes. Monitoring and analytics sit outside the core system boundary but are important operational dependencies.
+SAP Sector sits in the middle. Users reach it through DfE Sign-in. Upstream education datasets, including Ofsted data which are consumed indirectly, feed the platform through the data pipeline. Monitoring and analytics sit outside the core system boundary but are still operational dependencies.
 
 ---
 
-## 8.2 C4 Level 2 – Container Diagram
+## 8.2 C4 Level 2, container diagram
 
-This view breaks the service into its main runtime and supporting containers.
+This breaks the service into its main runtime and supporting containers.
 
 ```mermaid
 flowchart TB
@@ -330,195 +375,97 @@ flowchart TB
     dsi[DfE Sign-in]
 
     subgraph aks[Azure Kubernetes Service]
-        web[SAPSec.Web - ASP.NET Core MVC]
-        core[SAPSec.Core - Business Logic]
-        infra[SAPSec.Infrastructure - Repositories / Search / Integrations]
+        web[Web Application]
+        search[Lucene index - in memory, per replica]
         maintenance[Maintenance Page]
     end
 
     pg[(PostgreSQL)]
-    lucene[(Lucene Index)]
     pipeline[SAPData Pipeline]
     ext[External Datasets]
+    analytics[Analytics - BigQuery, GA, Clarity]
 
     user --> dsi
     dsi --> web
-    web --> core
-    core --> infra
-    infra --> pg
-    infra --> lucene
+    web -->|read only| pg
+    web -->|builds at startup, then queries| search
+    web -.->|usage events| analytics
 
     ext --> pipeline
-    pipeline --> pg
-    pipeline --> lucene
+    pipeline -->|owns schema and writes| pg
+    
 
     maintenance -. failover / maintenance .- web
 ```
 
-*Figure 3. C4 Level 2 – Container Diagram.*
+*Figure 3. C4 level 2, container diagram.*
 
 ### Container explanation
 
-This view shows the main deployable and logical containers:
+The containers are:
 
-- the **web application**
-- the **business logic layer**
-- the **infrastructure layer**
-- the **database**
-- the **search index**
-- the **data pipeline**
-- the **maintenance page**
+- the web application, hosted in AKS
+- the database, which the application reads and the pipeline writes
+- the search index
+- the data pipeline
+- the maintenance page
 
-The web application handles requests, the core layer applies rules, and the infrastructure layer handles technical integration with PostgreSQL and Lucene.
+The direction of the arrows matters here. All writes come from the pipeline, and the application's relationship with both stores is read-only. See section 5.1.
 
 ---
 
-## 8.3 C4 Level 3 – Component Diagram
+## 8.3 High-level data flow diagram
 
-This view describes the main internal components within the application.
-
-```mermaid
-flowchart TB
-    user[Authenticated User]
-
-    subgraph web[SAPSec.Web]
-        controllers[Controllers]
-        views[Views / GOV.UK Design System]
-        viewmodels[ViewModels]
-        middleware[Security / Session / Auth Middleware]
-    end
-
-    subgraph core[SAPSec.Core]
-        services[Application Services / Use Cases]
-        entities[Domain Entities]
-        interfaces[Interfaces]
-        rules[Business Rules]
-    end
-
-    subgraph infra[SAPSec.Infrastructure]
-        repos[Repositories\nDapper / Npgsql]
-        search[Search Service\nLucene]
-        files[Generated / JSON Data Files]
-        integrations[External Technical Integrations]
-    end
-
-    pg[(PostgreSQL)]
-    lucene[(Lucene Index)]
-
-    user --> middleware
-    middleware --> controllers
-    controllers --> services
-    services --> entities
-    services --> rules
-    services --> interfaces
-    interfaces --> repos
-    interfaces --> search
-    repos --> pg
-    search --> lucene
-    files --> repos
-    integrations --> repos
-```
-
-*Figure 4. C4 Level 3 – Component Diagram.*
-
-### Component explanation
-
-This view shows how responsibilities are separated inside the application:
-
-- **Controllers** coordinate incoming requests
-- **Views** and **ViewModels** shape the UI
-- **Application services** and **use cases** implement business behaviour
-- **Interfaces** define abstractions between core and infrastructure
-- **Repositories** provide data access to PostgreSQL
-- **Search services** provide Lucene-backed searching
-
-This layered structure helps maintain separation of concerns and keeps technical implementation details out of the business logic.
-
----
-
-## 8.4 High-level data flow diagram
-
-This diagram focuses specifically on how external data moves into the platform and is then consumed by the service.
+This one focuses on how external data gets into the platform and is then used by the service.
 
 ```mermaid
 flowchart LR
     gias[GIAS]
-    perf[Performance Datasets]
-    dest[Destinations Datasets]
-    abs[Absence Datasets]
-    sim[Similar Schools Data]
+    perf[EES]    
+    ofsted[Ofsted]
+    
 
     pipeline[SAPData ETL / SQL Generation]
-    pg[(PostgreSQL)]
-    lucene[(Lucene Index)]
+    pg[(PostgreSQL + Materialised Views)]
+    search[Lucene index - in memory]
     web[SAP Sector Web App]
 
     gias --> pipeline
     perf --> pipeline
-    dest --> pipeline
-    abs --> pipeline
-    sim --> pipeline
+    ofsted --> pipeline
+    
 
     pipeline --> pg
-    pipeline --> lucene
 
-    web --> pg
-    web --> lucene
+    web -->|read only| pg
+    web -->|builds at startup, then queries| search
 ```
 
-*Figure 5. High-level data flow diagram.*
+*Figure 4. High-level data flow diagram.*
 
 ### Data flow explanation
 
-This view shows the service’s dual data-consumption model:
+The service reads from one place: PostgreSQL, through materialised views. That access is read-only. Search is served from an in-memory Lucene index that the application builds for itself from the same PostgreSQL data at startup, so it is derived rather than a second source of truth.
 
-- **PostgreSQL** provides authoritative structured data
-- **Lucene** provides fast search capability
-
-Both are fed by the supporting data ingestion and transformation process.
+Moving search onto PostgreSQL full-text search, as described in section 5.3, would remove the index from this diagram entirely.
 
 ---
 
 ## 9. Interactions and key flows
 
-### 9.1 Search schools
+These are the journeys and operational flows the service supports. The step-by-step sequences, the responsibilities of each part of the application, and the query detail are in the [LLD](./low-level-design.md).
 
-1. user authenticates through DfE Sign-in
-2. user enters search criteria
-3. request is received by the web application
-4. application logic delegates search to the infrastructure search service
-5. Lucene returns matching results
-6. results are displayed to the user
+### 9.1 Search schools
 
 ### 9.2 View school details
 
-1. user requests a school detail page
-2. controller receives the request
-3. application logic identifies the required entity/data
-4. infrastructure repositories query PostgreSQL
-5. view model is assembled
-6. details page is rendered
-
 ### 9.3 Compare schools
 
-1. user requests a comparison journey
-2. business logic determines the comparison context and required data
-3. repositories retrieve structured data and derived comparison information
-4. comparison outputs are rendered in the web application
+### 9.4 Similar schools
 
-### 9.4 Authentication and protected access
+### 9.5 Authentication and protected access
 
-1. user attempts to access the service
-2. DfE Sign-in authenticates identity
-3. claims and authorization context are established
-4. the application applies authorization rules before allowing access to protected routes
-
-### 9.5 Operational health and deployment flow
-
-1. deployment pipeline builds and deploys the application
-2. health endpoints are called to verify runtime readiness
-3. monitoring and support tooling use these signals to determine service health
-4. maintenance mode/failover content may be used during operational events
+### 9.6 Operational health and deployment
 
 ---
 
@@ -526,54 +473,67 @@ Both are fed by the supporting data ingestion and transformation process.
 
 ### 10.1 Security
 
-- DfE Sign-in used for authentication
-- ASP.NET Core authorization policies applied
+- DfE Sign-in for authentication
+- authorization policies applied, with routes protected by default
 - secure session and cookie handling
-- anti-forgery protections configured
-- Content Security Policy applied through middleware
+- anti-forgery protections
+- Content Security Policy applied
 - data protection keys managed for distributed deployments
-- separation of business logic and infrastructure reduces accidental exposure of technical concerns
+- the application has no write permissions on the database, which limits what an application-level compromise could do
 
 ### 10.2 Performance
 
-- Lucene supports efficient search workloads
-- PostgreSQL provides structured and authoritative retrieval
-- layered separation supports focused performance tuning
+- materialised views give pre-shaped, predictable query performance for detail and comparison pages
+- the search index handles search workloads efficiently
+- separating the layers makes performance tuning easier to target
 - frontend assets are built and served in a predictable way
 
 ### 10.3 Availability
 
-- service runs on AKS
-- health endpoints support runtime verification
-- review/deployment workflows support controlled release
-- maintenance page supports operational continuity during maintenance or failover scenarios
+- the service runs on AKS
+- health endpoints allow runtime verification
+- review and deployment workflows support controlled release
+- the maintenance page covers maintenance and failover
+- application availability does not depend on data refresh, because refreshes are driven by the pipeline
 
 ### 10.4 Maintainability
 
-- project is separated into Web, Core, Infrastructure, and Data concerns
-- testing strategy covers unit, integration, UI, end-to-end, and accessibility levels
-- repository includes architecture and developer guidance to support consistency
+- a clear split between the data platform and the runtime service
+- schema change is metadata-driven and deterministic
+- testing covers unit, integration, UI, end-to-end and accessibility levels
 
 ### 10.5 Observability
 
-- structured logging support is configured through Serilog, logit.io.
-- monitoring and health endpoints are available
-- analytics integration exists for service insight and behaviour tracking
+- structured logging through Serilog and logit.io
+- monitoring and health endpoints
+- analytics integration for service insight and behaviour tracking, across three destinations (see section 6.5)
+
+The `/healthcheck` endpoint currently reports only that the application is running and that the static content directory is present. It does not test PostgreSQL connectivity or confirm that the search index has been built, so a replica can pass its readiness probe while search is still empty. Extending the health endpoint to cover its dependencies is an open item.
 
 ---
 
 ## 11. Assumptions and constraints
 
 - PostgreSQL is the authoritative structured data store
-- search schema changes may require reindexing
-- the service is primarily authenticated
-- upstream dataset availability and quality affect downstream outputs
-- the repo contains both runtime service code and supporting data-pipeline concerns
-- some data refresh cadences are dataset-dependent rather than uniform
+- the data pipeline owns the schema and all writes to PostgreSQL, and the application is read-only against it; every Dapper call in the infrastructure layer is a query, with no insert, update or delete path
+- the only thing the application writes is its own in-memory search index, which does not survive a restart
+- the application queries materialised views rather than base tables, so query patterns are limited to what the views provide
+- read models are generated from serialised view structures rather than written by hand
+- the service is authenticated throughout
+- upstream dataset availability and quality, including Ofsted publication cycles, affect what the service can show
+- the repository holds both runtime service code and data pipeline concerns
+- refresh cadences vary by dataset rather than being uniform
 
 ---
 
 ## 12. References
+
+### Architecture documents
+
+- [`docs/architecture/overview.md`](./overview.md)
+- [`docs/architecture/low-level-design.md`](./low-level-design.md)
+- [`docs/architecture/entity-relationship-diagram.md`](./entity-relationship-diagram.md)
+- [`docs/adrs/`](../adrs/)
 
 ### Repository documents
 
@@ -585,12 +545,6 @@ Both are fed by the supporting data ingestion and transformation process.
 - `docs/developers/search-lucene.md`
 - `docs/developers/testing.md`
 
-### Key code/configuration references
-
-- `SAPSec.Web/Program.cs`
-- `SAPSec.Web/package.json`
-- `SAPSec.Infrastructure/SAPSec.Infrastructure.csproj`
-
 ### Workflow references
 
 - `.github/workflows/build-and-deploy.yml`
@@ -598,52 +552,37 @@ Both are fed by the supporting data ingestion and transformation process.
 - `.github/workflows/delete-review-app.yml`
 - `.github/workflows/toggle-maintenance-page.yml`
 
-### Additional supporting areas
+### Other supporting areas
 
 - `terraform/`
 - `Tests/`
-- `docs/adrs/`
 
 ---
 
 ## 13. Glossary
 
-### SAP Sector
-The sector-facing service described in this document.
+**SAP Sector.** The sector-facing service described in this document.
 
-### SAPSec.Web
-The ASP.NET Core MVC web application that handles requests, rendering, sessions, authentication integration, and user-facing behaviour.
+**SAPData.** The data ingestion and SQL generation part of the repository. It prepares and loads data for the service and owns the database structure.
 
-### SAPSec.Core
-The business logic layer containing domain entities, use cases, rules, interfaces, and application services.
+**PostgreSQL.** The relational database used as the authoritative data store.
 
-### SAPSec.Infrastructure
-The technical layer containing repositories, data access logic, Lucene search integration, JSON-backed assets, and supporting technical services.
+**Materialised view.** A stored, pre-computed result set built by the pipeline. Materialised views are the query surface the application uses, with relationships already resolved.
 
-### SAPData
-The data ingestion and SQL-generation part of the repository used to prepare and load data for the service.
+**Dapper.** The lightweight data access library used to issue read-only queries against materialised views. Used instead of an ORM because the application does not write data or manage schema.
 
-### PostgreSQL
-The primary relational database used as the authoritative data store.
+**Search index.** The derived index that supports search journeys. Currently Lucene, with a planned move to PostgreSQL full-text search.
 
-### Lucene Index
-The derived search index used to support fast school search and lookup behaviour.
+**DfE Sign-in (DSI).** The authentication system used to establish user identity and access context.
 
-### DfE Sign-in (DSI)
-The authentication system used to establish user identity and access context.
+**ETL.** Extract, transform, load. The process used to acquire, clean, transform and load external data into the platform.
 
-### ETL
-Extract, Transform, Load. The process used to acquire, clean, transform, and load external data into the platform.
+**GIAS.** Get Information About Schools, a government dataset holding school and establishment information.
 
-### GIAS
-Get Information About Schools, a government dataset providing school and establishment information.
+**Ofsted.** The Office for Standards in Education, Children's Services and Skills. 
 
-### Performance datasets
-Education-related performance and statistical datasets used to enrich the service.
+**Performance datasets.** Education performance and statistical datasets used to enrich the service.
 
-### Similar schools data
-Derived or supplied comparison data used to support peer-group and comparison journeys.
+**Similar schools data.** Derived or supplied comparison data that supports peer group and comparison journeys.
 
-### Cadence
-The refresh frequency or update schedule of a dataset or derived technical asset.
-
+**Cadence.** How often a dataset or derived technical asset is refreshed.

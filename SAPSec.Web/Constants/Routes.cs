@@ -9,16 +9,36 @@ public static class Routes
     public const string SignIn = "/auth/signin";
     public const string Error = "/error";
     public const string AccessDenied = "/error/403";
+    public const string TermsAndConditions = "/terms-and-conditions";
 
-    public static string FindASchool(string? query = null, int? page = null)
+    public const string FindASchoolBasePath = "/find-a-school";
+    public static string FindASchool(string? query = null, string? page = null, string[]? localAuthorities = null)
     {
         var queryString =
-            (query is not null ? $"&query={query}" : "") +
-            (page is not null ? $"&page={page}" : "");
+            (query is not null ? $"&query={Uri.EscapeDataString(query)}" : "") +
+            (page is not null ? $"&page={Uri.EscapeDataString(page)}" : "");
+
+        if (localAuthorities is not null)
+        {
+            foreach (var la in localAuthorities)
+            {
+                queryString += $"&localAuthorities={Uri.EscapeDataString(la)}";
+            }
+        }
 
         var qs = queryString.Any() ? "?" + queryString.Substring(1) : "";
 
         return $"/find-a-school{qs}";
+    }
+
+    public static string FindASchoolSuggest(string? queryPart = null)
+    {
+        var queryString =
+            (queryPart is not null ? $"&queryPart={Uri.EscapeDataString(queryPart)}" : "");
+
+        var qs = queryString.Any() ? "?" + queryString.Substring(1) : "";
+
+        return $"/find-a-school/suggest{qs}";
     }
 
     public static string School(string urn, string? phaseOfEducationName) =>
@@ -36,6 +56,7 @@ public static class Routes
         public string Overview => _basePath;
         public string KS2 => $"{_basePath}/ks2";
         public string Attendance => $"{_basePath}/attendance";
+        public string RiseResources => $"{_basePath}/rise-resources";
         public string ViewSimilarSchools => $"{_basePath}/view-similar-schools";
         public string SchoolDetails => $"{_basePath}/school-details";
         public string WhatIsASimilarSchool => $"{_basePath}/what-is-a-similar-school";
@@ -45,11 +66,11 @@ public static class Routes
         {
             private string _basePath = $"{basePath}/view-similar-schools/{similarSchoolUrn}";
 
-            public string Overview => _basePath;
-            public string Similarity => $"{_basePath}/similarity";
-            public string Ks2 => $"{_basePath}/ks2";
-            public string Attendance => $"{_basePath}/attendance";
-            public string SchoolDetails => $"{_basePath}/school-details";
+            public string BasePath => _basePath;
+            public string Similarity => $"{_basePath}/compare-similarity";
+            public string Ks2 => $"{_basePath}/compare-ks2";
+            public string Attendance => $"{_basePath}/compare-attendance";
+            public string SchoolDetails => $"{_basePath}/compare-school-details";
         }
     }
 
@@ -62,6 +83,7 @@ public static class Routes
         public string KS4CoreSubjects => $"{_basePath}/ks4-core-subjects";
         public string Attendance => $"{_basePath}/attendance";
         public string AttendanceData => $"{_basePath}/attendance-data";
+        public string RiseResources => $"{_basePath}/rise-resources";
         public string ViewSimilarSchools => $"{_basePath}/view-similar-schools";
         public string SchoolDetails => $"{_basePath}/school-details";
         public string WhatIsASimilarSchool => $"{_basePath}/what-is-a-similar-school";
@@ -71,16 +93,13 @@ public static class Routes
         {
             private string _basePath => $"{basePath}/view-similar-schools/{similarSchoolUrn}";
 
-            public string Overview => _basePath;
-            public string Similarity => $"{_basePath}/similarity";
-            public string KS4HeadlineMeasures => $"{_basePath}/ks4-headline-measures";
-            public string KS4HeadlineMeasuresData => $"{_basePath}/ks4-headline-measures/data";
-            public string KS4CoreSubjects => $"{_basePath}/ks4-core-subjects";
-            public string KS4CoreSubjectsData => $"{_basePath}/ks4-core-subjects/data";
-            public string Attendance => $"{_basePath}/attendance";
+            public string BasePath => _basePath;
+            public string Similarity => $"{_basePath}/compare-similarity";
+            public string KS4HeadlineMeasures => $"{_basePath}/compare-ks4-headline-measures";
+            public string KS4CoreSubjects => $"{_basePath}/compare-ks4-core-subjects";
+            public string Attendance => $"{_basePath}/compare-attendance";
             public string AttendanceData => $"{_basePath}/attendance-data";
-            public string SchoolDetails => $"{_basePath}/school-details";
-            public string KS4DestinationsData => $"{_basePath}/ks4-destinations/data";
+            public string SchoolDetails => $"{_basePath}/compare-school-details";
         }
     }
 }

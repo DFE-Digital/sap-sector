@@ -1,5 +1,6 @@
 
 const datasetColorKeys = ['school', 'similarSchools', 'localAuthority', 'england'];
+const supportedPointStyles = new Set(['triangle', 'circle', 'rect', 'rectRot']);
 
 const CHART_CONFIG = {
     defaults: {
@@ -7,6 +8,7 @@ const CHART_CONFIG = {
         maxDevicePixelRatio: 2,
         resizeDebounceMs: 100,
         labelWrapChars: 15,
+        mobileLabelWrapChars: 12,
         mobileBreakpoint: '(max-width: 40.0625em)'
     },
     legend: {
@@ -28,8 +30,8 @@ const CHART_CONFIG = {
         },
         series: {
             tension: 0.2,
-            pointRadius: 4,
-            pointHoverRadius: 5
+            pointRadius: 5,
+            pointHoverRadius: 6
         },
         datalabels: {
             anchor: 'end',
@@ -49,10 +51,15 @@ const CHART_CONFIG = {
         },
         labels: {
             yTickPadding: 10,
+            yAxisWidthPadding: 16,
             noDataOffset: 12,
             baseContainerHeight: 260,
             rowHeight: 70,
             lineHeight: 18
+        },
+        layout: {
+            leftPadding: 8,
+            mobileLeftPadding: 20
         },
         dataset: {
             borderWidth: 1,
@@ -81,6 +88,7 @@ const CHART_CONFIG = {
 };
 
 const charts = {};
+const chartInteractionState = new WeakMap();
 
 function gdsVars(canvas) {
     const s = getComputedStyle(canvas);
@@ -196,6 +204,18 @@ function isMobileViewport() {
     return window.matchMedia(CHART_CONFIG.defaults.mobileBreakpoint).matches;
 }
 
+function getLabelWrapChars() {
+    return isMobileViewport()
+        ? CHART_CONFIG.defaults.mobileLabelWrapChars
+        : CHART_CONFIG.defaults.labelWrapChars;
+}
+
+function getBarChartLeftPadding() {
+    return isMobileViewport()
+        ? CHART_CONFIG.bar.layout.mobileLeftPadding
+        : CHART_CONFIG.bar.layout.leftPadding;
+}
+
 function isLargeEnoughForInsideLabel(value, ctx) {
     if (value === null || value === undefined || Number.isNaN(value)) {
         return false;
@@ -220,6 +240,7 @@ function getBarLabelAlignment(ctx, axisSuffix, barLabelAlign) {
 
     if (isMobileViewport()) {
         return isLargeEnoughForInsideLabel(ctx.dataset.data[ctx.dataIndex], ctx)
+            && canBarFitLabel(ctx, axisSuffix)
             ? CHART_CONFIG.bar.datalabels.defaultAlign
             : CHART_CONFIG.bar.datalabels.smallValueAlign;
     }
@@ -379,6 +400,8 @@ function getOrCreateHtmlTooltip(chart) {
         tooltip = document.createElement('div');
         tooltip.className = 'app-chart-tooltip';
         tooltip.setAttribute('data-chart-id', chart.canvas.id);
+        tooltip.setAttribute('role', 'tooltip');
+        tooltip.setAttribute('aria-hidden', 'true');
 
         const title = document.createElement('div');
         title.className = 'app-chart-tooltip__title';
@@ -397,7 +420,97 @@ function getOrCreateHtmlTooltip(chart) {
 function hideAllHtmlTooltips() {
     document.querySelectorAll('.app-chart-tooltip--visible').forEach(function (tooltip) {
         tooltip.classList.remove('app-chart-tooltip--visible');
+        tooltip.setAttribute('aria-hidden', 'true');
     });
+}
+
+function getChartInteractionState(chart) {
+    if (!chartInteractionState.has(chart)) {
+        chartInteractionState.set(chart, {
+            activeDataIndex: null,
+            suppressTooltip: false
+        });
+    }
+
+    return chartInteractionState.get(chart);
+}
+
+function hideHtmlTooltip(chart) {
+    const tooltip = getOrCreateHtmlTooltip(chart);
+    if (!tooltip) {
+        return;
+    }
+
+    tooltip.classList.remove('app-chart-tooltip--visible');
+    tooltip.setAttribute('aria-hidden', 'true');
+}
+
+function isLineChart(chart) {
+    return chart?.config?.type === 'line';
+}
+
+function clearChartTooltip(chart, updateChart = true) {
+    if (!isLineChart(chart)) {
+        return;
+    }
+
+    const state = getChartInteractionState(chart);
+    state.activeDataIndex = null;
+    chart.setActiveElements([]);
+
+    if (chart.tooltip?.setActiveElements) {
+        chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+    }
+
+    hideHtmlTooltip(chart);
+
+    if (updateChart) {
+        chart.update();
+    }
+}
+
+function suppressChartTooltip(chart) {
+    if (!isLineChart(chart)) {
+        return;
+    }
+
+    const state = getChartInteractionState(chart);
+    state.suppressTooltip = true;
+    clearChartTooltip(chart);
+}
+
+function getLineChartPointCount(chart) {
+    return Array.isArray(chart?.data?.labels) ? chart.data.labels.length : 0;
+}
+
+function showLineChartTooltip(chart, dataIndex) {
+    if (!isLineChart(chart)) {
+        return;
+    }
+
+    const pointCount = getLineChartPointCount(chart);
+    if (pointCount === 0 || dataIndex < 0 || dataIndex >= pointCount) {
+        return;
+    }
+
+    const state = getChartInteractionState(chart);
+    state.activeDataIndex = dataIndex;
+    state.suppressTooltip = false;
+
+    const activeElements = chart.data.datasets
+        .map(function (_, datasetIndex) {
+            return { datasetIndex, index: dataIndex };
+        });
+    const firstPoint = chart.getDatasetMeta(0)?.data?.[dataIndex];
+    const position = firstPoint?.getProps(['x', 'y'], true) || { x: 0, y: 0 };
+
+    chart.setActiveElements(activeElements);
+
+    if (chart.tooltip?.setActiveElements) {
+        chart.tooltip.setActiveElements(activeElements, position);
+    }
+
+    chart.update();
 }
 
 function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
@@ -408,8 +521,15 @@ function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
         return;
     }
 
+    if (getChartInteractionState(chart).suppressTooltip) {
+        tooltipElement.classList.remove('app-chart-tooltip--visible');
+        tooltipElement.setAttribute('aria-hidden', 'true');
+        return;
+    }
+
     if (!tooltip || tooltip.opacity === 0) {
         tooltipElement.classList.remove('app-chart-tooltip--visible');
+        tooltipElement.setAttribute('aria-hidden', 'true');
         return;
     }
 
@@ -430,6 +550,7 @@ function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
         const marker = document.createElement('span');
         marker.className = 'app-chart-tooltip__marker';
         marker.style.backgroundColor = point.dataset.borderColor || point.dataset.backgroundColor || CHART_CONFIG.fallbacks.legendBoxColor;
+        applyMarkerStyle(marker, point.dataset.pointStyle);
 
         const label = document.createElement('span');
         label.className = 'app-chart-tooltip__label';
@@ -446,6 +567,7 @@ function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
     });
 
     tooltipElement.classList.add('app-chart-tooltip--visible');
+    tooltipElement.setAttribute('aria-hidden', 'false');
 
     const container = getTooltipContainer(chart);
     if (!container) {
@@ -468,6 +590,80 @@ function renderHtmlTooltip(context, axisSuffix, tooltipDecimals) {
 
     tooltipElement.style.left = `${left}px`;
     tooltipElement.style.top = `${top}px`;
+}
+
+function initializeLineChartAccessibility(chart) {
+    if (!isLineChart(chart)) {
+        return;
+    }
+
+    const canvas = chart.canvas;
+    canvas.setAttribute('tabindex', '0');
+    canvas.setAttribute(
+        'aria-label',
+        'Interactive line chart. Use the left and right arrow keys to move between data points. Press Escape to dismiss the tooltip.'
+    );
+
+    canvas.onkeydown = function (event) {
+        const key = event.key;
+        const pointCount = getLineChartPointCount(chart);
+        const state = getChartInteractionState(chart);
+
+        if (key === 'Escape') {
+            event.preventDefault();
+            suppressChartTooltip(chart);
+            return;
+        }
+
+        if (!pointCount) {
+            return;
+        }
+
+        let nextIndex = state.activeDataIndex;
+
+        if (key === 'ArrowLeft' || key === 'ArrowDown') {
+            event.preventDefault();
+            nextIndex = nextIndex === null ? pointCount - 1 : Math.max(0, nextIndex - 1);
+        } else if (key === 'ArrowRight' || key === 'ArrowUp') {
+            event.preventDefault();
+            nextIndex = nextIndex === null ? 0 : Math.min(pointCount - 1, nextIndex + 1);
+        } else if (key === 'Home') {
+            event.preventDefault();
+            nextIndex = 0;
+        } else if (key === 'End') {
+            event.preventDefault();
+            nextIndex = pointCount - 1;
+        } else {
+            return;
+        }
+
+        showLineChartTooltip(chart, nextIndex);
+    };
+
+    canvas.onblur = function () {
+        const state = getChartInteractionState(chart);
+        state.suppressTooltip = false;
+        clearChartTooltip(chart);
+    };
+
+    canvas.onmouseleave = function () {
+        const state = getChartInteractionState(chart);
+        state.suppressTooltip = false;
+        hideHtmlTooltip(chart);
+    };
+}
+
+function dismissVisibleTooltips() {
+    Object.values(charts).forEach(function (chart) {
+        if (!isLineChart(chart)) {
+            return;
+        }
+
+        const tooltipElement = getOrCreateHtmlTooltip(chart);
+        if (tooltipElement?.classList.contains('app-chart-tooltip--visible')) {
+            suppressChartTooltip(chart);
+        }
+    });
 }
 
 function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisMax, axisAutoSkip, showLegend, showDataLabels, showXGrid, barLabelAlign, dynamicLineAxis, tooltipDecimals) {
@@ -634,6 +830,9 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                     }
                 },
                 y: {
+                    afterFit: function (scale) {
+                        scale.width += CHART_CONFIG.bar.labels.yAxisWidthPadding;
+                    },
                     grid: {
                         display: false,
                         drawBorder: false
@@ -643,10 +842,15 @@ function buildChartOptions(type, gdsStyles, axisStep, axisSuffix, axisMin, axisM
                         font: fonts,
                         callback: function (value) {
                             const label = this.getLabelForValue(value);
-                            return wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars);
+                            return wrapLabel(label.toString(), getLabelWrapChars());
                         },
                         padding: CHART_CONFIG.bar.labels.yTickPadding
                     }
+                }
+            },
+            layout: {
+                padding: {
+                    left: getBarChartLeftPadding()
                 }
             },
             animation: false,
@@ -737,6 +941,7 @@ function buildDatasets(type, chartData, colorConfig, barOptions) {
         return chartData.datasets.map((ds, i) => {
             const keyedColor = colorConfig.byKey[datasetColorKeys[i]];
             const color = ds.borderColor || keyedColor || colorConfig.palette[i] || colorConfig.byKey.fallback;
+            const pointStyle = normalizePointStyle(ds.pointStyle);
             return {
                 label: ds.label,
                 data: ds.data,
@@ -747,7 +952,9 @@ function buildDatasets(type, chartData, colorConfig, barOptions) {
                 pointRadius: ds.pointRadius ?? CHART_CONFIG.line.series.pointRadius,
                 pointHoverRadius: ds.pointHoverRadius ?? CHART_CONFIG.line.series.pointHoverRadius,
                 pointBackgroundColor: ds.pointBackgroundColor || color,
-                ...ds
+                ...ds,
+                pointStyle,
+                pointHoverStyle: ds.pointHoverStyle || pointStyle
             };
         });
     }
@@ -793,8 +1000,9 @@ function resizeBarChartContainer(canvas, chartData) {
         return;
     }
 
+    const labelWrapChars = getLabelWrapChars();
     const maxWrappedLines = Math.max(...labels.map(label =>
-        wrapLabel(label.toString(), CHART_CONFIG.defaults.labelWrapChars).length
+        wrapLabel(label.toString(), labelWrapChars).length
     ));
     const rowHeight = CHART_CONFIG.bar.labels.rowHeight
         + Math.max(0, maxWrappedLines - 2) * CHART_CONFIG.bar.labels.lineHeight;
@@ -804,6 +1012,14 @@ function resizeBarChartContainer(canvas, chartData) {
     );
 
     container.style.height = `${height}px`;
+}
+
+function syncBarChartContainerHeight(chart) {
+    if (chart?.config?.type !== 'bar') {
+        return;
+    }
+
+    resizeBarChartContainer(chart.canvas, { labels: chart.data?.labels || [] });
 }
 
 function isYearByYearLineChart(canvas) {
@@ -926,6 +1142,8 @@ function initCharts(canvas) {
         const chart = new Chart(canvas, config);
         charts[canvas.id] = chart;
 
+        initializeLineChartAccessibility(chart);
+
         if (showLegend) {
             const legendContainer = type === 'line'
                 ? ensureTopLegendContainer(canvas)
@@ -954,6 +1172,14 @@ function wrapLabel(label, maxChars) {
     return lines;
 }
 
+function normalizePointStyle(pointStyle) {
+    return supportedPointStyles.has(pointStyle) ? pointStyle : 'circle';
+}
+
+function applyMarkerStyle(marker, pointStyle) {
+    marker.classList.add('app-chart-marker', `app-chart-marker--${normalizePointStyle(pointStyle)}`);
+}
+
 function buildVerticalLegend(chart, container) {
     container.innerHTML = '';
 
@@ -970,6 +1196,7 @@ function buildVerticalLegend(chart, container) {
         const box = document.createElement('span');
         box.classList.add('app-chart-legend__box');
         box.style.backgroundColor = ds.backgroundColor || ds.borderColor || CHART_CONFIG.fallbacks.legendBoxColor;
+        applyMarkerStyle(box, ds.pointStyle);
 
         const label = document.createElement('span');
         label.classList.add('app-chart-legend__label');
@@ -1013,6 +1240,8 @@ function adjustChartResize() {
             Object.values(charts).forEach(chart => {
                 const fontSizePx = gdsVars(chart.canvas).fontSize;
 
+                syncBarChartContainerHeight(chart);
+
                 if (chart.options.scales.x.ticks.font && typeof chart.options.scales.x.ticks.font !== 'function') {
                     chart.options.scales.x.ticks.font.size = fontSizePx;
                 }
@@ -1049,6 +1278,11 @@ function initAll() {
 
     window.addEventListener('scroll', hideAllHtmlTooltips, { passive: true });
     window.addEventListener('resize', hideAllHtmlTooltips, { passive: true });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            dismissVisibleTooltips();
+        }
+    });
 
     adjustChartResize();
 }

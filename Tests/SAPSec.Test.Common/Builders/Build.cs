@@ -23,10 +23,24 @@ public static class Build
             .ToArray();
     }
 
+    public static SimilarSchoolsPrimaryValuesEntry[] PrimaryValues(params string[] urns)
+    {
+        return urns
+            .Select(urn => new SimilarSchoolsPrimaryValuesEntry { URN = urn })
+            .ToArray();
+    }
+
     public static SimilarSchoolsSecondaryGroupsEntry[] SecondaryGroup(string urn, IEnumerable<string> neighbourUrns)
     {
         return neighbourUrns
             .Select(n => new SimilarSchoolsSecondaryGroupsEntry { URN = urn, NeighbourURN = n })
+            .ToArray();
+    }
+
+    public static SimilarSchoolsSecondaryValuesEntry[] SecondaryValues(params string[] urns)
+    {
+        return urns
+            .Select(urn => new SimilarSchoolsSecondaryValuesEntry { URN = urn })
             .ToArray();
     }
 

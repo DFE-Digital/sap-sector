@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Interfaces.Services;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Helpers;
@@ -17,15 +19,18 @@ public class SimilarSchoolsController : Controller
 {
     private readonly IRequestSchoolAccessor _requestSchoolAccessor;
     private readonly FindSimilarSchools _findSimilarSchools;
+    private readonly IFeatureFlagService _featureFlagService;
     private readonly ILogger<SimilarSchoolsController> _logger;
 
     public SimilarSchoolsController(
         IRequestSchoolAccessor requestSchoolAccessor,
         FindSimilarSchools findSimilarSchools,
+        IFeatureFlagService featureFlagService,
         ILogger<SimilarSchoolsController> logger)
     {
         _requestSchoolAccessor = requestSchoolAccessor;
         _findSimilarSchools = findSimilarSchools;
+        _featureFlagService = featureFlagService;
         _logger = logger;
     }
 
@@ -39,13 +44,14 @@ public class SimilarSchoolsController : Controller
         var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(urn);
-        ViewData["SchoolDetails"] = school;
+        ViewData[ViewDataKeys.SchoolDetails] = school;
         if (Url is not null)
         {
-            ViewData["SchoolNavigation"] = SchoolSideNavigationViewModel.CreateSecondary(
+            ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
                 Url,
                 school?.Urn ?? urn,
-                nameof(ViewSimilarSchools));
+                nameof(ViewSimilarSchools),
+                await IsRiseResourcesEnabledAsync());
         }
 
         var filterBy = BuildCoreFilters(Request.Query);
@@ -137,7 +143,11 @@ public class SimilarSchoolsController : Controller
             UrbanOrRural = school.UrbanRural.Name,
             SortMetricName = result.SortValue.Name,
             SortMetricDisplayValue = result.SortValue.Value.Display(),
-            ComparisonUrl = Routes.SecondarySchool(currentSchoolUrn).Comparison(school.URN).Overview
+            ComparisonUrl = Routes.SecondarySchool(currentSchoolUrn).Comparison(school.URN).Similarity
         };
     }
+
+    private async Task<bool> IsRiseResourcesEnabledAsync() =>
+        _featureFlagService is not null
+        && await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 }

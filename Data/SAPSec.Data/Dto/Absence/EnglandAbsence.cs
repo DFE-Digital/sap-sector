@@ -2,7 +2,6 @@
 // Please do not manually edit this file or your changes will be lost when the file is regenerated.
 
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 
 namespace SAPSec.Data.Dto.Absence;
 
@@ -10,23 +9,20 @@ namespace SAPSec.Data.Dto.Absence;
 public class EnglandAbsence
 {
     public string Id { get; set; } = string.Empty;
-
-    public string Abs_Persistent_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
-    public string Abs_Persistent_Secondary_Eng_Previous_Pct { get; set; } = string.Empty;
-    public string Abs_Persistent_Secondary_Eng_Previous2_Pct { get; set; } = string.Empty;
-    public string Abs_Tot_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
-    public string Abs_Tot_Secondary_Eng_Previous_Pct { get; set; } = string.Empty;
-    public string Abs_Tot_Secondary_Eng_Previous2_Pct { get; set; } = string.Empty;
-    public string Auth_Tot_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
-    public string UnAuth_Tot_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
-
     public string Abs_Persistent_Primary_Eng_Current_Pct { get; set; } = string.Empty;
     public string Abs_Persistent_Primary_Eng_Previous_Pct { get; set; } = string.Empty;
     public string Abs_Persistent_Primary_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Secondary_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Secondary_Eng_Previous2_Pct { get; set; } = string.Empty;
     public string Abs_Tot_Primary_Eng_Current_Pct { get; set; } = string.Empty;
     public string Abs_Tot_Primary_Eng_Previous_Pct { get; set; } = string.Empty;
     public string Abs_Tot_Primary_Eng_Previous2_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Secondary_Eng_Previous_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Secondary_Eng_Previous2_Pct { get; set; } = string.Empty;
     public string Auth_Tot_Primary_Eng_Current_Pct { get; set; } = string.Empty;
+    public string Auth_Tot_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
     public string UnAuth_Tot_Primary_Eng_Current_Pct { get; set; } = string.Empty;
-
+    public string UnAuth_Tot_Secondary_Eng_Current_Pct { get; set; } = string.Empty;
 }

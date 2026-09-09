@@ -13,9 +13,9 @@ public abstract class BasePageTest : PageTest
     {
         _fixture = fixture;
 
+        // Run in headed mode when debugging
         if (System.Diagnostics.Debugger.IsAttached)
         {
-            // Run in headed mode when debugging
             Environment.SetEnvironmentVariable("HEADED", "1");
         }
     }

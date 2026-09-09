@@ -9,22 +9,20 @@ namespace SAPSec.Data.Dto.Absence;
 public class LAAbsence
 {
     public string Id { get; set; } = string.Empty;
-    public string Abs_Persistent_Secondary_LA_Current_Pct { get; set; } = string.Empty;
-    public string Abs_Persistent_Secondary_LA_Previous_Pct { get; set; } = string.Empty;
-    public string Abs_Persistent_Secondary_LA_Previous2_Pct { get; set; } = string.Empty;
-    public string Abs_Tot_Secondary_LA_Current_Pct { get; set; } = string.Empty;
-    public string Abs_Tot_Secondary_LA_Previous_Pct { get; set; } = string.Empty;
-    public string Abs_Tot_Secondary_LA_Previous2_Pct { get; set; } = string.Empty;
-    public string Auth_Tot_Secondary_LA_Current_Pct { get; set; } = string.Empty;
-    public string UnAuth_Tot_Secondary_LA_Current_Pct { get; set; } = string.Empty;
-
     public string Abs_Persistent_Primary_LA_Current_Pct { get; set; } = string.Empty;
     public string Abs_Persistent_Primary_LA_Previous_Pct { get; set; } = string.Empty;
     public string Abs_Persistent_Primary_LA_Previous2_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Secondary_LA_Current_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Secondary_LA_Previous_Pct { get; set; } = string.Empty;
+    public string Abs_Persistent_Secondary_LA_Previous2_Pct { get; set; } = string.Empty;
     public string Abs_Tot_Primary_LA_Current_Pct { get; set; } = string.Empty;
     public string Abs_Tot_Primary_LA_Previous_Pct { get; set; } = string.Empty;
     public string Abs_Tot_Primary_LA_Previous2_Pct { get; set; } = string.Empty;
-    public string Auth_Tot_Primary_LA_Current_Pct    { get; set; } = string.Empty;
+    public string Abs_Tot_Secondary_LA_Current_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Secondary_LA_Previous_Pct { get; set; } = string.Empty;
+    public string Abs_Tot_Secondary_LA_Previous2_Pct { get; set; } = string.Empty;
+    public string Auth_Tot_Primary_LA_Current_Pct { get; set; } = string.Empty;
+    public string Auth_Tot_Secondary_LA_Current_Pct { get; set; } = string.Empty;
     public string UnAuth_Tot_Primary_LA_Current_Pct { get; set; } = string.Empty;
-
+    public string UnAuth_Tot_Secondary_LA_Current_Pct { get; set; } = string.Empty;
 }

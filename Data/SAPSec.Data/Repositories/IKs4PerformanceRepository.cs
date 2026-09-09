@@ -1,16 +1,6 @@
-using SAPSec.Data.Dto.KS4.Performance;
-
 namespace SAPSec.Data.Repositories;
 
-public interface IKs4PerformanceRepository
+public interface IKs4PerformanceRepository : IMeasureDataRepository<Ks4PerformanceData>
 {
-    Task<Ks4PerformanceData?> GetByUrnAsync(string urn);
-    Task<IReadOnlyCollection<Ks4PerformanceData>> GetByUrnsAsync(IEnumerable<string> urns);
 }
-
-public record Ks4PerformanceData(
-    string Urn,
-    EstablishmentPerformance? EstablishmentPerformance,
-    LAPerformance? LocalAuthorityPerformance,
-    EnglandPerformance? EnglandPerformance);
 

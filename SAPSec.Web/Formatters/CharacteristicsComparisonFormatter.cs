@@ -1,7 +1,6 @@
-using System.Globalization;
-using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Web.ViewModels;
+using System.Globalization;
 
 namespace SAPSec.Web.Formatters;
 
@@ -13,10 +12,10 @@ public interface ICharacteristicsComparisonFormatter
 
 public sealed class CharacteristicsComparisonFormatter : ICharacteristicsComparisonFormatter
 {
- public IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow> BuildRows(
-    GetCharacteristicsComparisonResponse response)
-{
-    return new List<SimilarSchoolsComparisonViewModel.CharacteristicRow>(9)
+    public IReadOnlyList<SimilarSchoolsComparisonViewModel.CharacteristicRow> BuildRows(
+       GetCharacteristicsComparisonResponse response)
+    {
+        return new List<SimilarSchoolsComparisonViewModel.CharacteristicRow>(9)
     {
         new()
         {
@@ -91,7 +90,7 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
             Similarity = response.PupilsWithEalPercentage.Similarity
         }
     }.AsReadOnly();
-}
+    }
 
     // Formatting rules
     private static string Ks2Int(decimal v) =>
@@ -110,5 +109,5 @@ public sealed class CharacteristicsComparisonFormatter : ICharacteristicsCompari
 
     private static string PolarText(int q) =>
         $"Quintile {q}";
-    
+
 }

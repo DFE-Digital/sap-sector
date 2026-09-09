@@ -1,4 +1,4 @@
-using SAPSec.Core.Features.SimilarSchools;
+using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures;
 
@@ -10,10 +10,11 @@ public record TopPerformer(
     bool IsCurrentSchool = false)
 {
     internal static IReadOnlyCollection<TopPerformer> BuildTopPerformers<T>(
-        SchoolData<T> currentSchool,
-        IEnumerable<SchoolData<T>> similarSchools,
+        SchoolMeasureData<T> currentSchool,
+        IEnumerable<SchoolMeasureData<T>> similarSchools,
         MeasureFieldSelector<T> fieldSelector,
         MeasureDataType dataType)
+        where T : class, IMeasureData
     {
         return similarSchools
             // Include current school in list
