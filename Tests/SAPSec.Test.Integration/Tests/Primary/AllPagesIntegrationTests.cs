@@ -18,7 +18,7 @@ public class AllPagesIntegrationTests(
         new(Routes.PrimarySchool("100001").Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
         new(Routes.PrimarySchool("100001").KS2, "KS2 performance measures", NavigationText: "KS2"),
         new(Routes.PrimarySchool("100001").Attendance, "Attendance measures", NavigationText: "Attendance"),
-        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
+        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools", PageTitle: "2 similar schools - View similar schools"),
         new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
         new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
         new(Routes.PrimarySchool("100001").RiseResources, "RISE resources"),
@@ -65,7 +65,8 @@ public class AllPagesIntegrationTests(
     public async Task AllPages_Headings(string path, string expectedHeading, bool isOverviewPage)
     {
         var page = await Fixture.RequestPageAsync(path);
-        page.Title.Should().Be($"{expectedHeading} - Get school improvement insights - GOV.UK");
+        var expectedTitle = PrimaryPages.Single(p => p.Path == path).PageTitle ?? expectedHeading;
+        page.Title.Should().Be($"{expectedTitle} - Get school improvement insights - GOV.UK");
 
         var heading = page.QuerySelector("h1.govuk-heading-xl");
         heading.Should().NotBeNull();
@@ -200,5 +201,11 @@ public class AllPagesIntegrationTests(
         return data;
     }
 
-    private record PageTestCase(string Path, string Heading, string? NavigationText = null, bool IsOverviewPage = false, bool IsInNavigation = true);
+    private record PageTestCase(
+        string Path,
+        string Heading,
+        string? NavigationText = null,
+        bool IsOverviewPage = false,
+        bool IsInNavigation = true,
+        string? PageTitle = null);
 }
