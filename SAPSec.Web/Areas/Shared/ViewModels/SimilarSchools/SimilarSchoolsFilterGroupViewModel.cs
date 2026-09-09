@@ -93,10 +93,6 @@ public record SimilarSchoolsFilterGroupViewModel(
     string Heading,
     List<SimilarSchoolsAvailableFilter> Filters);
 
-public record SimilarSchoolsSelectedFilterTagViewModel(
-    string Label,
-    string RemoveUrl);
-
 
 
 

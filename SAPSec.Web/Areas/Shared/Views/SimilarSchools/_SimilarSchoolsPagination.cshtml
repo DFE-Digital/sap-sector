@@ -1,8 +1,9 @@
-@using SAPSec.Web.ViewModels
+@using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools
+
 @model SimilarSchoolsPageViewModel
 
 @{
-    var baseUrl = Model.ResultsBaseUrl;
+    var baseUrl = Model.ViewSimilarSchoolsUrl;
 }
 
 @if (Model.TotalPages > 1)

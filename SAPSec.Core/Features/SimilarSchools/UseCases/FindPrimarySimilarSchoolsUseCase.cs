@@ -12,8 +12,8 @@ namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 public class FindPrimarySimilarSchoolsUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
-    IAbsenceRepository absenceRepository,
-    IKs2PerformanceRepository performanceRepository)
+    IKs2PerformanceRepository performanceRepository,
+    IAbsenceRepository absenceRepository)
     : IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>
 {
     public async Task<FindPrimarySimilarSchoolsResponse> Execute(FindPrimarySimilarSchoolsRequest request)
@@ -21,10 +21,10 @@ public class FindPrimarySimilarSchoolsUseCase(
         var dataProvider = new PrimarySimilarSchoolsDataProvider(
             establishmentRepository,
             similarSchoolsRepository,
-            absenceRepository,
-            performanceRepository);
+            performanceRepository,
+            absenceRepository);
 
-        var data = await dataProvider.GetSimilarSchoolsData(request.Urn);
+        var data = await dataProvider.GetData(request.Urn);
         var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
@@ -37,18 +37,13 @@ public class FindPrimarySimilarSchoolsUseCase(
         var sorted = sorting.Sort(filtered);
 
         var allResults = sorted
-            .Select(sortedItem =>
-            {
-                return new SimilarSchoolResult
-                (
-                    sortedItem.Item.URN,
-                    sortedItem.Item.Name,
-                    sortedItem.Item.Address,
-                    sortedItem.Item.LocalAuthority,
-                    sortedItem.Item.Coordinates != null ? CoordinateConverter.Convert(sortedItem.Item.Coordinates) : null,
-                    sortedItem.Value
-                );
-            })
+            .Select(r => new SimilarSchoolResult(
+                r.Item.URN,
+                r.Item.Name,
+                r.Item.Address,
+                r.Item.LocalAuthority,
+                r.Item.Coordinates != null ? CoordinateConverter.Convert(r.Item.Coordinates) : null,
+                r.Value))
             .ToList()
             .AsReadOnly();
 

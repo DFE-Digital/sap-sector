@@ -1,4 +1,5 @@
 ﻿using SAPSec.Core.Features.Availability;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Test.Common.InMemory;
 
@@ -3826,9 +3827,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -3873,9 +3874,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -3920,9 +3921,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -3967,9 +3968,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4014,9 +4015,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4061,9 +4062,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4108,9 +4109,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4155,9 +4156,9 @@ public class FindSecondarySimilarSchoolsUseCaseTests
 
         response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(

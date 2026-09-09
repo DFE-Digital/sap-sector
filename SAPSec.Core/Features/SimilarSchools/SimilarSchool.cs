@@ -27,16 +27,6 @@ public record SimilarSchool
     public required ReferenceData TypeOfEstablishment { get; set; }
     public required ReferenceData EstablishmentTypeGroup { get; set; }
     public required ReferenceData TrustSchoolFlag { get; set; }
-    //public required EstablishmentAbsence? AbsenceData { get; set; }
-    //public required DataWithAvailability<decimal> Attainment8Score { get; set; }
-    //public required DataWithAvailability<decimal> BiologyGcseGrade5AndAbovePercentage { get; set; }
-    //public required DataWithAvailability<decimal> ChemistryGcseGrade5AndAbovePercentage { get; set; }
-    //public required DataWithAvailability<decimal> CombinedScienceGcseGrade55AndAbovePercentage { get; set; }
-    //public required DataWithAvailability<decimal> EnglishLanguageGcseGrade5AndAbovePercentage { get; set; }
-    //public required DataWithAvailability<decimal> EnglishLiteratureGcseGrade5AndAbovePercentage { get; set; }
-    //public required DataWithAvailability<decimal> EnglishMathsGcseGrade5AndAbovePercentage { get; set; }
-    //public required DataWithAvailability<decimal> MathsGcseGrade5AndAbovePercentage { get; set; }
-    //public required DataWithAvailability<decimal> PhysicsGcseGrade5AndAbovePercentage { get; set; }
     public required DataWithAvailability<decimal> OverallAbsenceRate { get; set; }
     public required DataWithAvailability<decimal> PersistentAbsenceRate { get; set; }
 
@@ -69,16 +59,6 @@ public record SimilarSchool
             TrustSchoolFlag = new(currentEstab.TrustSchoolFlagId, currentEstab.TrustSchoolFlagName),
             OfficialSixthForm = new(currentEstab.OfficialSixthFormId, currentEstab.OfficialSixthFormName),
             ResourcedProvision = new(currentEstab.ResourcedProvisionId, currentEstab.ResourcedProvisionName),
-            //AbsenceData = absence,
-            //Attainment8Score = DataWithAvailability.FromDecimalString(performance?.Attainment8_Tot_Est_Current_Num),
-            //BiologyGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Bio59_Sum_Est_Current_Pct),
-            //ChemistryGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Chem59_Sum_Est_Current_Pct),
-            //CombinedScienceGcseGrade55AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.CombSci59_Sum_Est_Current_Pct),
-            //EnglishLanguageGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngLang59_Sum_Est_Current_Pct),
-            //EnglishLiteratureGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngLit59_Sum_Est_Current_Pct),
-            //EnglishMathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.EngMaths59_Tot_Est_Current_Pct),
-            //MathsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Maths59_Sum_Est_Current_Pct),
-            //PhysicsGcseGrade5AndAbovePercentage = DataWithAvailability.FromDecimalString(performance?.Physics59_Sum_Est_Current_Pct),
             OverallAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Tot_Est_Current_Pct),
             PersistentAbsenceRate = DataWithAvailability.FromDecimalString(absence?.Abs_Persistent_Est_Current_Pct)
         };

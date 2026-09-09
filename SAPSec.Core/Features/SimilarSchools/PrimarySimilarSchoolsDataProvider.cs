@@ -1,5 +1,4 @@
 using SAPSec.Core.Features.SimilarSchools.Sorting;
-using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Repositories;
 
@@ -8,10 +7,10 @@ namespace SAPSec.Core.Features.SimilarSchools;
 internal class PrimarySimilarSchoolsDataProvider(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
-    IAbsenceRepository absenceRepository,
-    IKs2PerformanceRepository performanceRepository)
+    IKs2PerformanceRepository performanceRepository,
+    IAbsenceRepository absenceRepository)
 {
-    public async Task<PrimarySimilarSchoolsSourceData> GetSimilarSchoolsData(string currentSchoolUrn)
+    public async Task<PrimarySimilarSchoolsSourceData> GetData(string currentSchoolUrn)
     {
         var groups = (await similarSchoolsRepository.GetGroupAsync(currentSchoolUrn))
             .Where(group => !string.IsNullOrWhiteSpace(group.NeighbourURN))
@@ -53,12 +52,6 @@ internal class PrimarySimilarSchoolsDataProvider(
                 return new SimilarSchoolSortItem<EstablishmentPerformance>(
                     SimilarSchool.FromData(establishment, absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence),
                     performances.GetValueOrDefault(group.NeighbourURN)?.EstablishmentPerformance);
-
-                //return new PrimaryRankedSimilarSchoolData(
-                //    group.Rank,
-                //    group.Dist,
-                //    similarSchool,
-                //    performances.GetValueOrDefault(group.NeighbourURN));
             })
             .Where(school => school is not null)
             .Select(school => school!)
@@ -66,13 +59,11 @@ internal class PrimarySimilarSchoolsDataProvider(
             .AsReadOnly();
 
         return new PrimarySimilarSchoolsSourceData(
-            currentEstablishment,
             currentSimilarSchool,
             similarSchools);
     }
 }
 
 internal record PrimarySimilarSchoolsSourceData(
-    Establishment CurrentEstablishment,
     SimilarSchool CurrentSimilarSchool,
     IReadOnlyCollection<SimilarSchoolSortItem<EstablishmentPerformance>> SimilarSchools);

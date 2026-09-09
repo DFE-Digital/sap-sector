@@ -32,7 +32,9 @@ public class FindSecondarySimilarSchoolsUseCase(
             from e in establishments
             join p in performance on e.URN equals p.Urn into perf
             join a in absence on e.URN equals a.Urn into abs
-            select new SimilarSchoolSortItem<EstablishmentPerformance>(SimilarSchool.FromData(e, abs.FirstOrDefault()?.EstablishmentAbsence), perf.FirstOrDefault()?.EstablishmentPerformance);
+            select new SimilarSchoolSortItem<EstablishmentPerformance>(
+                SimilarSchool.FromData(e, abs.FirstOrDefault()?.EstablishmentAbsence),
+                perf.FirstOrDefault()?.EstablishmentPerformance);
 
         var currentSchool = schools.FirstOrDefault(s => s.SimilarSchool.URN == request.CurrentSchoolUrn);
         if (currentSchool is null)
