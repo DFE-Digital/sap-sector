@@ -182,7 +182,7 @@ public class SchoolDetailsServiceTests
         // Arrange
         _establishmentRepository
             .SetupEstablishments(Build.Establishment("123456", "Test Academy", x => x
-                .WithNurseryProvisionName(" ")));
+                .WithNurseryProvisionName("Has Nursery Classes")));
 
         // Act
         var result = await _sut.GetByUrnAsync("123456");
