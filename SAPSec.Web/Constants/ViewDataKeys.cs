@@ -3,6 +3,7 @@ namespace SAPSec.Web.Constants;
 public static class ViewDataKeys
 {
     public const string Backlink = nameof(Backlink);
+    public const string PageTitle = nameof(PageTitle);
     public const string Title = nameof(Title);
     public const string UseJsBackLink = nameof(UseJsBackLink);
     public const string CookieReturnUrl = nameof(CookieReturnUrl);

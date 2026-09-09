@@ -5,6 +5,7 @@
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = "View similar schools";
+    ViewData[ViewDataKeys.PageTitle] = $"{Model.TotalResults} similar schools - {ViewData[ViewDataKeys.Title]}";
     var hasVisibleResults = Model.SimilarSchools.Any();
 }
 <link rel="stylesheet" href="~/css/leaflet.css"/>
@@ -45,6 +46,8 @@
 <p class="govuk-body">
     Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">how DfE identifies what a similar school is</a>.
 </p>
+
+<a href="#similar-schools-results" class="govuk-skip-link" data-module="govuk-skip-link">Skip to search results</a>
 
 <div class="govuk-grid-row app-similar-schools-content">
     <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsFilter.cshtml" model="Model" />

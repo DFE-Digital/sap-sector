@@ -16,15 +16,16 @@
     var skipNavigationTargetId = ViewData[ViewDataKeys.SkipNavigationTargetId]?.ToString();
     var skipNavigationText = ViewData[ViewDataKeys.SkipNavigationText]?.ToString() ?? "Skip to navigation";
     var skipLinkTargetId = ViewData[ViewDataKeys.SkipLinkTargetId]?.ToString() ?? "main-content";
+    var pageTitle = ViewData[ViewDataKeys.PageTitle]?.ToString() ?? ViewData[ViewDataKeys.Title]?.ToString();
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
     <meta charset="utf-8" />
     <title>
-        @if (ViewData.ContainsKey(ViewDataKeys.Title))
+        @if (!string.IsNullOrWhiteSpace(pageTitle))
         {
-            <text>@ViewData[ViewDataKeys.Title] - @LayoutConstants.ServiceName - GOV.UK</text>
+            <text>@pageTitle - @LayoutConstants.ServiceName - GOV.UK</text>
         }
         else
         {
