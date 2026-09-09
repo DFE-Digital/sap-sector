@@ -4,22 +4,22 @@ using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools;
 
-public class FindSimilarSchoolsTests
+public class FindSecondarySimilarSchoolsUseCaseTests
 {
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
     private readonly InMemoryAbsenceRepository _absenceRepo;
-    private readonly FindSimilarSchools _sut;
+    private readonly FindSecondarySimilarSchoolsUseCase _sut;
 
-    public FindSimilarSchoolsTests()
+    public FindSecondarySimilarSchoolsUseCaseTests()
     {
         _establishmentRepo = new();
         _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
         _absenceRepo = new(_establishmentRepo);
 
-        _sut = new FindSimilarSchools(
+        _sut = new FindSecondarySimilarSchoolsUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
             _performanceRepo,
@@ -4444,7 +4444,7 @@ public class FindSimilarSchoolsTests
             .Should().Equal(expectedUrnsOnPage);
     }
 
-    private FindSimilarSchoolsRequest Request(string urn, Dictionary<string, IEnumerable<string>>? filterBy = null, string? sortBy = null, string? page = null, int? resultsPerPage = null) =>
+    private FindSecondarySimilarSchoolsRequest Request(string urn, Dictionary<string, IEnumerable<string>>? filterBy = null, string? sortBy = null, string? page = null, int? resultsPerPage = null) =>
         resultsPerPage is int rpp
             ? new(urn, filterBy ?? [], sortBy ?? "", page ?? "", rpp)
             : new(urn, filterBy ?? [], sortBy ?? "", page ?? "");

@@ -6,17 +6,19 @@ using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
+using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class FindSimilarSchools(
+public class FindSecondarySimilarSchoolsUseCase(
     IEstablishmentRepository establishmentRepository,
     ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
     IKs4PerformanceRepository performanceRepository,
     IAbsenceRepository absenceRepository)
+    : IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse>
 {
-    public async Task<FindSimilarSchoolsResponse> Execute(FindSimilarSchoolsRequest request)
+    public async Task<FindSecondarySimilarSchoolsResponse> Execute(FindSecondarySimilarSchoolsRequest request)
     {
         // TODO: Validate request
 
@@ -76,14 +78,14 @@ public class FindSimilarSchools(
     }
 }
 
-public record FindSimilarSchoolsRequest(
+public record FindSecondarySimilarSchoolsRequest(
     string CurrentSchoolUrn,
     IDictionary<string, IEnumerable<string>>? FilterBy = null,
     string? SortBy = null,
     string? Page = null,
     int ResultsPerPage = 10);
 
-public record FindSimilarSchoolsResponse(
+public record FindSecondarySimilarSchoolsResponse(
     string SchoolName,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,

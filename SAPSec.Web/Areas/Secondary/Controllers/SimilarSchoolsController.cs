@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
+using SAPSec.Core.UseCases;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Helpers;
@@ -15,25 +16,11 @@ namespace SAPSec.Web.Areas.Secondary.Controllers;
 [Route("school/secondary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
-public class SimilarSchoolsController : Controller
-{
-    private readonly IRequestSchoolAccessor _requestSchoolAccessor;
-    private readonly FindSimilarSchools _findSimilarSchools;
-    private readonly IFeatureFlagService _featureFlagService;
-    private readonly ILogger<SimilarSchoolsController> _logger;
-
-    public SimilarSchoolsController(
+public class SimilarSchoolsController(
         IRequestSchoolAccessor requestSchoolAccessor,
-        FindSimilarSchools findSimilarSchools,
-        IFeatureFlagService featureFlagService,
-        ILogger<SimilarSchoolsController> logger)
-    {
-        _requestSchoolAccessor = requestSchoolAccessor;
-        _findSimilarSchools = findSimilarSchools;
-        _featureFlagService = featureFlagService;
-        _logger = logger;
-    }
-
+        IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
+        IFeatureFlagService featureFlagService) : Controller
+{
     [HttpGet]
     [Route("view-similar-schools")]
     public async Task<IActionResult> ViewSimilarSchools(
@@ -41,7 +28,7 @@ public class SimilarSchoolsController : Controller
         [FromQuery] string? sortBy = null,
         [FromQuery] string? page = null)
     {
-        var school = await _requestSchoolAccessor.GetAsync(HttpContext, urn);
+        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         if (Url is not null)
         {
@@ -55,7 +42,7 @@ public class SimilarSchoolsController : Controller
         var filterBy = BuildCoreFilters(Request.Query);
         var currentFilters = ExtractCurrentFilters(Request.Query);
 
-        var response = await _findSimilarSchools.Execute(new FindSimilarSchoolsRequest(
+        var response = await findSimilarSchoolsUseCase.Execute(new(
             urn,
             filterBy,
             sortBy,
@@ -146,6 +133,6 @@ public class SimilarSchoolsController : Controller
     }
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
-        _featureFlagService is not null
-        && await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+        featureFlagService is not null
+        && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 }

@@ -45,10 +45,12 @@ public static class ServiceCollectionExtensions
 
         // Similar schools
 
-        services.AddSingleton<FindSimilarSchools>();
         services.AddSingleton<
             IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>,
             FindPrimarySimilarSchoolsUseCase>();
+        services.AddSingleton<
+            IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse>,
+            FindSecondarySimilarSchoolsUseCase>();
         services.AddSingleton<
             IUseCase<GetSecondaryComparisonSimilarityCharacteristicsRequest, GetSecondaryComparisonSimilarityCharacteristicsResponse>,
             GetSecondaryComparisonSimilarityCharacteristicsUseCase>();
@@ -88,7 +90,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<
             IUseCase<GetSecondaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>,
             GetSecondaryComparisonAttendanceMeasuresUseCase>();
-        
+
         // RISE Resources
 
         services.AddSingleton<

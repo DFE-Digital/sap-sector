@@ -8,10 +8,8 @@ using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
-using SAPSec.Web.Areas.Primary.ViewModels;
 using SAPSec.Web.Areas.Primary.ViewModels.School;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
@@ -36,7 +34,6 @@ public class SchoolController(
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
-        IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
         IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
@@ -88,27 +85,6 @@ public class SchoolController(
         };
 
         return View(model);
-    }
-
-    [HttpGet]
-    [Route("view-similar-schools")]
-    public async Task<IActionResult> ViewSimilarSchools(
-        string urn,
-        [FromQuery] string? sortBy = null,
-        [FromQuery] string? page = null)
-    {
-        var schoolInfoResponse = await getSchoolInfoUseCase.Execute(new(urn));
-        var filterBy = PrimarySimilarSchoolsPageViewModel.ExtractCurrentFilters(Request.Query)
-            .ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<string>)kvp.Value, StringComparer.InvariantCultureIgnoreCase);
-        var response = await findPrimarySimilarSchoolsUseCase.Execute(new(
-            urn,
-            filterBy,
-            sortBy,
-            page));
-
-        await PopulateViewData(schoolInfoResponse.School);
-
-        return View(PrimarySimilarSchoolsPageViewModel.FromResponse(response, Request.Query));
     }
 
     [HttpGet]
