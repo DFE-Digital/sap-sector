@@ -28,13 +28,13 @@ public class SimilarSchoolsController(
         [FromQuery] string? sortBy = null,
         [FromQuery] string? page = null)
     {
-        var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
+        //var school = await requestSchoolAccessor.GetAsync(HttpContext, urn);
 
         if (Url is not null)
         {
             ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
                 Url,
-                school?.Urn ?? urn,
+                urn,
                 nameof(ViewSimilarSchools),
                 await IsRiseResourcesEnabledAsync());
         }
@@ -61,12 +61,18 @@ public class SimilarSchoolsController(
 
         var viewModel = new SimilarSchoolsPageViewModel
         {
-            EstablishmentName = school.Name,
-            PhaseOfEducation = school.PhaseOfEducation.Display(),
-            Urn = int.TryParse(urn, out var urnValue) ? urnValue : 0,
-            Schools = schools,
+            Urn = response.CurrentSchool.Urn,
+            SchoolName = response.CurrentSchool.Name,
+            NoResultsMessage = "There are no schools that match your search.",
+            PhaseLabel = "secondary",
+            ResultsBaseUrl = baseUrl,
+            FilterFormUrl = baseUrl,
+            SimilarSchools = schools,
+            //PhaseOfEducation = school.PhaseOfEducation.Display(),
+            //Urn = int.TryParse(urn, out var urnValue) ? urnValue : 0,
+            //Schools = schools,
             MapSchools = allSchools,
-            FilterOptions = response.FilterOptions,
+            //FilterOptions = response.FilterOptions,
             SortOptions = response.SortOptions,
             CurrentFilters = currentFilters,
             FilterGroups = SimilarSchoolsViewModelHelpers.BuildFilterGroups(response.FilterOptions),
@@ -80,7 +86,6 @@ public class SimilarSchoolsController(
             PageSize = response.ResultsPage.ItemsPerPage,
             TotalResults = response.AllResults.Count,
             ValidationErrors = response.ValidationErrors,
-            FilterFormUrl = baseUrl,
             WhatIsASimilarSchoolUrl = Routes.SecondarySchool(urn).WhatIsASimilarSchool
         };
 
@@ -111,24 +116,17 @@ public class SimilarSchoolsController(
 
     private SimilarSchoolViewModel MapToViewModel(SimilarSchoolResult result, string currentSchoolUrn)
     {
-        var school = result.SimilarSchool;
-        var address = school.Address;
-
         return new SimilarSchoolViewModel
         {
-            UrnRaw = school.URN,
-            Urn = int.TryParse(school.URN, out var urn) ? urn : 0,
-            EstablishmentName = school.Name,
-            LocalAuthorityName = school.LocalAuthority.Name,
-            Street = address.Street,
-            Town = address.Town,
-            Postcode = address.Postcode,
+            Urn = result.URN,
+            Name = result.Name,
+            LocalAuthorityName = result.LocalAuthority.Name,
+            FullAddress = result.Address.ToString(),
             Latitude = result.Coordinates?.Latitude.ToString(),
             Longitude = result.Coordinates?.Longitude.ToString(),
-            UrbanOrRural = school.UrbanRural.Name,
             SortMetricName = result.SortValue.Name,
             SortMetricDisplayValue = result.SortValue.Value.Display(),
-            ComparisonUrl = Routes.SecondarySchool(currentSchoolUrn).Comparison(school.URN).Similarity
+            ComparisonUrl = Routes.SecondarySchool(currentSchoolUrn).Comparison(result.URN).Similarity
         };
     }
 

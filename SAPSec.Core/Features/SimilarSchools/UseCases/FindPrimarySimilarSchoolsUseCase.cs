@@ -1,5 +1,4 @@
 using SAPSec.Core.Extensions;
-using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
@@ -26,51 +25,44 @@ public class FindPrimarySimilarSchoolsUseCase(
             performanceRepository);
 
         var data = await dataProvider.GetSimilarSchoolsData(request.Urn);
+        var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
 
-        var filters = new SimilarSchoolsFilters(
-            request.FilterBy.AsCaseInsensitive(),
-            data.CurrentSimilarSchool);
-
+        var filterBy = request.FilterBy.AsCaseInsensitive();
+        var filters = new SimilarSchoolsFilters(filterBy, data.CurrentSimilarSchool);
         var validationErrors = filters.Validate();
+        var filtered = filters.Filter(data.SimilarSchools, i => i.SimilarSchool);
 
-        var filteredSimilarSchools = filters.Filter(data.SimilarSchools.Select(x => x.SimilarSchool))
-            .Select(school => data.SimilarSchools.First(x => x.SimilarSchool.URN == school.URN))
-            .ToList();
-        var sorting = new PrimarySimilarSchoolsSorting(request.SortBy ?? string.Empty);
-        var sortedSimilarSchools = sorting.Sort(filteredSimilarSchools)
-            .Select(sortedItem => sortedItem.Item with { SortValue = sortedItem.Value })
-            .ToList();
+        var sortBy = request.SortBy ?? string.Empty;
+        var sorting = new PrimarySimilarSchoolsSorting(sortBy);
+        var sorted = sorting.Sort(filtered);
 
-        var page = int.TryParse(request.Page, out var parsedPage) ? parsedPage : 1;
-        var pagedSimilarSchools = new PagedCollection<PrimaryRankedSimilarSchoolData>(
-            sortedSimilarSchools,
-            page,
-            request.ResultsPerPage);
+        var allResults = sorted
+            .Select(sortedItem =>
+            {
+                return new SimilarSchoolResult
+                (
+                    sortedItem.Item.URN,
+                    sortedItem.Item.Name,
+                    sortedItem.Item.Address,
+                    sortedItem.Item.LocalAuthority,
+                    sortedItem.Item.Coordinates != null ? CoordinateConverter.Convert(sortedItem.Item.Coordinates) : null,
+                    sortedItem.Value
+                );
+            })
+            .ToList()
+            .AsReadOnly();
+
+        var page = int.TryParse(request.Page, out int parsed) ? parsed : 1;
+        var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
 
         return new(
-            new PrimaryCurrentSchool(
-                data.CurrentEstablishment.URN,
-                data.CurrentEstablishment.EstablishmentName,
-                data.CurrentEstablishment.LAName),
-            pagedSimilarSchools.Map(ToSimilarSchool),
-            sortedSimilarSchools.Select(ToSimilarSchool).ToList().AsReadOnly(),
-            filters.AsAvailableFilters(data.SimilarSchools.Select(x => x.SimilarSchool)),
-            sorting.GetPossibleOptions(request.SortBy).ToList().AsReadOnly(),
+            currentSchoolInfo,
+            sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
+            filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
+            resultsPage,
+            allResults,
             validationErrors);
     }
-
-    private static PrimarySimilarSchool ToSimilarSchool(PrimaryRankedSimilarSchoolData school) =>
-        new(
-            school.SimilarSchool,
-            school.SimilarSchool.Coordinates is not null
-                ? CoordinateConverter.Convert(school.SimilarSchool.Coordinates)
-                : null,
-            school.Rank,
-            school.Distance,
-            school.SortValue ?? new SortOptionValue<DataWithAvailability<string>>(
-                string.Empty,
-                string.Empty,
-                DataWithAvailability.NotAvailable<string>()));
 }
 
 public record FindPrimarySimilarSchoolsRequest(
@@ -81,28 +73,9 @@ public record FindPrimarySimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindPrimarySimilarSchoolsResponse(
-    PrimaryCurrentSchool CurrentSchool,
-    IPagedCollection<PrimarySimilarSchool> SimilarSchoolsPage,
-    IReadOnlyCollection<PrimarySimilarSchool> AllSimilarSchools,
-    IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
+    SchoolInfo.SchoolInfo CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
+    IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
+    IPagedCollection<SimilarSchoolResult> ResultsPage,
+    IReadOnlyCollection<SimilarSchoolResult> AllResults,
     IReadOnlyCollection<ValidationError> ValidationErrors);
-
-public record PrimaryCurrentSchool(
-    string Urn,
-    string Name,
-    string LocalAuthorityName);
-
-public record PrimarySimilarSchool(
-    SimilarSchool SimilarSchool,
-    GeographicCoordinates? Coordinates,
-    string Rank,
-    string Distance,
-    SortOptionValue<DataWithAvailability<string>> SortValue);
-
-internal record PrimaryRankedSimilarSchoolData(
-    string Rank,
-    string Distance,
-    SimilarSchool SimilarSchool,
-    Ks2PerformanceData? PerformanceData,
-    SortOptionValue<DataWithAvailability<string>>? SortValue = null);

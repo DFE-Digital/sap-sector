@@ -14,13 +14,13 @@ public class SimilarSchoolsSchoolCapacityInUseFilter(
             ? DataWithAvailability.Available(c.ToString("0.0\\%"))
             : DataWithAvailability.NotAvailable<string>();
 
-    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, decimal from, decimal to)
+    protected override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, decimal from, decimal to)
     {
         return items
             .Select(i => new
             {
                 Item = i,
-                CapacityInUse = CalculateCapacityInUse(i)
+                CapacityInUse = CalculateCapacityInUse(similarSchoolAccessor(i))
             })
             .Where(i => i.CapacityInUse is not null && from <= i.CapacityInUse && i.CapacityInUse <= to)
             .Select(i => i.Item);

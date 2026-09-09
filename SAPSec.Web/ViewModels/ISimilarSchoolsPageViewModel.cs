@@ -8,37 +8,82 @@ namespace SAPSec.Web.ViewModels;
 /// primary and secondary page ViewModels. All URLs are pre-built by the implementer
 /// so the shared views never need to know which controller/area they're rendering for.
 /// </summary>
-public interface ISimilarSchoolsPageViewModel
+public class SimilarSchoolsPageViewModel
 {
-    string Urn { get; }
-    string SchoolName { get; }
-    string PhaseLabel { get; }
-    string NoResultsMessage { get; }
-    string FilterFormUrl { get; }
-    string ResultsBaseUrl { get; }
-    string WhatIsASimilarSchoolUrl { get; }
+    public required string Urn { get; init; }
+    public required string SchoolName { get; init; }
+    public required string PhaseLabel { get; init; }
+    public required string NoResultsMessage { get; init; }
+    public required string FilterFormUrl { get; init; }
+    public required string ResultsBaseUrl { get; init; }
+    public required string WhatIsASimilarSchoolUrl { get; init; }
 
-    IReadOnlyCollection<ISimilarSchoolRowViewModel> SimilarSchools { get; }
-    IReadOnlyCollection<ISimilarSchoolRowViewModel> MapSchools { get; }
-    List<SimilarSchoolsFilterGroupViewModel> FilterGroups { get; }
-    List<SimilarSchoolsSelectedFilterTagViewModel> SelectedFilterTags { get; }
-    IReadOnlyCollection<SortOption> SortOptions { get; }
-    IReadOnlyCollection<ValidationError> ValidationErrors { get; }
+    public required IReadOnlyCollection<SimilarSchoolViewModel> SimilarSchools { get; init; }
+    public required IReadOnlyCollection<SimilarSchoolViewModel> MapSchools { get; init; }
+    public required List<SimilarSchoolsFilterGroupViewModel> FilterGroups { get; init; }
+    public required List<SimilarSchoolsSelectedFilterTagViewModel> SelectedFilterTags { get; init; }
+    public required IReadOnlyCollection<SortOption> SortOptions { get; init; }
+    public required IReadOnlyCollection<ValidationError> ValidationErrors { get; init; }
 
-    int CurrentPage { get; }
-    int TotalResults { get; }
-    int TotalPages { get; }
-    int ShowingFrom { get; }
-    int ShowingTo { get; }
-    bool HasPreviousPage { get; }
-    bool HasNextPage { get; }
-    bool HasActiveFilters { get; }
+    public int TotalPages => (int)Math.Ceiling((double)TotalResults / PageSize);
+    public int ShowingFrom => TotalResults == 0 ? 0 : (CurrentPage - 1) * PageSize + 1;
+    public int ShowingTo => Math.Min(CurrentPage * PageSize, TotalResults);
+    public bool HasPreviousPage => CurrentPage > 1;
+    public bool HasNextPage => CurrentPage < TotalPages;
+    public bool HasActiveFilters => SelectedFilterTags.Any();
 
-    List<int> GetPaginationItems();
-    string BuildPaginationQueryString(int page);
-}
+    public required int CurrentPage { get; init; }
+    public required int PageSize { get; init; } = 10;
+    public required int TotalResults { get; init; }
+    //public required int TotalPages { get; init; }
+    //public required int ShowingFrom { get; init; }
+    //public required int ShowingTo { get; init; }
+    //public required bool HasPreviousPage { get; init; }
+    //public required bool HasNextPage { get; init; }
+    //public required bool HasActiveFilters { get; init; }
+    public required string SortBy { get; init; } = "RwmExpected";
+    public required Dictionary<string, List<string>> CurrentFilters { get; init; } = new(StringComparer.InvariantCultureIgnoreCase);
 
-public static class SimilarSchoolsPagination
-{
-    public const int Ellipsis = -1;
+    public string BuildPaginationQueryString(int page)
+    {
+        var queryParts = new List<string> { $"page={page}" };
+
+        if (!string.IsNullOrWhiteSpace(SortBy))
+        {
+            queryParts.Add($"sortBy={Uri.EscapeDataString(SortBy)}");
+        }
+
+        foreach (var (key, values) in CurrentFilters)
+        {
+            foreach (var value in values)
+            {
+                queryParts.Add($"{key}={Uri.EscapeDataString(value)}");
+            }
+        }
+
+        return "?" + string.Join("&", queryParts);
+    }
+
+    public List<int> GetPaginationItems()
+    {
+        var items = new List<int>();
+
+        if (TotalPages <= 7)
+        {
+            for (var i = 1; i <= TotalPages; i++) items.Add(i);
+            return items;
+        }
+
+        items.Add(1);
+        if (CurrentPage > 3) items.Add(SimilarSchoolsPagination.Ellipsis);
+
+        var start = Math.Max(2, CurrentPage - 1);
+        var end = Math.Min(TotalPages - 1, CurrentPage + 1);
+        for (var i = start; i <= end; i++) items.Add(i);
+
+        if (CurrentPage < TotalPages - 2) items.Add(SimilarSchoolsPagination.Ellipsis);
+        items.Add(TotalPages);
+
+        return items;
+    }
 }

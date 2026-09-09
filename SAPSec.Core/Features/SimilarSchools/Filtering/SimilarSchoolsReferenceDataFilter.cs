@@ -14,18 +14,18 @@ public class SimilarSchoolsReferenceDataFilter(
     protected override DataWithAvailability<string> CurrentSchoolValue
         => DataWithAvailability.FromStringWithCodes(field(CurrentSchool).Id, field(CurrentSchool).Name);
 
-    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values)
     {
         if (!values.Any())
         {
             return items;
         }
 
-        return items.Where(i => values.Contains(field(i).Id, StringComparer.OrdinalIgnoreCase));
+        return items.Where(i => values.Contains(field(similarSchoolAccessor(i)).Id, StringComparer.OrdinalIgnoreCase));
     }
 
-    protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
-        items.GroupBy(field)
+    protected override IEnumerable<FilterOption> GetPossibleOptions<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values) =>
+        items.GroupBy(i => field(similarSchoolAccessor(i)))
             .Where(f => !string.IsNullOrWhiteSpace(f.Key.Id) && f.Key.Id != "9")
             .Select(g => new FilterOption(
                 g.Key.Id,

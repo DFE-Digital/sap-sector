@@ -17,18 +17,18 @@ public class SimilarSchoolsNurseryProvisionFilter(string key,
     protected override DataWithAvailability<string>? CurrentSchoolValue
         => DataWithAvailability.FromStringWithoutCodes(CurrentSchool.NurseryProvisionName);
 
-    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values)
     {
         if (!values.Any())
         {
             return items;
         }
 
-        return items.Where(i => values.Contains(i.NurseryProvisionName, StringComparer.OrdinalIgnoreCase));
+        return items.Where(i => values.Contains(similarSchoolAccessor(i).NurseryProvisionName, StringComparer.OrdinalIgnoreCase));
     }
 
-    protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values) =>
-        items.GroupBy(i => i.NurseryProvisionName)
+    protected override IEnumerable<FilterOption> GetPossibleOptions<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values) =>
+        items.GroupBy(i => similarSchoolAccessor(i).NurseryProvisionName)
             .Where(f => !string.IsNullOrWhiteSpace(f.Key))
             .Select(g => new FilterOption(
                 g.Key,

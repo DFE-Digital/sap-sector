@@ -1,5 +1,6 @@
-using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Data.Dto;
+using SAPSec.Data.Dto.KS2.Performance;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools;
@@ -39,10 +40,7 @@ internal class PrimarySimilarSchoolsDataProvider(
         var performances = (await performanceRepository.GetByUrnsAsync(urns))
             .ToDictionary(performance => performance.Urn, StringComparer.Ordinal);
 
-        var currentSimilarSchool = SimilarSchool.FromData(
-            currentEstablishment,
-            null,
-            absences.GetValueOrDefault(currentSchoolUrn)?.EstablishmentAbsence);
+        var currentSimilarSchool = SimilarSchool.FromData(currentEstablishment, absences.GetValueOrDefault(currentSchoolUrn)?.EstablishmentAbsence);
 
         var similarSchools = groups
             .Select(group =>
@@ -52,16 +50,15 @@ internal class PrimarySimilarSchoolsDataProvider(
                     return null;
                 }
 
-                var similarSchool = SimilarSchool.FromData(
-                    establishment,
-                    null,
-                    absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence);
+                return new SimilarSchoolSortItem<EstablishmentPerformance>(
+                    SimilarSchool.FromData(establishment, absences.GetValueOrDefault(group.NeighbourURN)?.EstablishmentAbsence),
+                    performances.GetValueOrDefault(group.NeighbourURN)?.EstablishmentPerformance);
 
-                return new PrimaryRankedSimilarSchoolData(
-                    group.Rank,
-                    group.Dist,
-                    similarSchool,
-                    performances.GetValueOrDefault(group.NeighbourURN));
+                //return new PrimaryRankedSimilarSchoolData(
+                //    group.Rank,
+                //    group.Dist,
+                //    similarSchool,
+                //    performances.GetValueOrDefault(group.NeighbourURN));
             })
             .Where(school => school is not null)
             .Select(school => school!)
@@ -78,4 +75,4 @@ internal class PrimarySimilarSchoolsDataProvider(
 internal record PrimarySimilarSchoolsSourceData(
     Establishment CurrentEstablishment,
     SimilarSchool CurrentSimilarSchool,
-    IReadOnlyCollection<PrimaryRankedSimilarSchoolData> SimilarSchools);
+    IReadOnlyCollection<SimilarSchoolSortItem<EstablishmentPerformance>> SimilarSchools);

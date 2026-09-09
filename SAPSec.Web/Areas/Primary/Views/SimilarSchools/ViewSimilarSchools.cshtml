@@ -1,9 +1,9 @@
 @using SAPSec.Web.ViewModels
 @using SAPSec.Web.Constants;
 
-@model ISimilarSchoolsPageViewModel
+@model SimilarSchoolsPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Primary/Views/School/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = "View similar schools";
     var hasVisibleResults = Model.SimilarSchools.Any();
 }

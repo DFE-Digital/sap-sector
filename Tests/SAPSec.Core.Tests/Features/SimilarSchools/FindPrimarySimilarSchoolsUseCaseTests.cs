@@ -40,8 +40,8 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         response.CurrentSchool.Urn.Should().Be("100001");
         response.CurrentSchool.Name.Should().Be("Current School");
-        response.SimilarSchoolsPage.Should().BeEmpty();
-        response.AllSimilarSchools.Should().BeEmpty();
+        response.ResultsPage.Should().BeEmpty();
+        response.AllResults.Should().BeEmpty();
     }
 
     [Fact]
@@ -109,23 +109,19 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             LocalAuthorityName = "LA One"
         });
 
-        response.SimilarSchoolsPage.Should().HaveCount(2);
-        response.SimilarSchoolsPage.Should().SatisfyRespectively(
+        response.ResultsPage.Should().HaveCount(2);
+        response.ResultsPage.Should().SatisfyRespectively(
             first =>
             {
-                first.SimilarSchool.URN.Should().Be("100002");
-                first.SimilarSchool.Name.Should().Be("Similar School 1");
-                first.SimilarSchool.LocalAuthority.Name.Should().Be("LA Two");
-                first.Rank.Should().Be("1");
-                first.Distance.Should().Be("0.1");
+                first.URN.Should().Be("100002");
+                first.Name.Should().Be("Similar School 1");
+                first.LocalAuthority.Name.Should().Be("LA Two");
             },
             second =>
             {
-                second.SimilarSchool.URN.Should().Be("100003");
-                second.SimilarSchool.Name.Should().Be("Similar School 2");
-                second.SimilarSchool.LocalAuthority.Name.Should().Be("LA Three");
-                second.Rank.Should().Be("2");
-                second.Distance.Should().Be("0.2");
+                second.URN.Should().Be("100003");
+                second.Name.Should().Be("Similar School 2");
+                second.LocalAuthority.Name.Should().Be("LA Three");
             });
         response.FilterOptions.Should().NotBeEmpty();
         response.SortOptions.Should().SatisfyRespectively(
@@ -144,30 +140,84 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         _establishmentRepo.SetupEstablishments(
             new Establishment
             {
-                URN = "100001", EstablishmentName = "Current School", LAName = "LA One",
-                Easting = 100000, Northing = 100000, RegionId = "R1", RegionName = "North East",
-                UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter",
-                PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form",
-                AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed",
-                ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 210
+                URN = "100001",
+                EstablishmentName = "Current School",
+                LAName = "LA One",
+                Easting = 100000,
+                Northing = 100000,
+                RegionId = "R1",
+                RegionName = "North East",
+                UrbanRuralId = "U1",
+                UrbanRuralName = "Urban",
+                TypeOfEstablishmentId = "34",
+                TypeOfEstablishmentName = "Academy converter",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "3",
+                GenderName = "Mixed",
+                ResourcedProvisionId = "1",
+                ResourcedProvisionName = "Not applicable",
+                NurseryProvisionName = "No",
+                TotalCapacity = 300,
+                TotalPupils = 210
             },
             new Establishment
             {
-                URN = "100002", EstablishmentName = "Similar School 1", LAName = "LA Two",
-                Easting = 108046, Northing = 100000, RegionId = "R1", RegionName = "North East",
-                UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter",
-                PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form",
-                AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed",
-                ResourcedProvisionId = "4", ResourcedProvisionName = "Resourced provision", NurseryProvisionName = "Yes", TotalCapacity = 400, TotalPupils = 220
+                URN = "100002",
+                EstablishmentName = "Similar School 1",
+                LAName = "LA Two",
+                Easting = 108046,
+                Northing = 100000,
+                RegionId = "R1",
+                RegionName = "North East",
+                UrbanRuralId = "U1",
+                UrbanRuralName = "Urban",
+                TypeOfEstablishmentId = "34",
+                TypeOfEstablishmentName = "Academy converter",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "3",
+                GenderName = "Mixed",
+                ResourcedProvisionId = "4",
+                ResourcedProvisionName = "Resourced provision",
+                NurseryProvisionName = "Yes",
+                TotalCapacity = 400,
+                TotalPupils = 220
             },
             new Establishment
             {
-                URN = "100003", EstablishmentName = "Similar School 2", LAName = "LA Three",
-                Easting = 180467, Northing = 100000, RegionId = "R2", RegionName = "South East",
-                UrbanRuralId = "R1", UrbanRuralName = "Rural", TypeOfEstablishmentId = "28", TypeOfEstablishmentName = "Community school",
-                PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form",
-                AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "2", GenderName = "Girls",
-                ResourcedProvisionId = "8", ResourcedProvisionName = "SEN unit", NurseryProvisionName = "No", TotalCapacity = 500, TotalPupils = 230
+                URN = "100003",
+                EstablishmentName = "Similar School 2",
+                LAName = "LA Three",
+                Easting = 180467,
+                Northing = 100000,
+                RegionId = "R2",
+                RegionName = "South East",
+                UrbanRuralId = "R1",
+                UrbanRuralName = "Rural",
+                TypeOfEstablishmentId = "28",
+                TypeOfEstablishmentName = "Community school",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "2",
+                GenderName = "Girls",
+                ResourcedProvisionId = "8",
+                ResourcedProvisionName = "SEN unit",
+                NurseryProvisionName = "No",
+                TotalCapacity = 500,
+                TotalPupils = 230
             });
 
         _similarSchoolsRepo.SetupGroups(
@@ -189,7 +239,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             ["ur"] = ["U1"]
         }));
 
-        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.URN).Should().Equal("100002");
+        response.ResultsPage.Select(x => x.URN).Should().Equal("100002");
         response.FilterOptions.Should().Contain(x => x.Key == "ur");
         response.FilterOptions.Should().Contain(x => x.Key == "reg");
         response.FilterOptions.Should().Contain(x => x.Key == "oar");
@@ -218,8 +268,8 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(new("100001", SortBy: "GpsExpected"));
 
-        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.URN).Should().Equal("100003", "100002");
-        response.SimilarSchoolsPage.First().SortValue.Name.Should().Be("Meeting expected standard in grammar, punctuation and spelling");
+        response.ResultsPage.Select(x => x.URN).Should().Equal("100003", "100002");
+        response.ResultsPage.First().SortValue.Name.Should().Be("Meeting expected standard in grammar, punctuation and spelling");
         response.SortOptions.Should().Contain(x => x.Key == "GpsExpected" && x.Selected);
     }
 
@@ -246,8 +296,8 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(new("100001", SortBy: sortBy));
 
-        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.URN).Should().Equal("100003", "100002");
-        response.SimilarSchoolsPage.First().SortValue.Name.Should().Be(expectedSortName);
+        response.ResultsPage.Select(x => x.URN).Should().Equal("100003", "100002");
+        response.ResultsPage.First().SortValue.Name.Should().Be(expectedSortName);
         response.SortOptions.Should().Contain(x => x.Key == sortBy && x.Selected);
     }
 
@@ -263,7 +313,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
         var response = await _sut.Execute(new("100001", SortBy: "RwmExpected"));
 
         // Alpha School and Beta School tie on score, so fall back to alphabetical order.
-        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Alpha School", "Beta School");
+        response.ResultsPage.Select(x => x.Name).Should().Equal("Alpha School", "Beta School");
     }
 
     [Fact]
@@ -279,7 +329,7 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(new("100001", SortBy: "RwmExpected"));
 
-        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Alpha School", "Beta School");
+        response.ResultsPage.Select(x => x.Name).Should().Equal("Alpha School", "Beta School");
     }
 
     private void SetupThreeSchoolsForSorting()
@@ -326,12 +376,30 @@ public class FindPrimarySimilarSchoolsUseCaseTests
             var urn = (100002 + i).ToString();
             establishments.Add(new Establishment
             {
-                URN = urn, EstablishmentName = $"Similar School {i + 1}", LAName = $"LA {i + 2}",
-                Easting = 108046 + i, Northing = 100000, RegionId = "R1", RegionName = "North East",
-                UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter",
-                PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form",
-                AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed",
-                ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", NurseryProvisionName = "No", TotalCapacity = 300, TotalPupils = 200 + i
+                URN = urn,
+                EstablishmentName = $"Similar School {i + 1}",
+                LAName = $"LA {i + 2}",
+                Easting = 108046 + i,
+                Northing = 100000,
+                RegionId = "R1",
+                RegionName = "North East",
+                UrbanRuralId = "U1",
+                UrbanRuralName = "Urban",
+                TypeOfEstablishmentId = "34",
+                TypeOfEstablishmentName = "Academy converter",
+                PhaseOfEducationId = "P",
+                PhaseOfEducationName = "Primary",
+                OfficialSixthFormId = "0",
+                OfficialSixthFormName = "Does not have sixth form",
+                AdmissionsPolicyId = "1",
+                AdmissionsPolicyName = "Non-selective",
+                GenderId = "3",
+                GenderName = "Mixed",
+                ResourcedProvisionId = "1",
+                ResourcedProvisionName = "Not applicable",
+                NurseryProvisionName = "No",
+                TotalCapacity = 300,
+                TotalPupils = 200 + i
             });
             groups.Add(new SimilarSchoolsPrimaryGroupsEntry { URN = "100001", NeighbourURN = urn, Dist = $"0.{i + 1}", Rank = (i + 1).ToString() });
             values.Add(new SimilarSchoolsPrimaryValuesEntry { URN = urn, PPPerc = "20", Polar4QuintilePupils = "2", PStability = "95", PercentSchSupport = "10", PercentEAL = "5", IdaciPupils = "0.123", PercentageStatementOrEhp = "1.5", NumberOfPupils = (200 + i).ToString(), ReadMatAverage = "100", Ks1PriorRwmAverage = "10" });
@@ -343,12 +411,12 @@ public class FindPrimarySimilarSchoolsUseCaseTests
 
         var response = await _sut.Execute(new("100001", Page: "2"));
 
-        response.SimilarSchoolsPage.CurrentPage.Should().Be(2);
-        response.SimilarSchoolsPage.Should().HaveCount(2);
-        response.AllSimilarSchools.Should().HaveCount(12);
+        response.ResultsPage.CurrentPage.Should().Be(2);
+        response.ResultsPage.Should().HaveCount(2);
+        response.AllResults.Should().HaveCount(12);
 
         // None of the 12 schools have performance data, so they all tie on the default sort
         // measure and fall back to alphabetical order (AC3) - page 2 is items 11-12 of that order.
-        response.SimilarSchoolsPage.Select(x => x.SimilarSchool.Name).Should().Equal("Similar School 8", "Similar School 9");
+        response.ResultsPage.Select(x => x.Name).Should().Equal("Similar School 8", "Similar School 9");
     }
 }

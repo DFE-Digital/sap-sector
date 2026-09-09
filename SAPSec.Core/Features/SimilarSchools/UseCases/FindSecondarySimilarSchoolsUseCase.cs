@@ -1,12 +1,11 @@
 using SAPSec.Core.Extensions;
-using SAPSec.Core.Features.Availability;
-using SAPSec.Core.Features.Filtering;
 using SAPSec.Core.Features.Geography;
 using SAPSec.Core.Features.Pagination;
 using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.UseCases;
+using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -33,30 +32,36 @@ public class FindSecondarySimilarSchoolsUseCase(
             from e in establishments
             join p in performance on e.URN equals p.Urn into perf
             join a in absence on e.URN equals a.Urn into abs
-            select SimilarSchool.FromData(e, perf.FirstOrDefault()?.EstablishmentPerformance, abs.FirstOrDefault()?.EstablishmentAbsence);
+            select new SimilarSchoolSortItem<EstablishmentPerformance>(SimilarSchool.FromData(e, abs.FirstOrDefault()?.EstablishmentAbsence), perf.FirstOrDefault()?.EstablishmentPerformance);
 
-        var currentSchool = schools.FirstOrDefault(s => s.URN == request.CurrentSchoolUrn);
+        var currentSchool = schools.FirstOrDefault(s => s.SimilarSchool.URN == request.CurrentSchoolUrn);
         if (currentSchool is null)
         {
             throw new NotFoundException($"School with URN {request.CurrentSchoolUrn} was not found");
         }
 
+        var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(currentSchool.SimilarSchool);
+
         var similarSchools = schools.Except([currentSchool]);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
-        var filters = new SimilarSchoolsFilters(filterBy, currentSchool);
+        var filters = new SimilarSchoolsFilters(filterBy, currentSchool.SimilarSchool);
+        var validationErrors = filters.Validate();
+        var filtered = filters.Filter(similarSchools, i => i.SimilarSchool);
 
-        var errors = filters.Validate();
+        var sortBy = request.SortBy ?? string.Empty;
+        var sorting = new SecondarySimilarSchoolsSorting(sortBy);
+        var sorted = sorting.Sort(filtered);
 
-        var sortBy = request.SortBy ?? "";
-        var sorting = new SimilarSchoolsSorting(sortBy);
-
-        var allResults = sorting.Sort(filters.Filter(similarSchools))
+        var allResults = sorted
             .Select(sortedItem =>
             {
                 return new SimilarSchoolResult
                 (
-                    sortedItem.Item,
+                    sortedItem.Item.URN,
+                    sortedItem.Item.Name,
+                    sortedItem.Item.Address,
+                    sortedItem.Item.LocalAuthority,
                     sortedItem.Item.Coordinates != null ? CoordinateConverter.Convert(sortedItem.Item.Coordinates) : null,
                     sortedItem.Value
                 );
@@ -68,12 +73,12 @@ public class FindSecondarySimilarSchoolsUseCase(
         var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
 
         return new(
-            currentSchool.Name,
+            currentSchoolInfo,
             sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
-            filters.AsAvailableFilters(similarSchools),
+            filters.AsAvailableFilters(similarSchools, i => i.SimilarSchool),
             resultsPage,
             allResults,
-            errors
+            validationErrors
         );
     }
 }
@@ -86,44 +91,9 @@ public record FindSecondarySimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindSecondarySimilarSchoolsResponse(
-    string SchoolName,
+    SchoolInfo.SchoolInfo CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
     IPagedCollection<SimilarSchoolResult> ResultsPage,
     IReadOnlyCollection<SimilarSchoolResult> AllResults,
     IReadOnlyCollection<ValidationError> ValidationErrors);
-
-public abstract record SimilarSchoolsAvailableFilter(
-    string Key,
-    string Name,
-    DataWithAvailability<string>? CurrentSchoolValue);
-
-public record SimilarSchoolsSingleValueAvailableFilter(
-    string Key,
-    string Name,
-    IReadOnlyCollection<FilterOption> Options,
-    DataWithAvailability<string>? CurrentSchoolValue)
-    : SimilarSchoolsAvailableFilter(Key, Name, CurrentSchoolValue);
-
-public record SimilarSchoolsMultiValueAvailableFilter(
-    string Key,
-    string Name,
-    IReadOnlyCollection<FilterOption> Options,
-    DataWithAvailability<string>? CurrentSchoolValue)
-    : SimilarSchoolsAvailableFilter(Key, Name, CurrentSchoolValue);
-
-public record SimilarSchoolsNumericRangeAvailableFilter(
-    string Key,
-    string Name,
-    SimilarSchoolsNumericRangeAvailableFilterField From,
-    SimilarSchoolsNumericRangeAvailableFilterField To,
-    DataWithAvailability<string>? CurrentSchoolValue,
-    IReadOnlyCollection<ValidationError> ValidationErrors)
-    : SimilarSchoolsAvailableFilter(Key, Name, CurrentSchoolValue);
-
-public record SimilarSchoolsNumericRangeAvailableFilterField(string Key, string Value);
-
-public record SimilarSchoolResult(
-    SimilarSchool SimilarSchool,
-    GeographicCoordinates? Coordinates,
-    SortOptionValue<DataWithAvailability<string>> SortValue);

@@ -39,7 +39,23 @@ public class SimilarSchoolsFilters(CaseInsensitiveDictionary<IEnumerable<string>
         return errors;
     }
 
-    public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
+    //public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items) =>
+    //    Filter(items, i => i);
+    //{
+    //    var filteredItems = items;
+
+    //    foreach (var filter in _filters.Values)
+    //    {
+    //        if (filter.IsApplied)
+    //        {
+    //            filteredItems = filter.Filter(filteredItems);
+    //        }
+    //    }
+
+    //    return filteredItems;
+    //}
+
+    public IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor)
     {
         var filteredItems = items;
 
@@ -47,20 +63,20 @@ public class SimilarSchoolsFilters(CaseInsensitiveDictionary<IEnumerable<string>
         {
             if (filter.IsApplied)
             {
-                filteredItems = filter.Filter(filteredItems);
+                filteredItems = filter.Filter(filteredItems, similarSchoolAccessor);
             }
         }
 
         return filteredItems;
     }
 
-    public IReadOnlyCollection<SimilarSchoolsAvailableFilter> AsAvailableFilters(IEnumerable<SimilarSchool> items)
+    public IReadOnlyCollection<SimilarSchoolsAvailableFilter> AsAvailableFilters<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor)
     {
         var availableFilters = new List<SimilarSchoolsAvailableFilter>();
 
         foreach (var (key, filter) in _filters)
         {
-            var availableFilter = filter.AsAvailableFilter(items);
+            var availableFilter = filter.AsAvailableFilter(items, similarSchoolAccessor);
             if (availableFilter is not null)
             {
                 availableFilters.Add(availableFilter);

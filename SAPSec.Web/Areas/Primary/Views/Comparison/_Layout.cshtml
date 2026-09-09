@@ -21,7 +21,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Routes.PrimarySchool(layout!.CurrentSchool.Urn).ViewSimilarSchools">
+                   href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).ViewSimilarSchools">
                     View similar schools
                 </a>
             </li>
@@ -34,7 +34,7 @@
     @* LEFT: back link *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Routes.PrimarySchool(layout!.CurrentSchool.Urn).ViewSimilarSchools">
+           href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).ViewSimilarSchools">
             Back
         </a>
     </div>
@@ -42,7 +42,7 @@
     @* MAIN CONTENT *@
     <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
         <span class="govuk-caption-xl">
-            @layout!.CurrentSchool.Name
+            @layout.CurrentSchool.Name
         </span>
 
         <span
