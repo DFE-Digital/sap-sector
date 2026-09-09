@@ -5,7 +5,6 @@ using SAPSec.Core.Features.SimilarSchools.Filtering;
 using SAPSec.Core.Features.SimilarSchools.Sorting;
 using SAPSec.Core.Features.Sorting;
 using SAPSec.Core.UseCases;
-using SAPSec.Data.Dto.KS4.Performance;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -21,35 +20,19 @@ public class FindSecondarySimilarSchoolsUseCase(
     {
         // TODO: Validate request
 
-        var groups = await similarSchoolsRepository.GetGroupAsync(request.CurrentSchoolUrn);
-        var urns = groups.Select(g => g.NeighbourURN).Concat([request.CurrentSchoolUrn]);
+        var dataProvider = new SecondarySimilarSchoolsDataProvider(
+            establishmentRepository,
+            similarSchoolsRepository,
+            performanceRepository,
+            absenceRepository);
 
-        var establishments = await establishmentRepository.GetEstablishmentsAsync(urns);
-        var performance = await performanceRepository.GetByUrnsAsync(urns);
-        var absence = await absenceRepository.GetByUrnsAsync(urns);
-
-        var schools =
-            from e in establishments
-            join p in performance on e.URN equals p.Urn into perf
-            join a in absence on e.URN equals a.Urn into abs
-            select new SimilarSchoolSortItem<EstablishmentPerformance>(
-                SimilarSchool.FromData(e, abs.FirstOrDefault()?.EstablishmentAbsence),
-                perf.FirstOrDefault()?.EstablishmentPerformance);
-
-        var currentSchool = schools.FirstOrDefault(s => s.SimilarSchool.URN == request.CurrentSchoolUrn);
-        if (currentSchool is null)
-        {
-            throw new NotFoundException($"School with URN {request.CurrentSchoolUrn} was not found");
-        }
-
-        var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(currentSchool.SimilarSchool);
-
-        var similarSchools = schools.Except([currentSchool]);
+        var data = await dataProvider.GetData(request.CurrentSchoolUrn);
+        var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
-        var filters = new SimilarSchoolsFilters(filterBy, currentSchool.SimilarSchool);
+        var filters = new SimilarSchoolsFilters(filterBy, data.CurrentSimilarSchool);
         var validationErrors = filters.Validate();
-        var filtered = filters.Filter(similarSchools, i => i.SimilarSchool);
+        var filtered = filters.Filter(data.SimilarSchools, i => i.SimilarSchool);
 
         var sortBy = request.SortBy ?? string.Empty;
         var sorting = new SecondarySimilarSchoolsSorting(sortBy);
@@ -77,7 +60,7 @@ public class FindSecondarySimilarSchoolsUseCase(
         return new(
             currentSchoolInfo,
             sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
-            filters.AsAvailableFilters(similarSchools, i => i.SimilarSchool),
+            filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
             resultsPage,
             allResults,
             validationErrors

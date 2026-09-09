@@ -24,7 +24,7 @@ public class FindPrimarySimilarSchoolsUseCase(
             performanceRepository,
             absenceRepository);
 
-        var data = await dataProvider.GetData(request.Urn);
+        var data = await dataProvider.GetData(request.CurrentSchoolUrn);
         var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
 
         var filterBy = request.FilterBy.AsCaseInsensitive();
@@ -61,7 +61,7 @@ public class FindPrimarySimilarSchoolsUseCase(
 }
 
 public record FindPrimarySimilarSchoolsRequest(
-    string Urn,
+    string CurrentSchoolUrn,
     IDictionary<string, IEnumerable<string>>? FilterBy = null,
     string? SortBy = null,
     string? Page = null,

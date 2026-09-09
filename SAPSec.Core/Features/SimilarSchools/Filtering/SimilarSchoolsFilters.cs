@@ -39,22 +39,6 @@ public class SimilarSchoolsFilters(CaseInsensitiveDictionary<IEnumerable<string>
         return errors;
     }
 
-    //public IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items) =>
-    //    Filter(items, i => i);
-    //{
-    //    var filteredItems = items;
-
-    //    foreach (var filter in _filters.Values)
-    //    {
-    //        if (filter.IsApplied)
-    //        {
-    //            filteredItems = filter.Filter(filteredItems);
-    //        }
-    //    }
-
-    //    return filteredItems;
-    //}
-
     public IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor)
     {
         var filteredItems = items;
