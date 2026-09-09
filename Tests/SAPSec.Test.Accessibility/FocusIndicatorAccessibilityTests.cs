@@ -84,7 +84,7 @@ public class FocusIndicatorAccessibilityTests(AccessibilityTestsFixture fixture)
         ");
 
         clusterLabels.Should().NotBeEmpty();
-        clusterLabels.Should().OnlyContain(label => label.Contains("containing"));
+        clusterLabels.Should().OnlyContain(label => label.Contains("including"));
     }
 
     private static async Task<string[]> GetFocusStyles(ILocator element)
