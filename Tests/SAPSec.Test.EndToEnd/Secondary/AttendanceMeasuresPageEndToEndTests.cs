@@ -35,9 +35,9 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2023 to 2024" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2023 to 2024" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -67,7 +67,7 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
     public async Task Attendance_ViewTableView()
     {
         var section = await GetSection(AttendanceMeasuresHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();

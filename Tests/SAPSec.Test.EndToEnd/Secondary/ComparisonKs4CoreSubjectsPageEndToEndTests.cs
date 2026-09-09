@@ -47,9 +47,9 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -79,7 +79,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task EnglishLanguage_ViewTableView()
     {
         var section = await GetSection(EnglishLanguageHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -98,7 +98,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task EnglishLanguage_ChangeGradeFilters()
     {
         var section = await GetSection(EnglishLanguageHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -127,9 +127,9 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -159,7 +159,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task EnglishLiterature_ViewTableView()
     {
         var section = await GetSection(EnglishLiteratureHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -178,7 +178,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task EnglishLiterature_ChangeGradeFilters()
     {
         var section = await GetSection(EnglishLiteratureHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -207,9 +207,9 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -239,7 +239,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Maths_ViewTableView()
     {
         var section = await GetSection(MathsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -258,7 +258,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Maths_ChangeGradeFilters()
     {
         var section = await GetSection(MathsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -287,9 +287,9 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -319,7 +319,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task CombinedScience_ViewTableView()
     {
         var section = await GetSection(CombinedScienceHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -338,7 +338,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task CombinedScience_ChangeGradeFilters()
     {
         var section = await GetSection(CombinedScienceHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -367,9 +367,9 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -399,7 +399,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Biology_ViewTableView()
     {
         var section = await GetSection(BiologyHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -418,7 +418,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Biology_ChangeGradeFilters()
     {
         var section = await GetSection(BiologyHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -447,9 +447,9 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -479,7 +479,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Chemistry_ViewTableView()
     {
         var section = await GetSection(ChemistryHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -498,7 +498,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Chemistry_ChangeGradeFilters()
     {
         var section = await GetSection(ChemistryHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -527,9 +527,9 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
+        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
         var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -559,7 +559,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Physics_ViewTableView()
     {
         var section = await GetSection(PhysicsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -578,7 +578,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
     public async Task Physics_ChangeGradeFilters()
     {
         var section = await GetSection(PhysicsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();

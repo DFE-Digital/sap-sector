@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.UI.Tests.Deprecated.Infrastructure;
 using SAPSec.UI.Tests.Infrastructure;
@@ -23,7 +23,7 @@ public class SchoolKs4HeadlineMeasuresPageTests(WebApplicationSetupFixture fixtu
     private async Task ToggleChartViewAsync(int chartGroupIndex = 0)
     {
         var chartTabs = Page.Locator(".app-measure-tabs").Nth(chartGroupIndex);
-        await chartTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
+        await chartTabs.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" }).ClickAsync();
     }
 
     [Fact]
