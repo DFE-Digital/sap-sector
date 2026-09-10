@@ -565,8 +565,8 @@ public static class Measures
                         new(AllPupils, "All pupils"),
                         new(Boys, "Boys"),
                         new(Girls, "Girls"),
-                        new(Fsm, "Ever6 FSM pupils"),
-                        new(NonFsm, "Non-Ever6 FSM pupils"),
+                        new(Fsm, "Ever 6 FSM pupils"),
+                        new(NonFsm, "Non-Ever 6 FSM pupils"),
                         new(Eal, "English as an additional language"),
                         new(Efl, "English as a first language"),
                     ];
