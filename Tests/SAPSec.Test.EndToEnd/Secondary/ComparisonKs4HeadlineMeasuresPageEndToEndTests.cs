@@ -39,9 +39,9 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     public async Task Attainment8_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(Attainment8HeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -75,13 +75,13 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var section = await GetSection(EnglishMathsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -152,7 +152,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var section = await GetSection(DestinationsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2022 to 2023" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });

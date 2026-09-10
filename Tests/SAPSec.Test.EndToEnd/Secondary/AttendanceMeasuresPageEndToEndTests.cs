@@ -32,7 +32,7 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
         var section = await GetSection(AttendanceMeasuresHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
         var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2023 to 2024" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });

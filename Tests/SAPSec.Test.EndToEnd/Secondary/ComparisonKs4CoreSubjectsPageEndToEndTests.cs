@@ -44,13 +44,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(EnglishLanguageHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -124,13 +124,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(EnglishLiteratureHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -204,13 +204,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(MathsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -284,13 +284,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(CombinedScienceHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -364,13 +364,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(BiologyHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -444,13 +444,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(ChemistryHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -524,13 +524,13 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(PhysicsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();

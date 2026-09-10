@@ -40,13 +40,13 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
         var section = await GetSection(MeetingExpectedStandardHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -152,13 +152,13 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
         var section = await GetSection(AchievedHigherStandardHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
         await Expect(yearByYearHeader).ToBeHiddenAsync();
@@ -262,9 +262,9 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
     public async Task AverageScaledScoreReading_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(ReadingScaledScoreHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -312,9 +312,9 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
     public async Task MeetingExpectedStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(MeetingExpectedStandardGpsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
@@ -361,9 +361,9 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
     public async Task AchievedHigherStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(AchievedHigherStandardGpsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
+        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
         var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
 
         await Expect(currentYearHeader).ToBeVisibleAsync();
