@@ -14,8 +14,7 @@ public class GetRiseResourcesUseCase(
         var data = await dataProvider.GetRiseResourcesData(request.Urn);
 
         return new(
-            Urn: data.Establishment.URN,
-            SchoolName: data.Establishment.EstablishmentName,
+            School: SchoolInfo.SchoolInfo.FromEstablishment(data.Establishment),
             Resources: data.Resources,
             LastUpdated: data.LastUpdated);
     }
@@ -24,8 +23,7 @@ public class GetRiseResourcesUseCase(
 public record GetRiseResourcesRequest(string Urn);
 
 public record GetRiseResourcesResponse(
-    string Urn,
-    string SchoolName,
+    SchoolInfo.SchoolInfo School,
     IReadOnlyList<RiseResource> Resources,
     DateTime? LastUpdated);
 

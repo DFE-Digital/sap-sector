@@ -1,4 +1,5 @@
 using AngleSharp.Dom;
+using AngleSharp.Html.Dom;
 using FluentAssertions;
 using SAPSec.Core.Constants;
 using SAPSec.Test.Common.AngleSharp;
@@ -6,6 +7,7 @@ using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
+using System.Text.RegularExpressions;
 using Xunit.Abstractions;
 
 namespace SAPSec.Test.Integration.Tests.Primary;
@@ -15,18 +17,21 @@ public class AllPagesIntegrationTests(
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     private static readonly PageTestCase[] PrimaryPages = [
-        new(Routes.PrimarySchool("100001").Overview, "Test School 1", NavigationText: "Overview", IsOverviewPage: true),
+        new(Routes.PrimarySchool("100001").Overview, "Test School 1", NavigationText: "Overview"),
         new(Routes.PrimarySchool("100001").KS2, "KS2 performance measures", NavigationText: "KS2"),
         new(Routes.PrimarySchool("100001").Attendance, "Attendance measures", NavigationText: "Attendance"),
-        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools", PageTitle: "2 similar schools - View similar schools"),
+        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
         new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
         new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
         new(Routes.PrimarySchool("100001").RiseResources, "RISE resources"),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Similarity, "Test School 2", IsInNavigation: false),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Ks2, "Test School 2", IsInNavigation: false),
-        new(Routes.PrimarySchool("100001").Comparison("100002").Attendance, "Test School 2", IsInNavigation: false),
-        new(Routes.PrimarySchool("100001").Comparison("100002").SchoolDetails, "Test School 2", IsInNavigation: false)
+        new(Routes.PrimarySchool("100001").Comparison("100002").Similarity, "How these schools compare", NavigationText: "Similarity"),
+        new(Routes.PrimarySchool("100001").Comparison("100002").Ks2, "KS2 performance measures", NavigationText: "KS2"),
+        new(Routes.PrimarySchool("100001").Comparison("100002").Attendance, "Attendance measures", NavigationText: "Attendance"),
+        new(Routes.PrimarySchool("100001").Comparison("100002").SchoolDetails, "School details", NavigationText: "School details")
     ];
+
+    private static readonly Regex ComparisonPage = new Regex(Routes.PrimarySchool(@"\d{6}").Comparison(@"\d{6}").BasePath, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+    private static readonly Regex OverviewPage = new Regex(Routes.PrimarySchool(@"\d{6}").Overview, RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
     public override Task InitializeAsync()
     {
@@ -39,7 +44,7 @@ public class AllPagesIntegrationTests(
             Build.PrimaryGroup("100001", ["100002", "100003"]));
 
         Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
-            Build.PrimaryValues("100001", "100002", "100003"));
+            Build.PrimaryValues(["100001", "100002", "100003"]));
 
         return base.InitializeAsync();
     }
@@ -62,21 +67,32 @@ public class AllPagesIntegrationTests(
 
     [Theory]
     [MemberData(nameof(AllPagesWithPageHeadings))]
-    public async Task AllPages_Headings(string path, string expectedHeading, bool isOverviewPage)
+    public async Task AllPages_Headings(string path, string expectedHeading)
     {
+        var isComparisonPage = ComparisonPage.IsMatch(path);
+        var isOverviewPage = OverviewPage.IsMatch(path);
+
         var page = await Fixture.RequestPageAsync(path);
-        var expectedTitle = PrimaryPages.Single(p => p.Path == path).PageTitle ?? expectedHeading;
+
+        var expectedTitle = isComparisonPage ? "Test School 2" : expectedHeading;
         page.Title.Should().Be($"{expectedTitle} - Get school improvement insights - GOV.UK");
 
-        var heading = page.QuerySelector("h1.govuk-heading-xl");
-        heading.Should().NotBeNull();
-        heading.TrimmedTextContent().Should().Be(expectedHeading);
+        var h1 = page.QuerySelector("h1.govuk-heading-xl");
+        h1.Should().NotBeNull();
+        h1.TrimmedTextContent().Should().Be(isComparisonPage ? "Test School 2" : expectedHeading);
 
         if (!isOverviewPage)
         {
             var caption = page.QuerySelector(".govuk-caption-xl");
             caption.Should().NotBeNull();
             caption.TrimmedTextContent().Should().Be("Test School 1");
+        }
+
+        if (isComparisonPage)
+        {
+            var h2 = page.QuerySelector("h2.govuk-heading-l");
+            h2.Should().NotBeNull();
+            h2.TrimmedTextContent().Should().Be(expectedHeading);
         }
     }
 
@@ -101,15 +117,17 @@ public class AllPagesIntegrationTests(
     }
 
     [Theory]
-    [MemberData(nameof(AllPagesWithSideNavigation))]
-    public async Task AllPages_Navigation_ShowsLinksInCorrectOrder(string path)
+    [MemberData(nameof(NonComparisonPages))]
+    public async Task AllPages_Navigation_ShowsLinksInCorrectOrder(string path, string navigationText)
     {
         var page = await Fixture.RequestPageAsync(path);
 
         var navigationItems = page.QuerySelectorAll(".app-side-navigation__item a");
 
+        var hrefs = navigationItems.Cast<IHtmlAnchorElement>().Select(a => a.Href).ToArray();
+
         var navigationAssertions = PrimaryPages
-            .Where(p => p.IsInNavigation)
+            .Where(p => !ComparisonPage.IsMatch(p.Path))
             .Select(p => new Action<IElement>(n => n.ShouldLinkTo(p.NavigationText ?? p.Heading, p.Path)))
             .ToArray();
 
@@ -117,7 +135,7 @@ public class AllPagesIntegrationTests(
     }
 
     [Theory]
-    [MemberData(nameof(AllPagesInNavigation))]
+    [MemberData(nameof(NonComparisonPages))]
     public async Task AllPages_Navigation_ShowsSelectedTabAsActive(string path, string navigationText)
     {
         var page = await Fixture.RequestPageAsync(path);
@@ -132,23 +150,51 @@ public class AllPagesIntegrationTests(
         link.GetAttribute("aria-current").Should().Be("page");
     }
 
-    [Fact]
-    public async Task OverviewPage_ContainsWhatIsASimilarSchoolLink()
+    [Theory]
+    [MemberData(nameof(ComparisonPages))]
+    public async Task AllPages_NotInNavigation_HasBackLink(string path, string navigationText)
     {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Overview);
+        var page = await Fixture.RequestPageAsync(path);
 
-        var link = page.QuerySelector(".app-body-container-with-side-navigation a");
-        link.Should().NotBeNull();
-        link.GetAttribute("href").Should().Be(Routes.PrimarySchool("100001").WhatIsASimilarSchool);
+        var backLink = page.QuerySelector("a.govuk-back-link");
+        backLink.Should().NotBeNull();
+
+        var linkText = backLink.TrimmedTextContent();
+        linkText.Should().Contain("Back");
+
+        var href = backLink.GetAttribute("href");
+
+        href.Should().NotBeNullOrWhiteSpace("Back link should have an href");
+        href!.Should().Contain("view-similar-schools", "Back link should navigate to the similar schools journey");
     }
 
-    [Fact]
-    public async Task WhatIsASimilarSchoolPage_ContainsViewSimilarSchoolsLink()
+    [Theory]
+    [MemberData(nameof(ComparisonPages))]
+    public async Task AllPages_NotInNavigation_HasAllTabs(string path, string navigationText)
     {
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").WhatIsASimilarSchool);
+        var page = await Fixture.RequestPageAsync(path);
 
-        var links = page.QuerySelectorAll(".app-body-container-with-side-navigation a");
-        links.Should().Contain(l => l.GetAttribute("href") == Routes.PrimarySchool("100001").ViewSimilarSchools);
+        var tabs = page.ElementsShouldExist("div.govuk-service-navigation.compare-nav a.govuk-service-navigation__link");
+
+        var navigationAssertions = PrimaryPages
+            .Where(p => ComparisonPage.IsMatch(p.Path))
+            .Select(p => new Action<IElement>(n => n.ShouldLinkTo(p.NavigationText ?? p.Heading, p.Path)))
+            .ToArray();
+
+        tabs.Should().SatisfyRespectively(navigationAssertions);
+    }
+
+    [Theory]
+    [MemberData(nameof(ComparisonPages))]
+    public async Task AllPages_ActiveTab(string path, string navigationText)
+    {
+        var page = await Fixture.RequestPageAsync(path);
+
+        var activeTab = page.ElementShouldExist("li.govuk-service-navigation__item--active a.govuk-service-navigation__link");
+        activeTab.TrimmedTextContent().Should().Be(navigationText);
+
+        var ariaCurrent = activeTab.GetAttribute("aria-current");
+        ariaCurrent.Should().Be("page", "Active tab should have aria-current='page'");
     }
 
     public static TheoryData<string> AllPages()
@@ -162,26 +208,12 @@ public class AllPagesIntegrationTests(
         return data;
     }
 
-    public static TheoryData<string> AllPagesWithSideNavigation()
-    {
-        var data = new TheoryData<string>();
-        foreach (var page in PrimaryPages)
-        {
-            if (page.IsInNavigation)
-            {
-                data.Add(page.Path);
-            }
-        }
-
-        return data;
-    }
-
-    public static TheoryData<string, string> AllPagesInNavigation()
+    public static TheoryData<string, string> NonComparisonPages()
     {
         var data = new TheoryData<string, string>();
         foreach (var page in PrimaryPages)
         {
-            if (page.IsInNavigation)
+            if (!ComparisonPage.IsMatch(page.Path))
             {
                 data.Add(page.Path, page.NavigationText ?? page.Heading);
             }
@@ -190,22 +222,30 @@ public class AllPagesIntegrationTests(
         return data;
     }
 
-    public static TheoryData<string, string, bool> AllPagesWithPageHeadings()
+    public static TheoryData<string, string> ComparisonPages()
     {
-        var data = new TheoryData<string, string, bool>();
+        var data = new TheoryData<string, string>();
         foreach (var page in PrimaryPages)
         {
-            data.Add(page.Path, page.Heading, page.IsOverviewPage);
+            if (ComparisonPage.IsMatch(page.Path))
+            {
+                data.Add(page.Path, page.NavigationText ?? page.Heading);
+            }
         }
 
         return data;
     }
 
-    private record PageTestCase(
-        string Path,
-        string Heading,
-        string? NavigationText = null,
-        bool IsOverviewPage = false,
-        bool IsInNavigation = true,
-        string? PageTitle = null);
+    public static TheoryData<string, string> AllPagesWithPageHeadings()
+    {
+        var data = new TheoryData<string, string>();
+        foreach (var page in PrimaryPages)
+        {
+            data.Add(page.Path, page.Heading);
+        }
+
+        return data;
+    }
+
+    private record PageTestCase(string Path, string Heading, string? NavigationText = null);
 }

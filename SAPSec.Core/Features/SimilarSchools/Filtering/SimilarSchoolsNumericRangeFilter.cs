@@ -38,7 +38,7 @@ public abstract class SimilarSchoolsNumericRangeFilter(
         }
     }
 
-    public override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
+    public override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor)
     {
         (var fromError, var from) = ParseAndValidateFieldValue("_f", MinValue);
         (var toError, var to) = ParseAndValidateFieldValue("_t", MaxValue);
@@ -48,10 +48,10 @@ public abstract class SimilarSchoolsNumericRangeFilter(
             return items;
         }
 
-        return Filter(items, from, to);
+        return Filter(items, similarSchoolAccessor, from, to);
     }
 
-    public override SimilarSchoolsAvailableFilter? AsAvailableFilter(IEnumerable<SimilarSchool> items)
+    public override SimilarSchoolsAvailableFilter? AsAvailableFilter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor)
     {
         (var fromError, var from) = ParseAndValidateFieldValue("_f", MinValue);
         (var toError, var to) = ParseAndValidateFieldValue("_t", MaxValue);
@@ -93,5 +93,5 @@ public abstract class SimilarSchoolsNumericRangeFilter(
         return (error, value);
     }
 
-    protected abstract IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, decimal from, decimal to);
+    protected abstract IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, decimal from, decimal to);
 }

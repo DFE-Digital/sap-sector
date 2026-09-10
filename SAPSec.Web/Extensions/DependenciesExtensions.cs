@@ -21,7 +21,7 @@ public static class DependenciesExtensions
         services.AddSingleton<IKs2PerformanceRepository, JsonKs2PerformanceRepository>();
 
         // Formatters
-        services.AddSingleton<ICharacteristicsComparisonFormatter, CharacteristicsComparisonFormatter>();
+        services.AddSingleton<ISecondaryCharacteristicsComparisonFormatter, SecondaryCharacteristicsComparisonFormatter>();
         services.AddSingleton<IPrimaryCharacteristicsComparisonFormatter, PrimaryCharacteristicsComparisonFormatter>();
     }
 }
