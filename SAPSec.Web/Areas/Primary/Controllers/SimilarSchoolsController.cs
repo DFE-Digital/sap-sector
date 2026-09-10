@@ -10,15 +10,17 @@ using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
 
-namespace SAPSec.Web.Areas.Secondary.Controllers;
+namespace SAPSec.Web.Areas.Primary.Controllers;
 
-[Area("Secondary")]
-[Route("school/secondary/{urn}")]
+[Area("Primary")]
+[Route("school/primary/{urn}")]
 [Authorize]
-[RequireSchoolPhase(ExpectedSchoolPhase.Secondary)]
+[RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
+[RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SimilarSchoolsController(
-        IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
-        IFeatureFlagService featureFlagService) : Controller
+        IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
+        IFeatureFlagService featureFlagService)
+    : Controller
 {
     [HttpGet]
     [Route("view-similar-schools")]
@@ -38,7 +40,7 @@ public class SimilarSchoolsController(
         await PopulateViewData(response.CurrentSchool);
 
         var viewModel = SimilarSchoolsPageViewModel.Build(
-            "secondary",
+            "primary",
             Request.Query,
             response.CurrentSchool,
             response.SortOptions,
@@ -46,9 +48,9 @@ public class SimilarSchoolsController(
             response.ResultsPage,
             response.AllResults,
             response.ValidationErrors,
-            Routes.SecondarySchool(urn).ViewSimilarSchools,
-            Routes.SecondarySchool(urn).WhatIsASimilarSchool,
-            comparatorUrn => Routes.SecondarySchool(urn).Comparison(comparatorUrn).Similarity
+            Routes.PrimarySchool(urn).ViewSimilarSchools,
+            Routes.PrimarySchool(urn).WhatIsASimilarSchool,
+            comparatorUrn => Routes.PrimarySchool(urn).Comparison(comparatorUrn).Similarity
         );
 
         return View(viewModel);
@@ -59,7 +61,7 @@ public class SimilarSchoolsController(
         var includeRise = featureFlagService is not null
             && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 
-        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
+        ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreatePrimary(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,

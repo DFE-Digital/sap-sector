@@ -1,25 +1,26 @@
 ﻿using SAPSec.Core.Features.Availability;
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Test.Common.InMemory;
 
 namespace SAPSec.Core.Tests.Features.SimilarSchools;
 
-public class FindSimilarSchoolsTests
+public class FindSecondarySimilarSchoolsUseCaseTests
 {
     private readonly InMemorySimilarSchoolsSecondaryRepository _similarSchoolsRepo;
     private readonly InMemoryEstablishmentRepository _establishmentRepo;
     private readonly InMemoryKs4PerformanceRepository _performanceRepo;
     private readonly InMemoryAbsenceRepository _absenceRepo;
-    private readonly FindSimilarSchools _sut;
+    private readonly FindSecondarySimilarSchoolsUseCase _sut;
 
-    public FindSimilarSchoolsTests()
+    public FindSecondarySimilarSchoolsUseCaseTests()
     {
         _establishmentRepo = new();
         _similarSchoolsRepo = new();
         _performanceRepo = new(_establishmentRepo);
         _absenceRepo = new(_establishmentRepo);
 
-        _sut = new FindSimilarSchools(
+        _sut = new FindSecondarySimilarSchoolsUseCase(
             _establishmentRepo,
             _similarSchoolsRepo,
             _performanceRepo,
@@ -44,7 +45,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.SchoolName.Should().Be("Test School");
+        response.CurrentSchool.Name.Should().Be("Test School");
         response.AllResults.Should().BeEmpty();
         response.ResultsPage.Should().BeEmpty();
     }
@@ -76,7 +77,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -84,7 +85,7 @@ public class FindSimilarSchoolsTests
                 "100005",
                 "100006");
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -179,10 +180,10 @@ public class FindSimilarSchoolsTests
             ["ur"] = ["UF1", "RLN1"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo("100003", "100004");
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().BeEquivalentTo("100003", "100004");
     }
 
@@ -219,7 +220,7 @@ public class FindSimilarSchoolsTests
             ["yyy"] = ["3", "4"],
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo("100003", "100004");
     }
 
@@ -282,7 +283,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -304,7 +305,7 @@ public class FindSimilarSchoolsTests
             ["dist"] = ["100"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003");
     }
 
@@ -330,7 +331,7 @@ public class FindSimilarSchoolsTests
             ["dist"] = ["100"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo("100002");
     }
 
@@ -603,7 +604,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -629,7 +630,7 @@ public class FindSimilarSchoolsTests
             ["reg"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -850,7 +851,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -876,7 +877,7 @@ public class FindSimilarSchoolsTests
             ["ur"] = ["UN1"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -1095,10 +1096,10 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -1124,7 +1125,7 @@ public class FindSimilarSchoolsTests
             ["poe"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -1425,7 +1426,7 @@ public class FindSimilarSchoolsTests
             [toFilterKey] = toFilterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -1454,7 +1455,7 @@ public class FindSimilarSchoolsTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -1483,7 +1484,7 @@ public class FindSimilarSchoolsTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003", "100004", "100005", "100006");
     }
 
@@ -1628,7 +1629,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -1853,7 +1854,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2064,7 +2065,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2090,7 +2091,7 @@ public class FindSimilarSchoolsTests
             ["sf"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -2293,7 +2294,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2319,7 +2320,7 @@ public class FindSimilarSchoolsTests
             ["ap"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -2555,7 +2556,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2810,7 +2811,7 @@ public class FindSimilarSchoolsTests
             [filterKey] = filterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -2836,7 +2837,7 @@ public class FindSimilarSchoolsTests
             ["goe"] = ["1"]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -3126,7 +3127,7 @@ public class FindSimilarSchoolsTests
             [toFilterKey] = toFilterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -3159,7 +3160,7 @@ public class FindSimilarSchoolsTests
             ["oar_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -3192,7 +3193,7 @@ public class FindSimilarSchoolsTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003", "100004", "100005");
     }
 
@@ -3420,7 +3421,7 @@ public class FindSimilarSchoolsTests
             [toFilterKey] = toFilterValues
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(expectedUrns);
     }
 
@@ -3453,7 +3454,7 @@ public class FindSimilarSchoolsTests
             ["par_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(["100002"]);
     }
 
@@ -3486,7 +3487,7 @@ public class FindSimilarSchoolsTests
             ["sciu_t"] = [""]
         }));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo("100002", "100003", "100004", "100005");
     }
 
@@ -3634,7 +3635,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30.0")),
                 ("100005", DataWithAvailability.Available("20.0")),
@@ -3676,7 +3677,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().Equal("100003", "100004", "100002");
     }
 
@@ -3701,7 +3702,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().Equal("100003", "100002");
     }
 
@@ -3730,7 +3731,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: "XXX"));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30.0")),
                 ("100005", DataWithAvailability.Available("20.0")),
@@ -3777,7 +3778,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
                 ("100004", DataWithAvailability.Available("30.0")),
                 ("100005", DataWithAvailability.Available("20.0")),
@@ -3824,11 +3825,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -3871,11 +3872,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -3918,11 +3919,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -3965,11 +3966,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4012,11 +4013,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4059,11 +4060,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4106,11 +4107,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4153,11 +4154,11 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001", sortBy: sortBy));
 
-        response.AllResults.Select(r => (r.SimilarSchool.URN, r.SortValue.Value))
+        response.AllResults.Select(r => (r.URN, r.SortValue.Value))
             .Should().Equal(
-                ("100004", DataWithAvailability.Available("30.0%")),
-                ("100005", DataWithAvailability.Available("20.0%")),
-                ("100002", DataWithAvailability.Available("10.0%")),
+                ("100004", DataWithAvailability.Available("30%")),
+                ("100005", DataWithAvailability.Available("20%")),
+                ("100002", DataWithAvailability.Available("10%")),
                 ("100003", DataWithAvailability.NotAvailable<string>()));
 
         response.SortOptions.Should().SatisfyRespectively(
@@ -4206,7 +4207,7 @@ public class FindSimilarSchoolsTests
 
         var response = await _sut.Execute(Request("100001"));
 
-        response.AllResults.Select(r => r.SimilarSchool.URN)
+        response.AllResults.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -4220,7 +4221,7 @@ public class FindSimilarSchoolsTests
                 "100011",
                 "100012");
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().BeEquivalentTo(
                 "100002",
                 "100003",
@@ -4279,7 +4280,7 @@ public class FindSimilarSchoolsTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
@@ -4331,7 +4332,7 @@ public class FindSimilarSchoolsTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
@@ -4382,7 +4383,7 @@ public class FindSimilarSchoolsTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
@@ -4440,11 +4441,11 @@ public class FindSimilarSchoolsTests
         response.ResultsPage.CurrentPage.Should().Be(expectedCurrentPage);
         response.ResultsPage.Count.Should().Be(expectedUrnsOnPage.Length);
 
-        response.ResultsPage.Select(r => r.SimilarSchool.URN)
+        response.ResultsPage.Select(r => r.URN)
             .Should().Equal(expectedUrnsOnPage);
     }
 
-    private FindSimilarSchoolsRequest Request(string urn, Dictionary<string, IEnumerable<string>>? filterBy = null, string? sortBy = null, string? page = null, int? resultsPerPage = null) =>
+    private FindSecondarySimilarSchoolsRequest Request(string urn, Dictionary<string, IEnumerable<string>>? filterBy = null, string? sortBy = null, string? page = null, int? resultsPerPage = null) =>
         resultsPerPage is int rpp
             ? new(urn, filterBy ?? [], sortBy ?? "", page ?? "", rpp)
             : new(urn, filterBy ?? [], sortBy ?? "", page ?? "");

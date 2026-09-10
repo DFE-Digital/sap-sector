@@ -1,5 +1,6 @@
-@using SAPSec.Web.ViewModels
-@model ISimilarSchoolsPageViewModel
+@using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools
+
+@model SimilarSchoolsPageViewModel
 
 @if (Model.SimilarSchools.Any())
 {
@@ -47,5 +48,5 @@
 else
 {
     <hr class="govuk-section-break govuk-section-break--visible govuk-!-margin-bottom-4">
-    <p class="govuk-body">@Model.NoResultsMessage</p>
+    <p class="govuk-body">@SimilarSchoolsPageViewModel.NoResultsMessage</p>
 }

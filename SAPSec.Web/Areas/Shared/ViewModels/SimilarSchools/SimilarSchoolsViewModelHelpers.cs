@@ -1,6 +1,7 @@
+using SAPSec.Core.Features.SimilarSchools;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 
-namespace SAPSec.Web.ViewModels;
+namespace SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 
 /// <summary>
 /// Filter/tag-building logic shared between the primary and secondary

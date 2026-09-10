@@ -9,16 +9,18 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.SimilarSchools.UseCases;
 
-public class FindPrimarySimilarSchoolsUseCase(
+public class FindSecondarySimilarSchoolsUseCase(
     IEstablishmentRepository establishmentRepository,
-    ISimilarSchoolsPrimaryRepository similarSchoolsRepository,
-    IKs2PerformanceRepository performanceRepository,
+    ISimilarSchoolsSecondaryRepository similarSchoolsRepository,
+    IKs4PerformanceRepository performanceRepository,
     IAbsenceRepository absenceRepository)
-    : IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse>
+    : IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse>
 {
-    public async Task<FindPrimarySimilarSchoolsResponse> Execute(FindPrimarySimilarSchoolsRequest request)
+    public async Task<FindSecondarySimilarSchoolsResponse> Execute(FindSecondarySimilarSchoolsRequest request)
     {
-        var dataProvider = new PrimarySimilarSchoolsDataProvider(
+        // TODO: Validate request
+
+        var dataProvider = new SecondarySimilarSchoolsDataProvider(
             establishmentRepository,
             similarSchoolsRepository,
             performanceRepository,
@@ -33,17 +35,22 @@ public class FindPrimarySimilarSchoolsUseCase(
         var filtered = filters.Filter(data.SimilarSchools, i => i.SimilarSchool);
 
         var sortBy = request.SortBy ?? string.Empty;
-        var sorting = new PrimarySimilarSchoolsSorting(sortBy);
+        var sorting = new SecondarySimilarSchoolsSorting(sortBy);
         var sorted = sorting.Sort(filtered);
 
         var allResults = sorted
-            .Select(r => new SimilarSchoolResult(
-                r.Item.URN,
-                r.Item.Name,
-                r.Item.Address,
-                r.Item.LocalAuthority,
-                r.Item.Coordinates != null ? CoordinateConverter.Convert(r.Item.Coordinates) : null,
-                r.Value))
+            .Select(sortedItem =>
+            {
+                return new SimilarSchoolResult
+                (
+                    sortedItem.Item.URN,
+                    sortedItem.Item.Name,
+                    sortedItem.Item.Address,
+                    sortedItem.Item.LocalAuthority,
+                    sortedItem.Item.Coordinates != null ? CoordinateConverter.Convert(sortedItem.Item.Coordinates) : null,
+                    sortedItem.Value
+                );
+            })
             .ToList()
             .AsReadOnly();
 
@@ -56,18 +63,19 @@ public class FindPrimarySimilarSchoolsUseCase(
             filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
             resultsPage,
             allResults,
-            validationErrors);
+            validationErrors
+        );
     }
 }
 
-public record FindPrimarySimilarSchoolsRequest(
+public record FindSecondarySimilarSchoolsRequest(
     string CurrentSchoolUrn,
     IDictionary<string, IEnumerable<string>>? FilterBy = null,
     string? SortBy = null,
     string? Page = null,
     int ResultsPerPage = 10);
 
-public record FindPrimarySimilarSchoolsResponse(
+public record FindSecondarySimilarSchoolsResponse(
     SchoolInfo.SchoolInfo CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,

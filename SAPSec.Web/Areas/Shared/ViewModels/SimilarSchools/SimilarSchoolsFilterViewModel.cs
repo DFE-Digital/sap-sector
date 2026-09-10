@@ -1,4 +1,4 @@
-﻿namespace SAPSec.Web.ViewModels;
+﻿namespace SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 
 public class SimilarSchoolsFilterViewModel
 {

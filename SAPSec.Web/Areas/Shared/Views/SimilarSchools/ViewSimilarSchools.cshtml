@@ -1,12 +1,13 @@
-@using SAPSec.Web.ViewModels
+@using SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools
 @using SAPSec.Web.Constants;
 
-@model ISimilarSchoolsPageViewModel
+@model SimilarSchoolsPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Shared/Views/School/_Layout.cshtml";
     ViewData[ViewDataKeys.Title] = "View similar schools";
     var hasVisibleResults = Model.SimilarSchools.Any();
 }
+
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 <link rel="stylesheet" href="~/css/MarkerCluster.css"/>
 
@@ -19,17 +20,22 @@
             </h2>
             <div class="govuk-error-summary__body">
                 <ul class="govuk-list govuk-error-summary__list">
-                    @foreach (var error in Model.ValidationErrors)
-                    {
-                        <li>
-                            @{
-                                var key = !error.Key.EndsWith("_f") && !error.Key.EndsWith("_t")
-                                    ? error.Key + "_f"
-                                    : error.Key;
-                            }
-                            <a href="#@(key)">@error.Message</a>
-                        </li>
-                    }
+                @foreach (var error in Model.ValidationErrors)
+                {
+                    <li>
+                        @{
+                            // If there is an error with both fields in a numeric range filter,
+                            // we still need to link to one of the fields, so we choose the From
+                            // field.
+                            // Note: This will only work as long as numeric range filters are
+                            // the only filters with validation errors
+                            var key = !error.Key.EndsWith("_f") && !error.Key.EndsWith("_t")
+                                ? error.Key + "_f"
+                                : error.Key;
+                        }
+                        <a href="#@(key)">@error.Message</a>
+                    </li>
+                }
                 </ul>
             </div>
         </div>
@@ -40,15 +46,19 @@
 <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body">
-    We've identified <strong>50</strong> similar @(Model.PhaseLabel) phase schools (including all-throughs). Select a school to compare futher and connect with for support. You can also refine the results by applying filters.
+    We've identified <strong>50</strong> similar @(Model.PhaseLabel) phase schools (including all-throughs).
+    Select a school to compare further and connect with for support. You can also refine the results by applying filters.
 </p>
 <p class="govuk-body">
     Find out <a href="@Model.WhatIsASimilarSchoolUrl" class="govuk-link">how DfE identifies what a similar school is</a>.
 </p>
 
 <div class="govuk-grid-row app-similar-schools-content">
-    <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsFilter.cshtml" model="Model" />
 
+    @* Left column: MOJ filters *@
+    <partial name="_SimilarSchoolsFilter" model="Model" />
+
+    @* Right column: Sort + Results + Pagination *@
     <div class="govuk-grid-column-two-thirds app-filter__results-column">
         @if (hasVisibleResults)
         {
@@ -78,16 +88,20 @@
         }
 
         <div id="listView">
-            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsResults.cshtml" model="Model" />
-            <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsPagination.cshtml" model="Model" />
+            @* Results list *@
+            <partial name="_SimilarSchoolsResults" model="Model" />
+
+            @* Pagination *@
+            <partial name="_SimilarSchoolsPagination" model="Model" />
         </div>
 
         @if (hasVisibleResults)
         {
             <div id="mapView" class="govuk-!-display-none">
-                <partial name="~/Views/Shared/SimilarSchools/SimilarSchoolsMap.cshtml" model="Model" />
+                <partial name="_SimilarSchoolsMap" model="Model" />
             </div>
         }
+
     </div>
 </div>
 

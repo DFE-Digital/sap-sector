@@ -12,12 +12,12 @@ public class SimilarSchoolsPersistentAbsenceRateFilter(
     protected override DataWithAvailability<string> CurrentSchoolValue
         => CurrentSchool.PersistentAbsenceRate.Map(v => v.ToString("0.0\\%"));
 
-    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, decimal from, decimal to)
+    protected override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, decimal from, decimal to)
     {
         var minValue = DataWithAvailability.Available(from);
         var maxValue = DataWithAvailability.Available(to);
 
         return items
-            .Where(i => minValue <= i.PersistentAbsenceRate && i.PersistentAbsenceRate <= maxValue);
+            .Where(i => minValue <= similarSchoolAccessor(i).PersistentAbsenceRate && similarSchoolAccessor(i).PersistentAbsenceRate <= maxValue);
     }
 }
