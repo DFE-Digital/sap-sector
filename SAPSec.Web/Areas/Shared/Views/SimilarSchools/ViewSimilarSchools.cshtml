@@ -108,18 +108,6 @@
     </div>
 </div>
 
-<script add-nonce="true">
-    (function () {
-        var sortSelect = document.getElementById('sort-by');
-        if (sortSelect) {
-            sortSelect.addEventListener('change', function () {
-                var form = document.getElementById('app-filter-panel');
-                if (form) form.submit();
-            });
-        }
-    })();
-</script>
-
 @section Scripts {
     <script src="~/js/similar-schools-filter.js"></script>
     <script src="~/js/school-search-toggle.js"></script>
