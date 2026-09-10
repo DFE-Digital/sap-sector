@@ -54,6 +54,32 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     }
 
     [Fact]
+    public async Task FooterAccessibilityLink_NavigatesToManagedAccessibilityStatementInSameTab()
+    {
+        await Page.RouteAsync($"{LayoutConstants.AccessibilityStatementUrl}*", async route =>
+        {
+            await route.FulfillAsync(new()
+            {
+                Status = 200,
+                ContentType = "text/html",
+                Body = "<html><head><title>Accessibility statement</title></head><body>Accessibility statement</body></html>"
+            });
+        });
+
+        var accessibilityLink = Page.Locator("footer").GetByRole(AriaRole.Link, new() { Name = "Accessibility" });
+
+        await Expect(accessibilityLink).ToBeVisibleAsync();
+        (await accessibilityLink.GetAttributeAsync("href")).Should().Be(LayoutConstants.AccessibilityStatementUrl);
+        (await accessibilityLink.GetAttributeAsync("target")).Should().BeNull();
+
+        await accessibilityLink.ClickAsync();
+        await Page.WaitForURLAsync($"{LayoutConstants.AccessibilityStatementUrl}*");
+
+        Page.Url.Should().Be(LayoutConstants.AccessibilityStatementUrl);
+        new Uri(Page.Url).AbsolutePath.Should().NotBe("/accessibility");
+    }
+
+    [Fact]
     public async Task Attainment8_ViewTableView()
     {
         var section = await GetSection(Attainment8HeaderText);
