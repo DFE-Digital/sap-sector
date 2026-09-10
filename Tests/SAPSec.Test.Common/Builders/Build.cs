@@ -16,6 +16,11 @@ public static class Build
         return build(new EstablishmentBuilder(urn, name)).Build();
     }
 
+    public static EstablishmentEmail EstablishmentEmail(string urn, string mainEmail)
+    {
+        return new EstablishmentEmail { URN = urn, MainEmail = mainEmail };
+    }
+
     public static SimilarSchoolsPrimaryGroupsEntry[] PrimaryGroup(string urn, IEnumerable<string> neighbourUrns)
     {
         return neighbourUrns

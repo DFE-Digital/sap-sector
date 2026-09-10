@@ -1,10 +1,11 @@
-﻿@using SAPSec.Core.Model
+﻿@using SAPSec.Core.Constants
+@using SAPSec.Core.Extensions
+@using SAPSec.Core.Features.SchoolDetails
+@using SAPSec.Core.Model
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
-@using SAPSec.Core.Constants
-@using SAPSec.Core.Extensions
 
-@model SAPSec.Core.Model.SchoolDetails
+@model SchoolDetails
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = $"School details";
@@ -143,7 +144,7 @@
     </div>
     @if (Model.Website.IsAvailable)
     {
-        <div class="govuk-summary-list__row">
+        <div class="govuk-summary-list__row" data-testid="website">
             <dt class="govuk-summary-list__key">Website</dt>
             <dd class="govuk-summary-list__value">
                 <a href="@Model.Website.Value" class="govuk-link" target="_blank" rel="noopener noreferrer">
@@ -152,7 +153,7 @@
             </dd>
         </div>
     }
-    <div class="govuk-summary-list__row">
+    <div class="govuk-summary-list__row" data-testid="telephone">
         <dt class="govuk-summary-list__key">Telephone</dt>
         <dd class="govuk-summary-list__value">@Model.Telephone.Display()</dd>
     </div>

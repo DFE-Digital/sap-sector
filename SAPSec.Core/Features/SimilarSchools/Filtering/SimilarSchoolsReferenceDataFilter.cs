@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 

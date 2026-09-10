@@ -1,5 +1,5 @@
-﻿using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Model;
+﻿using SAPSec.Core.Features.Availability;
+using SAPSec.Core.Features.Sorting;
 
 namespace SAPSec.Core.Features.SimilarSchools.Sorting;
 

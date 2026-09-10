@@ -1,5 +1,5 @@
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Geography;
-using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.KS4.Performance;
