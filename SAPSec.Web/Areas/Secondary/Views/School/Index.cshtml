@@ -1,7 +1,9 @@
 ﻿@using SAPSec.Core.Model
 @using SAPSec.Web.Constants;
 @using SAPSec.Web.Helpers
-@model SchoolDetails
+@using SAPSec.Web.Areas.Shared.ViewModels;
+
+@model SchoolInfoViewModel
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = Model.Name;
@@ -10,7 +12,7 @@
 <div class="app-overview">
     <header class="app-overview__header">
         <h1 class="govuk-heading-xl app-overview__title">@ViewData[ViewDataKeys.Title]</h1>
-        <p class="govuk-body-l app-overview__address">@Model.Address.Display()</p>
+        <p class="govuk-body-l app-overview__address">@Model.Address</p>
     </header>
 
     <section class="app-overview__section">
