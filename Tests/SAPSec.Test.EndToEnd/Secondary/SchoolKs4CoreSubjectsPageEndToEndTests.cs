@@ -824,6 +824,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     {
         var section = Page.GetByLabel(headerText);
         await Expect(section).ToBeVisibleAsync();
+        await Expect(section.GetByRole(AriaRole.Tab).First).ToBeVisibleAsync();
 
         return section;
     }
