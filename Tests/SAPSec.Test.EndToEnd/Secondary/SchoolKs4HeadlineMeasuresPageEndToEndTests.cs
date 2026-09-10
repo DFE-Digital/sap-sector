@@ -19,7 +19,14 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     private const string DestinationsHeaderText = "Staying in education or entering employment";
 
     private const string Urn = "100052";
+    private const int UiReadyTimeoutMilliseconds = 30_000;
     private static readonly Routes.Secondary SecondarySchoolRoute = Routes.SecondarySchool(Urn);
+    private static readonly string[] SectionTabNames =
+    [
+        "3-year average chart",
+        "Table of data",
+        "Top performing similar schools"
+    ];
 
     public override async Task InitializeAsync()
     {
@@ -35,19 +42,7 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     [Fact]
     public async Task Attainment8_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(Attainment8HeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(Attainment8HeaderText, "2024 to 2025");
     }
 
     [Fact]
@@ -85,38 +80,7 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     [Fact]
     public async Task EnglishMaths_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(EnglishMathsHeaderText);
-        var panel = section.GetByRole(AriaRole.Tabpanel);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
-
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
-
-        await showYearByYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
-
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
-
-        await showCurrentYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(EnglishMathsHeaderText, "2024 to 2025");
     }
 
     [Fact]
@@ -197,38 +161,7 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     [Fact]
     public async Task Destinations_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(DestinationsHeaderText);
-        var panel = section.GetByRole(AriaRole.Tabpanel);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2022 to 2023" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
-
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2022 to 2023" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
-
-        await showYearByYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
-
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
-
-        await showCurrentYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(DestinationsHeaderText, "2022 to 2023");
     }
 
     [Fact]
@@ -309,8 +242,47 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
     private async Task<ILocator> GetSection(string headerText)
     {
         var section = Page.GetByLabel(headerText);
-        await Expect(section).ToBeVisibleAsync();
+        await Expect(section).ToBeVisibleAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(section.GetByRole(AriaRole.Tabpanel)).ToBeVisibleAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+
+        foreach (var tabName in SectionTabNames)
+        {
+            var tab = section.GetByRole(AriaRole.Tab, new() { Name = tabName });
+            await Expect(tab).ToBeVisibleAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+            await Expect(tab).ToBeEnabledAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        }
 
         return section;
+    }
+
+    private async Task AssertCanToggleBetweenYearByYearAndCurrentYearView(string headerText, string currentYearContentName)
+    {
+        var section = await GetSection(headerText);
+        var panel = section.GetByRole(AriaRole.Tabpanel);
+
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+
+        var currentYearPanel = panel.Locator($"[data-content-toggle-name=\"{currentYearContentName}\"]");
+        var yearByYearPanel = panel.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
+
+        await Expect(currentYearPanel).ToBeVisibleAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(yearByYearPanel).ToBeHiddenAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+
+        await Expect(toggleButton).ToBeVisibleAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(toggleButton).ToBeEnabledAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false", new() { Timeout = UiReadyTimeoutMilliseconds });
+
+        await toggleButton.ClickAsync();
+
+        await Expect(currentYearPanel).ToBeHiddenAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(yearByYearPanel).ToBeVisibleAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true", new() { Timeout = UiReadyTimeoutMilliseconds });
+
+        await toggleButton.ClickAsync();
+
+        await Expect(currentYearPanel).ToBeVisibleAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(yearByYearPanel).ToBeHiddenAsync(new() { Timeout = UiReadyTimeoutMilliseconds });
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false", new() { Timeout = UiReadyTimeoutMilliseconds });
     }
 }
