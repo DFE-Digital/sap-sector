@@ -42,42 +42,41 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(EnglishLanguageHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
 
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showCurrentYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
     public async Task EnglishLanguage_ViewAndNavigateToTopPerfomers()
     {
         var section = await GetSection(EnglishLanguageHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performing similar schools" });
         await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
@@ -109,7 +108,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task EnglishLanguage_ViewTableView()
     {
         var section = await GetSection(EnglishLanguageHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -128,7 +127,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task EnglishLanguage_ChangeGradeFilters()
     {
         var section = await GetSection(EnglishLanguageHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -154,42 +153,41 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(EnglishLiteratureHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
 
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showCurrentYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
     public async Task EnglishLiterature_ViewAndNavigateToTopPerfomers()
     {
         var section = await GetSection(EnglishLiteratureHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performing similar schools" });
         await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
@@ -221,7 +219,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task EnglishLiterature_ViewTableView()
     {
         var section = await GetSection(EnglishLiteratureHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -240,7 +238,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task EnglishLiterature_ChangeGradeFilters()
     {
         var section = await GetSection(EnglishLiteratureHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -266,42 +264,41 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(MathsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
 
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showCurrentYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
     public async Task Maths_ViewAndNavigateToTopPerfomers()
     {
         var section = await GetSection(MathsHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performing similar schools" });
         await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
@@ -333,7 +330,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Maths_ViewTableView()
     {
         var section = await GetSection(MathsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -352,7 +349,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Maths_ChangeGradeFilters()
     {
         var section = await GetSection(MathsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -378,42 +375,41 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(CombinedScienceHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
 
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showCurrentYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
     public async Task CombinedScience_ViewAndNavigateToTopPerfomers()
     {
         var section = await GetSection(CombinedScienceHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performing similar schools" });
         await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
@@ -445,7 +441,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task CombinedScience_ViewTableView()
     {
         var section = await GetSection(CombinedScienceHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -464,7 +460,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task CombinedScience_ChangeGradeFilters()
     {
         var section = await GetSection(CombinedScienceHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -490,42 +486,41 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(BiologyHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
 
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showCurrentYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
     public async Task Biology_ViewAndNavigateToTopPerfomers()
     {
         var section = await GetSection(BiologyHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performing similar schools" });
         await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
@@ -557,7 +552,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Biology_ViewTableView()
     {
         var section = await GetSection(BiologyHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -576,7 +571,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Biology_ChangeGradeFilters()
     {
         var section = await GetSection(BiologyHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -602,42 +597,41 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(ChemistryHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
 
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showCurrentYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
     public async Task Chemistry_ViewAndNavigateToTopPerfomers()
     {
         var section = await GetSection(ChemistryHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performing similar schools" });
         await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
@@ -669,7 +663,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Chemistry_ViewTableView()
     {
         var section = await GetSection(ChemistryHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -688,7 +682,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Chemistry_ChangeGradeFilters()
     {
         var section = await GetSection(ChemistryHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -714,42 +708,41 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(PhysicsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
 
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showCurrentYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(toggleButton).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
     public async Task Physics_ViewAndNavigateToTopPerfomers()
     {
         var section = await GetSection(PhysicsHeaderText);
-        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performers" });
+        var topPerfomersTab = section.GetByRole(AriaRole.Tab, new() { Name = "Top performing similar schools" });
         await topPerfomersTab.ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
@@ -781,7 +774,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Physics_ViewTableView()
     {
         var section = await GetSection(PhysicsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -800,7 +793,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     public async Task Physics_ChangeGradeFilters()
     {
         var section = await GetSection(PhysicsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -824,7 +817,6 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     {
         var section = Page.GetByLabel(headerText);
         await Expect(section).ToBeVisibleAsync();
-        await Expect(section.GetByRole(AriaRole.Tab).First).ToBeVisibleAsync();
 
         return section;
     }
