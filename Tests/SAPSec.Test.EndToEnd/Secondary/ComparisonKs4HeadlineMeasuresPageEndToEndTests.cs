@@ -38,19 +38,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     [Fact]
     public async Task Attainment8_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(Attainment8HeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(Attainment8HeaderText, "2024 to 2025");
     }
 
     [Fact]
@@ -98,38 +86,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     [Fact]
     public async Task EnglishMaths_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(EnglishMathsHeaderText);
-        var panel = section.GetByRole(AriaRole.Tabpanel);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "3-year average chart" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
-
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 3-year average chart" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
-
-        await showYearByYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
-
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
-
-        await showCurrentYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(EnglishMathsHeaderText, "2024 to 2025");
     }
 
     [Fact]
@@ -175,38 +132,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     [Fact]
     public async Task Destinations_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(DestinationsHeaderText);
-        var panel = section.GetByRole(AriaRole.Tabpanel);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2022 to 2023" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year chart" });
-
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year chart" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2022 to 2023" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
-
-        await showYearByYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
-
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
-
-        await showCurrentYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(DestinationsHeaderText, "2022 to 2023");
     }
 
     [Fact]
@@ -255,5 +181,33 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         await Expect(section).ToBeVisibleAsync();
 
         return section;
+    }
+
+    private async Task AssertCanToggleBetweenYearByYearAndCurrentYearView(string headerText, string currentYearContentName)
+    {
+        var section = await GetSection(headerText);
+        var panel = section.GetByRole(AriaRole.Tabpanel);
+
+        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+
+        var currentYearPanel = panel.Locator($"[data-content-toggle-name=\"{currentYearContentName}\"]");
+        var yearByYearPanel = panel.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
+
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+
+        await toggleButton.ClickAsync();
+
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+
+        await toggleButton.ClickAsync();
+
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 }
