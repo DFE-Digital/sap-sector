@@ -44,7 +44,7 @@ public class ComparisonSimilarityPageIntegrationTests(
             Routes.PrimarySchool("100001").Comparison("999999").Similarity, HttpStatusCode.NotFound);
     }
 
-    [Fact(Skip = "Not implemented yet")]
+    [Fact]
     public async Task Similarity_WhenComparatorSchoolIsNotInSimilarSchoolsGroupForCurrentSchool_ReturnsNotFound()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
@@ -53,7 +53,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", []))
-            .SetupValues(Build.PrimaryValues("100001", "100002"));
+            .SetupValues(Build.PrimaryValues(["100001", "100002"]));
 
         await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity, HttpStatusCode.NotFound);
@@ -68,7 +68,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
-            .SetupValues(Build.PrimaryValues("100002"));
+            .SetupValues(Build.PrimaryValues(["100002"]));
 
         await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity, HttpStatusCode.NotFound);
@@ -83,7 +83,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
-            .SetupValues(Build.PrimaryValues("100001"));
+            .SetupValues(Build.PrimaryValues(["100001"]));
 
         await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity, HttpStatusCode.NotFound);
@@ -155,7 +155,7 @@ public class ComparisonSimilarityPageIntegrationTests(
 
         Fixture.SimilarSchoolsPrimaryRepository
             .SetupGroups(Build.PrimaryGroup("100001", ["100002"]))
-            .SetupValues(Build.PrimaryValues("100001", "100002"));
+            .SetupValues(Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(
             Routes.PrimarySchool("100001").Comparison("100002").Similarity);

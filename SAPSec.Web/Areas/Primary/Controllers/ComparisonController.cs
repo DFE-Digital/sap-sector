@@ -5,7 +5,6 @@ using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
-using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels.Comparison;
@@ -14,7 +13,6 @@ using SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Formatters;
-using SAPSec.Web.ViewModels;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
@@ -25,37 +23,32 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary, "urn", "comparatorSchoolUrn")]
 [RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class ComparisonController(
-    IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
-    [FromKeyedServices(ServiceKeys.Primary)]
-    IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSimilarSchoolDetailsUseCase,
+    IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse> getSimilarityCharacteristicsUseCase,
     IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
-    GetPrimaryCharacteristicsComparison getPrimaryCharacteristicsComparison,
-    IPrimaryCharacteristicsComparisonFormatter primaryCharacteristicsComparisonFormatter,
-    IUseCase<GetPrimaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase)
+    IUseCase<GetPrimaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
+    [FromKeyedServices(ServiceKeys.Primary)]
+    IUseCase<GetComparisonSchoolDetailsRequest, GetComparisonSchoolDetailsResponse> getSchoolDetailsUseCase,
+    IPrimaryCharacteristicsComparisonFormatter characteristicsComparisonFormatter)
     : Controller
 {
     [HttpGet]
     [Route("compare-similarity")]
     public async Task<IActionResult> Similarity(string urn, string comparatorSchoolUrn)
     {
-        var currentSchool = (await getSchoolInfoUseCase.Execute(new GetSchoolInfoRequest(urn))).School;
-        var comparatorSchool = (await getSchoolInfoUseCase.Execute(new GetSchoolInfoRequest(comparatorSchoolUrn))).School;
-        var characteristicsResponse = await getPrimaryCharacteristicsComparison.Execute(new(urn, comparatorSchoolUrn));
+        var response = await getSimilarityCharacteristicsUseCase.Execute(new(urn, comparatorSchoolUrn));
 
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(
-            currentSchool,
-            comparatorSchool);
+            response.CurrentSchool,
+            response.ComparatorSchool);
 
         var model = new SimilarityPageViewModel
         {
-            Urn = urn,
-            SimilarSchoolUrn = comparatorSchoolUrn,
-            Name = currentSchool.Name,
-            SimilarSchoolName = comparatorSchool.Name,
-            CharacteristicsRows = primaryCharacteristicsComparisonFormatter.BuildRows(characteristicsResponse)
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
+            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
+            CharacteristicsRows = characteristicsComparisonFormatter.BuildRows(response.SimilarityCharacteristics)
         };
 
-        return View("Similarity", model);
+        return View(model);
     }
 
     [HttpGet]
@@ -97,10 +90,8 @@ public class ComparisonController(
 
         var model = new AttendancePageViewModel
         {
-            Urn = response.CurrentSchool.Urn,
-            Name = response.CurrentSchool.Name,
-            SimilarSchoolUrn = response.ComparatorSchool.Urn,
-            SimilarSchoolName = response.ComparatorSchool.Name,
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
+            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
             Absence = MeasureViewModel.FromPrimaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
         };
 
@@ -111,26 +102,24 @@ public class ComparisonController(
     [Route("compare-school-details")]
     public async Task<IActionResult> SchoolDetails(string urn, string comparatorSchoolUrn)
     {
-        var response = await getSimilarSchoolDetailsUseCase.Execute(new(urn, comparatorSchoolUrn));
+        var response = await getSchoolDetailsUseCase.Execute(new(urn, comparatorSchoolUrn));
 
         ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(
             response.CurrentSchool.School,
             response.ComparatorSchool.School);
 
-        var schoolDetailsModel = new SimilarSchoolDetailsViewModel
+        var model = new SchoolDetailsPageViewModel
         {
-            CurrentSchoolUrn = urn,
-            ComparatorSchoolUrn = comparatorSchoolUrn,
-            CurrentSchoolName = response.CurrentSchool.School.Name,
-            ComparatorSchoolName = response.ComparatorSchoolDetails.Name,
+            CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool.School),
+            ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool.School),
             CurrentSchoolLatitude = response.CurrentSchool.Coordinates?.Latitude,
             CurrentSchoolLongitude = response.CurrentSchool.Coordinates?.Longitude,
             ComparatorSchoolLatitude = response.ComparatorSchool.Coordinates?.Latitude,
             ComparatorSchoolLongitude = response.ComparatorSchool.Coordinates?.Longitude,
             Distance = response.DistanceMiles,
-            ComparatorSchoolDetails = response.ComparatorSchoolDetails
+            ComparatorSchoolDetails = SchoolDetailsViewModel.FromSchoolDetails(response.ComparatorSchoolDetails)
         };
 
-        return View(schoolDetailsModel);
+        return View(model);
     }
 }

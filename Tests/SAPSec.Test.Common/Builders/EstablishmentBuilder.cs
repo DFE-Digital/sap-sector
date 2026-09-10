@@ -6,12 +6,23 @@ namespace SAPSec.Test.Common.Builders;
 public class EstablishmentBuilder(string urn, string name)
 {
     string UkPrn = string.Empty;
+    string EstablishmentNumber = string.Empty;
+    int? AgeRangeLow = null;
+    int? AgeRangeHigh = null;
     string PhaseOfEducationId = string.Empty;
     string PhaseOfEducationName = string.Empty;
     string EstablishmentStatusId = string.Empty;
     string EstablishmentStatusName = string.Empty;
+    string TypeOfEstablishmentId = string.Empty;
+    string TypeOfEstablishmentName = string.Empty;
     string LAId = string.Empty;
     string LAName = string.Empty;
+    string RegionId = string.Empty;
+    string RegionName = string.Empty;
+    string DistrictAdministrativeId = string.Empty;
+    string DistrictAdministrativeName = string.Empty;
+    string UrbanRuralId = string.Empty;
+    string UrbanRuralName = string.Empty;
     string Street = string.Empty;
     string Locality = string.Empty;
     string Address3 = string.Empty;
@@ -73,6 +84,13 @@ public class EstablishmentBuilder(string urn, string name)
         return this;
     }
 
+    public EstablishmentBuilder WithEstablishmentNumber(string establishmentNumber)
+    {
+        EstablishmentNumber = establishmentNumber;
+
+        return this;
+    }
+
     public EstablishmentBuilder WithAddress(
         string street,
         string locality,
@@ -105,10 +123,50 @@ public class EstablishmentBuilder(string urn, string name)
         return this;
     }
 
+    public EstablishmentBuilder InRegion(string id, string? name = null)
+    {
+        RegionId = id;
+        RegionName = name ?? string.Empty;
+
+        return this;
+    }
+
+    public EstablishmentBuilder InAdministrativeDistrict(string id, string? name = null)
+    {
+        DistrictAdministrativeId = id;
+        DistrictAdministrativeName = name ?? string.Empty;
+
+        return this;
+    }
+
+    public EstablishmentBuilder WithUrbanRural(string id, string? name = null)
+    {
+        UrbanRuralId = id;
+        UrbanRuralName = name ?? string.Empty;
+
+        return this;
+    }
+
     public EstablishmentBuilder WithAdmissionsPolicy(string id, string? name = null)
     {
         AdmissionsPolicyId = id;
         AdmissionsPolicyName = name ?? string.Empty;
+
+        return this;
+    }
+
+    public EstablishmentBuilder WithAgeRange(int low, int high)
+    {
+        AgeRangeLow = low;
+        AgeRangeHigh = high;
+
+        return this;
+    }
+
+    public EstablishmentBuilder WithTypeOfEstablishment(string id, string? name = null)
+    {
+        TypeOfEstablishmentId = id;
+        TypeOfEstablishmentName = name ?? string.Empty;
 
         return this;
     }
@@ -204,13 +262,22 @@ public class EstablishmentBuilder(string urn, string name)
         {
             URN = urn,
             UKPRN = UkPrn,
+            EstablishmentNumber = EstablishmentNumber,
             EstablishmentName = name,
             PhaseOfEducationId = PhaseOfEducationId,
             PhaseOfEducationName = PhaseOfEducationName,
+            AgeRangeLow = AgeRangeLow,
+            AgeRangeHigh = AgeRangeHigh,
             EstablishmentStatusId = EstablishmentStatusId,
             EstablishmentStatusName = EstablishmentStatusName,
             LAId = LAId,
             LAName = LAName,
+            RegionId = RegionId,
+            RegionName = RegionName,
+            DistrictAdministrativeId = DistrictAdministrativeId,
+            DistrictAdministrativeName = DistrictAdministrativeName,
+            UrbanRuralId = UrbanRuralId,
+            UrbanRuralName = UrbanRuralName,
             Street = Street,
             Locality = Locality,
             Address3 = Address3,
@@ -220,6 +287,8 @@ public class EstablishmentBuilder(string urn, string name)
             Northing = Northing,
             AdmissionsPolicyId = AdmissionsPolicyId,
             AdmissionsPolicyName = AdmissionsPolicyName,
+            TypeOfEstablishmentId = TypeOfEstablishmentId,
+            TypeOfEstablishmentName = TypeOfEstablishmentName,
             TrustId = TrustId,
             TrustName = TrustName,
             TrustSchoolFlagId = TrustSchoolFlagId,

@@ -1,20 +1,18 @@
 using System.Globalization;
-using SAPSec.Core.Features.SchoolDetails;
 
-namespace SAPSec.Web.ViewModels;
+namespace SAPSec.Web.Areas.Shared.ViewModels.Comparison;
 
-public class SimilarSchoolDetailsViewModel
+public class SchoolDetailsPageViewModel
 {
-    public required string CurrentSchoolUrn { get; init; }
-    public required string ComparatorSchoolUrn { get; init; }
-    public required string CurrentSchoolName { get; init; }
-    public required string ComparatorSchoolName { get; init; }
+    public required SchoolInfoViewModel CurrentSchool { get; set; }
+    public required SchoolInfoViewModel ComparatorSchool { get; set; }
+
     public double? CurrentSchoolLatitude { get; init; }
     public double? CurrentSchoolLongitude { get; init; }
     public double? ComparatorSchoolLatitude { get; init; }
     public double? ComparatorSchoolLongitude { get; init; }
     public double? Distance { get; init; }
-    public SchoolDetails? ComparatorSchoolDetails { get; init; }
+    public SchoolDetailsViewModel? ComparatorSchoolDetails { get; init; }
 
     public string DistanceDisplay =>
         Distance is double d

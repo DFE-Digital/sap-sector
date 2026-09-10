@@ -46,4 +46,16 @@ public static class ElementExtensions
         child.Should().NotBeNull();
         return child.Should().BeAssignableTo<T>().Subject;
     }
+
+    public static IReadOnlyCollection<IHtmlElement> ChildElementsShouldExist(this IElement el, string selector)
+        => el.ChildElementsShouldExist<IHtmlElement>(selector);
+
+    public static IReadOnlyCollection<T> ChildElementsShouldExist<T>(this IElement el, string selector)
+        where T : IHtmlElement
+    {
+        var children = el.QuerySelectorAll(selector);
+        children.Should().NotBeEmpty();
+
+        return children.Should().AllBeAssignableTo<T>().Subject.ToList();
+    }
 }

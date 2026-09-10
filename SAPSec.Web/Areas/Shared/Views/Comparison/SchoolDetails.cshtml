@@ -5,13 +5,15 @@
 @using SAPSec.Core.Extensions
 @using SAPSec.Core.Features.SchoolDetails
 @using SAPSec.Web.Areas.Secondary.ViewModels
+@using SAPSec.Web.Areas.Shared.ViewModels.Comparison
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
 @using SAPSec.Web.ViewModels
-@model SimilarSchoolDetailsViewModel
+
+@model SchoolDetailsPageViewModel
 @{
     Layout = "_Layout";
-    ViewData[ViewDataKeys.Title] = $"School details compared to {Model.ComparatorSchoolName}";
+    ViewData[ViewDataKeys.Title] = $"School details compared to {Model.ComparatorSchool.Name}";
 
     var inv = CultureInfo.InvariantCulture;
 
@@ -20,7 +22,7 @@
         new
         {
             urn = "",
-            name = Model.CurrentSchoolName,
+            name = Model.CurrentSchool.Name,
             address = "",
             la = "",
             lat = Model.CurrentSchoolLatitude,
@@ -32,7 +34,7 @@
         new
         {
             urn = "",
-            name = Model.ComparatorSchoolName,
+            name = Model.ComparatorSchool.Name,
             address = "",
             la = "",
             lat = Model.ComparatorSchoolLatitude,
@@ -51,7 +53,7 @@
 }
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 
-<h2>School Details</h2>
+<h2 class="govuk-heading-l">School details</h2>
 
 <details class="govuk-details js-only" data-module="govuk-details" id="comparison-map-details">
     <summary class="govuk-details__summary">
@@ -74,7 +76,7 @@
                     class="school-marker-icon"
                 />
                 <span class="govuk-!-margin-left-2">
-                @Model.ComparatorSchoolName
+                @Model.ComparatorSchool.Name
                 </span>
             </span>
 
@@ -85,7 +87,7 @@
                     class="school-marker-icon"
                 />
                 <span class="govuk-!-margin-left-2">
-                @Model.CurrentSchoolName
+                @Model.ComparatorSchool.Name
                 </span>
             </span>
         </div>
@@ -110,7 +112,7 @@
                 </div>
 
 
-                <div class="govuk-summary-list__row" data-testid="website">
+                <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Website</dt>
                     @if (Model.ComparatorSchoolDetails.Website.IsAvailable)
                     {
@@ -130,7 +132,7 @@
                 </div>
 
 
-                <div class="govuk-summary-list__row" data-testid="telephone">
+                <div class="govuk-summary-list__row">
                     <dt class="govuk-summary-list__key">Telephone</dt>
                     <dd class="govuk-summary-list__value">@Model.ComparatorSchoolDetails.Telephone.Display()</dd>
                 </div>
@@ -161,7 +163,7 @@
     <h2 class="govuk-heading-m">Location</h2>
     <dl class="govuk-summary-list govuk-!-margin-bottom-9">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Distance between school</dt>
+            <dt class="govuk-summary-list__key">Distance between schools</dt>
             <dd class="govuk-summary-list__value">@Model.DistanceDisplay miles</dd>
         </div>
         <div class="govuk-summary-list__row">
@@ -187,9 +189,7 @@
     <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">ID</dt>
-            <dd class="govuk-summary-list__value">URN: @Model.ComparatorSchoolDetails.Urn, DfE
-                number:@Model.ComparatorSchoolDetails.DfENumber.Display(),
-                UKPRN: @Model.ComparatorSchoolDetails.Ukprn.Display()</dd>
+            <dd class="govuk-summary-list__value">URN: @Model.ComparatorSchoolDetails.Urn, DfE number: @Model.ComparatorSchoolDetails.DfENumber.Display(), UKPRN: @Model.ComparatorSchoolDetails.Ukprn.Display()</dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Age range</dt>
@@ -292,7 +292,7 @@
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Ofsted report</dt>
             <dd class="govuk-summary-list__value">
-                <a href="https://reports.ofsted.gov.uk/provider/@(Model.ComparatorSchoolDetails.IsPrimarySchool() ? 21 : 23)/@Model.ComparatorSchoolDetails.Urn"
+                <a href="https://reports.ofsted.gov.uk/provider/@(Model.ComparatorSchoolDetails.IsPrimarySchool ? 21 : 23)/@Model.ComparatorSchoolDetails.Urn"
                     class="govuk-link" target="_blank" rel="noopener noreferrer">
                     View the latest Ofsted report (opens in new tab)
                 </a>

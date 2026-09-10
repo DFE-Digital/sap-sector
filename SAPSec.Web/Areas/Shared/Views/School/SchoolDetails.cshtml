@@ -2,10 +2,11 @@
 @using SAPSec.Core.Extensions
 @using SAPSec.Core.Features.SchoolDetails
 @using SAPSec.Core.Model
+@using SAPSec.Web.Areas.Shared.ViewModels
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
 
-@model SchoolDetails
+@model SchoolDetailsViewModel
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = $"School details";
@@ -40,7 +41,7 @@
 <dl class="govuk-summary-list">
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">ID</dt>
-        <dd class="govuk-summary-list__value">URN: @Model.Urn, DfE number:@Model.DfENumber.Display(), UKPRN: @Model.Ukprn.Display()</dd>
+        <dd class="govuk-summary-list__value">URN: @Model.Urn, DfE number: @Model.DfENumber.Display(), UKPRN: @Model.Ukprn.Display()</dd>
     </div>
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Age range</dt>
@@ -139,12 +140,12 @@
 <h2 class="govuk-heading-m">Contact details</h2>
 <dl class="govuk-summary-list govuk-!-margin-bottom-9">
     <div class="govuk-summary-list__row">
-        <dt class="govuk-summary-list__key">Headteacher / Principal</dt>
+        <dt class="govuk-summary-list__key">Headteacher/Principal</dt>
         <dd class="govuk-summary-list__value">@Model.HeadteacherName.Display()</dd>
     </div>
     @if (Model.Website.IsAvailable)
     {
-        <div class="govuk-summary-list__row" data-testid="website">
+        <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Website</dt>
             <dd class="govuk-summary-list__value">
                 <a href="@Model.Website.Value" class="govuk-link" target="_blank" rel="noopener noreferrer">
@@ -153,7 +154,7 @@
             </dd>
         </div>
     }
-    <div class="govuk-summary-list__row" data-testid="telephone">
+    <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Telephone</dt>
         <dd class="govuk-summary-list__value">@Model.Telephone.Display()</dd>
     </div>
@@ -180,7 +181,7 @@
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Ofsted report</dt>
         <dd class="govuk-summary-list__value">
-            <a href="https://reports.ofsted.gov.uk/provider/@(Model.IsPrimarySchool() ? 21 : 23)/@Model.Urn"
+            <a href="https://reports.ofsted.gov.uk/provider/@(Model.IsPrimarySchool ? 21 : 23)/@Model.Urn"
                 class="govuk-link" target="_blank" rel="noopener noreferrer">
                 View the latest Ofsted report (opens in new tab)
             </a>

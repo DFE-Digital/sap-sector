@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Microsoft.Playwright;
-using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
 using Xunit;
@@ -8,7 +7,7 @@ using Xunit;
 namespace SAPSec.Test.EndToEnd.Primary;
 
 [Collection("EndToEndTestsCollection")]
-public class ComparisonSchoolDetailsPageEndToEndTests(EndToEndTestsFixture fixture)
+public class ComparisonSimilarityPageEndToEndTests(EndToEndTestsFixture fixture)
     : EndToEndTests(fixture)
 {
     private const string CurrentSchoolUrn = "101206";
@@ -27,27 +26,20 @@ public class ComparisonSchoolDetailsPageEndToEndTests(EndToEndTestsFixture fixtu
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools);
         await Page.GetByRole(AriaRole.Link, new() { Name = ComparatorSchoolName, Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
-        await Page.GetByRole(AriaRole.Link, new() { Name = "School details", Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).SchoolDetails);
     }
 
     [Fact]
-    public async Task SchoolDetails_IdentifiesCorrectSchool()
+    public async Task SimilarSchoolComparison_CanNavigateToSimilarity_AndSeeCharacteristicsTable()
     {
-        await Expect(Page.GetByDefinitionTerm("ID")).ToContainTextAsync($"URN: {ComparatorSchoolUrn}");
-        await Expect(Page.Locator(".govuk-caption-xl")).ToHaveTextAsync(CurrentSchoolName);
-        await Expect(Page.Locator(".govuk-heading-xl")).ToHaveTextAsync(ComparatorSchoolName);
-    }
+        var heading = Page.Locator("h2.govuk-heading-l");
+        await heading.WaitForAsync();
+        (await heading.TextContentAsync()).Should().Contain("How these schools compare");
 
-    [Fact]
-    public async Task SchoolDetails_DisplaysMapDetails_Component()
-    {
-        var details = Page.Locator("details#comparison-map-details.govuk-details");
-        var count = await details.CountAsync();
+        var table = Page.Locator("table.govuk-table");
+        await table.WaitForAsync();
+        (await table.CountAsync()).Should().Be(1, "Similarity table should be visible");
 
-        count.Should().Be(1, "Map details component should be present");
-
-        var summaryText = details.Locator("summary .govuk-details__summary-text");
-        (await summaryText.TextContentAsync()).Should().Contain("View on a map");
+        var rows = table.Locator("tbody tr.govuk-table__row");
+        (await rows.CountAsync()).Should().Be(9, "Similarity table should list 9 characteristics");
     }
 }
