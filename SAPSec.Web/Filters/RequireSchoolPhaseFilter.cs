@@ -69,6 +69,7 @@ public sealed class RequireSchoolPhaseFilter(
             return new NotFoundResult();
         }
 
+
         return new RedirectResult(canonicalPath + context.HttpContext.Request.QueryString, permanent: false);
     }
 }
