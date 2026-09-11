@@ -1,8 +1,52 @@
 (function () {
+    var focusTargetParameter = 'focusTarget';
+    var filterFocusTarget = 'filters';
+    var sortFocusTarget = 'sort';
+
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initFilterProtection);
     } else {
         initFilterProtection();
+    }
+
+    function focusElement(element) {
+        if (!element) return;
+
+        if (!element.hasAttribute('tabindex')) {
+            element.setAttribute('tabindex', '-1');
+        }
+
+        element.focus();
+    }
+
+    function focusAfterPageLoad() {
+        var focusTarget = new URLSearchParams(window.location.search).get(focusTargetParameter);
+        if (!focusTarget) return;
+
+        if (focusTarget === sortFocusTarget) {
+            focusElement(document.getElementById('sort-by'));
+            return;
+        }
+
+        if (focusTarget === filterFocusTarget) {
+            focusElement(
+                document.getElementById('selected-filters')
+                || document.getElementById('similar-schools-results-count')
+                || document.getElementById('similar-schools-results'));
+        }
+    }
+
+    function setFocusTarget(value) {
+        var focusTargetInput = document.getElementById('similar-schools-focus-target');
+        if (focusTargetInput) {
+            focusTargetInput.value = value;
+        }
+    }
+
+    function appendFocusTarget(url, value) {
+        var parsedUrl = new URL(url, window.location.origin);
+        parsedUrl.searchParams.set(focusTargetParameter, value);
+        return parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
     }
 
     function initFilterProtection() {
@@ -21,6 +65,8 @@
                 return false;
             }
 
+            setFocusTarget(filterFocusTarget);
+
             for (var applyButton of applyButtons) {
                 applyButton.classList.add('govuk-button--loading');
                 applyButton.disabled = true;
@@ -32,7 +78,21 @@
             var clone = cb.cloneNode(true);
             cb.parentNode.replaceChild(clone, cb);
         });
+
+        filterForm.querySelectorAll('.app-filter__tag, .app-clear-filters-spacing a').forEach(function (link) {
+            link.href = appendFocusTarget(link.href, filterFocusTarget);
+        });
+
+        var sortSelect = document.getElementById('sort-by');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function () {
+                setFocusTarget(sortFocusTarget);
+                filterForm.submit();
+            });
+        }
     }
+
+    focusAfterPageLoad();
 })();
 
 (function () {

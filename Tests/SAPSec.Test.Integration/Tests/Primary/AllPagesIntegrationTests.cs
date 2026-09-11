@@ -20,7 +20,7 @@ public class AllPagesIntegrationTests(
         new(Routes.PrimarySchool("100001").Overview, "Test School 1", NavigationText: "Overview"),
         new(Routes.PrimarySchool("100001").KS2, "KS2 performance measures", NavigationText: "KS2"),
         new(Routes.PrimarySchool("100001").Attendance, "Attendance measures", NavigationText: "Attendance"),
-        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
+        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools", Title: "2 similar schools - View similar schools"),
         new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
         new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
         new(Routes.PrimarySchool("100001").RiseResources, "RISE resources"),
@@ -67,14 +67,14 @@ public class AllPagesIntegrationTests(
 
     [Theory]
     [MemberData(nameof(AllPagesWithPageHeadings))]
-    public async Task AllPages_Headings(string path, string expectedHeading)
+    public async Task AllPages_Headings(string path, string expectedHeading, string? expectedTitleOverride)
     {
         var isComparisonPage = ComparisonPage.IsMatch(path);
         var isOverviewPage = OverviewPage.IsMatch(path);
 
         var page = await Fixture.RequestPageAsync(path);
 
-        var expectedTitle = isComparisonPage ? "Test School 2" : expectedHeading;
+        var expectedTitle = isComparisonPage ? "Test School 2" : expectedTitleOverride ?? expectedHeading;
         page.Title.Should().Be($"{expectedTitle} - Get school improvement insights - GOV.UK");
 
         var h1 = page.QuerySelector("h1.govuk-heading-xl");
@@ -236,16 +236,16 @@ public class AllPagesIntegrationTests(
         return data;
     }
 
-    public static TheoryData<string, string> AllPagesWithPageHeadings()
+    public static TheoryData<string, string, string?> AllPagesWithPageHeadings()
     {
-        var data = new TheoryData<string, string>();
+        var data = new TheoryData<string, string, string?>();
         foreach (var page in PrimaryPages)
         {
-            data.Add(page.Path, page.Heading);
+            data.Add(page.Path, page.Heading, page.Title);
         }
 
         return data;
     }
 
-    private record PageTestCase(string Path, string Heading, string? NavigationText = null);
+    private record PageTestCase(string Path, string Heading, string? NavigationText = null, string? Title = null);
 }

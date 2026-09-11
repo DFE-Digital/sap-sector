@@ -170,6 +170,11 @@ public class ViewSimilarSchoolsPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.OK);
 
+        page.Title.Should().Contain("2 similar schools - View similar schools");
+        page.QuerySelector("a[href=\"#similar-schools-results\"]")?.TextContent.Trim().Should().Be("Skip to search results");
+        page.QuerySelector("#similar-schools-results").Should().NotBeNull();
+        page.QuerySelectorAll(".govuk-skip-link").Should().HaveCount(1);
+
         var filter = page.ElementWithTestIdShouldExist("primary-similar-schools-filter");
         filter.TextContent.Should().Contain("Filters");
         filter.TextContent.Should().Contain("Location");

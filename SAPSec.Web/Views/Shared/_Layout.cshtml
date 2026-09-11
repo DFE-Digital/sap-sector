@@ -16,15 +16,16 @@
     var skipNavigationTargetId = ViewData[ViewDataKeys.SkipNavigationTargetId]?.ToString();
     var skipNavigationText = ViewData[ViewDataKeys.SkipNavigationText]?.ToString() ?? "Skip to navigation";
     var skipLinkTargetId = ViewData[ViewDataKeys.SkipLinkTargetId]?.ToString() ?? "main-content";
+    var pageTitle = ViewData[ViewDataKeys.PageTitle]?.ToString() ?? ViewData[ViewDataKeys.Title]?.ToString();
 }
 <!DOCTYPE html>
 <html lang="en" class="govuk-template govuk-template--rebranded app-html-class">
 <head>
     <meta charset="utf-8" />
     <title>
-        @if (ViewData.ContainsKey(ViewDataKeys.Title))
+        @if (!string.IsNullOrWhiteSpace(pageTitle))
         {
-            <text>@ViewData[ViewDataKeys.Title] - @LayoutConstants.ServiceName - GOV.UK</text>
+            <text>@pageTitle - @LayoutConstants.ServiceName - GOV.UK</text>
         }
         else
         {
@@ -200,7 +201,7 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
                             <a class="govuk-footer__link" href="@Url.Action("Cookies", "StaticContent")">Cookies</a>
                         </li>
                         <li class="govuk-footer__inline-list-item">
-                            <a class="govuk-footer__link" href="@Url.Action("Accessibility", "StaticContent")">Accessibility</a>
+                            <a class="govuk-footer__link" href="@LayoutConstants.AccessibilityStatementUrl">Accessibility</a>
                         </li>
                         <li class="govuk-footer__inline-list-item">
                             <a class="govuk-footer__link" href="@Url.Action("TermsAndConditions", "StaticContent")">Terms and conditions</a>

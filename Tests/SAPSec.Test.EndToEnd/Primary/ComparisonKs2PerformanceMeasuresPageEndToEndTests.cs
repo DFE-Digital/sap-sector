@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.Playwright;
 using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Common.Playwright;
@@ -54,7 +54,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     public async Task MeetingExpectedStandardRwm_ViewTableView()
     {
         var section = await GetSection(MeetingExpectedStandardHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -67,7 +67,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     public async Task MeetingExpectedStandardRwm_ChangeSubjectFilter_UpdatesTableValues()
     {
         var section = await GetSection(MeetingExpectedStandardHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -89,27 +89,14 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     [Fact]
     public async Task MeetingExpectedStandardRwm_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(MeetingExpectedStandardHeaderText);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(MeetingExpectedStandardHeaderText);
     }
 
     [Fact]
     public async Task AchievedHigherStandardRwm_ViewTableView()
     {
         var section = await GetSection(AchievedHigherStandardHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -122,7 +109,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     public async Task AchievedHigherStandardRwm_ChangeSubjectFilter_UpdatesTableValues()
     {
         var section = await GetSection(AchievedHigherStandardHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -144,20 +131,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     [Fact]
     public async Task AchievedHigherStandardRwm_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(AchievedHigherStandardHeaderText);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(AchievedHigherStandardHeaderText);
     }
 
     [Fact]
@@ -175,7 +149,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     public async Task AverageScaledScoreReading_ViewTableView()
     {
         var section = await GetSection(ReadingScaledScoreHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -187,20 +161,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     [Fact]
     public async Task AverageScaledScoreReading_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(ReadingScaledScoreHeaderText);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(ReadingScaledScoreHeaderText);
     }
 
     [Fact]
@@ -218,7 +179,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     public async Task AverageScaledScoreMaths_ViewTableView()
     {
         var section = await GetSection(MathsScaledScoreHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -230,20 +191,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     [Fact]
     public async Task AverageScaledScoreMaths_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(MathsScaledScoreHeaderText);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(MathsScaledScoreHeaderText);
     }
 
     [Fact]
@@ -261,7 +209,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     public async Task MeetingExpectedStandardGps_ViewTableView()
     {
         var section = await GetSection(MeetingExpectedStandardGpsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -273,20 +221,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     [Fact]
     public async Task MeetingExpectedStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(MeetingExpectedStandardGpsHeaderText);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(MeetingExpectedStandardGpsHeaderText);
     }
 
     [Fact]
@@ -304,7 +239,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     public async Task AchievedHigherStandardGps_ViewTableView()
     {
         var section = await GetSection(AchievedHigherStandardGpsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Table" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Table of data" }).ClickAsync();
 
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
@@ -316,20 +251,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     [Fact]
     public async Task AchievedHigherStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
     {
-        var section = await GetSection(AchievedHigherStandardGpsHeaderText);
-
-        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
-
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" }).ClickAsync();
-
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
+        await AssertCanToggleBetweenYearByYearAndCurrentYearView(AchievedHigherStandardGpsHeaderText);
     }
 
     private async Task<ILocator> GetSection(string headerText)
@@ -338,5 +260,33 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
         await Expect(section).ToBeVisibleAsync();
 
         return section;
+    }
+
+    private async Task AssertCanToggleBetweenYearByYearAndCurrentYearView(string headerText)
+    {
+        var section = await GetSection(headerText);
+        var panel = section.GetByRole(AriaRole.Tabpanel);
+
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
+
+        var currentYearPanel = panel.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = panel.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
+
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
+
+        await toggleButton.ClickAsync();
+
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
+
+        await toggleButton.ClickAsync();
+
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 }
