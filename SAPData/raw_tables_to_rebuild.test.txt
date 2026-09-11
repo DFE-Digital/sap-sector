@@ -25,3 +25,6 @@ oa_percent_3term_sch_202425_ccss
 pa_percent_3term_sch_202223_ccss
 pa_percent_3term_sch_202324_ccss
 pa_percent_3term_sch_202425_ccss
+
+# KS4 sources
+ees_ks4_202223_api

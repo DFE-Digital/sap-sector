@@ -7,3 +7,6 @@ links_edubasealldataYYYYmmDD
 grouplinks_edubaseallacademiesandfreeYYYYmmDD
 school-email-addresses-24-08-2026
 
+# KS4 sources
+ees_ks4_202223_api
+
