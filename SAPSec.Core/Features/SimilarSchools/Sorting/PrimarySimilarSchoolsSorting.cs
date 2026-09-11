@@ -1,7 +1,6 @@
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Model;
-using SAPSec.Data.Repositories;
-using SAPSec.Core.Features.SimilarSchools.UseCases;
+using SAPSec.Data.Dto.KS2.Performance;
 
 namespace SAPSec.Core.Features.SimilarSchools.Sorting;
 
@@ -9,11 +8,12 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
 {
     private const string PercentFormat = "0\\%";
     private const int PercentDecimalPlaces = 0;
+
     private const string ScaledScoreFormat = "0.0";
     private const int ScaledScoreDecimalPlaces = 1;
 
-    public IEnumerable<SortedItem<PrimaryRankedSimilarSchoolData, DataWithAvailability<string>>> Sort(
-        IEnumerable<PrimaryRankedSimilarSchoolData> items)
+    public IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<string>>> Sort(
+        IEnumerable<SimilarSchoolSortItem<EstablishmentPerformance>> items)
     {
         return sortBy.ToLowerInvariant() switch
         {
@@ -21,7 +21,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "RwmHigher",
                 "Achieved a higher standard in reading, writing and maths",
-                i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.RwmHigher_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromDecimalString(i?.RwmHigher_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -29,7 +29,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "ReadingScaledScore",
                 "Average scaled score in reading",
-                i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.ReadingScaledScore_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromDecimalString(i?.ReadingScaledScore_Tot_Cohort_Est_Current_Num),
                 ScaledScoreFormat,
                 ScaledScoreDecimalPlaces),
 
@@ -37,7 +37,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "MathsScaledScore",
                 "Average scaled score in maths",
-                i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.MathsScaledScore_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromDecimalString(i?.MathsScaledScore_Tot_Cohort_Est_Current_Num),
                 ScaledScoreFormat,
                 ScaledScoreDecimalPlaces),
 
@@ -45,7 +45,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "GpsExpected",
                 "Meeting expected standard in grammar, punctuation and spelling",
-                i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.GpsExpected_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromDecimalString(i?.GpsExpected_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -53,7 +53,7 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "GpsHigher",
                 "Achieved a higher standard in grammar, punctuation and spelling",
-                i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.GpsHigher_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromDecimalString(i?.GpsHigher_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces),
 
@@ -61,17 +61,17 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
                 items,
                 "RwmExpected",
                 "Meeting expected standard in reading, writing and maths",
-                i => DataWithAvailability.FromDecimalString(i.PerformanceData?.EstablishmentPerformance?.RwmExpected_Tot_Cohort_Est_Current_Num),
+                i => DataWithAvailability.FromDecimalString(i?.RwmExpected_Tot_Cohort_Est_Current_Num),
                 PercentFormat,
                 PercentDecimalPlaces)
         };
     }
 
-    private static IEnumerable<SortedItem<PrimaryRankedSimilarSchoolData, DataWithAvailability<string>>> Sort(
-        IEnumerable<PrimaryRankedSimilarSchoolData> items,
+    private static IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<string>>> Sort(
+        IEnumerable<SimilarSchoolSortItem<EstablishmentPerformance>> items,
         string sortKey,
         string sortName,
-        Func<PrimaryRankedSimilarSchoolData, DataWithAvailability<decimal>> property,
+        Func<EstablishmentPerformance?, DataWithAvailability<decimal>> property,
         string displayFormat,
         int decimalPlaces) =>
         SimilarSchoolsSortEngine.Sort(
@@ -79,14 +79,20 @@ internal class PrimarySimilarSchoolsSorting(string sortBy)
             sortKey,
             sortName,
             property,
-            i => i.SimilarSchool.Name,
             displayFormat,
             decimalPlaces);
 
-    public IEnumerable<SortOption> GetPossibleOptions(string? selectedSortBy)
+    public IEnumerable<SortOption> GetPossibleOptions(string? sortBy)
     {
-        var normalized = selectedSortBy?.ToLowerInvariant() ?? string.Empty;
-        var rwmExpectedSelected = normalized is "" or "rwmexpected";
+        var normalized = sortBy?.ToLowerInvariant() ?? string.Empty;
+
+        var rwmExpectedSelected = !new[] {
+            "rwmhigher",
+            "readingscaledscore",
+            "mathsscaledscore",
+            "gpsexpected",
+            "gpshigher",
+        }.Contains(normalized);
 
         yield return new("RwmExpected", "Meeting expected standard in reading, writing and maths", rwmExpectedSelected);
         yield return new("RwmHigher", "Achieved a higher standard in reading, writing and maths", normalized == "rwmhigher");

@@ -1,4 +1,4 @@
-using SAPSec.Core.Constants;
+using SAPSec.Core.Features.SchoolDetails;
 
 namespace SAPSec.Web.Constants;
 

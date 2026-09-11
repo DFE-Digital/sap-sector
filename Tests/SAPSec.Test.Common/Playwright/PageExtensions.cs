@@ -15,4 +15,9 @@ public static class PageExtensions
 
         return matchingElement;
     }
+
+    public static ILocator GetByDefinitionTerm(this IPage page, string term)
+    {
+        return page.Locator($"dt:has-text(\"{term}\") + dd");
+    }
 }

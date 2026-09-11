@@ -32,7 +32,7 @@ public class GetRiseResourcesUseCaseTests
 
         var result = await _sut.Execute(new GetRiseResourcesRequest("123456"));
 
-        result.Urn.Should().Be("123456");
-        result.SchoolName.Should().Be("Test School");
+        result.School.Urn.Should().Be("123456");
+        result.School.Name.Should().Be("Test School");
     }
 }

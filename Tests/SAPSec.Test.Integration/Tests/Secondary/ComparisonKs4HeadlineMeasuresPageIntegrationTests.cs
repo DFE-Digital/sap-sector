@@ -16,27 +16,39 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     [Fact]
-    public async Task Ks4HeadlineMeasures_WithNonExistentUrn_ReturnsNotFound()
+    public async Task NonExistentCurrentSchoolUrn_ReturnsNotFound()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
 
-        var response = await Fixture.Client.GetAsync(Routes.SecondarySchool("999999").Comparison("100002").KS4HeadlineMeasures);
-
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await Fixture.RequestPageAsync(
+            Routes.SecondarySchool("999999").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.NotFound);
     }
 
     [Fact]
-    public async Task Ks4HeadlineMeasures_WithNonExistentSimilarSchoolUrn_ReturnsNotFound()
+    public async Task NonExistentComparatorSchoolUrn_ReturnsNotFound()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
 
-        var response = await Fixture.Client.GetAsync(Routes.SecondarySchool("100001").Comparison("999999").KS4HeadlineMeasures);
+        await Fixture.RequestPageAsync(
+            Routes.SecondarySchool("100001").Comparison("999999").KS4HeadlineMeasures, HttpStatusCode.NotFound);
+    }
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    [Fact]
+    public async Task WhenComparatorSchoolIsNotInSimilarSchoolsGroupForCurrentSchool_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", []));
+
+        await Fixture.RequestPageAsync(
+            Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.NotFound);
     }
 
     [Fact]
@@ -45,6 +57,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
@@ -59,6 +74,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var heading = page.ElementWithTestIdShouldExist("attainment8-heading");
@@ -72,6 +90,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var tabs = page.ElementWithTestIdShouldExist("attainment8-tabs");
@@ -84,6 +105,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEnglandPerformance(
             Build.Ks4Performance.England(x => x.WithAttainment8(current: "107.4", prev: "106.6", prev2: "105.8")));
@@ -109,6 +133,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
@@ -138,6 +165,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("attainment8-current-year-chart");
@@ -156,6 +186,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var heading = page.ElementWithTestIdShouldExist("eng-maths-heading");
@@ -169,6 +202,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var tabs = page.ElementWithTestIdShouldExist("eng-maths-tabs");
@@ -181,6 +217,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "81", prev: "80", prev2: "79")),
@@ -206,6 +245,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngMaths49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -235,6 +277,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("eng-maths-current-year-chart");
@@ -263,6 +308,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("eng-maths-current-year-chart");
@@ -281,6 +329,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var filter = page.ElementWithTestIdShouldExist("eng-maths-grade-filter");
@@ -295,6 +346,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -334,6 +388,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var heading = page.ElementWithTestIdShouldExist("destinations-heading");
@@ -346,6 +403,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
@@ -361,7 +421,7 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
         Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
-            Build.SecondaryGroup("100001", ["100002", "100003"]));
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "81", prev: "80", prev2: "79")),
@@ -388,6 +448,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x.WithAllDest(current: "80.99", prev: "80.3", prev2: "78.9")),
             Build.Ks4Destinations.Establishment("100002", x => x.WithAllDest(current: "70.6", prev: "70.3", prev2: "69.1")));
@@ -412,6 +475,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
@@ -441,6 +507,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("destinations-current-year-chart");
@@ -459,6 +528,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
 
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var filter = page.ElementWithTestIdShouldExist("destinations-dest-filter");
@@ -473,6 +545,9 @@ public class ComparisonKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
             Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x

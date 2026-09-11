@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using SAPSec.Core.Constants;
-using SAPSec.Core.Extensions;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Interfaces.Services;
-using SAPSec.Core.Model;
 using SAPSec.Web.Helpers;
 using SAPSec.Web.Services;
 
