@@ -36,9 +36,10 @@ public class SchoolSearchService(
         }
 
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+        var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools);
         var school = await _establishmentRepository.GetEstablishmentByAnyNumberAsync(trimmedSchoolNumber);
 
-        return school.CanSearch(primarySchoolsEnabled)
+        return school.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled)
             ? school
             : null;
     }
@@ -46,6 +47,7 @@ public class SchoolSearchService(
     private async Task<IReadOnlyList<SchoolSearchResult>> SearchInternalAsync(string query, int maxResults, bool includeCoordinates)
     {
         var primarySchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+        var allThroughSchoolsEnabled = await _featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools);
         var searchResults = await _indexReader.SearchAsync(query, maxResults);
 
         var results = new List<SchoolSearchResult>();
@@ -68,7 +70,7 @@ public class SchoolSearchService(
                 continue;
             }
 
-            if (!r.School.CanSearch(primarySchoolsEnabled))
+            if (!r.School.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled))
             {
                 continue;
             }

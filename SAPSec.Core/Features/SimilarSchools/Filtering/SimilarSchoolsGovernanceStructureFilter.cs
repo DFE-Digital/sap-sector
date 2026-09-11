@@ -1,7 +1,7 @@
 using SAPSec.Core.Collections;
-using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Model;
+using SAPSec.Core.Features.SchoolDetails;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -18,7 +18,7 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
     protected override DataWithAvailability<string>? CurrentSchoolValue
         => DataWithAvailability.Available(FindGroup(CurrentSchool).Name);
 
-    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values)
     {
         if (!values.Any())
         {
@@ -26,16 +26,16 @@ public class SimilarSchoolsGovernanceStructureFilter(string key,
         }
 
         return items.Where(i =>
-                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "5")
-              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "3")
-              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (i.TrustSchoolFlag?.Id is "1" or "2" || i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id == "4"))
-              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && i.TrustSchoolFlag?.Id == "0" && i.EstablishmentTypeGroup?.Id != "4"));
+                 (values.Contains("S", StringComparer.OrdinalIgnoreCase) && similarSchoolAccessor(i).TrustSchoolFlag?.Id == "5")
+              || (values.Contains("M", StringComparer.OrdinalIgnoreCase) && similarSchoolAccessor(i).TrustSchoolFlag?.Id == "3")
+              || (values.Contains("MS", StringComparer.OrdinalIgnoreCase) && (similarSchoolAccessor(i).TrustSchoolFlag?.Id is "1" or "2" || similarSchoolAccessor(i).TrustSchoolFlag?.Id == "0" && similarSchoolAccessor(i).EstablishmentTypeGroup?.Id == "4"))
+              || (values.Contains("N", StringComparer.OrdinalIgnoreCase) && similarSchoolAccessor(i).TrustSchoolFlag?.Id == "0" && similarSchoolAccessor(i).EstablishmentTypeGroup?.Id != "4"));
     }
 
-    protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<FilterOption> GetPossibleOptions<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values)
     {
         return items
-            .GroupBy(FindGroup)
+            .GroupBy(i => FindGroup(similarSchoolAccessor(i)))
             .Select(g => new FilterOption(
                 g.Key!.Key,
                 g.Key.Name,

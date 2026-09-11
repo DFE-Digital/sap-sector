@@ -71,7 +71,7 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
         var content = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        content.Should().Contain("There are no schools that match your search.");
+        content.Should().Contain("There are no similar schools available for this school.");
         content.Should().NotContain("toggleViewLink");
         content.Should().NotContain("View on map");
     }

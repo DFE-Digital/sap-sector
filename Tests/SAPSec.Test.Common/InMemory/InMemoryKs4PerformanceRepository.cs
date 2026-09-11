@@ -9,26 +9,34 @@ public class InMemoryKs4PerformanceRepository(IEstablishmentRepository establish
     private List<LAPerformance> _la = new();
     private List<EnglandPerformance> _england = new();
 
-    public void SetupEstablishmentPerformance(params EstablishmentPerformance[] establishment)
+    public InMemoryKs4PerformanceRepository SetupEstablishmentPerformance(params EstablishmentPerformance[] establishment)
     {
         _establishment = establishment.ToList();
+
+        return this;
     }
 
-    public void SetupLAPerformance(params LAPerformance[] la)
+    public InMemoryKs4PerformanceRepository SetupLAPerformance(params LAPerformance[] la)
     {
         _la = la.ToList();
+
+        return this;
     }
 
-    public void SetupEnglandPerformance(params EnglandPerformance[] england)
+    public InMemoryKs4PerformanceRepository SetupEnglandPerformance(params EnglandPerformance[] england)
     {
         _england = england.ToList();
+
+        return this;
     }
 
-    public void ClearDown()
+    public InMemoryKs4PerformanceRepository ClearDown()
     {
         _establishment = [];
         _la = [];
         _england = [];
+
+        return this;
     }
 
     public async Task<Ks4PerformanceData?> GetByUrnAsync(string urn)

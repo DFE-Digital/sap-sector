@@ -35,4 +35,27 @@ public static class ElementExtensions
             option.IsSelected = option.TrimmedTextContent() == optionText;
         }
     }
+
+    public static IHtmlElement ChildElementShouldExist(this IElement el, string selector)
+        => el.ChildElementShouldExist<IHtmlElement>(selector);
+
+    public static T ChildElementShouldExist<T>(this IElement el, string selector)
+        where T : IHtmlElement
+    {
+        var child = el.QuerySelector(selector);
+        child.Should().NotBeNull();
+        return child.Should().BeAssignableTo<T>().Subject;
+    }
+
+    public static IReadOnlyCollection<IHtmlElement> ChildElementsShouldExist(this IElement el, string selector)
+        => el.ChildElementsShouldExist<IHtmlElement>(selector);
+
+    public static IReadOnlyCollection<T> ChildElementsShouldExist<T>(this IElement el, string selector)
+        where T : IHtmlElement
+    {
+        var children = el.QuerySelectorAll(selector);
+        children.Should().NotBeEmpty();
+
+        return children.Should().AllBeAssignableTo<T>().Subject.ToList();
+    }
 }

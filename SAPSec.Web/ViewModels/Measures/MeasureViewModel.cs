@@ -126,7 +126,7 @@ public record MeasureViewModel(
        seriesType switch
        {
            MeasureSeriesType.CurrentSchool => currentSchool.Name,
-           MeasureSeriesType.SimilarSchool => similarSchool?.Name ??
+           MeasureSeriesType.ComparatorSchool => similarSchool?.Name ??
                throw new InvalidOperationException($"Similar school required to resolve label for Measure Series Type: {Enum.GetName(seriesType)}"),
            MeasureSeriesType.SimilarSchoolsAverage => "Similar schools average",
            MeasureSeriesType.LASchoolsAverage => "Local authority schools average",
@@ -138,7 +138,7 @@ public record MeasureViewModel(
         seriesType switch
         {
             MeasureSeriesType.CurrentSchool => "triangle",
-            MeasureSeriesType.SimilarSchool => "circle",
+            MeasureSeriesType.ComparatorSchool => "circle",
             MeasureSeriesType.SimilarSchoolsAverage => "circle",
             MeasureSeriesType.LASchoolsAverage => "rect",
             MeasureSeriesType.EnglandSchoolsAverage => "rectRot",
