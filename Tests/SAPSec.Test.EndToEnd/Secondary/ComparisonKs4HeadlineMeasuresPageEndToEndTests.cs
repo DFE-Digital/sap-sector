@@ -17,22 +17,24 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     private const string EnglishMathsHeaderText = "Grade achieved in English and maths GCSEs";
     private const string DestinationsHeaderText = "Staying in education or entering employment";
 
-    private const string Urn = "100052";
-    private const string SimilarSchoolUrn = "141617";
+    private const string CurrentSchoolUrn = "100052";
+    private const string CurrentSchoolName = "Hampstead School";
+    private const string ComparatorSchoolUrn = "141617";
+    private const string ComparatorSchoolName = "The Hurlingham Academy";
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         await NavigateTo(Routes.FindASchool());
-        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(Urn);
+        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Overview);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).Overview);
         await Page.GetByText("View similar schools", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).ViewSimilarSchools);
-        await Page.GetByText("The Hurlingham Academy", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).Similarity);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).ViewSimilarSchools);
+        await Page.GetByText(ComparatorSchoolName, new() { Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
         await Page.GetByText("KS4 headline measures", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).KS4HeadlineMeasures);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).KS4HeadlineMeasures);
     }
 
     [Fact]

@@ -16,33 +16,112 @@ public static class Build
         return build(new EstablishmentBuilder(urn, name)).Build();
     }
 
-    public static SimilarSchoolsPrimaryGroupsEntry[] PrimaryGroup(string urn, IEnumerable<string> neighbourUrns)
-    {
-        return neighbourUrns
+    public static EstablishmentEmail EstablishmentEmail(string urn, string mainEmail) =>
+        new() { URN = urn, MainEmail = mainEmail };
+
+    public static SimilarSchoolsPrimaryGroupsEntry[] PrimaryGroup(string urn, IEnumerable<string> neighbourUrns) =>
+        neighbourUrns
             .Select(n => new SimilarSchoolsPrimaryGroupsEntry { URN = urn, NeighbourURN = n })
             .ToArray();
-    }
 
-    public static SimilarSchoolsPrimaryValuesEntry[] PrimaryValues(params string[] urns)
-    {
-        return urns
+    public static SimilarSchoolsPrimaryValuesEntry[] PrimaryValues(string[] urns) =>
+        urns
             .Select(urn => new SimilarSchoolsPrimaryValuesEntry { URN = urn })
             .ToArray();
-    }
 
-    public static SimilarSchoolsSecondaryGroupsEntry[] SecondaryGroup(string urn, IEnumerable<string> neighbourUrns)
-    {
-        return neighbourUrns
+    public static SimilarSchoolsPrimaryValuesEntry[] PrimaryValues((string Urn, string Value)[] values) =>
+        values
+            .Select(v => new SimilarSchoolsPrimaryValuesEntry
+            {
+                URN = v.Urn,
+                Ks1PriorRwmAverage = v.Value,
+                PPPerc = v.Value,
+                PercentEAL = v.Value,
+                Polar4QuintilePupils = v.Value,
+                PStability = v.Value,
+                IdaciPupils = v.Value,
+                PercentSchSupport = v.Value,
+                NumberOfPupils = v.Value,
+                PercentageStatementOrEhp = v.Value
+            })
+            .ToArray();
+
+    public static SimilarSchoolsPrimaryValuesEntry PrimaryValues(
+            string urn,
+            string ks1Prior,
+            string pp = "0",
+            string eal = "0",
+            string polar4Quintile = "0",
+            string stability = "0",
+            string idaci = "0",
+            string senSupport = "0",
+            string pupilCount = "0",
+            string ehcp = "0") =>
+        new()
+        {
+            URN = urn,
+            Ks1PriorRwmAverage = ks1Prior,
+            PPPerc = pp,
+            PercentEAL = eal,
+            Polar4QuintilePupils = polar4Quintile,
+            PStability = stability,
+            IdaciPupils = idaci,
+            PercentSchSupport = senSupport,
+            NumberOfPupils = pupilCount,
+            PercentageStatementOrEhp = ehcp
+        };
+
+    public static SimilarSchoolsSecondaryGroupsEntry[] SecondaryGroup(string urn, IEnumerable<string> neighbourUrns) =>
+        neighbourUrns
             .Select(n => new SimilarSchoolsSecondaryGroupsEntry { URN = urn, NeighbourURN = n })
             .ToArray();
-    }
 
-    public static SimilarSchoolsSecondaryValuesEntry[] SecondaryValues(params string[] urns)
-    {
-        return urns
+    public static SimilarSchoolsSecondaryValuesEntry[] SecondaryValues(string[] urns) =>
+        urns
             .Select(urn => new SimilarSchoolsSecondaryValuesEntry { URN = urn })
             .ToArray();
-    }
+
+    public static SimilarSchoolsSecondaryValuesEntry SecondaryValues(
+            string urn,
+            string ks2Avg = "0",
+            string pp = "0",
+            string eal = "0",
+            string polar4Quintile = "0",
+            string stability = "0",
+            string idaci = "0",
+            string senSupport = "0",
+            string pupilCount = "0",
+            string ehcp = "0") =>
+        new()
+        {
+            URN = urn,
+            KS2MRP = ks2Avg,
+            PPPerc = pp,
+            PercentEAL = eal,
+            Polar4QuintilePupils = polar4Quintile,
+            PStability = stability,
+            IdaciPupils = idaci,
+            PercentSchSupport = senSupport,
+            NumberOfPupils = pupilCount,
+            PercentageStatementOrEHP = ehcp
+        };
+
+    public static SimilarSchoolsSecondaryValuesEntry[] SecondaryValues((string Urn, string Value)[] values) =>
+        values
+            .Select(v => new SimilarSchoolsSecondaryValuesEntry
+            {
+                URN = v.Urn,
+                KS2MRP = v.Value,
+                PPPerc = v.Value,
+                PercentEAL = v.Value,
+                Polar4QuintilePupils = v.Value,
+                PStability = v.Value,
+                IdaciPupils = v.Value,
+                PercentSchSupport = v.Value,
+                NumberOfPupils = v.Value,
+                PercentageStatementOrEHP = v.Value
+            })
+            .ToArray();
 
     public static class Ks2Performance
     {

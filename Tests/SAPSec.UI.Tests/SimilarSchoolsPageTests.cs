@@ -195,7 +195,7 @@ public class SimilarSchoolsPageTests(WebApplicationSetupFixture fixture) : BaseP
         await Page.GotoAsync(NoResultsSimilarSchoolsPath);
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var message = Page.Locator("p.govuk-body").Filter(new() { HasText = "There are no schools that match your search." });
+        var message = Page.Locator("p.govuk-body").Filter(new() { HasText = "There are no similar schools available for this school." });
 
         (await message.CountAsync()).Should().Be(1);
         (await message.First.IsVisibleAsync()).Should().BeTrue();

@@ -17,8 +17,8 @@ internal static class AttendanceMeasures
             var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
 
             return Measure.ForSchoolAttendance(
-                Constants.Measures.Absence.Key,
-                Constants.Measures.Absence.Name,
+                Measures.Absence.Key,
+                Measures.Absence.Name,
                 2024,
                 measureDataType,
                 availableFilters,
@@ -35,8 +35,8 @@ internal static class AttendanceMeasures
             var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
 
             return Measure.ForSchoolComparison(
-                Constants.Measures.Absence.Key,
-                Constants.Measures.Absence.Name,
+                Measures.Absence.Key,
+                Measures.Absence.Name,
                 2024,
                 measureDataType,
                 availableFilters,
@@ -49,29 +49,29 @@ internal static class AttendanceMeasures
             MeasurePhase phase,
             CaseInsensitiveDictionary<string> filters)
         {
-            var type = filters.ContainsKey(Constants.Measures.Absence.Filters.Type.Key)
-                ? filters[Constants.Measures.Absence.Filters.Type.Key]
-                : Constants.Measures.Absence.Filters.Type.Values.Overall;
+            var type = filters.ContainsKey(Measures.Absence.Filters.Type.Key)
+                ? filters[Measures.Absence.Filters.Type.Key]
+                : Measures.Absence.Filters.Type.Values.Overall;
 
-            var characteristic = filters.ContainsKey(Constants.Measures.Absence.Filters.PupilCharacteristic.Key)
-                ? filters[Constants.Measures.Absence.Filters.PupilCharacteristic.Key]
-                : Constants.Measures.Absence.Filters.PupilCharacteristic.Values.AllPupils;
+            var characteristic = filters.ContainsKey(Measures.Absence.Filters.PupilCharacteristic.Key)
+                ? filters[Measures.Absence.Filters.PupilCharacteristic.Key]
+                : Measures.Absence.Filters.PupilCharacteristic.Values.AllPupils;
 
-            var measureDataType = type == Constants.Measures.Absence.Filters.Type.Values.Overall
+            var measureDataType = type == Measures.Absence.Filters.Type.Values.Overall
                 ? MeasureDataType.OverallAbsencePercentage
                 : MeasureDataType.PersistentAbsencePercentage;
 
             IEnumerable<MeasureAvailableFilter> availableFilters = [
                 new MeasureAvailableFilter(
-                    Constants.Measures.Absence.Filters.Type.Key,
-                    Constants.Measures.Absence.Filters.Type.Name,
-                    Constants.Measures.Absence.Filters.Type.Values.AllValues.Select(f =>
+                    Measures.Absence.Filters.Type.Key,
+                    Measures.Absence.Filters.Type.Name,
+                    Measures.Absence.Filters.Type.Values.AllValues.Select(f =>
                         new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(type)))
                     .ToList()),
                 new MeasureAvailableFilter(
-                    Constants.Measures.Absence.Filters.PupilCharacteristic.Key,
-                    Constants.Measures.Absence.Filters.PupilCharacteristic.Name,
-                    Constants.Measures.Absence.Filters.PupilCharacteristic.Values.AllValues.Select(f =>
+                    Measures.Absence.Filters.PupilCharacteristic.Key,
+                    Measures.Absence.Filters.PupilCharacteristic.Name,
+                    Measures.Absence.Filters.PupilCharacteristic.Values.AllValues.Select(f =>
                         new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(characteristic)))
                     .ToList())
             ];
@@ -95,29 +95,29 @@ internal static class AttendanceMeasures
         {
             return type switch
             {
-                _ when type.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.Type.Values.Persistent) => characteristic switch
+                _ when type.EqualsCaseInsensitive(Measures.Absence.Filters.Type.Values.Persistent) => characteristic switch
                 {
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Boy_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Boy_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Boy_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Grl_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Grl_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Grl_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Dis_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Dis_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_Dis_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
                         x => x?.EstablishmentAbsence?.Abs_Persistent_NDi_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_NDi_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_NDi_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
                         x => x?.EstablishmentAbsence?.Abs_Persistent_EAL_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_EAL_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_EAL_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
                         x => x?.EstablishmentAbsence?.Abs_Persistent_EFL_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_EFL_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Persistent_EFL_Est_Previous2_Pct),
@@ -128,27 +128,27 @@ internal static class AttendanceMeasures
                 },
                 _ => characteristic switch
                 {
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
                         x => x?.EstablishmentAbsence?.Abs_Tot_Boy_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_Boy_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_Boy_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
                         x => x?.EstablishmentAbsence?.Abs_Tot_Grl_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_Grl_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_Grl_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
                         x => x?.EstablishmentAbsence?.Abs_Tot_Dis_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_Dis_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_Dis_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
                         x => x?.EstablishmentAbsence?.Abs_Tot_NDi_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_NDi_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_NDi_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
                         x => x?.EstablishmentAbsence?.Abs_Tot_EAL_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_EAL_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_EAL_Est_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
                         x => x?.EstablishmentAbsence?.Abs_Tot_EFL_Est_Current_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_EFL_Est_Previous_Pct,
                         x => x?.EstablishmentAbsence?.Abs_Tot_EFL_Est_Previous2_Pct),
@@ -170,9 +170,9 @@ internal static class AttendanceMeasures
         {
             return type switch
             {
-                _ when type.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.Type.Values.Persistent) => characteristic switch
+                _ when type.EqualsCaseInsensitive(Measures.Absence.Filters.Type.Values.Persistent) => characteristic switch
                 {
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Persistent_Boy_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Persistent_Boy_Secondary_LA_Current_Pct,
@@ -191,7 +191,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Persistent_Boy_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Persistent_Boy_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Persistent_Grl_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Persistent_Grl_Secondary_LA_Current_Pct,
@@ -210,7 +210,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Persistent_Grl_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Persistent_Grl_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Persistent_Dis_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Persistent_Dis_Secondary_LA_Current_Pct,
@@ -229,7 +229,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Persistent_Dis_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Persistent_Dis_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Persistent_NDi_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Persistent_NDi_Secondary_LA_Current_Pct,
@@ -248,7 +248,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Persistent_NDi_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Persistent_NDi_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Persistent_EAL_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Persistent_EAL_Secondary_LA_Current_Pct,
@@ -267,7 +267,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Persistent_EAL_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Persistent_EAL_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Persistent_EFL_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Persistent_EFL_Secondary_LA_Current_Pct,
@@ -308,7 +308,7 @@ internal static class AttendanceMeasures
                 },
                 _ => characteristic switch
                 {
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Boys) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Tot_Boy_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Tot_Boy_Secondary_LA_Current_Pct,
@@ -327,7 +327,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Tot_Boy_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Tot_Boy_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Girls) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Tot_Grl_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Tot_Grl_Secondary_LA_Current_Pct,
@@ -346,7 +346,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Tot_Grl_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Tot_Grl_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Fsm) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Tot_Dis_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Tot_Dis_Secondary_LA_Current_Pct,
@@ -365,7 +365,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Tot_Dis_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Tot_Dis_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.NonFsm) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Tot_NDi_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Tot_NDi_Secondary_LA_Current_Pct,
@@ -384,7 +384,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Tot_NDi_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Tot_NDi_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Eal) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Tot_EAL_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Tot_EAL_Secondary_LA_Current_Pct,
@@ -403,7 +403,7 @@ internal static class AttendanceMeasures
                         phase is MeasurePhase.Primary
                             ? x => x?.EnglandAbsence?.Abs_Tot_EAL_Primary_Eng_Previous2_Pct
                             : x => x?.EnglandAbsence?.Abs_Tot_EAL_Secondary_Eng_Previous2_Pct),
-                    _ when characteristic.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
+                    _ when characteristic.EqualsCaseInsensitive(Measures.Absence.Filters.PupilCharacteristic.Values.Efl) => (
                         phase is MeasurePhase.Primary
                             ? x => x?.LocalAuthorityAbsence?.Abs_Tot_EFL_Primary_LA_Current_Pct
                             : x => x?.LocalAuthorityAbsence?.Abs_Tot_EFL_Secondary_LA_Current_Pct,

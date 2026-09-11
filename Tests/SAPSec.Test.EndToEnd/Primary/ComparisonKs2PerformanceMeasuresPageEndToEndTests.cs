@@ -19,17 +19,29 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     private const string MeetingExpectedStandardGpsHeaderText = "Meeting expected standard in grammar, punctuation and spelling";
     private const string AchievedHigherStandardGpsHeaderText = "Achieved a higher standard in grammar, punctuation and spelling";
 
-    private const string Urn = "101206";
+    private const string CurrentSchoolUrn = "101206";
+    private const string CurrentSchoolName = "Grafton Primary School";
+
     // Most of this school's ranked similar schools have no characteristics data in the
     // EndToEnd JSON fixture, which 404s the Similarity page the "KS2" nav link lives on.
     // 101230 is a confirmed-good pairing (both schools have characteristics + KS2 data).
-    private const string SimilarSchoolUrn = "101230";
-    private static readonly Routes.Primary PrimarySchoolRoute = Routes.PrimarySchool(Urn);
+    private const string ComparatorSchoolUrn = "101230";
+    private const string ComparatorSchoolName = "Roding Primary School";
+
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        await NavigateTo(PrimarySchoolRoute.Comparison(SimilarSchoolUrn).Ks2);
+        await NavigateTo(Routes.FindASchool());
+        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
+        await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Overview);
+        await Page.GetByRole(AriaRole.Link, new() { Name = "View similar schools", Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools);
+        await Page.GetByRole(AriaRole.Link, new() { Name = ComparatorSchoolName, Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
+        await Page.GetByRole(AriaRole.Link, new() { Name = "KS2", Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Ks2);
     }
 
     [Fact]
