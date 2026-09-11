@@ -7,9 +7,9 @@
 
 <div id="@Model.MeasureInfo.HtmlPrefix">
     <tabbed-view html-prefix="@Model.MeasureInfo.HtmlPrefix">
-        <tab-content id="charts" name="Charts" aria-label="3-year average chart">
+        <tab-content id="charts" name="Charts" aria-label="Charts">
             <content-toggle>
-                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" aria-label="3-year average chart" active="true">
+                <toggle-content id="current-year" name="@SAPSec.Web.ViewModels.AcademicYearLabelConfig.FormatAcademicYear(Model.MeasureInfo.Year)" aria-label="Charts" active="true">
                     <partial name="Measures/_CurrentYearChart" model=@Model.CurrentYear />
                 </toggle-content>
                 <toggle-content id="year-by-year" name="Year by year" aria-label="Year by year chart">

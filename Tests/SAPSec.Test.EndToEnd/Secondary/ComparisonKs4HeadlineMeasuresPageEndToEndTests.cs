@@ -41,7 +41,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     public async Task Attainment8_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(Attainment8HeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -104,7 +104,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var section = await GetSection(EnglishMathsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -180,7 +180,7 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var section = await GetSection(DestinationsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2022 to 2023\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");

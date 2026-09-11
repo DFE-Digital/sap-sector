@@ -40,7 +40,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
         var section = await GetSection(MeetingExpectedStandardHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -151,7 +151,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
         var section = await GetSection(AchievedHigherStandardHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -260,7 +260,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
     public async Task AverageScaledScoreReading_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(ReadingScaledScoreHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -311,7 +311,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
     public async Task MeetingExpectedStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(MeetingExpectedStandardGpsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -361,7 +361,7 @@ public class SchoolKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixture 
     public async Task AchievedHigherStandardGps_ToggleBetweenYearByYearAndCurrentYearView()
     {
         var section = await GetSection(AchievedHigherStandardGpsHeaderText);
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");

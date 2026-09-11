@@ -396,7 +396,7 @@ public class ComparisonKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fix
         var section = await GetSection(headerText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = panel.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = panel.Locator("[data-content-toggle-name=\"Year by year\"]");

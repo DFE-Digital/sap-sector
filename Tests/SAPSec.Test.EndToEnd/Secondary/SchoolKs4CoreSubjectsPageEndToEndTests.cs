@@ -42,7 +42,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(EnglishLanguageHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -153,7 +153,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(EnglishLiteratureHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -264,7 +264,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(MathsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -375,7 +375,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(CombinedScienceHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -486,7 +486,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(BiologyHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -597,7 +597,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(ChemistryHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");
@@ -708,7 +708,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
         var section = await GetSection(PhysicsHeaderText);
         var panel = section.GetByRole(AriaRole.Tabpanel);
 
-        await section.GetByRole(AriaRole.Tab, new() { Name = "3-year average chart" }).ClickAsync();
+        await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
         var currentYearPanel = section.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
         var yearByYearPanel = section.Locator("[data-content-toggle-name=\"Year by year\"]");

@@ -75,7 +75,7 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var tabs = page.ElementWithTestIdShouldExist("attainment8-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
         tabs.QuerySelectorAll("a").Select(tab => tab.GetAttribute("aria-label"))
-            .Should().BeEquivalentTo("3-year average chart", "Table of data", "Top performing similar schools");
+            .Should().BeEquivalentTo("Charts", "Table of data", "Top performing similar schools");
     }
 
     [Fact]
