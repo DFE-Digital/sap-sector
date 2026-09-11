@@ -27,6 +27,8 @@ public class FindPrimarySimilarSchoolsUseCase(
 
         var data = await dataProvider.GetSimilarSchoolsData(request.Urn);
 
+        var hasSimilarSchools = data.SimilarSchools.Count > 0;
+
         var filters = new SimilarSchoolsFilters(
             request.FilterBy.AsCaseInsensitive(),
             data.CurrentSimilarSchool);
@@ -48,6 +50,7 @@ public class FindPrimarySimilarSchoolsUseCase(
             request.ResultsPerPage);
 
         return new(
+            hasSimilarSchools,
             new PrimaryCurrentSchool(
                 data.CurrentEstablishment.URN,
                 data.CurrentEstablishment.EstablishmentName,
@@ -81,6 +84,7 @@ public record FindPrimarySimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindPrimarySimilarSchoolsResponse(
+    bool HasSimilarSchools,
     PrimaryCurrentSchool CurrentSchool,
     IPagedCollection<PrimarySimilarSchool> SimilarSchoolsPage,
     IReadOnlyCollection<PrimarySimilarSchool> AllSimilarSchools,

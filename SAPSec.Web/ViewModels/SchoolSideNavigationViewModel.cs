@@ -7,7 +7,7 @@ public sealed class SchoolSideNavigationViewModel
 {
     public required IReadOnlyList<SchoolSideNavigationItemViewModel> Items { get; init; }
 
-    public static SchoolSideNavigationViewModel CreatePrimary(IUrlHelper url, string urn, string? currentAction, bool includeRiseResources = false)
+    public static SchoolSideNavigationViewModel CreatePrimary(IUrlHelper url, string urn, string? currentAction, bool hasSimilarSchools = true, bool includeRiseResources = false)
     {
         var items = new List<SchoolSideNavigationItemViewModel>
         {
@@ -18,6 +18,11 @@ public sealed class SchoolSideNavigationViewModel
             new() { Text = "School details", Href = url.Action("SchoolDetails", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "SchoolDetails" },
             new() { Text = "What is a similar school?", Href = url.Action("WhatIsASimilarSchool", "School", new { area = "Primary", urn })!, IsSelected = currentAction == "WhatIsASimilarSchool" }
         };
+
+        if (!hasSimilarSchools)
+        {
+            items.RemoveAt(3);
+        }
 
         if (includeRiseResources)
         {

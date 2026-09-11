@@ -44,10 +44,17 @@ public class SchoolController(
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var similarSchoolsResponse = await findPrimarySimilarSchoolsUseCase.Execute(new FindPrimarySimilarSchoolsRequest(urn));
 
-        await PopulateViewData(response.School);
+        await PopulateViewData(response.School, similarSchoolsResponse.HasSimilarSchools);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var model = new SchoolOverviewPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            HasSimilarSchools = similarSchoolsResponse.HasSimilarSchools
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -57,17 +64,19 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
 
+        var similarSchoolsResponse = await findPrimarySimilarSchoolsUseCase.Execute(new FindPrimarySimilarSchoolsRequest(urn));
+
         await PopulateViewData(response.School);
 
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School),
-            AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School),
-            AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School),
-            AverageScaledScoreMaths = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreMaths, response.School),
-            MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardGps, response.School),
-            AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School)
+            MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AverageScaledScoreMaths = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreMaths, response.School, similarSchoolsResponse.HasSimilarSchools),
+            MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
 
         return View(model);
@@ -149,7 +158,7 @@ public class SchoolController(
         return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
         ViewData[ViewDataKeys.BreadcrumbNode] = BreadcrumbNodes.SchoolHome(currentSchool.Urn);
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
@@ -161,6 +170,7 @@ public class SchoolController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            hasSimilarSchools,
             includeRise);
     }
 }
