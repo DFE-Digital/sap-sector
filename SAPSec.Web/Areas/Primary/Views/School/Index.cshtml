@@ -1,58 +1,94 @@
-﻿@using SAPSec.Core.Model
-@using SAPSec.Web.Areas.Shared.ViewModels
+﻿
+@using SAPSec.Web.Areas.Shared.ViewModels.School
 @using SAPSec.Web.Constants;
-@using SAPSec.Web.Helpers
-@using SAPSec.Web.ViewModels
 
-@model SchoolInfoViewModel
+@model SchoolOverviewPageViewModel
 @{
     Layout = "_Layout.cshtml";
-    ViewData[ViewDataKeys.Title] = Model.Name;
+    ViewData[ViewDataKeys.Title] = Model.School.Name;
 } 
 
 <div class="app-overview">
     <header class="app-overview__header">
         <h1 class="govuk-heading-xl app-overview__title">@ViewData[ViewDataKeys.Title]</h1>
-        <p class="govuk-body-l app-overview__address">@Model.Address</p>
+        <p class="govuk-body-l app-overview__address">@Model.School.Address</p>
     </header>
 
-    <section class="app-overview__section">
-        <p class="govuk-body app-overview__lead">
-            We've identified <strong>50</strong> similar primary phase schools (including all-throughs) to help you:
-        </p>
-        <ul class="govuk-list govuk-list--bullet app-overview__list">
-            <li>compare performance data</li>
-            <li>find improvement opportunities</li>
-            <li>connect with school leaders and share insights</li>
-        </ul>
+    @if (Model.HasSimilarSchools)
+    {
+        <section class="app-overview__section">
 
-        <p class="govuk-body">
-            We use 9 characteristics to find schools similar to yours. Similar schools will not
-            match every characteristic but they will be similar across a large number of them.
-        </p>
-        <p class="govuk-body">
-            Find out more about <a href="@Routes.PrimarySchool(Model.Urn).WhatIsASimilarSchool" class="govuk-link">how the DfE defines what a similar school is</a>.
-        </p>
-    </section>
+            <p class="govuk-body app-overview__lead">
+                We've identified <strong>50</strong> similar primary phase schools (including all-throughs) to help you:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                <li>compare performance data</li>
+                <li>find improvement opportunities</li>
+                <li>connect with school leaders and share insights</li>
+            </ul>
 
-    <section class="app-overview__section">
-        <h2 class="govuk-heading-m app-overview__section-heading">Compare school performance</h2>
-        <p class="govuk-body">
-            Explore this school's performance data across all education phases and compare:
-        </p>
-        <ul class="govuk-list govuk-list--bullet app-overview__list">
-            <li>similar school averages</li>
-            <li>the local authority average</li>
-            <li>the national average</li>
-        </ul>
-    </section>
+            <p class="govuk-body">
+                We use 9 characteristics to find schools similar to yours. Similar schools will not
+                match every characteristic but they will be similar across a large number of them.
+            </p>
+            <p class="govuk-body">
+                Find out more about <a href="@Routes.PrimarySchool(Model.School.Urn).WhatIsASimilarSchool" class="govuk-link">how the DfE defines what a similar school is</a>.
+            </p>
+        </section>
 
-    <section class="app-overview__section">
-        <h2 class="govuk-heading-m app-overview__section-heading">View similar schools to connect with</h2>
-        <p class="govuk-body">
-            Review the full list of schools you've matched with individually to compare their
-            performance and find top-performing schools with similar characteristics. After
-            finding the right match, use their contact details to connect with them.
-        </p>
-    </section>
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">Compare school performance</h2>
+            <p class="govuk-body">
+                Explore this school's performance data across all education phases and compare:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                <li>similar school averages</li>
+                <li>the local authority average</li>
+                <li>the national average</li>
+            </ul>
+        </section>
+
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">View similar schools to connect with</h2>
+            <p class="govuk-body">
+                Review the full list of schools you've matched with individually to compare their
+                performance and find top-performing schools with similar characteristics. After
+                finding the right match, use their contact details to connect with them.
+            </p>
+        </section>
+    } else
+    {
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">This school cannot be compared with similar schools</h2>
+            <p class="govuk-body">
+                This could be because the school:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                <li>had no pupils completing KS2 or KS4 when the most recent data was release</li>
+                <li>recently changed type, for example became an academy</li>
+                <li>reopened after a previous school school closed</li>
+            </ul>
+        </section>
+
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">Compare data from previous academic years</h2>
+            <p class="govuk-body">
+                If the school changed type or reopened, performance data from previous academic years may be available on the former school's page.
+            </p>
+            <p class="govuk-body">
+                If the school has performance data from previous academic years, you can compare against:
+            </p>
+            <ul class="govuk-list govuk-list--bullet app-overview__list">
+                <li>the local authority average</li>
+                <li>the national average</li>
+            </ul>
+        </section>
+
+        <section class="app-overview__section">
+            <h2 class="govuk-heading-m app-overview__section-heading">If you expected to see similar schools</h2>
+            <p class="govuk-body">
+                If you think this school has recent KS2 or KS4 performance data and should be compared to similar schools, contact the support team at ...
+            </p>
+        </section>
+    }
 </div>

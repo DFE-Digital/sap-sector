@@ -22,12 +22,13 @@ public record MeasureViewModel(
     private static readonly string[] ComparisonCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
 
-    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
-            SchoolYearByYearColors);
+            SchoolYearByYearColors,
+            hasSimilarSchools);
 
     public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
@@ -57,7 +58,8 @@ public record MeasureViewModel(
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[] currentYearChartColors,
-        string[] yearByYearChartColors)
+        string[] yearByYearChartColors,
+        bool hasSimilarSchools = true)
     {
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
@@ -93,7 +95,10 @@ public record MeasureViewModel(
 
         TopPerformersViewModel? topPerformers = null;
 
-        if (measure.TopPerformers is not null)
+        //do something here
+        //don't show top performers if has similar schools is false
+        //              true                         false
+        if (measure.TopPerformers is not null && hasSimilarSchools)
         {
             TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
                 t.Rank,
