@@ -1,4 +1,5 @@
 ---
 ASPNETCORE_ENVIRONMENT: "Test"
 FeatureManagement__EnablePrimarySchools: "true"
+FeatureManagement__EnableAllThroughSchools: "true"
 FeatureManagement__EnableRiseResources: "true"

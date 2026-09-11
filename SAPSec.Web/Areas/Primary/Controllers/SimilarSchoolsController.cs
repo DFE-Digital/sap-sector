@@ -16,7 +16,6 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Route("school/primary/{urn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary)]
-[RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class SimilarSchoolsController(
         IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findSimilarSchoolsUseCase,
         IFeatureFlagService featureFlagService)

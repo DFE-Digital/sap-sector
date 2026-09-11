@@ -49,20 +49,23 @@ public class EstablishmentExtensionsTests
     }
 
     [Theory]
-    [InlineData("0", true, false)]
-    [InlineData("2", true, true)]
-    [InlineData("2", false, false)]
-    [InlineData("4", true, true)]
-    [InlineData("4", false, true)]
-    [InlineData("7", true, true)]
-    [InlineData("7", false, false)]
-    public void CanSearch_UsesPhaseIdAndFeatureFlag(string phaseId, bool primarySchoolsEnabled, bool expected)
+    [InlineData("0", true, true, false)]
+    [InlineData("2", true, false, true)]
+    [InlineData("2", false, true, false)]
+    [InlineData("4", false, false, true)]
+    [InlineData("7", false, true, true)]
+    [InlineData("7", true, false, false)]
+    public void CanSearch_UsesPhaseIdAndFeatureFlags(
+        string phaseId,
+        bool primarySchoolsEnabled,
+        bool allThroughSchoolsEnabled,
+        bool expected)
     {
         var result = new Establishment
         {
             PhaseOfEducationId = phaseId,
             EstablishmentStatusId = expected ? "1" : string.Empty
-        }.CanSearch(primarySchoolsEnabled);
+        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
 
         result.Should().Be(expected);
     }
@@ -75,7 +78,7 @@ public class EstablishmentExtensionsTests
     public void CanSearch_UsesStatusId(string statusId, bool expected)
     {
         var result = new Establishment { PhaseOfEducationId = "4", EstablishmentStatusId = statusId }
-            .CanSearch(primarySchoolsEnabled: false);
+            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
 
         result.Should().Be(expected);
     }
@@ -93,7 +96,7 @@ public class EstablishmentExtensionsTests
         {
             PhaseOfEducationName = "Secondary",
             EstablishmentStatusId = statusId
-        }.CanSearch(primarySchoolsEnabled);
+        }.CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled: true);
 
         result.Should().BeFalse();
     }
@@ -106,21 +109,26 @@ public class EstablishmentExtensionsTests
     public void CanSearch_FallsBackToStatusName(string statusName, bool expected)
     {
         var result = new Establishment { PhaseOfEducationName = "Secondary", EstablishmentStatusName = statusName }
-            .CanSearch(primarySchoolsEnabled: false);
+            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
 
         result.Should().Be(expected);
     }
 
     [Theory]
-    [InlineData("Primary", false, false)]
-    [InlineData("Primary", true, true)]
-    [InlineData("All-through", false, false)]
-    [InlineData("All-through", true, true)]
-    [InlineData("Secondary", false, true)]
-    public void CanSearch_FallsBackToPhaseName(string phaseName, bool primarySchoolsEnabled, bool expected)
+    [InlineData("Primary", false, false, false)]
+    [InlineData("Primary", true, false, true)]
+    [InlineData("All-through", false, false, false)]
+    [InlineData("All-through", false, true, true)]
+    [InlineData("All-through", true, false, false)]
+    [InlineData("Secondary", false, false, true)]
+    public void CanSearch_FallsBackToPhaseName(
+        string phaseName,
+        bool primarySchoolsEnabled,
+        bool allThroughSchoolsEnabled,
+        bool expected)
     {
         var result = new Establishment { PhaseOfEducationName = phaseName, EstablishmentStatusId = "1" }
-            .CanSearch(primarySchoolsEnabled);
+            .CanSearch(primarySchoolsEnabled, allThroughSchoolsEnabled);
 
         result.Should().Be(expected);
     }
@@ -129,7 +137,7 @@ public class EstablishmentExtensionsTests
     public void CanSearch_WithSecondarySchoolAndMissingStatus_ReturnsTrue()
     {
         var result = new Establishment { PhaseOfEducationId = "4", PhaseOfEducationName = "Secondary" }
-            .CanSearch(primarySchoolsEnabled: false);
+            .CanSearch(primarySchoolsEnabled: false, allThroughSchoolsEnabled: false);
 
         result.Should().BeTrue();
     }
@@ -138,7 +146,7 @@ public class EstablishmentExtensionsTests
     public void CanSearch_WithPrimarySchoolAndMissingStatus_ReturnsFalse()
     {
         var result = new Establishment { PhaseOfEducationId = "2", PhaseOfEducationName = "Primary" }
-            .CanSearch(primarySchoolsEnabled: true);
+            .CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: true);
 
         result.Should().BeFalse();
     }
@@ -151,7 +159,7 @@ public class EstablishmentExtensionsTests
             PhaseOfEducationId = "2",
             PhaseOfEducationName = "Primary",
             EstablishmentStatusId = "1"
-        }.CanSearch(primarySchoolsEnabled: true);
+        }.CanSearch(primarySchoolsEnabled: true, allThroughSchoolsEnabled: false);
 
         result.Should().BeTrue();
     }
