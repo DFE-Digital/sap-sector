@@ -153,7 +153,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var hiddenQueryField = Page.Locator("input[name='Query'][type='hidden']");
+        var hiddenQueryField = Page.Locator("input[name='__Query'][type='hidden']");
         var hiddenUrnField = Page.Locator("input[name='Urn'][type='hidden']");
 
         (await hiddenQueryField.CountAsync()).Should().Be(1, "Hidden Query field should exist");
@@ -169,7 +169,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("input[name='__Query']").FillAsync("Test School");
         await Page.WaitForTimeoutAsync(100);
 
-        var hiddenQueryValue = await Page.Locator("input[name='Query'][type='hidden']").InputValueAsync();
+        var hiddenQueryValue = await Page.Locator("input[name='__Query'][type='hidden']").InputValueAsync();
         hiddenQueryValue.Should().Be("Test School", "Hidden Query field should sync with visible input");
     }
 
@@ -760,7 +760,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(Routes.FindASchool());
 
-        var input = Page.Locator("input[name='Query']");
+        var input = Page.Locator("input[name='__Query']");
         var ariaDescribedBy = await input.GetAttributeAsync("aria-describedby");
 
         ariaDescribedBy.Should().Contain("hint", "Input should reference hint text");
@@ -774,7 +774,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var input = Page.Locator("input[name='Query']");
+        var input = Page.Locator("input[name='__Query']");
         var ariaDescribedBy = await input.GetAttributeAsync("aria-describedby");
 
         ariaDescribedBy.Should().Contain("error", "Input with error should reference error message");
@@ -830,7 +830,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         await jsDisabledPage.GotoAsync(Routes.FindASchool());
 
-        await jsDisabledPage.Locator("input[name='Query']").FillAsync("Test School");
+        await jsDisabledPage.Locator("input[name='__Query']").FillAsync("Test School");
         await jsDisabledPage.Locator("button[name='Search']").ClickAsync();
         await jsDisabledPage.WaitForLoadStateAsync(LoadState.NetworkIdle);
 

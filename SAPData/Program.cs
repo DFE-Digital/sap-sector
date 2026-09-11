@@ -43,12 +43,14 @@ internal class Program
             string infrastructureDir = Path.Combine(Directory.GetParent(baseDir)!.FullName, "SAPSec.Infrastructure");
             string jsonDir = Path.Combine(infrastructureDir, "Data", "Files");
             string generatedJsonDir = Path.Combine(jsonDir, "Generated");
+            string primaryJsonDir = Path.Combine(jsonDir, "PrimarySchools");
             string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
 
             Directory.CreateDirectory(cleanedDir);
             Directory.CreateDirectory(sqlDir);
             Directory.CreateDirectory(jsonDir);
             Directory.CreateDirectory(generatedJsonDir);
+            Directory.CreateDirectory(primaryJsonDir);
 
             // -------------------------------------------------
             // 1. Load DataMap

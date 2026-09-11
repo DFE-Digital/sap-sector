@@ -10,6 +10,7 @@ namespace SAPSec.Data.Dto.SimilarSchools.Primary;
 public class SimilarSchoolsPrimaryValuesEntry : ISimilarSchoolsValuesEntry
 {
     public string URN { get; set; } = string.Empty;
+    public string Ks1PriorRwmAverage { get; set; } = string.Empty;
     public string PPPerc { get; set; } = string.Empty;
     public string Polar4QuintilePupils { get; set; } = string.Empty;
     public string PStability { get; set; } = string.Empty;
@@ -19,5 +20,4 @@ public class SimilarSchoolsPrimaryValuesEntry : ISimilarSchoolsValuesEntry
     public string PercentageStatementOrEhp { get; set; } = string.Empty;
     public string NumberOfPupils { get; set; } = string.Empty;
     public string ReadMatAverage { get; set; } = string.Empty;
-    public string Ks1PriorRwmAverage { get; set; } = string.Empty;
 }

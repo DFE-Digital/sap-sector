@@ -163,6 +163,16 @@
             inputClasses: "govuk-input-autocomplete",
         });
 
+        // axe-core's label-visibility check doesn't reliably resolve the <label for>
+        // relationship once accessible-autocomplete swaps in this generated input, so
+        // set an explicit aria-label from the original label's text as a direct, unambiguous
+        // accessible name.
+        const labelElement = document.querySelector(`label[for="${id}"]`);
+        const generatedInput = document.getElementById(id);
+        if (labelElement && generatedInput) {
+            generatedInput.setAttribute("aria-label", labelElement.textContent.trim());
+        }
+
         inputElement.type = "hidden";
 
         autoCompleteElement.addEventListener("keydown", (e) => {

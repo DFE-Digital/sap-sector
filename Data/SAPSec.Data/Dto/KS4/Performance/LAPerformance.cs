@@ -22,7 +22,11 @@ public class LAPerformance
     public string Attainment8_Grl_LA_Previous_Num { get; set; } = string.Empty;
     public string Attainment8_Grl_LA_Previous2_Num { get; set; } = string.Empty;
     public string Attainment8_Mob_LA_Current_Num { get; set; } = string.Empty;
+    public string Attainment8_Mob_LA_Previous_Num { get; set; } = string.Empty;
+    public string Attainment8_Mob_LA_Previous2_Num { get; set; } = string.Empty;
     public string Attainment8_NDi_LA_Current_Num { get; set; } = string.Empty;
+    public string Attainment8_NDi_LA_Previous_Num { get; set; } = string.Empty;
+    public string Attainment8_NDi_LA_Previous2_Num { get; set; } = string.Empty;
     public string Attainment8_Tot_LA_Current_Num { get; set; } = string.Empty;
     public string Attainment8_Tot_LA_Previous_Num { get; set; } = string.Empty;
     public string Attainment8_Tot_LA_Previous2_Num { get; set; } = string.Empty;
@@ -322,8 +326,16 @@ public class LAPerformance
     public string EngMaths49_Grl_LA_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths49_Mob_LA_Current_Num { get; set; } = string.Empty;
     public string EngMaths49_Mob_LA_Current_Pct { get; set; } = string.Empty;
+    public string EngMaths49_Mob_LA_Previous_Num { get; set; } = string.Empty;
+    public string EngMaths49_Mob_LA_Previous_Pct { get; set; } = string.Empty;
+    public string EngMaths49_Mob_LA_Previous2_Num { get; set; } = string.Empty;
+    public string EngMaths49_Mob_LA_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths49_NDi_LA_Current_Num { get; set; } = string.Empty;
     public string EngMaths49_NDi_LA_Current_Pct { get; set; } = string.Empty;
+    public string EngMaths49_NDi_LA_Previous_Num { get; set; } = string.Empty;
+    public string EngMaths49_NDi_LA_Previous_Pct { get; set; } = string.Empty;
+    public string EngMaths49_NDi_LA_Previous2_Num { get; set; } = string.Empty;
+    public string EngMaths49_NDi_LA_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths49_Tot_LA_Current_Num { get; set; } = string.Empty;
     public string EngMaths49_Tot_LA_Current_Pct { get; set; } = string.Empty;
     public string EngMaths49_Tot_LA_Previous_Num { get; set; } = string.Empty;
@@ -356,8 +368,16 @@ public class LAPerformance
     public string EngMaths59_Grl_LA_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths59_Mob_LA_Current_Num { get; set; } = string.Empty;
     public string EngMaths59_Mob_LA_Current_Pct { get; set; } = string.Empty;
+    public string EngMaths59_Mob_LA_Previous_Num { get; set; } = string.Empty;
+    public string EngMaths59_Mob_LA_Previous_Pct { get; set; } = string.Empty;
+    public string EngMaths59_Mob_LA_Previous2_Num { get; set; } = string.Empty;
+    public string EngMaths59_Mob_LA_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths59_NDi_LA_Current_Num { get; set; } = string.Empty;
     public string EngMaths59_NDi_LA_Current_Pct { get; set; } = string.Empty;
+    public string EngMaths59_NDi_LA_Previous_Num { get; set; } = string.Empty;
+    public string EngMaths59_NDi_LA_Previous_Pct { get; set; } = string.Empty;
+    public string EngMaths59_NDi_LA_Previous2_Num { get; set; } = string.Empty;
+    public string EngMaths59_NDi_LA_Previous2_Pct { get; set; } = string.Empty;
     public string EngMaths59_Tot_LA_Current_Num { get; set; } = string.Empty;
     public string EngMaths59_Tot_LA_Current_Pct { get; set; } = string.Empty;
     public string EngMaths59_Tot_LA_Previous_Num { get; set; } = string.Empty;
@@ -472,6 +492,5 @@ public class LAPerformance
     public string Physics79_Tot_LA_Previous_Pct { get; set; } = string.Empty;
     public string Physics79_Tot_LA_Previous2_Num { get; set; } = string.Empty;
     public string Physics79_Tot_LA_Previous2_Pct { get; set; } = string.Empty;
-    public string Prog8_Avg_LA_Previous_Num { get; set; } = string.Empty;
     public string Prog8_Avg_LA_Previous2_Num { get; set; } = string.Empty;
 }

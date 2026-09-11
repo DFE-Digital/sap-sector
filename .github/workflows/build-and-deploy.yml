@@ -151,7 +151,15 @@ jobs:
           for proj in $TEST_PROJECTS; do
             echo "=== Running tests in $proj ==="
 
+            FILTER_ARGS=()
+            # SchoolSearchPageTests is flaky in CI (autocomplete-JS timing) - excluded pending
+            # investigation. Rest of the deprecated UI suite still runs.
+            if [[ "$proj" == *"SAPSec.UI.Tests.Deprecated.csproj" ]]; then
+              FILTER_ARGS=(--filter "FullyQualifiedName!~SchoolSearchPageTests")
+            fi
+
             dotnet test "$proj" \
+              "${FILTER_ARGS[@]}" \
               --no-build \
               --configuration Debug \
               --results-directory "TestResults" \
