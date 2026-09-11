@@ -57,7 +57,7 @@ public sealed class GenerateViews
         new("v_establishment_email", "URN", "URN", ViewRange.Establishment, "Email", "EstablishmentEmail"),
 
         new("v_establishment_absence", "Id", "URN", ViewRange.Establishment, "PupilAbsence", "EstablishmentAbsence"),
-        new("v_establishment_destinations", "Id", "LAESTAB", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
+        new("v_establishment_destinations", "Id", "URN", ViewRange.Establishment, "KS4_Destinations", "EstablishmentDestinations"),
         new("v_establishment_performance", "Id", "URN", ViewRange.Establishment, "KS4_Performance", "EstablishmentPerformance"),
         new("v_establishment_workforce", "Id", "URN", ViewRange.Establishment, "Workforce", "EstablishmentWorkforce"),
         new("v_establishment_ks2_performance", "Id", "URN", ViewRange.Establishment, "KS2_Performance", "EstablishmentPerformance"),
