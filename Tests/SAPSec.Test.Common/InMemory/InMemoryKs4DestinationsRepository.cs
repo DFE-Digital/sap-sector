@@ -9,26 +9,34 @@ public class InMemoryKs4DestinationsRepository(IEstablishmentRepository establis
     private List<LADestinations> _la = new();
     private List<EnglandDestinations> _england = new();
 
-    public void SetupEstablishmentDestinations(params EstablishmentDestinations[] establishment)
+    public InMemoryKs4DestinationsRepository SetupEstablishmentDestinations(params EstablishmentDestinations[] establishment)
     {
         _establishment = establishment.ToList();
+
+        return this;
     }
 
-    public void SetupLADestinations(params LADestinations[] la)
+    public InMemoryKs4DestinationsRepository SetupLADestinations(params LADestinations[] la)
     {
         _la = la.ToList();
+
+        return this;
     }
 
-    public void SetupEnglandDestinations(params EnglandDestinations[] england)
+    public InMemoryKs4DestinationsRepository SetupEnglandDestinations(params EnglandDestinations[] england)
     {
         _england = england.ToList();
+
+        return this;
     }
 
-    public void ClearDown()
+    public InMemoryKs4DestinationsRepository ClearDown()
     {
         _establishment = [];
         _la = [];
         _england = [];
+
+        return this;
     }
 
     public async Task<Ks4DestinationsData?> GetByUrnAsync(string urn)

@@ -17,8 +17,8 @@ internal static class AttendanceMeasures
             var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
 
             return Measure.ForSchoolAttendance(
-                Constants.Measures.Absence.Key,
-                Constants.Measures.Absence.Name,
+                Measures.Absence.Key,
+                Measures.Absence.Name,
                 2023,
                 measureDataType,
                 availableFilters,
@@ -35,8 +35,8 @@ internal static class AttendanceMeasures
             var (availableFilters, fieldSelector, measureDataType) = ResolveFilters(phase, filters);
 
             return Measure.ForSchoolComparison(
-                Constants.Measures.Absence.Key,
-                Constants.Measures.Absence.Name,
+                Measures.Absence.Key,
+                Measures.Absence.Name,
                 2023,
                 measureDataType,
                 availableFilters,
@@ -49,26 +49,26 @@ internal static class AttendanceMeasures
             MeasurePhase phase,
             CaseInsensitiveDictionary<string> filters)
         {
-            var type = filters.ContainsKey(Constants.Measures.Absence.Filters.Type.Key)
-                ? filters[Constants.Measures.Absence.Filters.Type.Key]
-                : Constants.Measures.Absence.Filters.Type.Values.Overall;
+            var type = filters.ContainsKey(Measures.Absence.Filters.Type.Key)
+                ? filters[Measures.Absence.Filters.Type.Key]
+                : Measures.Absence.Filters.Type.Values.Overall;
 
-            var measureDataType = type == Constants.Measures.Absence.Filters.Type.Values.Overall
+            var measureDataType = type == Measures.Absence.Filters.Type.Values.Overall
                 ? MeasureDataType.OverallAbsencePercentage
                 : MeasureDataType.PersistentAbsencePercentage;
 
             IEnumerable<MeasureAvailableFilter> availableFilters = [
                 new MeasureAvailableFilter(
-                    Constants.Measures.Absence.Filters.Type.Key,
-                    Constants.Measures.Absence.Filters.Type.Name,
-                    Constants.Measures.Absence.Filters.Type.Values.AllValues.Select(f =>
+                    Measures.Absence.Filters.Type.Key,
+                    Measures.Absence.Filters.Type.Name,
+                    Measures.Absence.Filters.Type.Values.AllValues.Select(f =>
                         new FilterOption(f.Value, f.Name, f.Value.EqualsCaseInsensitive(type)))
                     .ToList())
             ];
 
             MeasureFieldSelector<AbsenceData> fieldSelector = type switch
             {
-                _ when type.EqualsCaseInsensitive(Constants.Measures.Absence.Filters.Type.Values.Persistent) => new(
+                _ when type.EqualsCaseInsensitive(Measures.Absence.Filters.Type.Values.Persistent) => new(
                     x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Current_Pct,
                     x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous_Pct,
                     x => x?.EstablishmentAbsence?.Abs_Persistent_Est_Previous2_Pct,
