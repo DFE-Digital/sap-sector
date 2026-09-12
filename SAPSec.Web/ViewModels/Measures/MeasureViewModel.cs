@@ -37,12 +37,13 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
-    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
-            SchoolYearByYearColors);
+            SchoolYearByYearColors,
+            hasSimilarSchools);
 
     public static MeasureViewModel FromSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
@@ -95,9 +96,6 @@ public record MeasureViewModel(
 
         TopPerformersViewModel? topPerformers = null;
 
-        //do something here
-        //don't show top performers if has similar schools is false
-        //              true                         false
         if (measure.TopPerformers is not null && hasSimilarSchools)
         {
             TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(

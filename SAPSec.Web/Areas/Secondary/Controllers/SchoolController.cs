@@ -8,6 +8,7 @@ using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
@@ -33,6 +34,7 @@ public class SchoolController(
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getSchoolKs4CoreSubjectsUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
+        IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSecondarySimilarSchoolsUseCase,
         IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
@@ -41,8 +43,17 @@ public class SchoolController(
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
-        await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var similarSchoolsResponse = await findSecondarySimilarSchoolsUseCase.Execute(new FindSecondarySimilarSchoolsRequest(urn));
+
+        await PopulateViewData(response.School, similarSchoolsResponse.HasSimilarSchools);
+
+        var model = new SchoolOverviewPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            HasSimilarSchools = similarSchoolsResponse.HasSimilarSchools
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -70,14 +81,16 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
 
+        var similarSchoolsResponse = await findSecondarySimilarSchoolsUseCase.Execute(new FindSecondarySimilarSchoolsRequest(urn));
+
         await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School),
-            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School),
-            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School)
+            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School, similarSchoolsResponse.HasSimilarSchools),
+            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School, similarSchoolsResponse.HasSimilarSchools),
+            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
 
         return View(model);
@@ -90,19 +103,21 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
 
+        var similarSchoolsResponse = await findSecondarySimilarSchoolsUseCase.Execute(new FindSecondarySimilarSchoolsRequest(urn));
+
         await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4CoreSubjectsPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Measures = [
-                MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Maths, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.CombinedScience, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Biology, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Chemistry, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Physics, response.School)
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School, similarSchoolsResponse.HasSimilarSchools ),
+                MeasureViewModel.FromSecondaryMeasure(response.Maths, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.CombinedScience, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.Biology, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.Chemistry, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.Physics, response.School, similarSchoolsResponse.HasSimilarSchools)
             ]
         };
 
@@ -137,7 +152,7 @@ public class SchoolController(
         return View(RiseResourcesPageViewModel.FromResponse(response));
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
 
@@ -145,6 +160,7 @@ public class SchoolController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            hasSimilarSchools,
             await IsRiseResourcesEnabledAsync());
     }
 

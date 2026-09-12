@@ -25,6 +25,7 @@ public class FindPrimarySimilarSchoolsUseCase(
             absenceRepository);
 
         var data = await dataProvider.GetData(request.CurrentSchoolUrn);
+
         var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
 
         var hasSimilarSchools = data.SimilarSchools.Count > 0;
@@ -53,13 +54,13 @@ public class FindPrimarySimilarSchoolsUseCase(
         var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
 
         return new(
-            hasSimilarSchools,
             currentSchoolInfo,
             sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
             filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
             resultsPage,
             allResults,
-            validationErrors);
+            validationErrors,
+            hasSimilarSchools);
     }
 }
 
@@ -71,10 +72,10 @@ public record FindPrimarySimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindPrimarySimilarSchoolsResponse(
-    bool hasSimilarSchools,
     SchoolInfo.SchoolInfo CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,
     IPagedCollection<SimilarSchoolResult> ResultsPage,
     IReadOnlyCollection<SimilarSchoolResult> AllResults,
-    IReadOnlyCollection<ValidationError> ValidationErrors);
+    IReadOnlyCollection<ValidationError> ValidationErrors,
+    bool HasSimilarSchools = true);

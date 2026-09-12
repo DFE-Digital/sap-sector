@@ -32,7 +32,7 @@ public sealed class SchoolSideNavigationViewModel
         return new SchoolSideNavigationViewModel { Items = items };
     }
 
-    public static SchoolSideNavigationViewModel CreateSecondary(IUrlHelper url, string urn, string? currentAction, bool includeRiseResources = false)
+    public static SchoolSideNavigationViewModel CreateSecondary(IUrlHelper url, string urn, string? currentAction, bool hasSimilarSchools = true, bool includeRiseResources = false)
     {
         var items = new List<SchoolSideNavigationItemViewModel>
         {
@@ -44,6 +44,11 @@ public sealed class SchoolSideNavigationViewModel
             new() { Text = "School details", Href = Routes.SecondarySchool(urn).SchoolDetails, IsSelected = currentAction == "SchoolDetails" },
             new() { Text = "What is a similar school?", Href = Routes.SecondarySchool(urn).WhatIsASimilarSchool, IsSelected = currentAction == "WhatIsASimilarSchool" }
         };
+
+        if (!hasSimilarSchools)
+        {
+            items.RemoveAt(4);
+        }
 
         if (includeRiseResources)
         {
