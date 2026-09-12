@@ -145,7 +145,7 @@ public class SchoolController(
             includeRise);
     }
 
-    private async Task PopulateViewData(SchoolDetails currentSchool)
+    private async Task PopulateViewData(SchoolDetails currentSchool, bool hasSimilarSchools = true)
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
 
@@ -156,6 +156,7 @@ public class SchoolController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            hasSimilarSchools,
             includeRise);
     }
 }
