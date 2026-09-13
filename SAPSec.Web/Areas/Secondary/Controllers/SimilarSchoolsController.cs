@@ -35,7 +35,7 @@ public class SimilarSchoolsController(
             sortBy,
             page));
 
-        await PopulateViewData(response.CurrentSchool);
+        await PopulateViewData(response.CurrentSchool, response.HasSimilarSchools);
 
         var viewModel = SimilarSchoolsPageViewModel.Build(
             "secondary",
@@ -54,7 +54,7 @@ public class SimilarSchoolsController(
         return View(viewModel);
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
         var includeRise = featureFlagService is not null
             && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
@@ -63,6 +63,7 @@ public class SimilarSchoolsController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            hasSimilarSchools,
             includeRise);
     }
 }

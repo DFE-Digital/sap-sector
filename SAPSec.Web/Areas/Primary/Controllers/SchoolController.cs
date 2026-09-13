@@ -43,14 +43,15 @@ public class SchoolController(
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
-        var similarSchoolsResponse = await findPrimarySimilarSchoolsUseCase.Execute(new FindPrimarySimilarSchoolsRequest(urn));
 
-        await PopulateViewData(response.School, similarSchoolsResponse.HasSimilarSchools);
+        var hasSimilarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
+        await PopulateViewData(response.School);
 
         var model = new SchoolOverviewPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            HasSimilarSchools = similarSchoolsResponse.HasSimilarSchools
+            HasSimilarSchools = hasSimilarSchoolsResponse.HasSimilarSchools
         };
 
         return View(model);
@@ -63,7 +64,7 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
 
-        var similarSchoolsResponse = await findPrimarySimilarSchoolsUseCase.Execute(new FindPrimarySimilarSchoolsRequest(urn));
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
 
         await PopulateViewData(response.School);
 
@@ -88,7 +89,9 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Primary, urn, filters));
 
-        await PopulateViewData(response.School);
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
+        await PopulateViewData(response.School, similarSchoolsResponse.HasSimilarSchools);
 
         var model = new AttendancePageViewModel
         {
@@ -132,6 +135,8 @@ public class SchoolController(
 
     private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
+
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
 
         var includeRise = featureFlagService is not null
@@ -141,12 +146,14 @@ public class SchoolController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
-            hasSimilarSchools,
+            similarSchoolsResponse.HasSimilarSchools,
             includeRise);
     }
 
-    private async Task PopulateViewData(SchoolDetails currentSchool, bool hasSimilarSchools = true)
+    private async Task PopulateViewData(SchoolDetails currentSchool)
     {
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
+
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
 
         var includeRise = featureFlagService is not null
@@ -156,7 +163,12 @@ public class SchoolController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
-            hasSimilarSchools,
+            similarSchoolsResponse.HasSimilarSchools,
             includeRise);
+    }
+
+    private async Task<FindPrimarySimilarSchoolsResponse> GetSimilarSchoolsAsync(string urn)
+    {
+        return await findPrimarySimilarSchoolsUseCase.Execute(new FindPrimarySimilarSchoolsRequest(urn));
     }
 }
