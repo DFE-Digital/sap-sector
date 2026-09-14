@@ -43,7 +43,8 @@ public class JsonKs4PerformanceRepository(
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandPerformance = (await englandPerformanceFile.ReadAllAsync()).FirstOrDefault();
+        var englandPerformance = (await englandPerformanceFile.ReadAllAsync())
+            .FirstOrDefault(x => string.Equals(x.Id, "National", StringComparison.Ordinal));
 
         var results = new List<Ks4PerformanceData>(requestedUrns.Length);
 
