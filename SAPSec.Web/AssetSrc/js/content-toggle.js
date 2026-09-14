@@ -50,6 +50,11 @@ function initialiseToggle(toggle, activeIndex) {
         var activePanel = panels[index];
         var nextPanel = panels[nextIndex];
         var activeName = activePanel.getAttribute("data-content-toggle-name") || "";
+
+        //button.setAttribute("aria-label", index === 0 ? "Show year by year" : "Show " + activeName);
+
+        button.setAttribute("aria-label", "Show " + activeName);
+
         var nextName = nextPanel.getAttribute("data-content-toggle-name") || "";
 
         panels.forEach(function (panel, panelIndex) {
@@ -59,12 +64,14 @@ function initialiseToggle(toggle, activeIndex) {
 
         title.textContent = activeName;
         button.textContent = "Show " + nextName.toLowerCase();
+
+
       //  button.setAttribute("aria-pressed", index === 0 ? "false" : "true");
         // button.setAttribute("aria-pressed", "true");
         // const isPressed = button.getAttribute('aria-pressed') === 'true';
         // button.setAttribute('aria-pressed', !isPressed);
 
-        button.setAttribute("aria-label", index === 0 ? "Show year by year" : "Show " + activeName);
+
 
         resizeCharts(activePanel);
     }

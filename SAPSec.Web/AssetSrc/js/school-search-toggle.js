@@ -35,7 +35,7 @@
         requestAnimationFrame(() => mountToggle(MAP_SLOT_ID));
         setTimeout(() => mountToggle(MAP_SLOT_ID), 0);
 
-        if (persist) sessionStorage.setItem(STORAGE_KEY, "map");
+        //if (persist) sessionStorage.setItem(STORAGE_KEY, "map");
 
         window.dispatchEvent(new Event("map:shown"));
     }
@@ -57,7 +57,7 @@
 
         mountToggle(LIST_SLOT_ID);
 
-        if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
+       // if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
     }
 
     document.addEventListener("DOMContentLoaded", function () {
