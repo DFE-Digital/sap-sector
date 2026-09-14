@@ -803,7 +803,8 @@ jobs:
 
       - name: Enable maintenance page
         id: enable_maintenance
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' }}
+        # TODO: re-enable for test once maintenance page setup is verified there
+        if: ${{ matrix.target_env != 'test' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
         shell: bash
         run: |
           set -euo pipefail
@@ -920,7 +921,7 @@ jobs:
           echo "backup_file=${backup_file}" >> "$GITHUB_OUTPUT"
 
       - name: Summarise maintenance enable
-        if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+        if: ${{ always() && matrix.target_env != 'test' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
         shell: pwsh
         run: |
           $reportDir = $env:PIPELINE_REPORT_DIR
@@ -1101,7 +1102,8 @@ jobs:
 
       - name: Disable maintenance page
         id: disable_maintenance
-        if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+        # TODO: re-enable for test once maintenance page setup is verified there
+        if: ${{ always() && matrix.target_env != 'test' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
         shell: bash
         run: |
           set -euo pipefail
@@ -1118,7 +1120,7 @@ jobs:
           echo "restore_status=completed" >> "$GITHUB_OUTPUT"
 
       - name: Summarise maintenance restore
-        if: ${{ always() && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+        if: ${{ always() && matrix.target_env != 'test' && (github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
         shell: pwsh
         run: |
           $reportDir = $env:PIPELINE_REPORT_DIR

@@ -316,9 +316,92 @@ public class GetSecondaryComparisonAttendanceMeasuresUseCaseTests
         series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage).Current.Should().Be((decimal?)england);
     }
 
+    [Fact]
+    public async Task Secondary_Absence_FilterBy_PupilCharacteristic_WhenMissing_DefaultsToAllPupils()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
+
+        _absenceRepo.SetupEstablishmentAbsence(
+            Build.Absence.Establishment("100001", x => x
+                .WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")
+                .WithOverallAbsenceBoys(current: "7.00", previous: "7.05", previous2: "6.91")));
+
+        var withoutFilter = await _sut.Execute(Request("100001", "100002"));
+        var withExplicitAllPupils = await _sut.Execute(Request("100001", "100002", new()
+        {
+            [Absence.Filters.PupilCharacteristic.Key] = Absence.Filters.PupilCharacteristic.Values.AllPupils
+        }));
+
+        withoutFilter.Absence.Series.Should().Equal(withExplicitAllPupils.Absence.Series);
+    }
+
+    [InlineData(Absence.Filters.PupilCharacteristic.Values.Boys, 7.00, 6.10, 2.24)]
+    [InlineData(Absence.Filters.PupilCharacteristic.Values.Girls, 6.00, 5.10, 1.24)]
+    [InlineData(Absence.Filters.PupilCharacteristic.Values.Fsm, 9.00, 8.10, 5.24)]
+    [InlineData(Absence.Filters.PupilCharacteristic.Values.NonFsm, 4.00, 3.10, 0.24)]
+    [InlineData(Absence.Filters.PupilCharacteristic.Values.Eal, 3.00, 2.10, 9.24)]
+    [InlineData(Absence.Filters.PupilCharacteristic.Values.Efl, 2.00, 1.10, 8.24)]
+    [InlineData(Absence.Filters.PupilCharacteristic.Values.AllPupils, 8.00, 6.10, 6.10)]
+    [Theory]
+    public async Task Secondary_Absence_FilterBy_PupilCharacteristic_ContainsCurrentYearValuesForSelectedCharacteristic(
+        string characteristic, double currentSchool, double similarSchool, double england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Secondary()),
+            Build.Establishment("100002", "Test School 2", x => x.Secondary()));
+
+        _similarSchoolsRepo
+            .SetupGroups(Build.SecondaryGroup("100001", ["100002"]));
+
+        _absenceRepo.SetupEstablishmentAbsence(
+            Build.Absence.Establishment("100001", x => x
+                .WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")
+                .WithOverallAbsenceBoys(current: "7.00", previous: "7.05", previous2: "6.91")
+                .WithOverallAbsenceGirls(current: "6.00", previous: "6.05", previous2: "5.91")
+                .WithOverallAbsenceFsm(current: "9.00", previous: "9.05", previous2: "8.91")
+                .WithOverallAbsenceNonFsm(current: "4.00", previous: "4.05", previous2: "3.91")
+                .WithOverallAbsenceEal(current: "3.00", previous: "3.05", previous2: "2.91")
+                .WithOverallAbsenceEfl(current: "2.00", previous: "2.05", previous2: "1.91")),
+            Build.Absence.Establishment("100002", x => x
+                .WithOverallAbsence(current: "6.10", previous: "6.20", previous2: "6.30")
+                .WithOverallAbsenceBoys(current: "6.10", previous: "6.20", previous2: "6.30")
+                .WithOverallAbsenceGirls(current: "5.10", previous: "5.20", previous2: "5.30")
+                .WithOverallAbsenceFsm(current: "8.10", previous: "8.20", previous2: "8.30")
+                .WithOverallAbsenceNonFsm(current: "3.10", previous: "3.20", previous2: "3.30")
+                .WithOverallAbsenceEal(current: "2.10", previous: "2.20", previous2: "2.30")
+                .WithOverallAbsenceEfl(current: "1.10", previous: "1.20", previous2: "1.30")));
+
+        _absenceRepo.SetupEnglandAbsence(
+            Build.Absence.England(x => x
+                .WithOverallAbsenceSecondary(current: "6.10", previous: "6.90", previous2: "5.45")
+                .WithOverallAbsenceBoysSecondary(current: "2.24", previous: "1.20", previous2: "0.20")
+                .WithOverallAbsenceGirlsSecondary(current: "1.24", previous: "0.20", previous2: "9.20")
+                .WithOverallAbsenceFsmSecondary(current: "5.24", previous: "4.20", previous2: "3.20")
+                .WithOverallAbsenceNonFsmSecondary(current: "0.24", previous: "9.20", previous2: "8.20")
+                .WithOverallAbsenceEalSecondary(current: "9.24", previous: "8.20", previous2: "7.20")
+                .WithOverallAbsenceEflSecondary(current: "8.24", previous: "7.20", previous2: "6.20")));
+
+        var response = await _sut.Execute(Request("100001", "100002", new()
+        {
+            [Absence.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var series = response.Absence.Series;
+
+        series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool).Current.Should().Be((decimal?)currentSchool);
+        series.First(s => s.SeriesType == MeasureSeriesType.ComparatorSchool).Current.Should().Be((decimal?)similarSchool);
+        series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage).Current.Should().Be((decimal?)england);
+    }
+
     private static GetSecondaryComparisonAttendanceMeasuresRequest Request(
         string urn,
         string similarSchoolUrn,
         Dictionary<string, string>? filterBy = null) =>
             new(urn, similarSchoolUrn, filterBy);
+
 }
