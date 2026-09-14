@@ -151,7 +151,10 @@ jobs:
           for proj in $TEST_PROJECTS; do
             echo "=== Running tests in $proj ==="
 
+            FILTER_ARGS=()
+
             dotnet test "$proj" \
+              "${FILTER_ARGS[@]}" \
               --no-build \
               --configuration Debug \
               --results-directory "TestResults" \

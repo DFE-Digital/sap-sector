@@ -635,6 +635,228 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task MeetingExpectedStandardRwm_FilterBy_PupilCharacteristic_WhenMissing_DefaultsToAllPupils()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmExpected(current: "82", prev: "81", prev2: "80")
+                .WithRwmExpectedBoys(current: "72", prev: "71", prev2: "70")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x.WithRwmExpected(current: "83", prev: "82", prev2: "81")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmExpected(current: "84", prev: "83", prev2: "82")));
+
+        var withoutFilter = await _sut.Execute(Request("100001"));
+        var withExplicitAllPupils = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedRwm.Filters.PupilCharacteristic.Key] = Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.AllPupils
+        }));
+
+        withoutFilter.MeetingExpectedStandardRwm.Series.Should().Equal(withExplicitAllPupils.MeetingExpectedStandardRwm.Series);
+    }
+
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.Boys, new[] { 72.0, 71.0, 70.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.Girls, new[] { 62.0, 61.0, 60.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 52.0, 51.0, 50.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 42.0, 41.0, 40.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 })]
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.Eal, new[] { 32.0, 31.0, 30.0 }, new[] { 33.0, 32.0, 31.0 }, new[] { 34.0, 33.0, 32.0 })]
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.AllPupils, new[] { 82.0, 81.0, 80.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    // Invalid filter values default to AllPupils
+    [InlineData("xyz", new[] { 82.0, 81.0, 80.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [Theory]
+    public async Task MeetingExpectedStandardRwm_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(string characteristic, double[] currentSchool, double[] la, double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmExpected(current: "82", prev: "81", prev2: "80")
+                .WithRwmExpectedBoys(current: "72", prev: "71", prev2: "70")
+                .WithRwmExpectedGirls(current: "62", prev: "61", prev2: "60")
+                .WithRwmExpectedDisadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithRwmExpectedNonDisadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithRwmExpectedEal(current: "32", prev: "31", prev2: "30")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x
+                .WithRwmExpected(current: "83", prev: "82", prev2: "81")
+                .WithRwmExpectedBoys(current: "73", prev: "72", prev2: "71")
+                .WithRwmExpectedGirls(current: "63", prev: "62", prev2: "61")
+                .WithRwmExpectedDisadvantaged(current: "53", prev: "52", prev2: "51")
+                .WithRwmExpectedNonDisadvantaged(current: "43", prev: "42", prev2: "41")
+                .WithRwmExpectedEal(current: "33", prev: "32", prev2: "31")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x
+                .WithRwmExpected(current: "84", prev: "83", prev2: "82")
+                .WithRwmExpectedBoys(current: "74", prev: "73", prev2: "72")
+                .WithRwmExpectedGirls(current: "64", prev: "63", prev2: "62")
+                .WithRwmExpectedDisadvantaged(current: "54", prev: "53", prev2: "52")
+                .WithRwmExpectedNonDisadvantaged(current: "44", prev: "43", prev2: "42")
+                .WithRwmExpectedEal(current: "34", prev: "33", prev2: "32")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedRwm.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var series = response.MeetingExpectedStandardRwm.Series;
+
+        series.Should().NotBeNull();
+        series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2]));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_FilterBy_PupilCharacteristic_NonMobile_EstablishmentHasData_ButLAAndEnglandAreNull()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        // LA/England Non-mobile data does not exist in the source (not published at that level),
+        // so only Establishment is given a value here - the builders leave LA/England unset.
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmExpectedNonMobile(current: "72", prev: "71", prev2: "70")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x.WithRwmExpected(current: "83", prev: "82", prev2: "81")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmExpected(current: "84", prev: "83", prev2: "82")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedRwm.Filters.PupilCharacteristic.Key] = Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var series = response.MeetingExpectedStandardRwm.Series;
+
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.CurrentSchool, 72, 71, 70));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_FilterBy_SubjectAndPupilCharacteristic_Combined_ContainsExpectedValues()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                // Combined RWM x Disadvantaged - should NOT be picked when Subject=Writing
+                .WithRwmExpectedDisadvantaged(current: "1", prev: "1", prev2: "1")
+                // Writing x All pupils - should NOT be picked when Characteristic=Disadvantaged
+                .WithRwmExpectedWriting(current: "2", prev: "2", prev2: "2")
+                // Writing x Disadvantaged - the combination actually selected
+                .WithRwmExpectedWritingDisadvantaged(current: "45", prev: "44", prev2: "43")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedRwm.Filters.Subject.Key] = Ks2ExpectedRwm.Filters.Subject.Values.Writing,
+            [Ks2ExpectedRwm.Filters.PupilCharacteristic.Key] = Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.Disadvantaged
+        }));
+
+        var currentSchoolSeries = response.MeetingExpectedStandardRwm.Series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+
+        currentSchoolSeries.Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, 45, 44, 43));
+    }
+
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.Boys, new[] { "100003", "100001", "100002" })]
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.Girls, new[] { "100002", "100004", "100001" })]
+    [InlineData(Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.AllPupils, new[] { "100002", "100003", "100004" })]
+    [Theory]
+    public async Task MeetingExpectedStandardRwm_FilterBy_PupilCharacteristic_TopPerformers_RanksSimilarSchoolsBasedOnSelectedCharacteristic(string characteristic, string[] expected)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()),
+            Build.Establishment("100004", "Test School 4", x => x.Primary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003", "100004"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmExpected(current: "1", prev: "", prev2: "")
+                .WithRwmExpectedBoys(current: "30", prev: "", prev2: "")
+                .WithRwmExpectedGirls(current: "50", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100002", x => x
+                .WithRwmExpected(current: "4", prev: "", prev2: "")
+                .WithRwmExpectedBoys(current: "20", prev: "", prev2: "")
+                .WithRwmExpectedGirls(current: "97", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x
+                .WithRwmExpected(current: "3", prev: "", prev2: "")
+                .WithRwmExpectedBoys(current: "40", prev: "", prev2: "")
+                .WithRwmExpectedGirls(current: "10", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100004", x => x
+                .WithRwmExpected(current: "2", prev: "", prev2: "")
+                .WithRwmExpectedBoys(current: "10", prev: "", prev2: "")
+                .WithRwmExpectedGirls(current: "60", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedRwm.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var topPerformers = response.MeetingExpectedStandardRwm.TopPerformers;
+
+        topPerformers.Should().NotBeNullOrEmpty();
+        topPerformers.Select(tp => tp.Urn).Should().Equal(expected);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_FilterBy_PupilCharacteristic_NonMobile_TopPerformers_UsesEstablishmentDataOnly()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary()),
+            Build.Establishment("100002", "Test School 2", x => x.Primary()),
+            Build.Establishment("100003", "Test School 3", x => x.Primary()));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002", "100003"]));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x.WithRwmExpectedNonMobile(current: "10", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpectedNonMobile(current: "30", prev: "", prev2: "")),
+            Build.Ks2Performance.Establishment("100003", x => x.WithRwmExpectedNonMobile(current: "20", prev: "", prev2: "")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedRwm.Filters.PupilCharacteristic.Key] = Ks2ExpectedRwm.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var topPerformers = response.MeetingExpectedStandardRwm.TopPerformers;
+
+        topPerformers.Should().NotBeNullOrEmpty();
+        topPerformers.Select(tp => tp.Urn).Should().Equal(["100002", "100003", "100001"]);
+    }
+
+    [Fact]
     public async Task AchievedHigherStandardRwm_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
@@ -1172,6 +1394,144 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task AchievedHigherStandardRwm_FilterBy_PupilCharacteristic_WhenMissing_DefaultsToAllPupils()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmHigher(current: "82", prev: "81", prev2: "80")
+                .WithRwmHigherBoys(current: "72", prev: "71", prev2: "70")));
+
+        var withoutFilter = await _sut.Execute(Request("100001"));
+        var withExplicitAllPupils = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2HigherRwm.Filters.PupilCharacteristic.Key] = Ks2HigherRwm.Filters.PupilCharacteristic.Values.AllPupils
+        }));
+
+        withoutFilter.AchievedHigherStandardRwm.Series.Should().Equal(withExplicitAllPupils.AchievedHigherStandardRwm.Series);
+    }
+
+    [InlineData(Ks2HigherRwm.Filters.PupilCharacteristic.Values.Boys, new[] { 72.0, 71.0, 70.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks2HigherRwm.Filters.PupilCharacteristic.Values.Girls, new[] { 62.0, 61.0, 60.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks2HigherRwm.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 52.0, 51.0, 50.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
+    [InlineData(Ks2HigherRwm.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 42.0, 41.0, 40.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 })]
+    [InlineData(Ks2HigherRwm.Filters.PupilCharacteristic.Values.Eal, new[] { 32.0, 31.0, 30.0 }, new[] { 33.0, 32.0, 31.0 }, new[] { 34.0, 33.0, 32.0 })]
+    [InlineData(Ks2HigherRwm.Filters.PupilCharacteristic.Values.AllPupils, new[] { 82.0, 81.0, 80.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [Theory]
+    public async Task AchievedHigherStandardRwm_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(string characteristic, double[] currentSchool, double[] la, double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmHigher(current: "82", prev: "81", prev2: "80")
+                .WithRwmHigherBoys(current: "72", prev: "71", prev2: "70")
+                .WithRwmHigherGirls(current: "62", prev: "61", prev2: "60")
+                .WithRwmHigherDisadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithRwmHigherNonDisadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithRwmHigherEal(current: "32", prev: "31", prev2: "30")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x
+                .WithRwmHigher(current: "83", prev: "82", prev2: "81")
+                .WithRwmHigherBoys(current: "73", prev: "72", prev2: "71")
+                .WithRwmHigherGirls(current: "63", prev: "62", prev2: "61")
+                .WithRwmHigherDisadvantaged(current: "53", prev: "52", prev2: "51")
+                .WithRwmHigherNonDisadvantaged(current: "43", prev: "42", prev2: "41")
+                .WithRwmHigherEal(current: "33", prev: "32", prev2: "31")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x
+                .WithRwmHigher(current: "84", prev: "83", prev2: "82")
+                .WithRwmHigherBoys(current: "74", prev: "73", prev2: "72")
+                .WithRwmHigherGirls(current: "64", prev: "63", prev2: "62")
+                .WithRwmHigherDisadvantaged(current: "54", prev: "53", prev2: "52")
+                .WithRwmHigherNonDisadvantaged(current: "44", prev: "43", prev2: "42")
+                .WithRwmHigherEal(current: "34", prev: "33", prev2: "32")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2HigherRwm.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var series = response.AchievedHigherStandardRwm.Series;
+
+        series.Should().NotBeNull();
+        series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2]));
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardRwm_FilterBy_PupilCharacteristic_NonMobile_EstablishmentHasData_ButLAAndEnglandAreNull()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmHigherNonMobile(current: "72", prev: "71", prev2: "70")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x.WithRwmHigher(current: "83", prev: "82", prev2: "81")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithRwmHigher(current: "84", prev: "83", prev2: "82")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2HigherRwm.Filters.PupilCharacteristic.Key] = Ks2HigherRwm.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var series = response.AchievedHigherStandardRwm.Series;
+
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.CurrentSchool, 72, 71, 70));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardRwm_FilterBy_SubjectAndPupilCharacteristic_Combined_ContainsExpectedValues()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithRwmHigherDisadvantaged(current: "1", prev: "1", prev2: "1")
+                .WithRwmHigherWriting(current: "2", prev: "2", prev2: "2")
+                .WithRwmHigherWritingDisadvantaged(current: "45", prev: "44", prev2: "43")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2HigherRwm.Filters.Subject.Key] = Ks2HigherRwm.Filters.Subject.Values.Writing,
+            [Ks2HigherRwm.Filters.PupilCharacteristic.Key] = Ks2HigherRwm.Filters.PupilCharacteristic.Values.Disadvantaged
+        }));
+
+        var currentSchoolSeries = response.AchievedHigherStandardRwm.Series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool);
+
+        currentSchoolSeries.Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, 45, 44, 43));
+    }
+
+    [Fact]
     public async Task MeetingExpectedStandardGps_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
@@ -1549,6 +1909,118 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
             new TopPerformer(2, "100002", "Test School B", 77m, IsCurrentSchool: false),
             new TopPerformer(3, "100004", "Test School C", 76m, IsCurrentSchool: false)
         ]);
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_FilterBy_PupilCharacteristic_WhenMissing_DefaultsToAllPupils()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithGpsExpected(current: "82", prev: "81", prev2: "80")
+                .WithGpsExpectedBoys(current: "72", prev: "71", prev2: "70")));
+
+        var withoutFilter = await _sut.Execute(Request("100001"));
+        var withExplicitAllPupils = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedGps.Filters.PupilCharacteristic.Key] = Ks2ExpectedGps.Filters.PupilCharacteristic.Values.AllPupils
+        }));
+
+        withoutFilter.MeetingExpectedStandardGps.Series.Should().Equal(withExplicitAllPupils.MeetingExpectedStandardGps.Series);
+    }
+
+    [InlineData(Ks2ExpectedGps.Filters.PupilCharacteristic.Values.Boys, new[] { 72.0, 71.0, 70.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks2ExpectedGps.Filters.PupilCharacteristic.Values.Girls, new[] { 62.0, 61.0, 60.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks2ExpectedGps.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 52.0, 51.0, 50.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
+    [InlineData(Ks2ExpectedGps.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 42.0, 41.0, 40.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 })]
+    [InlineData(Ks2ExpectedGps.Filters.PupilCharacteristic.Values.Eal, new[] { 32.0, 31.0, 30.0 }, new[] { 33.0, 32.0, 31.0 }, new[] { 34.0, 33.0, 32.0 })]
+    [InlineData(Ks2ExpectedGps.Filters.PupilCharacteristic.Values.AllPupils, new[] { 82.0, 81.0, 80.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [Theory]
+    public async Task MeetingExpectedStandardGps_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(string characteristic, double[] currentSchool, double[] la, double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithGpsExpected(current: "82", prev: "81", prev2: "80")
+                .WithGpsExpectedBoys(current: "72", prev: "71", prev2: "70")
+                .WithGpsExpectedGirls(current: "62", prev: "61", prev2: "60")
+                .WithGpsExpectedDisadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithGpsExpectedNonDisadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithGpsExpectedEal(current: "32", prev: "31", prev2: "30")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x
+                .WithGpsExpected(current: "83", prev: "82", prev2: "81")
+                .WithGpsExpectedBoys(current: "73", prev: "72", prev2: "71")
+                .WithGpsExpectedGirls(current: "63", prev: "62", prev2: "61")
+                .WithGpsExpectedDisadvantaged(current: "53", prev: "52", prev2: "51")
+                .WithGpsExpectedNonDisadvantaged(current: "43", prev: "42", prev2: "41")
+                .WithGpsExpectedEal(current: "33", prev: "32", prev2: "31")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x
+                .WithGpsExpected(current: "84", prev: "83", prev2: "82")
+                .WithGpsExpectedBoys(current: "74", prev: "73", prev2: "72")
+                .WithGpsExpectedGirls(current: "64", prev: "63", prev2: "62")
+                .WithGpsExpectedDisadvantaged(current: "54", prev: "53", prev2: "52")
+                .WithGpsExpectedNonDisadvantaged(current: "44", prev: "43", prev2: "42")
+                .WithGpsExpectedEal(current: "34", prev: "33", prev2: "32")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedGps.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var series = response.MeetingExpectedStandardGps.Series;
+
+        series.Should().NotBeNull();
+        series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2]));
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardGps_FilterBy_PupilCharacteristic_NonMobile_EstablishmentHasData_ButLAAndEnglandAreNull()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithGpsExpectedNonMobile(current: "72", prev: "71", prev2: "70")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x.WithGpsExpected(current: "83", prev: "82", prev2: "81")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsExpected(current: "84", prev: "83", prev2: "82")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ExpectedGps.Filters.PupilCharacteristic.Key] = Ks2ExpectedGps.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var series = response.MeetingExpectedStandardGps.Series;
+
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.CurrentSchool, 72, 71, 70));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
     }
 
     [Fact]
@@ -1958,6 +2430,118 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task AchievedHigherStandardGps_FilterBy_PupilCharacteristic_WhenMissing_DefaultsToAllPupils()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithGpsHigher(current: "82", prev: "81", prev2: "80")
+                .WithGpsHigherBoys(current: "72", prev: "71", prev2: "70")));
+
+        var withoutFilter = await _sut.Execute(Request("100001"));
+        var withExplicitAllPupils = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2HigherGps.Filters.PupilCharacteristic.Key] = Ks2HigherGps.Filters.PupilCharacteristic.Values.AllPupils
+        }));
+
+        withoutFilter.AchievedHigherStandardGps.Series.Should().Equal(withExplicitAllPupils.AchievedHigherStandardGps.Series);
+    }
+
+    [InlineData(Ks2HigherGps.Filters.PupilCharacteristic.Values.Boys, new[] { 72.0, 71.0, 70.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks2HigherGps.Filters.PupilCharacteristic.Values.Girls, new[] { 62.0, 61.0, 60.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks2HigherGps.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 52.0, 51.0, 50.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
+    [InlineData(Ks2HigherGps.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 42.0, 41.0, 40.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 })]
+    [InlineData(Ks2HigherGps.Filters.PupilCharacteristic.Values.Eal, new[] { 32.0, 31.0, 30.0 }, new[] { 33.0, 32.0, 31.0 }, new[] { 34.0, 33.0, 32.0 })]
+    [InlineData(Ks2HigherGps.Filters.PupilCharacteristic.Values.AllPupils, new[] { 82.0, 81.0, 80.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [Theory]
+    public async Task AchievedHigherStandardGps_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(string characteristic, double[] currentSchool, double[] la, double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithGpsHigher(current: "82", prev: "81", prev2: "80")
+                .WithGpsHigherBoys(current: "72", prev: "71", prev2: "70")
+                .WithGpsHigherGirls(current: "62", prev: "61", prev2: "60")
+                .WithGpsHigherDisadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithGpsHigherNonDisadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithGpsHigherEal(current: "32", prev: "31", prev2: "30")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x
+                .WithGpsHigher(current: "83", prev: "82", prev2: "81")
+                .WithGpsHigherBoys(current: "73", prev: "72", prev2: "71")
+                .WithGpsHigherGirls(current: "63", prev: "62", prev2: "61")
+                .WithGpsHigherDisadvantaged(current: "53", prev: "52", prev2: "51")
+                .WithGpsHigherNonDisadvantaged(current: "43", prev: "42", prev2: "41")
+                .WithGpsHigherEal(current: "33", prev: "32", prev2: "31")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x
+                .WithGpsHigher(current: "84", prev: "83", prev2: "82")
+                .WithGpsHigherBoys(current: "74", prev: "73", prev2: "72")
+                .WithGpsHigherGirls(current: "64", prev: "63", prev2: "62")
+                .WithGpsHigherDisadvantaged(current: "54", prev: "53", prev2: "52")
+                .WithGpsHigherNonDisadvantaged(current: "44", prev: "43", prev2: "42")
+                .WithGpsHigherEal(current: "34", prev: "33", prev2: "32")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2HigherGps.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var series = response.AchievedHigherStandardGps.Series;
+
+        series.Should().NotBeNull();
+        series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2]));
+    }
+
+    [Fact]
+    public async Task AchievedHigherStandardGps_FilterBy_PupilCharacteristic_NonMobile_EstablishmentHasData_ButLAAndEnglandAreNull()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithGpsHigherNonMobile(current: "72", prev: "71", prev2: "70")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x.WithGpsHigher(current: "83", prev: "82", prev2: "81")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithGpsHigher(current: "84", prev: "83", prev2: "82")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2HigherGps.Filters.PupilCharacteristic.Key] = Ks2HigherGps.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var series = response.AchievedHigherStandardGps.Series;
+
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.CurrentSchool, 72, 71, 70));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
     public async Task AverageScaledScoreReading_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
@@ -2309,6 +2893,118 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
     }
 
     [Fact]
+    public async Task AverageScaledScoreReading_FilterBy_PupilCharacteristic_WhenMissing_DefaultsToAllPupils()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithReadingScaledScore(current: "82", prev: "81", prev2: "80")
+                .WithReadingScaledScoreBoys(current: "72", prev: "71", prev2: "70")));
+
+        var withoutFilter = await _sut.Execute(Request("100001"));
+        var withExplicitAllPupils = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ReadingScore.Filters.PupilCharacteristic.Key] = Ks2ReadingScore.Filters.PupilCharacteristic.Values.AllPupils
+        }));
+
+        withoutFilter.AverageScaledScoreReading.Series.Should().Equal(withExplicitAllPupils.AverageScaledScoreReading.Series);
+    }
+
+    [InlineData(Ks2ReadingScore.Filters.PupilCharacteristic.Values.Boys, new[] { 72.0, 71.0, 70.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks2ReadingScore.Filters.PupilCharacteristic.Values.Girls, new[] { 62.0, 61.0, 60.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks2ReadingScore.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 52.0, 51.0, 50.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
+    [InlineData(Ks2ReadingScore.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 42.0, 41.0, 40.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 })]
+    [InlineData(Ks2ReadingScore.Filters.PupilCharacteristic.Values.Eal, new[] { 32.0, 31.0, 30.0 }, new[] { 33.0, 32.0, 31.0 }, new[] { 34.0, 33.0, 32.0 })]
+    [InlineData(Ks2ReadingScore.Filters.PupilCharacteristic.Values.AllPupils, new[] { 82.0, 81.0, 80.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [Theory]
+    public async Task AverageScaledScoreReading_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(string characteristic, double[] currentSchool, double[] la, double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithReadingScaledScore(current: "82", prev: "81", prev2: "80")
+                .WithReadingScaledScoreBoys(current: "72", prev: "71", prev2: "70")
+                .WithReadingScaledScoreGirls(current: "62", prev: "61", prev2: "60")
+                .WithReadingScaledScoreDisadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithReadingScaledScoreNonDisadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithReadingScaledScoreEal(current: "32", prev: "31", prev2: "30")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x
+                .WithReadingScaledScore(current: "83", prev: "82", prev2: "81")
+                .WithReadingScaledScoreBoys(current: "73", prev: "72", prev2: "71")
+                .WithReadingScaledScoreGirls(current: "63", prev: "62", prev2: "61")
+                .WithReadingScaledScoreDisadvantaged(current: "53", prev: "52", prev2: "51")
+                .WithReadingScaledScoreNonDisadvantaged(current: "43", prev: "42", prev2: "41")
+                .WithReadingScaledScoreEal(current: "33", prev: "32", prev2: "31")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x
+                .WithReadingScaledScore(current: "84", prev: "83", prev2: "82")
+                .WithReadingScaledScoreBoys(current: "74", prev: "73", prev2: "72")
+                .WithReadingScaledScoreGirls(current: "64", prev: "63", prev2: "62")
+                .WithReadingScaledScoreDisadvantaged(current: "54", prev: "53", prev2: "52")
+                .WithReadingScaledScoreNonDisadvantaged(current: "44", prev: "43", prev2: "42")
+                .WithReadingScaledScoreEal(current: "34", prev: "33", prev2: "32")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ReadingScore.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var series = response.AverageScaledScoreReading.Series;
+
+        series.Should().NotBeNull();
+        series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2]));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreReading_FilterBy_PupilCharacteristic_NonMobile_EstablishmentHasData_ButLAAndEnglandAreNull()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithReadingScaledScoreNonMobile(current: "72", prev: "71", prev2: "70")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x.WithReadingScaledScore(current: "83", prev: "82", prev2: "81")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "84", prev: "83", prev2: "82")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2ReadingScore.Filters.PupilCharacteristic.Key] = Ks2ReadingScore.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var series = response.AverageScaledScoreReading.Series;
+
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.CurrentSchool, 72, 71, 70));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
+    }
+
+    [Fact]
     public async Task AverageScaledScoreMaths_ShouldContainExpectedMeasureSeries()
     {
         _establishmentRepo.SetupEstablishments(
@@ -2657,6 +3353,118 @@ public class GetSchoolKs2PerformanceMeasuresUseCaseTests
             new TopPerformer(2, "100002", "Test School 2", 105.2m, IsCurrentSchool: false),
             new TopPerformer(3, "100003", "Test School 3", 105.2m, IsCurrentSchool: false)
         ]);
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_FilterBy_PupilCharacteristic_WhenMissing_DefaultsToAllPupils()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithMathsScaledScore(current: "82", prev: "81", prev2: "80")
+                .WithMathsScaledScoreBoys(current: "72", prev: "71", prev2: "70")));
+
+        var withoutFilter = await _sut.Execute(Request("100001"));
+        var withExplicitAllPupils = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2MathsScore.Filters.PupilCharacteristic.Key] = Ks2MathsScore.Filters.PupilCharacteristic.Values.AllPupils
+        }));
+
+        withoutFilter.AverageScaledScoreMaths.Series.Should().Equal(withExplicitAllPupils.AverageScaledScoreMaths.Series);
+    }
+
+    [InlineData(Ks2MathsScore.Filters.PupilCharacteristic.Values.Boys, new[] { 72.0, 71.0, 70.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks2MathsScore.Filters.PupilCharacteristic.Values.Girls, new[] { 62.0, 61.0, 60.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
+    [InlineData(Ks2MathsScore.Filters.PupilCharacteristic.Values.Disadvantaged, new[] { 52.0, 51.0, 50.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
+    [InlineData(Ks2MathsScore.Filters.PupilCharacteristic.Values.NonDisadvantaged, new[] { 42.0, 41.0, 40.0 }, new[] { 43.0, 42.0, 41.0 }, new[] { 44.0, 43.0, 42.0 })]
+    [InlineData(Ks2MathsScore.Filters.PupilCharacteristic.Values.Eal, new[] { 32.0, 31.0, 30.0 }, new[] { 33.0, 32.0, 31.0 }, new[] { 34.0, 33.0, 32.0 })]
+    [InlineData(Ks2MathsScore.Filters.PupilCharacteristic.Values.AllPupils, new[] { 82.0, 81.0, 80.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
+    [Theory]
+    public async Task AverageScaledScoreMaths_FilterBy_PupilCharacteristic_ContainsYearByYearValuesForSelectedCharacteristic(string characteristic, double[] currentSchool, double[] la, double[] england)
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithMathsScaledScore(current: "82", prev: "81", prev2: "80")
+                .WithMathsScaledScoreBoys(current: "72", prev: "71", prev2: "70")
+                .WithMathsScaledScoreGirls(current: "62", prev: "61", prev2: "60")
+                .WithMathsScaledScoreDisadvantaged(current: "52", prev: "51", prev2: "50")
+                .WithMathsScaledScoreNonDisadvantaged(current: "42", prev: "41", prev2: "40")
+                .WithMathsScaledScoreEal(current: "32", prev: "31", prev2: "30")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x
+                .WithMathsScaledScore(current: "83", prev: "82", prev2: "81")
+                .WithMathsScaledScoreBoys(current: "73", prev: "72", prev2: "71")
+                .WithMathsScaledScoreGirls(current: "63", prev: "62", prev2: "61")
+                .WithMathsScaledScoreDisadvantaged(current: "53", prev: "52", prev2: "51")
+                .WithMathsScaledScoreNonDisadvantaged(current: "43", prev: "42", prev2: "41")
+                .WithMathsScaledScoreEal(current: "33", prev: "32", prev2: "31")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x
+                .WithMathsScaledScore(current: "84", prev: "83", prev2: "82")
+                .WithMathsScaledScoreBoys(current: "74", prev: "73", prev2: "72")
+                .WithMathsScaledScoreGirls(current: "64", prev: "63", prev2: "62")
+                .WithMathsScaledScoreDisadvantaged(current: "54", prev: "53", prev2: "52")
+                .WithMathsScaledScoreNonDisadvantaged(current: "44", prev: "43", prev2: "42")
+                .WithMathsScaledScoreEal(current: "34", prev: "33", prev2: "32")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2MathsScore.Filters.PupilCharacteristic.Key] = characteristic
+        }));
+
+        var series = response.AverageScaledScoreMaths.Series;
+
+        series.Should().NotBeNull();
+        series.First(s => s.SeriesType == MeasureSeriesType.CurrentSchool)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.CurrentSchool, (decimal?)currentSchool[0], (decimal?)currentSchool[1], (decimal?)currentSchool[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.LASchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, (decimal?)la[0], (decimal?)la[1], (decimal?)la[2]));
+        series.First(s => s.SeriesType == MeasureSeriesType.EnglandSchoolsAverage)
+            .Should().Be(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, (decimal?)england[0], (decimal?)england[1], (decimal?)england[2]));
+    }
+
+    [Fact]
+    public async Task AverageScaledScoreMaths_FilterBy_PupilCharacteristic_NonMobile_EstablishmentHasData_ButLAAndEnglandAreNull()
+    {
+        _establishmentRepo.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Primary().InLA("001")));
+
+        _similarSchoolsRepo.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        _performanceRepo.SetupEstablishmentPerformance(
+            Build.Ks2Performance.Establishment("100001", x => x
+                .WithMathsScaledScoreNonMobile(current: "72", prev: "71", prev2: "70")));
+
+        _performanceRepo.SetupLAPerformance(
+             Build.Ks2Performance.LA("001", x => x.WithMathsScaledScore(current: "83", prev: "82", prev2: "81")));
+
+        _performanceRepo.SetupEnglandPerformance(
+            Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "84", prev: "83", prev2: "82")));
+
+        var response = await _sut.Execute(Request("100001", filterBy: new()
+        {
+            [Ks2MathsScore.Filters.PupilCharacteristic.Key] = Ks2MathsScore.Filters.PupilCharacteristic.Values.NonMobile
+        }));
+
+        var series = response.AverageScaledScoreMaths.Series;
+
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.CurrentSchool, 72, 71, 70));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.LASchoolsAverage, null, null, null));
+        series.Should().Contain(new MeasureSeries(MeasureSeriesType.EnglandSchoolsAverage, null, null, null));
     }
 
     private GetSchoolKs2PerformanceMeasuresRequest Request(string urn, Dictionary<string, string>? filterBy = null) =>
