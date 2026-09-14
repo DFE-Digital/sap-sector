@@ -169,7 +169,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("input[name='__Query']").FillAsync("Test School");
         await Page.WaitForTimeoutAsync(100);
 
-        var hiddenQueryValue = await Page.Locator("input[name='__Query'][type='hidden']").InputValueAsync();
+        var hiddenQueryValue = await Page.Locator("input[name='Query'][type='hidden']").InputValueAsync();
         hiddenQueryValue.Should().Be("Test School", "Hidden Query field should sync with visible input");
     }
 
@@ -830,7 +830,10 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         await jsDisabledPage.GotoAsync(Routes.FindASchool());
 
-        await jsDisabledPage.Locator("input[name='__Query']").FillAsync("Test School");
+        // With JavaScript disabled, accessible-autocomplete never runs, so the
+        // JS-generated "__Query" combobox is never created - only the original
+        // server-rendered "Query" input exists.
+        await jsDisabledPage.Locator("input[name='Query']").FillAsync("Test School");
         await jsDisabledPage.Locator("button[name='Search']").ClickAsync();
         await jsDisabledPage.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
