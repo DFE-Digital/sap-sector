@@ -291,7 +291,7 @@ public class SchoolKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture fix
 
         subjectValues.Add(await table.GetCells().AllTrimmedTextContentsAsync());
 
-        foreach (var subject in new[] { "Education", "Employment and apprenticeships" })
+        foreach (var subject in new[] { "Education", "Apprenticeships", "Employment" })
         {
             await section.GetByRole(AriaRole.Combobox, new() { Name = "Destination" }).SelectOptionAsync(subject);
             await table.WaitForDomToStopChanging();
