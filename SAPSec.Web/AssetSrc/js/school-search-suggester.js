@@ -173,6 +173,20 @@
             generatedInput.setAttribute("aria-label", labelElement.textContent.trim());
         }
 
+        // accessible-autocomplete builds its own aria-describedby on the generated input
+        // (pointing only at its internal "assistiveHint" keyboard-usage text), discarding
+        // the original input's link to our hint and validation-error text. Re-attach both
+        // so screen reader users still hear them via the enhanced input.
+        if (generatedInput) {
+            const hintId = `${inputElementId}-hint`;
+            const errorId = `${inputElementId}-error`;
+            const describedBy = [generatedInput.getAttribute("aria-describedby"), hintId];
+            if (document.getElementById(errorId)) {
+                describedBy.push(errorId);
+            }
+            generatedInput.setAttribute("aria-describedby", describedBy.filter(Boolean).join(" "));
+        }
+
         inputElement.type = "hidden";
 
         autoCompleteElement.addEventListener("keydown", (e) => {

@@ -153,7 +153,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.GotoAsync(Routes.FindASchool());
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var hiddenQueryField = Page.Locator("input[name='__Query'][type='hidden']");
+        var hiddenQueryField = Page.Locator("input[name='Query'][type='hidden']");
         var hiddenUrnField = Page.Locator("input[name='Urn'][type='hidden']");
 
         (await hiddenQueryField.CountAsync()).Should().Be(1, "Hidden Query field should exist");
