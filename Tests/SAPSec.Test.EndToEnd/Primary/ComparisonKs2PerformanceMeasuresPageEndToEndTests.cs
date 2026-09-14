@@ -25,6 +25,9 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
     // Most of this school's ranked similar schools have no characteristics data in the
     // EndToEnd JSON fixture, which 404s the Similarity page the "KS2" nav link lives on.
     // 101230 is a confirmed-good pairing (both schools have characteristics + KS2 data).
+    // The similar-schools list defaults to sorting by RwmExpected performance value
+    // (descending), not similarity rank, and is paginated at 10 per page - 101230 sits
+    // at position 34 of 50 in that ordering, which lands it on page 4.
     private const string ComparatorSchoolUrn = "101230";
     private const string ComparatorSchoolName = "Roding Primary School";
 
@@ -38,6 +41,7 @@ public class ComparisonKs2PerformanceMeasuresPageEndToEndTests(EndToEndTestsFixt
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Overview);
         await Page.GetByRole(AriaRole.Link, new() { Name = "View similar schools", Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools);
+        await NavigateTo($"{Routes.PrimarySchool(CurrentSchoolUrn).ViewSimilarSchools}?page=4");
         await Page.GetByRole(AriaRole.Link, new() { Name = ComparatorSchoolName, Exact = true }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(Routes.PrimarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
         await Page.GetByRole(AriaRole.Link, new() { Name = "KS2", Exact = true }).ClickAsync();

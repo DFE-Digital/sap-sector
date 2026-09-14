@@ -43,7 +43,8 @@ public class JsonKs4DestinationsRepository(
             .Where(x => laIds.Contains(x.Id, StringComparer.Ordinal))
             .ToDictionary(x => x.Id, StringComparer.Ordinal);
 
-        var englandDestinations = (await englandDestinationsFile.ReadAllAsync()).FirstOrDefault();
+        var englandDestinations = (await englandDestinationsFile.ReadAllAsync())
+            .FirstOrDefault(x => string.Equals(x.Id, "National", StringComparison.Ordinal));
 
         var results = new List<Ks4DestinationsData>(requestedUrns.Length);
 
