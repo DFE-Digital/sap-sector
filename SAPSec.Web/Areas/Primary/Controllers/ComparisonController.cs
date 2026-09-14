@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core;
-using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.Measures.Primary;
 using SAPSec.Core.Features.SchoolDetails.Comparison;
@@ -21,7 +20,6 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Route("school/primary/{urn}/view-similar-schools/{comparatorSchoolUrn}")]
 [Authorize]
 [RequireSchoolPhase(ExpectedSchoolPhase.Primary, "urn", "comparatorSchoolUrn")]
-[RequireFeatureFlag(FeatureFlags.EnablePrimarySchools)]
 public class ComparisonController(
     IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse> getSimilarityCharacteristicsUseCase,
     IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,

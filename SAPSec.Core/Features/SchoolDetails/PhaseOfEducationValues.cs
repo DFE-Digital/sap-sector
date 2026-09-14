@@ -103,15 +103,24 @@ public static class PhaseOfEducationValues
         return false;
     }
 
-    public static bool IsPrimaryOrAllThrough(string? phase)
+    public static bool IsPrimary(string? phase)
     {
         if (string.IsNullOrWhiteSpace(phase))
             return false;
 
         var trimmedPhase = phase.Trim();
 
-        return string.Equals(trimmedPhase, Primary, StringComparison.OrdinalIgnoreCase)
-            || string.Equals(trimmedPhase, AllThrough, StringComparison.OrdinalIgnoreCase);
+        return string.Equals(trimmedPhase, Primary, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public static bool IsAllThrough(string? phase)
+    {
+        if (string.IsNullOrWhiteSpace(phase))
+            return false;
+
+        var trimmedPhase = phase.Trim();
+
+        return string.Equals(trimmedPhase, AllThrough, StringComparison.OrdinalIgnoreCase);
     }
 
     public static bool IsSecondary(string? phase)
@@ -129,14 +138,21 @@ public static class PhaseOfEducationValues
         return trimmedPhaseId is PrimaryId or SecondaryId or AllThroughId;
     }
 
-    public static bool IsSearchableSearchPhaseId(string? phaseId, bool primarySchoolsEnabled)
+    public static bool IsPrimaryOrAllThrough(string? phase)
+        => IsPrimary(phase) || IsAllThrough(phase);
+
+    public static bool IsSearchableSearchPhaseId(
+        string? phaseId,
+        bool primarySchoolsEnabled,
+        bool allThroughSchoolsEnabled)
     {
         var trimmedPhaseId = phaseId?.Trim();
 
         return trimmedPhaseId switch
         {
             SecondaryId => true,
-            PrimaryId or AllThroughId => primarySchoolsEnabled,
+            PrimaryId => primarySchoolsEnabled,
+            AllThroughId => allThroughSchoolsEnabled,
             _ => false
         };
     }
