@@ -24,6 +24,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.PrimarySchool("100171").ViewSimilarSchools),
         new(Routes.PrimarySchool("100171").SchoolDetails),
         new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
+        new(Routes.PrimarySchool("100171").RiseResources),
         new(Routes.PrimarySchool("100171").Comparison("150318").Similarity),
         new(Routes.PrimarySchool("100171").Comparison("150318").Ks2),
         new(Routes.PrimarySchool("100171").Comparison("150318").Attendance),
@@ -36,6 +37,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),
+        new(Routes.SecondarySchool("100182").RiseResources),
         // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
         new(Routes.SecondarySchool("100182").Comparison("136555").Similarity, AllowHorizontalScroll: true),
         new(Routes.SecondarySchool("100182").Comparison("136555").KS4HeadlineMeasures),
@@ -277,7 +279,10 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
     {
         await NavigateTo(path);
 
-        var links = Page.Locator("main a");
+        // RISE resource links are content-managed external URLs that deliberately open in the
+        // current tab, not a new one, so they're excluded from this check rather than the
+        // domain-pattern list above (their domains vary and are controlled by content editors).
+        var links = Page.Locator("main a:not([data-testid='rise-resource-title'])");
         var count = await links.CountAsync();
 
         for (var i = 0; i < count; i++)
