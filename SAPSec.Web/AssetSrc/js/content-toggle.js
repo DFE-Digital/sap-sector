@@ -51,9 +51,9 @@ function initialiseToggle(toggle, activeIndex) {
         var nextPanel = panels[nextIndex];
         var activeName = activePanel.getAttribute("data-content-toggle-name") || "";
 
-        //button.setAttribute("aria-label", index === 0 ? "Show year by year" : "Show " + activeName);
+        button.setAttribute("aria-label", index === 0 ? "Show year by year, click to activate" : "Show 2024 to 2025, click to activate");
 
-        button.setAttribute("aria-label", "Show " + activeName);
+        //button.setAttribute("aria-label", "Show " + activeName);
 
         var nextName = nextPanel.getAttribute("data-content-toggle-name") || "";
 
