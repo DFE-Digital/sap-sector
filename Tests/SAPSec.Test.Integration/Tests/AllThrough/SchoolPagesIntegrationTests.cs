@@ -100,6 +100,53 @@ public class SchoolPagesIntegrationTests(
         button.GetAttribute("data-label-hide").Should().Be("Hide navigation");
     }
 
+    [Fact]
+    public async Task AttendancePage_ShowsPrototypeContent()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance);
+
+        page.QuerySelector(".govuk-caption-xl")!.TextContent.Trim().Should().Be("Test School 1");
+        page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("Attendance measures");
+        page.QuerySelector(".app-school-page p.govuk-body")!.TextContent.Trim().Should().Be("Compare this school's attendance measures with:");
+
+        page.QuerySelectorAll(".app-school-page ul.govuk-list li")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "the local authority primary average",
+                "the local authority secondary average",
+                "the national primary average",
+                "the national secondary average");
+
+        page.QuerySelector(".govuk-inset-text")!.TextContent.Should().Contain("Monitor your school attendance service");
+    }
+
+    [Fact]
+    public async Task AttendancePage_LinksToAllThroughSimilarSchoolsInfoAndVyedServices()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).Attendance);
+
+        var links = page.QuerySelectorAll(".app-school-page a").ToArray();
+
+        links[0].TextContent.Trim().Should().Be("how DfE identifies what a similar school is");
+        links[0].GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+
+        links[1].TextContent.Trim().Should().Be("View your education data (VYED) (opens in new tab)");
+        links[1].GetAttribute("href").Should().Be("https://viewyourdata.education.gov.uk/");
+        links[1].GetAttribute("target").Should().Be("_blank");
+        links[1].GetAttribute("rel").Should().Be("noopener noreferrer");
+
+        links[2].TextContent.Trim().Should().Be("get help on accessing VYED (opens in new tab)");
+        links[2].GetAttribute("href").Should().Be("https://viewyourdata.education.gov.uk/Account/Help");
+        links[2].GetAttribute("target").Should().Be("_blank");
+        links[2].GetAttribute("rel").Should().Be("noopener noreferrer");
+    }
+
     public static TheoryData<string, string, string> AllThroughPages => new()
     {
         { Routes.AllThroughSchool(Urn).Overview, "Test School 1", "Overview" },

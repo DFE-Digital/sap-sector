@@ -50,8 +50,13 @@ public class SchoolController(
 
     [HttpGet]
     [Route("attendance")]
-    public Task<IActionResult> Attendance(string urn) =>
-        HeadingPage(urn, "Attendance measures");
+    public async Task<IActionResult> Attendance(string urn)
+    {
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        await PopulateViewData(response.School);
+
+        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+    }
 
     [HttpGet]
     [Route("view-similar-schools")]
