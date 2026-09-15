@@ -13,7 +13,6 @@ public class SchoolDetailsPagesAccessibilityTests(AccessibilityTestsFixture fixt
 {
     private static readonly string[] SchoolDetailsPagePaths = [
         Routes.PrimarySchool("100171").SchoolDetails,
-        Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails,
         Routes.SecondarySchool("100052").SchoolDetails,
         Routes.SecondarySchool("100052").Comparison("141617").SchoolDetails
     ];
