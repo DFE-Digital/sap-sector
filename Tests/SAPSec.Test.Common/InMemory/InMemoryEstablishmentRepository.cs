@@ -8,19 +8,25 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
     private List<Establishment> _establishments = new();
     private List<EstablishmentEmail> _establishmentEmails = new();
 
-    public void SetupEstablishments(params Establishment[] establishments)
+    public InMemoryEstablishmentRepository SetupEstablishments(params Establishment[] establishments)
     {
         _establishments = establishments.ToList();
+
+        return this;
     }
 
-    public void SetupEstablishmentEmails(params EstablishmentEmail[] establishmentEmails)
+    public InMemoryEstablishmentRepository SetupEstablishmentEmails(params EstablishmentEmail[] establishmentEmails)
     {
         _establishmentEmails = establishmentEmails.ToList();
+
+        return this;
     }
 
-    public void ClearDown()
+    public InMemoryEstablishmentRepository ClearDown()
     {
         _establishments = [];
+
+        return this;
     }
 
     public Task<IReadOnlyCollection<Establishment>> GetAllEstablishmentsAsync()

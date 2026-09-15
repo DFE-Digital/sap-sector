@@ -33,7 +33,7 @@ public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
     protected override IntegrationTestsWebApplicationFactory CreateWebApplicationFactory() =>
         new InMemoryRepositoryIntegrationTestsWebApplicationFactory();
 
-    public override async Task DisposeAsync()
+    public void ClearDownRepositories()
     {
         EstablishmentRepository.ClearDown();
         SimilarSchoolsSecondaryRepository.ClearDown();
@@ -43,6 +43,11 @@ public class InMemoryRepositoryIntegrationTestFixture : IntegrationTestFixture
         Ks4DestinationsRepository.ClearDown();
         AbsenceRepository.ClearDown();
         RiseResourcesRepository.ClearDown();
+    }
+
+    public override async Task DisposeAsync()
+    {
+        ClearDownRepositories();
 
         await base.DisposeAsync();
     }

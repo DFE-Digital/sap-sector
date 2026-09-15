@@ -9,12 +9,12 @@ namespace SAPSec.Test.Accessibility.Setup;
 
 public abstract class AccessibilityTests : PageTest
 {
-    private readonly AccessibilityTestsFixture _fixture;
+    protected AccessibilityTestsFixture Fixture { get; }
 
     // ReSharper disable once ConvertToPrimaryConstructor
     protected AccessibilityTests(AccessibilityTestsFixture fixture)
     {
-        _fixture = fixture;
+        Fixture = fixture;
 
         // Run in headed mode when debugging
         if (System.Diagnostics.Debugger.IsAttached)
@@ -27,7 +27,7 @@ public abstract class AccessibilityTests : PageTest
     {
         return new BrowserNewContextOptions
         {
-            BaseURL = _fixture.BaseUrl.TrimEnd('/'),
+            BaseURL = Fixture.BaseUrl.TrimEnd('/'),
             IgnoreHTTPSErrors = true,
             ViewportSize = new() { Width = 1280, Height = 720 },
             Locale = "en-GB",

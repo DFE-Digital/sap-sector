@@ -25,6 +25,14 @@ public static class LocatorAssertionsExtensions
         values.Should().AllSatisfy(x => x.Should().MatchRegex(NumericValuePattern));
     }
 
+    public static async Task ToContainTextAsync(this ILocatorAssertions assertions, string text)
+    {
+        var locator = assertions.GetActualLocator();
+        var textContent = await locator.TextContentAsync();
+
+        textContent.Should().Contain(text);
+    }
+
     private static ILocator GetActualLocator(this ILocatorAssertions assertions)
     {
         // BRITTLE: ActualLocator is a private property of internal LocatorAssertions class,

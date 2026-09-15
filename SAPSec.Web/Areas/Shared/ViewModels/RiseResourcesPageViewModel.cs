@@ -61,8 +61,8 @@ public sealed class RiseResourcesPageViewModel
     public static RiseResourcesPageViewModel FromResponse(GetRiseResourcesResponse response) =>
         new()
         {
-            SchoolUrn = response.Urn,
-            SchoolName = response.SchoolName,
+            SchoolUrn = response.School.Urn,
+            SchoolName = response.School.Name,
             Categories = [.. response.Categories
                 .Select(category => new RiseResourceCategoryViewModel
                 {

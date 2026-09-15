@@ -7,6 +7,7 @@ using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
+using System.Net;
 using Xunit.Abstractions;
 
 namespace SAPSec.Test.Integration.Tests.Primary;
@@ -15,18 +16,6 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
-    private const string PrimarySchoolUrn = "100001";
-    private const string SimilarSchoolUrn = "100002";
-
-    public override Task InitializeAsync()
-    {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment(PrimarySchoolUrn, "Test School 1", x => x.Open().Primary().InLA("001")),
-            Build.Establishment(SimilarSchoolUrn, "Test School 2", x => x.Open().Primary().InLA("002")));
-
-        return base.InitializeAsync();
-    }
-
     public override Task DisposeAsync()
     {
         Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
@@ -35,10 +24,53 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task NonExistentCurrentSchoolUrn_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2, HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task NonExistentComparatorSchoolUrn_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2, HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task WhenComparatorSchoolIsNotInSimilarSchoolsGroupForCurrentSchool_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", []));
+
+        await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2, HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task SimilarSchoolComparison_Ks2_DisplaysProgressScoreSection()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var tabHeading = page.QuerySelector("h2.govuk-heading-l");
         tabHeading.Should().NotBeNull();
@@ -56,8 +88,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardRwm_MeasureExistsOnPage()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("expected-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Meeting expected standard in reading, writing and maths");
@@ -72,8 +111,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardRwm_Tabs()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -82,52 +128,73 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardRwm_TableView_ShouldShowCorrectValues()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithRwmExpected(current: "81", prev: "80", prev2: "79")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithRwmExpected(current: "60", prev: "61", prev2: "62")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithRwmExpected(current: "81", prev: "80", prev2: "79")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected(current: "60", prev: "61", prev2: "62")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithRwmExpected(current: "61", prev: "60", prev2: "59")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "62%", "61%", "60%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "62%", "61%", "60%"],
             ["Schools in England average", "59%", "60%", "61%"]);
     }
 
     [Fact]
     public async Task MeetingExpectedStandardRwm_TableView_ValuesRoundTo0DecimalPlaces()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithRwmExpected(current: "81.0", prev: "80.3", prev2: "78.5")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithRwmExpected(current: "59.8", prev: "61.4", prev2: "62.2")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithRwmExpected(current: "81.0", prev: "80.3", prev2: "78.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmExpected(current: "59.8", prev: "61.4", prev2: "62.2")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithRwmExpected(current: "60.5", prev: "60.4", prev2: "59.3")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-rwm-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "62%", "61%", "60%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "62%", "61%", "60%"],
             ["Schools in England average", "59%", "60%", "61%"]);
     }
 
     [Fact]
     public async Task MeetingExpectedStandardRwm_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -151,8 +218,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardRwm_Charts_UseCorrectSchoolColours()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-rwm-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -166,8 +240,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardRwm_SubjectFilter_HasExpectedOptions()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var filter = page.ElementWithTestIdShouldExist("expected-rwm-subject-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Reading, writing and maths", "Reading", "Writing", "Maths"]);
@@ -180,12 +261,19 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     public async Task MeetingExpectedStandardRwm_SubjectFilter_UpdatesTableViewWithSubjectValues(
         string filterOption, string[] currentSchool, string[] similarSchool, string[] england)
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x
+            Build.Ks2Performance.Establishment("100001", x => x
                 .WithRwmExpectedReading(current: "72", prev: "71", prev2: "70")
                 .WithRwmExpectedWriting(current: "62", prev: "61", prev2: "60")
                 .WithRwmExpectedMaths(current: "52", prev: "51", prev2: "50")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x
+            Build.Ks2Performance.Establishment("100002", x => x
                 .WithRwmExpectedReading(current: "52", prev: "51", prev2: "50")
                 .WithRwmExpectedWriting(current: "42", prev: "41", prev2: "40")
                 .WithRwmExpectedMaths(current: "32", prev: "31", prev2: "30")));
@@ -197,7 +285,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
                 .WithRwmExpectedMaths(current: "54", prev: "53", prev2: "52")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("expected-rwm-subject-filter");
         filter.SelectOption(filterOption);
@@ -209,16 +297,23 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchool],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchool],
             ["Schools in England average", .. england]);
     }
 
     [Fact]
     public async Task AchievedHigherStandardRwm_MeasureExistsOnPage()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("higher-rwm-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in reading, writing and maths");
@@ -233,8 +328,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedHigherStandardRwm_Tabs()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -243,52 +345,73 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedHigherStandardRwm_TableView_ShouldShowCorrectValues()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithRwmHigher(current: "31", prev: "30", prev2: "29")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithRwmHigher(current: "20", prev: "21", prev2: "22")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithRwmHigher(current: "31", prev: "30", prev2: "29")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmHigher(current: "20", prev: "21", prev2: "22")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithRwmHigher(current: "21", prev: "20", prev2: "19")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-rwm-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "29%", "30%", "31%"],
-            ["Test School 2", "22%", "21%", "20%"],
+            ["Current School", "29%", "30%", "31%"],
+            ["Comparator School", "22%", "21%", "20%"],
             ["Schools in England average", "19%", "20%", "21%"]);
     }
 
     [Fact]
     public async Task AchievedHigherStandardRwm_TableView_ValuesRoundTo0DecimalPlaces()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithRwmHigher(current: "31.0", prev: "30.3", prev2: "28.5")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithRwmHigher(current: "19.8", prev: "21.4", prev2: "22.2")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithRwmHigher(current: "31.0", prev: "30.3", prev2: "28.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithRwmHigher(current: "19.8", prev: "21.4", prev2: "22.2")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithRwmHigher(current: "20.5", prev: "20.4", prev2: "19.3")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-rwm-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "29%", "30%", "31%"],
-            ["Test School 2", "22%", "21%", "20%"],
+            ["Current School", "29%", "30%", "31%"],
+            ["Comparator School", "22%", "21%", "20%"],
             ["Schools in England average", "19%", "20%", "21%"]);
     }
 
     [Fact]
     public async Task AchievedHigherStandardRwm_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -312,8 +435,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedExpectedStandardRwm_Charts_UseCorrectSchoolColours()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-rwm-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -327,8 +457,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedHigherStandardRwm_SubjectFilter_HasExpectedOptions()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var filter = page.ElementWithTestIdShouldExist("higher-rwm-subject-filter");
         filter.ChildTrimmedTextContent().Should().Equal(["Reading, writing and maths", "Reading", "Writing", "Maths"]);
@@ -341,12 +478,19 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     public async Task AchievedHigherStandardRwm_SubjectFilter_UpdatesTableViewWithSubjectValues(
         string filterOption, string[] currentSchool, string[] similarSchool, string[] england)
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x
+            Build.Ks2Performance.Establishment("100001", x => x
                 .WithRwmHigherReading(current: "22", prev: "21", prev2: "20")
                 .WithRwmHigherWriting(current: "17", prev: "16", prev2: "15")
                 .WithRwmHigherMaths(current: "12", prev: "11", prev2: "10")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x
+            Build.Ks2Performance.Establishment("100002", x => x
                 .WithRwmHigherReading(current: "12", prev: "11", prev2: "10")
                 .WithRwmHigherWriting(current: "7", prev: "6", prev2: "5")
                 .WithRwmHigherMaths(current: "2", prev: "1", prev2: "0")));
@@ -358,7 +502,7 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
                 .WithRwmHigherMaths(current: "14", prev: "13", prev2: "12")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("higher-rwm-subject-filter");
         filter.SelectOption(filterOption);
@@ -370,16 +514,23 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchool],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchool],
             ["Schools in England average", .. england]);
     }
 
     [Fact]
     public async Task AverageScaledScoreReading_MeasureExistsOnPage()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("reading-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in reading");
@@ -394,8 +545,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AverageScaledScoreReading_Tabs()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var tabs = page.ElementWithTestIdShouldExist("higher-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -404,52 +562,73 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AverageScaledScoreReading_TableView_ShouldShowCorrectValues()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.4", prev: "100.4", prev2: "99.4")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "103.2", prev: "102.2", prev2: "101.2")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.4", prev: "106.6", prev2: "105.8")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "99.4", "100.4", "101.4"],
-            ["Test School 2", "101.2", "102.2", "103.2"],
+            ["Current School", "99.4", "100.4", "101.4"],
+            ["Comparator School", "101.2", "102.2", "103.2"],
             ["Schools in England average", "105.8", "106.6", "107.4"]);
     }
 
     [Fact]
     public async Task AverageScaledScoreReading_TableView_ValuesRoundTo1DecimalPlace()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithReadingScaledScore(current: "101.41", prev: "100.43", prev2: "99.42")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithReadingScaledScore(current: "103.24", prev: "102.20", prev2: "101.15")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithReadingScaledScore(current: "101.41", prev: "100.43", prev2: "99.42")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithReadingScaledScore(current: "103.24", prev: "102.20", prev2: "101.15")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithReadingScaledScore(current: "107.42", prev: "106.59", prev2: "105.82")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("reading-score-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "99.4", "100.4", "101.4"],
-            ["Test School 2", "101.2", "102.2", "103.2"],
+            ["Current School", "99.4", "100.4", "101.4"],
+            ["Comparator School", "101.2", "102.2", "103.2"],
             ["Schools in England average", "105.8", "106.6", "107.4"]);
     }
 
     [Fact]
     public async Task AverageScaledScoreReading_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -473,8 +652,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AverageScaledScoreReading_Charts_UseCorrectSchoolColours()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("reading-score-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -488,8 +674,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AverageScaledScoreMaths_MeasureExistsOnPage()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("maths-score-heading");
         heading.TrimmedTextContent().Should().Be("Average scaled score in maths");
@@ -504,8 +697,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AverageScaledScoreMaths_Tabs()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var tabs = page.ElementWithTestIdShouldExist("reading-score-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -514,52 +714,73 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AverageScaledScoreMaths_TableView_ShouldShowCorrectValues()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithMathsScaledScore(current: "102.4", prev: "101.4", prev2: "100.4")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithMathsScaledScore(current: "104.2", prev: "103.2", prev2: "102.2")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithMathsScaledScore(current: "102.4", prev: "101.4", prev2: "100.4")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithMathsScaledScore(current: "104.2", prev: "103.2", prev2: "102.2")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.4", prev: "107.6", prev2: "106.8")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "100.4", "101.4", "102.4"],
-            ["Test School 2", "102.2", "103.2", "104.2"],
+            ["Current School", "100.4", "101.4", "102.4"],
+            ["Comparator School", "102.2", "103.2", "104.2"],
             ["Schools in England average", "106.8", "107.6", "108.4"]);
     }
 
     [Fact]
     public async Task AverageScaledScoreMaths_TableView_ValuesRoundTo1DecimalPlace()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithMathsScaledScore(current: "102.42", prev: "101.41", prev2: "100.39")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithMathsScaledScore(current: "104.21", prev: "103.22", prev2: "102.19")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithMathsScaledScore(current: "102.42", prev: "101.41", prev2: "100.39")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithMathsScaledScore(current: "104.21", prev: "103.22", prev2: "102.19")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithMathsScaledScore(current: "108.37", prev: "107.61", prev2: "106.79")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("maths-score-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "100.4", "101.4", "102.4"],
-            ["Test School 2", "102.2", "103.2", "104.2"],
+            ["Current School", "100.4", "101.4", "102.4"],
+            ["Comparator School", "102.2", "103.2", "104.2"],
             ["Schools in England average", "106.8", "107.6", "108.4"]);
     }
 
     [Fact]
     public async Task AverageScaledScoreMaths_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -583,8 +804,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AverageScaledScoreMaths_Charts_UseCorrectSchoolColours()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("maths-score-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -598,8 +826,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardGps_MeasureExistsOnPage()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("expected-gps-heading");
         heading.TrimmedTextContent().Should().Be("Meeting expected standard in grammar, punctuation and spelling");
@@ -617,8 +852,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardGps_Tabs()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var tabs = page.ElementWithTestIdShouldExist("maths-score-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -627,52 +869,73 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardGps_TableView_ShouldShowCorrectValues()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsExpected(current: "62", prev: "61", prev2: "60")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsExpected(current: "77", prev: "76", prev2: "75")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsExpected(current: "62", prev: "61", prev2: "60")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsExpected(current: "77", prev: "76", prev2: "75")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69", prev: "68", prev2: "67")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "60%", "61%", "62%"],
-            ["Test School 2", "75%", "76%", "77%"],
+            ["Current School", "60%", "61%", "62%"],
+            ["Comparator School", "75%", "76%", "77%"],
             ["Schools in England average", "67%", "68%", "69%"]);
     }
 
     [Fact]
     public async Task MeetingExpectedStandardGps_TableView_ValuesRoundTo0DecimalPlaces()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsExpected(current: "62.0", prev: "61.2", prev2: "59.6")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsExpected(current: "77.2", prev: "76.4", prev2: "74.5")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsExpected(current: "62.0", prev: "61.2", prev2: "59.6")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsExpected(current: "77.2", prev: "76.4", prev2: "74.5")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithGpsExpected(current: "69.0", prev: "67.5", prev2: "67.1")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("expected-gps-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "60%", "61%", "62%"],
-            ["Test School 2", "75%", "76%", "77%"],
+            ["Current School", "60%", "61%", "62%"],
+            ["Comparator School", "75%", "76%", "77%"],
             ["Schools in England average", "67%", "68%", "69%"]);
     }
 
     [Fact]
     public async Task MeetingExpectedStandardGps_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -696,8 +959,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task MeetingExpectedStandardGps_Charts_UseCorrectSchoolColours()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("expected-gps-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
@@ -711,8 +981,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedHigherStandardGps_MeasureExistsOnPage()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var heading = page.ElementWithTestIdShouldExist("higher-gps-heading");
         heading.TrimmedTextContent().Should().Be("Achieved a higher standard in grammar, punctuation and spelling");
@@ -730,8 +1007,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedHigherStandardGps_Tabs()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var tabs = page.ElementWithTestIdShouldExist("expected-gps-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -740,52 +1024,73 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedHigherStandardGps_TableView_ShouldShowCorrectValues()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsHigher(current: "18", prev: "17", prev2: "16")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsHigher(current: "24", prev: "23", prev2: "22")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18", prev: "17", prev2: "16")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "24", prev: "23", prev2: "22")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15", prev: "14", prev2: "13")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "16%", "17%", "18%"],
-            ["Test School 2", "22%", "23%", "24%"],
+            ["Current School", "16%", "17%", "18%"],
+            ["Comparator School", "22%", "23%", "24%"],
             ["Schools in England average", "13%", "14%", "15%"]);
     }
 
     [Fact]
     public async Task AchievedHigherStandardGps_TableView_ValuesRoundTo0DecimalPlaces()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.Ks2PerformanceRepository.SetupEstablishmentPerformance(
-            Build.Ks2Performance.Establishment(PrimarySchoolUrn, x => x.WithGpsHigher(current: "18.1", prev: "17.2", prev2: "15.5")),
-            Build.Ks2Performance.Establishment(SimilarSchoolUrn, x => x.WithGpsHigher(current: "24.0", prev: "23.2", prev2: "21.8")));
+            Build.Ks2Performance.Establishment("100001", x => x.WithGpsHigher(current: "18.1", prev: "17.2", prev2: "15.5")),
+            Build.Ks2Performance.Establishment("100002", x => x.WithGpsHigher(current: "24.0", prev: "23.2", prev2: "21.8")));
 
         Fixture.Ks2PerformanceRepository.SetupEnglandPerformance(
             Build.Ks2Performance.England(x => x.WithGpsHigher(current: "15.1", prev: "13.6", prev2: "13.2")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("higher-gps-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "16%", "17%", "18%"],
-            ["Test School 2", "22%", "23%", "24%"],
+            ["Current School", "16%", "17%", "18%"],
+            ["Comparator School", "22%", "23%", "24%"],
             ["Schools in England average", "13%", "14%", "15%"]);
     }
 
     [Fact]
     public async Task AchievedHigherStandardGps_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -809,8 +1114,15 @@ public class ComparisonKs2PerformanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task AchievedHigherStandardGps_Charts_UseCorrectSchoolColours()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Ks2);
+            Routes.PrimarySchool("100001").Comparison("100002").Ks2);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("higher-gps-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")

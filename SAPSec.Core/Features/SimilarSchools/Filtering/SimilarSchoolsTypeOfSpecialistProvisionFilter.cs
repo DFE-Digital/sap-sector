@@ -1,7 +1,6 @@
 ﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Filtering;
-using SAPSec.Core.Model;
-using SAPSec.Core.Rules;
 
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
@@ -15,11 +14,10 @@ public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
         filterValues,
         currentSchool)
 {
-    private readonly ResourcedProvisionRule _resourcedProvisionRule = new();
     protected override DataWithAvailability<string>? CurrentSchoolValue
         => DataWithAvailability.Available(FindGroup(CurrentSchool).Name);
 
-    protected override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values)
     {
         if (!values.Any())
         {
@@ -28,21 +26,21 @@ public class SimilarSchoolsTypeOfSpecialistProvisionFilter(string key,
 
         return items.Where(i =>
             (values.Contains("R", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "Resourced provision")
+                && similarSchoolAccessor(i).ResourcedProvision?.Name == "Resourced provision")
             || (values.Contains("RS", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "Resourced provision and SEN unit")
+                && similarSchoolAccessor(i).ResourcedProvision?.Name == "Resourced provision and SEN unit")
             || (values.Contains("S", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name == "SEN unit")
+                && similarSchoolAccessor(i).ResourcedProvision?.Name == "SEN unit")
             || (values.Contains("N", StringComparer.OrdinalIgnoreCase)
-                && i.ResourcedProvision?.Name != "Resourced provision"
-                && i.ResourcedProvision?.Name != "Resourced provision and SEN unit"
-                && i.ResourcedProvision?.Name != "SEN unit"));
+                && similarSchoolAccessor(i).ResourcedProvision?.Name != "Resourced provision"
+                && similarSchoolAccessor(i).ResourcedProvision?.Name != "Resourced provision and SEN unit"
+                && similarSchoolAccessor(i).ResourcedProvision?.Name != "SEN unit"));
     }
 
-    protected override IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values)
+    protected override IEnumerable<FilterOption> GetPossibleOptions<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values)
     {
         return items
-            .GroupBy(FindGroup)
+            .GroupBy(i => FindGroup(similarSchoolAccessor(i)))
             .Select(g => new FilterOption(
                 g.Key!.Key,
                 g.Key.Name,

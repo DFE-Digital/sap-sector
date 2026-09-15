@@ -1,5 +1,4 @@
-using SAPSec.Core.Constants;
-using SAPSec.Data.Dto;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Data.Repositories;
 
@@ -29,7 +28,7 @@ internal class RiseResourcesDataProvider(
 
         var categories = BuildOrderedCategories(document.ResourceCategories, applicableResources);
 
-        return new RiseResourcesSourceData(establishment, categories);
+        return new RiseResourcesSourceData(SchoolInfo.SchoolInfo.FromEstablishment(establishment), categories);
     }
 
     private static IReadOnlyList<RiseResourceCategory> BuildOrderedCategories(
@@ -125,5 +124,5 @@ internal class RiseResourcesDataProvider(
 }
 
 internal record RiseResourcesSourceData(
-    Establishment Establishment,
+    SchoolInfo.SchoolInfo School,
     IReadOnlyList<RiseResourceCategory> Categories);

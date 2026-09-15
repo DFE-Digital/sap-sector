@@ -4,12 +4,14 @@ using SAPSec.Test.Accessibility.Setup;
 using SAPSec.Test.Common.Playwright;
 using SAPSec.Test.EndToEnd.Setup;
 using SAPSec.Web.Constants;
+using System.Text.RegularExpressions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace SAPSec.Test.Accessibility;
 
 [Collection("AccessibilityTestsCollection")]
-public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : AccessibilityTests(fixture)
+public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, ITestOutputHelper outputHelper) : AccessibilityTests(fixture)
 {
     private static readonly PageTestCase[] AllPagePaths = [
         new(Routes.Home),
@@ -44,6 +46,14 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
         new(Routes.SecondarySchool("100182").Comparison("136555").SchoolDetails),
         
         // TODO: Fill out with all pages from service
+    ];
+
+    private static readonly Regex[] LinkPatternsNotRequiredToOpenInANewTab = [
+        new Regex(@"^\/", RegexOptions.Compiled | RegexOptions.IgnoreCase),
+        new Regex(@"^\#", RegexOptions.Compiled | RegexOptions.IgnoreCase),
+        new Regex(@"^mailto\:", RegexOptions.Compiled | RegexOptions.IgnoreCase),
+        new Regex(@"help\.signin\.education\.gov\.uk", RegexOptions.Compiled | RegexOptions.IgnoreCase),
+        new Regex(@"leafletjs\.com", RegexOptions.Compiled | RegexOptions.IgnoreCase)
     ];
 
     [Theory]
@@ -260,6 +270,60 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture) : 
             var href = await links.Nth(i).GetAttributeAsync("href");
 
             href.Should().NotBeNullOrWhiteSpace();
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(AllPages))]
+    public async Task AllPages_ExternalLinks_ShouldOpenInANewTab(string path)
+    {
+        await NavigateTo(path);
+
+        // RISE resource links are content-managed external URLs that deliberately open in the
+        // current tab, not a new one, so they're excluded from this check rather than the
+        // domain-pattern list above (their domains vary and are controlled by content editors).
+        var links = Page.Locator("main a:not([data-testid='rise-resource-title'])");
+        var count = await links.CountAsync();
+
+        for (var i = 0; i < count; i++)
+        {
+            var link = links.Nth(i);
+            var href = await link.GetAttributeAsync("href");
+
+            if (href is not null && !LinkPatternsNotRequiredToOpenInANewTab.Any(r => r.IsMatch(href)))
+            {
+                var content = await link.TrimmedTextContentAsync();
+                outputHelper.WriteLine($"{content} ({href})");
+                content.Should().MatchRegex(@"\(opens in new tab\)\.?$");
+
+                var target = await link.GetAttributeAsync("target");
+                target.Should().Be("_blank");
+
+                var rel = await link.GetAttributeAsync("rel");
+                rel.Should().NotBeNull();
+                rel.Should().Contain("noopener");
+                rel.Should().Contain("noreferrer");
+            }
+        }
+    }
+
+    [Theory]
+    [MemberData(nameof(AllPages))]
+    public async Task AllPages_SummaryListRows_HaveKeyAndValue(string path)
+    {
+        await NavigateTo(path);
+
+        var rows = Page.Locator(".govuk-summary-list__row");
+        var count = await rows.CountAsync();
+
+        for (var i = 0; i < count; i++)
+        {
+            var row = rows.Nth(i);
+            var key = row.Locator(".govuk-summary-list__key");
+            var value = row.Locator(".govuk-summary-list__value");
+
+            (await key.CountAsync()).Should().Be(1, $"Row {i} should have a key");
+            (await value.CountAsync()).Should().Be(1, $"Row {i} should have a value");
         }
     }
 

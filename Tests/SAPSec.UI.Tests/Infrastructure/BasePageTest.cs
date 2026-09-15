@@ -33,12 +33,31 @@ public abstract class BasePageTest : PageTest
         };
     }
 
+    // 1x1 transparent PNG, used to stub map tile responses below.
+    private static readonly byte[] StubTilePng = Convert.FromBase64String(
+        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=");
+
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
 
         Page.SetDefaultTimeout((float)TimeSpan.FromSeconds(60).TotalMilliseconds);
         Page.SetDefaultNavigationTimeout((float)TimeSpan.FromSeconds(100).TotalMilliseconds);
+
+        // Search results pages render a Leaflet map that fetches tiles from
+        // tile.openstreetmap.org. That server actively rate-limits/blocks automated
+        // traffic (including CI runners), so real tile requests can hang indefinitely -
+        // which in turn stalls every WaitForLoadStateAsync(NetworkIdle) call in this
+        // suite. Stub tile responses so they resolve instantly and never block network-idle.
+        await Page.RouteAsync("**/tile.openstreetmap.org/**", async route =>
+        {
+            await route.FulfillAsync(new RouteFulfillOptions
+            {
+                Status = 200,
+                ContentType = "image/png",
+                BodyBytes = StubTilePng
+            });
+        });
     }
 
     public async Task WaitForSearchInputsAsync(int timeoutMs = 5000)

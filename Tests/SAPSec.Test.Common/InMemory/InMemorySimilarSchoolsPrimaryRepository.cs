@@ -8,20 +8,26 @@ public class InMemorySimilarSchoolsPrimaryRepository : ISimilarSchoolsPrimaryRep
     private List<SimilarSchoolsPrimaryGroupsEntry> _groups = new();
     private List<SimilarSchoolsPrimaryValuesEntry> _values = new();
 
-    public void SetupGroups(params SimilarSchoolsPrimaryGroupsEntry[] groups)
+    public InMemorySimilarSchoolsPrimaryRepository SetupGroups(params SimilarSchoolsPrimaryGroupsEntry[] groups)
     {
         _groups = groups.ToList();
+
+        return this;
     }
 
-    public void SetupValues(params SimilarSchoolsPrimaryValuesEntry[] values)
+    public InMemorySimilarSchoolsPrimaryRepository SetupValues(params SimilarSchoolsPrimaryValuesEntry[] values)
     {
         _values = values.ToList();
+
+        return this;
     }
 
-    public void ClearDown()
+    public InMemorySimilarSchoolsPrimaryRepository ClearDown()
     {
         _groups = [];
         _values = [];
+
+        return this;
     }
 
     public Task<IReadOnlyCollection<SimilarSchoolsPrimaryGroupsEntry>> GetGroupAsync(string urn)

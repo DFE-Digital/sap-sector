@@ -13,17 +13,17 @@ public abstract class SimilarSchoolsMultiValueFilter(
 {
     public override bool IsApplied => HasFilterValues(Key);
 
-    public override IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items)
+    public override IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor)
     {
         var values = FilterValues.ContainsKey(Key) ? FilterValues[Key] : [];
 
-        return Filter(items, values);
+        return Filter(items, similarSchoolAccessor, values);
     }
 
-    public override SimilarSchoolsAvailableFilter? AsAvailableFilter(IEnumerable<SimilarSchool> items)
+    public override SimilarSchoolsAvailableFilter? AsAvailableFilter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor)
     {
         var values = FilterValues.ContainsKey(Key) ? FilterValues[Key] : [];
-        var options = GetPossibleOptions(items, values).ToList().AsReadOnly();
+        var options = GetPossibleOptions(items, similarSchoolAccessor, values).ToList().AsReadOnly();
         if (options.Count > 1)
         {
             return new SimilarSchoolsMultiValueAvailableFilter(
@@ -36,6 +36,6 @@ public abstract class SimilarSchoolsMultiValueFilter(
         return null;
     }
 
-    protected abstract IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items, IEnumerable<string?> values);
-    protected abstract IEnumerable<FilterOption> GetPossibleOptions(IEnumerable<SimilarSchool> items, IEnumerable<string?> values);
+    protected abstract IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values);
+    protected abstract IEnumerable<FilterOption> GetPossibleOptions<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor, IEnumerable<string?> values);
 }

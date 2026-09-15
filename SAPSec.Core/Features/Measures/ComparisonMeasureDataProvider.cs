@@ -2,16 +2,19 @@ using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures;
 
-public class ComparisonMeasureDataProvider<T>(
+public class ComparisonMeasureDataProvider<T, TGroupsEntry, TValuesEntry>(
     IEstablishmentRepository establishmentRepository,
+    ISimilarSchoolsRepository<TGroupsEntry, TValuesEntry> similarSchoolsRepository,
     IMeasureDataRepository<T> repository) : IComparisonMeasureDataProvider<T>
     where T : class, IMeasureData
+    where TGroupsEntry : ISimilarSchoolsGroupsEntry
+    where TValuesEntry : ISimilarSchoolsValuesEntry
 {
     public async Task<ComparisonMeasureData<T>> GetData(
         string currentSchoolUrn,
-        string similarSchoolUrn)
+        string comparatorSchoolUrn)
     {
-        var urns = new[] { currentSchoolUrn, similarSchoolUrn };
+        string[] urns = [currentSchoolUrn, comparatorSchoolUrn];
 
         var schools = (await establishmentRepository.GetEstablishmentsAsync(urns))
             .Select(SchoolInfo.SchoolInfo.FromEstablishment)
@@ -22,9 +25,16 @@ public class ComparisonMeasureDataProvider<T>(
             throw new NotFoundException($"School not found with URN: {currentSchoolUrn}");
         }
 
-        if (!schools.ContainsKey(similarSchoolUrn))
+        if (!schools.ContainsKey(comparatorSchoolUrn))
         {
-            throw new NotFoundException($"School not found with URN: {similarSchoolUrn}");
+            throw new NotFoundException($"School not found with URN: {comparatorSchoolUrn}");
+        }
+
+        var group = await similarSchoolsRepository.GetGroupAsync(currentSchoolUrn);
+
+        if (!group.Any(g => g.NeighbourURN == comparatorSchoolUrn))
+        {
+            throw new NotFoundException($"School with URN {comparatorSchoolUrn} is not in similar schools group for school with URN {currentSchoolUrn}");
         }
 
         var absence = (await repository.GetByUrnsAsync(urns))
@@ -34,10 +44,10 @@ public class ComparisonMeasureDataProvider<T>(
             schools[currentSchoolUrn],
             absence.TryGetValue(currentSchoolUrn, out var currentAbsence) ? currentAbsence : null);
 
-        var similarSchoolData = new SchoolMeasureData<T>(
-            schools[similarSchoolUrn],
-            absence.TryGetValue(similarSchoolUrn, out var similarAbsence) ? similarAbsence : null);
+        var comparatorSchoolData = new SchoolMeasureData<T>(
+            schools[comparatorSchoolUrn],
+            absence.TryGetValue(comparatorSchoolUrn, out var similarAbsence) ? similarAbsence : null);
 
-        return new(currentSchoolData, similarSchoolData);
+        return new(currentSchoolData, comparatorSchoolData);
     }
 }

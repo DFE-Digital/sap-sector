@@ -32,6 +32,8 @@
             }
             <div class="govuk-form-group @(hasError ? "govuk-form-group--error" : string.Empty)">
                 <h1 class="govuk-label-wrapper">
+                    @* The "__" prefix matches the id accessible-autocomplete generates for the
+                       visible combobox it swaps in for #Query once JS runs (school-search-suggester.js) *@
                     <label class="govuk-label govuk-label--xl" for="__@nameof(SchoolSearchQueryViewModel.Query)">
                         @ViewData[ViewDataKeys.Title]
                     </label>

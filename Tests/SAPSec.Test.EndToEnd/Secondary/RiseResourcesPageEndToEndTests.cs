@@ -53,8 +53,9 @@ public class RiseResourcesPageEndToEndTests(EndToEndTestsFixture fixture)
 
         contentsLinkCount.Should().Be(subCategoryCount).And.BeGreaterThan(0);
 
-        // Resource links come from the content file and open in a new tab.
-        await Expect(Page.GetByTestId("rise-resource-title").First).ToHaveAttributeAsync("target", "_blank");
+        // Resource links come from the content file and open in the same tab (no target override).
+        var target = await Page.GetByTestId("rise-resource-title").First.GetAttributeAsync("target");
+        target.Should().BeNull();
     }
 
     [Fact]

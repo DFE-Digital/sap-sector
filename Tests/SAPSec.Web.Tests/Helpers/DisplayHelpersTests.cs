@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Model;
 using SAPSec.Web.Helpers;
-using Xunit;
 
 namespace SAPSec.Web.Tests.Helpers;
 

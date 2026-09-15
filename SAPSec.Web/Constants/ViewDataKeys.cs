@@ -6,11 +6,9 @@ public static class ViewDataKeys
     public const string Title = nameof(Title);
     public const string UseJsBackLink = nameof(UseJsBackLink);
     public const string CookieReturnUrl = nameof(CookieReturnUrl);
-    public const string BreadcrumbNode = nameof(BreadcrumbNode);
     public const string SchoolUrn = nameof(SchoolUrn);
     public const string SchoolName = nameof(SchoolName);
     public const string SchoolLayout = nameof(SchoolLayout);
-    public const string SchoolDetails = nameof(SchoolDetails);
     public const string SchoolNavigation = nameof(SchoolNavigation);
     public const string ComparisonSchool = nameof(ComparisonSchool);
     public const string ComparisonLayout = nameof(ComparisonLayout);

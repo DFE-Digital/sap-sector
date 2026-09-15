@@ -15,8 +15,7 @@ public class GetRiseResourcesUseCase(
         var data = await dataProvider.GetRiseResourcesData(request.Urn);
 
         return new(
-            Urn: data.Establishment.URN,
-            SchoolName: data.Establishment.EstablishmentName,
+            School: data.School,
             Categories: data.Categories);
     }
 }
@@ -24,8 +23,7 @@ public class GetRiseResourcesUseCase(
 public record GetRiseResourcesRequest(string Urn);
 
 public record GetRiseResourcesResponse(
-    string Urn,
-    string SchoolName,
+    SchoolInfo.SchoolInfo School,
     IReadOnlyList<RiseResourceCategory> Categories);
 
 public record RiseResourceCategory(

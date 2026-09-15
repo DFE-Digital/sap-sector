@@ -1,5 +1,6 @@
 using FluentAssertions;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Data.Dto.RiseResources;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;

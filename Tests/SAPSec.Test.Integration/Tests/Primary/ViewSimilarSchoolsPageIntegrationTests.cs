@@ -1,4 +1,5 @@
 using FluentAssertions;
+using SAPSec.Core.Constants;
 using SAPSec.Data.Dto;
 using SAPSec.Data.Dto.Absence;
 using SAPSec.Data.Dto.SimilarSchools.Primary;
@@ -15,6 +16,13 @@ public class ViewSimilarSchoolsPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
+    public override Task DisposeAsync()
+    {
+        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
+
+        return base.DisposeAsync();
+    }
+
     [Fact]
     public async Task ViewSimilarSchools_ShowsExistingSimilarSchoolFiltersAndResults()
     {

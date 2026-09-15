@@ -163,6 +163,30 @@
             inputClasses: "govuk-input-autocomplete",
         });
 
+        // axe-core's label-visibility check doesn't reliably resolve the <label for>
+        // relationship once accessible-autocomplete swaps in this generated input, so
+        // set an explicit aria-label from the original label's text as a direct, unambiguous
+        // accessible name.
+        const labelElement = document.querySelector(`label[for="${id}"]`);
+        const generatedInput = document.getElementById(id);
+        if (labelElement && generatedInput) {
+            generatedInput.setAttribute("aria-label", labelElement.textContent.trim());
+        }
+
+        // accessible-autocomplete builds its own aria-describedby on the generated input
+        // (pointing only at its internal "assistiveHint" keyboard-usage text), discarding
+        // the original input's link to our hint and validation-error text. Re-attach both
+        // so screen reader users still hear them via the enhanced input.
+        if (generatedInput) {
+            const hintId = `${inputElementId}-hint`;
+            const errorId = `${inputElementId}-error`;
+            const describedBy = [generatedInput.getAttribute("aria-describedby"), hintId];
+            if (document.getElementById(errorId)) {
+                describedBy.push(errorId);
+            }
+            generatedInput.setAttribute("aria-describedby", describedBy.filter(Boolean).join(" "));
+        }
+
         inputElement.type = "hidden";
 
         autoCompleteElement.addEventListener("keydown", (e) => {

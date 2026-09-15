@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Html.Dom;
 using FluentAssertions;
+using SAPSec.Core.Constants;
 using SAPSec.Core.Services.Helper;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
@@ -15,6 +16,13 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
+    public override Task DisposeAsync()
+    {
+        Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
+
+        return base.DisposeAsync();
+    }
+
     [Fact]
     public async Task Absence_MeasureExistsOnPage()
     {
@@ -59,7 +67,7 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
             ["Test School 1", "8.10%", "8.20%", "7.90%"],
             ["Local authority schools average", "9.10%", "9.00%", "8.90%"],
             ["Schools in England average", "10.10%", "10.00%", "9.90%"]);
@@ -85,7 +93,7 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
             ["Test School 1", "8.11%", "8.32%", "7.89%"],
             ["Local authority schools average", "9.10%", "8.98%", "8.91%"],
             ["Schools in England average", "7.21%", "8.52%", "9.50%"]);
@@ -181,7 +189,7 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
         var table = newPage.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
 
         table.ShouldHaveRows(
-            ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
             ["Test School 1", .. currentSchool],
             ["Local authority schools average", .. la],
             ["Schools in England average", .. england]);
