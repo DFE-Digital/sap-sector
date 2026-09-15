@@ -17,6 +17,7 @@ public static class PostgresDependenciesExtensions
         services.AddSingleton<IKs4PerformanceRepository, PostgresKs4PerformanceRepository>();
         services.AddSingleton<IKs4DestinationsRepository, PostgresKs4DestinationsRepository>();
         services.AddSingleton<IAbsenceRepository, PostgresAbsenceRepository>();
+        services.AddSingleton<IKs2PerformanceRepository, PostgresKs2PerformanceRepository>();
 
         return services;
     }

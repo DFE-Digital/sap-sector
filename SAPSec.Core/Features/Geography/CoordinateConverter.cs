@@ -23,3 +23,9 @@ public static class CoordinateConverter
         return new(wgsLatLon.Latitude, wgsLatLon.Longitude);
     }
 }
+
+public static class CoordinateExtensions
+{
+    public static GeographicCoordinates? ToGeographicCoordinates(this BNGCoordinates? coordinates)
+        => coordinates is null ? null : CoordinateConverter.Convert(coordinates);
+}

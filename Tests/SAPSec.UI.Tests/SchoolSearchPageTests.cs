@@ -760,7 +760,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
     {
         await Page.GotoAsync(Routes.FindASchool());
 
-        var input = Page.Locator("input[name='Query']");
+        var input = Page.Locator("input[name='__Query']");
         var ariaDescribedBy = await input.GetAttributeAsync("aria-describedby");
 
         ariaDescribedBy.Should().Contain("hint", "Input should reference hint text");
@@ -774,7 +774,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         await Page.Locator("button[name='Search']").ClickAsync();
         await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
-        var input = Page.Locator("input[name='Query']");
+        var input = Page.Locator("input[name='__Query']");
         var ariaDescribedBy = await input.GetAttributeAsync("aria-describedby");
 
         ariaDescribedBy.Should().Contain("error", "Input with error should reference error message");
@@ -830,6 +830,9 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
 
         await jsDisabledPage.GotoAsync(Routes.FindASchool());
 
+        // With JavaScript disabled, accessible-autocomplete never runs, so the
+        // JS-generated "__Query" combobox is never created - only the original
+        // server-rendered "Query" input exists.
         await jsDisabledPage.Locator("input[name='Query']").FillAsync("Test School");
         await jsDisabledPage.Locator("button[name='Search']").ClickAsync();
         await jsDisabledPage.WaitForLoadStateAsync(LoadState.NetworkIdle);

@@ -1,6 +1,7 @@
 (function () {
     let initialised = false;
     let mapInstance = null;
+    let clusterFocusRestoreTimer = null;
 
     function getFocusablePopupElements(marker) {
         const popupEl = marker.getPopup()?.getElement();
@@ -67,22 +68,179 @@
 
         const orderedMarkers = rows
             .sort((left, right) => left.centerY - right.centerY)
-            .flatMap((row, rowIndex) => {
-                const sortedRowItems = row.items
-                    .sort((left, right) => left.rect.left - right.rect.left);
-
-                if (rowIndex % 2 === 1) {
-                    sortedRowItems.reverse();
-                }
-
-                return sortedRowItems.map((item) => item.element);
+            .flatMap((row) => {
+                return row.items
+                    .sort((left, right) => left.rect.left - right.rect.left)
+                    .map((item) => item.element);
             });
 
         return [...orderedMarkers, ...controls];
     }
 
+    function getClusterResetTarget(items, direction) {
+        const markerItems = items.filter((element) => !element.classList.contains("marker-cluster"));
+
+        if (direction < 0) {
+            return markerItems[markerItems.length - 1] || items[items.length - 1] || null;
+        }
+
+        return markerItems[0] || items[0] || null;
+    }
+
+    function getMarkerResetTarget(items, direction) {
+        const markerItems = items.filter((element) => !element.classList.contains("marker-cluster"));
+
+        if (!markerItems.length) {
+            return null;
+        }
+
+        return direction < 0
+            ? markerItems[markerItems.length - 1]
+            : markerItems[0];
+    }
+
+    function syncMapTabStops(host, preferredElement = null) {
+        const items = getVisibleMapItems(host);
+        if (!items.length) {
+            return;
+        }
+
+        const activeElement = document.activeElement;
+        let tabStop = preferredElement && items.includes(preferredElement)
+            ? preferredElement
+            : null;
+
+        if (!tabStop && host.dataset.pendingClusterFocusReset === "true") {
+            tabStop = getClusterResetTarget(items, 1);
+        }
+
+        if (!tabStop && activeElement && items.includes(activeElement)) {
+            tabStop = activeElement;
+        }
+
+        if (!tabStop) {
+            tabStop = getClusterResetTarget(items, 1);
+        }
+
+        items.forEach((element) => {
+            element.tabIndex = element === tabStop ? 0 : -1;
+        });
+    }
+
+    function scheduleClusterFocusRestore(host) {
+        if (host.dataset.pendingClusterFocusReset !== "true") {
+            return;
+        }
+
+        if (clusterFocusRestoreTimer) {
+            clearTimeout(clusterFocusRestoreTimer);
+        }
+
+        clusterFocusRestoreTimer = setTimeout(() => {
+            const items = getVisibleMapItems(host);
+            const restoreTarget = getMarkerResetTarget(items, 1);
+
+            if (restoreTarget) {
+                delete host.dataset.pendingClusterFocusReset;
+                delete host.dataset.pendingClusterFocusResetUntil;
+                syncMapTabStops(host, restoreTarget);
+                restoreTarget.focus();
+                clusterFocusRestoreTimer = null;
+                return;
+            }
+
+            const restoreUntil = Number(host.dataset.pendingClusterFocusResetUntil || "0");
+            if (Date.now() < restoreUntil) {
+                scheduleClusterFocusRestore(host);
+                return;
+            }
+
+            delete host.dataset.pendingClusterFocusReset;
+            delete host.dataset.pendingClusterFocusResetUntil;
+            syncMapTabStops(host);
+            clusterFocusRestoreTimer = null;
+        }, 100);
+    }
+
+    function deferPendingClusterTabFocus(host, direction) {
+        if (clusterFocusRestoreTimer) {
+            clearTimeout(clusterFocusRestoreTimer);
+        }
+
+        clusterFocusRestoreTimer = setTimeout(() => {
+            const items = getVisibleMapItems(host);
+            const markerTarget = getMarkerResetTarget(items, direction);
+
+            if (markerTarget) {
+                delete host.dataset.pendingClusterFocusReset;
+                delete host.dataset.pendingClusterFocusResetUntil;
+                syncMapTabStops(host, markerTarget);
+                markerTarget.focus();
+                clusterFocusRestoreTimer = null;
+                return;
+            }
+
+            const restoreUntil = Number(host.dataset.pendingClusterFocusResetUntil || "0");
+            if (Date.now() < restoreUntil) {
+                deferPendingClusterTabFocus(host, direction);
+                return;
+            }
+
+            const fallbackTarget = getClusterResetTarget(items, direction);
+            delete host.dataset.pendingClusterFocusReset;
+            delete host.dataset.pendingClusterFocusResetUntil;
+
+            if (fallbackTarget) {
+                syncMapTabStops(host, fallbackTarget);
+                fallbackTarget.focus();
+            }
+
+            clusterFocusRestoreTimer = null;
+        }, 100);
+    }
+
+    function handlePendingClusterTab(event) {
+        if (event.key !== "Tab") {
+            return;
+        }
+
+        const host = document.getElementById("map");
+        if (!host || host.dataset.pendingClusterFocusReset !== "true") {
+            return;
+        }
+
+        const items = getVisibleMapItems(host);
+        const direction = event.shiftKey ? -1 : 1;
+        const resetTarget = getMarkerResetTarget(items, direction);
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (resetTarget) {
+            delete host.dataset.pendingClusterFocusReset;
+            delete host.dataset.pendingClusterFocusResetUntil;
+            syncMapTabStops(host, resetTarget);
+            resetTarget.focus();
+            return;
+        }
+
+        deferPendingClusterTabFocus(host, direction);
+    }
+
     function focusAdjacentMapItem(host, currentElement, direction) {
         const items = getVisibleMapItems(host);
+        if (host.dataset.pendingClusterFocusReset === "true") {
+            const resetTarget = getClusterResetTarget(items, direction);
+
+            if (resetTarget && resetTarget !== currentElement) {
+                delete host.dataset.pendingClusterFocusReset;
+                delete host.dataset.pendingClusterFocusResetUntil;
+                syncMapTabStops(host, resetTarget);
+                resetTarget.focus();
+                return true;
+            }
+        }
+
         const currentIndex = items.indexOf(currentElement);
 
         if (currentIndex === -1) {
@@ -94,8 +252,14 @@
             return false;
         }
 
+        syncMapTabStops(host, nextItem);
         nextItem.focus();
         return true;
+    }
+
+    function queueClusterFocusReset(host) {
+        host.dataset.pendingClusterFocusReset = "true";
+        host.dataset.pendingClusterFocusResetUntil = String(Date.now() + 1500);
     }
 
     function focusPopupStart(marker) {
@@ -239,7 +403,7 @@
         element.dataset.focusManaged = "true";
         element.dataset.mapFocusable = "true";
         element.dataset.mapFocusGroup = "marker";
-        element.tabIndex = 0;
+        element.tabIndex = -1;
         element.setAttribute("role", "button");
         element.setAttribute("aria-haspopup", "dialog");
         const markerLabel = getSchoolMarkerLabel(school);
@@ -247,6 +411,9 @@
         element.setAttribute("title", markerLabel);
         element.setAttribute("alt", markerLabel);
         syncMarkerExpandedState(markerState);
+        element.addEventListener("focus", () => {
+            syncMapTabStops(host, element);
+        });
 
         element.addEventListener("keydown", (event) => {
             // Markers are rendered as images by Leaflet, so we promote them to
@@ -289,22 +456,38 @@
             element.dataset.focusManaged = "true";
             element.dataset.mapFocusable = "true";
             element.dataset.mapFocusGroup = "marker";
-            element.tabIndex = 0;
+            element.tabIndex = -1;
             element.setAttribute("role", "button");
 
             const count = element.textContent?.trim();
-            const clusterLabel = count
-                ? `Expand map cluster of ${count} schools`
-                : "Open map cluster";
+            const clusterLabel =
+                element.querySelector("[data-cluster-label]")?.getAttribute("data-cluster-label")
+                || (count ? `Expand map cluster of ${count} schools` : "Open map cluster");
             element.setAttribute("aria-label", clusterLabel);
             element.setAttribute("title", clusterLabel);
             element.querySelectorAll("span").forEach((span) => {
                 span.setAttribute("aria-hidden", "true");
             });
+            element.addEventListener("click", () => {
+                queueClusterFocusReset(host);
+                requestAnimationFrame(() => {
+                    if (document.activeElement === element) {
+                        element.blur();
+                    }
+                });
+            });
+            element.addEventListener("focus", () => {
+                if (host.dataset.pendingClusterFocusReset === "true") {
+                    return;
+                }
+
+                syncMapTabStops(host, element);
+            });
 
             element.addEventListener("keydown", (event) => {
                 if (event.key === "Enter" || event.key === " ") {
                     event.preventDefault();
+                    queueClusterFocusReset(host);
                     element.click();
                     return;
                 }
@@ -330,6 +513,7 @@
             element.dataset.focusManaged = "true";
             element.dataset.mapFocusable = "true";
             element.dataset.mapFocusGroup = "control";
+            element.tabIndex = -1;
 
             if (!element.getAttribute("aria-label")) {
                 const zoomLabel = element.classList.contains("leaflet-control-zoom-in")
@@ -342,6 +526,9 @@
                     element.setAttribute("aria-label", zoomLabel);
                 }
             }
+            element.addEventListener("focus", () => {
+                syncMapTabStops(host, element);
+            });
 
             element.addEventListener("keydown", (event) => {
                 if (event.key !== "Tab") return;
@@ -403,6 +590,31 @@
             .replaceAll(">", "&gt;")
             .replaceAll('"', "&quot;")
             .replaceAll("'", "&#039;");
+    }
+
+    function getClusterLabel(cluster) {
+        const count = cluster.getChildCount();
+        const schoolNames = cluster.getAllChildMarkers()
+            .map((marker) => marker.options?.title || marker.options?.alt || "")
+            .map((label) => label.replace(/^Open map marker for\s+/i, "").trim())
+            .filter(Boolean)
+            .filter((label, index, labels) => labels.indexOf(label) === index)
+            .slice(0, 3);
+
+        if (!schoolNames.length) {
+            return count
+                ? `Expand map cluster of ${count} schools`
+                : "Open map cluster";
+        }
+
+        const remainder = count - schoolNames.length;
+        const schoolSummary = schoolNames.join("; ");
+
+        if (remainder > 0) {
+            return `Expand map cluster of ${count} schools including ${schoolSummary}; and ${remainder} more`;
+        }
+
+        return `Expand map cluster of ${count} schools including ${schoolSummary}`;
     }
 
     function popupHtml(s) {
@@ -505,13 +717,14 @@
                 spiderfyOnMaxZoom: true,
                 iconCreateFunction: (cluster) => {
                     const count = cluster.getChildCount();
+                    const clusterLabel = getClusterLabel(cluster);
 
                     let cls = "cluster-yellow";
                     if (count >= 10 && count <= 100) cls = "cluster-orange";
                     if (count > 100) cls = "cluster-red";
 
                     return L.divIcon({
-                        html: `<div aria-hidden="true"><span aria-hidden="true">${count}</span></div>`,
+                        html: `<div aria-hidden="true" data-cluster-label="${escapeHtml(clusterLabel)}"><span aria-hidden="true">${count}</span></div>`,
                         className: `marker-cluster ${cls}`,
                         iconSize: L.point(40, 40),
                     });
@@ -608,6 +821,8 @@
         const refresh = () => {
             mapInstance?.invalidateSize(true);
             refreshMapAccessibility(host, markerStates);
+            syncMapTabStops(host);
+            scheduleClusterFocusRestore(host);
         };
 
         // Recalculate layout and focus order after map movement or cluster changes.
@@ -627,6 +842,7 @@
     }
 
     window.addEventListener("map:shown", initMap);
+    document.addEventListener("keydown", handlePendingClusterTab, true);
 
     document.addEventListener("DOMContentLoaded", function () {
         const mapView = document.getElementById("mapView");

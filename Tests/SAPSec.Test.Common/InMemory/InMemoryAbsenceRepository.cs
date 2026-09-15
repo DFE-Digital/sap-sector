@@ -9,26 +9,34 @@ public class InMemoryAbsenceRepository(IEstablishmentRepository establishmentRep
     private List<LAAbsence> _la = new();
     private List<EnglandAbsence> _england = new();
 
-    public void SetupEstablishmentAbsence(params EstablishmentAbsence[] establishment)
+    public InMemoryAbsenceRepository SetupEstablishmentAbsence(params EstablishmentAbsence[] establishment)
     {
         _establishment = establishment.ToList();
+
+        return this;
     }
 
-    public void SetupLAAbsence(params LAAbsence[] la)
+    public InMemoryAbsenceRepository SetupLAAbsence(params LAAbsence[] la)
     {
         _la = la.ToList();
+
+        return this;
     }
 
-    public void SetupEnglandAbsence(params EnglandAbsence[] england)
+    public InMemoryAbsenceRepository SetupEnglandAbsence(params EnglandAbsence[] england)
     {
         _england = england.ToList();
+
+        return this;
     }
 
-    public void ClearDown()
+    public InMemoryAbsenceRepository ClearDown()
     {
         _establishment = [];
         _la = [];
         _england = [];
+
+        return this;
     }
 
     public async Task<AbsenceData?> GetByUrnAsync(string urn)

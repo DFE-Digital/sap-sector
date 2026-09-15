@@ -1,5 +1,6 @@
-﻿using SAPSec.Core.Model;
-using SAPSec.Core.Rules;
+﻿using SAPSec.Core.Features.Availability;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Model;
 using SAPSec.Data.Dto;
 
 namespace SAPSec.Core.Tests.Rules;

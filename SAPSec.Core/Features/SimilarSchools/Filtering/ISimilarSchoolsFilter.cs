@@ -7,6 +7,6 @@ public interface ISimilarSchoolsFilter
     string Key { get; }
     string Name { get; }
     bool IsApplied { get; }
-    IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items);
-    SimilarSchoolsAvailableFilter? AsAvailableFilter(IEnumerable<SimilarSchool> items);
+    IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor);
+    SimilarSchoolsAvailableFilter? AsAvailableFilter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor);
 }

@@ -17,22 +17,24 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
     private const string EnglishMathsHeaderText = "Grade achieved in English and maths GCSEs";
     private const string DestinationsHeaderText = "Staying in education or entering employment";
 
-    private const string Urn = "100052";
-    private const string SimilarSchoolUrn = "141617";
+    private const string CurrentSchoolUrn = "100052";
+    private const string CurrentSchoolName = "Hampstead School";
+    private const string ComparatorSchoolUrn = "141617";
+    private const string ComparatorSchoolName = "The Hurlingham Academy";
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         await NavigateTo(Routes.FindASchool());
-        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(Urn);
+        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(CurrentSchoolUrn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Overview);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).Overview);
         await Page.GetByText("View similar schools", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).ViewSimilarSchools);
-        await Page.GetByText("The Hurlingham Academy", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).Similarity);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).ViewSimilarSchools);
+        await Page.GetByText(ComparatorSchoolName, new() { Exact = true }).ClickAsync();
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).Similarity);
         await Page.GetByText("KS4 headline measures", new() { Exact = true }).ClickAsync();
-        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(Urn).Comparison(SimilarSchoolUrn).KS4HeadlineMeasures);
+        await Expect(Page).ToHaveURLAsync(Routes.SecondarySchool(CurrentSchoolUrn).Comparison(ComparatorSchoolUrn).KS4HeadlineMeasures);
     }
 
     [Fact]
@@ -192,11 +194,10 @@ public class ComparisonKs4HeadlineMeasuresPageEndToEndTests(EndToEndTestsFixture
         var table = section.GetByRole(AriaRole.Table);
         await Expect(table).ToBeVisibleAsync();
 
-        foreach (var heading in new[] { "2020 to 2021", "2021 to 2022", "2022 to 2023" })
-        {
-            var values = await table.GetTableColumnAsync(heading);
-            await Expect(values).ToBePercentageValuesHavingCount(3);
-        }
+        // Destinations data is only published for the current year in the source data -
+        // 2020 to 2021 and 2021 to 2022 (Previous/Previous2) are genuinely unavailable.
+        var current = await table.GetTableColumnAsync("2022 to 2023");
+        await Expect(current).ToBePercentageValuesHavingCount(3);
     }
 
     [Fact]
