@@ -27,13 +27,15 @@
 
         setToggleText(toggle, "View as a list");
         toggle.dataset.view = "map";
-        toggle.setAttribute("aria-expanded", "true");
+        // toggle.setAttribute("aria-expanded", "true");
+        //toggle.setAttribute("role", "button");
+        toggle.setAttribute("aria-label", "Showing list,");
 
         // mount into map header (sometimes needs a tick after display change)
         requestAnimationFrame(() => mountToggle(MAP_SLOT_ID));
         setTimeout(() => mountToggle(MAP_SLOT_ID), 0);
 
-        if (persist) sessionStorage.setItem(STORAGE_KEY, "map");
+        //if (persist) sessionStorage.setItem(STORAGE_KEY, "map");
 
         window.dispatchEvent(new Event("map:shown"));
     }
@@ -49,11 +51,13 @@
 
         setToggleText(toggle, "View on map");
         toggle.dataset.view = "list";
-        toggle.setAttribute("aria-expanded", "false");
+        // toggle.setAttribute("aria-expanded", "false");
+       // toggle.setAttribute("role", "button");
+        toggle.setAttribute("aria-label", "Showing map,");
 
         mountToggle(LIST_SLOT_ID);
 
-        if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
+       // if (persist) sessionStorage.setItem(STORAGE_KEY, "list");
     }
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -72,8 +76,12 @@
         if (toggleLink) {
             e.preventDefault();
             const isList = toggleLink.dataset.view === "list";
-            if (isList) showMap();
-            else showList();
+            if (isList) { 
+                showMap();
+            }
+            else {
+                showList();
+            }
             return;
         }
 
