@@ -2,6 +2,8 @@
     var focusTargetParameter = 'focusTarget';
     var filterFocusTarget = 'filters';
     var sortFocusTarget = 'sort';
+    var focusDelayMilliseconds = 1200;
+    var hasUserInteracted = false;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initFilterProtection);
@@ -23,17 +25,39 @@
         var focusTarget = new URLSearchParams(window.location.search).get(focusTargetParameter);
         if (!focusTarget) return;
 
+        var target = null;
+
         if (focusTarget === sortFocusTarget) {
-            focusElement(document.getElementById('sort-by'));
-            return;
+            target = document.getElementById('sort-by');
         }
 
         if (focusTarget === filterFocusTarget) {
-            focusElement(
+            target =
                 document.getElementById('selected-filters')
                 || document.getElementById('similar-schools-results-count')
-                || document.getElementById('similar-schools-results'));
+                || document.getElementById('similar-schools-results');
         }
+
+        if (!target) return;
+
+        window.setTimeout(function () {
+            if (hasUserInteracted || !isDefaultActiveElement()) return;
+
+            focusElement(target);
+        }, focusDelayMilliseconds);
+    }
+
+    function isDefaultActiveElement() {
+        return document.activeElement === document.body
+            || document.activeElement === document.documentElement;
+    }
+
+    function trackUserInteraction() {
+        ['keydown', 'pointerdown', 'touchstart', 'focusin'].forEach(function (eventName) {
+            document.addEventListener(eventName, function () {
+                hasUserInteracted = true;
+            }, { once: true, capture: true });
+        });
     }
 
     function setFocusTarget(value) {
@@ -92,6 +116,7 @@
         }
     }
 
+    trackUserInteraction();
     focusAfterPageLoad();
 })();
 
