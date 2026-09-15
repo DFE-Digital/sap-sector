@@ -8,6 +8,7 @@ using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Shared.ViewModels;
@@ -33,6 +34,7 @@ public class SchoolController(
         IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getSchoolKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getSchoolKs4CoreSubjectsUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
+        IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSecondarySimilarSchoolsUseCase,
         IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
@@ -41,8 +43,18 @@ public class SchoolController(
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+
+        var model = new SchoolOverviewPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            HasSimilarSchools = similarSchoolsResponse.HasSimilarSchools
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -70,14 +82,16 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getSchoolKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
 
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
         await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4HeadlineMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School),
-            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School),
-            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School)
+            Attainment8 = MeasureViewModel.FromSecondaryMeasure(response.Attainment8, response.School, similarSchoolsResponse.HasSimilarSchools),
+            EnglishMaths = MeasureViewModel.FromSecondaryMeasure(response.EnglishMaths, response.School, similarSchoolsResponse.HasSimilarSchools),
+            Destinations = MeasureViewModel.FromSecondaryMeasure(response.Destinations, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
 
         return View(model);
@@ -90,19 +104,21 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getSchoolKs4CoreSubjectsUseCase.Execute(new(urn, filters));
 
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
         await PopulateViewData(response.School);
 
         var model = new ViewModels.School.Ks4CoreSubjectsPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
             Measures = [
-                MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Maths, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.CombinedScience, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Biology, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Chemistry, response.School),
-                MeasureViewModel.FromSecondaryMeasure(response.Physics, response.School)
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLanguage, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.EnglishLiterature, response.School, similarSchoolsResponse.HasSimilarSchools ),
+                MeasureViewModel.FromSecondaryMeasure(response.Maths, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.CombinedScience, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.Biology, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.Chemistry, response.School, similarSchoolsResponse.HasSimilarSchools),
+                MeasureViewModel.FromSecondaryMeasure(response.Physics, response.School, similarSchoolsResponse.HasSimilarSchools)
             ]
         };
 
@@ -139,26 +155,36 @@ public class SchoolController(
 
     private async Task PopulateViewData(SchoolInfo currentSchool)
     {
-        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
 
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            similarSchoolsResponse.HasSimilarSchools,
             await IsRiseResourcesEnabledAsync());
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
     {
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
+
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = SchoolSideNavigationViewModel.CreateSecondary(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            similarSchoolsResponse.HasSimilarSchools,
             await IsRiseResourcesEnabledAsync());
     }
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
         && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
+
+    private async Task<FindSecondarySimilarSchoolsResponse> GetSimilarSchoolsAsync(string urn)
+    {
+        return await findSecondarySimilarSchoolsUseCase.Execute(new FindSecondarySimilarSchoolsRequest(urn));
+    }
 }

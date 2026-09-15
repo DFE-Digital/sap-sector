@@ -51,12 +51,31 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     public async Task MeetingExpectedStandardRwm_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
         var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task MeetingExpectedStandardRwm_NoTopPerformersTab_WhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
+
+        var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -324,7 +343,14 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     public async Task AchievedHigherStandardRwm_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
@@ -597,7 +623,14 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     public async Task AverageScaledScoreReading_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
@@ -766,7 +799,14 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     public async Task AverageScaledScoreMaths_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
@@ -935,7 +975,14 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     public async Task MeetingExpectedStandardGps_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 
@@ -1104,7 +1151,14 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
     public async Task AMeetingExpectedStandardRwm_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").KS2, HttpStatusCode.OK);
 

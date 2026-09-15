@@ -7,7 +7,7 @@ public sealed class SchoolSideNavigationViewModel
 {
     public required IReadOnlyList<SchoolSideNavigationItemViewModel> Items { get; init; }
 
-    public static SchoolSideNavigationViewModel CreatePrimary(IUrlHelper url, string urn, string? currentAction, bool includeRiseResources = false)
+    public static SchoolSideNavigationViewModel CreatePrimary(IUrlHelper url, string urn, string? currentAction, bool hasSimilarSchools = true, bool includeRiseResources = false)
     {
         var items = new List<SchoolSideNavigationItemViewModel>
         {
@@ -19,6 +19,11 @@ public sealed class SchoolSideNavigationViewModel
             new() { Text = "What is a similar school?", Href = Routes.PrimarySchool(urn).WhatIsASimilarSchool, IsSelected = currentAction == "WhatIsASimilarSchool" }
         };
 
+        if (!hasSimilarSchools)
+        {
+            items.RemoveAt(3);
+        }
+
         if (includeRiseResources)
         {
             items.Add(new() { Text = "RISE resources", Href = Routes.PrimarySchool(urn).RiseResources, IsSelected = currentAction == "RiseResources" });
@@ -27,7 +32,7 @@ public sealed class SchoolSideNavigationViewModel
         return new SchoolSideNavigationViewModel { Items = items };
     }
 
-    public static SchoolSideNavigationViewModel CreateSecondary(IUrlHelper url, string urn, string? currentAction, bool includeRiseResources = false)
+    public static SchoolSideNavigationViewModel CreateSecondary(IUrlHelper url, string urn, string? currentAction, bool hasSimilarSchools = true, bool includeRiseResources = false)
     {
         var items = new List<SchoolSideNavigationItemViewModel>
         {
@@ -39,6 +44,11 @@ public sealed class SchoolSideNavigationViewModel
             new() { Text = "School details", Href = Routes.SecondarySchool(urn).SchoolDetails, IsSelected = currentAction == "SchoolDetails" },
             new() { Text = "What is a similar school?", Href = Routes.SecondarySchool(urn).WhatIsASimilarSchool, IsSelected = currentAction == "WhatIsASimilarSchool" }
         };
+
+        if (!hasSimilarSchools)
+        {
+            items.RemoveAt(4);
+        }
 
         if (includeRiseResources)
         {
