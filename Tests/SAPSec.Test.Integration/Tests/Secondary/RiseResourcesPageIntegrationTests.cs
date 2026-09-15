@@ -131,6 +131,9 @@ public class RiseResourcesPageIntegrationTests(
 
         var link = literacyList.QuerySelector("a")!;
         link.GetAttribute("href").Should().Be("https://example.gov.uk/improving-literacy-in-ks2");
+
+        // Resource links open in the current tab, not a new one.
+        link.GetAttribute("target").Should().BeNull();
     }
 
     [Fact]

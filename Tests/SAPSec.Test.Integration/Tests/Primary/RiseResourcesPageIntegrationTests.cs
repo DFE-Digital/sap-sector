@@ -124,7 +124,10 @@ public class RiseResourcesPageIntegrationTests(
             .Should().NotContain(title => title.Contains("Raising GCSE attainment"));
 
         // Resource link href is the configured URL (from JSON, not hard-coded).
-        literacyList.QuerySelector("a")!.GetAttribute("href")
-            .Should().Be("https://example.gov.uk/choosing-a-validated-phonics-teaching-programme");
+        var link = literacyList.QuerySelector("a")!;
+        link.GetAttribute("href").Should().Be("https://example.gov.uk/choosing-a-validated-phonics-teaching-programme");
+
+        // Resource links open in the current tab, not a new one.
+        link.GetAttribute("target").Should().BeNull();
     }
 }
