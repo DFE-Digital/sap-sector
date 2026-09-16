@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.SchoolDetails;
+using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
@@ -20,6 +22,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 [RequireSchoolPhase(ExpectedSchoolPhase.AllThrough)]
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
+        IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
         ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
         IFeatureFlagService featureFlagService)
@@ -65,8 +68,12 @@ public class SchoolController(
 
     [HttpGet]
     [Route("school-details")]
-    public Task<IActionResult> SchoolDetails(string urn) =>
-        HeadingPage(urn, "School details");
+    public async Task<IActionResult> SchoolDetails(string urn)
+    {
+        var response = await getSchoolDetailsUseCase.Execute(new(urn));
+        await PopulateViewData(response.SchoolDetails);
+        return View(SchoolDetailsViewModel.FromSchoolDetails(response.SchoolDetails));
+    }
 
     [HttpGet]
     [Route("what-is-a-similar-school")]
@@ -95,6 +102,12 @@ public class SchoolController(
     private async Task PopulateViewData(SchoolInfo currentSchool)
     {
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
+        ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Urn);
+    }
+
+    private async Task PopulateViewData(SchoolDetails currentSchool)
+    {
+        ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
         ViewData[ViewDataKeys.SchoolNavigation] = await CreateNavigation(currentSchool.Urn);
     }
 
