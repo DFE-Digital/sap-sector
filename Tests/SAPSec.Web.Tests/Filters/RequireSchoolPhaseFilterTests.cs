@@ -398,6 +398,7 @@ public class RequireSchoolPhaseFilterTests
             GenderOfEntry = DataWithAvailability.Available("Mixed"),
             PhaseOfEducation = DataWithAvailability.Available(phaseOfEducation),
             SchoolType = DataWithAvailability.Available("Community school"),
+            TypeOfEstablishmentCode = DataWithAvailability.Available("1"),
             AdmissionsPolicy = DataWithAvailability.Available("Not applicable"),
             ReligiousCharacter = DataWithAvailability.Available("None"),
             GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceType>(),

@@ -147,6 +147,55 @@ public class SchoolPagesIntegrationTests(
         links[2].GetAttribute("rel").Should().Be("noopener noreferrer");
     }
 
+    [Fact]
+    public async Task SchoolDetailsPage_ShowsExpectedExternalLinks()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).SchoolDetails);
+
+        var links = page.QuerySelectorAll(".govuk-summary-list a").ToArray();
+
+        links.Should().Contain(x =>
+            x.TextContent.Trim() == "View the latest Ofsted report (opens in new tab)"
+            && x.GetAttribute("href") == $"https://reports.ofsted.gov.uk/provider/28/{Urn}"
+            && x.GetAttribute("target") == "_blank"
+            && x.GetAttribute("rel") == "noopener noreferrer");
+
+        links.Should().Contain(x =>
+            x.TextContent.Trim() == "Financial benchmarking and insights tool (opens in new tab)"
+            && x.GetAttribute("href") == $"https://financial-benchmarking-and-insights-tool.education.gov.uk/school/{Urn}"
+            && x.GetAttribute("target") == "_blank"
+            && x.GetAttribute("rel") == "noopener noreferrer");
+
+        links.Should().Contain(x =>
+            x.TextContent.Trim() == "Get information about schools (opens in new tab)"
+            && x.GetAttribute("href") == $"https://get-information-schools.service.gov.uk/Establishments/Establishment/Details/{Urn}"
+            && x.GetAttribute("target") == "_blank"
+            && x.GetAttribute("rel") == "noopener noreferrer");
+
+        links.Should().Contain(x =>
+            x.TextContent.Trim() == "View your education data (VYED) (opens in new tab)"
+            && x.GetAttribute("href") == "https://viewyourdata.education.gov.uk/"
+            && x.GetAttribute("target") == "_blank"
+            && x.GetAttribute("rel") == "noopener noreferrer");
+    }
+
+    [Fact]
+    public async Task SchoolDetailsPage_HasCollapsedDetailsComponentsAndHomeBreadcrumb()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).SchoolDetails);
+
+        page.QuerySelectorAll("details").Should().OnlyContain(x => x.GetAttribute("open") == null);
+
+        var homeBreadcrumb = page.QuerySelector(".govuk-breadcrumbs__link");
+        homeBreadcrumb.Should().NotBeNull();
+        homeBreadcrumb!.TextContent.Trim().Should().Be("Home");
+        homeBreadcrumb.GetAttribute("href").Should().Be(Routes.FindASchool());
+    }
+
     public static TheoryData<string, string, string> AllThroughPages => new()
     {
         { Routes.AllThroughSchool(Urn).Overview, "Test School 1", "Overview" },
@@ -166,7 +215,7 @@ public class SchoolPagesIntegrationTests(
         Fixture.FeatureFlagService.Override(FeatureFlags.EnableRiseResources, true);
 
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28")),
             Build.Establishment("100002", "Test School 2", x => x.Open().AllThrough().InLA("001")));
     }
 

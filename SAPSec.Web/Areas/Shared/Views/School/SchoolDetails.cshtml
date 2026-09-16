@@ -64,10 +64,10 @@
         <dd class="govuk-summary-list__value">@Model.GovernanceStructure.Display()</dd>
     </div>
 
-    @if (Model.AcademyTrustName.IsAvailable)
+    @if (Model.HasAcademyTrust)
     {
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Academy trust</dt>
+            <dt class="govuk-summary-list__key">Academy Trust</dt>
             <dd class="govuk-summary-list__value">
                 <a href="https://get-information-schools.service.gov.uk/Groups/Group/Details/@Model.AcademyTrustId.Value"
                    class="govuk-link" target="_blank" rel="noopener noreferrer">
@@ -181,7 +181,7 @@
     <div class="govuk-summary-list__row">
         <dt class="govuk-summary-list__key">Ofsted report</dt>
         <dd class="govuk-summary-list__value">
-            <a href="https://reports.ofsted.gov.uk/provider/@(Model.IsPrimarySchool ? 21 : 23)/@Model.Urn"
+            <a href="@Model.OfstedReportUrl"
                 class="govuk-link" target="_blank" rel="noopener noreferrer">
                 View the latest Ofsted report (opens in new tab)
             </a>
@@ -199,6 +199,14 @@
                 class="govuk-link" target="_blank" rel="noopener noreferrer">
                 Get information about schools (opens in new tab)
             </a>
+            @if (Model.IsAllThroughSchool)
+            {
+                <br />
+                <a href="https://viewyourdata.education.gov.uk/"
+                   class="govuk-link" target="_blank" rel="noopener noreferrer">
+                    View your education data (VYED) (opens in new tab)
+                </a>
+            }
         </dd>
     </div>
 </dl>
