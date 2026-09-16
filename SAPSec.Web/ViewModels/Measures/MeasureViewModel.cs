@@ -21,6 +21,11 @@ public record MeasureViewModel(
     // chart-factory.js treats as "local authority", so comparison charts must supply explicit colours.
     private static readonly string[] ComparisonCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] ComparisonYearByYearColors = ["#ca357c", "#2a1950", "#4b9b7d"];
+    // All-through attendance measures are also a 3-series shape (CurrentSchool/LASchoolsAverage/
+    // EnglandSchoolsAverage, no SimilarSchoolsAverage), but need distinct LA/England colours from
+    // the comparison shape above.
+    private static readonly string[] AllThroughCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
+    private static readonly string[] AllThroughYearByYearColors = ["#ca357c", "#5694ca", "#4b9b7d"];
 
     public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo)
         => FromMeasure(measure, schoolInfo, null,
@@ -50,6 +55,17 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
+    public static MeasureViewModel FromAllThroughMeasure(MeasurePhase phase, Measure measure, SchoolInfo schoolInfo)
+        => FromMeasure(measure, schoolInfo, null,
+            _ => throw new InvalidOperationException("All-through attendance measures have no top performers"),
+            (_, _) => throw new InvalidOperationException("All-through attendance measures have no top performers"),
+            AllThroughCurrentYearColors,
+            AllThroughYearByYearColors,
+            labelResolver: (seriesType, currentSchool, _) => ResolveAllThroughSeriesLabel(phase, seriesType, currentSchool),
+            pointStyleResolver: seriesType => seriesType is MeasureSeriesType.LASchoolsAverage
+                ? "circle"
+                : ResolveSeriesPointStyle(seriesType));
+
     private static MeasureViewModel FromMeasure(
         Measure measure,
         SchoolInfo schoolInfo,
@@ -57,16 +73,21 @@ public record MeasureViewModel(
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[] currentYearChartColors,
-        string[] yearByYearChartColors)
+        string[] yearByYearChartColors,
+        Func<MeasureSeriesType, SchoolInfo, SchoolInfo?, string>? labelResolver = null,
+        Func<MeasureSeriesType, string>? pointStyleResolver = null)
     {
+        labelResolver ??= ResolveSeriesLabel;
+        pointStyleResolver ??= ResolveSeriesPointStyle;
+
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
             measure.Name,
             measure.Year,
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
-            measure.Series.Select(s => ResolveSeriesLabel(s.SeriesType, schoolInfo, similarSchool)),
-            measure.Series.Select(s => ResolveSeriesPointStyle(s.SeriesType)));
+            measure.Series.Select(s => labelResolver(s.SeriesType, schoolInfo, similarSchool)),
+            measure.Series.Select(s => pointStyleResolver(s.SeriesType)));
 
         decimal? MapCurrentYear(MeasureSeries series) =>
             series.Current;
@@ -128,6 +149,19 @@ public record MeasureViewModel(
            MeasureSeriesType.EnglandSchoolsAverage => "Schools in England average",
            _ => throw new InvalidOperationException($"No label found for Measure Series Type: {Enum.GetName(seriesType)}")
        };
+
+    private static string ResolveAllThroughSeriesLabel(MeasurePhase phase, MeasureSeriesType seriesType, SchoolInfo currentSchool) =>
+        seriesType switch
+        {
+            MeasureSeriesType.CurrentSchool => currentSchool.Name,
+            MeasureSeriesType.LASchoolsAverage => $"Local authority {PhaseLabel(phase)} schools average",
+            MeasureSeriesType.EnglandSchoolsAverage => $"{CapitalisedPhaseLabel(phase)} schools in England average",
+            _ => throw new InvalidOperationException($"No all-through label found for Measure Series Type: {Enum.GetName(seriesType)}")
+        };
+
+    private static string PhaseLabel(MeasurePhase phase) => phase is MeasurePhase.Primary ? "primary" : "secondary";
+
+    private static string CapitalisedPhaseLabel(MeasurePhase phase) => phase is MeasurePhase.Primary ? "Primary" : "Secondary";
 
     private static string ResolveSeriesPointStyle(MeasureSeriesType seriesType) =>
         seriesType switch

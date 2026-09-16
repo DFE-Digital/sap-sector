@@ -85,6 +85,9 @@ public static class ServiceCollectionExtensions
             IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse>,
             GetSchoolAttendanceMeasuresUseCase>();
         services.AddSingleton<
+            IUseCase<GetSchoolAllThroughAttendanceMeasuresRequest, GetSchoolAllThroughAttendanceMeasuresResponse>,
+            GetSchoolAllThroughAttendanceMeasuresUseCase>();
+        services.AddSingleton<
             IUseCase<GetPrimaryComparisonAttendanceMeasuresRequest, GetComparisonAttendanceMeasuresResponse>,
             GetPrimaryComparisonAttendanceMeasuresUseCase>();
         services.AddSingleton<

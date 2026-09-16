@@ -1,17 +1,21 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
+using SAPSec.Core.Features.Measures;
+using SAPSec.Core.Features.Measures.Attendance;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
+using SAPSec.Web.Areas.AllThrough.ViewModels.School;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.AllThrough.Controllers;
 
@@ -23,6 +27,7 @@ namespace SAPSec.Web.Areas.AllThrough.Controllers;
 public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
+        IUseCase<GetSchoolAllThroughAttendanceMeasuresRequest, GetSchoolAllThroughAttendanceMeasuresResponse> getAllThroughAttendanceMeasuresUseCase,
         ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
         ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
         IFeatureFlagService featureFlagService)
@@ -55,10 +60,19 @@ public class SchoolController(
     [Route("attendance")]
     public async Task<IActionResult> Attendance(string urn)
     {
-        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getAllThroughAttendanceMeasuresUseCase.Execute(new(urn, filters));
+
         await PopulateViewData(response.School);
 
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var model = new AllThroughAttendancePageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            PrimaryAbsence = MeasureViewModel.FromAllThroughMeasure(MeasurePhase.Primary, response.PrimaryAbsence, response.School),
+            SecondaryAbsence = MeasureViewModel.FromAllThroughMeasure(MeasurePhase.Secondary, response.SecondaryAbsence, response.School)
+        };
+
+        return View(model);
     }
 
     [HttpGet]
