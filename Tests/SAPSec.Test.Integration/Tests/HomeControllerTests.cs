@@ -27,7 +27,8 @@ public class HomeControllerTests(JsonRepositoryIntegrationTestFixture fixture)
         var content = await response.Content.ReadAsStringAsync();
 
         content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/cookies\">Cookies</a>");
-        content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/accessibility\">Accessibility</a>");
+        content.Should().Contain($"<a class=\"govuk-footer__link\" href=\"{LayoutConstants.AccessibilityStatementUrl}\">Accessibility</a>");
+        content.Should().NotContain("<a class=\"govuk-footer__link\" href=\"/accessibility\">Accessibility</a>");
         content.Should().Contain("<a class=\"govuk-footer__link\" href=\"/terms-and-conditions\">Terms and conditions</a>");
         content.Should().Contain("https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers");
         content.Should().Contain("Report a problem with this site to:");

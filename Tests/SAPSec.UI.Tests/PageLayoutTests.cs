@@ -126,7 +126,7 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
         var footerLinks = new Dictionary<string, string>
         {
             { "Cookies", "/cookies" },
-            { "Accessibility", "/accessibility" },
+            { "Accessibility", LayoutConstants.AccessibilityStatementUrl },
             { "Terms and conditions", "/terms-and-conditions" },
             { "Privacy", "https://www.gov.uk/government/publications/privacy-information-education-providers-workforce-including-teachers/privacy-information-education-providers-workforce-including-teachers" }
         };
@@ -137,6 +137,9 @@ public class PageLayoutTests(WebApplicationSetupFixture fixture) : BasePageTest(
             (await link.IsVisibleAsync()).Should().BeTrue();
             (await link.GetAttributeAsync("href")).Should().Be(expectedHref);
         }
+
+        (await Page.Locator("a.govuk-footer__link:has-text(\"Accessibility\")").GetAttributeAsync("target"))
+            .Should().BeNull("Accessibility link should open in the same tab");
 
         var supportText = Page.Locator("footer.govuk-footer").GetByText("Report a problem with this site to:");
         (await supportText.IsVisibleAsync()).Should().BeTrue();
