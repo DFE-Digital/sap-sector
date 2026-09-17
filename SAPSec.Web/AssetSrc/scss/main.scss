@@ -1132,3 +1132,15 @@
     font-size: 14px !important;
   }
 }
+
+.app-closed-school-banner {
+  box-sizing: border-box;
+  border-left: 4px solid govuk-colour("blue");
+  background-color: #f4f8fb;
+  padding: 15px 20px;
+  margin-bottom: 30px;
+
+  &__text {
+    margin-bottom: 0;
+  }
+}

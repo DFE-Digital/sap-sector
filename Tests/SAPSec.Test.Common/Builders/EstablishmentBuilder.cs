@@ -13,6 +13,7 @@ public class EstablishmentBuilder(string urn, string name)
     string PhaseOfEducationName = string.Empty;
     string EstablishmentStatusId = string.Empty;
     string EstablishmentStatusName = string.Empty;
+    string CloseDate = string.Empty;
     string TypeOfEstablishmentId = string.Empty;
     string TypeOfEstablishmentName = string.Empty;
     string LAId = string.Empty;
@@ -73,6 +74,15 @@ public class EstablishmentBuilder(string urn, string name)
     {
         EstablishmentStatusId = EstablishmentStatusValues.OpenId;
         EstablishmentStatusName = EstablishmentStatusValues.Open;
+
+        return this;
+    }
+
+    public EstablishmentBuilder Closed(string closeDate = "")
+    {
+        EstablishmentStatusId = EstablishmentStatusValues.ClosedId;
+        EstablishmentStatusName = EstablishmentStatusValues.Closed;
+        CloseDate = closeDate;
 
         return this;
     }
@@ -270,6 +280,7 @@ public class EstablishmentBuilder(string urn, string name)
             AgeRangeHigh = AgeRangeHigh,
             EstablishmentStatusId = EstablishmentStatusId,
             EstablishmentStatusName = EstablishmentStatusName,
+            CloseDate = CloseDate,
             LAId = LAId,
             LAName = LAName,
             RegionId = RegionId,

@@ -27,4 +27,19 @@ public static class EstablishmentStatusValues
         return string.Equals(trimmedStatusName, Open, StringComparison.OrdinalIgnoreCase)
             || string.Equals(trimmedStatusName, OpenButProposedToClose, StringComparison.OrdinalIgnoreCase);
     }
+
+    public static bool IsClosed(string? statusId, string? statusName)
+    {
+        var trimmedStatusId = statusId?.Trim();
+
+        if (trimmedStatusId is ClosedId)
+            return true;
+
+        if (trimmedStatusId is OpenId or OpenButProposedToCloseId or ProposedToOpenId)
+            return false;
+
+        var trimmedStatusName = statusName?.Trim();
+
+        return string.Equals(trimmedStatusName, Closed, StringComparison.OrdinalIgnoreCase);
+    }
 }

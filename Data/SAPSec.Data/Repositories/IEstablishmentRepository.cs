@@ -9,4 +9,5 @@ public interface IEstablishmentRepository
     Task<Establishment?> GetEstablishmentAsync(string urn);
     Task<Establishment?> GetEstablishmentByAnyNumberAsync(string number);
     Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn);
+    Task<IReadOnlyCollection<EstablishmentLinks>> GetEstablishmentLinksAsync(string urn);
 }

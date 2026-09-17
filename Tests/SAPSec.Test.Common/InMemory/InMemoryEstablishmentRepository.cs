@@ -7,6 +7,7 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
 {
     private List<Establishment> _establishments = new();
     private List<EstablishmentEmail> _establishmentEmails = new();
+    private List<EstablishmentLinks> _establishmentLinks = new();
 
     public InMemoryEstablishmentRepository SetupEstablishments(params Establishment[] establishments)
     {
@@ -18,6 +19,13 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
     public InMemoryEstablishmentRepository SetupEstablishmentEmails(params EstablishmentEmail[] establishmentEmails)
     {
         _establishmentEmails = establishmentEmails.ToList();
+
+        return this;
+    }
+
+    public InMemoryEstablishmentRepository SetupEstablishmentLinks(params EstablishmentLinks[] establishmentLinks)
+    {
+        _establishmentLinks = establishmentLinks.ToList();
 
         return this;
     }
@@ -43,4 +51,7 @@ public class InMemoryEstablishmentRepository : IEstablishmentRepository
 
     public Task<EstablishmentEmail?> GetEstablishmentEmailAsync(string urn)
         => Task.FromResult(_establishmentEmails.FirstOrDefault(i => i.URN == urn));
+
+    public Task<IReadOnlyCollection<EstablishmentLinks>> GetEstablishmentLinksAsync(string urn)
+        => Task.FromResult((IReadOnlyCollection<EstablishmentLinks>)_establishmentLinks.Where(i => i.urn == urn).ToList());
 }

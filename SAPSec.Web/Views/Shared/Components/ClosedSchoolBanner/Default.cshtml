@@ -1,0 +1,12 @@
+@using SAPSec.Web.ViewModels.Components
+@model ClosedSchoolBannerViewModel
+
+@{
+    var modifierClass = Model.Variant == ClosedSchoolBannerVariant.Comparator
+        ? "app-closed-school-banner--comparator"
+        : "app-closed-school-banner--this-school";
+}
+
+<div class="app-closed-school-banner @modifierClass" role="region" aria-label="Closed school notice">
+    <p class="govuk-body app-closed-school-banner__text">This school is closed.</p>
+</div>

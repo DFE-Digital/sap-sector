@@ -12,6 +12,7 @@ namespace SAPSec.Core.Features.SchoolDetails;
 public sealed class SchoolDetailsService : ISchoolDetailsService
 {
     private readonly IEstablishmentRepository _establishmentRepository;
+    private readonly ISchoolClosureEligibilityService _closureEligibilityService;
     private readonly ILogger<SchoolDetailsService> _logger;
 
     // Rules instantiated directly - they are stateless pure functions
@@ -23,9 +24,11 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
 
     public SchoolDetailsService(
         IEstablishmentRepository establishmentRepository,
+        ISchoolClosureEligibilityService closureEligibilityService,
         ILogger<SchoolDetailsService> logger)
     {
         _establishmentRepository = establishmentRepository;
+        _closureEligibilityService = closureEligibilityService;
         _logger = logger;
     }
 
@@ -38,18 +41,29 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             throw new NotFoundException($"School not found with URN: {urn}");
         }
 
+        var closureEligibility = await _closureEligibilityService.EvaluateAsync(establishment);
+
+        if (!closureEligibility.IsEligibleForDisplay)
+        {
+            throw new NotFoundException($"School with URN {urn} is closed and no longer available");
+        }
+
         var establishmentEmail = await _establishmentRepository.GetEstablishmentEmailAsync(urn);
 
-        return MapToSchoolDetails(establishment, establishmentEmail);
+        return MapToSchoolDetails(establishment, establishmentEmail, closureEligibility);
     }
 
-    private SchoolDetails MapToSchoolDetails(Establishment establishment, EstablishmentEmail? establishmentEmail)
+    private SchoolDetails MapToSchoolDetails(
+        Establishment establishment,
+        EstablishmentEmail? establishmentEmail,
+        SchoolClosureEligibility closureEligibility)
     {
         return new SchoolDetails
         {
             // Identifiers
             Urn = establishment.URN,
             Name = establishment.EstablishmentName,
+            ShowClosedSchoolBanner = closureEligibility.ShowClosedSchoolBanner,
             DfENumber = DataMapper.MapDfENumber(establishment),
             Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
 

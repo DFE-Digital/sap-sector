@@ -9,6 +9,7 @@ public class EstablishmentRepositoryTests
 {
     private readonly Mock<IJsonFile<Establishment>> _mockEstablishmentJsonFile;
     private readonly Mock<IJsonFile<EstablishmentEmail>> _mockEstablishmentEmailJsonFile;
+    private readonly Mock<IJsonFile<EstablishmentLinks>> _mockEstablishmentLinksJsonFile;
     private readonly Mock<ILogger<JsonEstablishmentRepository>> _mockLogger;
     private readonly JsonEstablishmentRepository _sut;
 
@@ -16,8 +17,13 @@ public class EstablishmentRepositoryTests
     {
         _mockEstablishmentJsonFile = new Mock<IJsonFile<Establishment>>();
         _mockEstablishmentEmailJsonFile = new Mock<IJsonFile<EstablishmentEmail>>();
+        _mockEstablishmentLinksJsonFile = new Mock<IJsonFile<EstablishmentLinks>>();
         _mockLogger = new Mock<ILogger<JsonEstablishmentRepository>>();
-        _sut = new JsonEstablishmentRepository(_mockEstablishmentJsonFile.Object, _mockEstablishmentEmailJsonFile.Object, _mockLogger.Object);
+        _sut = new JsonEstablishmentRepository(
+            _mockEstablishmentJsonFile.Object,
+            _mockEstablishmentEmailJsonFile.Object,
+            _mockEstablishmentLinksJsonFile.Object,
+            _mockLogger.Object);
     }
 
     [Fact]
@@ -155,5 +161,42 @@ public class EstablishmentRepositoryTests
         // Assert
         Assert.Null(result);
         _mockEstablishmentEmailJsonFile.Verify(r => r.ReadAllAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetEstablishmentLinks_ReturnsMatchingItemsForUrn()
+    {
+        // Arrange
+        var expected = new[]
+        {
+            new EstablishmentLinks { urn = "123", linkurn = "456", linktype = "Successor" },
+            new EstablishmentLinks { urn = "999", linkurn = "111", linktype = "Successor" }
+        };
+        _mockEstablishmentLinksJsonFile.Setup(r => r.ReadAllAsync()).ReturnsAsync(expected);
+
+        // Act
+        var result = await _sut.GetEstablishmentLinksAsync("123");
+
+        // Assert
+        Assert.NotNull(result);
+        var link = Assert.Single(result);
+        Assert.Equal("123", link.urn);
+        Assert.Equal("456", link.linkurn);
+        _mockEstablishmentLinksJsonFile.Verify(r => r.ReadAllAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetEstablishmentLinks_ReturnsEmptyWhenUrnDoesNotExist()
+    {
+        // Arrange
+        _mockEstablishmentLinksJsonFile.Setup(r => r.ReadAllAsync()).ReturnsAsync(Enumerable.Empty<EstablishmentLinks>());
+
+        // Act
+        var result = await _sut.GetEstablishmentLinksAsync("999");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Empty(result);
+        _mockEstablishmentLinksJsonFile.Verify(r => r.ReadAllAsync(), Times.Once);
     }
 }

@@ -9,6 +9,7 @@ public class SchoolDetailsBuilder(string urn)
     private string? _name = null;
     private string? _telephone = null;
     private string? _website = null;
+    private bool _showClosedSchoolBanner = false;
 
     public SchoolDetailsBuilder WithName(string name)
     {
@@ -28,12 +29,19 @@ public class SchoolDetailsBuilder(string urn)
         return this;
     }
 
+    public SchoolDetailsBuilder WithClosedSchoolBanner(bool showClosedSchoolBanner = true)
+    {
+        _showClosedSchoolBanner = showClosedSchoolBanner;
+        return this;
+    }
+
     public SD.SchoolDetails Build()
     {
         return new SD.SchoolDetails
         {
             Urn = urn,
             Name = _name ?? "",
+            ShowClosedSchoolBanner = _showClosedSchoolBanner,
             DfENumber = DataWithAvailability.NotAvailable<string>(),
             Ukprn = DataWithAvailability.NotAvailable<string>(),
             Address = DataWithAvailability.NotAvailable<string>(),

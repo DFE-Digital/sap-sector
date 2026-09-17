@@ -25,6 +25,7 @@ public class SchoolDetailsServiceTests
 
         _sut = new SchoolDetailsService(
             _establishmentRepository,
+            new SchoolClosureEligibilityService(_establishmentRepository),
             _loggerMock.Object);
     }
 

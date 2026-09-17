@@ -649,6 +649,7 @@ public sealed class GenerateViews
         sb.AppendLine("    t.\"establishmentnumber\"                      AS \"EstablishmentNumber\",");
         sb.AppendLine("    t.\"establishmentstatus__code_\"               AS \"EstablishmentStatusId\",");
         sb.AppendLine("    t.\"establishmentstatus__name_\"               AS \"EstablishmentStatusName\",");
+        sb.AppendLine("    t.\"closedate\"                                AS \"CloseDate\",");
         sb.AppendLine("    t.\"la__code_\" || t.\"establishmentnumber\"     AS \"LAESTAB\",");
         sb.AppendLine();
         sb.AppendLine("    t.\"trusts__code_\"                            AS \"TrustId\",");
