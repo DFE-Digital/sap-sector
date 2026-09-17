@@ -350,7 +350,7 @@ public class ViewSimilarSchoolsPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             new Establishment { URN = "100001", EstablishmentName = "Test School 1", LAId = "001", LAName = "Test LA 1", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", NurseryProvisionName = "No", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", Easting = 100000, Northing = 100000, TotalCapacity = 300, TotalPupils = 210 });
 
-        var response = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").ViewSimilarSchools, HttpStatusCode.NotFound);
+        var response = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.NotFound);
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
