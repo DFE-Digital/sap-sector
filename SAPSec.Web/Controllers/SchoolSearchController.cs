@@ -16,7 +16,7 @@ public class SchoolSearchController(
     ISchoolSearchService _searchService) : Controller
 {
     private const int PageSize = 10;
-    public const string Hint = "Search by name or school ID";
+    public const string Hint = "Enter a school name, URN, DfE number or UKPRN";
     public const string NoResultsErrorMessage = "We could not find any schools matching your search criteria";
 
     [HttpGet]

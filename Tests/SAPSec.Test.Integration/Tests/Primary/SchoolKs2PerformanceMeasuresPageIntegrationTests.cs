@@ -57,6 +57,8 @@ public class SchoolKs2PerformanceMeasuresPageIntegrationTests(
 
         var tabs = page.ElementWithTestIdShouldExist("expected-rwm-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+        tabs.QuerySelectorAll("a").Select(tab => tab.GetAttribute("aria-label"))
+            .Should().BeEquivalentTo("Charts", "Table of data", "Top performing similar schools");
     }
 
     [Fact]

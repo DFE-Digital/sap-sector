@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using System.Net;
 
 namespace SAPSec.Web.TagHelpers;
 
@@ -36,7 +37,7 @@ public class TabbedViewTagHelper : TagHelper
             output.Content.AppendHtml(
         $"""
                 <li class="govuk-tabs__list-item {selected}">
-                    <a class="govuk-tabs__tab" href="#{HtmlPrefix}-{tab.Id}">{tab.Name}</a>
+                    <a class="govuk-tabs__tab" href="#{HtmlPrefix}-{tab.Id}"{BuildAriaLabel(tab.AriaLabel)}>{tab.Name}</a>
                 </li>
         """);
         }
@@ -61,6 +62,11 @@ public class TabbedViewTagHelper : TagHelper
             """);
         }
     }
+
+    private static string BuildAriaLabel(string? ariaLabel) =>
+        string.IsNullOrWhiteSpace(ariaLabel)
+            ? string.Empty
+            : $" aria-label=\"{WebUtility.HtmlEncode(ariaLabel)}\"";
 }
 
 public class TabbedViewContext
@@ -69,13 +75,14 @@ public class TabbedViewContext
     public List<Tab> Tabs { get; set; } = [];
 }
 
-public record Tab(string? Id, string? Name, IHtmlContent Content);
+public record Tab(string? Id, string? Name, string? AriaLabel, IHtmlContent Content);
 
 [HtmlTargetElement("tab-content")]
 public class TabbedContentTagHelper : TagHelper
 {
     public string? Id { get; set; }
     public string? Name { get; set; }
+    public string? AriaLabel { get; set; }
 
     public override async Task ProcessAsync(TagHelperContext context, TagHelperOutput output)
     {
@@ -83,7 +90,7 @@ public class TabbedContentTagHelper : TagHelper
 
         var tabContext = (TabbedViewContext)context.Items[typeof(TabbedViewTagHelper)];
 
-        tabContext.Tabs.Add(new(Id, Name, content));
+        tabContext.Tabs.Add(new(Id, Name, AriaLabel, content));
 
         output.SuppressOutput();
     }
