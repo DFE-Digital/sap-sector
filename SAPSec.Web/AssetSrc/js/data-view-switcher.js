@@ -144,7 +144,18 @@
             return "";
         }
 
-        return baseUrl.replace(/\/+$/, "") + "/" + encodeURIComponent(urn);
+        try {
+            var parsedBaseUrl = new URL(baseUrl, window.location.origin);
+
+            if (parsedBaseUrl.protocol !== "http:" && parsedBaseUrl.protocol !== "https:") {
+                return "";
+            }
+
+            parsedBaseUrl.pathname = parsedBaseUrl.pathname.replace(/\/+$/, "") + "/" + encodeURIComponent(urn);
+            return parsedBaseUrl.toString();
+        } catch (e) {
+            return "";
+        }
     }
 
     function updateTopPerformers(tableBody, rows, baseUrl) {
