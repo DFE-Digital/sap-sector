@@ -110,7 +110,14 @@ public static class DsiAuthenticationHandler
         var logger = GetLogger(context.HttpContext);
         logger.LogWarning(
             "Spurious authentication callback request detected at {Path}",
-            context.Request.Path);
+            SanitizeForLog(context.Request.Path.Value));
+    }
+
+    private static string SanitizeForLog(string? value)
+    {
+        return string.IsNullOrEmpty(value)
+            ? string.Empty
+            : value.Replace("\r", string.Empty).Replace("\n", string.Empty);
     }
 
     private static void RedirectToHomeAndHandle(MessageReceivedContext context)
