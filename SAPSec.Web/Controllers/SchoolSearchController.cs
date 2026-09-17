@@ -220,7 +220,5 @@ public class SchoolSearchController(
         Redirect(BuildSchoolUrl(school.URN, school.PhaseOfEducationName));
 
     private static string BuildSchoolUrl(string urn, string? phaseOfEducationName) =>
-        PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
-            ? Routes.PrimarySchool(urn).Overview
-            : Routes.SecondarySchool(urn).Overview;
+        Routes.School(urn, phaseOfEducationName);
 }
