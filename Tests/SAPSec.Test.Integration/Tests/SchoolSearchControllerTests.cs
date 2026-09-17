@@ -165,7 +165,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseContent.Should().Contain("Enter a school name or school ID to start a search");
+        responseContent.Should().Contain("Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseContent.Should().Contain("Enter a school name or school ID (minimum 3 characters)");
+        responseContent.Should().Contain("Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
     }
 
     [Fact]
@@ -228,7 +228,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseContent.Should().Contain("Enter a school name or school ID to start a search");
+        responseContent.Should().Contain("Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
     }
 
     [Fact]
@@ -343,7 +343,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseContent.Should().Contain("Enter a school name or school ID to start a search");
+        responseContent.Should().Contain("Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
     }
 
     [Fact]
@@ -490,7 +490,7 @@ public class SchoolSearchControllerTests(JsonRepositoryIntegrationTestFixture fi
         var responseContent = await response.Content.ReadAsStringAsync();
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
-        responseContent.Should().Contain("Enter a school name or school ID to start a search");
+        responseContent.Should().Contain("Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
     }
 
     [Fact]
