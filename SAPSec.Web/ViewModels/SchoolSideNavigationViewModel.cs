@@ -21,7 +21,7 @@ public sealed class SchoolSideNavigationViewModel
 
         if (!hasSimilarSchools)
         {
-            items.RemoveAt(3);
+            items.RemoveAll(item => item.Text == "View similar schools");
         }
 
         if (includeRiseResources)
@@ -47,7 +47,7 @@ public sealed class SchoolSideNavigationViewModel
 
         if (!hasSimilarSchools)
         {
-            items.RemoveAt(4);
+            items.RemoveAll(item => item.Text == "View similar schools");
         }
 
         if (includeRiseResources)
