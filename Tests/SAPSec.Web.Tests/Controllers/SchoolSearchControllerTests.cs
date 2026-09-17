@@ -592,7 +592,7 @@ public class SchoolSearchControllerTests
         {
             Query = "AB"
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn (minimum 3 characters)");
+        _controller.ModelState.AddModelError("Query", "Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
 
         var result = await _controller.Index(viewModel);
 
@@ -613,7 +613,7 @@ public class SchoolSearchControllerTests
         {
             Query = null!
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn to start a search");
+        _controller.ModelState.AddModelError("Query", "Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
 
         var result = await _controller.Index(viewModel);
 
@@ -1022,7 +1022,7 @@ public class SchoolSearchControllerTests
         {
             Query = "AB"
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn (minimum 3 characters)");
+        _controller.ModelState.AddModelError("Query", "Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
 
         var result = await _controller.Index(viewModel);
 
@@ -1044,7 +1044,7 @@ public class SchoolSearchControllerTests
         {
             Query = string.Empty
         };
-        _controller.ModelState.AddModelError("Query", "Enter a school name or Urn to start a search");
+        _controller.ModelState.AddModelError("Query", "Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
 
         var result = await _controller.Index(viewModel);
 
