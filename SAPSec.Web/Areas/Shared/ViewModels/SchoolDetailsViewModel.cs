@@ -49,10 +49,14 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<string> Email { get; init; }
 
     public bool HasAcademyTrust =>
-        GovernanceStructure.IsAvailable
-        && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust
-        && AcademyTrustName.IsAvailable
+        AcademyTrustName.IsAvailable
         && AcademyTrustId.IsAvailable;
+
+    public bool ShouldDisplayAcademyTrust =>
+        HasAcademyTrust
+        && (!IsAllThroughSchool
+            || (GovernanceStructure.IsAvailable
+                && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust));
 
     public string OfstedReportUrl
     {
