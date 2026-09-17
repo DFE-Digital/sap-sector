@@ -134,31 +134,36 @@ public class AllPagesIntegrationTests(
         navigationItems.Should().SatisfyRespectively(navigationAssertions);
     }
 
-    //[Theory]
-    //[MemberData(nameof(NonComparisonPages))]
-    //public async Task AllPages_Navigation_ShowsLinksInCorrectOrderWithNoSimilarSchools(string path, string navigationText)
-    //{
-    //    Fixture.EstablishmentRepository.ClearDown();
-    //    Fixture.SimilarSchoolsPrimaryRepository.ClearDown();
+    [Theory]
+    [MemberData(nameof(NonComparisonPages))]
+    public async Task AllPages_Navigation_ShowsLinksInCorrectOrderWithNoSimilarSchools(string path, string navigationText)
+    {
+        Fixture.EstablishmentRepository.ClearDown();
+        Fixture.SimilarSchoolsPrimaryRepository.ClearDown();
 
-    //    Fixture.EstablishmentRepository.SetupEstablishments(
-    //       Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));   
+        Fixture.EstablishmentRepository.SetupEstablishments(
+           Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));   
 
-    //    var page = await Fixture.RequestPageAsync(path);
+        if (path.Contains("view-similar-schools"))
+        { 
+            return;
+        }
 
-    //    var navigationItems = page.QuerySelectorAll(".app-side-navigation__item a");
+        var page = await Fixture.RequestPageAsync(path);
 
-    //    var hrefs = navigationItems.Cast<IHtmlAnchorElement>().Select(a => a.Href).ToArray();
+        var navigationItems = page.QuerySelectorAll(".app-side-navigation__item a");
 
-    //    var pagesNoSimilarSchools = PrimaryPages.Where(p => p.Path != "/school/primary/100001/view-similar-schools");
+        var hrefs = navigationItems.Cast<IHtmlAnchorElement>().Select(a => a.Href).ToArray();
 
-    //    var navigationAssertions = pagesNoSimilarSchools
-    //        .Where(p => !ComparisonPage.IsMatch(p.Path))
-    //        .Select(p => new Action<IElement>(n => n.ShouldLinkTo(p.NavigationText ?? p.Heading, p.Path)))
-    //        .ToArray();
+        var pagesNoSimilarSchools = PrimaryPages.Where(p => p.Path != "/school/primary/100001/view-similar-schools");
 
-    //    navigationItems.Should().SatisfyRespectively(navigationAssertions);
-    //}
+        var navigationAssertions = pagesNoSimilarSchools
+            .Where(p => !ComparisonPage.IsMatch(p.Path))
+            .Select(p => new Action<IElement>(n => n.ShouldLinkTo(p.NavigationText ?? p.Heading, p.Path)))
+            .ToArray();
+
+        navigationItems.Should().SatisfyRespectively(navigationAssertions);
+    }
 
     [Theory]
     [MemberData(nameof(NonComparisonPages))]
