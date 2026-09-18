@@ -7,6 +7,7 @@ using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Data.Repositories;
+using SAPSec.Web.Areas.AllThrough.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels;
 using SAPSec.Web.Areas.Shared.ViewModels.School;
 using SAPSec.Web.Constants;
@@ -33,7 +34,14 @@ public class SchoolController(
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+        var similarSchoolPhases = await GetSimilarSchoolPhasesAsync(urn);
+
+        var model = new AllThroughOverviewViewModel(
+            SchoolInfoViewModel.FromSchoolInfo(response.School),
+            similarSchoolPhases.HasPrimary,
+            similarSchoolPhases.HasSecondary);
+
+        return View(model);
     }
 
     [HttpGet]
@@ -116,12 +124,13 @@ public class SchoolController(
             Url,
             urn,
             ControllerContext.ActionDescriptor.ActionName,
-            await HasSimilarSchoolsAsync(urn),
+            await GetSimilarSchoolPhasesAsync(urn),
             await IsRiseResourcesEnabledAsync());
 
-    private async Task<bool> HasSimilarSchoolsAsync(string urn) =>
-        (await similarSchoolsPrimaryRepository.GetGroupAsync(urn)).Any()
-        || (await similarSchoolsSecondaryRepository.GetGroupAsync(urn)).Any();
+    private async Task<AllThroughSimilarSchoolPhases> GetSimilarSchoolPhasesAsync(string urn) =>
+        new(
+            (await similarSchoolsPrimaryRepository.GetGroupAsync(urn)).Any(),
+            (await similarSchoolsSecondaryRepository.GetGroupAsync(urn)).Any());
 
     private async Task<bool> IsRiseResourcesEnabledAsync() =>
         featureFlagService is not null
