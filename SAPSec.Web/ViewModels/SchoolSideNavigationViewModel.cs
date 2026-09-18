@@ -5,6 +5,7 @@ namespace SAPSec.Web.ViewModels;
 
 public sealed class SchoolSideNavigationViewModel
 {
+    public const string ViewSimilarSchools = "View similar schools";
     public required IReadOnlyList<SchoolSideNavigationItemViewModel> Items { get; init; }
 
     public static SchoolSideNavigationViewModel CreatePrimary(IUrlHelper url, string urn, string? currentAction, bool hasSimilarSchools = true, bool includeRiseResources = false)
@@ -21,7 +22,7 @@ public sealed class SchoolSideNavigationViewModel
 
         if (!hasSimilarSchools)
         {
-            items.RemoveAll(item => item.Text == "View similar schools");
+            items.RemoveAll(item => item.Text == ViewSimilarSchools);
         }
 
         if (includeRiseResources)
@@ -47,7 +48,7 @@ public sealed class SchoolSideNavigationViewModel
 
         if (!hasSimilarSchools)
         {
-            items.RemoveAll(item => item.Text == "View similar schools");
+            items.RemoveAll(item => item.Text == ViewSimilarSchools);
         }
 
         if (includeRiseResources)
