@@ -1133,14 +1133,9 @@
   }
 }
 
-.app-closed-school-banner {
-  box-sizing: border-box;
-  border-left: 4px solid govuk-colour("blue");
-  background-color: #f4f8fb;
-  padding: 15px 20px;
-  margin-bottom: 30px;
-
-  &__text {
-    margin-bottom: 0;
-  }
+// MoJ design pattern: "Inset text (highlighted)"
+// https://design-patterns.service.justice.gov.uk/components/inset-text-highlighted/
+.guidance-panel {
+  border-left-color: govuk-colour("blue");
+  background-color: #eaf4f9;
 }

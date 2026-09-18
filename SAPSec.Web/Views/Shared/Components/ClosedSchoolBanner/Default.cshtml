@@ -2,11 +2,11 @@
 @model ClosedSchoolBannerViewModel
 
 @{
-    var modifierClass = Model.Variant == ClosedSchoolBannerVariant.Comparator
-        ? "app-closed-school-banner--comparator"
-        : "app-closed-school-banner--this-school";
+    var ariaLabel = Model.Variant == ClosedSchoolBannerVariant.Comparator
+        ? "Comparator school closed notice"
+        : "Closed school notice";
 }
 
-<div class="app-closed-school-banner @modifierClass" role="region" aria-label="Closed school notice">
-    <p class="govuk-body app-closed-school-banner__text">This school is closed.</p>
+<div class="govuk-inset-text guidance-panel app-closed-school-banner" role="region" aria-label="@ariaLabel">
+    <p class="govuk-body">This school is closed.</p>
 </div>
