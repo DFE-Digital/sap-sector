@@ -62,9 +62,7 @@ public class SchoolController(
     {
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getAllThroughAttendanceMeasuresUseCase.Execute(new(urn, filters));
-
         await PopulateViewData(response.School);
-
         var model = new AllThroughAttendancePageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),

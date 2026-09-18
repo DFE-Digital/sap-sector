@@ -48,11 +48,11 @@ public class SchoolDetailsViewModel
     public required DataWithAvailability<string> Telephone { get; init; }
     public required DataWithAvailability<string> Email { get; init; }
 
-    public bool HasAcademyTrust =>
-        GovernanceStructure.IsAvailable
-        && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust
-        && AcademyTrustName.IsAvailable
-        && AcademyTrustId.IsAvailable;
+    public bool ShouldDisplayAcademyTrust =>
+        HasAcademyTrust
+        && (!IsAllThroughSchool
+            || (GovernanceStructure.IsAvailable
+                && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust));
 
     public string OfstedReportUrl
     {
@@ -70,6 +70,16 @@ public class SchoolDetailsViewModel
         TypeOfEstablishmentCode.IsAvailable && TypeOfEstablishmentCode.Value == "49"
             ? "100003"
             : "28";
+
+    public bool HasAcademyTrust =>
+        GovernanceStructure.IsAvailable
+        && GovernanceStructure.Value is GovernanceType.MultiAcademyTrust or GovernanceType.SingleAcademyTrust
+        && AcademyTrustName.IsAvailable
+        && AcademyTrustId.IsAvailable;
+
+    //public bool HasAcademyTrust =>
+    //   AcademyTrustName.IsAvailable
+    //   && AcademyTrustId.IsAvailable;
 
     public static SchoolDetailsViewModel FromSchoolDetails(SchoolDetails schoolDetails) =>
         new()

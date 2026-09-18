@@ -1,7 +1,4 @@
-﻿@using SAPSec.Core.Constants
-@using SAPSec.Core.Extensions
-@using SAPSec.Core.Features.SchoolDetails
-@using SAPSec.Core.Model
+﻿@using SAPSec.Core.Features.SchoolDetails
 @using SAPSec.Web.Areas.Shared.ViewModels
 @using SAPSec.Web.Constants
 @using SAPSec.Web.Helpers
@@ -64,7 +61,8 @@
         <dd class="govuk-summary-list__value">@Model.GovernanceStructure.Display()</dd>
     </div>
 
-    @if (Model.HasAcademyTrust)
+    @if (Model.ShouldDisplayAcademyTrust)
+    @* @if (Model.HasAcademyTrust) *@
     {
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Academy Trust</dt>
