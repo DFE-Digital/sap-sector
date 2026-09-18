@@ -17,6 +17,7 @@ public class SchoolPagesAccessibilityTests(AccessibilityTestsFixture fixture) : 
         Routes.PrimarySchool("100171").ViewSimilarSchools,
         Routes.PrimarySchool("100171").SchoolDetails,
         Routes.PrimarySchool("100171").WhatIsASimilarSchool,
+        Routes.AllThroughSchool("100171").Overview,
         Routes.SecondarySchool("100182").Overview,
         Routes.SecondarySchool("100182").KS4HeadlineMeasures,
         Routes.SecondarySchool("100182").KS4CoreSubjects,
