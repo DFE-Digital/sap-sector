@@ -47,6 +47,41 @@ public sealed class SchoolSideNavigationViewModel
 
         return new SchoolSideNavigationViewModel { Items = items };
     }
+
+    public static SchoolSideNavigationViewModel CreateAllThrough(
+        IUrlHelper url,
+        string urn,
+        string? currentAction,
+        bool includeSimilarSchools,
+        bool includeRiseResources = false)
+    {
+        var items = new List<SchoolSideNavigationItemViewModel>
+        {
+            new() { Text = "Overview", Href = Routes.AllThroughSchool(urn).Overview, IsSelected = currentAction == "Index" },
+            new() { Text = "KS2", Href = Routes.AllThroughSchool(urn).KS2, IsSelected = currentAction == "Ks2PerformanceMeasures" },
+            new() { Text = "KS4 headline measures", Href = Routes.AllThroughSchool(urn).KS4HeadlineMeasures, IsSelected = currentAction == "Ks4HeadlineMeasures" },
+            new() { Text = "KS4 core subjects", Href = Routes.AllThroughSchool(urn).KS4CoreSubjects, IsSelected = currentAction == "Ks4CoreSubjects" },
+            new() { Text = "Attendance", Href = Routes.AllThroughSchool(urn).Attendance, IsSelected = currentAction == "Attendance" }
+        };
+
+        if (includeSimilarSchools)
+        {
+            items.Add(new() { Text = "View similar schools", Href = Routes.AllThroughSchool(urn).ViewSimilarSchools, IsSelected = currentAction == "ViewSimilarSchools" });
+        }
+
+        items.AddRange(
+        [
+            new() { Text = "School details", Href = Routes.AllThroughSchool(urn).SchoolDetails, IsSelected = currentAction == "SchoolDetails" },
+            new() { Text = "What is a similar school?", Href = Routes.AllThroughSchool(urn).WhatIsASimilarSchool, IsSelected = currentAction == "WhatIsASimilarSchool" }
+        ]);
+
+        if (includeRiseResources)
+        {
+            items.Add(new() { Text = "RISE resources", Href = Routes.AllThroughSchool(urn).RiseResources, IsSelected = currentAction == "RiseResources" });
+        }
+
+        return new SchoolSideNavigationViewModel { Items = items };
+    }
 }
 
 public sealed class SchoolSideNavigationItemViewModel

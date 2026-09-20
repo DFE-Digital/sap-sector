@@ -93,6 +93,7 @@ public class RequestSchoolAccessorTests
             GenderOfEntry = DataWithAvailability.Available("Mixed"),
             PhaseOfEducation = DataWithAvailability.Available("Secondary"),
             SchoolType = DataWithAvailability.Available("Academy converter"),
+            TypeOfEstablishmentCode = DataWithAvailability.Available("1"),
             AdmissionsPolicy = DataWithAvailability.Available("Non-selective"),
             ReligiousCharacter = DataWithAvailability.Available("None"),
             GovernanceStructure = DataWithAvailability.Available(GovernanceType.MultiAcademyTrust),

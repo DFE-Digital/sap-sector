@@ -18,7 +18,7 @@
         MeasureDataType.OverallAbsencePercentage or MeasureDataType.PersistentAbsencePercentage => 2,
         _ => 0
     };
-    var (axisMin, axisStep, axisMax) = Model.MeasureInfo.DataType switch
+    var (axisMin, axisStep, defaultAxisMax) = Model.MeasureInfo.DataType switch
     {
         MeasureDataType.Score => (0, 30, 90),
         MeasureDataType.OverallAbsencePercentage => (0, 1, 10),
@@ -26,6 +26,10 @@
         MeasureDataType.ScaledScore => (80, 20, 120),
         _ => (0, 25, 100)
     };
+    var maxDataValue = Model.Averages.Where(a => a.HasValue).Select(a => a!.Value).DefaultIfEmpty(0).Max();
+    var axisMax = maxDataValue > defaultAxisMax
+        ? (int)(Math.Ceiling(maxDataValue / axisStep) * axisStep)
+        : defaultAxisMax;
 }
 
 <div class="app-measure-chart-container">
