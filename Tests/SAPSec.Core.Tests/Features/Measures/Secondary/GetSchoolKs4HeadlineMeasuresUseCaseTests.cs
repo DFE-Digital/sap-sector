@@ -3,7 +3,7 @@ using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Test.Common.Builders;
 using SAPSec.Test.Common.InMemory;
-using static SAPSec.Core.Constants.Measures.Secondary;
+using static SAPSec.Core.Features.Measures.Measures.Secondary;
 
 namespace SAPSec.Core.Tests.Features.Measures.Secondary;
 

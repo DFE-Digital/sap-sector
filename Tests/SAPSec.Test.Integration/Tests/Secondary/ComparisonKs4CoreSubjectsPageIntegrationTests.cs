@@ -16,35 +16,50 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
     [Fact]
-    public async Task Ks4CoreSubjects_WithNonExistentUrn_ReturnsNotFound()
+    public async Task NonExistentCurrentSchoolUrn_ReturnsNotFound()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
 
-        var response = await Fixture.Client.GetAsync(Routes.SecondarySchool("999999").Comparison("100002").KS4CoreSubjects);
-
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        await Fixture.RequestPageAsync(
+            Routes.SecondarySchool("999999").Comparison("100002").KS4CoreSubjects, HttpStatusCode.NotFound);
     }
 
     [Fact]
-    public async Task Ks4CoreSubjects_WithNonExistentSimilarSchoolUrn_ReturnsNotFound()
+    public async Task NonExistentComparatorSchoolUrn_ReturnsNotFound()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
 
-        var response = await Fixture.Client.GetAsync(Routes.SecondarySchool("100001").Comparison("999999").KS4CoreSubjects);
+        await Fixture.RequestPageAsync(
+            Routes.SecondarySchool("100001").Comparison("999999").KS4CoreSubjects, HttpStatusCode.NotFound);
+    }
 
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    [Fact]
+    public async Task WhenComparatorSchoolIsNotInSimilarSchoolsGroupForCurrentSchool_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", []));
+
+        await Fixture.RequestPageAsync(
+            Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task EnglishLanguage_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -56,8 +71,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLanguage_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -69,8 +87,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLanguage_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngLang49(current: "81", prev: "80", prev2: "79")),
@@ -85,8 +106,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -94,8 +115,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLanguage_TableView_ValuesRoundTo0DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngLang49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -110,8 +134,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -119,8 +143,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLanguage_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -147,8 +174,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLanguage_Charts_UseCorrectSchoolColours()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -168,8 +198,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLanguage_GradeFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -200,8 +233,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchools],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
     }
 
@@ -209,8 +242,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -222,8 +258,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -235,8 +274,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngLit49(current: "81", prev: "80", prev2: "79")),
@@ -254,8 +296,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -263,8 +305,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_TableView_ValuesRoundTo0DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithEngLit49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -279,8 +324,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -288,8 +333,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -316,8 +364,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_Charts_UseCorrectSchoolColours()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -334,8 +385,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -350,8 +404,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_GradeFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -382,8 +439,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchools],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
     }
 
@@ -391,8 +448,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -404,8 +464,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -417,8 +480,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithMaths49(current: "81", prev: "80", prev2: "79")),
@@ -433,8 +499,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -442,8 +508,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_TableView_ValuesRoundTo0DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithMaths49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -458,8 +527,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -467,8 +536,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -495,8 +567,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_Charts_UseCorrectSchoolColours()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -513,8 +588,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -529,8 +607,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_GradeFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -560,8 +641,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchools],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
     }
 
@@ -569,8 +650,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -582,8 +666,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -595,8 +682,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithCombSci49(current: "81", prev: "80", prev2: "79")),
@@ -611,8 +701,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -620,8 +710,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_TableView_ValuesRoundTo0DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithCombSci49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -636,8 +729,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -645,8 +738,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -673,8 +769,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_Charts_UseCorrectSchoolColours()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -691,8 +790,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -707,11 +809,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_GradeFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
 
         Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
-            Build.SecondaryGroup("100001", ["100002", "100003"]));
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -742,8 +844,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchools],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
     }
 
@@ -751,8 +853,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -764,8 +869,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -777,8 +885,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithBio49(current: "81", prev: "80", prev2: "79")),
@@ -794,8 +905,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -803,8 +914,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_TableView_ValuesRoundTo0DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithBio49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -820,8 +934,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -829,8 +943,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -857,8 +974,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_Charts_UseCorrectSchoolColours()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -875,8 +995,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -891,8 +1014,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_GradeFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -922,8 +1048,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchools],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
     }
 
@@ -931,8 +1057,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -944,8 +1073,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -957,8 +1089,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithChem49(current: "81", prev: "80", prev2: "79")),
@@ -973,8 +1108,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -982,8 +1117,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_TableView_ValuesRoundTo0DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithChem49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -998,8 +1136,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -1007,8 +1145,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1035,8 +1176,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_Charts_UseCorrectSchoolColours()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1053,8 +1197,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1069,8 +1216,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_GradeFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -1100,8 +1250,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchools],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
     }
 
@@ -1109,8 +1259,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_MeasureExistsOnPage()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1122,8 +1275,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1135,8 +1291,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_TableView_ShouldShowCorrectValues()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithPhysics49(current: "81", prev: "80", prev2: "79")),
@@ -1151,8 +1310,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -1160,8 +1319,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_TableView_ValuesRoundTo0DecimalPlaces()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x.WithPhysics49(current: "80.99", prev: "80.3", prev2: "78.9")),
@@ -1176,8 +1338,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", "79%", "80%", "81%"],
-            ["Test School 2", "69%", "70%", "71%"],
+            ["Current School", "79%", "80%", "81%"],
+            ["Comparator School", "69%", "70%", "71%"],
             ["Schools in England average", "99%", "100%", "101%"]);
     }
 
@@ -1185,8 +1347,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_ChartSettings()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1213,8 +1378,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_Charts_UseCorrectSchoolColours()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1231,8 +1399,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_GradeFilter_HasExpectedOptions()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").Comparison("100002").KS4CoreSubjects, HttpStatusCode.OK);
 
@@ -1247,8 +1418,11 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_GradeFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] england)
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary()),
-            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary()));
+            Build.Establishment("100001", "Current School", x => x.Open().Secondary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Secondary()));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
 
         Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
             Build.Ks4Performance.Establishment("100001", x => x
@@ -1278,8 +1452,8 @@ public class ComparisonKs4CoreSubjectsPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
-            ["Test School 1", .. currentSchool],
-            ["Test School 2", .. similarSchools],
+            ["Current School", .. currentSchool],
+            ["Comparator School", .. similarSchools],
             ["Schools in England average", .. england]);
     }
 

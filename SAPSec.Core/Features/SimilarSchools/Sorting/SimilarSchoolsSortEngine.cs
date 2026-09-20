@@ -1,5 +1,5 @@
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.Sorting;
-using SAPSec.Core.Model;
 
 namespace SAPSec.Core.Features.SimilarSchools.Sorting;
 
@@ -12,25 +12,25 @@ namespace SAPSec.Core.Features.SimilarSchools.Sorting;
 /// </summary>
 internal static class SimilarSchoolsSortEngine
 {
-    public static IEnumerable<SortedItem<TItem, DataWithAvailability<string>>> Sort<TItem>(
-        IEnumerable<TItem> items,
+    public static IEnumerable<SortedItem<SimilarSchool, DataWithAvailability<string>>> Sort<TSortData>(
+        IEnumerable<SimilarSchoolSortItem<TSortData>> items,
         string sortKey,
         string sortName,
-        Func<TItem, DataWithAvailability<decimal>> valueSelector,
-        Func<TItem, string> nameSelector,
+        Func<TSortData?, DataWithAvailability<decimal>> valueSelector,
         string displayFormat,
-        int decimalPlaces) =>
+        int decimalPlaces)
+            where TSortData : class =>
         items
-            .Select(item => new SortedItem<TItem, DataWithAvailability<decimal>>(
-                item,
-                new SortOptionValue<DataWithAvailability<decimal>>(sortKey, sortName, valueSelector(item))))
+            .Select(item => new SortedItem<SimilarSchool, DataWithAvailability<decimal>>(
+                item.SimilarSchool,
+                new SortOptionValue<DataWithAvailability<decimal>>(sortKey, sortName, valueSelector(item.SortData))))
             // Sort on the value rounded to the precision shown to the user, so schools that
             // display the same score (e.g. both "83%") are treated as tied.
             .OrderByDescending(
                 i => i.Value.Value.Map(v => Math.Round(v, decimalPlaces, MidpointRounding.AwayFromZero)),
                 DataWithAvailability<decimal>.Comparer)
-            .ThenBy(i => nameSelector(i.Item), StringComparer.OrdinalIgnoreCase)
-            .Select(item => new SortedItem<TItem, DataWithAvailability<string>>(
+            .ThenBy(i => i.Item.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(item => new SortedItem<SimilarSchool, DataWithAvailability<string>>(
                 item.Item,
                 new SortOptionValue<DataWithAvailability<string>>(
                     item.Value.Key,

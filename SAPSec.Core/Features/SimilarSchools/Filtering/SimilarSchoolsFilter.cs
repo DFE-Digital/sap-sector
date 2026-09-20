@@ -1,6 +1,6 @@
 ﻿using SAPSec.Core.Collections;
+using SAPSec.Core.Features.Availability;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
-using SAPSec.Core.Model;
 namespace SAPSec.Core.Features.SimilarSchools.Filtering;
 
 public abstract class SimilarSchoolsFilter(
@@ -18,6 +18,6 @@ public abstract class SimilarSchoolsFilter(
     public string Key => key;
     public string Name => name;
     public abstract bool IsApplied { get; }
-    public abstract IEnumerable<SimilarSchool> Filter(IEnumerable<SimilarSchool> items);
-    public abstract SimilarSchoolsAvailableFilter? AsAvailableFilter(IEnumerable<SimilarSchool> items);
+    public abstract IEnumerable<T> Filter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor);
+    public abstract SimilarSchoolsAvailableFilter? AsAvailableFilter<T>(IEnumerable<T> items, Func<T, SimilarSchool> similarSchoolAccessor);
 }

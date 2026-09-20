@@ -16,18 +16,6 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
     InMemoryRepositoryIntegrationTestFixture fixture,
     ITestOutputHelper outputHelper) : InMemoryRepositoryIntegrationTests(fixture, outputHelper)
 {
-    private const string PrimarySchoolUrn = "100001";
-    private const string SimilarSchoolUrn = "100002";
-
-    public override Task InitializeAsync()
-    {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment(PrimarySchoolUrn, "Test School 1", x => x.Open().Primary().InLA("001")),
-            Build.Establishment(SimilarSchoolUrn, "Test School 2", x => x.Open().Primary().InLA("002")));
-
-        return base.InitializeAsync();
-    }
-
     public override Task DisposeAsync()
     {
         Fixture.FeatureFlagService.ClearOverrides(FeatureFlags.EnablePrimarySchools);
@@ -36,10 +24,53 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
     }
 
     [Fact]
+    public async Task NonExistentCurrentSchoolUrn_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("999999").Comparison("100002").Attendance, HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task NonExistentComparatorSchoolUrn_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("100001").Comparison("999999").Attendance, HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task WhenComparatorSchoolIsNotInSimilarSchoolsGroupForCurrentSchool_ReturnsNotFound()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", []));
+
+        await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance, HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task Absence_DisplaysHeadingAndFilterOptions()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance);
 
         var heading = page.ElementWithTestIdShouldExist("attendance-heading");
         heading.TrimmedTextContent().Should().Be("Attendance");
@@ -52,9 +83,14 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
     public async Task Absence_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
 
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Attendance, HttpStatusCode.OK);
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance);
 
         var tabs = page.ElementWithTestIdShouldExist("absence-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
@@ -63,33 +99,47 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task Absence_TableView_ShowsOverallAbsenceValuesByDefault()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.AbsenceRepository.SetupEstablishmentAbsence(
-            Build.Absence.Establishment(PrimarySchoolUrn, x => x.WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")),
-            Build.Absence.Establishment(SimilarSchoolUrn, x => x.WithOverallAbsence(current: "6.10", previous: "6.20", previous2: "6.30")));
+            Build.Absence.Establishment("100001", x => x.WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")),
+            Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "6.10", previous: "6.20", previous2: "6.30")));
 
         Fixture.AbsenceRepository.SetupEnglandAbsence(
             Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "6.10", previous: "6.90", previous2: "5.45")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance);
 
         var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
 
         table.ShouldHaveRows(
             ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
-            ["Test School 1", "7.91%", "8.05%", "8.00%"],
-            ["Test School 2", "6.30%", "6.20%", "6.10%"],
+            ["Current School", "7.91%", "8.05%", "8.00%"],
+            ["Comparator School", "6.30%", "6.20%", "6.10%"],
             ["Schools in England average", "5.45%", "6.90%", "6.10%"]);
     }
 
     [Fact]
     public async Task Absence_FilterBy_Persistent_UpdatesTableViewWithPersistentAbsenceValues()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]));
+
         Fixture.AbsenceRepository.SetupEstablishmentAbsence(
-            Build.Absence.Establishment(PrimarySchoolUrn, x => x
+            Build.Absence.Establishment("100001", x => x
                 .WithOverallAbsence(current: "8.00", previous: "8.05", previous2: "7.91")
                 .WithPersistentAbsence(current: "2.27", previous: "1.24", previous2: "8.20")),
-            Build.Absence.Establishment(SimilarSchoolUrn, x => x
+            Build.Absence.Establishment("100002", x => x
                 .WithOverallAbsence(current: "6.10", previous: "6.20", previous2: "6.30")
                 .WithPersistentAbsence(current: "1.24", previous: "1.30", previous2: "1.40")));
 
@@ -99,7 +149,7 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
                 .WithPersistentAbsencePrimary(current: "3.20", previous: "2.24", previous2: "2.20")));
 
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("absence-type-filter");
         filter.SelectOption("Persistent absence");
@@ -111,16 +161,23 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
 
         table.ShouldHaveRows(
             ["School(s)", "2021 to 2022", "2022 to 2023", "2023 to 2024"],
-            ["Test School 1", "8.20%", "1.24%", "2.27%"],
-            ["Test School 2", "1.40%", "1.30%", "1.24%"],
+            ["Current School", "8.20%", "1.24%", "2.27%"],
+            ["Comparator School", "1.40%", "1.30%", "1.24%"],
             ["Schools in England average", "2.20%", "2.24%", "3.20%"]);
     }
 
     [Fact]
     public async Task Absence_OverallAbsence_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("absence-current-year-chart");
         currentYearChart.Dataset.Should().Contain(
@@ -144,8 +201,15 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task Absence_PersistentAbsence_ChartSettings()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance);
 
         var filter = page.ElementWithTestIdShouldExist<IHtmlSelectElement>("absence-type-filter");
         filter.SelectOption("Persistent absence");
@@ -175,8 +239,15 @@ public class ComparisonAttendanceMeasuresPageIntegrationTests(
     [Fact]
     public async Task Absence_Charts_UseCorrectSchoolColours()
     {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Current School", x => x.Open().Primary()),
+            Build.Establishment("100002", "Comparator School", x => x.Open().Primary()));
+
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup("100001", ["100002"]));
+
         var page = await Fixture.RequestPageAsync(
-            Routes.PrimarySchool(PrimarySchoolUrn).Comparison(SimilarSchoolUrn).Attendance);
+            Routes.PrimarySchool("100001").Comparison("100002").Attendance);
 
         var currentYearChart = page.ElementWithTestIdShouldExist("absence-current-year-chart");
         currentYearChart.Dataset.Should().ContainKey("colors")
