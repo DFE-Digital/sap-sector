@@ -16,6 +16,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var showClosedSchoolBanner = ViewData[ViewDataKeys.ShowClosedSchoolBanner] as bool? ?? false;
+    var closedSchoolSuccessors = ViewData[ViewDataKeys.ClosedSchoolSuccessors] as IReadOnlyList<SuccessorLinkViewModel> ?? [];
 }
 
 @section Breadcrumbs {
@@ -28,9 +29,9 @@
     </nav>
 }
 
-@if (showClosedSchoolBanner)
+@if (showClosedSchoolBanner || closedSchoolSuccessors.Any())
 {
-    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.ThisSchool })
+    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.ThisSchool, successors = closedSchoolSuccessors })
 }
 
 <div class="govuk-grid-row">

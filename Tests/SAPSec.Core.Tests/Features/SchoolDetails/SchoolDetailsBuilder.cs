@@ -10,6 +10,7 @@ public class SchoolDetailsBuilder(string urn)
     private string? _telephone = null;
     private string? _website = null;
     private bool _showClosedSchoolBanner = false;
+    private IReadOnlyList<SD.SuccessorSchool> _successors = [];
 
     public SchoolDetailsBuilder WithName(string name)
     {
@@ -35,6 +36,12 @@ public class SchoolDetailsBuilder(string urn)
         return this;
     }
 
+    public SchoolDetailsBuilder WithSuccessors(params SD.SuccessorSchool[] successors)
+    {
+        _successors = successors;
+        return this;
+    }
+
     public SD.SchoolDetails Build()
     {
         return new SD.SchoolDetails
@@ -42,6 +49,7 @@ public class SchoolDetailsBuilder(string urn)
             Urn = urn,
             Name = _name ?? "",
             ShowClosedSchoolBanner = _showClosedSchoolBanner,
+            Successors = _successors,
             DfENumber = DataWithAvailability.NotAvailable<string>(),
             Ukprn = DataWithAvailability.NotAvailable<string>(),
             Address = DataWithAvailability.NotAvailable<string>(),

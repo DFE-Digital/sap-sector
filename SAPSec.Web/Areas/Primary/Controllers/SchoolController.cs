@@ -17,6 +17,7 @@ using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 using SAPSec.Web.ViewModels.Measures;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
@@ -134,6 +135,7 @@ public class SchoolController(
 
         var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
@@ -150,5 +152,6 @@ public class SchoolController(
             includeRise);
 
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);
     }
 }

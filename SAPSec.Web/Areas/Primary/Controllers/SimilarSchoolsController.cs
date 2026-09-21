@@ -10,6 +10,7 @@ using SAPSec.Web.Constants;
 using SAPSec.Web.Filters;
 using SAPSec.Web.Services;
 using SAPSec.Web.ViewModels;
+using SAPSec.Web.ViewModels.Components;
 
 namespace SAPSec.Web.Areas.Primary.Controllers;
 
@@ -70,5 +71,6 @@ public class SimilarSchoolsController(
 
         var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
+        ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
     }
 }

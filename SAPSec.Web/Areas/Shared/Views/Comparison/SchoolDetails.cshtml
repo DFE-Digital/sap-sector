@@ -54,9 +54,13 @@
 }
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 
-@if (Model.ComparatorSchoolDetails?.ShowClosedSchoolBanner == true)
+@{
+    var comparatorSuccessors = Model.ComparatorSchoolDetails?.Successors ?? [];
+}
+
+@if (Model.ComparatorSchoolDetails?.ShowClosedSchoolBanner == true || comparatorSuccessors.Any())
 {
-    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.Comparator })
+    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.Comparator, successors = comparatorSuccessors })
 }
 
 <h2 class="govuk-heading-l">School details</h2>

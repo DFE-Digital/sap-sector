@@ -64,6 +64,7 @@ public sealed class SchoolDetailsService : ISchoolDetailsService
             Urn = establishment.URN,
             Name = establishment.EstablishmentName,
             ShowClosedSchoolBanner = closureEligibility.ShowClosedSchoolBanner,
+            Successors = closureEligibility.Successors,
             DfENumber = DataMapper.MapDfENumber(establishment),
             Ukprn = DataMapper.MapRequiredString(establishment.UKPRN),
 

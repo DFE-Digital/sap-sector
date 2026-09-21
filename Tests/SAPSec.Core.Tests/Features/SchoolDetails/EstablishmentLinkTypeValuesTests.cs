@@ -10,6 +10,8 @@ public class EstablishmentLinkTypeValuesTests
     [InlineData("Successor - amalgamated")]
     [InlineData("successor")]
     [InlineData("  Successor  ")]
+    [InlineData("Result of Amalgamation")]
+    [InlineData("result of amalgamation")]
     public void IsSuccessor_ReturnsTrue_ForSuccessorLinkTypes(string linkType)
     {
         EstablishmentLinkTypeValues.IsSuccessor(linkType).Should().BeTrue();
@@ -19,7 +21,6 @@ public class EstablishmentLinkTypeValuesTests
     [InlineData("Predecessor")]
     [InlineData("Predecessor - amalgamated")]
     [InlineData("Sixth Form Centre Link")]
-    [InlineData("Result of Amalgamation")]
     [InlineData("Other")]
     [InlineData(null)]
     [InlineData("")]
