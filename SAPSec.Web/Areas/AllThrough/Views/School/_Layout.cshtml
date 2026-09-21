@@ -1,0 +1,37 @@
+@using SAPSec.Web.Constants
+@using SAPSec.Web.ViewModels
+
+@{
+    var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
+    if (navigation is not null)
+    {
+        ViewData[ViewDataKeys.SkipNavigationTargetId] = "school-navigation";
+        ViewData[ViewDataKeys.SkipNavigationText] = "Skip to school navigation";
+    }
+
+    ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Breadcrumbs {
+    <nav class="govuk-breadcrumbs govuk-breadcrumbs--collapse-on-mobile" aria-label="Breadcrumb">
+        <ol class="govuk-breadcrumbs__list">
+            <li class="govuk-breadcrumbs__list-item">
+                <a class="govuk-breadcrumbs__link" href="@Routes.FindASchool()">Home</a>
+            </li>
+        </ol>
+    </nav>
+}
+
+<div class="govuk-grid-row">
+    @if (navigation is not null)
+    {
+        @await Component.InvokeAsync("SchoolSideNavigation", navigation)
+    }
+
+    <div class="app-body-container-with-side-navigation" id="page-content" tabindex="-1">
+        @RenderBody()
+    </div>
+</div>
+
+@await RenderSectionAsync("Scripts", required: false)

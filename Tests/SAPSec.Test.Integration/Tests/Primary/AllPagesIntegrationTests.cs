@@ -20,7 +20,7 @@ public class AllPagesIntegrationTests(
         new(Routes.PrimarySchool("100001").Overview, "Test School 1", NavigationText: "Overview"),
         new(Routes.PrimarySchool("100001").KS2, "KS2 performance measures", NavigationText: "KS2"),
         new(Routes.PrimarySchool("100001").Attendance, "Attendance measures", NavigationText: "Attendance"),
-        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools"),
+        new(Routes.PrimarySchool("100001").ViewSimilarSchools, "View similar schools", Title: "2 similar schools - View similar schools"),
         new(Routes.PrimarySchool("100001").SchoolDetails, "School details"),
         new(Routes.PrimarySchool("100001").WhatIsASimilarSchool, "What is a similar school?"),
         new(Routes.PrimarySchool("100001").RiseResources, "RISE resources"),
@@ -67,14 +67,14 @@ public class AllPagesIntegrationTests(
 
     [Theory]
     [MemberData(nameof(AllPagesWithPageHeadings))]
-    public async Task AllPages_Headings(string path, string expectedHeading)
+    public async Task AllPages_Headings(string path, string expectedHeading, string? expectedTitleOverride)
     {
         var isComparisonPage = ComparisonPage.IsMatch(path);
         var isOverviewPage = OverviewPage.IsMatch(path);
 
         var page = await Fixture.RequestPageAsync(path);
 
-        var expectedTitle = isComparisonPage ? "Test School 2" : expectedHeading;
+        var expectedTitle = isComparisonPage ? "Test School 2" : expectedTitleOverride ?? expectedHeading;
         page.Title.Should().Be($"{expectedTitle} - Get school improvement insights - GOV.UK");
 
         var h1 = page.QuerySelector("h1.govuk-heading-xl");
@@ -127,6 +127,37 @@ public class AllPagesIntegrationTests(
         var hrefs = navigationItems.Cast<IHtmlAnchorElement>().Select(a => a.Href).ToArray();
 
         var navigationAssertions = PrimaryPages
+            .Where(p => !ComparisonPage.IsMatch(p.Path))
+            .Select(p => new Action<IElement>(n => n.ShouldLinkTo(p.NavigationText ?? p.Heading, p.Path)))
+            .ToArray();
+
+        navigationItems.Should().SatisfyRespectively(navigationAssertions);
+    }
+
+    [Theory]
+    [MemberData(nameof(NonComparisonPages))]
+    public async Task AllPages_Navigation_ShowsLinksInCorrectOrderWithNoSimilarSchools(string path, string navigationText)
+    {
+        Fixture.EstablishmentRepository.ClearDown();
+        Fixture.SimilarSchoolsPrimaryRepository.ClearDown();
+
+        Fixture.EstablishmentRepository.SetupEstablishments(
+           Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")));   
+
+        if (path.Contains("view-similar-schools"))
+        { 
+            return;
+        }
+
+        var page = await Fixture.RequestPageAsync(path);
+
+        var navigationItems = page.QuerySelectorAll(".app-side-navigation__item a");
+
+        var hrefs = navigationItems.Cast<IHtmlAnchorElement>().Select(a => a.Href).ToArray();
+
+        var pagesNoSimilarSchools = PrimaryPages.Where(p => p.Path != "/school/primary/100001/view-similar-schools");
+
+        var navigationAssertions = pagesNoSimilarSchools
             .Where(p => !ComparisonPage.IsMatch(p.Path))
             .Select(p => new Action<IElement>(n => n.ShouldLinkTo(p.NavigationText ?? p.Heading, p.Path)))
             .ToArray();
@@ -236,16 +267,16 @@ public class AllPagesIntegrationTests(
         return data;
     }
 
-    public static TheoryData<string, string> AllPagesWithPageHeadings()
+    public static TheoryData<string, string, string?> AllPagesWithPageHeadings()
     {
-        var data = new TheoryData<string, string>();
+        var data = new TheoryData<string, string, string?>();
         foreach (var page in PrimaryPages)
         {
-            data.Add(page.Path, page.Heading);
+            data.Add(page.Path, page.Heading, page.Title);
         }
 
         return data;
     }
 
-    private record PageTestCase(string Path, string Heading, string? NavigationText = null);
+    private record PageTestCase(string Path, string Heading, string? NavigationText = null, string? Title = null);
 }

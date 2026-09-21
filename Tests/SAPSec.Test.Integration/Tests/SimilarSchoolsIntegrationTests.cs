@@ -55,6 +55,22 @@ public class SimilarSchoolsIntegrationTests(JsonRepositoryIntegrationTestFixture
     }
 
     [Fact]
+    public async Task GetSimilarSchools_PageTitleIncludesResultsCountAndHasSkipToResultsLink()
+    {
+        var response = await fixture.Client.GetAsync(SimilarSchoolsPath);
+        var content = await response.Content.ReadAsStringAsync();
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        content.Should().Contain("<title>");
+        content.Should().Contain("50 similar schools - View similar schools");
+        content.Should().Contain("class=\"govuk-skip-link\"");
+        Regex.Matches(content, "class=\"govuk-skip-link\"").Should().HaveCount(1);
+        content.Should().Contain("href=\"#similar-schools-results\"");
+        content.Should().Contain(">Skip to search results</a>");
+        content.Should().Contain("id=\"similar-schools-results\"");
+    }
+
+    [Fact]
     public async Task GetSimilarSchools_ContainsToggleLink()
     {
         var response = await fixture.Client.GetAsync(SimilarSchoolsPath);
