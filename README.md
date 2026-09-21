@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# SAP Sector — Get School Improvement Insights (Sector Facing)
+# SAP Sector — Compare and connect with similar schools (Sector Facing)
 
 [![Build and Deploy](https://github.com/DFE-Digital/sap-sector/actions/workflows/build-and-deploy.yml/badge.svg)](https://github.com/DFE-Digital/sap-sector/actions/workflows/build-and-deploy.yml)
 [![Contributors][contributors-shield]][contributors-url]
@@ -16,13 +16,13 @@
     <img src="docs/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-<h3 align="center">Get School Improvement Insights</h3>
+<h3 align="center">Compare and connect with similar schools</h3>
 
   <p align="center">
     Sector facing output of the SAP (School Account Profile) project — an authenticated ASP.NET Core MVC service that lets schools, trusts and local authorities search for schools, view school detail, and compare against similar schools.
     <br />
     <br />
-    <a href="https://get-school-improvement-insights.education.gov.uk">View Service</a>
+    <a href="https://compare-connect-similar-schools.education.gov.uk/">View Service</a>
     ·
     <a href="https://github.com/DFE-Digital/sap-sector/issues/new?labels=bug">Report Bug</a>
     ·
@@ -76,8 +76,8 @@ The application uses the GOV.UK Design System and DfE Frontend for a consistent,
 
 | Environment | Public URL | Internal URL | Status |
 | --- | --- | --- | --- |
-| Production | https://get-school-improvement-insights.education.gov.uk | `get-school-improvement-insights-production.teacherservices.cloud` | ![Production](https://img.shields.io/github/deployments/DFE-Digital/sap-sector/production) |
-| Test | https://test.get-school-improvement-insights.education.gov.uk | `get-school-improvement-insights-test.test.teacherservices.cloud` | ![Test](https://img.shields.io/github/deployments/DFE-Digital/sap-sector/test) |
+| Production | https://compare-connect-similar-schools.education.gov.uk | `compare-connect-similar-schools-production.teacherservices.cloud` | ![Production](https://img.shields.io/github/deployments/DFE-Digital/sap-sector/production) |
+| Test | https://test.compare-connect-similar-schools.education.gov.uk | `compare-connect-similar-schools-test.test.teacherservices.cloud` | ![Test](https://img.shields.io/github/deployments/DFE-Digital/sap-sector/test) |
 | Review | Per-PR, published to the PR's **Environments** section | `*.test.teacherservices.cloud` | ![Review](https://img.shields.io/github/deployments/DFE-Digital/sap-sector/review) |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
