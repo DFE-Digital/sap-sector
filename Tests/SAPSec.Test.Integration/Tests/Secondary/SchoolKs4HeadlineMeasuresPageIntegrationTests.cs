@@ -760,11 +760,12 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
 
         var filter = page.ElementWithTestIdShouldExist("destinations-dest-filter");
-        filter.ChildTrimmedTextContent().Should().Equal(["All destinations", "Education", "Employment and apprenticeships"]);
+        filter.ChildTrimmedTextContent().Should().Equal(["All destinations", "Education", "Apprenticeships", "Employment"]);
     }
 
     [InlineData("Education", new[] { "70%", "71%", "72%" }, new[] { "69%", "70%", "71%" }, new[] { "71%", "72%", "73%" }, new[] { "72%", "73%", "74%" })]
-    [InlineData("Employment and apprenticeships", new[] { "60%", "61%", "62%" }, new[] { "59%", "60%", "61%" }, new[] { "61%", "62%", "63%" }, new[] { "62%", "63%", "64%" })]
+    [InlineData("Apprenticeships", new[] { "50%", "51%", "52%" }, new[] { "49%", "50%", "51%" }, new[] { "51%", "52%", "53%" }, new[] { "52%", "53%", "54%" })]
+    [InlineData("Employment", new[] { "60%", "61%", "62%" }, new[] { "59%", "60%", "61%" }, new[] { "61%", "62%", "63%" }, new[] { "62%", "63%", "64%" })]
     [Theory]
     public async Task Destinations_DestinationFilter_UpdatesTableViewWithSubjectValues(string filterOption, string[] currentSchool, string[] similarSchools, string[] la, string[] england)
     {
@@ -779,22 +780,27 @@ public class SchoolKs4HeadlineMeasuresPageIntegrationTests(
         Fixture.Ks4DestinationsRepository.SetupEstablishmentDestinations(
             Build.Ks4Destinations.Establishment("100001", x => x
                 .WithEducation(current: "72", prev: "71", prev2: "70")
+                .WithApprenticeships(current: "52", prev: "51", prev2: "50")
                 .WithEmployment(current: "62", prev: "61", prev2: "60")),
             Build.Ks4Destinations.Establishment("100002", x => x
                 .WithEducation(current: "72", prev: "71", prev2: "70")
+                .WithApprenticeships(current: "50", prev: "49", prev2: "48")
                 .WithEmployment(current: "60", prev: "59", prev2: "58")),
             Build.Ks4Destinations.Establishment("100003", x => x
                 .WithEducation(current: "70", prev: "69", prev2: "68")
+                .WithApprenticeships(current: "52", prev: "51", prev2: "50")
                 .WithEmployment(current: "62", prev: "61", prev2: "60")));
 
         Fixture.Ks4DestinationsRepository.SetupLADestinations(
              Build.Ks4Destinations.LA("001", x => x
                 .WithEducation(current: "73", prev: "72", prev2: "71")
+                .WithApprenticeships(current: "53", prev: "52", prev2: "51")
                 .WithEmployment(current: "63", prev: "62", prev2: "61")));
 
         Fixture.Ks4DestinationsRepository.SetupEnglandDestinations(
             Build.Ks4Destinations.England(x => x
                 .WithEducation(current: "74", prev: "73", prev2: "72")
+                .WithApprenticeships(current: "54", prev: "53", prev2: "52")
                 .WithEmployment(current: "64", prev: "63", prev2: "62")));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4HeadlineMeasures, HttpStatusCode.OK);
