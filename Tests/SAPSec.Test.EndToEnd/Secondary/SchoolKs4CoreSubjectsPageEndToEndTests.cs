@@ -29,7 +29,7 @@ public class SchoolKs4CoreSubjectsPageEndToEndTests(EndToEndTestsFixture fixture
     {
         await base.InitializeAsync();
         await NavigateTo(Routes.FindASchool());
-        await Page.GetByLabel("Get school improvement insights", new() { Exact = true }).FillAsync(Urn);
+        await Page.GetByLabel("Compare and connect with similar schools", new() { Exact = true }).FillAsync(Urn);
         await Page.GetByRole(AriaRole.Button, new() { Name = "Search" }).ClickAsync();
         await Expect(Page).ToHaveURLAsync(SecondarySchoolRoute.Overview);
         await Page.GetByText("KS4 core subjects", new() { Exact = true }).ClickAsync();
