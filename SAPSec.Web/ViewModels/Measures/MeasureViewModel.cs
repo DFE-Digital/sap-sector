@@ -27,12 +27,13 @@ public record MeasureViewModel(
     private static readonly string[] AllThroughCurrentYearColors = ["#ca357c", "#2a1950", "#2a1950"];
     private static readonly string[] AllThroughYearByYearColors = ["#ca357c", "#5694ca", "#4b9b7d"];
 
-    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.PrimarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
-            SchoolYearByYearColors);
+            SchoolYearByYearColors,
+            hasSimilarSchools);
 
     public static MeasureViewModel FromPrimaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
@@ -41,12 +42,13 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
-    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo)
+    public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools = true)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
-            SchoolYearByYearColors);
+            SchoolYearByYearColors,
+            hasSimilarSchools);
 
     public static MeasureViewModel FromSecondaryComparisonMeasure(Measure measure, SchoolInfo schoolInfo, SchoolInfo similarSchool)
         => FromMeasure(measure, schoolInfo, similarSchool,
@@ -73,9 +75,10 @@ public record MeasureViewModel(
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[] currentYearChartColors,
-        string[] yearByYearChartColors,
+        string[] yearByYearChartColors,        
         Func<MeasureSeriesType, SchoolInfo, SchoolInfo?, string>? labelResolver = null,
-        Func<MeasureSeriesType, string>? pointStyleResolver = null)
+        Func<MeasureSeriesType, string>? pointStyleResolver = null
+        bool hasSimilarSchools = true)
     {
         labelResolver ??= ResolveSeriesLabel;
         pointStyleResolver ??= ResolveSeriesPointStyle;
@@ -114,7 +117,7 @@ public record MeasureViewModel(
 
         TopPerformersViewModel? topPerformers = null;
 
-        if (measure.TopPerformers is not null)
+        if (measure.TopPerformers is not null && hasSimilarSchools)
         {
             TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
                 t.Rank,
