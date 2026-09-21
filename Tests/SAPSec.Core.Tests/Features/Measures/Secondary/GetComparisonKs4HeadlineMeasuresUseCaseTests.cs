@@ -637,6 +637,7 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(Ks4Destinations.Filters.Destination.Values.Education)]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Apprenticeships)]
     [InlineData(Ks4Destinations.Filters.Destination.Values.Employment)]
     [Theory]
     public async Task Destinations_FilterBy_Subject_WhenMissingEmptyOrInvalidValuesForSelectedSubject_ContainsNullValues(string subject)
@@ -652,16 +653,19 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
             Build.Ks4Destinations.Establishment("100001", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")),
             Build.Ks4Destinations.Establishment("100002", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")));
 
         _destinationsRepo.SetupEnglandDestinations(
             Build.Ks4Destinations.England(x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")));
 
         var response = await _sut.Execute(Request("100001", "100002", filterBy: new()
@@ -679,6 +683,7 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(Ks4Destinations.Filters.Destination.Values.Education, new[] { 72.0, 71.0, 70.0 }, new[] { 71.0, 70.0, 69.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Apprenticeships, new[] { 52.0, 51.0, 50.0 }, new[] { 51.0, 50.0, 49.0 }, new[] { 54.0, 53.0, 52.0 })]
     [InlineData(Ks4Destinations.Filters.Destination.Values.Employment, new[] { 62.0, 61.0, 60.0 }, new[] { 61.0, 60.0, 59.0 }, new[] { 64.0, 63.0, 62.0 })]
     [InlineData(Ks4Destinations.Filters.Destination.Values.AllDestinations, new[] { 82.0, 81.0, 80.0 }, new[] { 81.0, 80.0, 79.0 }, new[] { 84.0, 83.0, 82.0 })]
     // Empty or invalid filter values default to ReadingWritingMaths
@@ -698,16 +703,19 @@ public class GetComparisonKs4HeadlineMeasuresUseCaseTests
             Build.Ks4Destinations.Establishment("100001", x => x
                 .WithAllDest(current: "82", prev: "81", prev2: "80")
                 .WithEducation(current: "72", prev: "71", prev2: "70")
+                .WithApprenticeships(current: "52", prev: "51", prev2: "50")
                 .WithEmployment(current: "62", prev: "61", prev2: "60")),
             Build.Ks4Destinations.Establishment("100002", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "71", prev: "70", prev2: "69")
+                .WithApprenticeships(current: "51", prev: "50", prev2: "49")
                 .WithEmployment(current: "61", prev: "60", prev2: "59")));
 
         _destinationsRepo.SetupEnglandDestinations(
             Build.Ks4Destinations.England(x => x
                 .WithAllDest(current: "84", prev: "83", prev2: "82")
                 .WithEducation(current: "74", prev: "73", prev2: "72")
+                .WithApprenticeships(current: "54", prev: "53", prev2: "52")
                 .WithEmployment(current: "64", prev: "63", prev2: "62")));
 
         var response = await _sut.Execute(Request("100001", "100002", filterBy: new()

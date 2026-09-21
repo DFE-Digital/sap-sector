@@ -97,8 +97,7 @@ public class DsiApiService : IDsiClient
             {
                 var body = await response.Content.ReadAsStringAsync();
                 _logger.LogWarning(
-                    "Failed to get user by email {Email} from DSI API. Status: {StatusCode}. Body: {Body}",
-                    email,
+                    "Failed to get user by email from DSI API. Status: {StatusCode}. Body: {Body}",
                     response.StatusCode,
                     body);
                 return null;
@@ -108,7 +107,7 @@ public class DsiApiService : IDsiClient
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting user by email {Email} from DSI API", email);
+            _logger.LogError(ex, "Error getting user by email from DSI API");
             throw;
         }
     }

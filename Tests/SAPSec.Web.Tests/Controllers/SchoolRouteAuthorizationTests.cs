@@ -1,8 +1,10 @@
 using FluentAssertions;
 using Microsoft.AspNetCore.Authorization;
+using SAPSec.Core.Constants;
 using SAPSec.Web.Areas.Secondary.Controllers;
 using SAPSec.Web.Controllers;
 using SAPSec.Web.Filters;
+using AllThroughSchoolController = SAPSec.Web.Areas.AllThrough.Controllers.SchoolController;
 using PrimarySchoolController = SAPSec.Web.Areas.Primary.Controllers.SchoolController;
 using SecondarySchoolController = SAPSec.Web.Areas.Secondary.Controllers.SchoolController;
 
@@ -12,6 +14,7 @@ public class SchoolRouteAuthorizationTests
 {
     [Theory]
     [InlineData(typeof(SecondarySchoolController))]
+    [InlineData(typeof(AllThroughSchoolController))]
     [InlineData(typeof(SimilarSchoolsController))]
     [InlineData(typeof(ComparisonController))]
     public void SchoolRouteController_RequiresAuthorization(Type controllerType)
@@ -25,6 +28,7 @@ public class SchoolRouteAuthorizationTests
     [InlineData(typeof(SimilarSchoolsController), ExpectedSchoolPhase.Secondary)]
     [InlineData(typeof(ComparisonController), ExpectedSchoolPhase.Secondary)]
     [InlineData(typeof(PrimarySchoolController), ExpectedSchoolPhase.Primary)]
+    [InlineData(typeof(AllThroughSchoolController), ExpectedSchoolPhase.AllThrough)]
     public void SchoolRouteController_UsesExpectedSchoolPhaseFilter(
         Type controllerType,
         ExpectedSchoolPhase expectedPhase)
@@ -37,6 +41,19 @@ public class SchoolRouteAuthorizationTests
         filter.Should().NotBeNull();
         filter!.Arguments.Should().NotBeNull();
         filter.Arguments![0].Should().Be(expectedPhase);
+    }
+
+    [Fact]
+    public void AllThroughSchoolController_RequiresAllThroughFeatureFlag()
+    {
+        var filter = typeof(AllThroughSchoolController)
+            .GetCustomAttributes(typeof(RequireFeatureFlagAttribute), inherit: true)
+            .OfType<RequireFeatureFlagAttribute>()
+            .SingleOrDefault();
+
+        filter.Should().NotBeNull();
+        filter!.Arguments.Should().NotBeNull();
+        filter.Arguments![0].Should().Be(FeatureFlags.EnableAllThroughSchools);
     }
 
     [Theory]

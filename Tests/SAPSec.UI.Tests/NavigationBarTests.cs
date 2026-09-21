@@ -444,11 +444,12 @@ public class NavigationBarTests(WebApplicationSetupFixture fixture) : BasePageTe
         await Page.GotoAsync(_fixture.BaseUrl);
 
         // Act
-        var accessibilityLink = Page.Locator(".govuk-footer__link[href=\"/accessibility\"]");
+        var accessibilityLink = Page.Locator($".govuk-footer__link[href=\"{LayoutConstants.AccessibilityStatementUrl}\"]");
         var isVisible = await accessibilityLink.IsVisibleAsync();
 
         // Assert
         isVisible.Should().BeTrue("Accessibility link should be visible in footer");
+        (await accessibilityLink.GetAttributeAsync("target")).Should().BeNull("Accessibility link should open in the same tab");
     }
 
     [Fact]

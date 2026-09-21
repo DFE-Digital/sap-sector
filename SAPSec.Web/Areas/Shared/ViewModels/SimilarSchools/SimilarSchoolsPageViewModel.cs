@@ -15,6 +15,9 @@ namespace SAPSec.Web.Areas.Shared.ViewModels.SimilarSchools;
 public class SimilarSchoolsPageViewModel
 {
     public const string NoResultsMessage = "There are no similar schools available for this school.";
+    public const string FocusTargetQueryParameter = "focusTarget";
+    public const string FocusTargetFilters = "filters";
+    public const string FocusTargetSort = "sort";
 
     public required string Urn { get; init; }
     public required string SchoolName { get; init; }
@@ -41,6 +44,12 @@ public class SimilarSchoolsPageViewModel
     public bool HasPreviousPage => CurrentPage > 1;
     public bool HasNextPage => CurrentPage < TotalPages;
     public bool HasActiveFilters => SelectedFilterTags.Any();
+
+    public static string BuildFocusUrl(string url, string focusTarget)
+    {
+        var separator = url.Contains('?') ? "&" : "?";
+        return $"{url}{separator}{FocusTargetQueryParameter}={Uri.EscapeDataString(focusTarget)}";
+    }
 
     public string BuildPaginationQueryString(int page)
     {
@@ -140,7 +149,7 @@ public class SimilarSchoolsPageViewModel
     public static Dictionary<string, IEnumerable<string>> BuildCoreFilters(IQueryCollection query)
     {
         return query
-            .Where(kvp => kvp.Key != "sortBy" && kvp.Key != "page")
+            .Where(kvp => !IsPageControlQueryParameter(kvp.Key))
             .ToDictionary(
                 kvp => kvp.Key,
                 kvp => kvp.Value.Where(v => !string.IsNullOrWhiteSpace(v))!.Select(v => v!),
@@ -152,7 +161,7 @@ public class SimilarSchoolsPageViewModel
         var result = new Dictionary<string, List<string>>(StringComparer.InvariantCultureIgnoreCase);
         foreach (var (key, values) in query)
         {
-            if (key == "sortBy" || key == "page")
+            if (IsPageControlQueryParameter(key))
             {
                 continue;
             }
@@ -180,4 +189,9 @@ public class SimilarSchoolsPageViewModel
             ComparisonUrl = comparisonUrl(result.URN)
         };
     }
+
+    private static bool IsPageControlQueryParameter(string key) =>
+        key.Equals("sortBy", StringComparison.InvariantCultureIgnoreCase)
+        || key.Equals("page", StringComparison.InvariantCultureIgnoreCase)
+        || key.Equals(FocusTargetQueryParameter, StringComparison.InvariantCultureIgnoreCase);
 }

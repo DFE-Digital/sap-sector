@@ -170,6 +170,11 @@ public class ViewSimilarSchoolsPageIntegrationTests(
 
         var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.OK);
 
+        page.Title.Should().Contain("2 similar schools - View similar schools");
+        page.QuerySelector("a[href=\"#similar-schools-results\"]")?.TextContent.Trim().Should().Be("Skip to search results");
+        page.QuerySelector("#similar-schools-results").Should().NotBeNull();
+        page.QuerySelectorAll(".govuk-skip-link").Should().HaveCount(1);
+
         var filter = page.ElementWithTestIdShouldExist("primary-similar-schools-filter");
         filter.TextContent.Should().Contain("Filters");
         filter.TextContent.Should().Contain("Location");
@@ -350,9 +355,8 @@ public class ViewSimilarSchoolsPageIntegrationTests(
         Fixture.EstablishmentRepository.SetupEstablishments(
             new Establishment { URN = "100001", EstablishmentName = "Test School 1", LAId = "001", LAName = "Test LA 1", PhaseOfEducationId = "P", PhaseOfEducationName = "Primary", RegionId = "R1", RegionName = "North East", UrbanRuralId = "U1", UrbanRuralName = "Urban", TypeOfEstablishmentId = "34", TypeOfEstablishmentName = "Academy converter", AdmissionsPolicyId = "1", AdmissionsPolicyName = "Non-selective", GenderId = "3", GenderName = "Mixed", NurseryProvisionName = "No", OfficialSixthFormId = "0", OfficialSixthFormName = "Does not have sixth form", ResourcedProvisionId = "1", ResourcedProvisionName = "Not applicable", Easting = 100000, Northing = 100000, TotalCapacity = 300, TotalPupils = 210 });
 
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.OK);
+        var response = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").ViewSimilarSchools, HttpStatusCode.NotFound);
 
-        page.Body!.TextContent.Should().Contain("There are no similar schools available for this school.");
-        page.QuerySelector("#sort-by").Should().BeNull();
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

@@ -195,6 +195,17 @@ internal static class Ks4HeadlineMeasures
                     x => x?.EnglandDestinations?.Education_Tot_Eng_Previous_Pct,
                     x => x?.EnglandDestinations?.Education_Tot_Eng_Previous2_Pct),
 
+                _ when destination.EqualsCaseInsensitive(Ks4Destinations.Filters.Destination.Values.Apprenticeships) => new(
+                    x => x?.EstablishmentDestinations?.Apprentice_Tot_Est_Current_Pct,
+                    x => x?.EstablishmentDestinations?.Apprentice_Tot_Est_Previous_Pct,
+                    x => x?.EstablishmentDestinations?.Apprentice_Tot_Est_Previous2_Pct,
+                    x => x?.LocalAuthorityDestinations?.Apprentice_Tot_LA_Current_Pct,
+                    x => x?.LocalAuthorityDestinations?.Apprentice_Tot_LA_Previous_Pct,
+                    x => x?.LocalAuthorityDestinations?.Apprentice_Tot_LA_Previous2_Pct,
+                    x => x?.EnglandDestinations?.Apprentice_Tot_Eng_Current_Pct,
+                    x => x?.EnglandDestinations?.Apprentice_Tot_Eng_Previous_Pct,
+                    x => x?.EnglandDestinations?.Apprentice_Tot_Eng_Previous2_Pct),
+
                 _ when destination.EqualsCaseInsensitive(Ks4Destinations.Filters.Destination.Values.Employment) => new(
                     x => x?.EstablishmentDestinations?.Employment_Tot_Est_Current_Pct,
                     x => x?.EstablishmentDestinations?.Employment_Tot_Est_Previous_Pct,

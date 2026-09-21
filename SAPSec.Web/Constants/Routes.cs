@@ -42,12 +42,16 @@ public static class Routes
     }
 
     public static string School(string urn, string? phaseOfEducationName) =>
-        PhaseOfEducationValues.IsPrimaryOrAllThrough(phaseOfEducationName)
-            ? PrimarySchool(urn).Overview
-            : SecondarySchool(urn).Overview;
+        phaseOfEducationName switch
+        {
+            _ when PhaseOfEducationValues.IsAllThrough(phaseOfEducationName) => AllThroughSchool(urn).Overview,
+            _ when PhaseOfEducationValues.IsPrimary(phaseOfEducationName) => PrimarySchool(urn).Overview,
+            _ => SecondarySchool(urn).Overview
+        };
 
     public static Primary PrimarySchool(string urn) => new Primary(urn);
     public static Secondary SecondarySchool(string urn) => new Secondary(urn);
+    public static AllThrough AllThroughSchool(string urn) => new AllThrough(urn);
 
     public class Primary(string urn)
     {
@@ -101,5 +105,20 @@ public static class Routes
             public string AttendanceData => $"{_basePath}/attendance-data";
             public string SchoolDetails => $"{_basePath}/compare-school-details";
         }
+    }
+
+    public class AllThrough(string urn)
+    {
+        private string _basePath = $"/school/all-through/{urn}";
+
+        public string Overview => _basePath;
+        public string KS2 => $"{_basePath}/ks2";
+        public string KS4HeadlineMeasures => $"{_basePath}/ks4-headline-measures";
+        public string KS4CoreSubjects => $"{_basePath}/ks4-core-subjects";
+        public string Attendance => $"{_basePath}/attendance";
+        public string RiseResources => $"{_basePath}/rise-resources";
+        public string ViewSimilarSchools => $"{_basePath}/view-similar-schools";
+        public string SchoolDetails => $"{_basePath}/school-details";
+        public string WhatIsASimilarSchool => $"{_basePath}/what-is-a-similar-school";
     }
 }

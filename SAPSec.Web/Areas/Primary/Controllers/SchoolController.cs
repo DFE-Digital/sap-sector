@@ -8,6 +8,7 @@ using SAPSec.Core.Features.RiseResources;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
+using SAPSec.Core.Features.SimilarSchools.UseCases;
 using SAPSec.Core.Interfaces.Services;
 using SAPSec.Core.UseCases;
 using SAPSec.Web.Areas.Primary.ViewModels.School;
@@ -33,6 +34,7 @@ public class SchoolController(
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
         IUseCase<GetSchoolAttendanceMeasuresRequest, GetSchoolAttendanceMeasuresResponse> getAttendanceMeasuresUseCase,
+        IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
         IUseCase<GetRiseResourcesRequest, GetRiseResourcesResponse> getRiseResourcesUseCase,
         IFeatureFlagService featureFlagService)
     : Controller
@@ -41,8 +43,18 @@ public class SchoolController(
     public async Task<IActionResult> Index(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
+
+        var hasSimilarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+
+        var model = new SchoolOverviewPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            HasSimilarSchools = hasSimilarSchoolsResponse.HasSimilarSchools
+        };
+
+        return View(model);
     }
 
     [HttpGet]
@@ -52,17 +64,19 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getKs2PerformanceMeasuresUseCase.Execute(new(urn, filters));
 
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
         await PopulateViewData(response.School);
 
         var model = new Ks2PerformanceMeasuresPageViewModel
         {
             School = SchoolInfoViewModel.FromSchoolInfo(response.School),
-            MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School),
-            AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School),
-            AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School),
-            AverageScaledScoreMaths = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreMaths, response.School),
-            MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardGps, response.School),
-            AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School)
+            MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardRwm, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AverageScaledScoreReading = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreReading, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AverageScaledScoreMaths = MeasureViewModel.FromPrimaryMeasure(response.AverageScaledScoreMaths, response.School, similarSchoolsResponse.HasSimilarSchools),
+            MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryMeasure(response.MeetingExpectedStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools),
+            AchievedHigherStandardGps = MeasureViewModel.FromPrimaryMeasure(response.AchievedHigherStandardGps, response.School, similarSchoolsResponse.HasSimilarSchools)
         };
 
         return View(model);
@@ -75,7 +89,9 @@ public class SchoolController(
         var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
         var response = await getAttendanceMeasuresUseCase.Execute(new(MeasurePhase.Primary, urn, filters));
 
-        await PopulateViewData(response.School);
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(urn);
+
+        await PopulateViewData(response.School, similarSchoolsResponse.HasSimilarSchools);
 
         var model = new AttendancePageViewModel
         {
@@ -117,8 +133,10 @@ public class SchoolController(
         return View(RiseResourcesPageViewModel.FromResponse(riseResourcesResponse));
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
+
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolInfo(currentSchool);
 
         var includeRise = featureFlagService is not null
@@ -128,11 +146,14 @@ public class SchoolController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            similarSchoolsResponse.HasSimilarSchools,
             includeRise);
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
     {
+        var similarSchoolsResponse = await GetSimilarSchoolsAsync(currentSchool.Urn);
+
         ViewData[ViewDataKeys.SchoolLayout] = SchoolLayoutModel.FromSchoolDetails(currentSchool);
 
         var includeRise = featureFlagService is not null
@@ -142,6 +163,12 @@ public class SchoolController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            similarSchoolsResponse.HasSimilarSchools,
             includeRise);
+    }
+
+    private async Task<FindPrimarySimilarSchoolsResponse> GetSimilarSchoolsAsync(string urn)
+    {
+        return await findPrimarySimilarSchoolsUseCase.Execute(new FindPrimarySimilarSchoolsRequest(urn));
     }
 }

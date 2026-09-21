@@ -29,6 +29,8 @@ public class FindSecondarySimilarSchoolsUseCase(
         var data = await dataProvider.GetData(request.CurrentSchoolUrn);
         var currentSchoolInfo = SchoolInfo.SchoolInfo.FromSimilarSchool(data.CurrentSimilarSchool);
 
+        var hasSimilarSchools = data.SimilarSchools.Count > 0;
+
         var filterBy = request.FilterBy.AsCaseInsensitive();
         var filters = new SimilarSchoolsFilters(filterBy, data.CurrentSimilarSchool);
         var validationErrors = filters.Validate();
@@ -58,6 +60,7 @@ public class FindSecondarySimilarSchoolsUseCase(
         var resultsPage = new PagedCollection<SimilarSchoolResult>(allResults, page, request.ResultsPerPage);
 
         return new(
+            hasSimilarSchools,
             currentSchoolInfo,
             sorting.GetPossibleOptions(sortBy).ToList().AsReadOnly(),
             filters.AsAvailableFilters(data.SimilarSchools, i => i.SimilarSchool),
@@ -76,6 +79,7 @@ public record FindSecondarySimilarSchoolsRequest(
     int ResultsPerPage = 10);
 
 public record FindSecondarySimilarSchoolsResponse(
+    bool HasSimilarSchools,
     SchoolInfo.SchoolInfo CurrentSchool,
     IReadOnlyCollection<SortOption> SortOptions,
     IReadOnlyCollection<SimilarSchoolsAvailableFilter> FilterOptions,

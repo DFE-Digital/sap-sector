@@ -28,6 +28,7 @@ public class SchoolDetails
     public required DataWithAvailability<string> GenderOfEntry { get; init; }
     public required DataWithAvailability<string> PhaseOfEducation { get; init; }
     public required DataWithAvailability<string> SchoolType { get; init; }
+    public required DataWithAvailability<string> TypeOfEstablishmentCode { get; init; }
     public required DataWithAvailability<string> AdmissionsPolicy { get; init; }
     public required DataWithAvailability<string> ReligiousCharacter { get; init; }
 

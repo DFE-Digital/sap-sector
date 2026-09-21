@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using SAPSec.Core.Authentication;
+using SAPSec.Core.Extensions;
 using SAPSec.Web.Constants;
 
 namespace SAPSec.Web.Authentication;
@@ -110,7 +111,7 @@ public static class DsiAuthenticationHandler
         var logger = GetLogger(context.HttpContext);
         logger.LogWarning(
             "Spurious authentication callback request detected at {Path}",
-            context.Request.Path);
+            context.Request.Path.Value.SanitizeForLog());
     }
 
     private static void RedirectToHomeAndHandle(MessageReceivedContext context)

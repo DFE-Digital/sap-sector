@@ -1,0 +1,38 @@
+@using SAPSec.Web.Areas.Shared.ViewModels
+@using SAPSec.Web.Constants
+
+@model SchoolInfoViewModel
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = "Attendance measures";
+}
+
+<div class="app-school-page">
+    <span class="govuk-caption-xl">@Model.Name</span>
+    <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
+
+    <p class="govuk-body">
+        Compare this school's attendance measures with:
+    </p>
+
+    <ul class="govuk-list govuk-list--bullet">
+        <li>the local authority primary average</li>
+        <li>the local authority secondary average</li>
+        <li>the national primary average</li>
+        <li>the national secondary average</li>
+    </ul>
+
+    <p class="govuk-body">
+        Find out <a href="@Routes.AllThroughSchool(Model.Urn).WhatIsASimilarSchool" class="govuk-link">how DfE identifies what a similar school is</a>.
+    </p>
+
+    <div class="govuk-inset-text">
+        <p class="govuk-body">
+            To compare this school with similar schools using up-to-date attendance data,
+            use the Monitor your school attendance service.
+        </p>
+        <p class="govuk-body">
+            You can access this service on <a href="https://viewyourdata.education.gov.uk/" class="govuk-link" target="_blank" rel="noopener noreferrer">View your education data (VYED) (opens in new tab)</a>. If you do not have VYED access, <a href="https://viewyourdata.education.gov.uk/Account/Help" class="govuk-link" target="_blank" rel="noopener noreferrer">get help on accessing VYED (opens in new tab)</a>.
+        </p>
+    </div>
+</div>

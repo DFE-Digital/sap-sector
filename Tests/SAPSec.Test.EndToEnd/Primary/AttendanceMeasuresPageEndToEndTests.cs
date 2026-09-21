@@ -10,7 +10,6 @@ namespace SAPSec.Test.EndToEnd.Primary;
 public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
     : EndToEndTests(fixture)
 {
-    private const string UrlPattern = @"\d{6}";
     private const string AttendanceMeasuresHeaderText = "Attendance";
 
     private const string Urn = "101206";
@@ -35,33 +34,25 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
 
         await section.GetByRole(AriaRole.Tab, new() { Name = "Charts" }).ClickAsync();
 
-        var currentYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "2024 to 2025" });
-        var yearByYearHeader = section.GetByRole(AriaRole.Heading, new() { Name = "Year by year" });
+        var currentYearPanel = panel.Locator("[data-content-toggle-name=\"2024 to 2025\"]");
+        var yearByYearPanel = panel.Locator("[data-content-toggle-name=\"Year by year\"]");
+        var toggleButton = section.Locator(".app-content-toggle__header button[type=\"button\"]");
 
-        var showYearByYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show year by year" });
-        var showCurrentYearButton = section.GetByRole(AriaRole.Button, new() { Name = "Show 2024 to 2025" });
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
 
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeHiddenAsync();
+        await Expect(yearByYearPanel).ToBeVisibleAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "true");
 
-        await showYearByYearButton.ClickAsync();
+        await toggleButton.ClickAsync();
 
-        await Expect(currentYearHeader).ToBeHiddenAsync();
-        await Expect(yearByYearHeader).ToBeVisibleAsync();
-
-        await Expect(showCurrentYearButton).ToBeVisibleAsync();
-        await Expect(showYearByYearButton).ToBeHiddenAsync();
-
-        await showCurrentYearButton.ClickAsync();
-
-        await Expect(currentYearHeader).ToBeVisibleAsync();
-        await Expect(yearByYearHeader).ToBeHiddenAsync();
-
-        await Expect(showYearByYearButton).ToBeVisibleAsync();
-        await Expect(showCurrentYearButton).ToBeHiddenAsync();
+        await Expect(currentYearPanel).ToBeVisibleAsync();
+        await Expect(yearByYearPanel).ToBeHiddenAsync();
+        await Expect(toggleButton).ToHaveAttributeAsync("aria-pressed", "false");
     }
 
     [Fact]
@@ -85,7 +76,7 @@ public class AttendanceMeasuresPageEndToEndTests(EndToEndTestsFixture fixture)
 
     private async Task<ILocator> GetSection(string headerText)
     {
-        var section = Page.GetByLabel(AttendanceMeasuresHeaderText);
+        var section = Page.GetByLabel(headerText);
         await Expect(section).ToBeVisibleAsync();
 
         return section;

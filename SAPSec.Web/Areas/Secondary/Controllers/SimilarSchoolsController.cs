@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SAPSec.Core;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.SchoolInfo;
 using SAPSec.Core.Features.SimilarSchools.UseCases;
@@ -35,7 +36,12 @@ public class SimilarSchoolsController(
             sortBy,
             page));
 
-        await PopulateViewData(response.CurrentSchool);
+        if (!response.HasSimilarSchools)
+        {
+            throw new NotFoundException($"School {urn} does not have any similar schools.");
+        }
+
+        await PopulateViewData(response.CurrentSchool, response.HasSimilarSchools);
 
         var viewModel = SimilarSchoolsPageViewModel.Build(
             "secondary",
@@ -54,7 +60,7 @@ public class SimilarSchoolsController(
         return View(viewModel);
     }
 
-    private async Task PopulateViewData(SchoolInfo currentSchool)
+    private async Task PopulateViewData(SchoolInfo currentSchool, bool hasSimilarSchools = true)
     {
         var includeRise = featureFlagService is not null
             && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
@@ -63,6 +69,7 @@ public class SimilarSchoolsController(
             Url,
             currentSchool.Urn,
             ControllerContext.ActionDescriptor.ActionName,
+            hasSimilarSchools,
             includeRise);
     }
 }

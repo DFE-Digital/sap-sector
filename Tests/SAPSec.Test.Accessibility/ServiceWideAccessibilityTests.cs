@@ -24,10 +24,8 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.PrimarySchool("100171").ViewSimilarSchools),
         new(Routes.PrimarySchool("100171").SchoolDetails),
         new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
-        new(Routes.PrimarySchool("100171").Comparison("150318").Similarity),
-        new(Routes.PrimarySchool("100171").Comparison("150318").Ks2),
-        new(Routes.PrimarySchool("100171").Comparison("150318").Attendance),
-        new(Routes.PrimarySchool("100171").Comparison("150318").SchoolDetails),
+
+        new(Routes.AllThroughSchool("100171").SchoolDetails),
 
         new(Routes.SecondarySchool("100182").Overview),
         new(Routes.SecondarySchool("100182").KS4HeadlineMeasures),

@@ -10,6 +10,9 @@ public class EnglandDestinationsBuilder()
     string Education_Tot_Eng_Current_Pct = string.Empty;
     string Education_Tot_Eng_Previous_Pct = string.Empty;
     string Education_Tot_Eng_Previous2_Pct = string.Empty;
+    string Apprentice_Tot_Eng_Current_Pct = string.Empty;
+    string Apprentice_Tot_Eng_Previous_Pct = string.Empty;
+    string Apprentice_Tot_Eng_Previous2_Pct = string.Empty;
     string Employment_Tot_Eng_Current_Pct = string.Empty;
     string Employment_Tot_Eng_Previous_Pct = string.Empty;
     string Employment_Tot_Eng_Previous2_Pct = string.Empty;
@@ -28,6 +31,15 @@ public class EnglandDestinationsBuilder()
         Education_Tot_Eng_Current_Pct = current;
         Education_Tot_Eng_Previous_Pct = prev;
         Education_Tot_Eng_Previous2_Pct = prev2;
+
+        return this;
+    }
+
+    public EnglandDestinationsBuilder WithApprenticeships(string current, string prev, string prev2)
+    {
+        Apprentice_Tot_Eng_Current_Pct = current;
+        Apprentice_Tot_Eng_Previous_Pct = prev;
+        Apprentice_Tot_Eng_Previous2_Pct = prev2;
 
         return this;
     }
@@ -51,6 +63,9 @@ public class EnglandDestinationsBuilder()
             Education_Tot_Eng_Current_Pct = Education_Tot_Eng_Current_Pct,
             Education_Tot_Eng_Previous_Pct = Education_Tot_Eng_Previous_Pct,
             Education_Tot_Eng_Previous2_Pct = Education_Tot_Eng_Previous2_Pct,
+            Apprentice_Tot_Eng_Current_Pct = Apprentice_Tot_Eng_Current_Pct,
+            Apprentice_Tot_Eng_Previous_Pct = Apprentice_Tot_Eng_Previous_Pct,
+            Apprentice_Tot_Eng_Previous2_Pct = Apprentice_Tot_Eng_Previous2_Pct,
             Employment_Tot_Eng_Current_Pct = Employment_Tot_Eng_Current_Pct,
             Employment_Tot_Eng_Previous_Pct = Employment_Tot_Eng_Previous_Pct,
             Employment_Tot_Eng_Previous2_Pct = Employment_Tot_Eng_Previous2_Pct,

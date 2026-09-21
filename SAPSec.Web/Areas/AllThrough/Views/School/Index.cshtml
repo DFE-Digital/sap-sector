@@ -1,0 +1,14 @@
+@using SAPSec.Web.Areas.Shared.ViewModels
+@using SAPSec.Web.Constants
+
+@model SchoolInfoViewModel
+@{
+    Layout = "_Layout";
+    ViewData[ViewDataKeys.Title] = Model.Name;
+}
+
+<div class="app-overview">
+    <header class="app-overview__header">
+        <h1 class="govuk-heading-xl app-overview__title">@ViewData[ViewDataKeys.Title]</h1>
+    </header>
+</div>

@@ -1340,6 +1340,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(Ks4Destinations.Filters.Destination.Values.Education)]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Apprenticeships)]
     [InlineData(Ks4Destinations.Filters.Destination.Values.Employment)]
     [Theory]
     public async Task Destinations_FilterBy_Subject_WhenMissingEmptyOrInvalidValuesForSelectedSubject_ContainsNullValues(string subject)
@@ -1356,26 +1357,31 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.Ks4Destinations.Establishment("100001", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")),
             Build.Ks4Destinations.Establishment("100002", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")),
             Build.Ks4Destinations.Establishment("100003", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")));
 
         _destinationsRepo.SetupLADestinations(
              Build.Ks4Destinations.LA("001", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")));
 
         _destinationsRepo.SetupEnglandDestinations(
             Build.Ks4Destinations.England(x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "", prev: "", prev2: "")
+                .WithApprenticeships(current: "", prev: "", prev2: "")
                 .WithEmployment(current: "x", prev: "y", prev2: "z")));
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
@@ -1394,6 +1400,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(Ks4Destinations.Filters.Destination.Values.Education, new[] { 72.0, 71.0, 70.0 }, new[] { 71.0, 70.0, 69.0 }, new[] { 73.0, 72.0, 71.0 }, new[] { 74.0, 73.0, 72.0 })]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Apprenticeships, new[] { 52.0, 51.0, 50.0 }, new[] { 51.0, 50.0, 49.0 }, new[] { 53.0, 52.0, 51.0 }, new[] { 54.0, 53.0, 52.0 })]
     [InlineData(Ks4Destinations.Filters.Destination.Values.Employment, new[] { 62.0, 61.0, 60.0 }, new[] { 61.0, 60.0, 59.0 }, new[] { 63.0, 62.0, 61.0 }, new[] { 64.0, 63.0, 62.0 })]
     [InlineData(Ks4Destinations.Filters.Destination.Values.AllDestinations, new[] { 82.0, 81.0, 80.0 }, new[] { 81.0, 80.0, 79.0 }, new[] { 83.0, 82.0, 81.0 }, new[] { 84.0, 83.0, 82.0 })]
     // Empty or invalid filter values default to ReadingWritingMaths
@@ -1414,26 +1421,31 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.Ks4Destinations.Establishment("100001", x => x
                 .WithAllDest(current: "82", prev: "81", prev2: "80")
                 .WithEducation(current: "72", prev: "71", prev2: "70")
+                .WithApprenticeships(current: "52", prev: "51", prev2: "50")
                 .WithEmployment(current: "62", prev: "61", prev2: "60")),
             Build.Ks4Destinations.Establishment("100002", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "72", prev: "71", prev2: "70")
+                .WithApprenticeships(current: "50", prev: "49", prev2: "48")
                 .WithEmployment(current: "60", prev: "59", prev2: "58")),
             Build.Ks4Destinations.Establishment("100003", x => x
                 .WithAllDest(current: "81", prev: "80", prev2: "79")
                 .WithEducation(current: "70", prev: "69", prev2: "68")
+                .WithApprenticeships(current: "52", prev: "51", prev2: "50")
                 .WithEmployment(current: "62", prev: "61", prev2: "60")));
 
         _destinationsRepo.SetupLADestinations(
              Build.Ks4Destinations.LA("001", x => x
                 .WithAllDest(current: "83", prev: "82", prev2: "81")
                 .WithEducation(current: "73", prev: "72", prev2: "71")
+                .WithApprenticeships(current: "53", prev: "52", prev2: "51")
                 .WithEmployment(current: "63", prev: "62", prev2: "61")));
 
         _destinationsRepo.SetupEnglandDestinations(
             Build.Ks4Destinations.England(x => x
                 .WithAllDest(current: "84", prev: "83", prev2: "82")
                 .WithEducation(current: "74", prev: "73", prev2: "72")
+                .WithApprenticeships(current: "54", prev: "53", prev2: "52")
                 .WithEmployment(current: "64", prev: "63", prev2: "62")));
 
         var response = await _sut.Execute(Request("100001", filterBy: new()
@@ -1453,6 +1465,7 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
     }
 
     [InlineData(Ks4Destinations.Filters.Destination.Values.Education, new[] { "100001", "100002", "100003" })]
+    [InlineData(Ks4Destinations.Filters.Destination.Values.Apprenticeships, new[] { "100001", "100003", "100004" })]
     [InlineData(Ks4Destinations.Filters.Destination.Values.Employment, new[] { "100004", "100003", "100002" })]
     [InlineData(Ks4Destinations.Filters.Destination.Values.AllDestinations, new[] { "100002", "100003", "100004" })]
     [Theory]
@@ -1471,18 +1484,22 @@ public class GetSchoolKs4HeadlineMeasuresUseCaseTests
             Build.Ks4Destinations.Establishment("100001", x => x
                 .WithAllDest(current: "1", prev: "", prev2: "")
                 .WithEducation(current: "30", prev: "", prev2: "")
+                .WithApprenticeships(current: "50", prev: "", prev2: "")
                 .WithEmployment(current: "96", prev: "", prev2: "")),
             Build.Ks4Destinations.Establishment("100002", x => x
                 .WithAllDest(current: "4", prev: "", prev2: "")
                 .WithEducation(current: "20", prev: "", prev2: "")
+                .WithApprenticeships(current: "10", prev: "", prev2: "")
                 .WithEmployment(current: "97", prev: "", prev2: "")),
             Build.Ks4Destinations.Establishment("100003", x => x
                 .WithAllDest(current: "3", prev: "", prev2: "")
                 .WithEducation(current: "10", prev: "", prev2: "")
+                .WithApprenticeships(current: "30", prev: "", prev2: "")
                 .WithEmployment(current: "98", prev: "", prev2: "")),
             Build.Ks4Destinations.Establishment("100004", x => x
                 .WithAllDest(current: "2", prev: "", prev2: "")
                 .WithEducation(current: "0", prev: "", prev2: "")
+                .WithApprenticeships(current: "20", prev: "", prev2: "")
                 .WithEmployment(current: "99", prev: "", prev2: "")));
 
         var response = await _sut.Execute(Request("100001", filterBy: new()

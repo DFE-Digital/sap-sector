@@ -4,8 +4,8 @@ namespace SAPSec.Web.ViewModels;
 
 public class SchoolSearchQueryViewModel
 {
-    [Required(ErrorMessage = "Enter a school name or school ID to start a search")]
-    [MinLength(3, ErrorMessage = "Enter a school name or school ID (minimum 3 characters)")]
+    [Required(ErrorMessage = "Enter a school name (minimum 3 characters), URN, DfE number or UKPRN")]
+    [MinLength(3, ErrorMessage = "Enter a school name (minimum 3 characters), URN, DfE number or UKPRN")]
     public string Query { get; set; } = string.Empty;
 
     public string? Urn { get; set; }

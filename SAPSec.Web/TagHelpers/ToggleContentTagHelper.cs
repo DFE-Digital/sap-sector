@@ -14,6 +14,9 @@ public class ToggleContentTagHelper : TagHelper
     [HtmlAttributeName("name")]
     public string Name { get; set; } = string.Empty;
 
+    [HtmlAttributeName("aria-label")]
+    public string? AriaLabel { get; set; }
+
     [HtmlAttributeName("active")]
     public bool Active { get; set; }
 
@@ -23,7 +26,7 @@ public class ToggleContentTagHelper : TagHelper
             && items is IList<ContentToggleItem> toggleItems)
         {
             var childContent = await output.GetChildContentAsync();
-            toggleItems.Add(new ContentToggleItem(Id, Name, new HtmlString(childContent.GetContent()), Active));
+            toggleItems.Add(new ContentToggleItem(Id, Name, AriaLabel, new HtmlString(childContent.GetContent()), Active));
         }
 
         output.SuppressOutput();

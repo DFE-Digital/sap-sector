@@ -56,11 +56,29 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLanguage_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues(["100001", "100002"]));
+          
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("eng-lang-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task EnglishLanguage_Tabs_TopPerformersHiddenWhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
             Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
         var tabs = page.ElementWithTestIdShouldExist("eng-lang-tabs");
-        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -329,11 +347,29 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     public async Task EnglishLiterature_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
         var tabs = page.ElementWithTestIdShouldExist("eng-lit-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task EnglishLiterature_Tabs_TopPerformersHiddenWhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("eng-lit-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -602,11 +638,29 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     public async Task Maths_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
         var tabs = page.ElementWithTestIdShouldExist("maths-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task Maths_Tab_TopPerformersHiddenWhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("maths-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -875,11 +929,29 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     public async Task CombinedScience_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
         var tabs = page.ElementWithTestIdShouldExist("comb-sci-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task CombinedScience_Tabs_TopPerformersHiddenWhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("comb-sci-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -1148,11 +1220,29 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     public async Task Biology_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
         var tabs = page.ElementWithTestIdShouldExist("bio-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task Biology_Tabs_TopPerformersHiddenWhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("bio-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -1421,11 +1511,29 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     public async Task Chemistry_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
         var tabs = page.ElementWithTestIdShouldExist("chem-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task Chemistry_Tabs_TopPerformersHiddenWhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("chem-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
@@ -1694,11 +1802,29 @@ public class SchoolKs4CoreSubjectsPageIntegrationTests(
     public async Task Physics_Tabs()
     {
         Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Secondary().InLA("002")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(
+            Build.SecondaryValues(["100001", "100002"]));
 
         var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
         var tabs = page.ElementWithTestIdShouldExist("phys-tabs");
         tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task Physics_Tabs_TopPerformersHiddenWhenNoSimilarSchools()
+    {
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Secondary().InLA("001")));
+
+        var page = await Fixture.RequestPageAsync(Routes.SecondarySchool("100001").KS4CoreSubjects, HttpStatusCode.OK);
+        var tabs = page.ElementWithTestIdShouldExist("phys-tabs");
+        tabs.ChildTrimmedTextContent().Should().BeEquivalentTo("Charts", "Table");
     }
 
     [Fact]
