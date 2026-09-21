@@ -48,6 +48,7 @@ public class FindSecondarySimilarSchoolsUseCaseTests
         response.CurrentSchool.Name.Should().Be("Test School");
         response.AllResults.Should().BeEmpty();
         response.ResultsPage.Should().BeEmpty();
+        response.HasSimilarSchools.Should().BeFalse();
     }
 
     [Fact]

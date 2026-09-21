@@ -61,7 +61,7 @@ public class SchoolSearchPageTests(WebApplicationSetupFixture fixture) : BasePag
         isVisible.Should().BeTrue("Error summary should be visible");
 
         var errorMessage = await errorSummary.Locator(".govuk-error-summary__list li").TextContentAsync();
-        errorMessage.Should().Contain("Enter a school name or school ID to start a search");
+        errorMessage.Should().Contain("Enter a school name (minimum 3 characters), URN, DfE number or UKPRN");
     }
 
     [Fact]

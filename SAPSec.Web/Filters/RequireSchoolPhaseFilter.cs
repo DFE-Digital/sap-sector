@@ -27,6 +27,13 @@ public sealed class RequireSchoolPhaseFilter(
             var school = await requestSchoolAccessor.GetAsync(context.HttpContext, urn);
             if (!MatchesExpectedPhase(school, expectedPhase))
             {
+                if (school.IsAllThroughSchool()
+                    && !await featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+                {
+                    context.Result = new NotFoundResult();
+                    return;
+                }
+
                 context.Result = TryBuildRedirectResult(context, school);
                 return;
             }
@@ -57,13 +64,19 @@ public sealed class RequireSchoolPhaseFilter(
     private static bool MatchesExpectedPhase(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
         => expectedPhase switch
         {
-            ExpectedSchoolPhase.Primary => school.IsPrimarySchool() || school.IsAllThroughSchool(),
+            ExpectedSchoolPhase.Primary => school.IsPrimarySchool() && !school.IsAllThroughSchool(),
             ExpectedSchoolPhase.Secondary => school.IsSecondarySchool(),
+            ExpectedSchoolPhase.AllThrough => school.IsAllThroughSchool(),
             _ => false
         };
 
     private async Task<bool> IsFeatureEnabledForSchoolAsync(SchoolDetails school, ExpectedSchoolPhase expectedPhase)
     {
+        if (expectedPhase == ExpectedSchoolPhase.AllThrough)
+        {
+            return await featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools);
+        }
+
         if (expectedPhase != ExpectedSchoolPhase.Primary)
         {
             return true;
