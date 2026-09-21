@@ -36,6 +36,14 @@ public record MeasureViewModel(
             ComparisonCurrentYearColors,
             ComparisonYearByYearColors);
 
+    public static MeasureViewModel FromAllThroughPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool includeTopPerformers)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
+            SchoolCurrentYearColors,
+            SchoolYearByYearColors,
+            includeTopPerformers: includeTopPerformers);
+
     public static MeasureViewModel FromSecondaryMeasure(Measure measure, SchoolInfo schoolInfo)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
@@ -57,7 +65,8 @@ public record MeasureViewModel(
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[] currentYearChartColors,
-        string[] yearByYearChartColors)
+        string[] yearByYearChartColors,
+        bool includeTopPerformers = true)
     {
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
@@ -93,7 +102,7 @@ public record MeasureViewModel(
 
         TopPerformersViewModel? topPerformers = null;
 
-        if (measure.TopPerformers is not null)
+        if (includeTopPerformers && measure.TopPerformers is not null)
         {
             TopPerformerViewModel MapTopPerformer(TopPerformer t) => new TopPerformerViewModel(
                 t.Rank,

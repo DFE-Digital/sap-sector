@@ -19,7 +19,7 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 [Area("Primary")]
 [Route("school/primary/{urn}/view-similar-schools/{comparatorSchoolUrn}")]
 [Authorize]
-[RequireSchoolPhase(ExpectedSchoolPhase.Primary, "urn", "comparatorSchoolUrn")]
+[RequireSchoolPhase(ExpectedSchoolPhase.PrimaryComparisonParticipant, "urn", "comparatorSchoolUrn")]
 public class ComparisonController(
     IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse> getSimilarityCharacteristicsUseCase,
     IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
