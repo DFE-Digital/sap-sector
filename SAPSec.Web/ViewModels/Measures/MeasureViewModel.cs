@@ -75,10 +75,10 @@ public record MeasureViewModel(
         Func<string, string> viewSimilarSchoolsUrl,
         Func<string, string, string> similarSchoolComparisonUrl,
         string[] currentYearChartColors,
-        string[] yearByYearChartColors,        
+        string[] yearByYearChartColors,
+        bool hasSimilarSchools = true,
         Func<MeasureSeriesType, SchoolInfo, SchoolInfo?, string>? labelResolver = null,
-        Func<MeasureSeriesType, string>? pointStyleResolver = null
-        bool hasSimilarSchools = true)
+        Func<MeasureSeriesType, string>? pointStyleResolver = null)
     {
         labelResolver ??= ResolveSeriesLabel;
         pointStyleResolver ??= ResolveSeriesPointStyle;
