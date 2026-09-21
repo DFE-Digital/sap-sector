@@ -54,12 +54,12 @@
 }
 <link rel="stylesheet" href="~/css/leaflet.css"/>
 
-<h2 class="govuk-heading-l">School details</h2>
-
 @if (Model.ComparatorSchoolDetails?.ShowClosedSchoolBanner == true)
 {
     @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.Comparator })
 }
+
+<h2 class="govuk-heading-l">School details</h2>
 
 <details class="govuk-details js-only" data-module="govuk-details" id="comparison-map-details">
     <summary class="govuk-details__summary">
