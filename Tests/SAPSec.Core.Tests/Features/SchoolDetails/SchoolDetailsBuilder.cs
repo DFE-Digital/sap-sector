@@ -54,6 +54,7 @@ public class SchoolDetailsBuilder(string urn)
             GenderOfEntry = DataWithAvailability.NotAvailable<string>(),
             PhaseOfEducation = DataWithAvailability.NotAvailable<string>(),
             SchoolType = DataWithAvailability.NotAvailable<string>(),
+            TypeOfEstablishmentCode = DataWithAvailability.NotAvailable<string>(),
             AdmissionsPolicy = DataWithAvailability.NotAvailable<string>(),
             ReligiousCharacter = DataWithAvailability.NotAvailable<string>(),
             GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceType>(),

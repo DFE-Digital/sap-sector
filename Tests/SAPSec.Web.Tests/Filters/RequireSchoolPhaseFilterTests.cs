@@ -149,7 +149,7 @@ public class RequireSchoolPhaseFilterTests
     }
 
     [Fact]
-    public async Task PrimaryFilter_WithAllThroughSchoolAndOnlyAllThroughFeatureEnabled_AllowsExecution()
+    public async Task PrimaryFilter_WithAllThroughSchoolAndOnlyAllThroughFeatureEnabled_RedirectsToAllThroughPath()
     {
         var school = CreateSchoolDetails("123456", "All-through");
         _requestSchoolAccessorMock
@@ -169,7 +169,50 @@ public class RequireSchoolPhaseFilterTests
             area: "Primary",
             routeValues: [("urn", "123456")]);
 
+        result.Should().BeOfType<RedirectResult>()
+            .Which.Url.Should().Be(Routes.AllThroughSchool("123456").Overview);
+    }
+
+    [Fact]
+    public async Task AllThroughFilter_WithAllThroughSchoolAndAllThroughFeatureEnabled_AllowsExecution()
+    {
+        var school = CreateSchoolDetails("123456", "All-through");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .ReturnsAsync(true);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.AllThrough,
+            controller: "School",
+            action: "Index",
+            area: "AllThrough",
+            routeValues: [("urn", "123456")]);
+
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task AllThroughFilter_WithAllThroughSchoolAndAllThroughFeatureDisabled_ReturnsNotFound()
+    {
+        var school = CreateSchoolDetails("123456", "All-through");
+        _requestSchoolAccessorMock
+            .Setup(x => x.GetAsync(It.IsAny<HttpContext?>(), "123456"))
+            .ReturnsAsync(school);
+        _featureFlagServiceMock
+            .Setup(x => x.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools))
+            .ReturnsAsync(false);
+
+        var result = await ExecuteFilterAsync(
+            ExpectedSchoolPhase.AllThrough,
+            controller: "School",
+            action: "Index",
+            area: "AllThrough",
+            routeValues: [("urn", "123456")]);
+
+        result.Should().BeOfType<NotFoundResult>();
     }
 
     [Fact]
@@ -356,6 +399,7 @@ public class RequireSchoolPhaseFilterTests
             GenderOfEntry = DataWithAvailability.Available("Mixed"),
             PhaseOfEducation = DataWithAvailability.Available(phaseOfEducation),
             SchoolType = DataWithAvailability.Available("Community school"),
+            TypeOfEstablishmentCode = DataWithAvailability.Available("1"),
             AdmissionsPolicy = DataWithAvailability.Available("Not applicable"),
             ReligiousCharacter = DataWithAvailability.Available("None"),
             GovernanceStructure = DataWithAvailability.NotAvailable<GovernanceType>(),

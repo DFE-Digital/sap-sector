@@ -45,6 +45,10 @@ public class ContentToggleTagHelper : TagHelper
         title.AddCssClass("govuk-heading-m");
         title.AddCssClass("app-content-toggle__title");
         title.InnerHtml.Append(items[activeIndex].Name);
+        if (!string.IsNullOrWhiteSpace(items[activeIndex].AriaLabel))
+        {
+            title.Attributes["aria-label"] = items[activeIndex].AriaLabel;
+        }
 
         var button = new TagBuilder("button");
         button.Attributes["type"] = "button";
@@ -53,6 +57,10 @@ public class ContentToggleTagHelper : TagHelper
         button.Attributes["aria-pressed"] = activeIndex == 0 ? "false" : "true";
         button.Attributes["data-module"] = "govuk-button";
         button.InnerHtml.Append($"Show {items[(activeIndex + 1) % items.Count].Name.ToLowerInvariant()}");
+        if (!string.IsNullOrWhiteSpace(items[(activeIndex + 1) % items.Count].AriaLabel))
+        {
+            button.Attributes["aria-label"] = $"Show {items[(activeIndex + 1) % items.Count].AriaLabel!.ToLowerInvariant()}";
+        }
 
         header.InnerHtml.AppendHtml(title);
         header.InnerHtml.AppendHtml(button);
