@@ -1,5 +1,6 @@
 @using SAPSec.Web.Constants
 @using SAPSec.Web.ViewModels
+@using SAPSec.Web.ViewModels.Components
 
 @{
     var navigation = ViewData[ViewDataKeys.SchoolNavigation] as SchoolSideNavigationViewModel;
@@ -11,6 +12,8 @@
 
     ViewData[ViewDataKeys.SkipLinkTargetId] = "page-content";
     Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var showClosedSchoolBanner = ViewData[ViewDataKeys.ShowClosedSchoolBanner] as bool? ?? false;
 }
 
 @section Breadcrumbs {
@@ -21,6 +24,11 @@
             </li>
         </ol>
     </nav>
+}
+
+@if (showClosedSchoolBanner)
+{
+    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.ThisSchool })
 }
 
 <div class="govuk-grid-row">
