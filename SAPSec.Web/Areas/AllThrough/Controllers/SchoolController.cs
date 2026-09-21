@@ -71,8 +71,13 @@ public class SchoolController(
 
     [HttpGet]
     [Route("view-similar-schools")]
-    public Task<IActionResult> ViewSimilarSchools(string urn) =>
-        HeadingPage(urn, "View similar schools");
+    public async Task<IActionResult> ViewSimilarSchools(string urn, [FromQuery] string? phase = null)
+    {
+        var response = await getSchoolInfoUseCase.Execute(new(urn));
+        await PopulateViewData(response.School);
+
+        return View(AllThroughSimilarSchoolsPageViewModel.FromSchoolInfo(response.School, phase));
+    }
 
     [HttpGet]
     [Route("school-details")]

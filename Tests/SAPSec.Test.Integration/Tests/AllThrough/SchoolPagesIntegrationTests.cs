@@ -183,6 +183,54 @@ public class SchoolPagesIntegrationTests(
     }
 
     [Fact]
+    public async Task ViewSimilarSchoolsPage_ShowsAllThroughStaticContentAndPrimaryTabByDefault()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+
+        page.QuerySelector(".govuk-caption-xl")!.TextContent.Trim().Should().Be("Test School 1");
+        page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("View similar schools");
+
+        NormaliseWhitespace(page.QuerySelector(".app-all-through-similar-schools p.govuk-body")!.TextContent)
+            .Should().Be("We've identified 50 similar primary phase schools (including all-throughs) and 50 similar secondary phase schools (including all-throughs). Select primary or secondary then choose a school to compare further and connect with for support. You can also refine the results by applying filters.");
+
+        var link = page.QuerySelector(".app-all-through-similar-schools p.govuk-body a");
+        link.Should().NotBeNull();
+        link!.TextContent.Trim().Should().Be("how DfE identifies what a similar school is");
+        link.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+        link.GetAttribute("target").Should().BeNull();
+
+        var tabs = page.QuerySelectorAll(".app-phase-tabs__tab").ToArray();
+        tabs.Select(x => x.TextContent.Trim()).Should().Equal("Primary", "Secondary");
+        tabs.Select(x => x.GetAttribute("role")).Should().Equal("tab", "tab");
+
+        tabs[0].GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).ViewSimilarSchools);
+        tabs[0].GetAttribute("aria-selected").Should().Be("true");
+        tabs[0].ParentElement!.ClassList.Should().Contain("app-phase-tabs__list-item--selected");
+
+        tabs[1].GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+        tabs[1].GetAttribute("aria-selected").Should().Be("false");
+    }
+
+    [Fact]
+    public async Task ViewSimilarSchoolsPage_WithSecondaryPhase_ShowsSecondaryTabAsActive()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(Build.PrimaryGroup(Urn, ["100002"]));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        var tabs = page.QuerySelectorAll(".app-phase-tabs__tab").ToArray();
+        tabs[0].GetAttribute("aria-selected").Should().Be("false");
+        tabs[1].GetAttribute("aria-selected").Should().Be("true");
+        tabs[1].ParentElement!.ClassList.Should().Contain("app-phase-tabs__list-item--selected");
+    }
+
+    [Fact]
     public async Task AttendancePage_ShowsPrototypeContent()
     {
         SetupAllThroughSchool();
@@ -335,4 +383,7 @@ public class SchoolPagesIntegrationTests(
         link.ClassList.Should().Contain("app-side-navigation__link--selected");
         link.GetAttribute("aria-current").Should().Be("page");
     }
+
+    private static string NormaliseWhitespace(string value) =>
+        string.Join(" ", value.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries));
 }

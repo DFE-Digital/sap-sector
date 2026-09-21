@@ -486,7 +486,85 @@
   margin-bottom: 0;
 }
 
+.app-all-through-similar-schools {
+  max-width: 960px;
+}
+
+.app-phase-tabs {
+  margin-top: govuk-spacing(7);
+}
+
+.app-phase-tabs__list {
+  display: flex;
+  gap: govuk-spacing(4);
+  margin: 0;
+  padding: 0;
+  border-bottom: 1px solid #b1b4b6;
+  list-style: none;
+}
+
+.app-phase-tabs__list-item {
+  margin: 0;
+  padding: 0 0 govuk-spacing(2);
+}
+
+.app-phase-tabs__list-item--selected {
+  padding-bottom: govuk-spacing(1);
+  border-bottom: 5px solid govuk-colour("blue");
+}
+
+.app-phase-tabs__tab {
+  @include govuk-font($size: 19);
+  display: inline-block;
+  padding: 0;
+  color: govuk-colour("blue");
+  text-decoration: none;
+}
+
+.app-phase-tabs__tab:visited {
+  color: govuk-colour("blue");
+}
+
+.app-phase-tabs__tab:hover {
+  color: govuk-colour("dark-blue");
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, .0625rem);
+  text-underline-offset: .1578em;
+}
+
+.app-phase-tabs__tab:focus {
+  outline: 3px solid transparent;
+  color: govuk-colour("black");
+  background-color: govuk-colour("yellow");
+  box-shadow: 0 -2px govuk-colour("yellow"), 0 4px govuk-colour("black");
+  text-decoration: none;
+}
+
+.app-phase-tabs__list-item--selected .app-phase-tabs__tab {
+  font-weight: 700;
+  color: govuk-colour("black");
+}
+
 @media (max-width: 40.0625em) {
+  .app-phase-tabs__list {
+    display: block;
+    gap: 0;
+    border-bottom: 0;
+  }
+
+  .app-phase-tabs__list-item {
+    display: block;
+    margin-right: 0;
+    padding: govuk-spacing(2) 0;
+    border-bottom: 1px solid #b1b4b6;
+  }
+
+  .app-phase-tabs__list-item--selected {
+    padding-left: govuk-spacing(2);
+    border-bottom: 1px solid #b1b4b6;
+    border-left: 5px solid govuk-colour("blue");
+  }
+
   .app-primary-overview__header {
     margin-bottom: 40px;
   }

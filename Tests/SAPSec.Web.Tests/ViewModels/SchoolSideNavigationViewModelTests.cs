@@ -11,7 +11,7 @@ public class SchoolSideNavigationViewModelTests
     [Theory]
     [MemberData(nameof(AllThroughNavigationScenarios))]
     public void CreateAllThrough_ReturnsExpectedItems(
-        bool includeSimilarSchools,
+        AllThroughSimilarSchoolPhases similarSchoolPhases,
         bool includeRiseResources,
         string[] expectedText,
         string[] expectedHref)
@@ -20,7 +20,7 @@ public class SchoolSideNavigationViewModelTests
             url: null!,
             urn: Urn,
             currentAction: "Index",
-            includeSimilarSchools,
+            similarSchoolPhases,
             includeRiseResources);
 
         model.Items.Select(x => x.Text).Should().Equal(expectedText);
@@ -45,7 +45,7 @@ public class SchoolSideNavigationViewModelTests
             url: null!,
             urn: Urn,
             currentAction,
-            includeSimilarSchools: true,
+            new AllThroughSimilarSchoolPhases(true, true),
             includeRiseResources: true);
 
         model.Items.Should().ContainSingle(x => x.IsSelected)
@@ -110,10 +110,10 @@ public class SchoolSideNavigationViewModelTests
             Routes.SecondarySchool(Urn).RiseResources);
     }
 
-    public static TheoryData<bool, bool, string[], string[]> AllThroughNavigationScenarios => new()
+    public static TheoryData<AllThroughSimilarSchoolPhases, bool, string[], string[]> AllThroughNavigationScenarios => new()
     {
         {
-            true,
+            new AllThroughSimilarSchoolPhases(true, true),
             true,
             [
                 "Overview",
@@ -139,13 +139,10 @@ public class SchoolSideNavigationViewModelTests
             ]
         },
         {
-            false,
+            new AllThroughSimilarSchoolPhases(false, false),
             true,
             [
                 "Overview",
-                "KS2",
-                "KS4 headline measures",
-                "KS4 core subjects",
                 "Attendance",
                 "School details",
                 "What is a similar school?",
@@ -153,9 +150,6 @@ public class SchoolSideNavigationViewModelTests
             ],
             [
                 Routes.AllThroughSchool(Urn).Overview,
-                Routes.AllThroughSchool(Urn).KS2,
-                Routes.AllThroughSchool(Urn).KS4HeadlineMeasures,
-                Routes.AllThroughSchool(Urn).KS4CoreSubjects,
                 Routes.AllThroughSchool(Urn).Attendance,
                 Routes.AllThroughSchool(Urn).SchoolDetails,
                 Routes.AllThroughSchool(Urn).WhatIsASimilarSchool,
@@ -163,13 +157,11 @@ public class SchoolSideNavigationViewModelTests
             ]
         },
         {
-            true,
+            new AllThroughSimilarSchoolPhases(true, false),
             false,
             [
                 "Overview",
                 "KS2",
-                "KS4 headline measures",
-                "KS4 core subjects",
                 "Attendance",
                 "View similar schools",
                 "School details",
@@ -178,8 +170,6 @@ public class SchoolSideNavigationViewModelTests
             [
                 Routes.AllThroughSchool(Urn).Overview,
                 Routes.AllThroughSchool(Urn).KS2,
-                Routes.AllThroughSchool(Urn).KS4HeadlineMeasures,
-                Routes.AllThroughSchool(Urn).KS4CoreSubjects,
                 Routes.AllThroughSchool(Urn).Attendance,
                 Routes.AllThroughSchool(Urn).ViewSimilarSchools,
                 Routes.AllThroughSchool(Urn).SchoolDetails,
@@ -187,23 +177,23 @@ public class SchoolSideNavigationViewModelTests
             ]
         },
         {
-            false,
+            new AllThroughSimilarSchoolPhases(false, true),
             false,
             [
                 "Overview",
-                "KS2",
                 "KS4 headline measures",
                 "KS4 core subjects",
                 "Attendance",
+                "View similar schools",
                 "School details",
                 "What is a similar school?"
             ],
             [
                 Routes.AllThroughSchool(Urn).Overview,
-                Routes.AllThroughSchool(Urn).KS2,
                 Routes.AllThroughSchool(Urn).KS4HeadlineMeasures,
                 Routes.AllThroughSchool(Urn).KS4CoreSubjects,
                 Routes.AllThroughSchool(Urn).Attendance,
+                Routes.AllThroughSchool(Urn).ViewSimilarSchools,
                 Routes.AllThroughSchool(Urn).SchoolDetails,
                 Routes.AllThroughSchool(Urn).WhatIsASimilarSchool
             ]
