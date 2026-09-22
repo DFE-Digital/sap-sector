@@ -4,6 +4,7 @@ using FluentAssertions;
 using SAPSec.Core.Constants;
 using SAPSec.Test.Common.AngleSharp;
 using SAPSec.Test.Common.Builders;
+using SAPSec.Test.Common.FluentAssertions;
 using SAPSec.Test.Integration.Setup;
 using SAPSec.Web.Constants;
 using System.Net;
@@ -490,6 +491,56 @@ public class SchoolPagesIntegrationTests(
                 Routes.AllThroughSchool(Urn).SecondaryComparison("100002").KS4CoreSubjects,
                 Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Attendance,
                 Routes.AllThroughSchool(Urn).SecondaryComparison("100002").SchoolDetails);
+    }
+
+    [Fact]
+    public async Task PrimaryComparisonAttendancePage_AllThroughRoute_UsesPrimaryEnglandAverageLabel()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsPrimaryRepository
+            .SetupGroups(Build.PrimaryGroup(Urn, ["100002"]))
+            .SetupValues(Build.PrimaryValues([Urn, "100002"]));
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(Urn, x => x.WithOverallAbsence(current: "6.91", previous: "6.90", previous2: "6.89")),
+            Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "5.12", previous: "5.11", previous2: "5.10")));
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x.WithOverallAbsencePrimary(current: "4.83", previous: "4.82", previous2: "4.81")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).PrimaryComparison("100002").Attendance);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "6.89%", "6.90%", "6.91%"],
+            ["Test School 2", "5.10%", "5.11%", "5.12%"],
+            ["Primary schools in England average", "4.81%", "4.82%", "4.83%"]);
+    }
+
+    [Fact]
+    public async Task SecondaryComparisonAttendancePage_AllThroughRoute_UsesSecondaryEnglandAverageLabel()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository
+            .SetupGroups(Build.SecondaryGroup(Urn, ["100002"]))
+            .SetupValues(Build.SecondaryValues([Urn, "100002"]));
+        Fixture.AbsenceRepository.SetupEstablishmentAbsence(
+            Build.Absence.Establishment(Urn, x => x.WithOverallAbsence(current: "6.91", previous: "6.90", previous2: "6.89")),
+            Build.Absence.Establishment("100002", x => x.WithOverallAbsence(current: "5.12", previous: "5.11", previous2: "5.10")));
+        Fixture.AbsenceRepository.SetupEnglandAbsence(
+            Build.Absence.England(x => x.WithOverallAbsenceSecondary(current: "4.83", previous: "4.82", previous2: "4.81")));
+
+        var page = await Fixture.RequestPageAsync(
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Attendance);
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("absence-table-view-table");
+
+        table.ShouldHaveRows(
+            ["School(s)", "2022 to 2023", "2023 to 2024", "2024 to 2025"],
+            ["Test School 1", "6.89%", "6.90%", "6.91%"],
+            ["Test School 2", "5.10%", "5.11%", "5.12%"],
+            ["Secondary schools in England average", "4.81%", "4.82%", "4.83%"]);
     }
 
     [Fact]

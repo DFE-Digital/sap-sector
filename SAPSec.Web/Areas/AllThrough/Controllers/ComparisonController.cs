@@ -78,12 +78,12 @@ public class ComparisonController(
         {
             CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
             ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
-            MeetingExpectedStandardRwm = MeasureViewModel.FromPrimaryComparisonMeasure(response.MeetingExpectedStandardRwm, response.CurrentSchool, response.ComparatorSchool),
-            AchievedHigherStandardRwm = MeasureViewModel.FromPrimaryComparisonMeasure(response.AchievedHigherStandardRwm, response.CurrentSchool, response.ComparatorSchool),
-            AverageScaledScoreReading = MeasureViewModel.FromPrimaryComparisonMeasure(response.AverageScaledScoreReading, response.CurrentSchool, response.ComparatorSchool),
-            AverageScaledScoreMaths = MeasureViewModel.FromPrimaryComparisonMeasure(response.AverageScaledScoreMaths, response.CurrentSchool, response.ComparatorSchool),
-            MeetingExpectedStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(response.MeetingExpectedStandardGps, response.CurrentSchool, response.ComparatorSchool),
-            AchievedHigherStandardGps = MeasureViewModel.FromPrimaryComparisonMeasure(response.AchievedHigherStandardGps, response.CurrentSchool, response.ComparatorSchool),
+            MeetingExpectedStandardRwm = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.MeetingExpectedStandardRwm, response.CurrentSchool, response.ComparatorSchool),
+            AchievedHigherStandardRwm = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.AchievedHigherStandardRwm, response.CurrentSchool, response.ComparatorSchool),
+            AverageScaledScoreReading = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.AverageScaledScoreReading, response.CurrentSchool, response.ComparatorSchool),
+            AverageScaledScoreMaths = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.AverageScaledScoreMaths, response.CurrentSchool, response.ComparatorSchool),
+            MeetingExpectedStandardGps = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.MeetingExpectedStandardGps, response.CurrentSchool, response.ComparatorSchool),
+            AchievedHigherStandardGps = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.AchievedHigherStandardGps, response.CurrentSchool, response.ComparatorSchool),
         };
 
         return View(PrimaryKs2View, model);
@@ -103,7 +103,7 @@ public class ComparisonController(
         {
             CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
             ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
-            Absence = MeasureViewModel.FromPrimaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
+            Absence = MeasureViewModel.FromAllThroughPrimaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
         };
 
         return View(AttendanceView, model);
@@ -148,9 +148,9 @@ public class ComparisonController(
         {
             CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
             ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
-            Attainment8 = MeasureViewModel.FromSecondaryComparisonMeasure(response.Attainment8, response.CurrentSchool, response.ComparatorSchool),
-            EnglishMaths = MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishMaths, response.CurrentSchool, response.ComparatorSchool),
-            Destinations = MeasureViewModel.FromSecondaryComparisonMeasure(response.Destinations, response.CurrentSchool, response.ComparatorSchool)
+            Attainment8 = MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.Attainment8, response.CurrentSchool, response.ComparatorSchool),
+            EnglishMaths = MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.EnglishMaths, response.CurrentSchool, response.ComparatorSchool),
+            Destinations = MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.Destinations, response.CurrentSchool, response.ComparatorSchool)
         };
 
         return View(SecondaryKs4HeadlineMeasuresView, model);
@@ -171,13 +171,13 @@ public class ComparisonController(
             CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
             ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
             Measures = [
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLanguage, response.CurrentSchool, response.ComparatorSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.EnglishLiterature, response.CurrentSchool, response.ComparatorSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Maths, response.CurrentSchool, response.ComparatorSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.CombinedScience, response.CurrentSchool, response.ComparatorSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Biology, response.CurrentSchool, response.ComparatorSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Chemistry, response.CurrentSchool, response.ComparatorSchool),
-                MeasureViewModel.FromSecondaryComparisonMeasure(response.Physics, response.CurrentSchool, response.ComparatorSchool)
+                MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.EnglishLanguage, response.CurrentSchool, response.ComparatorSchool),
+                MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.EnglishLiterature, response.CurrentSchool, response.ComparatorSchool),
+                MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.Maths, response.CurrentSchool, response.ComparatorSchool),
+                MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.CombinedScience, response.CurrentSchool, response.ComparatorSchool),
+                MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.Biology, response.CurrentSchool, response.ComparatorSchool),
+                MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.Chemistry, response.CurrentSchool, response.ComparatorSchool),
+                MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.Physics, response.CurrentSchool, response.ComparatorSchool)
             ]
         };
 
@@ -198,7 +198,7 @@ public class ComparisonController(
         {
             CurrentSchool = SchoolInfoViewModel.FromSchoolInfo(response.CurrentSchool),
             ComparatorSchool = SchoolInfoViewModel.FromSchoolInfo(response.ComparatorSchool),
-            Absence = MeasureViewModel.FromSecondaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
+            Absence = MeasureViewModel.FromAllThroughSecondaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
         };
 
         return View(AttendanceView, model);
