@@ -68,21 +68,12 @@ public sealed class SchoolSideNavigationViewModel
     {
         var items = new List<SchoolSideNavigationItemViewModel>
         {
-            new() { Text = "Overview", Href = Routes.AllThroughSchool(urn).Overview, IsSelected = currentAction == "Index" }
+            new() { Text = "Overview", Href = Routes.AllThroughSchool(urn).Overview, IsSelected = currentAction == "Index" },
+            new() { Text = "KS2", Href = Routes.AllThroughSchool(urn).KS2, IsSelected = currentAction == "Ks2PerformanceMeasures" },
+            new() { Text = "KS4 headline measures", Href = Routes.AllThroughSchool(urn).KS4HeadlineMeasures, IsSelected = currentAction == "Ks4HeadlineMeasures" },
+            new() { Text = "KS4 core subjects", Href = Routes.AllThroughSchool(urn).KS4CoreSubjects, IsSelected = currentAction == "Ks4CoreSubjects" },
+            new() { Text = "Attendance", Href = Routes.AllThroughSchool(urn).Attendance, IsSelected = currentAction == "Attendance" }
         };
-
-        if (similarSchoolPhases.HasPrimary)
-        {
-            items.Add(new() { Text = "KS2", Href = Routes.AllThroughSchool(urn).KS2, IsSelected = currentAction == "Ks2PerformanceMeasures" });
-        }
-
-        if (similarSchoolPhases.HasSecondary)
-        {
-            items.Add(new() { Text = "KS4 headline measures", Href = Routes.AllThroughSchool(urn).KS4HeadlineMeasures, IsSelected = currentAction == "Ks4HeadlineMeasures" });
-            items.Add(new() { Text = "KS4 core subjects", Href = Routes.AllThroughSchool(urn).KS4CoreSubjects, IsSelected = currentAction == "Ks4CoreSubjects" });
-        }
-
-        items.Add(new() { Text = "Attendance", Href = Routes.AllThroughSchool(urn).Attendance, IsSelected = currentAction == "Attendance" });
 
         if (similarSchoolPhases.HasAny)
         {

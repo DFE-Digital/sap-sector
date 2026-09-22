@@ -37,6 +37,8 @@ public class SchoolPagesIntegrationTests(
         AssertNavigation(page, [
             ("Overview", Routes.AllThroughSchool(Urn).Overview),
             ("KS2", Routes.AllThroughSchool(Urn).KS2),
+            ("KS4 headline measures", Routes.AllThroughSchool(Urn).KS4HeadlineMeasures),
+            ("KS4 core subjects", Routes.AllThroughSchool(Urn).KS4CoreSubjects),
             ("Attendance", Routes.AllThroughSchool(Urn).Attendance),
             ("View similar schools", Routes.AllThroughSchool(Urn).ViewSimilarSchools),
             ("School details", Routes.AllThroughSchool(Urn).SchoolDetails),
@@ -89,6 +91,7 @@ public class SchoolPagesIntegrationTests(
 
         AssertNavigation(page, [
             ("Overview", Routes.AllThroughSchool(Urn).Overview),
+            ("KS2", Routes.AllThroughSchool(Urn).KS2),
             ("KS4 headline measures", Routes.AllThroughSchool(Urn).KS4HeadlineMeasures),
             ("KS4 core subjects", Routes.AllThroughSchool(Urn).KS4CoreSubjects),
             ("Attendance", Routes.AllThroughSchool(Urn).Attendance),
@@ -141,11 +144,15 @@ public class SchoolPagesIntegrationTests(
 
         AssertNavigation(page, [
             ("Overview", Routes.AllThroughSchool(Urn).Overview),
+            ("KS2", Routes.AllThroughSchool(Urn).KS2),
+            ("KS4 headline measures", Routes.AllThroughSchool(Urn).KS4HeadlineMeasures),
+            ("KS4 core subjects", Routes.AllThroughSchool(Urn).KS4CoreSubjects),
             ("Attendance", Routes.AllThroughSchool(Urn).Attendance),
             ("School details", Routes.AllThroughSchool(Urn).SchoolDetails),
             ("What is a similar school?", Routes.AllThroughSchool(Urn).WhatIsASimilarSchool),
             ("RISE resources", Routes.AllThroughSchool(Urn).RiseResources)
         ]);
+        AssertSelectedNavigationItem(page, "Overview", Routes.AllThroughSchool(Urn).Overview);
     }
 
     [Theory]

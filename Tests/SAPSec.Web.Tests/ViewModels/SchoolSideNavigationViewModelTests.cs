@@ -143,6 +143,9 @@ public class SchoolSideNavigationViewModelTests
             true,
             [
                 "Overview",
+                "KS2",
+                "KS4 headline measures",
+                "KS4 core subjects",
                 "Attendance",
                 "School details",
                 "What is a similar school?",
@@ -150,6 +153,9 @@ public class SchoolSideNavigationViewModelTests
             ],
             [
                 Routes.AllThroughSchool(Urn).Overview,
+                Routes.AllThroughSchool(Urn).KS2,
+                Routes.AllThroughSchool(Urn).KS4HeadlineMeasures,
+                Routes.AllThroughSchool(Urn).KS4CoreSubjects,
                 Routes.AllThroughSchool(Urn).Attendance,
                 Routes.AllThroughSchool(Urn).SchoolDetails,
                 Routes.AllThroughSchool(Urn).WhatIsASimilarSchool,
@@ -162,6 +168,8 @@ public class SchoolSideNavigationViewModelTests
             [
                 "Overview",
                 "KS2",
+                "KS4 headline measures",
+                "KS4 core subjects",
                 "Attendance",
                 "View similar schools",
                 "School details",
@@ -170,6 +178,8 @@ public class SchoolSideNavigationViewModelTests
             [
                 Routes.AllThroughSchool(Urn).Overview,
                 Routes.AllThroughSchool(Urn).KS2,
+                Routes.AllThroughSchool(Urn).KS4HeadlineMeasures,
+                Routes.AllThroughSchool(Urn).KS4CoreSubjects,
                 Routes.AllThroughSchool(Urn).Attendance,
                 Routes.AllThroughSchool(Urn).ViewSimilarSchools,
                 Routes.AllThroughSchool(Urn).SchoolDetails,
@@ -181,6 +191,7 @@ public class SchoolSideNavigationViewModelTests
             false,
             [
                 "Overview",
+                "KS2",
                 "KS4 headline measures",
                 "KS4 core subjects",
                 "Attendance",
@@ -190,6 +201,7 @@ public class SchoolSideNavigationViewModelTests
             ],
             [
                 Routes.AllThroughSchool(Urn).Overview,
+                Routes.AllThroughSchool(Urn).KS2,
                 Routes.AllThroughSchool(Urn).KS4HeadlineMeasures,
                 Routes.AllThroughSchool(Urn).KS4CoreSubjects,
                 Routes.AllThroughSchool(Urn).Attendance,
