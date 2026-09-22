@@ -26,8 +26,8 @@ public abstract record MeasureBreakdownViewModel(
             : "No available data";
 
     public static string DisplayPercent(decimal? value, int decimalPlaces) =>
-    value.HasValue
-        ? value.Value.ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture) + "%"
-        : "No available data";
+        value.HasValue
+            ? value.Value.ToString($"F{decimalPlaces}", CultureInfo.InvariantCulture) + "%"
+            : "No available data";
 }
  
