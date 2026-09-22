@@ -10,6 +10,13 @@
     ViewData[ViewDataKeys.Title] = layout!.ComparatorSchool.Name;
 
     var currentAction = (string?)ViewContext.RouteData.Values["action"];
+    var similarSchoolsUrl = layout.IsCurrentSchoolAllThroughComparison
+        ? Routes.AllThroughSchool(layout.CurrentSchool.Urn).ViewSimilarSchools
+        : Routes.PrimarySchool(layout.CurrentSchool.Urn).ViewSimilarSchools;
+    var comparisonRoutes = layout.IsCurrentSchoolAllThroughComparison
+        ? Routes.AllThroughSchool(layout.CurrentSchool.Urn).PrimaryComparison(layout.ComparatorSchool.Urn)
+        : null;
+    var primaryComparisonRoutes = Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn);
     string active(bool condition) => condition ? "govuk-service-navigation__item--active" : "";
 }
 
@@ -21,7 +28,7 @@
             </li>
             <li class="govuk-breadcrumbs__list-item">
                 <a class="govuk-breadcrumbs__link"
-                   href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).ViewSimilarSchools">
+                   href="@similarSchoolsUrl">
                     View similar schools
                 </a>
             </li>
@@ -34,7 +41,7 @@
     @* LEFT: back link *@
     <div class="app-side-navigation-container">
         <a class="govuk-back-link"
-           href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).ViewSimilarSchools">
+           href="@similarSchoolsUrl">
             Back
         </a>
     </div>
@@ -61,7 +68,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Index" || currentAction == "Similarity")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Similarity"
+                               href="@(comparisonRoutes?.Similarity ?? primaryComparisonRoutes.Similarity)"
                                aria-current="@(currentAction == "Index" || currentAction == "Similarity" ? "page" : null)">
                                 Similarity
                             </a>
@@ -69,7 +76,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Ks2PerformanceMeasures")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Ks2"
+                               href="@(comparisonRoutes?.Ks2 ?? primaryComparisonRoutes.Ks2)"
                                aria-current="@(currentAction == "Ks2PerformanceMeasures" ? "page" : null)">
                                 KS2
                             </a>
@@ -77,7 +84,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "Attendance")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).Attendance"
+                               href="@(comparisonRoutes?.Attendance ?? primaryComparisonRoutes.Attendance)"
                                aria-current="@(currentAction == "Attendance" ? "page" : null)">
                                 Attendance
                             </a>
@@ -85,7 +92,7 @@
 
                         <li class="govuk-service-navigation__item @active(currentAction == "SchoolDetails")">
                             <a class="govuk-service-navigation__link"
-                               href="@Routes.PrimarySchool(layout.CurrentSchool.Urn).Comparison(layout.ComparatorSchool.Urn).SchoolDetails"
+                               href="@(comparisonRoutes?.SchoolDetails ?? primaryComparisonRoutes.SchoolDetails)"
                                aria-current="@(currentAction == "SchoolDetails" ? "page" : null)">
                                 School details
                             </a>

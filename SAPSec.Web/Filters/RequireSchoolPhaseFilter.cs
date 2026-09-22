@@ -68,6 +68,7 @@ public sealed class RequireSchoolPhaseFilter(
             ExpectedSchoolPhase.Secondary => school.IsSecondarySchool(),
             ExpectedSchoolPhase.AllThrough => school.IsAllThroughSchool(),
             ExpectedSchoolPhase.PrimaryComparisonParticipant => school.IsPrimarySchool() || school.IsAllThroughSchool(),
+            ExpectedSchoolPhase.SecondaryComparisonParticipant => school.IsSecondarySchool() || school.IsAllThroughSchool(),
             _ => false
         };
 
@@ -83,6 +84,13 @@ public sealed class RequireSchoolPhaseFilter(
             return school.IsAllThroughSchool()
                 ? await featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools)
                 : await featureFlagService.IsEnabledAsync(FeatureFlags.EnablePrimarySchools);
+        }
+
+        if (expectedPhase == ExpectedSchoolPhase.SecondaryComparisonParticipant)
+        {
+            return school.IsAllThroughSchool()
+                ? await featureFlagService.IsEnabledAsync(FeatureFlags.EnableAllThroughSchools)
+                : true;
         }
 
         if (expectedPhase != ExpectedSchoolPhase.Primary)

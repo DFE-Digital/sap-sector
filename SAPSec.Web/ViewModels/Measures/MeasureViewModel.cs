@@ -40,7 +40,7 @@ public record MeasureViewModel(
     public static MeasureViewModel FromAllThroughPrimaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.AllThroughSchool(urn).ViewSimilarSchools,
-            (currentSchoolUrn, similarSchoolUrn) => Routes.PrimarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).PrimaryComparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
             SchoolYearByYearColors,
             hasSimilarSchools);
@@ -49,6 +49,14 @@ public record MeasureViewModel(
         => FromMeasure(measure, schoolInfo, null,
             urn => Routes.SecondarySchool(urn).ViewSimilarSchools,
             (currentSchoolUrn, similarSchoolUrn) => Routes.SecondarySchool(currentSchoolUrn).Comparison(similarSchoolUrn).Similarity,
+            SchoolCurrentYearColors,
+            SchoolYearByYearColors,
+            hasSimilarSchools);
+
+    public static MeasureViewModel FromAllThroughSecondaryMeasure(Measure measure, SchoolInfo schoolInfo, bool hasSimilarSchools)
+        => FromMeasure(measure, schoolInfo, null,
+            urn => $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
+            (currentSchoolUrn, similarSchoolUrn) => Routes.AllThroughSchool(currentSchoolUrn).SecondaryComparison(similarSchoolUrn).Similarity,
             SchoolCurrentYearColors,
             SchoolYearByYearColors,
             hasSimilarSchools);

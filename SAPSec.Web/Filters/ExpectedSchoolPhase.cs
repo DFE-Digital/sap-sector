@@ -5,5 +5,6 @@ public enum ExpectedSchoolPhase
     Primary,
     Secondary,
     AllThrough,
-    PrimaryComparisonParticipant
+    PrimaryComparisonParticipant,
+    SecondaryComparisonParticipant
 }

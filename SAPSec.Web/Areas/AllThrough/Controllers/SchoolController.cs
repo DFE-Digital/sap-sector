@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SAPSec.Core.Constants;
 using SAPSec.Core.Features.Measures.Primary;
+using SAPSec.Core.Features.Measures.Secondary;
 using SAPSec.Core.Features.SchoolDetails;
 using SAPSec.Core.Features.SchoolDetails.School;
 using SAPSec.Core.Features.SchoolInfo;
@@ -27,6 +28,7 @@ public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
+        IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
         ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
         ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
         IFeatureFlagService featureFlagService)
@@ -77,8 +79,30 @@ public class SchoolController(
 
     [HttpGet]
     [Route("ks4-core-subjects")]
-    public Task<IActionResult> Ks4CoreSubjects(string urn) =>
-        HeadingPage(urn, "KS4 core subject GCSE results");
+    public async Task<IActionResult> Ks4CoreSubjects(string urn)
+    {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getKs4CoreSubjectsUseCase.Execute(new(urn, filters));
+
+        await PopulateViewData(response.School);
+
+        var hasSimilarSecondarySchools = response.SimilarSchoolsCount > 0;
+        var model = new Ks4CoreSubjectsPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Measures = [
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishLanguage, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishLiterature, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Maths, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.CombinedScience, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Biology, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Chemistry, response.School, hasSimilarSecondarySchools),
+                MeasureViewModel.FromAllThroughSecondaryMeasure(response.Physics, response.School, hasSimilarSecondarySchools)
+            ]
+        };
+
+        return View(model);
+    }
 
     [HttpGet]
     [Route("attendance")]
