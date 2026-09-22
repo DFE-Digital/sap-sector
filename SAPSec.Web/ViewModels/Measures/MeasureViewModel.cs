@@ -63,10 +63,7 @@ public record MeasureViewModel(
             (_, _) => throw new InvalidOperationException("All-through attendance measures have no top performers"),
             AllThroughCurrentYearColors,
             AllThroughYearByYearColors,
-            labelResolver: (seriesType, currentSchool, _) => ResolveAllThroughSeriesLabel(phase, seriesType, currentSchool),
-            pointStyleResolver: seriesType => seriesType is MeasureSeriesType.LASchoolsAverage
-                ? "circle"
-                : ResolveSeriesPointStyle(seriesType));
+            labelResolver: (seriesType, currentSchool, _) => ResolveAllThroughSeriesLabel(phase, seriesType, currentSchool));
 
     private static MeasureViewModel FromMeasure(
         Measure measure,
@@ -77,11 +74,9 @@ public record MeasureViewModel(
         string[] currentYearChartColors,
         string[] yearByYearChartColors,
         bool hasSimilarSchools = true,
-        Func<MeasureSeriesType, SchoolInfo, SchoolInfo?, string>? labelResolver = null,
-        Func<MeasureSeriesType, string>? pointStyleResolver = null)
+        Func<MeasureSeriesType, SchoolInfo, SchoolInfo?, string>? labelResolver = null)
     {
         labelResolver ??= ResolveSeriesLabel;
-        pointStyleResolver ??= ResolveSeriesPointStyle;
 
         var measureInfo = new MeasureInfoViewModel(
             measure.Key,
@@ -90,7 +85,7 @@ public record MeasureViewModel(
             measure.DataType,
             measure.Filters.Select(MapAvailableFilter),
             measure.Series.Select(s => labelResolver(s.SeriesType, schoolInfo, similarSchool)),
-            measure.Series.Select(s => pointStyleResolver(s.SeriesType)));
+            measure.Series.Select(s => ResolveSeriesPointStyle(s.SeriesType)));
 
         decimal? MapCurrentYear(MeasureSeries series) =>
             series.Current;

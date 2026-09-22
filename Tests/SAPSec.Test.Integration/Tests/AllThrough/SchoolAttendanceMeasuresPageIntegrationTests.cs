@@ -125,7 +125,7 @@ public class SchoolAttendanceMeasuresPageIntegrationTests(
             yearByYearChart.Dataset.Should().ContainKey("colors")
                 .WhoseValue.DeserializeToList<string>().Should().BeEquivalentTo("#ca357c", "#5694ca", "#4b9b7d");
 
-            AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "circle", "rectRot");
+            AssertYearByYearChartPointStyles(yearByYearChart, "triangle", "rect", "rectRot");
         }
     }
 
