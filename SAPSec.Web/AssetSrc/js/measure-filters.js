@@ -26,8 +26,12 @@ function init(select) {
             activeRequestId += 1;
             var requestId = activeRequestId;
 
-            var formData = new FormData(form);
-            var search = new URLSearchParams(formData);
+            var search = new URLSearchParams();
+            form.querySelectorAll('[data-measure-filter-target-id="' + targetId + '"]').forEach(function (field) {
+                if (field.name) {
+                    search.append(field.name, field.value);
+                }
+            });
             var requestUrl = '?' + search.toString();
 
             return fetch(requestUrl, {

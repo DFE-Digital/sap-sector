@@ -9,9 +9,6 @@ public class GetSchoolAllThroughAttendanceMeasuresUseCase(
     IAbsenceRepository absenceRepository)
     : IUseCase<GetSchoolAllThroughAttendanceMeasuresRequest, GetSchoolAllThroughAttendanceMeasuresResponse>
 {
-    private const string PrimaryKeyPrefix = "primary-";
-    private const string SecondaryKeyPrefix = "secondary-";
-
     public async Task<GetSchoolAllThroughAttendanceMeasuresResponse> Execute(GetSchoolAllThroughAttendanceMeasuresRequest request)
     {
         var dataProvider = new SchoolMeasureDataProvider<AbsenceData>(
@@ -28,12 +25,12 @@ public class GetSchoolAllThroughAttendanceMeasuresUseCase(
                 MeasurePhase.Primary,
                 currentSchoolPerformance,
                 filterBy,
-                PrimaryKeyPrefix),
+                MeasurePhase.Primary.KeyPrefix()),
             AttendanceMeasures.Absence.ForSchool(
                 MeasurePhase.Secondary,
                 currentSchoolPerformance,
                 filterBy,
-                SecondaryKeyPrefix));
+                MeasurePhase.Secondary.KeyPrefix()));
     }
 }
 
