@@ -18,12 +18,17 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.Accessibility),
         new(Routes.FindASchool()),
 
-        new(Routes.PrimarySchool("100171").Overview),
-        new(Routes.PrimarySchool("100171").KS2),
-        new(Routes.PrimarySchool("100171").Attendance),
-        new(Routes.PrimarySchool("100171").ViewSimilarSchools),
-        new(Routes.PrimarySchool("100171").SchoolDetails),
-        new(Routes.PrimarySchool("100171").WhatIsASimilarSchool),
+        new(Routes.PrimarySchool("101206").Overview),
+        new(Routes.PrimarySchool("101206").KS2),
+        new(Routes.PrimarySchool("101206").Attendance),
+        new(Routes.PrimarySchool("101206").ViewSimilarSchools),
+        new(Routes.PrimarySchool("101206").SchoolDetails),
+        new(Routes.PrimarySchool("101206").WhatIsASimilarSchool),
+        new(Routes.PrimarySchool("101206").RiseResources),
+        new(Routes.PrimarySchool("101206").Comparison("101230").Similarity),
+        new(Routes.PrimarySchool("101206").Comparison("101230").Ks2),
+        new(Routes.PrimarySchool("101206").Comparison("101230").Attendance),
+        new(Routes.PrimarySchool("101206").Comparison("101230").SchoolDetails),
 
         new(Routes.AllThroughSchool("100171").Attendance),
         new(Routes.AllThroughSchool("100171").SchoolDetails),
@@ -35,6 +40,7 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
         new(Routes.SecondarySchool("100182").ViewSimilarSchools),
         new(Routes.SecondarySchool("100182").SchoolDetails),
         new(Routes.SecondarySchool("100182").WhatIsASimilarSchool),
+        new(Routes.SecondarySchool("100182").RiseResources),
         // Allow horizontal scroll for school comparison page as similarity table scrolls on mobile
         new(Routes.SecondarySchool("100182").Comparison("136555").Similarity, AllowHorizontalScroll: true),
         new(Routes.SecondarySchool("100182").Comparison("136555").KS4HeadlineMeasures),
@@ -276,7 +282,10 @@ public class ServiceWideAccessibilityTests(AccessibilityTestsFixture fixture, IT
     {
         await NavigateTo(path);
 
-        var links = Page.Locator("main a");
+        // RISE resource links are content-managed external URLs that deliberately open in the
+        // current tab, not a new one, so they're excluded from this check rather than the
+        // domain-pattern list above (their domains vary and are controlled by content editors).
+        var links = Page.Locator("main a:not([data-testid='rise-resource-title'])");
         var count = await links.CountAsync();
 
         for (var i = 0; i < count; i++)
