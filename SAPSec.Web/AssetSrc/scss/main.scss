@@ -3,6 +3,8 @@
 @import "school-map";
 @import "measures";
 
+
+
 .govuk-input__suffix {
   &.govuk-input__suffix__button {
     border: 0;
@@ -1131,4 +1133,74 @@
   .app-school-results-count, #mapCount {
     font-size: 14px !important;
   }
+}
+
+.rise-resources-contents-list {
+    position: relative;
+    z-index: 1;
+    background: govuk-colour("white");
+    box-shadow: 0 20px 15px -10px govuk-colour("white");
+}
+
+.rise-resources-contents-list__title {
+    margin: 0;
+    @include govuk-text-colour;
+    @include govuk-font($size: false, $weight: regular);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.rise-resources-contents-list__list {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    @include govuk-text-colour;
+    @include govuk-font($size: false, $weight: regular);
+    font-size: 1rem;
+    line-height: 1.25;
+}
+
+.rise-resources-contents-list__list-item {
+    padding-top: govuk-spacing(2);
+    line-height: 1.3;
+    list-style-type: none;
+
+    @include govuk-media-query($from: tablet) {
+        padding-top: calc(#{govuk-spacing(6)} / 4);
+    }
+}
+
+.rise-resources-contents-list__list-item--dashed {
+    position: relative;
+    padding-left: govuk-spacing(5);
+    padding-right: govuk-spacing(5);
+    margin-bottom: 0px;
+
+    .rise-resources-contents-list__list-item-dash::before {
+        content: "\2014"; // em dash
+        position: absolute;
+        left: 0;
+        width: govuk-spacing(4);
+        overflow: hidden;
+    }
+}
+
+.rise-resources-contents-list__link {
+    &,
+    &:link,
+    &:visited {
+        color: $govuk-link-colour;
+    }
+}
+
+@include govuk-media-query($media-type: print) {
+    .rise-resources-contents-list__title {
+        font-size: 14pt;
+        line-height: 1.5;
+    }
+
+    .rise-resources-contents-list__list {
+        font-size: 14pt;
+        line-height: 1.2;
+    }
 }
