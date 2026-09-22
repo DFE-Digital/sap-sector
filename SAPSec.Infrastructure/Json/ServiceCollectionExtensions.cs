@@ -14,8 +14,6 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddJsonDependencies(this IServiceCollection services)
     {
-        services.AddSingleton<IJsonFileFactory, JsonFileFactory>();
-
         // JSON files
         services.RemoveAll<IEstablishmentRepository>();
         services.RemoveAll<ISimilarSchoolsPrimaryRepository>();
