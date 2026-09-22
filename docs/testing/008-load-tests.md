@@ -7,14 +7,27 @@ for how to run it.
 
 ## Status
 
-Draft for service assessment (raised by Robert Rees). A valid `stress` run
-against the deployed `test` environment with real authentication and real
-data - see
-[Real result: authenticated stress scenario against test (valid)](#real-result-authenticated-stress-scenario-against-test-valid).
-The app handled 150 concurrent authenticated users cleanly.
+Results available for service assessment (raised by Robert Rees).
 
-The operating targets below are still proposed starting points, not yet
-signed off. See [Open actions](#open-actions).
+Two staircase runs against the deployed `test` environment with real
+authentication bypassed and a real database:
+
+1. An initial run against `test` on its default **Burstable** database tier,
+   which broke at ~250 concurrent users - a limit of the undersized database,
+   not the service.
+2. A second run after `test`'s database was scaled to **production spec**
+   (General Purpose D2ds_v5, 2 vCores, 8 GiB). These results are
+   production-representative and are the ones cited below - see
+   [Production-tier stress result](#production-tier-stress-result).
+
+The service stays healthy to ~150 concurrent users, degrades gradually
+(slower but no errors) up to ~850, and starts failing around ~1,001. The
+binding constraint is the application's PostgreSQL connection pool, not the
+database or the app's CPU/memory - see
+[Why it breaks: connection pool](#why-it-breaks-connection-pool).
+
+The operating targets below are proposed starting points, not yet signed
+off. See [Open actions](#open-actions).
 
 ## Hosting model
 
@@ -24,21 +37,19 @@ The application runs on Azure Kubernetes Service (AKS):
   `rate_limit_max` is **300 on test** and **1000 on production**, with
   `block_ip: true` on repeat offenders
   (`terraform/domains/environment_domains/config/{test,production}.tfvars.json`).
-  This is a real, already-in-place traffic-shedding mechanism.
-  **Correction:** we previously described this as "req/s." That was an
-  unverified assumption - the actual rule lives in a vendored Terraform
-  module (`./vendor/modules/domains`) not present in this checkout, so its
-  real time window is unconfirmed. Needs confirming with whoever owns the
-  `domains` module before this is stated as fact anywhere else.
+  This is a real, already-in-place traffic-shedding mechanism. The runs below
+  targeted the direct backend origin, bypassing Front Door/WAF, so the app
+  could be characterised separately from infra-level shedding.
 - Health probes on `/healthcheck` (liveness/readiness).
 - A **fixed replica count of 2 pods** in both test and production
-  (`terraform/application/config/{test,production}.tfvars.json`). We did not
-  find a Horizontal Pod Autoscaler configured anywhere in this repo's
-  Terraform. **This contradicts the main README's claim of "auto-scaling
-  based on CPU/memory metrics" / HPA** - see [Open actions](#open-actions).
-  The AKS module itself is vendored and wasn't available to inspect locally,
-  so this needs confirming with the platform team rather than assumed either
-  way.
+  (`terraform/application/config/{test,production}.tfvars.json`). During the
+  production-tier run the two app pods scaled briefly to more replicas under
+  load before settling; the platform team should confirm whether an HPA is
+  configured, as the AKS module is vendored and not inspectable in this repo.
+- **Database:** Azure Database for PostgreSQL Flexible Server. Production runs
+  General Purpose D2ds_v5 (2 vCores, 8 GiB, HA enabled). Test's default is a
+  Burstable B1ms (1 vCore, 2 GiB, no HA), which Azure marks development-only;
+  it was temporarily scaled to match production for the valid run.
 
 ## What's tested
 
@@ -54,179 +65,170 @@ pages, compare performance): DfE Sign-in (OpenID Connect) can't be scripted
 against a real deployment without live user credentials. These journeys
 instead run against a dedicated `LoadTest` application mode
 (`ASPNETCORE_ENVIRONMENT=LoadTest`) that swaps DfE Sign-in for an
-auto-authenticating test scheme and swaps the Postgres-backed repositories
-for the same JSON fixture data (~1,924 real-looking establishment records)
-already used by the integration test suite - see `SAPSec.Web/Program.cs` and
+auto-authenticating test scheme - see `SAPSec.Web/Program.cs` and
 [How the `LoadTest` mode works](../../load_testing/README.md#how-the-loadtest-mode-works).
-This mode only ever runs on a machine we control; it must never be set on a
-shared review/test/production deployment, since it disables real
-authentication.
+This mode only ever runs on a machine we control, or on a `test` deployment
+temporarily and deliberately built with auth bypassed; it must never be the
+normal state of a shared deployment, since it disables real authentication.
 
 ## Load scenarios
 
-Four scenarios, selectable per run:
+The `stress` scenario is a **stepped staircase**: it ramps to each level,
+holds for 90s so the p95 at that level is steady-state, then steps up. Each
+step is tagged so per-level figures come straight out of the summary JSON.
+It climbs well past the earlier 150-VU cap to find the actual breaking point.
 
-| Scenario | Peak concurrent users | Duration | Purpose |
-|---|---|---|---|
-| `quick` | 10 | 25s | Smoke test |
-| `baseline` | 10 | ~4 min | Normal operations |
-| `peak-surge` | 50 | ~5.5 min | Surge event (e.g. results day) |
-| `stress` | 150 | ~9 min | Breaking point identification |
+| Scenario | Peak concurrent users | Purpose |
+|---|---|---|
+| `quick` | 10 | Smoke test |
+| `baseline` | 10 | Normal operations |
+| `peak-surge` | 50 | Surge event (e.g. results day) |
+| `stress` | up to 2,400 (staircase) | Breaking-point identification |
 
 Thresholds: p95 response time under 3s, error rate under 1%, no 5xx
-responses. These VU counts are starting estimates for a niche, business-hours,
-professional-user (school leader) tool - not yet derived from real production
-usage data. `stress` is deliberately capped well under the Front Door WAF
-rate limits, so app-level behaviour can be characterised separately from
-infra-level shedding.
+responses.
 
-## Results so far
+## Production-tier stress result
 
-Run locally (`quick` scenario, 10 VUs, both anonymous and authenticated
-journey sets): **383/383 checks passed, 0% error rate**, all response times
-well under threshold.
+`stress` staircase against the deployed `test` environment, database scaled
+to production spec (D2ds_v5), real authentication bypassed at the code level,
+direct backend origin (Front Door/WAF bypassed). Per-level figures are
+steady-state during each 90s hold. The p95 SLO is 3s.
 
-**Not yet run in a planned way**: `baseline`/`peak-surge` against a real
-review or test deployment. Local results don't reflect the real 2-pod
-capacity, real database latency, or the WAF sitting in front of test/production.
+| Concurrent users | p95 | Errors | Verdict |
+|---|---|---|---|
+| 50 | 499ms | 0% | fast |
+| 100 | 475ms | 0% | fast |
+| 150 | 790ms | 0% | fast, comfortable - last level inside SLO |
+| 250 | 5,091ms | 0% | slow, still succeeding |
+| 450 | 16,734ms | 0% | slow, still succeeding |
+| 650 | 24,226ms | 0% | slow, still succeeding |
+| 850 | 39,583ms | 0.02% | very slow, effectively no failures |
+| 1,001 | 60,007ms | 6.26% | first real failures |
+| 1,400 | 60,008ms | 47.45% | collapse |
+| 1,800 | (run aborted) | 45% | `abortOnFail` on failure rate halted the run |
 
-### Real result: authenticated stress scenario against test (valid)
+**Reading it.** Throughput plateaus at roughly 65 requests/second from ~150
+users onward, regardless of how many more users are added - the classic
+saturation signature. Beyond ~150 the extra load queues rather than getting
+served, which is what drives p95 from sub-second to the 60s request timeout.
+The service **degrades gradually and never sheds cleanly**: latency climbs
+long before any request fails, and it recovered on its own once load eased.
+The run aborted itself at ~1,800 users when the failure-rate threshold
+tripped, which is by design.
 
-A `stress` run on 2026-08-20 against the deployed `test` environment, with
-real authentication and real data. The numbers below can be cited.
+The **application tier stayed light** throughout - app pods peaked around 1
+of 4 available CPU cores (~25%), memory well within limits. The ceiling is
+not app CPU or memory.
 
-**What changed to make this work:**
+## Why it breaks: connection pool
 
-- The deployed `test` environment was temporarily built from this branch
-  with DfE Sign-in bypassed at the code level (`SAPSec.Web/Program.cs` -
-  `AutoAuthenticationHandler` used unconditionally instead of real DSI OIDC)
-  rather than via a session cookie. Every request auto-authenticates
-  regardless of what's sent - no MFA, no chunked-cookie handling, no
-  session-expiry risk. **This is a temporary, never-merged state of `test`**
-  - it disables real authentication for anyone using the shared environment
-    while deployed this way, and must be reverted before any merge to `main`.
-- Getting this deployed uncovered two real regressions introduced by
-  deleting the DSI authentication wiring wholesale rather than swapping just
-  the auth scheme: `AddDsiAuthentication()` also registered
-  `IHttpContextAccessor`, `IUserService`, and the DSI API `HttpClient` (used
-  by `AuthController`/`UserController`/`DsiAuthorizationHandler` regardless
-  of login scheme) - restored explicitly. And real DfE Analytics
-  (`Dfe.Analytics.AspNetCore.DfeAnalyticsMiddleware`) was still active for
-  the `"Test"` environment name and threw `BigQueryClient has not been
-  configured` on every request including `/healthcheck`, which is what was
-  actually blocking the Kubernetes rollout from completing (`1 out of 2 new
-  replicas have been updated...` for ~10 minutes then timing out) - fixed by
-  adding `"Test"` to the same skip-list as the other test environments.
-- Target: `test`'s direct backend origin
-  (`get-school-improvement-insights-test.test.teacherservices.cloud`),
-  bypassing Front Door/WAF - a team-cleared arrangement.
-- A quick smoke test was run first and confirmed genuine authentication
-  (100% status/content checks passed, including "contains expected
-  content") before committing to the full 9-minute run.
+Infra traced the failures and pod restarts at the top of the staircase to
+**exhaustion of the application's Npgsql (PostgreSQL driver) connection
+pool**, which is currently **100 connections per replica** (confirmed by
+infra). Under load the pool filled; once empty, requests blocked waiting for a
+connection.
 
-**What happened:**
+The pod restart *mechanism* is still being confirmed with infra - two signals
+appeared at different points in the run and may be two separate effects:
 
-- Ran to completion: 9m 5s, matching the scripted duration, peaked at the
-  target 150 VUs (dipping to a minimum of 83 during the ramp, per
-  `vus_max`).
-- **24,421 requests, all succeeded at the HTTP level** - `http_req_failed`
-  0.00%.
-- Our combined status+latency metric (`sap_sector_error_rate`) stayed well
-  under its 1% threshold: **0.14% overall** (36 of 24,421).
-- **99.95% of all checks passed** (88,110 of 88,146), including content
-  checks - confirming real authenticated pages with real data were being
-  exercised throughout, not a redirect loop like the invalid attempt.
-- Response times degraded gracefully with load rather than collapsing:
-  overall avg 193ms, median 95ms, p90 452ms, p95 687ms, max 6.66s (a single
-  outlier).
+- **Liveness-probe timeouts** at 17:15-17:17 (kubelet log: `failed liveness
+  probe, will be restarted`) - consistent with the health check being one of
+  the requests blocked on an exhausted pool.
+- **Exit Code 137** at ~18:16, an hour later - typically an OOM kill (pod
+  hitting its memory limit), though 137 only strictly means the container was
+  SIGKILLed. Whether the pods hit their configured memory limit, and what that
+  limit is, is being checked with infra.
 
-**Time-resolved detail** (30-second buckets from the CSV export; VUs is the
-scenario's target at that point):
+Both replicas were affected together because they share the same database and
+the same pool limit. Either way the brief 502/504s from the ingress are
+explained by requests hitting pods mid-restart.
 
-| Elapsed | VUs | Requests | p50 | p95 | max | Error rate |
-|---|---|---|---|---|---|---|
-| 0s | 28 | 263 | 56ms | 360ms | 1,384ms | 0.0% |
-| 30s | 48 | 555 | 47ms | 232ms | 449ms | 0.0% |
-| 60s | 61 | 767 | 57ms | 256ms | 777ms | 0.0% |
-| 90s | 74 | 958 | 53ms | 253ms | 485ms | 0.0% |
-| 120s | 86 | 1,087 | 59ms | 304ms | 598ms | 0.0% |
-| 150s | 99 | 1,270 | 61ms | 316ms | 933ms | 0.0% |
-| 180s | 107 | 1,414 | 70ms | 377ms | 1,000ms | 0.0% |
-| 210s | 116 | 1,534 | 80ms | 436ms | 931ms | 0.0% |
-| 240s | 124 | 1,588 | 79ms | 556ms | 1,862ms | 0.0% |
-| 270s | 132 | 1,722 | 89ms | 440ms | 1,084ms | 0.0% |
-| 300s | 141 | 1,817 | 104ms | 630ms | 1,569ms | 0.0% |
-| 330s | 149 | 1,867 | 127ms | 898ms | 1,911ms | 0.0% |
-| 360s | 150 | 1,957 | 125ms | 856ms | 2,176ms | 0.0% |
-| 390s | 150 | 1,906 | 127ms | 868ms | 1,785ms | 0.0% |
-| 420s | 150 | 1,819 | 167ms | 963ms | 2,382ms | 0.0% |
-| 450s | 150 | 1,907 | 129ms | 906ms | 1,678ms | 0.0% |
-| 480s | 96 | 1,400 | 153ms | 1,545ms | 6,669ms | 2.6% |
-| 510s | 11 | 584 | 94ms | 411ms | 2,643ms | 0.0% |
-| 540s | 1 | 6 | 68ms | 356ms | 356ms | 0.0% |
+Crucially, **the database itself was healthy throughout with capacity to
+spare** - its own metrics showed only 2 failed connections across the whole
+run, with succeeded connections peaking around 150. The Test database's
+`max_connections` is **856**, while the application can only ever open
+**2 replicas × 100 = 200** connections at its current pool size - so the
+database had over 650 connections spare when the service began failing. The
+constraint is an application configuration value (the pool cap), not database
+hardware.
 
-**Reading it**: error rate is a genuine **0.0% for the entire ramp-up and
-the entire 150-VU sustained window** (t=0 through t=450s). The only
-non-zero error window (2.6% at t=480s) falls during ramp-*down*, as VUs
-drop from 150 to 96 - consistent with a handful of in-flight requests being
-torn down mid-response rather than the app failing under peak load. Latency
-increases smoothly and predictably as load increases (p50 ~55ms at 28 VUs
-to ~125-167ms sustained at 150 VUs; p95 ~250-360ms to ~860-960ms) - no
-cliff, no runaway tail latency, no sustained spike. **At 150 concurrent
-authenticated users, this app does not show signs of being close to a
-breaking point** - the `stress` scenario's ceiling wasn't high enough to
-find one.
+**Consequence for the numbers below:** the ~1,001-user ceiling was measured
+with the pool at 100 per replica. Raising the pool size should raise the
+ceiling further, so these figures are conservative.
 
-**Still open**: this only tells us the app is healthy up to 150 VUs, not
-where it actually breaks. A higher-intensity run (above 150) and CPU/memory
-metrics for the pods during it would be needed to find the real ceiling.
-Raw per-request time-series (421,454 rows) saved locally as
-`load_testing/stress-test-timeseries.csv` - gitignored, not committed.
+**Proposed fix (not yet implemented).** Set the Npgsql `Maximum Pool Size`
+explicitly rather than relying on the default of 100, kept within the
+database's `max_connections` across both replicas. This would be wired
+through the app's connection setup (`SAPSec.Infrastructure/Postgres/NpgsqlDataSourceFactory.cs`),
+ideally read from configuration so `test` and `production` can differ.
+PgBouncer - built into Azure Flexible Server - is a tidier longer-term
+option that multiplexes many app connections onto few database ones, letting
+the app pool generously without each connection pinning a database backend.
+
+## Expected usage (from analytics)
+
+The analytics team's usage data for the comparable CSCP service:
+
+- Daily usage typically 1,000-5,000 users; exceeds 6,000 only occasionally;
+  single all-time peak ~12,000.
+
+Converted to **concurrent** users (the unit the load test measures), using an
+assumed mean session length and peak-window concentration:
+
+- Normal day: ~45 concurrent users.
+- Busy day: ~220 concurrent users.
+
+Both sit inside the tested envelope - a normal day well within guaranteed
+load, a busy publication day within the no-error range. **These conversions
+depend on session length and how concentrated a peak is; the analytics team
+should firm both up.**
 
 ## Operating targets (proposed - needs sign-off)
 
-Per Robert Rees' service assessment ask, four targets:
+Per Robert Rees' service assessment ask, four targets. Measured on the
+production-spec database run above.
 
 | Target | Proposed value | Basis |
 |---|---|---|
-| Guaranteed load | TBC | Needs real user-base sizing - number of schools in scope × a plausible concurrent-access percentage. Not yet estimated. |
-| Expected load | ~10 concurrent users | School leaders checking in during work hours; likely genuinely low given the tool's scope. Matches the `baseline` scenario. |
-| Target peak load | ~50 concurrent users | Speculative "surge" event (e.g. results day, start of term). No confirmed trigger event has been identified yet - this is a guess, not a target. |
-| Maximum load before collapse / shedding | Not yet found. Bounded first by the Front Door WAF (`rate_limit_max` 300 on test / 1000 on production, unit unconfirmed), but **the app itself handled 150 concurrent authenticated users cleanly (0.14% error rate, graceful latency growth, no failure onset)** - the highest level tested so far, not a breaking point. | Test direct-origin, WAF bypassed, real auth (2026-08-20) - 99.95% checks passed, 0.0% error rate through the full 150-VU sustained window - see [Real result: test, valid](#real-result-authenticated-stress-scenario-against-test-valid). Need a higher-intensity scenario to actually find the ceiling. |
-
-**Note for the assessment conversation**: given the service's actual
-audience (school leaders, business hours, no public/mass-market traffic),
-the case for deprioritising "guaranteed load" as a formal target - rather
-than engineering to a number nobody can currently justify - seems reasonable
-per Robert's own framing. Worth raising directly rather than inventing a
-number to fill the gap.
+| Guaranteed load | **150 concurrent users** | p95 under 800ms, zero errors, real headroom. The number to put in an SLA. |
+| Expected load | **~45 normal / ~220 busy-day concurrent** | Converted from analytics daily figures (above), not a load-test output. Comfortably inside the tested envelope. |
+| Target peak load | **150 (fast bar) or ~850 (working bar)** | Depends on the quality bar. If the bar is p95 < 3s, ~150. If it's "no errors, slower acceptable," ~850 (failures stay at zero to there). Given a realistic busy-day peak of ~220, ~850 is suggested so the target clears expected demand, with 150 as the fast/comfortable mark. Needs a steer on which bar the assessment holds to. |
+| Maximum before collapse / shedding | **~1,001 concurrent users** | First real failures appear here, rising to ~47% by 1,400. Degrades gradually rather than shedding cleanly. Well above any realistic demand, and conservative - measured with the connection pool at 100 per replica. |
 
 ## Open actions
 
-1. **`test` currently has no real authentication for anyone using it** -
-   it's running a temporary build with DfE Sign-in bypassed at the code
-   level (see [Real result: test, valid](#real-result-authenticated-stress-scenario-against-test-valid)).
-   **Revert this deployment back to a normal build as soon as load testing
-   is done.** This is live right now, not a historical item - the longer it
-   stays deployed, the bigger the exposure window.
-2. **Find the actual breaking point.** 150 VUs wasn't enough to stress the
-   app - it needs a higher-intensity scenario (a new scenario above `stress`,
-   or a longer sustain at higher VUs) to find where it actually starts to
-   fail. Do this **before** reverting the temporary deployment (item 1), or
-   it'll need redeploying.
-3. Pull CPU/memory metrics for the pods during a higher-intensity run, to
-   see what's actually being consumed even though nothing failed yet. Needs
-   Azure Monitor/Application Insights access.
-4. Confirm the autoscaling question with the platform/infra team, and
-   correct either this doc or the main README (they currently disagree).
-5. Confirm the actual WAF rate-limit window/duration with whoever owns the
-   `domains` Terraform module, and correct the unit claim once known.
-6. Size the real user base (schools in scope) to replace "TBC" and the
-   other proposed numbers with defensible ones.
-7. Run `baseline` and `peak-surge` against `test` for completeness (results
-   should be uneventful given the `stress` result, but worth recording).
-8. Get the four operating target numbers - or the decision to deprioritise
-   some of them - signed off by the service owner.
+1. **Raise the Npgsql connection pool size** (not yet implemented) and re-run
+   to confirm the ceiling moves up. Set `Maximum Pool Size` explicitly - it
+   currently sits at 100 per replica (confirmed by infra) - keeping
+   `2 replicas × pool size` within the database's `max_connections`; consider
+   PgBouncer for the longer term. This is the single highest-value change -
+   it's the current binding constraint. Change one thing at a time: pool
+   first, re-run, then reassess.
+2. **Confirm the pod restart mechanism and memory limit.** Exit Code 137 at
+   ~18:16 suggests a possible OOM kill separate from the earlier liveness
+   failures. Confirm with infra whether the pods hit their configured memory
+   limit and what it is set to, so the pool change isn't assumed to fix a
+   memory problem. More connections use slightly more memory, so if memory is
+   tight, review the limit alongside the pool change.
+3. **Database `max_connections` confirmed at 856** on the Test tier
+   (`sapsec_test`). A pool of ~200-300 per replica gives 400-600, safely
+   under 856 with headroom for the maintenance pod and the co-located
+   `sap-public` service. Confirm the production tier's value before applying
+   there.
+3. **Revert any temporary auth-bypass build of `test`** back to a normal
+   build once testing is done - it disables real authentication for anyone
+   using the shared environment while deployed that way.
+4. **Revert the `test` database** to its normal tier if the production-spec
+   scaling was temporary.
+5. Confirm whether an HPA is configured (pods scaled during the run) with the
+   platform team, and reconcile this doc with the main README.
+6. Confirm the actual WAF rate-limit window/duration with whoever owns the
+   `domains` Terraform module.
+7. Firm up the analytics-to-concurrent conversion (session length, peak
+   concentration) with the analytics team.
+8. Get the four operating target numbers - and the fast-vs-working decision
+   for target peak - signed off by the service owner.
 
 ## How to run it
 

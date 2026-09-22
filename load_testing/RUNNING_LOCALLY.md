@@ -105,7 +105,35 @@ Once the `quick` smoke test looks good, swap it for a heavier one:
 | Breaking point | `npm run test:stress` | `npm run test:loadtest:stress` |
 
 See [Test scenarios](README.md#test-scenarios) in the main README for what
-each one actually does (peak users, duration, purpose).
+each one actually does.
+
+## Reading a stress run
+
+`stress` is a **staircase**: it ramps to each user level, holds for 90s, then
+steps up, climbing past the old 150-user cap to find the breaking point. Each
+step is tagged, so the whole staircase lands in the summary JSON. Read it
+with:
+
+```bash
+node analyse.cjs sap-sector-load-test-summary.json
+```
+
+This prints requests, median, p95, max and failure rate at each user level,
+and flags the last level inside the p95 SLO and the first to breach. No
+dependencies needed.
+
+A local `stress` run against a `LoadTest`-mode instance uses JSON fixture data
+(no real database), so it shows the shape of the curve and any app-side limit,
+but **not** production-representative capacity numbers - those come from a run
+against a real environment with a real database. See
+[008-load-tests.md](../docs/testing/008-load-tests.md) for the
+production-tier results.
+
+> **Tip:** to stop a `stress` run early, just interrupt it (Ctrl-C) - k6 still
+> writes the summary, and `analyse.cjs` shows the steps it reached. Don't try
+> to shorten it with `--duration`: that overrides the staircase and runs a
+> single VU. (`npm run test:loadtest:stress:short` is currently identical to
+> `:stress`.)
 
 ## Troubleshooting
 
@@ -117,4 +145,10 @@ each one actually does (peak users, duration, purpose).
   feature flag, which is off by default.
 - **Real DSI sign-in redirect instead of the bypass**: `ASPNETCORE_ENVIRONMENT`
   isn't set to exactly `LoadTest`, or your checkout predates the `LoadTest`
-  mode changes.
+  mode changes. A quick tell: if a `stress` run shows roughly five HTTP
+  requests per page request, every request is bouncing through the DfE Sign-in
+  redirect chain rather than hitting real pages - check the auth bypass.
+- **`analyse.cjs` prints "no per-step sub-metrics found"**: the summary is
+  from a non-`stress` run (only `stress` emits step tags), or from an older
+  `load-test.js`/`stress-test.js` without the tagging. Re-run `stress` with
+  the current scripts.

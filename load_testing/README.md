@@ -37,6 +37,14 @@ challenge automatically. Two ways to exercise these pages instead:
   load test. Works against `test` or a review app with real data - useful
   when you need results from real infrastructure, not just the JSON fixture.
 
+> **Note on the production-tier results.** The valid breaking-point results in
+> [docs/testing/008-load-tests.md](../docs/testing/008-load-tests.md) were
+> produced against a `test` deployment temporarily built with auth bypassed
+> at the code level (not via session cookie), with the `test` database
+> temporarily scaled to production spec. That is a deliberate, temporary
+> state of a shared environment - see the caveats in that doc. It disables
+> real authentication while deployed that way and must be reverted.
+
 ## Setup
 
 1. **Install k6:**
@@ -56,7 +64,8 @@ challenge automatically. Two ways to exercise these pages instead:
    sudo apt install k6
    ```
 
-2. **Prepare environment variables (only needed for review apps or Grafana Cloud runs):**
+2. **Prepare environment variables (only needed for review apps, real-env
+   auth, or Grafana Cloud runs):**
 
    ```
    cd load_testing
@@ -115,6 +124,46 @@ journey mix (search, secondary/primary school pages, compare performance)
 instead of the anonymous one - see
 [How the `LoadTest` mode works](#how-the-loadtest-mode-works).
 
+## Reading the results: the stress staircase
+
+The `stress` scenario is a **stepped staircase**. It ramps to each user level,
+holds for 90 seconds so the p95 at that level is steady-state, then steps up -
+climbing well past the old 150-user cap to find the actual breaking point.
+Every request is tagged with the step it belongs to, and a threshold is
+declared per step, so k6 puts the per-level figures directly into the summary
+JSON. **This means the summary JSON alone contains the whole staircase - you
+don't need the raw CSV to read it.**
+
+`analyse.cjs` reads that summary and prints the staircase:
+
+```bash
+node analyse.cjs sap-sector-load-test-summary.json
+```
+
+It prints a table of requests, median, p95, max and failure rate per user
+level, flags each as ok/BREACH against the p95 SLO, and reports the last level
+inside the SLO and the first level to breach. It requires no dependencies
+(plain Node). Use it after any `stress` run.
+
+If a run only reached the early steps (e.g. you stopped it), `analyse.cjs`
+lists the levels that got no traffic so it's obvious the run was partial
+rather than the higher levels passing.
+
+### Optional: raw per-request CSV
+
+`test:loadtest:stress:trace` additionally writes a gzipped CSV
+(`results.csv.gz`) with system tags trimmed to keep it manageable. You only
+need this for per-second detail within a step or per-endpoint tail latency;
+for operating targets the summary JSON is enough. The raw CSV can be large,
+so prefer the plain `stress` run unless you specifically need it.
+
+> **`test:loadtest:stress:short`** is currently identical to
+> `test:loadtest:stress` (there is no duration override). To run a genuinely
+> short check, start `stress` and stop it after a few minutes - k6 still
+> writes the summary on interrupt, and `analyse.cjs` will show the early
+> steps. (Do not shorten it with `--duration`: that overrides the scenario
+> entirely and runs a single VU instead.)
+
 ## Authenticated pages against a real environment
 
 For search/school pages/compare performance results against real
@@ -167,6 +216,25 @@ This still generates real load against shared infrastructure, so the same
 rules apply as any other real-environment run - see
 [Running against the test environment](#running-against-the-test-environment).
 
+### Running the stress staircase against test
+
+There is no `test-env:stress` npm script (the `stress` scenario is wired to
+`loadtest`/`local` only). To run the staircase against the deployed `test`
+origin - as the production-tier results in
+[008-load-tests.md](../docs/testing/008-load-tests.md) were produced - point
+at the direct backend origin explicitly and coordinate with the team first
+(see the WAF note below):
+
+```bash
+k6 run --env SCENARIO=stress --env ENVIRONMENT=test sap-sector/load-test.js
+```
+
+with `LOADTEST_URL` / the `test` origin set so requests reach the app rather
+than Front Door, and `SESSION_COOKIE` set (or a code-level auth bypass
+deployed). Confirm with a `quick` run first that content checks pass and the
+request count is roughly one HTTP request per page (no auth-redirect
+amplification) before trusting a full run.
+
 ## Running against a PR review app
 
 Set `PR_NUMBER` (or `REVIEW_URL` directly) in `.env`, then:
@@ -181,10 +249,15 @@ npm run test:review:baseline
 **Coordinate with the team before doing this.** The test and production
 environments sit behind Azure Front Door with WAF rate limiting and IP
 blocking enabled (see `terraform/domains/environment_domains/config/`):
-`rate_limit_max` is **300 req/s on test** and **1000 req/s on production**.
-Exceeding this will get the load-test runner's IP blocked, not just
-throttled. The `stress` scenario is deliberately capped at 150 concurrent
-users to stay well under this, but check with the team first regardless.
+`rate_limit_max` is **300 on test** and **1000 on production** (time window
+unconfirmed - see 008-load-tests.md). Exceeding this will get the load-test
+runner's IP blocked, not just throttled.
+
+**The `stress` staircase deliberately exceeds these limits** (it climbs to
+2,400 users to find the breaking point), so it must be run against the direct
+backend origin with Front Door/WAF bypassed, as a team-cleared arrangement -
+never through the public Front Door endpoint. The lighter `quick`/`baseline`
+scenarios stay well under the limit.
 
 ```
 npm run test:test-env:quick
@@ -222,10 +295,12 @@ the UI/E2E/integration test suites to bypass real auth:
   Google Analytics/Clarity, so load-test traffic doesn't pollute production
   analytics.
 
-**This must never be set on a shared review/test/production deployment** -
-`LoadTest` disables real DfE Sign-in authentication entirely. It's only safe
-because it's a distinct, explicit environment name that has to be deliberately
-opted into; nothing sets it by default.
+**This must never be the normal state of a shared review/test/production
+deployment** - `LoadTest` disables real DfE Sign-in authentication entirely.
+It's only safe because it's a distinct, explicit environment name that has to
+be deliberately opted into; nothing sets it by default. (The production-tier
+results were produced by deploying it to `test` temporarily and deliberately,
+then reverting - see 008-load-tests.md.)
 
 ### Known-good test data
 
@@ -240,14 +315,28 @@ verified the same way to return real results.
 
 ## Test scenarios
 
-| Scenario | Peak users | Duration | Purpose |
-|---|---|---|---|
-| `quick` | 10 | 25s | Smoke test |
-| `baseline` | 10 | ~4m | Normal operations |
-| `peak-surge` | 50 | ~5.5m | Surge event (e.g. results day) |
-| `stress` | 150 | ~9m | Breaking point identification |
+| Scenario | Peak users | Purpose |
+|---|---|---|
+| `quick` | 10 | Smoke test |
+| `baseline` | 10 | Normal operations |
+| `peak-surge` | 50 | Surge event (e.g. results day) |
+| `stress` | up to 2,400 (staircase, 90s hold per step) | Breaking-point identification |
 
-Select via `--env SCENARIO=<name>` (defaults to `quick`).
+Select via `--env SCENARIO=<name>` (defaults to `quick`). See the
+[stress staircase](#reading-the-results-the-stress-staircase) section for how
+`stress` is shaped and read.
+
+## npm scripts
+
+| Script | Environment | Scenario |
+|---|---|---|
+| `test:quick` / `:baseline` / `:peak` / `:stress` | `local` | quick / baseline / peak-surge / stress |
+| `test:review:quick` / `:baseline` | `review` | quick / baseline |
+| `test:test-env:quick` / `:baseline` | `test` | quick / baseline |
+| `test:loadtest:quick` / `:baseline` / `:peak` / `:stress` | `loadtest` | quick / baseline / peak-surge / stress |
+| `test:loadtest:stress:short` | `loadtest` | stress (currently same as `:stress` - see note above) |
+| `test:loadtest:stress:trace` | `loadtest` | stress, plus a gzipped per-request CSV |
+| `grafana:login` | - | Grafana Cloud auth |
 
 ## Running in CI
 
@@ -272,12 +361,21 @@ performance-sensitive enough to justify load-testing every single one.
 
 - **Local:** results printed to the terminal; `sap-sector-load-test-summary.json`
   and `sap-sector-load-test-report.html` are written to the working directory.
+  Read a `stress` run with `node analyse.cjs sap-sector-load-test-summary.json`.
 - **Cloud (Grafana):** run `npm run grafana:login` first (needs
   `K6_CLOUD_API_TOKEN`), then `k6 cloud run sap-sector/load-test.js` for
   real-time dashboards and historic tracking.
 
 ## Notes
 
+- **Production-tier stress result** (against `test`, database scaled to
+  production spec, auth bypassed): the service is healthy to ~150 concurrent
+  users, degrades gradually with no failures to ~850, and starts failing
+  around ~1,001. The binding constraint is the application's Npgsql
+  connection pool (100 per replica), not the database or app
+  CPU/memory - the database had spare capacity throughout. Full write-up and
+  operating targets in
+  [docs/testing/008-load-tests.md](../docs/testing/008-load-tests.md).
 - **Anonymous pages**, verified against the local `dotnet run` dev server: all
   requests succeed and content checks pass, but the homepage occasionally
   exceeds the 2000ms threshold under the `quick` scenario's 10-VU burst - this
@@ -285,18 +383,20 @@ performance-sensitive enough to justify load-testing every single one.
   real issue. Expect cleaner numbers against a review app, `test`, or a
   production-mode Docker build.
 - **Authenticated pages**, verified against a local `LoadTest`-mode instance
-  (`quick` scenario, 10 VUs): 383/383 checks passed, 0% error rate, across
-  all four journeys (search, secondary school, primary school, compare
+  (`quick` scenario, 10 VUs): all checks passed, 0% error rate, across all
+  four journeys (search, secondary school, primary school, compare
   performance) - see [How the `LoadTest` mode works](#how-the-loadtest-mode-works).
 - Docker wasn't available in the environment this was built in, so a
   Postgres-backed local run (real DB instead of the JSON fixture) hasn't been
-  verified - only the JSON-backed `LoadTest` mode has.
+  verified locally - only the JSON-backed `LoadTest` mode has. The
+  production-tier `test` runs did exercise the real Postgres path.
 
 ## Structure
 
 ```
 load_testing/
 ├── package.json
+├── analyse.cjs            # reads a stress summary JSON into a per-level staircase table
 ├── .env.example
 ├── sap-sector/
 │   ├── load-test.js       # entry point: scenario selection, journey mix, reporting
@@ -312,7 +412,7 @@ load_testing/
 │   │   ├── school-search.js         # authenticated (loadtest only)
 │   │   ├── school-overview.js       # authenticated (loadtest only)
 │   │   └── compare-performance.js   # authenticated (loadtest only)
-│   ├── scenarios/          # load shapes (quick/baseline/peak-surge/stress)
+│   ├── scenarios/          # load shapes (quick/baseline/peak-surge/stress staircase)
 │   └── utils/
 │       ├── checks.js       # response time + content assertions, custom metrics
 │       └── auth.js         # SESSION_COOKIE handling for real-environment auth
