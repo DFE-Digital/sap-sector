@@ -13,6 +13,7 @@ public static class ViewDataKeys
     public const string SchoolNavigation = nameof(SchoolNavigation);
     public const string ShowClosedSchoolBanner = nameof(ShowClosedSchoolBanner);
     public const string ClosedSchoolSuccessors = nameof(ClosedSchoolSuccessors);
+    public const string SchoolPredecessors = nameof(SchoolPredecessors);
     public const string ComparisonSchool = nameof(ComparisonSchool);
     public const string ComparisonLayout = nameof(ComparisonLayout);
     public const string TotalResults = nameof(TotalResults);

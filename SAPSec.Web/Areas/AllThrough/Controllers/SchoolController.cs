@@ -110,6 +110,7 @@ public class SchoolController(
         var schoolDetails = await requestSchoolAccessor.GetAsync(HttpContext, currentSchool.Urn);
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = schoolDetails.ShowClosedSchoolBanner;
         ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(schoolDetails.Predecessors);
     }
 
     private async Task PopulateViewData(SchoolDetails currentSchool)
@@ -119,6 +120,7 @@ public class SchoolController(
 
         ViewData[ViewDataKeys.ShowClosedSchoolBanner] = currentSchool.ShowClosedSchoolBanner;
         ViewData[ViewDataKeys.ClosedSchoolSuccessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Successors);
+        ViewData[ViewDataKeys.SchoolPredecessors] = SuccessorLinkViewModel.FromSuccessors(currentSchool.Predecessors);
     }
 
     private async Task<SchoolSideNavigationViewModel> CreateNavigation(string urn) =>

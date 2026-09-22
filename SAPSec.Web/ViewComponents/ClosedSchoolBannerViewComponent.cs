@@ -7,8 +7,9 @@ public class ClosedSchoolBannerViewComponent : ViewComponent
 {
     public IViewComponentResult Invoke(
         ClosedSchoolBannerVariant variant = ClosedSchoolBannerVariant.ThisSchool,
-        IReadOnlyList<SuccessorLinkViewModel>? successors = null)
+        IReadOnlyList<SuccessorLinkViewModel>? successors = null,
+        IReadOnlyList<SuccessorLinkViewModel>? predecessors = null)
     {
-        return View(new ClosedSchoolBannerViewModel(variant, successors ?? []));
+        return View(new ClosedSchoolBannerViewModel(variant, successors ?? [], predecessors ?? []));
     }
 }

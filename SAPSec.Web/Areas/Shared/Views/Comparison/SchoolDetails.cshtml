@@ -56,11 +56,12 @@
 
 @{
     var comparatorSuccessors = Model.ComparatorSchoolDetails?.Successors ?? [];
+    var comparatorPredecessors = Model.ComparatorSchoolDetails?.Predecessors ?? [];
 }
 
-@if (Model.ComparatorSchoolDetails?.ShowClosedSchoolBanner == true || comparatorSuccessors.Any())
+@if (Model.ComparatorSchoolDetails?.ShowClosedSchoolBanner == true || comparatorSuccessors.Any() || comparatorPredecessors.Any())
 {
-    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.Comparator, successors = comparatorSuccessors })
+    @await Component.InvokeAsync("ClosedSchoolBanner", new { variant = ClosedSchoolBannerVariant.Comparator, successors = comparatorSuccessors, predecessors = comparatorPredecessors })
 }
 
 <h2 class="govuk-heading-l">School details</h2>
