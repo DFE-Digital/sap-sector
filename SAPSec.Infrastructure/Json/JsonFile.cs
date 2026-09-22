@@ -66,6 +66,7 @@ public class JsonFile<T> : IJsonFile<T> where T : class
         {
             JsonDataSource.Generated => "Generated",
             JsonDataSource.PrimarySchools => "PrimarySchools",
+            JsonDataSource.RiseResources => "RiseResources",
             _ => throw new ArgumentOutOfRangeException(nameof(dataSource), dataSource, "Unknown JSON data source")
         };
     }
