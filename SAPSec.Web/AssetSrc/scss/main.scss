@@ -529,9 +529,7 @@
 
 .app-phase-tabs__tab:hover {
   color: govuk-colour("dark-blue");
-  text-decoration: underline;
-  text-decoration-thickness: max(1px, .0625rem);
-  text-underline-offset: .1578em;
+  text-decoration: none;
 }
 
 .app-phase-tabs__tab:focus {
