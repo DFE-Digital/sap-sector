@@ -5,9 +5,8 @@
 @{
     Layout = "_Layout";
     var layout = ViewData[ViewDataKeys.ComparisonLayout] as ComparisonLayoutModel;
-    var whatIsASimilarSchoolUrl = layout?.IsCurrentSchoolAllThroughComparison == true
-        ? Routes.AllThroughSchool(Model.CurrentSchool.Urn).WhatIsASimilarSchool
-        : Routes.SecondarySchool(Model.CurrentSchool.Urn).WhatIsASimilarSchool;
+    var whatIsASimilarSchoolUrl = layout?.WhatIsASimilarSchoolUrl
+        ?? Routes.SecondarySchool(Model.CurrentSchool.Urn).WhatIsASimilarSchool;
 }
 
 <h2 class="govuk-heading-l">How these schools compare</h2>

@@ -1,7 +1,7 @@
 @using SAPSec.Web.Constants
 @model SAPSec.Web.Areas.Primary.ViewModels.Comparison.Ks2PerformanceMeasuresPageViewModel
 @{
-    Layout = "_Layout";
+    Layout = "~/Areas/Shared/Views/Comparison/_Layout.cshtml";
 }
 
 <h2 class="govuk-heading-l">KS2 performance measures</h2>
@@ -11,7 +11,7 @@
 </p>
 
 <form action="" method="get">
-    <partial name="_Ks2ProgressRWMInfo" />
+    <partial name="~/Areas/Primary/Views/Shared/_Ks2ProgressRWMInfo.cshtml" />
 
     <section class="app-measure-section" aria-labelledby="expected-rwm-heading">
         <h2 class="govuk-heading-m" id="expected-rwm-heading" data-testid="expected-rwm-heading">@Model.MeetingExpectedStandardRwm!.MeasureInfo.Name</h2>

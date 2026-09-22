@@ -18,9 +18,9 @@ namespace SAPSec.Web.Areas.Primary.Controllers;
 
 [Area("Primary")]
 [Route("school/primary/{urn}/view-similar-schools/{comparatorSchoolUrn}")]
-[Route("school/all-through/{urn}/view-similar-schools/primary/{comparatorSchoolUrn}")]
 [Authorize]
-[RequireSchoolPhase(ExpectedSchoolPhase.PrimaryComparisonParticipant, "urn", "comparatorSchoolUrn")]
+[RequireSchoolPhase(ExpectedSchoolPhase.Primary, "urn")]
+[RequireSchoolPhase(ExpectedSchoolPhase.PrimaryComparisonParticipant, "comparatorSchoolUrn")]
 public class ComparisonController(
     IUseCase<GetPrimaryComparisonSimilarityCharacteristicsRequest, GetPrimaryComparisonSimilarityCharacteristicsResponse> getSimilarityCharacteristicsUseCase,
     IUseCase<GetComparisonKs2PerformanceMeasuresRequest, GetComparisonKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
@@ -30,6 +30,10 @@ public class ComparisonController(
     IPrimaryCharacteristicsComparisonFormatter characteristicsComparisonFormatter)
     : Controller
 {
+    private const string SimilarityView = "~/Areas/Shared/Views/Comparison/Similarity.cshtml";
+    private const string AttendanceView = "~/Areas/Shared/Views/Comparison/Attendance.cshtml";
+    private const string SchoolDetailsView = "~/Areas/Shared/Views/Comparison/SchoolDetails.cshtml";
+
     [HttpGet]
     [Route("compare-similarity")]
     public async Task<IActionResult> Similarity(string urn, string comparatorSchoolUrn)
@@ -45,7 +49,7 @@ public class ComparisonController(
             CharacteristicsRows = characteristicsComparisonFormatter.BuildRows(response.SimilarityCharacteristics)
         };
 
-        return View(model);
+        return View(SimilarityView, model);
     }
 
     [HttpGet]
@@ -88,7 +92,7 @@ public class ComparisonController(
             Absence = MeasureViewModel.FromPrimaryComparisonMeasure(response.Absence, response.CurrentSchool, response.ComparatorSchool)
         };
 
-        return View(model);
+        return View(AttendanceView, model);
     }
 
     [HttpGet]
@@ -111,14 +115,13 @@ public class ComparisonController(
             ComparatorSchoolDetails = SchoolDetailsViewModel.FromSchoolDetails(response.ComparatorSchoolDetails)
         };
 
-        return View(model);
+        return View(SchoolDetailsView, model);
     }
 
     private void SetComparisonLayout(
         SAPSec.Core.Features.SchoolInfo.SchoolInfo currentSchool,
         SAPSec.Core.Features.SchoolInfo.SchoolInfo comparatorSchool) =>
-        ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.FromSchoolInfo(
+        ViewData[ViewDataKeys.ComparisonLayout] = ComparisonLayoutModel.Primary(
             currentSchool,
-            comparatorSchool,
-            Request.Path.StartsWithSegments("/school/all-through"));
+            comparatorSchool);
 }
