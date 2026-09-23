@@ -2540,6 +2540,207 @@
         ]
       }
     },
+    "ks2_regional_local_authority_and_pupil_characteristics_2019_to_2025_revised": {
+      "Columns": [
+        "absent_pupil_count",
+        "absent_pupil_percent",
+        "average_scaled_score",
+        "country_code",
+        "country_name",
+        "disadvantage_status",
+        "disapplied_pupil_count",
+        "disapplied_pupil_percent",
+        "education_investment_area_flag",
+        "eligible_pupil_count",
+        "engagement_model_or_below_pre_ks_std_pupil_count",
+        "engagement_model_or_below_pre_ks_std_pupil_percent",
+        "establishment_count",
+        "establishment_type_group",
+        "ethnicity_major",
+        "ethnicity_minor",
+        "expected_standard_pupil_count",
+        "expected_standard_pupil_percent",
+        "first_language",
+        "fsm_status",
+        "geographic_level",
+        "higher_standard_pupil_count",
+        "higher_standard_pupil_percent",
+        "la_name",
+        "new_la_code",
+        "not_meeting_pupil_count",
+        "not_meeting_pupil_percent",
+        "old_la_code",
+        "pre_ks_std_1_pupil_count",
+        "pre_ks_std_1_pupil_percent",
+        "pre_ks_std_2_pupil_count",
+        "pre_ks_std_2_pupil_percent",
+        "pre_ks_std_3_pupil_count",
+        "pre_ks_std_3_pupil_percent",
+        "pre_ks_std_4_pupil_count",
+        "pre_ks_std_4_pupil_percent",
+        "pre_ks_std_5_pupil_count",
+        "pre_ks_std_5_pupil_percent",
+        "pre_ks_std_6_pupil_count",
+        "pre_ks_std_6_pupil_percent",
+        "priority_area_flag",
+        "progress_measure_eligible_pupil_count",
+        "progress_measure_lower_conf_interval",
+        "progress_measure_score",
+        "progress_measure_total_score",
+        "progress_measure_upper_conf_interval",
+        "region_code",
+        "region_name",
+        "scaled_scores_eligible_pupil_count",
+        "scaled_scores_total",
+        "sen_provision",
+        "sex",
+        "subject",
+        "time_identifier",
+        "time_period",
+        "unable_to_access_arrived_pupil_count",
+        "unable_to_access_arrived_pupil_percent",
+        "version",
+        "working_below_pupil_count",
+        "working_below_pupil_percent",
+        "working_towards_pupil_count",
+        "working_towards_pupil_percent"
+      ],
+      "Values": {
+        "disadvantage_status": [
+          "Disadvantaged",
+          "Not known to be disadvantaged",
+          "Total"
+        ],
+        "ethnicity_minor": [
+          "African",
+          "All Asian / Asian British",
+          "All Black / African / Caribbean / Black British",
+          "All Mixed / Multiple ethnic groups",
+          "All White",
+          "Any other Asian background",
+          "Any other Black / African / Caribbean background",
+          "Any other Mixed / Multiple ethnic background",
+          "Any other White background",
+          "Any other ethnic group",
+          "Bangladeshi",
+          "Caribbean",
+          "Chinese",
+          "English / Welsh / Scottish / Northern Irish / British",
+          "Gypsy",
+          "Indian",
+          "Irish",
+          "Irish Traveller",
+          "Pakistani",
+          "Total",
+          "Unknown",
+          "White and Asian",
+          "White and Black African",
+          "White and Black Caribbean"
+        ],
+        "first_language": [
+          "First language unknown",
+          "Known or believed to be English",
+          "Known or believed to be other than English",
+          "Total"
+        ],
+        "fsm_status": [
+          "FSM eligible",
+          "Not known to be FSM eligible",
+          "Total"
+        ],
+        "geographic_level": [
+          "Local authority",
+          "National",
+          "Regional"
+        ],
+        "sen_provision": [
+          "All SEN provision",
+          "Education, health and care plan",
+          "No SEN provision",
+          "SEN support / SEN without an EHC plan",
+          "Total",
+          "Unknown SEN provision"
+        ],
+        "sex": [
+          "Boys",
+          "Girls",
+          "Other",
+          "Total"
+        ],
+        "subject": [
+          "Grammar, punctuation and spelling",
+          "Maths",
+          "Reading",
+          "Reading, writing and maths",
+          "Science",
+          "Writing"
+        ],
+        "time_period": [
+          "201819",
+          "202122",
+          "202223",
+          "202324",
+          "202425"
+        ]
+      }
+    },
+    "ks2_school_attainment_data": {
+      "Columns": [
+        "absent_or_disapplied_percent",
+        "absent_or_not_able_to_access_percent",
+        "average_scaled_score",
+        "breakdown",
+        "breakdown_topic",
+        "country_code",
+        "country_name",
+        "expected_standard_pupil_percent",
+        "geographic_level",
+        "higher_standard_pupil_percent",
+        "progress_measure_description",
+        "progress_measure_lower_conf_interval",
+        "progress_measure_score",
+        "progress_measure_unadjusted",
+        "progress_measure_upper_conf_interval",
+        "school_laestab",
+        "school_name",
+        "school_urn",
+        "subject",
+        "time_identifier",
+        "time_period",
+        "version",
+        "working_towards_expected_standard_pupil_percent"
+      ],
+      "Values": {
+        "breakdown": [
+          "3 year average",
+          "Boys",
+          "Difference in RWM for disadvantaged pupils",
+          "Disadvantaged",
+          "Girls",
+          "High attainment at key stage 2",
+          "Known or believed to be other than English",
+          "Low attainment at key stage 2",
+          "Mid attainment at key stage 2",
+          "Non mobile",
+          "Not known to be disadvantaged",
+          "Progress coverage",
+          "Total"
+        ],
+        "subject": [
+          "Grammar, punctuation and spelling",
+          "Maths",
+          "Reading",
+          "Reading, writing and maths",
+          "Science",
+          "Writing"
+        ],
+        "time_period": [
+          "202223",
+          "202324",
+          "202425"
+        ]
+      }
+    },
     "oa_percent_3term_sch_202223_ccss": {
       "Columns": [
         "all_oa_percent",
