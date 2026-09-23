@@ -61,7 +61,7 @@ public static class SimilarSchoolsViewModelHelpers
                 foreach (var option in single.Options.Where(o => o.Selected))
                 {
                     var queryString = BuildQueryStringWithout(currentFilters, sortBy, [(filter.Key, option.Key)]);
-                    tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, baseUrl + queryString));
+                    tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, AppendQueryString(baseUrl, queryString)));
                 }
             }
 
@@ -70,7 +70,7 @@ public static class SimilarSchoolsViewModelHelpers
                 foreach (var option in multi.Options.Where(o => o.Selected))
                 {
                     var queryString = BuildQueryStringWithout(currentFilters, sortBy, [(filter.Key, option.Key)]);
-                    tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, baseUrl + queryString));
+                    tags.Add(new SimilarSchoolsSelectedFilterTagViewModel(option.Name, AppendQueryString(baseUrl, queryString)));
                 }
             }
 
@@ -90,7 +90,7 @@ public static class SimilarSchoolsViewModelHelpers
                     (true, false) => $"up to {range.To.Value}%",
                     _ => ""
                 };
-                tags.Add(new SimilarSchoolsSelectedFilterTagViewModel($"{range.Name} {rangeText}".Trim(), baseUrl + queryString));
+                tags.Add(new SimilarSchoolsSelectedFilterTagViewModel($"{range.Name} {rangeText}".Trim(), AppendQueryString(baseUrl, queryString)));
             }
         }
 
@@ -124,5 +124,17 @@ public static class SimilarSchoolsViewModelHelpers
         }
 
         return parts.Count > 0 ? "?" + string.Join("&", parts) : string.Empty;
+    }
+
+    private static string AppendQueryString(string baseUrl, string queryString)
+    {
+        if (string.IsNullOrWhiteSpace(queryString))
+        {
+            return baseUrl;
+        }
+
+        return baseUrl.Contains('?')
+            ? baseUrl + "&" + queryString.TrimStart('?')
+            : baseUrl + queryString;
     }
 }

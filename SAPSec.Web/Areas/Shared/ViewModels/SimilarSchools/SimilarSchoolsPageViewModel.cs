@@ -68,7 +68,8 @@ public class SimilarSchoolsPageViewModel
             }
         }
 
-        return "?" + string.Join("&", queryParts);
+        var separator = ViewSimilarSchoolsUrl.Contains('?') ? "&" : "?";
+        return separator + string.Join("&", queryParts);
     }
 
     public List<int> GetPaginationItems()
@@ -193,5 +194,8 @@ public class SimilarSchoolsPageViewModel
     private static bool IsPageControlQueryParameter(string key) =>
         key.Equals("sortBy", StringComparison.InvariantCultureIgnoreCase)
         || key.Equals("page", StringComparison.InvariantCultureIgnoreCase)
-        || key.Equals(FocusTargetQueryParameter, StringComparison.InvariantCultureIgnoreCase);
+        || key.Equals(FocusTargetQueryParameter, StringComparison.InvariantCultureIgnoreCase)
+        || key.Equals("phase", StringComparison.InvariantCultureIgnoreCase)
+        || key.Equals("primaryQuery", StringComparison.InvariantCultureIgnoreCase)
+        || key.Equals("secondaryQuery", StringComparison.InvariantCultureIgnoreCase);
 }

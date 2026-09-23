@@ -6,13 +6,14 @@
 @{
     Layout = "_Layout";
     ViewData[ViewDataKeys.Title] = "View similar schools";
-    if (Model.PrimarySimilarSchools is not null)
+    var selectedSimilarSchools = Model.SelectedSimilarSchools;
+    if (selectedSimilarSchools is not null)
     {
-        ViewData[ViewDataKeys.PageTitle] = $"{Model.PrimarySimilarSchools.TotalResults} similar schools - {ViewData[ViewDataKeys.Title]}";
+        ViewData[ViewDataKeys.PageTitle] = $"{selectedSimilarSchools.TotalResults} similar schools - {ViewData[ViewDataKeys.Title]}";
     }
 }
 
-@if (Model.PrimarySimilarSchools?.ValidationErrors.Any() == true)
+@if (selectedSimilarSchools?.ValidationErrors.Any() == true)
 {
     <div class="govuk-error-summary" data-module="govuk-error-summary">
         <div role="alert">
@@ -21,7 +22,7 @@
             </h2>
             <div class="govuk-error-summary__body">
                 <ul class="govuk-list govuk-error-summary__list">
-                @foreach (var error in Model.PrimarySimilarSchools.ValidationErrors)
+                @foreach (var error in selectedSimilarSchools.ValidationErrors)
                 {
                     <li>
                         @{
@@ -38,7 +39,7 @@
     </div>
 }
 
-@if (Model.PrimarySimilarSchools is not null)
+@if (selectedSimilarSchools is not null)
 {
     <link rel="stylesheet" href="~/css/leaflet.css"/>
     <link rel="stylesheet" href="~/css/MarkerCluster.css"/>
@@ -83,9 +84,9 @@
     </nav>
 </div>
 
-@if (Model.IsPrimarySelected && Model.PrimarySimilarSchools is not null)
+@if (selectedSimilarSchools is not null)
 {
-    <partial name="~/Areas/Shared/Views/SimilarSchools/_SimilarSchoolsContent.cshtml" model="Model.PrimarySimilarSchools" />
+    <partial name="~/Areas/Shared/Views/SimilarSchools/_SimilarSchoolsContent.cshtml" model="selectedSimilarSchools" />
 }
 else if (Model.ShouldShowPrimaryEmptyState)
 {
@@ -93,15 +94,15 @@ else if (Model.ShouldShowPrimaryEmptyState)
         Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.
     </p>
 }
-else if (!Model.IsPrimarySelected)
+else if (Model.ShouldShowSecondaryEmptyState)
 {
-    <p class="govuk-body" data-testid="secondary-similar-schools-placeholder">
-        Secondary similar schools are not shown in this view yet.
+    <p class="govuk-body" data-testid="secondary-similar-schools-empty-state">
+        Similar schools are not shown for this phase because the required data is not yet available. You can still view similar schools for the other phase.
     </p>
 }
 
 @section Scripts {
-    @if (Model.PrimarySimilarSchools is not null)
+    @if (selectedSimilarSchools is not null)
     {
         <script src="~/js/similar-schools-filter.js"></script>
         <script src="~/js/school-search-toggle.js"></script>

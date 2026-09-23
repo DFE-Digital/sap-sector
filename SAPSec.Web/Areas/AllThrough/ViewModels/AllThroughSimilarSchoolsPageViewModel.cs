@@ -10,6 +10,7 @@ public record AllThroughSimilarSchoolsPageViewModel(
     string PrimaryTabUrl,
     string SecondaryTabUrl,
     SimilarSchoolsPageViewModel? PrimarySimilarSchools,
+    SimilarSchoolsPageViewModel? SecondarySimilarSchools,
     bool HasPrimarySimilarSchools,
     bool HasSecondarySimilarSchools)
 {
@@ -18,6 +19,8 @@ public record AllThroughSimilarSchoolsPageViewModel(
     public string WhatIsASimilarSchoolUrl => Routes.AllThroughSchool(School.Urn).WhatIsASimilarSchool;
 
     public bool ShouldShowPrimaryEmptyState => IsPrimarySelected && !HasPrimarySimilarSchools && HasSecondarySimilarSchools;
+    public bool ShouldShowSecondaryEmptyState => !IsPrimarySelected && !HasSecondarySimilarSchools && HasPrimarySimilarSchools;
+    public SimilarSchoolsPageViewModel? SelectedSimilarSchools => IsPrimarySelected ? PrimarySimilarSchools : SecondarySimilarSchools;
 
     public static AllThroughSimilarSchoolsPageViewModel FromSchoolInfo(
         Core.Features.SchoolInfo.SchoolInfo school,
@@ -25,6 +28,7 @@ public record AllThroughSimilarSchoolsPageViewModel(
         string primaryTabUrl,
         string secondaryTabUrl,
         SimilarSchoolsPageViewModel? primarySimilarSchools,
+        SimilarSchoolsPageViewModel? secondarySimilarSchools,
         bool hasPrimarySimilarSchools,
         bool hasSecondarySimilarSchools)
     {
@@ -38,6 +42,7 @@ public record AllThroughSimilarSchoolsPageViewModel(
             primaryTabUrl,
             secondaryTabUrl,
             primarySimilarSchools,
+            secondarySimilarSchools,
             hasPrimarySimilarSchools,
             hasSecondarySimilarSchools);
     }

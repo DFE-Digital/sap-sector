@@ -32,6 +32,7 @@ public class SchoolController(
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
         IUseCase<FindPrimarySimilarSchoolsRequest, FindPrimarySimilarSchoolsResponse> findPrimarySimilarSchoolsUseCase,
+        IUseCase<FindSecondarySimilarSchoolsRequest, FindSecondarySimilarSchoolsResponse> findSecondarySimilarSchoolsUseCase,
         ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
         ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
         IFeatureFlagService featureFlagService)
@@ -124,7 +125,8 @@ public class SchoolController(
         [FromQuery] string? phase = null,
         [FromQuery] string? sortBy = null,
         [FromQuery] string? page = null,
-        [FromQuery] string? primaryQuery = null)
+        [FromQuery] string? primaryQuery = null,
+        [FromQuery] string? secondaryQuery = null)
     {
         var schoolResponse = await getSchoolInfoUseCase.Execute(new(urn));
         await PopulateViewData(schoolResponse.School);
@@ -135,6 +137,7 @@ public class SchoolController(
             : "primary";
 
         SimilarSchoolsPageViewModel? primarySimilarSchools = null;
+        SimilarSchoolsPageViewModel? secondarySimilarSchools = null;
         if (selectedPhase == "primary" && similarSchoolPhases.HasPrimary)
         {
             var filterBy = SimilarSchoolsPageViewModel.BuildCoreFilters(Request.Query);
@@ -157,13 +160,36 @@ public class SchoolController(
                 Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
                 comparatorUrn => Routes.AllThroughSchool(urn).PrimaryComparison(comparatorUrn).Similarity);
         }
+        else if (selectedPhase == "secondary" && similarSchoolPhases.HasSecondary)
+        {
+            var filterBy = SimilarSchoolsPageViewModel.BuildCoreFilters(Request.Query);
+            var response = await findSecondarySimilarSchoolsUseCase.Execute(new(
+                urn,
+                filterBy,
+                sortBy,
+                page));
+
+            secondarySimilarSchools = SimilarSchoolsPageViewModel.Build(
+                "secondary",
+                Request.Query,
+                response.CurrentSchool,
+                response.SortOptions,
+                response.FilterOptions,
+                response.ResultsPage,
+                response.AllResults,
+                response.ValidationErrors,
+                $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary",
+                Routes.AllThroughSchool(urn).WhatIsASimilarSchool,
+                comparatorUrn => Routes.AllThroughSchool(urn).SecondaryComparison(comparatorUrn).Similarity);
+        }
 
         return View(AllThroughSimilarSchoolsPageViewModel.FromSchoolInfo(
             schoolResponse.School,
             selectedPhase,
-            BuildPrimaryTabUrl(urn, primaryQuery),
-            BuildSecondaryTabUrl(urn, selectedPhase),
+            BuildPrimaryTabUrl(urn, selectedPhase, primaryQuery, secondaryQuery),
+            BuildSecondaryTabUrl(urn, selectedPhase, secondaryQuery),
             primarySimilarSchools,
+            secondarySimilarSchools,
             similarSchoolPhases.HasPrimary,
             similarSchoolPhases.HasSecondary));
     }
@@ -230,41 +256,57 @@ public class SchoolController(
         featureFlagService is not null
         && await featureFlagService.IsEnabledAsync(FeatureFlags.EnableRiseResources);
 
-    private string BuildPrimaryTabUrl(string urn, string? primaryQuery)
+    private string BuildPrimaryTabUrl(string urn, string selectedPhase, string? primaryQuery, string? secondaryQuery)
     {
+        var url = Routes.AllThroughSchool(urn).ViewSimilarSchools;
         if (!string.IsNullOrWhiteSpace(primaryQuery) && primaryQuery.StartsWith('?'))
         {
-            return Routes.AllThroughSchool(urn).ViewSimilarSchools + primaryQuery;
+            url += primaryQuery;
+        }
+        else if (selectedPhase == "primary")
+        {
+            url += BuildPhaseQueryString();
         }
 
-        return Routes.AllThroughSchool(urn).ViewSimilarSchools + BuildPrimaryQueryString();
+        var secondaryQueryString = selectedPhase == "secondary"
+            ? BuildPhaseQueryString()
+            : secondaryQuery;
+
+        return AppendStoredQuery(url, "secondaryQuery", secondaryQueryString);
     }
 
-    private string BuildSecondaryTabUrl(string urn, string selectedPhase)
+    private string BuildSecondaryTabUrl(string urn, string selectedPhase, string? secondaryQuery)
     {
         var url = $"{Routes.AllThroughSchool(urn).ViewSimilarSchools}?phase=secondary";
+        var secondaryQueryString = selectedPhase == "secondary"
+            ? BuildPhaseQueryString()
+            : secondaryQuery;
+
+        if (!string.IsNullOrWhiteSpace(secondaryQueryString) && secondaryQueryString.StartsWith('?'))
+        {
+            url += "&" + secondaryQueryString.TrimStart('?');
+        }
+
         var primaryQueryString = selectedPhase == "primary"
-            ? BuildPrimaryQueryString()
-            : Request.Query.TryGetValue("primaryQuery", out var value)
-                ? value.FirstOrDefault()
+            ? BuildPhaseQueryString()
+            : Request.Query.TryGetValue("primaryQuery", out var primaryValue)
+                ? primaryValue.FirstOrDefault()
                 : null;
 
-        if (!string.IsNullOrWhiteSpace(primaryQueryString))
-        {
-            url += $"&primaryQuery={Uri.EscapeDataString(primaryQueryString)}";
-        }
+        url = AppendStoredQuery(url, "primaryQuery", primaryQueryString);
 
         return url;
     }
 
-    private string BuildPrimaryQueryString()
+    private string BuildPhaseQueryString()
     {
         var queryParts = new List<string>();
 
         foreach (var (key, values) in Request.Query)
         {
             if (key.Equals("phase", StringComparison.InvariantCultureIgnoreCase)
-                || key.Equals("primaryQuery", StringComparison.InvariantCultureIgnoreCase))
+                || key.Equals("primaryQuery", StringComparison.InvariantCultureIgnoreCase)
+                || key.Equals("secondaryQuery", StringComparison.InvariantCultureIgnoreCase))
             {
                 continue;
             }
@@ -279,5 +321,16 @@ public class SchoolController(
         }
 
         return queryParts.Count > 0 ? "?" + string.Join("&", queryParts) : string.Empty;
+    }
+
+    private static string AppendStoredQuery(string url, string key, string? queryString)
+    {
+        if (string.IsNullOrWhiteSpace(queryString))
+        {
+            return url;
+        }
+
+        var separator = url.Contains('?') ? "&" : "?";
+        return $"{url}{separator}{key}={Uri.EscapeDataString(queryString)}";
     }
 }
