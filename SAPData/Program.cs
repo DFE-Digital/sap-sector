@@ -6,10 +6,11 @@ using SAPSec.Data.Common.Catalogue;
 using SAPSec.Data.Common.Catalogue.Definitions;
 using SAPSec.Data.Common.Catalogue.Validation;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace SAPData;
 
-internal class Program
+internal partial class Program
 {
     static void Main(string[] args)
     {
@@ -74,13 +75,20 @@ internal class Program
             Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
 
             var rebuildAllRawTables = ShouldRebuildAllRawTables(configuration);
+            var incremental = IsIncremental(configuration);
             var logicalKeysToRebuild = rebuildAllRawTables
                 ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
                 : LoadLogicalKeysToRebuild(rawTablesToRebuildPath);
+
+            // Incremental: the database reloads and rebuilds only what changed, so the SQL covers everything.
+            // Listed raw tables are still forced to reload.
+            var generateAllSql = rebuildAllRawTables || incremental;
+
             WriteCleanupSql(
                 Path.Combine(sqlDir, "00_cleanup.sql"),
-                logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
-                rebuildAllRawTables);
+                incremental ? [] : logicalKeysToRebuild.Select(GenerateRawTables.GenerateShortTableName),
+                rebuildAllRawTables,
+                incremental);
 
             // -------------------------------------------------
             // 2. Generate raw tables + cleaned files + mapping
@@ -92,7 +100,8 @@ internal class Program
                 tableMappingPath,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
+                rebuildAllRawTables,
+                incremental
             ).Run();
 
             // -------------------------------------------------
@@ -106,7 +115,7 @@ internal class Program
                 generatedJsonDir,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
+                generateAllSql
             ).Run();
 
             // -------------------------------------------------
@@ -127,7 +136,7 @@ internal class Program
                 generatedJsonDir,
                 sqlFiles,
                 logicalKeysToRebuild,
-                rebuildAllRawTables
+                generateAllSql
             ).Run();
 
             // -------------------------------------------------
@@ -149,7 +158,17 @@ internal class Program
 
             foreach (var line in sqlFiles.Order())
             {
-                runAllSql.AppendLine(@$"\ir {line}");
+                var view = ViewFile().Match(line);
+                if (incremental && view.Success)
+                {
+                    // A view is rebuilt when it's missing (reloading a raw table drops its views) or its SQL changed.
+                    var fingerprint = IncrementalLoad.Fingerprint(File.ReadAllText(Path.Combine(sqlDir, line)) + HelperFunctionsSql());
+                    runAllSql.Append(IncrementalLoad.View(view.Groups["view"].Value, line, fingerprint));
+                }
+                else
+                {
+                    runAllSql.AppendLine(@$"\ir {line}");
+                }
             }
 
             File.WriteAllText(runAllSqlFile, runAllSql.ToString());
@@ -171,6 +190,91 @@ internal class Program
             }
             throw;
         }
+    }
+
+    // Helper functions the generated views call. Part of each view's fingerprint, so changing one rebuilds the views.
+    private static string HelperFunctionsSql()
+    {
+        var helpers = new StringBuilder();
+        helpers.AppendLine("-- =========================");
+        helpers.AppendLine("-- Cleaning helpers");
+        helpers.AppendLine("-- =========================");
+        helpers.AppendLine();
+        helpers.AppendLine("CREATE OR REPLACE FUNCTION clean_int(value TEXT)");
+        helpers.AppendLine("RETURNS INT");
+        helpers.AppendLine("LANGUAGE plpgsql");
+        helpers.AppendLine("IMMUTABLE");
+        helpers.AppendLine("AS $$");
+        helpers.AppendLine("BEGIN");
+        helpers.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    RETURN value::INT;");
+        helpers.AppendLine();
+        helpers.AppendLine("EXCEPTION WHEN others THEN");
+        helpers.AppendLine("    RETURN NULL;");
+        helpers.AppendLine("END;");
+        helpers.AppendLine("$$;");
+        helpers.AppendLine();
+        helpers.AppendLine("CREATE OR REPLACE FUNCTION clean_numeric(value TEXT)");
+        helpers.AppendLine("RETURNS NUMERIC");
+        helpers.AppendLine("LANGUAGE plpgsql");
+        helpers.AppendLine("IMMUTABLE");
+        helpers.AppendLine("AS $$");
+        helpers.AppendLine("DECLARE");
+        helpers.AppendLine("    result NUMERIC;");
+        helpers.AppendLine("BEGIN");
+        helpers.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    -- Same rules as the website's parser (SAPSec.Core MeasureHelper.ParseNullableDecimal):");
+        helpers.AppendLine("    -- a trailing '%' is ignored, and anything that isn't a finite number is NULL.");
+        helpers.AppendLine("    result := regexp_replace(trim(value), '%$', '')::NUMERIC;");
+        helpers.AppendLine();
+        helpers.AppendLine("    IF result IN ('NaN'::NUMERIC, 'Infinity'::NUMERIC, '-Infinity'::NUMERIC) THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    RETURN result;");
+        helpers.AppendLine();
+        helpers.AppendLine("EXCEPTION WHEN others THEN");
+        helpers.AppendLine("    RETURN NULL;");
+        helpers.AppendLine("END;");
+        helpers.AppendLine("$$;");
+        helpers.AppendLine();
+        helpers.AppendLine("CREATE OR REPLACE FUNCTION clean_date(value TEXT)");
+        helpers.AppendLine("RETURNS DATE");
+        helpers.AppendLine("LANGUAGE plpgsql");
+        helpers.AppendLine("IMMUTABLE");
+        helpers.AppendLine("AS $$");
+        helpers.AppendLine("BEGIN");
+        helpers.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'na', 'n/a', 'N/A', '.', '-', '--') THEN");
+        helpers.AppendLine("        RETURN NULL;");
+        helpers.AppendLine("    END IF;");
+        helpers.AppendLine();
+        helpers.AppendLine("    RETURN value::DATE;");
+        helpers.AppendLine();
+        helpers.AppendLine("EXCEPTION WHEN others THEN");
+        helpers.AppendLine("    RETURN NULL;");
+        helpers.AppendLine("END;");
+        helpers.AppendLine("$$;");
+        helpers.AppendLine();
+        return helpers.ToString();
+    }
+
+    [GeneratedRegex(@"^(03|04|50)_(?<view>v_\w+)\.sql$")]
+    private static partial Regex ViewFile();
+
+    private static bool IsIncremental(IConfiguration configuration)
+    {
+        var mode = configuration["RawTableRebuildMode"] ?? Environment.GetEnvironmentVariable("RAW_TABLE_REBUILD_MODE");
+        var incremental = !string.Equals(mode?.Trim(), "list", StringComparison.OrdinalIgnoreCase);
+        Console.WriteLine(incremental
+            ? "Raw table rebuild mode: incremental (reload what changed)."
+            : "Raw table rebuild mode: list (reload only the listed tables).");
+        return incremental;
     }
 
     // Fails before any SQL is generated, so a data map mistake never reaches the ETL step.
@@ -309,7 +413,7 @@ internal class Program
         return keys;
     }
 
-    private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables)
+    private static void WriteCleanupSql(string path, IEnumerable<string> tableNamesToRebuild, bool rebuildAllRawTables, bool incremental)
     {
         var tablesToRebuild = tableNamesToRebuild
             .Distinct(StringComparer.OrdinalIgnoreCase)
@@ -359,71 +463,14 @@ internal class Program
         sql.AppendLine("  END LOOP;");
         sql.AppendLine("END $$;");
         sql.AppendLine();
-        sql.AppendLine("-- =========================");
-        sql.AppendLine("-- Cleaning helpers");
-        sql.AppendLine("-- =========================");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_int(value TEXT)");
-        sql.AppendLine("RETURNS INT");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::INT;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_numeric(value TEXT)");
-        sql.AppendLine("RETURNS NUMERIC");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("DECLARE");
-        sql.AppendLine("    result NUMERIC;");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'NE', 'N', 'na', 'n/a', 'N/A', 'SUPP', '.', '-', '--', 'z') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    -- Same rules as the website's parser (SAPSec.Core MeasureHelper.ParseNullableDecimal):");
-        sql.AppendLine("    -- a trailing '%' is ignored, and anything that isn't a finite number is NULL.");
-        sql.AppendLine("    result := regexp_replace(trim(value), '%$', '')::NUMERIC;");
-        sql.AppendLine();
-        sql.AppendLine("    IF result IN ('NaN'::NUMERIC, 'Infinity'::NUMERIC, '-Infinity'::NUMERIC) THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN result;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
-        sql.AppendLine("CREATE OR REPLACE FUNCTION clean_date(value TEXT)");
-        sql.AppendLine("RETURNS DATE");
-        sql.AppendLine("LANGUAGE plpgsql");
-        sql.AppendLine("IMMUTABLE");
-        sql.AppendLine("AS $$");
-        sql.AppendLine("BEGIN");
-        sql.AppendLine("    IF value IS NULL OR trim(value) IN ('', 'na', 'n/a', 'N/A', '.', '-', '--') THEN");
-        sql.AppendLine("        RETURN NULL;");
-        sql.AppendLine("    END IF;");
-        sql.AppendLine();
-        sql.AppendLine("    RETURN value::DATE;");
-        sql.AppendLine();
-        sql.AppendLine("EXCEPTION WHEN others THEN");
-        sql.AppendLine("    RETURN NULL;");
-        sql.AppendLine("END;");
-        sql.AppendLine("$$;");
-        sql.AppendLine();
+        if (incremental)
+        {
+            sql.AppendLine("-- Fingerprints of what each raw table and view was last built from (incremental loads).");
+            sql.Append(IncrementalLoad.LogTablesSql(rebuildAllRawTables));
+            sql.AppendLine();
+        }
+
+        sql.Append(HelperFunctionsSql());
         sql.AppendLine(@"\echo 'Cleanup complete.'");
 
         File.WriteAllText(path, sql.ToString(), new UTF8Encoding(false));

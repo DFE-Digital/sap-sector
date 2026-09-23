@@ -13,8 +13,10 @@ public class GenerateRawTables
     private readonly List<string> _sqlFiles;
     private readonly HashSet<string> _logicalKeysToRebuild;
     private readonly bool _rebuildAllRawTables;
+    private readonly bool _incremental;
 
     private readonly Dictionary<string, string> _tableMappings = new(StringComparer.OrdinalIgnoreCase);
+    private readonly List<string> _loadedTables = [];
 
     public GenerateRawTables(
         string inputDir,
@@ -23,7 +25,8 @@ public class GenerateRawTables
         string tableMappingPath,
         List<string> sqlFiles,
         IEnumerable<string>? logicalKeysToRebuild = null,
-        bool rebuildAllRawTables = false)
+        bool rebuildAllRawTables = false,
+        bool incremental = false)
     {
         _inputDir = inputDir;
         _cleanDir = cleanDir;
@@ -34,6 +37,7 @@ public class GenerateRawTables
             logicalKeysToRebuild ?? Array.Empty<string>(),
             StringComparer.OrdinalIgnoreCase);
         _rebuildAllRawTables = rebuildAllRawTables;
+        _incremental = incremental;
     }
 
     public void Run()
@@ -46,9 +50,15 @@ public class GenerateRawTables
         copySql.AppendLine("-- AUTO-GENERATED COPY INTO RAW (PIPELINE)");
         copyLocalSql.AppendLine("-- AUTO-GENERATED LOCAL COPY INTO RAW");
 
-        foreach (var csvPath in Directory.GetFiles(_inputDir, "*.csv"))
+        foreach (var csvPath in SourceFiles())
         {
             ProcessCsv(csvPath, createSql, copySql, copyLocalSql);
+        }
+
+        if (_incremental)
+        {
+            copySql.Append(IncrementalLoad.DropSupersededTablesSql(_loadedTables));
+            copyLocalSql.Append(IncrementalLoad.DropSupersededTablesSql(_loadedTables));
         }
 
         var utf8NoBom = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
@@ -65,6 +75,33 @@ public class GenerateRawTables
         Console.WriteLine("RAW table creation scripts generated.");
     }
 
+    // Incremental loads read one file per dataset (the manual_ copy if there is one, as its table mapping does);
+    // loading both into one table would duplicate rows and reload it on every run.
+    private IEnumerable<string> SourceFiles()
+    {
+        var files = Directory.GetFiles(_inputDir, "*.csv");
+        if (!_incremental)
+            return files;
+
+        return files
+            .GroupBy(f => LogicalKey(Path.GetFileNameWithoutExtension(f)), StringComparer.OrdinalIgnoreCase)
+            .Select(g =>
+            {
+                var chosen = g.OrderBy(f => IsManual(Path.GetFileNameWithoutExtension(f))).Last();
+                foreach (var other in g.Where(f => f != chosen))
+                {
+                    Console.WriteLine($"Using {Path.GetFileName(chosen)} for '{g.Key}'; ignoring {Path.GetFileName(other)}.");
+                    _tableMappings[Path.GetFileNameWithoutExtension(other)] = GenerateShortTableName(g.Key);
+                }
+                return chosen;
+            })
+            .OrderBy(f => f, StringComparer.OrdinalIgnoreCase);
+    }
+
+    private static bool IsManual(string fileKey) => fileKey.StartsWith("manual_", StringComparison.OrdinalIgnoreCase);
+
+    private static string LogicalKey(string fileKey) => IsManual(fileKey) ? fileKey["manual_".Length..] : fileKey;
+
     private void ProcessCsv(
         string csvPath,
         StringBuilder createSql,
@@ -76,8 +113,7 @@ public class GenerateRawTables
         string fileKey = Path.GetFileNameWithoutExtension(csvPath);
 
         // logicalKey is the dataset identity used by DataMap / GenerateViews (no manual_ prefix)
-        bool isManual = fileKey.StartsWith("manual_", StringComparison.OrdinalIgnoreCase);
-        string logicalKey = isManual ? fileKey["manual_".Length..] : fileKey;
+        string logicalKey = LogicalKey(fileKey);
 
         // Physical table name: prefix-free, based on logical identity (stable)
         string tableName = GenerateShortTableName(logicalKey);
@@ -136,8 +172,33 @@ public class GenerateRawTables
         }
 
         // -----------------------------
-        // CREATE TABLE
+        // CREATE TABLE + COPY
         // -----------------------------
+        var createTable = new StringBuilder();
+        createTable.AppendLine($"CREATE TABLE {tableName} (");
+        for (int i = 0; i < headers.Count; i++)
+        {
+            string col = Sanitise(headers[i]);
+            string comma = i == headers.Count - 1 ? "" : ",";
+            createTable.AppendLine($"    \"{col}\" TEXT{comma}");
+        }
+        createTable.Append(");");
+
+        string copy = $"COPY {tableName} FROM '{cleanCsvPath.Replace("\\", "/")}' " +
+            "WITH (FORMAT csv, HEADER true, NULL '', DELIMITER ',');";
+        string copyLocal = $"\\copy {tableName} FROM '{cleanCsvPath.Replace("\\", "/")}' CSV HEADER;";
+
+        if (_incremental)
+        {
+            var fingerprint = IncrementalLoad.Fingerprint(csvPath, createTable.ToString());
+            var forced = _logicalKeysToRebuild.Contains(logicalKey);
+            _loadedTables.Add(tableName);
+            createSql.Append(IncrementalLoad.RawTableCreate(tableName, fileKey, fingerprint, createTable.ToString(), forced));
+            copySql.Append(IncrementalLoad.RawTableCopy(tableName, fileKey, fingerprint, copy));
+            copyLocalSql.Append(IncrementalLoad.RawTableCopy(tableName, fileKey, fingerprint, copyLocal));
+            return;
+        }
+
         if (!rebuildTable)
         {
             Console.WriteLine($"Leaving table for logical key '{logicalKey}' ({tableName}) unchanged. Skipping DROP/CREATE/COPY.");
@@ -145,31 +206,19 @@ public class GenerateRawTables
         }
 
         createSql.AppendLine($"DROP TABLE IF EXISTS {tableName};");
-        createSql.AppendLine($"CREATE TABLE {tableName} (");
-
-        for (int i = 0; i < headers.Count; i++)
-        {
-            string col = Sanitise(headers[i]);
-            string comma = i == headers.Count - 1 ? "" : ",";
-            createSql.AppendLine($"    \"{col}\" TEXT{comma}");
-        }
-
-        createSql.AppendLine(");");
+        createSql.AppendLine(createTable.ToString());
         createSql.AppendLine();
 
         // -----------------------------
         // COPY (pipeline)
         // -----------------------------
-        copySql.AppendLine(
-            $"COPY {tableName} FROM '{cleanCsvPath.Replace("\\", "/")}' " +
-            "WITH (FORMAT csv, HEADER true, NULL '', DELIMITER ',');");
+        copySql.AppendLine(copy);
         copySql.AppendLine();
 
         // -----------------------------
         // COPY (local)
         // -----------------------------
-        copyLocalSql.AppendLine(
-            $"\\copy {tableName} FROM '{cleanCsvPath.Replace("\\", "/")}' CSV HEADER;");
+        copyLocalSql.AppendLine(copyLocal);
         copyLocalSql.AppendLine();
     }
 

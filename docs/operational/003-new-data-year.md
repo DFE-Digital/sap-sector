@@ -74,9 +74,9 @@ Fix the definition, not the test.
 
 Run the generator and load the views as described in `SAPData/README.md`, then spot-check a few schools on the website against the published figures.
 
-### 7. Make sure the pipeline loads the new files
+### 7. Pipeline loading
 
-Until tables are rebuilt automatically, add the new files' dataset keys to `SAPData/raw_tables_to_rebuild.<environment>.txt` (without the `manual_` prefix or `.csv`).
+Nothing to do: the pipeline loads any source file it hasn't loaded before (or that has changed), and rebuilds the views whose SQL changed. See "Incremental loads" in `SAPData/README.md`.
 
 ### 8. Raise the pull request
 
@@ -85,7 +85,6 @@ Include:
 - `DataYears.cs`
 - the catalogue definition
 - `source-profiles.json`
-- any rebuild list changes
 
 ---
 

@@ -145,6 +145,26 @@ Commit the updated `source-profiles.json` with the catalogue change.
 
 ---
 
+## Incremental loads
+
+By default the pipeline reloads only what changed, decided by the database when `run_all.sql` runs:
+
+- a **raw table** is dropped and reloaded when its source file (or column list) differs from the one it was last
+  loaded from, or it doesn't exist. Dropping uses `CASCADE`, so the views built on it are dropped too
+- a **view** is rebuilt when it doesn't exist, or its SQL (including the helper functions it uses) has changed, for
+  example after a data map change
+
+Fingerprints are recorded in the `raw_table_loads` and `view_builds` tables. The first run in an environment
+without them reloads everything once.
+
+Overrides:
+- `REBUILD_ALL_RAW_TABLES=true` (workflow input `rebuild-all-raw-tables`) drops and reloads everything
+- datasets listed in `raw_tables_to_rebuild.<environment>.txt` are always reloaded; normally these are empty
+- `RAW_TABLE_REBUILD_MODE=list` restores the old behaviour: only listed tables are reloaded and nothing is
+  detected automatically
+
+---
+
 ## Design principles
 
 - SQL-first transformations

@@ -20,11 +20,15 @@ BEGIN
     SELECT schemaname, tablename
     FROM pg_tables
     WHERE schemaname = v_schema
-      AND tablename LIKE 't\_%' ESCAPE '\'
+      AND tablename = ANY(tables_to_rebuild)
   LOOP
     EXECUTE format('DROP TABLE IF EXISTS %I.%I CASCADE', r.schemaname, r.tablename);
   END LOOP;
 END $$;
+
+-- Fingerprints of what each raw table and view was last built from (incremental loads).
+CREATE TABLE IF NOT EXISTS raw_table_loads (table_name text PRIMARY KEY, source_file text NOT NULL, fingerprint text NOT NULL, loaded_at timestamptz NOT NULL);
+CREATE TABLE IF NOT EXISTS view_builds (view_name text PRIMARY KEY, fingerprint text NOT NULL, built_at timestamptz NOT NULL);
 
 -- =========================
 -- Cleaning helpers

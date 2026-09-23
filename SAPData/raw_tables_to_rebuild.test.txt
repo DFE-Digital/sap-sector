@@ -1,30 +1,5 @@
-# One logical dataset key per line to rebuild in the test environment.
-# Lines starting with # are ignored.
-
-# GIAS sources
-edubasealldataYYYYmmDD
-links_edubasealldataYYYYmmDD
-grouplinks_edubaseallacademiesandfreeYYYYmmDD
-school-email-addresses-24-08-2026
-
-# Similar School Sources
-2026_07_03_neighbours_list_primary
-2026_07_03_matched_primary_schools_data
-
-# KS2 sources
-ks2_regional_local_authority_and_pupil_characteristics_2019_to_2025_revised
-ks2_school_attainment_data
-
-# Absence sources
-6_absence_3term_characteristics
-1_absence_3term_nat_reg_la
-1a_absence_3term_school
-oa_percent_3term_sch_202223_ccss
-oa_percent_3term_sch_202324_ccss
-oa_percent_3term_sch_202425_ccss
-pa_percent_3term_sch_202223_ccss
-pa_percent_3term_sch_202324_ccss
-pa_percent_3term_sch_202425_ccss
-
-# KS4 sources
-ees_ks4_202223_api
+# Raw tables to force-reload in the test environment, one logical dataset key per line
+# (the source file name without "manual_" or ".csv"). Lines starting with # are ignored.
+#
+# Normally leave this empty: the pipeline reloads a raw table whenever its source file changes,
+# and rebuilds the views that depend on it. Use this only to force a reload, then remove the entry.

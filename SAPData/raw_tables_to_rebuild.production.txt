@@ -1,12 +1,5 @@
-# One logical dataset key per line to rebuild in the production environment.
-# Lines starting with # are ignored.
-
-# GIAS sources
-edubasealldataYYYYmmDD
-links_edubasealldataYYYYmmDD
-grouplinks_edubaseallacademiesandfreeYYYYmmDD
-school-email-addresses-24-08-2026
-
-# KS4 sources
-ees_ks4_202223_api
-
+# Raw tables to force-reload in the production environment, one logical dataset key per line
+# (the source file name without "manual_" or ".csv"). Lines starting with # are ignored.
+#
+# Normally leave this empty: the pipeline reloads a raw table whenever its source file changes,
+# and rebuilds the views that depend on it. Use this only to force a reload, then remove the entry.
