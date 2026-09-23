@@ -42,8 +42,6 @@ public sealed class MeasureSet
 
     public IReadOnlyList<Metric> Metrics => _metrics;
 
-    public IEnumerable<Source> Sources => _sources.Values;
-
     public MeasureSet Year(Period period, AcademicYear year)
     {
         _years[period] = year;

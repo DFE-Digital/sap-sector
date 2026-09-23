@@ -251,15 +251,19 @@ Acceptance criteria:
 
 ---
 
-## Data Issues Found During Migration
+## Data Issues Found And Fixed During Migration
 
-The migration preserves current behaviour exactly, so these are kept as-is and marked `DATA ISSUE` in the catalogue. Each should be fixed in its own change, because fixing one changes values shown on the website.
+Found while converting KS4 Performance (Story 2) and fixed in the catalogue. The golden test lists these as the only intended differences from datamap.csv.
 
-| Dataset | Issue | Effect |
-|---|---|---|
-| KS4 Performance | `Prog8_Avg_LA_Previous2_Num` is mapped three times; the generator uses the first, which reads 2024-25 filtered only on `sex = Total` | LA Progress 8 "two years ago" reads the wrong year and takes `MAX` across every breakdown topic |
-| KS4 Performance | `EngMaths59_Mob_Eng_*` (grade 5+, England, mobile pupils) reads `engmath_94_total` / `engmath_94_percent` | Shows the grade 4+ figure for the grade 5+ measure |
-| KS4 Performance | `EngLang79`, `EngLit79`, `Maths79` at Establishment/Previous filter `grade = 7 OR 8 OR 9`, values that don't exist in the file | Always blank |
+| Dataset | Issue in datamap.csv | Fix | Effect on the website |
+|---|---|---|---|
+| KS4 Performance | `Prog8_Avg_LA_Previous2_Num` was mapped three times; the generator used the first, which filtered only `sex = Total` for 2024-25, so `MAX` ran across every breakdown topic | `Prog8_Tot_LA_{Current,Previous,Previous2}_Num` filtered to `breakdown_topic = Total` | LA Progress 8 is available for each year (not currently displayed) |
+| KS4 Performance | `EngMaths59_Mob_Eng_*` (England, mobile pupils, grade 5+) read `engmath_94_*` | Reads `engmath_95_*` | e.g. 2024-25 national shows 23.4% instead of the grade 4+ figure 39.5% |
+| KS4 Performance | `EngLang79`, `EngLit79`, `Maths79` for schools in 2023-24 filtered `grade = 7 OR 8 OR 9`, values that don't exist in the file | Filter `grade = 9 to 7` as in other years | ~3,650 schools now show a 2023-24 value instead of blank |
+
+Verified with a full local pipeline run (Postgres 16, real source files): across `v_establishment_performance`, `v_la_performance` and `v_england_performance`, these 16 columns are the only differences from the datamap.csv-driven views.
+
+Related observation for Story 5: `double` values are stored as text, so `MAX` compares them as strings whenever a filter matches more than one row.
 
 ---
 

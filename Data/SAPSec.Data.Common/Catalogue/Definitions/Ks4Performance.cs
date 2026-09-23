@@ -1,5 +1,3 @@
-using SAPData.Models;
-
 namespace SAPSec.Data.Common.Catalogue.Definitions;
 
 /// <summary>
@@ -7,7 +5,6 @@ namespace SAPSec.Data.Common.Catalogue.Definitions;
 /// </summary>
 /// <remarks>
 /// To roll to a new year, bump <see cref="CurrentYear"/> and point each source at the new files.
-/// Comments marked DATA ISSUE preserve datamap.csv behaviour that looks wrong; fix them in their own change.
 /// </remarks>
 public static class Ks4Performance
 {
@@ -29,7 +26,7 @@ public static class Ks4Performance
         new("Physics", "Physics", "RC1"),
     ];
 
-    public static IReadOnlyList<MeasureSet> MeasureSets() => [Headline(), SubjectAchievements(), SubjectGrades(), Unmodelled()];
+    public static IReadOnlyList<MeasureSet> MeasureSets() => [Headline(), SubjectAchievements(), SubjectGrades()];
 
     /// <summary>Attainment 8, Progress 8 and English and maths grade 4+/5+.</summary>
     public static MeasureSet Headline()
@@ -40,14 +37,10 @@ public static class Ks4Performance
         // Compare School Performance download: one column per breakdown, so fields are set per breakdown below.
         var schoolsPrevious2 = Source.Cscp("2022-2023_england_ks4final").KeyedBy("URN");
 
-        var englandCurrent = Characteristics("geographic_level", Current);
-        var englandPrevious = Characteristics("geographic_level", Previous);
-        var englandPrevious2 = Characteristics("geographic_level", Previous2);
-
         return NewSet("Performance")
-            .Source(Scope.England, Period.Current, englandCurrent)
-            .Source(Scope.England, Period.Previous, englandPrevious)
-            .Source(Scope.England, Period.Previous2, englandPrevious2)
+            .Source(Scope.England, Period.Current, Characteristics("geographic_level", Current))
+            .Source(Scope.England, Period.Previous, Characteristics("geographic_level", Previous))
+            .Source(Scope.England, Period.Previous2, Characteristics("geographic_level", Previous2))
             .Source(Scope.Establishment, Period.Current, schoolsCurrent)
             .Source(Scope.Establishment, Period.Previous, schoolsPrevious)
             .Source(Scope.Establishment, Period.Previous2, schoolsPrevious2)
@@ -79,11 +72,7 @@ public static class Ks4Performance
                 .Field(schoolsPrevious2, Breakdowns.Eal, "PTL2BASICSEAL_94"))
             .Metric(new Metric("EngMaths59", "engmath_95_total")
                 .Field(schoolsPrevious, "t_l2basics_95")
-                .Skip(Scope.Establishment, Period.Previous2)
-                // DATA ISSUE: England "Mobile" reads the grade 4+ column for this grade 5+ measure.
-                .Field(englandCurrent, Breakdowns.Mobile, "engmath_94_total")
-                .Field(englandPrevious, Breakdowns.Mobile, "engmath_94_total")
-                .Field(englandPrevious2, Breakdowns.Mobile, "engmath_94_total"))
+                .Skip(Scope.Establishment, Period.Previous2))
             .Metric(new Metric("EngMaths59", "engmath_95_percent")
                 .Percentage()
                 .Field(schoolsPrevious, "pt_l2basics_95")
@@ -91,14 +80,10 @@ public static class Ks4Performance
                 .Field(schoolsPrevious2, Breakdowns.Boys, "PBL2BASICS_95")
                 .Field(schoolsPrevious2, Breakdowns.Girls, "PGL2BASICS_95")
                 .Field(schoolsPrevious2, Breakdowns.Disadvantaged, "PTFSM6CLA1ABASICS_95")
-                .Field(schoolsPrevious2, Breakdowns.Eal, "PTL2BASICSEAL_95")
-                // DATA ISSUE: England "Mobile" reads the grade 4+ column for this grade 5+ measure.
-                .Field(englandCurrent, Breakdowns.Mobile, "engmath_94_percent")
-                .Field(englandPrevious, Breakdowns.Mobile, "engmath_94_percent")
-                .Field(englandPrevious2, Breakdowns.Mobile, "engmath_94_percent"))
+                .Field(schoolsPrevious2, Breakdowns.Eal, "PTL2BASICSEAL_95"))
             .Metric(new Metric("Prog8", "progress8_average")
                 .For(Breakdowns.Total)
-                .In(Scope.Establishment)
+                .In(Scope.Establishment, Scope.LA)
                 .Field(schoolsPrevious, "avg_p8score")
                 .Field(schoolsPrevious2, Breakdowns.Total, "P8MEA"));
     }
@@ -130,20 +115,8 @@ public static class Ks4Performance
                 foreach (var band in bands)
                 {
                     var metric = new Metric($"{subject.Code}{band.Code}", percentage ? "percentage_achieving" : "number_achieving")
-                        .Where("subject", subject.Name);
-
-                    // DATA ISSUE: the 2023-24 school file is filtered to grades 7, 8 and 9 for these subjects, which don't
-                    // exist in that file (it has a "9 to 7" band), so these values are always blank.
-                    if (band.Code == "79" && subject.Code is "EngLang" or "EngLit" or "Maths")
-                    {
-                        metric.Where(schoolsPrevious, "grade", "7", "8", "9");
-                        foreach (var source in set.Sources.Where(s => s != schoolsPrevious))
-                            metric.Where(source, "grade", band.Grade);
-                    }
-                    else
-                    {
-                        metric.Where("grade", band.Grade);
-                    }
+                        .Where("subject", subject.Name)
+                        .Where("grade", band.Grade);
 
                     set.Metric(percentage ? metric.Percentage() : metric);
                 }
@@ -187,32 +160,6 @@ public static class Ks4Performance
 
         return set;
     }
-
-    /// <summary>Rows kept as-is from datamap.csv because they don't fit the catalogue model.</summary>
-    public static MeasureSet Unmodelled() =>
-        new MeasureSet(Type, "Unmodelled")
-            // DATA ISSUE: named Previous2 but reads 2024-25, filtered only on sex = Total so MAX runs across every
-            // breakdown topic. datamap.csv also had Previous and Previous2 rows under this name; the generator used this one.
-            .Row(new DataMapRow
-            {
-                Range = "LA",
-                Ref = "24_KS4_P8_TOT_LA",
-                PropertyName = "Prog8_Avg_LA_Previous2_Num",
-                PropertyDescription = "Progress 8",
-                Source = "EES",
-                Type = Type,
-                Subtype = "Performance",
-                Year = "2024-2025",
-                YearDesc = "Current",
-                FileName = "202425_all_state_funded_pupils_characteristics_and_geography_breakdowns_revised",
-                Field = "progress8_average",
-                DataType = "double",
-                RecordFilterBy = "old_la_code",
-                Filter = "sex",
-                FilterValue = "Total",
-                Filter3 = "time_period",
-                Filter3Value = "202425",
-            });
 
     private static MeasureSet NewSet(string subtype) => new MeasureSet(Type, subtype).Years(CurrentYear);
 
