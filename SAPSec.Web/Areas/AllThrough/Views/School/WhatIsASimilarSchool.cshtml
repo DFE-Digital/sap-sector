@@ -11,123 +11,11 @@
 <h1 class="govuk-heading-xl">@ViewData[ViewDataKeys.Title]</h1>
 
 <p class="govuk-body">
-    For all-through schools or cross-phase middle schools, DfE identifies up to <strong>50</strong> similar primary phase schools and up to <strong>50</strong> similar secondary phase schools (including all-throughs) by comparing schools against criteria based on characteristics such as levels of disadvantage, SEN support, prior attainment, and pupil numbers.
+    We identify <strong>50</strong> similar phase schools for each school phase using a range of characteristics.
 </p>
 
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Criteria used to find similar primary phase schools</h2>
-
-<table class="govuk-table">
-    <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Criteria</th>
-            <th scope="col" class="govuk-table__header">Description</th>
-        </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Combined average KS1 reading, writing and maths</td>
-            <td class="govuk-table__cell">The mean of these 3 attainment measures. Each of these measures constitutes an average across all pupils in the school for which this data is available.</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Total number of pupils</td>
-            <td class="govuk-table__cell">Ages 4-11</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Pupil stability rate</td>
-            <td class="govuk-table__cell">Percentage of pupils admitted to the school at the standard time of admission</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Eligibility for Pupil Premium</td>
-            <td class="govuk-table__cell">Proportion of pupils eligible for pupil premium</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Average IDACI score</td>
-            <td class="govuk-table__cell">
-                Proportion of children aged 0 to 15 in an area who live in income deprived families.
-                <a href="https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about English indices of deprivation (opens in new tab)</a>.
-            </td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Average POLAR4 quintile</td>
-            <td class="govuk-table__cell">
-                Areas across the UK classified into quintiles based on the proportion of young people who enter higher education.
-                <a href="https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about POLAR4 on the Office for Students website (opens in new tab)</a>.
-            </td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Percentage of pupils with an EHC plan</td>
-            <td class="govuk-table__cell">Education, health and care plan</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Percentage of pupils with SEN support</td>
-            <td class="govuk-table__cell">SEN pupils without EHC plans</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Percentage of pupils with EAL</td>
-            <td class="govuk-table__cell">English as an additional language</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Criteria used to find similar secondary phase schools</h2>
-
-<table class="govuk-table">
-    <thead class="govuk-table__head">
-        <tr class="govuk-table__row">
-            <th scope="col" class="govuk-table__header">Criteria</th>
-            <th scope="col" class="govuk-table__header">Description</th>
-        </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Average KS2 reading and maths score</td>
-            <td class="govuk-table__cell">Average KS2 reading and maths scaled score</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Total number of pupils</td>
-            <td class="govuk-table__cell">Ages 11-18</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Pupil stability rate</td>
-            <td class="govuk-table__cell">Pupils who remain at the same school throughout the phase</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Eligibility for Pupil Premium</td>
-            <td class="govuk-table__cell">Funding to support disadvantaged pupils</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Average IDACI score</td>
-            <td class="govuk-table__cell">
-                Proportion of children aged 0 to 15 in an area who live in income deprived families.
-                <a href="https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about English indices of deprivation (opens in new tab)</a>.
-            </td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Average POLAR4 quintile</td>
-            <td class="govuk-table__cell">
-                Areas across the UK classified into quintiles based on the proportion of young people who enter higher education.
-                <a href="https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about POLAR4 on the Office for Students website (opens in new tab)</a>.
-            </td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Percentage of pupils with an EHC plan</td>
-            <td class="govuk-table__cell">Education, health and care plan</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Percentage of pupils with SEN support</td>
-            <td class="govuk-table__cell">SEN pupils without EHC plans</td>
-        </tr>
-        <tr class="govuk-table__row">
-            <td class="govuk-table__cell govuk-!-font-weight-bold">Percentage of pupils with EAL</td>
-            <td class="govuk-table__cell">English as an additional language</td>
-        </tr>
-    </tbody>
-</table>
-
-<h2 class="govuk-heading-m govuk-!-padding-top-6">Which schools have been identified as similar?</h2>
-
 <p class="govuk-body">
-    While schools may not match on every criteria, the schools have matched because they share a large number of them.
+    While schools may not match on every characteristic, they are included because they share many similarities.
 </p>
 
 @if (Model.HasSimilarSchools)
@@ -143,6 +31,100 @@ else
     </p>
 }
 
+<h2 class="govuk-heading-m govuk-!-padding-top-6">Characteristics used to find similar schools</h2>
+
+<h3 class="govuk-heading-m">Prior attainment</h3>
+
+<table class="govuk-table">
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">KS4 prior attainment</th>
+            <td class="govuk-table__cell">The key stage 4 (KS4) model uses a key stage 2 (KS2) reading and maths combined measure.</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">KS2 prior attainment</th>
+            <td class="govuk-table__cell">The KS2 model uses key stage 1 (KS1) test scores.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 class="govuk-heading-m">Disadvantage</h3>
+
+<table class="govuk-table">
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">Ever 6 FSM</th>
+            <td class="govuk-table__cell">Percentage of pupils eligible for free school meals at any time during the past 6 years.</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">IDACI score</th>
+            <td class="govuk-table__cell">
+                <p class="govuk-body govuk-!-margin-bottom-4">
+                    Proportion of children aged 0 to 15 who live in income-deprived families in an area.
+                </p>
+                <a href="https://www.gov.uk/government/statistics/english-indices-of-deprivation-2025/english-indices-of-deprivation-2025-statistical-release" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about English indices of deprivation (opens in new tab)</a>
+            </td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">POLAR4 quintile</th>
+            <td class="govuk-table__cell">
+                <p class="govuk-body govuk-!-margin-bottom-4">
+                    Average Participation of Local Areas (POLAR4) quintile: areas across the UK grouped into quintiles based on the proportion of young people who enter higher education, reflecting differences in educational opportunity and aspiration.
+                </p>
+                <a href="https://www.officeforstudents.org.uk/data-and-analysis/young-participation-by-area/about-polar-and-adult-he/" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about POLAR4 on the Office for Students website (opens in new tab)</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 class="govuk-heading-m">Pupil cohort information</h3>
+
+<table class="govuk-table">
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">Total number of pupils</th>
+            <td class="govuk-table__cell">Total number of pupils on roll (all ages).</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">Pupil stability rate</th>
+            <td class="govuk-table__cell">Percentage of pupils admitted to the school at the standard time of admission.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 class="govuk-heading-m">Inclusion</h3>
+
+<table class="govuk-table">
+    <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">EHC plan</th>
+            <td class="govuk-table__cell">Percentage of pupils who have an education, health and care (EHC) plan.</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">SEN support</th>
+            <td class="govuk-table__cell">Percentage of pupils who have SEN support without an EHC plan.</td>
+        </tr>
+        <tr class="govuk-table__row">
+            <th scope="row" class="govuk-table__header govuk-!-width-one-third">EAL</th>
+            <td class="govuk-table__cell">Percentage of pupils who have English as an additional language.</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2 class="govuk-heading-m govuk-!-padding-top-6">How have these schools been identified as similar?</h2>
+
+<p class="govuk-body">
+    We use the DfE and Ofsted model for attainment to identify similar schools.
+</p>
+
+<p class="govuk-body">
+    The model provides information to help understand how well pupils are achieving compared to pupils in schools that have a similar context. The model identifies similar schools using factors known to influence attainment.
+</p>
+
+<p class="govuk-body">
+    <a href="https://www.gov.uk/government/publications/similar-schools-model-for-attainment" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about the similar schools model for attainment (opens in new tab)</a>
+</p>
+
 <h2 class="govuk-heading-m govuk-!-padding-top-6">Annual updates to similar schools data</h2>
 
 <p class="govuk-body">
@@ -150,9 +132,5 @@ else
 </p>
 
 <p class="govuk-body">
-    When this update occurs, the 3-year average and year by year average for primary phase similar schools and the current year average and year by year average for secondary phase similar schools will also change to show data only from the newest set of similar schools.
-</p>
-
-<p class="govuk-body">
-    <a href="https://www.gov.uk/government/publications/similar-schools-model-for-attainment" class="govuk-link" target="_blank" rel="noopener noreferrer">Find out more about the similar schools model for attainment (opens in new tab)</a>.
+    When this update occurs, the current year average and year by year average for similar schools will also change to show data only from the newest set of similar schools.
 </p>
