@@ -1,4 +1,3 @@
-using System.Text;
 using SAPData.Models;
 
 namespace SAPSec.Data.Common.Catalogue;
@@ -112,17 +111,5 @@ public static class DataMapEquivalence
         return $"{DbCol(r.Field)}:{(r.DataType ?? "").ToLowerInvariant()} where [{string.Join(", ", filters)}]";
     }
 
-    // Same normalisation as SAPData.GenerateViews.DbCol.
-    private static string DbCol(string? header)
-    {
-        if (string.IsNullOrWhiteSpace(header))
-            return header ?? "";
-
-        var s = header.Trim().ToLowerInvariant();
-        var sb = new StringBuilder(s.Length);
-        foreach (var ch in s)
-            sb.Append(char.IsLetterOrDigit(ch) ? ch : '_');
-
-        return sb.ToString();
-    }
+    private static string DbCol(string? header) => ColumnNames.Normalise(header);
 }

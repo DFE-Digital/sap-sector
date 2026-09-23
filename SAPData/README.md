@@ -121,6 +121,28 @@ Typical local workflow:
 
 ---
 
+## Data map catalogue and validation
+
+Datasets migrated from `datamap.csv` are defined in code under `Data/SAPSec.Data.Common/Catalogue/Definitions`
+(listed in `CatalogueDefinitions`). The generator uses those instead of their CSV rows.
+
+Before any SQL is generated, the catalogue is validated and the run stops if it finds:
+- a property whose name says one year but whose row, or `time_period` filter, is for another
+- two properties reading exactly the same file, field and filters
+- one file keyed by different columns within a view
+
+Unit tests also check every field, key column and filter value against `DataMap/source-profiles.json`, a snapshot
+of each source file's columns and filter values. After adding a source file or pointing the catalogue at a new
+one (for example a new year), place the files in `DataMap/SourceFiles` and refresh the snapshot:
+
+```
+dotnet run --project SAPData -- profile-sources
+```
+
+Commit the updated `source-profiles.json` with the catalogue change.
+
+---
+
 ## Design principles
 
 - SQL-first transformations

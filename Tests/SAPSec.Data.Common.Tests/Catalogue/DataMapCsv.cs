@@ -13,11 +13,13 @@ internal static class DataMapCsv
 
     private static IReadOnlyList<DataMapRow> Load()
     {
-        using var reader = new StreamReader(Path.Combine(RepositoryRoot(), "SAPData", "DataMap", "datamap.csv"));
+        using var reader = new StreamReader(RepositoryPath("SAPData", "DataMap", "datamap.csv"));
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
         csv.Context.RegisterClassMap<DataMapMapping>();
         return csv.GetRecords<DataMapRow>().ToList();
     }
+
+    public static string RepositoryPath(params string[] parts) => Path.Combine([RepositoryRoot(), .. parts]);
 
     private static string RepositoryRoot()
     {

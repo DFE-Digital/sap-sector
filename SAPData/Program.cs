@@ -5,6 +5,7 @@ using SAPData.Models;
 using SAPSec.Data.Common;
 using SAPSec.Data.Common.Catalogue;
 using SAPSec.Data.Common.Catalogue.Definitions;
+using SAPSec.Data.Common.Catalogue.Validation;
 using System.Globalization;
 using System.Text;
 
@@ -47,6 +48,13 @@ internal class Program
             string generatedJsonDir = Path.Combine(jsonDir, "Generated");
             string primaryJsonDir = Path.Combine(jsonDir, "PrimarySchools");
             string tableMappingPath = Path.Combine(sqlDir, "tablemapping.csv");
+            string sourceProfilesPath = Path.Combine(dataMapDir, "source-profiles.json");
+
+            if (args.Contains("profile-sources"))
+            {
+                WriteSourceProfiles(rawInputDir, sourceProfilesPath);
+                return;
+            }
 
             Directory.CreateDirectory(cleanedDir);
             Directory.CreateDirectory(sqlDir);
@@ -66,9 +74,12 @@ internal class Program
             }
 
             // Datasets migrated to the code catalogue replace their datamap.csv rows.
+            var catalogueRows = CatalogueDefinitions.Rows();
+            ValidateCatalogue(catalogueRows);
+
             dataMaps = dataMaps
-                .Where(r => r.Type != Ks4Performance.Type)
-                .Concat(DataMapCatalogue.Expand(Ks4Performance.MeasureSets()))
+                .Where(r => !CatalogueDefinitions.Types.Contains(r.Type))
+                .Concat(catalogueRows)
                 .ToList();
 
             Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
@@ -171,6 +182,39 @@ internal class Program
             }
             throw;
         }
+    }
+
+    // Fails before any SQL is generated, so a data map mistake never reaches the ETL step.
+    private static void ValidateCatalogue(IReadOnlyList<DataMapRow> rows)
+    {
+        var issues = CatalogueValidator.Validate(rows);
+        if (issues.Count == 0)
+        {
+            Console.WriteLine($"Catalogue validated: {rows.Count} rows, no issues.");
+            return;
+        }
+
+        foreach (var issue in issues)
+            Console.Error.WriteLine(issue);
+
+        throw new InvalidOperationException($"Data map catalogue has {issues.Count} validation issue(s); see the log above.");
+    }
+
+    // Snapshot of the source files' columns and filter values, committed so catalogue tests can check fields and
+    // filter values in CI. Regenerate after adding or changing a source file: dotnet run --project SAPData -- profile-sources
+    private static void WriteSourceProfiles(string sourceDir, string path)
+    {
+        var rows = CatalogueDefinitions.Rows();
+        var profiles = SourceProfiles.Build(rows, sourceDir);
+        profiles.Save(path);
+
+        var missing = rows.Select(r => r.FileName.Trim()).Distinct(StringComparer.OrdinalIgnoreCase)
+            .Where(f => !profiles.Files.ContainsKey(f))
+            .ToList();
+
+        Console.WriteLine($"Wrote {profiles.Files.Count} source profile(s) to {path}");
+        foreach (var file in missing)
+            Console.Error.WriteLine($"Not found in {sourceDir}: {file}.csv (or manual_{file}.csv)");
     }
 
     private static IDisposable? InitialiseSentry(IConfiguration configuration)
