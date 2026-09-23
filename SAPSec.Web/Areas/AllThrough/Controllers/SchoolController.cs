@@ -134,8 +134,15 @@ public class SchoolController(
     public async Task<IActionResult> WhatIsASimilarSchool(string urn)
     {
         var response = await getSchoolInfoUseCase.Execute(new(urn));
+        var similarSchoolPhases = await GetSimilarSchoolPhasesAsync(urn);
         await PopulateViewData(response.School);
-        return View(SchoolInfoViewModel.FromSchoolInfo(response.School));
+
+        var model = new AllThroughWhatIsASimilarSchoolViewModel(
+            SchoolInfoViewModel.FromSchoolInfo(response.School),
+            similarSchoolPhases.HasPrimary,
+            similarSchoolPhases.HasSecondary);
+
+        return View(model);
     }
 
     [HttpGet]
