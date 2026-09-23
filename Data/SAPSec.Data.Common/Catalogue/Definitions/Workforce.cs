@@ -1,12 +1,12 @@
 namespace SAPSec.Data.Common.Catalogue.Definitions;
 
 /// <summary>School workforce: pupil to qualified teacher ratio and pupil numbers, current year only.</summary>
-/// <remarks>To roll to a new year, bump <see cref="CurrentYear"/> and point the source at the new file.</remarks>
+/// <remarks>To roll to a new year, bump <see cref="DataYears"/> and point the source at the new file.</remarks>
 public static class Workforce
 {
     public const string Type = "Workforce";
 
-    private const int CurrentYear = 2024;
+    private const int CurrentYear = DataYears.Workforce;
 
     public static IReadOnlyList<IDataMapDefinition> Definitions() =>
     [

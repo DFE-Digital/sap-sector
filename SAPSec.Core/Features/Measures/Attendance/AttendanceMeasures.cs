@@ -1,6 +1,7 @@
-using SAPSec.Core.Collections;
+﻿using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
+using SAPSec.Data;
 using SAPSec.Data.Repositories;
 
 namespace SAPSec.Core.Features.Measures.Attendance;
@@ -19,7 +20,7 @@ internal static class AttendanceMeasures
             return Measure.ForSchoolAttendance(
                 Measures.Absence.Key,
                 Measures.Absence.Name,
-                2024,
+                DataYears.PupilAbsence,
                 measureDataType,
                 availableFilters,
                 currentSchool,
@@ -37,7 +38,7 @@ internal static class AttendanceMeasures
             return Measure.ForSchoolComparison(
                 Measures.Absence.Key,
                 Measures.Absence.Name,
-                2024,
+                DataYears.PupilAbsence,
                 measureDataType,
                 availableFilters,
                 currentSchool,

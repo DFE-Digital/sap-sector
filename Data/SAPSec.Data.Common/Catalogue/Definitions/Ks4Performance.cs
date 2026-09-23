@@ -4,13 +4,13 @@ namespace SAPSec.Data.Common.Catalogue.Definitions;
 /// KS4 performance measures: headline measures, subject achievement bands and subject grade entries.
 /// </summary>
 /// <remarks>
-/// To roll to a new year, bump <see cref="CurrentYear"/> and point each source at the new files.
+/// To roll to a new year, bump <see cref="DataYears"/> and point each source at the new files.
 /// </remarks>
 public static class Ks4Performance
 {
     public const string Type = "KS4_Performance";
 
-    private const int CurrentYear = 2024;
+    private const int CurrentYear = DataYears.Ks4Performance;
     private static readonly AcademicYear Current = new(CurrentYear);
     private static readonly AcademicYear Previous = new(CurrentYear - 1);
     private static readonly AcademicYear Previous2 = new(CurrentYear - 2);

@@ -5,7 +5,7 @@ namespace SAPSec.Data.Common.Catalogue.Definitions;
 /// </summary>
 /// <remarks>
 /// Totals and pupil-group breakdowns come from different files in some years, so each file has its own measure set.
-/// To roll to a new year, bump <see cref="CurrentYear"/> and point each source at the new files.
+/// To roll to a new year, bump <see cref="DataYears"/> and point each source at the new files.
 /// Property names: Abs_{Tot|Persistent}[_{breakdown}][_{Primary|Secondary}]_{scope}_{period}_Pct,
 /// where the breakdown is left out for all pupils and the phase only appears for LAs and England.
 /// </remarks>
@@ -13,7 +13,7 @@ public static class PupilAbsence
 {
     public const string Type = "PupilAbsence";
 
-    private const int CurrentYear = 2024;
+    private const int CurrentYear = DataYears.PupilAbsence;
     private static readonly AcademicYear Current = new(CurrentYear);
     private static readonly AcademicYear Previous = new(CurrentYear - 1);
     private static readonly AcademicYear Previous2 = new(CurrentYear - 2);

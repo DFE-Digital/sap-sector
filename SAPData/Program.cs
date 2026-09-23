@@ -53,6 +53,12 @@ internal class Program
                 return;
             }
 
+            if (args.Contains("catalogue-summary"))
+            {
+                WriteCatalogueSummary(rawInputDir);
+                return;
+            }
+
             Directory.CreateDirectory(cleanedDir);
             Directory.CreateDirectory(sqlDir);
             Directory.CreateDirectory(jsonDir);
@@ -198,6 +204,31 @@ internal class Program
         Console.WriteLine($"Wrote {profiles.Files.Count} source profile(s) to {path}");
         foreach (var file in missing)
             Console.Error.WriteLine($"Not found in {sourceDir}: {file}.csv (or manual_{file}.csv)");
+    }
+
+    // Lists each dataset's years and the source files it reads, marking any missing from the source folder.
+    // Use when preparing a new data year: dotnet run --project SAPData -- catalogue-summary
+    private static void WriteCatalogueSummary(string sourceDir)
+    {
+        bool Present(string file) =>
+            File.Exists(Path.Combine(sourceDir, $"{file}.csv")) || File.Exists(Path.Combine(sourceDir, $"manual_{file}.csv"));
+
+        foreach (var type in CatalogueDefinitions.Rows().GroupBy(r => r.Type))
+        {
+            Console.WriteLine(type.Key);
+
+            foreach (var period in type.GroupBy(r => r.YearDesc).OrderBy(g => g.Key))
+            {
+                var label = string.IsNullOrEmpty(period.Key) ? "(no year)" : $"{period.Key} {period.First().Year}";
+                Console.WriteLine($"  {label}");
+
+                foreach (var file in period.Select(r => r.FileName.Trim()).Distinct().Order())
+                    Console.WriteLine($"    {(Present(file) ? "  " : "! ")}{file}");
+            }
+        }
+
+        Console.WriteLine();
+        Console.WriteLine($"! = not found in {sourceDir}");
     }
 
     private static IDisposable? InitialiseSentry(IConfiguration configuration)

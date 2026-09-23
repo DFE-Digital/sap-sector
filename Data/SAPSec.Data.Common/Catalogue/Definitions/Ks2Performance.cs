@@ -4,14 +4,14 @@ namespace SAPSec.Data.Common.Catalogue.Definitions;
 /// KS2 performance measures: reading, writing and maths, grammar, punctuation and spelling, scaled scores and science.
 /// </summary>
 /// <remarks>
-/// To roll to a new year, bump <see cref="CurrentYear"/> and point the sources at the new files.
+/// To roll to a new year, bump <see cref="DataYears"/> and point the sources at the new files.
 /// Property names: {metric}_[{subject}_]{breakdown}_Cohort_{scope}_{period}_Num.
 /// </remarks>
 public static class Ks2Performance
 {
     public const string Type = "KS2_Performance";
 
-    private const int CurrentYear = 2024;
+    private const int CurrentYear = DataYears.Ks2Performance;
     private static readonly AcademicYear Current = new(CurrentYear);
     private static readonly AcademicYear Previous = new(CurrentYear - 1);
     private static readonly AcademicYear Previous2 = new(CurrentYear - 2);

@@ -1,6 +1,7 @@
-using SAPSec.Core.Collections;
+﻿using SAPSec.Core.Collections;
 using SAPSec.Core.Extensions;
 using SAPSec.Core.Features.Filtering;
+using SAPSec.Data;
 using SAPSec.Data.Repositories;
 using static SAPSec.Core.Features.Measures.Measures.Primary;
 
@@ -17,7 +18,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchool(
                 Ks2ExpectedRwm.Key,
                 Ks2ExpectedRwm.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -32,7 +33,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchoolComparison(
                 Ks2ExpectedRwm.Key,
                 Ks2ExpectedRwm.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -422,7 +423,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchool(
                 Ks2HigherRwm.Key,
                 Ks2HigherRwm.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -437,7 +438,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchoolComparison(
                 Ks2HigherRwm.Key,
                 Ks2HigherRwm.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -827,7 +828,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchool(
                 Ks2ReadingScore.Key,
                 Ks2ReadingScore.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.ScaledScore,
                 availableFilters,
                 currentSchool,
@@ -842,7 +843,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchoolComparison(
                 Ks2ReadingScore.Key,
                 Ks2ReadingScore.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.ScaledScore,
                 availableFilters,
                 currentSchool,
@@ -950,7 +951,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchool(
                 Ks2MathsScore.Key,
                 Ks2MathsScore.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.ScaledScore,
                 availableFilters,
                 currentSchool,
@@ -965,7 +966,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchoolComparison(
                 Ks2MathsScore.Key,
                 Ks2MathsScore.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.ScaledScore,
                 availableFilters,
                 currentSchool,
@@ -1073,7 +1074,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchool(
                 Ks2ExpectedGps.Key,
                 Ks2ExpectedGps.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -1088,7 +1089,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchoolComparison(
                 Ks2ExpectedGps.Key,
                 Ks2ExpectedGps.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -1196,7 +1197,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchool(
                 Ks2HigherGps.Key,
                 Ks2HigherGps.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,
@@ -1211,7 +1212,7 @@ internal static class Ks2PerformanceMeasures
             return Measure.ForSchoolComparison(
                 Ks2HigherGps.Key,
                 Ks2HigherGps.Name,
-                2024,
+                DataYears.Ks2Performance,
                 MeasureDataType.GradePercentage,
                 availableFilters,
                 currentSchool,

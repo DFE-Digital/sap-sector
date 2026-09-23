@@ -5,13 +5,13 @@ namespace SAPSec.Data.Common.Catalogue.Definitions;
 /// </summary>
 /// <remarks>
 /// Years are the cohort's KS4 year (the file's time_period), which is what the website labels them as.
-/// To roll to a new year, bump <see cref="CurrentYear"/> and point <see cref="File"/> at the new release.
+/// To roll to a new year, bump <see cref="DataYears"/> and point <see cref="File"/> at the new release.
 /// </remarks>
 public static class Ks4Destinations
 {
     public const string Type = "KS4_Destinations";
 
-    private const int CurrentYear = 2022;
+    private const int CurrentYear = DataYears.Ks4Destinations;
     private const string File = "ees_ks4_202223_api";
     private static readonly AcademicYear Current = new(CurrentYear);
     private static readonly AcademicYear Previous = new(CurrentYear - 1);
