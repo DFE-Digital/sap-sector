@@ -260,8 +260,9 @@ Found while converting KS4 Performance (Story 2) and fixed in the catalogue. The
 | KS4 Performance | `Prog8_Avg_LA_Previous2_Num` was mapped three times; the generator used the first, which filtered only `sex = Total` for 2024-25, so `MAX` ran across every breakdown topic | `Prog8_Tot_LA_{Current,Previous,Previous2}_Num` filtered to `breakdown_topic = Total` | LA Progress 8 is available for each year (not currently displayed) |
 | KS4 Performance | `EngMaths59_Mob_Eng_*` (England, mobile pupils, grade 5+) read `engmath_94_*` | Reads `engmath_95_*` | e.g. 2024-25 national shows 23.4% instead of the grade 4+ figure 39.5% |
 | KS4 Performance | `EngLang79`, `EngLit79`, `Maths79` for schools in 2023-24 filtered `grade = 7 OR 8 OR 9`, values that don't exist in the file | Filter `grade = 9 to 7` as in other years | ~3,650 schools now show a 2023-24 value instead of blank |
+| KS4 Performance | School performance tables: DfE relabelled breakdowns in 2024-25 (EAL: `Other than English` → `Known or believed to be other than English`; not disadvantaged: `Disadvantaged all other` → `Not known to be disadvantaged`), but one label was used for both years | Each year's source uses its own labels | School EAL (2024-25) and not-disadvantaged (2023-24) Attainment 8 and English & maths now have values for ~5,700 schools (not currently displayed). Found by the Story 4 validator |
 
-Verified with a full local pipeline run (Postgres 16, real source files): across `v_establishment_performance`, `v_la_performance` and `v_england_performance`, these 16 columns are the only differences from the datamap.csv-driven views.
+Verified with a full local pipeline run (Postgres 16, real source files): across `v_establishment_performance`, `v_la_performance` and `v_england_performance`, these columns are the only differences from the datamap.csv-driven views.
 
 Related observation for Story 5: `double` values are stored as text, so `MAX` compares them as strings whenever a filter matches more than one row.
 

@@ -33,6 +33,19 @@ public class Ks4PerformanceGoldenTests
         "KS4_Performance/Establishment.EngLit79_Sum_Est_Previous_Pct",
         "KS4_Performance/Establishment.Maths79_Sum_Est_Previous_Num",
         "KS4_Performance/Establishment.Maths79_Sum_Est_Previous_Pct",
+
+        // School performance tables: DfE relabelled breakdowns in 2024-25. The CSV used one label for both years, so
+        // EAL was blank for 2024-25 and not-disadvantaged was blank for 2023-24.
+        "KS4_Performance/Establishment.Attainment8_EAL_Est_Current_Num",
+        "KS4_Performance/Establishment.EngMaths49_EAL_Est_Current_Num",
+        "KS4_Performance/Establishment.EngMaths49_EAL_Est_Current_Pct",
+        "KS4_Performance/Establishment.EngMaths59_EAL_Est_Current_Num",
+        "KS4_Performance/Establishment.EngMaths59_EAL_Est_Current_Pct",
+        "KS4_Performance/Establishment.Attainment8_NDi_Est_Previous_Num",
+        "KS4_Performance/Establishment.EngMaths49_NDi_Est_Previous_Num",
+        "KS4_Performance/Establishment.EngMaths49_NDi_Est_Previous_Pct",
+        "KS4_Performance/Establishment.EngMaths59_NDi_Est_Previous_Num",
+        "KS4_Performance/Establishment.EngMaths59_NDi_Est_Previous_Pct",
     ];
 
     [Fact]

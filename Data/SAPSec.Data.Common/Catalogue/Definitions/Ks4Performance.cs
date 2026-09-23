@@ -31,8 +31,10 @@ public static class Ks4Performance
     /// <summary>Attainment 8, Progress 8 and English and maths grade 4+/5+.</summary>
     public static MeasureSet Headline()
     {
-        var schoolsCurrent = PerformanceTables("202425_performance_tables_schools_final", Current);
-        var schoolsPrevious = PerformanceTables("202324_performance_tables_schools_final", Previous);
+        var schoolsCurrent = PerformanceTables("202425_performance_tables_schools_final", Current,
+            eal: "Known or believed to be other than English", notDisadvantaged: "Not known to be disadvantaged");
+        var schoolsPrevious = PerformanceTables("202324_performance_tables_schools_final", Previous,
+            eal: "Other than English", notDisadvantaged: "Disadvantaged all other");
 
         // Compare School Performance download: one column per breakdown, so fields are set per breakdown below.
         var schoolsPrevious2 = Source.Cscp("2022-2023_england_ks4final").KeyedBy("URN");
@@ -163,8 +165,11 @@ public static class Ks4Performance
 
     private static MeasureSet NewSet(string subtype) => new MeasureSet(Type, subtype).Years(CurrentYear);
 
-    /// <summary>EES school performance tables: one row per school and breakdown.</summary>
-    private static Source PerformanceTables(string file, AcademicYear year) =>
+    /// <summary>
+    /// EES school performance tables: one row per school and breakdown. DfE relabelled the EAL and
+    /// not-disadvantaged breakdowns between years, so each year passes its own labels.
+    /// </summary>
+    private static Source PerformanceTables(string file, AcademicYear year, string eal, string notDisadvantaged) =>
         Source.Ees(file)
             .KeyedBy("school_urn")
             .Where("time_period", year.Code)
@@ -172,8 +177,8 @@ public static class Ks4Performance
             .Provides(Breakdowns.Boys, ("breakdown", "Boys"))
             .Provides(Breakdowns.Girls, ("breakdown", "Girls"))
             .Provides(Breakdowns.Disadvantaged, ("breakdown", "Disadvantaged"))
-            .Provides(Breakdowns.NotDisadvantaged, ("breakdown", "Not known to be disadvantaged"))
-            .Provides(Breakdowns.Eal, ("breakdown", "Other than English"))
+            .Provides(Breakdowns.NotDisadvantaged, ("breakdown", notDisadvantaged))
+            .Provides(Breakdowns.Eal, ("breakdown", eal))
             .Provides(Breakdowns.NonMobile, ("breakdown", "Non mobile"));
 
     /// <summary>EES pupil characteristics and geography breakdowns: every year in one file, LA and England rows.</summary>
