@@ -123,8 +123,10 @@ Typical local workflow:
 
 ## Data map catalogue and validation
 
-Datasets migrated from `datamap.csv` are defined in code under `Data/SAPSec.Data.Common/Catalogue/Definitions`
-(listed in `CatalogueDefinitions`). The generator uses those instead of their CSV rows.
+The data map is defined in code under `Data/SAPSec.Data.Common/Catalogue/Definitions` (every dataset is listed in
+`CatalogueDefinitions`). Each definition declares its source files, years, breakdowns and measures once, and
+expands to the rows the SQL generators read. To roll a dataset to a new year, bump its `CurrentYear` and point
+its sources at the new files.
 
 Before any SQL is generated, the catalogue is validated and the run stops if it finds:
 - a property whose name says one year but whose row, or `time_period` filter, is for another

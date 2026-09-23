@@ -195,7 +195,7 @@ raw_202425_performance_3979aec1
         <p><code>GenerateViews.cs</code>:</p>
         <ul>
             <li>Drops existing materialized views</li>
-            <li>Creates new ones driven entirely by datamap.csv</li>
+            <li>Creates new ones driven entirely by the data map catalogue (<code>Data/SAPSec.Data.Common/Catalogue/Definitions</code>)</li>
             <li>Ensures 1 row per entity</li>
         </ul>
 
@@ -230,7 +230,8 @@ SELECT COUNT(*) FROM v_establishment;
 
         <h2>Change management</h2>
         <ul>
-            <li>Update datamap.csv</li>
+            <li>Update the catalogue definition in <code>Data/SAPSec.Data.Common/Catalogue/Definitions</code></li>
+            <li>If a source file changed, refresh <code>SAPData/DataMap/source-profiles.json</code> (<code>dotnet run --project SAPData -- profile-sources</code>) and run the tests</li>
             <li>Regenerate raw tables</li>
             <li>Regenerate views</li>
             <li>Re-run integrity checks</li>

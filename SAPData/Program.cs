@@ -1,4 +1,3 @@
-using CsvHelper;
 using Microsoft.Extensions.Configuration;
 using Sentry;
 using SAPData.Models;
@@ -6,7 +5,6 @@ using SAPSec.Data.Common;
 using SAPSec.Data.Common.Catalogue;
 using SAPSec.Data.Common.Catalogue.Definitions;
 using SAPSec.Data.Common.Catalogue.Validation;
-using System.Globalization;
 using System.Text;
 
 namespace SAPData;
@@ -37,7 +35,6 @@ internal class Program
             string dataMapDir = Path.Combine(baseDir, "DataMap");
             string rawInputDir = Path.Combine(dataMapDir, "SourceFiles");
             string cleanedDir = Path.Combine(dataMapDir, "CleanedFiles");
-            string dataMapCsv = Path.Combine(dataMapDir, "datamap.csv");
             string sqlDir = Path.Combine(baseDir, "Sql");
             string rawTablesToRebuildPath = ResolveRawTablesToRebuildPath(baseDir, configuration);
             string runAllSqlFile = Path.Combine(sqlDir, "run_all.sql");
@@ -63,24 +60,10 @@ internal class Program
             Directory.CreateDirectory(primaryJsonDir);
 
             // -------------------------------------------------
-            // 1. Load DataMap
+            // 1. Load the data map (defined in code: SAPSec.Data.Common/Catalogue/Definitions)
             // -------------------------------------------------
-            List<DataMapRow> dataMaps;
-            using (var reader = new StreamReader(dataMapCsv))
-            using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-            {
-                csv.Context.RegisterClassMap<DataMapMapping>();
-                dataMaps = csv.GetRecords<DataMapRow>().ToList();
-            }
-
-            // Datasets migrated to the code catalogue replace their datamap.csv rows.
-            var catalogueRows = CatalogueDefinitions.Rows();
-            ValidateCatalogue(catalogueRows);
-
-            dataMaps = dataMaps
-                .Where(r => !CatalogueDefinitions.Types.Contains(r.Type))
-                .Concat(catalogueRows)
-                .ToList();
+            var dataMaps = CatalogueDefinitions.Rows().ToList();
+            ValidateCatalogue(dataMaps);
 
             Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
 
