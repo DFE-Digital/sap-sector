@@ -216,6 +216,20 @@ public class MeasureSetTests
     }
 
     [Fact]
+    public void Metric_can_name_properties_with_a_function()
+    {
+        var rows = new MeasureSet("T", "S")
+            .Year(Period.Current, new AcademicYear(2024))
+            .Breakdowns(Breakdowns.Total, Breakdowns.Boys)
+            .Source(Scope.LA, Period.Current, SchoolSource("la").KeyedBy("old_la_code"))
+            .Metric("Abs", "value", m => m.Named((b, s, p) =>
+                b == Breakdowns.Total ? $"Abs_Tot_{s.NameCode()}_{p}" : $"Abs_Tot_{b.Code}_{s.NameCode()}_{p}"))
+            .ToDataMapRows();
+
+        rows.Select(r => r.PropertyName).Should().Equal("Abs_Tot_LA_Current", "Abs_Tot_Boy_LA_Current");
+    }
+
+    [Fact]
     public void Appends_raw_rows_after_expanded_metrics()
     {
         var raw = new DataMapRow { Range = "Establishment", Type = "All establishment data", PropertyName = "TrustsId" };

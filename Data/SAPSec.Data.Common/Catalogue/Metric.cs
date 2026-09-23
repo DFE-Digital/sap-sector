@@ -11,6 +11,7 @@ public sealed class Metric
     private readonly Dictionary<Source, List<Filter>> _sourceFilters = [];
     private readonly Dictionary<(Source Source, string? Breakdown), string> _fields = [];
     private readonly HashSet<(Scope, Period)> _skipped = [];
+    private Func<Breakdown, Scope, Period, string>? _name;
 
     public Metric(string name, string field)
     {
@@ -133,6 +134,13 @@ public sealed class Metric
         return this;
     }
 
+    /// <summary>Names properties with a function, for naming schemes a template can't express.</summary>
+    public Metric Named(Func<Breakdown, Scope, Period, string> name)
+    {
+        _name = name;
+        return this;
+    }
+
     internal bool IsSkipped(Scope scope, Period period) => _skipped.Contains((scope, period));
 
     internal bool IsAvailableFrom(Source source, Breakdown breakdown) =>
@@ -147,7 +155,7 @@ public sealed class Metric
         : DefaultField;
 
     internal string PropertyName(Breakdown breakdown, Scope scope, Period period) =>
-        NameTemplate
+        _name?.Invoke(breakdown, scope, period) ?? NameTemplate
             .Replace("{metric}", Name)
             .Replace("{breakdown}", breakdown.Code)
             .Replace("{scope}", scope.NameCode())
