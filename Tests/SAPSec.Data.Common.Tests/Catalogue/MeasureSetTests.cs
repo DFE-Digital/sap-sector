@@ -107,25 +107,82 @@ public class MeasureSetTests
     }
 
     [Fact]
-    public void Source_can_override_field_per_metric_and_per_breakdown()
+    public void Metric_can_override_field_per_source_and_per_breakdown()
     {
+        var current = SchoolSource();
+        var previous = SchoolSource("schools_2023", "202324");
+
         // Mirrors the 2022-23 CSCP file, where each breakdown is its own column.
-        var cscp = Source.Cscp("2022-2023_england_ks4final")
-            .KeyedBy("URN")
-            .Field("Attainment8", "ATT8SCR")
-            .Provides(Breakdowns.Total)
-            .Field("Attainment8", Breakdowns.Boys, "ATT8SCR_BOYS");
+        var cscp = Source.Cscp("2022-2023_england_ks4final").KeyedBy("URN");
 
         var rows = new MeasureSet("KS4_Performance", "Performance")
-            .Year(Period.Previous2, new AcademicYear(2022))
+            .Years(2024)
             .Breakdowns(Breakdowns.Total, Breakdowns.Boys)
+            .Source(Scope.Establishment, Period.Current, current)
+            .Source(Scope.Establishment, Period.Previous, previous)
             .Source(Scope.Establishment, Period.Previous2, cscp)
-            .Metric("Attainment8", "attainment8_average")
+            .Metric("Attainment8", "attainment8_average", m => m
+                .Field(previous, "avg_att8")
+                .Field(cscp, Breakdowns.Total, "ATT8SCR")
+                .Field(cscp, Breakdowns.Boys, "ATT8SCR_BOYS"))
             .ToDataMapRows();
 
         rows.Select(r => (r.PropertyName, r.Field, r.Filter)).Should().Equal(
+            ("Attainment8_Tot_Est_Current_Num", "attainment8_average", "breakdown"),
+            ("Attainment8_Boy_Est_Current_Num", "attainment8_average", "breakdown"),
+            ("Attainment8_Tot_Est_Previous_Num", "avg_att8", "breakdown"),
+            ("Attainment8_Boy_Est_Previous_Num", "avg_att8", "breakdown"),
             ("Attainment8_Tot_Est_Previous2_Num", "ATT8SCR", ""),
             ("Attainment8_Boy_Est_Previous2_Num", "ATT8SCR_BOYS", ""));
+    }
+
+    [Fact]
+    public void Field_based_source_only_yields_breakdowns_with_a_field()
+    {
+        var cscp = Source.Cscp("ks4final").KeyedBy("URN");
+
+        var rows = new MeasureSet("T", "S")
+            .Year(Period.Previous2, new AcademicYear(2022))
+            .Breakdowns(Breakdowns.Standard)
+            .Source(Scope.Establishment, Period.Previous2, cscp)
+            .Metric("EngMaths49", "unused", m => m.Field(cscp, Breakdowns.Total, "PTL2BASICS_94"))
+            .Metric("Other", "unused")
+            .ToDataMapRows();
+
+        rows.Select(r => r.PropertyName).Should().Equal("EngMaths49_Tot_Est_Previous2_Num");
+    }
+
+    [Fact]
+    public void Metric_can_add_filters_for_one_source()
+    {
+        var current = SchoolSource();
+        var older = Source.From("DfE", "underlying").KeyedBy("URN").Provides(Breakdowns.Total);
+
+        var rows = new MeasureSet("T", "S")
+            .Years(2024)
+            .Source(Scope.Establishment, Period.Current, current)
+            .Source(Scope.Establishment, Period.Previous, older)
+            .Metric("Bio4", "number_achieving", m => m
+                .During(Period.Current, Period.Previous)
+                .Where(current, "subject", "Biology")
+                .Where(older, "Discount Code", "RH3"))
+            .ToDataMapRows();
+
+        (rows[0].Filter2, rows[0].Filter2Value).Should().Be(("subject", "Biology"));
+        (rows[1].Filter, rows[1].FilterValue).Should().Be(("Discount Code", "RH3"));
+    }
+
+    [Fact]
+    public void Metric_can_skip_a_scope_and_period()
+    {
+        var rows = new MeasureSet("T", "S")
+            .Years(2024)
+            .Source(Scope.Establishment, Period.Current, SchoolSource())
+            .Source(Scope.Establishment, Period.Previous, SchoolSource("schools_2023", "202324"))
+            .Metric("M", "field", m => m.During(Period.Current, Period.Previous).Skip(Scope.Establishment, Period.Previous))
+            .ToDataMapRows();
+
+        rows.Select(r => r.PropertyName).Should().Equal("M_Tot_Est_Current_Num");
     }
 
     [Fact]

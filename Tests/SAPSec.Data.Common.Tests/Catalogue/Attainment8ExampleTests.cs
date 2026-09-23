@@ -15,20 +15,25 @@ public class Attainment8ExampleTests
             .Provides(Breakdowns.Total, ("breakdown", "Total"))
             .Provides(Breakdowns.Boys, ("breakdown", "Boys"));
 
-    private static readonly MeasureSet Ks4Performance = new MeasureSet("KS4_Performance", "Performance")
-        .Years(2024)
-        .Breakdowns(Breakdowns.Standard)
-        .Source(Scope.Establishment, Period.Current,
-            PerformanceTables("202425_performance_tables_schools_final", new AcademicYear(2024)))
-        .Source(Scope.Establishment, Period.Previous,
-            PerformanceTables("202324_performance_tables_schools_final", new AcademicYear(2023))
-                .Field("Attainment8", "avg_att8"))
-        .Source(Scope.Establishment, Period.Previous2,
-            Source.Cscp("2022-2023_england_ks4final")
-                .KeyedBy("URN")
-                .Field("Attainment8", Breakdowns.Total, "ATT8SCR")
-                .Field("Attainment8", Breakdowns.Boys, "ATT8SCR_BOYS"))
-        .Metric("Attainment8", "attainment8_average");
+    private static readonly MeasureSet Ks4Performance = CreateKs4Performance();
+
+    private static MeasureSet CreateKs4Performance()
+    {
+        var current = PerformanceTables("202425_performance_tables_schools_final", new AcademicYear(2024));
+        var previous = PerformanceTables("202324_performance_tables_schools_final", new AcademicYear(2023));
+        var previous2 = Source.Cscp("2022-2023_england_ks4final").KeyedBy("URN");
+
+        return new MeasureSet("KS4_Performance", "Performance")
+            .Years(2024)
+            .Breakdowns(Breakdowns.Standard)
+            .Source(Scope.Establishment, Period.Current, current)
+            .Source(Scope.Establishment, Period.Previous, previous)
+            .Source(Scope.Establishment, Period.Previous2, previous2)
+            .Metric("Attainment8", "attainment8_average", m => m
+                .Field(previous, "avg_att8")
+                .Field(previous2, Breakdowns.Total, "ATT8SCR")
+                .Field(previous2, Breakdowns.Boys, "ATT8SCR_BOYS"));
+    }
 
     [Theory]
     [InlineData("Attainment8_Boy_Est_Current_Num", "2024-2025", "202425_performance_tables_schools_final", "attainment8_average", "school_urn", "breakdown", "Boys", "time_period", "202425")]

@@ -17,7 +17,6 @@ public sealed class Source
 {
     private readonly List<Filter> _filters = [];
     private readonly Dictionary<string, IReadOnlyList<Filter>> _breakdowns = new(StringComparer.Ordinal);
-    private readonly Dictionary<(string Metric, string? Breakdown), string> _fields = [];
 
     private Source(string org, string file)
     {
@@ -65,31 +64,8 @@ public sealed class Source
         return this;
     }
 
-    /// <summary>Overrides the field a metric is read from in this source, e.g. "avg_att8" instead of "attainment8_average".</summary>
-    public Source Field(string metric, string field)
-    {
-        _fields[(metric, null)] = field;
-        return this;
-    }
-
-    /// <summary>
-    /// Overrides the field for one metric and breakdown. Use for wide files where each breakdown is its own column,
-    /// e.g. ATT8SCR_BOYS. This also marks the breakdown as provided for that metric.
-    /// </summary>
-    public Source Field(string metric, Breakdown breakdown, string field)
-    {
-        _fields[(metric, breakdown.Code)] = field;
-        return this;
-    }
-
-    internal bool Provides(string metric, Breakdown breakdown) =>
-        _breakdowns.ContainsKey(breakdown.Code) || _fields.ContainsKey((metric, breakdown.Code));
+    internal bool HasBreakdown(Breakdown breakdown) => _breakdowns.ContainsKey(breakdown.Code);
 
     internal IReadOnlyList<Filter> BreakdownFilters(Breakdown breakdown) =>
         _breakdowns.TryGetValue(breakdown.Code, out var filters) ? filters : [];
-
-    internal string ResolveField(string metric, Breakdown breakdown, string defaultField) =>
-        _fields.TryGetValue((metric, breakdown.Code), out var byBreakdown) ? byBreakdown
-        : _fields.TryGetValue((metric, null), out var byMetric) ? byMetric
-        : defaultField;
 }

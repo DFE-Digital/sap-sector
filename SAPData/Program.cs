@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Sentry;
 using SAPData.Models;
 using SAPSec.Data.Common;
+using SAPSec.Data.Common.Catalogue;
+using SAPSec.Data.Common.Catalogue.Definitions;
 using System.Globalization;
 using System.Text;
 
@@ -62,6 +64,12 @@ internal class Program
                 csv.Context.RegisterClassMap<DataMapMapping>();
                 dataMaps = csv.GetRecords<DataMapRow>().ToList();
             }
+
+            // Datasets migrated to the code catalogue replace their datamap.csv rows.
+            dataMaps = dataMaps
+                .Where(r => r.Type != Ks4Performance.Type)
+                .Concat(DataMapCatalogue.Expand(Ks4Performance.MeasureSets()))
+                .ToList();
 
             Console.WriteLine($"Loaded {dataMaps.Count} DataMap rows");
 

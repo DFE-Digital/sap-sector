@@ -251,6 +251,18 @@ Acceptance criteria:
 
 ---
 
+## Data Issues Found During Migration
+
+The migration preserves current behaviour exactly, so these are kept as-is and marked `DATA ISSUE` in the catalogue. Each should be fixed in its own change, because fixing one changes values shown on the website.
+
+| Dataset | Issue | Effect |
+|---|---|---|
+| KS4 Performance | `Prog8_Avg_LA_Previous2_Num` is mapped three times; the generator uses the first, which reads 2024-25 filtered only on `sex = Total` | LA Progress 8 "two years ago" reads the wrong year and takes `MAX` across every breakdown topic |
+| KS4 Performance | `EngMaths59_Mob_Eng_*` (grade 5+, England, mobile pupils) reads `engmath_94_total` / `engmath_94_percent` | Shows the grade 4+ figure for the grade 5+ measure |
+| KS4 Performance | `EngLang79`, `EngLit79`, `Maths79` at Establishment/Previous filter `grade = 7 OR 8 OR 9`, values that don't exist in the file | Always blank |
+
+---
+
 ## Success Measures
 
 - A new year of data for one dataset is a change of under ~10 lines, reviewable in a PR

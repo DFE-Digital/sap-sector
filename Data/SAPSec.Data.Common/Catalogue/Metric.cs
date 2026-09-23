@@ -8,6 +8,9 @@ public sealed class Metric
     public const string DefaultNameTemplate = "{metric}_{breakdown}_{scope}_{period}_{unit}";
 
     private readonly List<Filter> _filters = [];
+    private readonly Dictionary<Source, List<Filter>> _sourceFilters = [];
+    private readonly Dictionary<(Source Source, string? Breakdown), string> _fields = [];
+    private readonly HashSet<(Scope, Period)> _skipped = [];
 
     public Metric(string name, string field)
     {
@@ -15,14 +18,14 @@ public sealed class Metric
             throw new CatalogueException("Metric name must not be empty.");
 
         Name = name;
-        Field = field;
+        DefaultField = field;
         Description = name;
     }
 
     public string Name { get; }
 
-    /// <summary>Default source field. Sources can override it with <see cref="Source.Field(string, string)"/>.</summary>
-    public string Field { get; }
+    /// <summary>Default source field. Override per source with <see cref="Field(Source, string)"/>.</summary>
+    public string DefaultField { get; }
 
     public string Description { get; private set; }
 
@@ -68,6 +71,41 @@ public sealed class Metric
         return this;
     }
 
+    /// <summary>A filter applied to this metric only when reading from <paramref name="source"/>.</summary>
+    public Metric Where(Source source, string column, params string[] values)
+    {
+        if (!_sourceFilters.TryGetValue(source, out var filters))
+            _sourceFilters[source] = filters = [];
+
+        filters.Add(new Filter(column, values));
+        return this;
+    }
+
+    /// <summary>Reads this metric from a different field in <paramref name="source"/>, e.g. "avg_att8" instead of "attainment8_average".</summary>
+    public Metric Field(Source source, string field)
+    {
+        _fields[(source, null)] = field;
+        return this;
+    }
+
+    /// <summary>
+    /// Reads one breakdown of this metric from its own field in <paramref name="source"/>. Use for wide files where each
+    /// breakdown is a separate column (e.g. ATT8SCR_BOYS). This also makes the breakdown available from that source
+    /// for this metric, even if the source doesn't <see cref="Source.Provides"/> it.
+    /// </summary>
+    public Metric Field(Source source, Breakdown breakdown, string field)
+    {
+        _fields[(source, breakdown.Code)] = field;
+        return this;
+    }
+
+    /// <summary>Excludes one scope and period, e.g. a measure not published in an older source file.</summary>
+    public Metric Skip(Scope scope, Period period)
+    {
+        _skipped.Add((scope, period));
+        return this;
+    }
+
     public Metric For(params Breakdown[] breakdowns)
     {
         Breakdowns = breakdowns;
@@ -94,6 +132,19 @@ public sealed class Metric
         NameTemplate = template;
         return this;
     }
+
+    internal bool IsSkipped(Scope scope, Period period) => _skipped.Contains((scope, period));
+
+    internal bool IsAvailableFrom(Source source, Breakdown breakdown) =>
+        source.HasBreakdown(breakdown) || _fields.ContainsKey((source, breakdown.Code));
+
+    internal IReadOnlyList<Filter> FiltersFor(Source source) =>
+        _sourceFilters.TryGetValue(source, out var filters) ? [.. _filters, .. filters] : _filters;
+
+    internal string FieldFor(Source source, Breakdown breakdown) =>
+        _fields.TryGetValue((source, breakdown.Code), out var byBreakdown) ? byBreakdown
+        : _fields.TryGetValue((source, null), out var bySource) ? bySource
+        : DefaultField;
 
     internal string PropertyName(Breakdown breakdown, Scope scope, Period period) =>
         NameTemplate

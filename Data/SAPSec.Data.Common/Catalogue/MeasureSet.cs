@@ -42,6 +42,8 @@ public sealed class MeasureSet
 
     public IReadOnlyList<Metric> Metrics => _metrics;
 
+    public IEnumerable<Source> Sources => _sources.Values;
+
     public MeasureSet Year(Period period, AcademicYear year)
     {
         _years[period] = year;
@@ -100,6 +102,9 @@ public sealed class MeasureSet
             {
                 foreach (var period in metric.Periods ?? [.. _years.Keys])
                 {
+                    if (metric.IsSkipped(scope, period))
+                        continue;
+
                     if (!_years.TryGetValue(period, out var year))
                         throw new CatalogueException($"{Type}: metric '{metric.Name}' uses period {period}, but no year is declared for it.");
 
@@ -110,7 +115,7 @@ public sealed class MeasureSet
 
                     foreach (var breakdown in metric.Breakdowns ?? _breakdowns)
                     {
-                        if (!source.Provides(metric.Name, breakdown))
+                        if (!metric.IsAvailableFrom(source, breakdown))
                             continue;
 
                         rows.Add(BuildRow(metric, scope, period, year, breakdown, source));
@@ -132,7 +137,7 @@ public sealed class MeasureSet
             throw new CatalogueException($"{Type}: source '{source.File}' used by '{propertyName}' has no key column. Call .KeyedBy(...).");
 
         var filters = source.BreakdownFilters(breakdown)
-            .Concat(metric.Filters)
+            .Concat(metric.FiltersFor(source))
             .Concat(source.Filters)
             .ToList();
 
@@ -151,7 +156,7 @@ public sealed class MeasureSet
             Year = year.Label,
             YearDesc = period.ToString(),
             FileName = source.File,
-            Field = source.ResolveField(metric.Name, breakdown, metric.Field),
+            Field = metric.FieldFor(source, breakdown),
             DataType = metric.DataType.DataMapValue(),
             RecordFilterBy = source.KeyColumn,
         };
