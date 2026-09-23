@@ -1139,3 +1139,10 @@
   border-left-color: govuk-colour("blue");
   background-color: #eaf4f9;
 }
+
+// The closed/predecessor school banner is always the first element in the main content area,
+// which already has its own top padding (govuk-main-wrapper). Without this, the banner's own
+// govuk-inset-text top margin stacks on top of that padding, pushing it too far down the page.
+.app-closed-school-banner {
+  margin-top: 0;
+}
