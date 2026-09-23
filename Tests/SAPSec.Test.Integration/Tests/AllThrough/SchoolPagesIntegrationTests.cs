@@ -411,6 +411,141 @@ public class SchoolPagesIntegrationTests(
     }
 
     [Fact]
+    public async Task Ks4HeadlineMeasuresPage_ShowsExpectedStaticContentAndMeasures()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4HeadlineMeasures);
+
+        page.QuerySelector(".govuk-caption-xl")!.TextContent.Trim().Should().Be("Test School 1");
+        page.QuerySelector("h1.govuk-heading-xl")!.TextContent.Trim().Should().Be("KS4 headline performance measures");
+        page.QuerySelector(".app-school-page p.govuk-body")!.TextContent.Trim().Should().Be("Compare this school's KS4 headline performance measures with:");
+
+        page.QuerySelectorAll(".app-school-page > ul.govuk-list li")
+            .Select(x => x.TextContent.Trim())
+            .Should().Equal(
+                "50 similar secondary phase schools (including all-throughs)",
+                "the local authority average",
+                "the national average");
+
+        var similarSchoolInfoLink = page.QuerySelector(".app-school-page > p.govuk-body a");
+        similarSchoolInfoLink.Should().NotBeNull();
+        similarSchoolInfoLink!.TextContent.Trim().Should().Be("how DfE identifies what a similar school is");
+        similarSchoolInfoLink.GetAttribute("href").Should().Be(Routes.AllThroughSchool(Urn).WhatIsASimilarSchool);
+
+        page.ElementWithTestIdShouldExist("progress8-heading").TrimmedTextContent().Should().Be("Progress 8");
+        page.ElementWithTestIdShouldExist("attainment8-heading").TrimmedTextContent().Should().Be("Attainment 8");
+        page.ElementWithTestIdShouldExist("eng-maths-heading").TrimmedTextContent().Should().Be("Grade achieved in English and maths GCSEs");
+        page.ElementWithTestIdShouldExist("destinations-heading").TrimmedTextContent().Should().Be("Staying in education or entering employment");
+
+        page.QuerySelectorAll("details").Should().OnlyContain(x => x.GetAttribute("open") == null);
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasuresPage_WithSecondarySimilarSchools_ShowsTopPerformersTabs()
+    {
+        SetupAllThroughSchool();
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(Build.SecondaryGroup(Urn, ["100002"]));
+        Fixture.SimilarSchoolsSecondaryRepository.SetupValues(Build.SecondaryValues([Urn, "100002"]));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4HeadlineMeasures);
+
+        page.ElementWithTestIdShouldExist("attainment8-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table", "Top performers");
+
+        page.ElementWithTestIdShouldExist("eng-maths-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table", "Top performers");
+
+        page.ElementWithTestIdShouldExist("destinations-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table", "Top performers");
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasuresPage_WithoutSecondarySimilarSchools_HidesTopPerformersTabs()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4HeadlineMeasures);
+
+        page.ElementWithTestIdShouldExist("attainment8-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table");
+
+        page.ElementWithTestIdShouldExist("eng-maths-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table");
+
+        page.ElementWithTestIdShouldExist("destinations-tabs")
+            .ChildTrimmedTextContent()
+            .Should().BeEquivalentTo("Charts", "Table");
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasuresPage_GradeFilter_HasExpectedOptions()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4HeadlineMeasures);
+
+        page.ElementWithTestIdShouldExist("eng-maths-grade-filter")
+            .ChildTrimmedTextContent()
+            .Should().Equal(["Grade 4 and above", "Grade 5 and above"]);
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasuresPage_DestinationFilter_HasExpectedOptions()
+    {
+        SetupAllThroughSchool();
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4HeadlineMeasures);
+
+        page.ElementWithTestIdShouldExist("destinations-dest-filter")
+            .ChildTrimmedTextContent()
+            .Should().Equal(["All destinations", "Education", "Apprenticeships", "Employment"]);
+    }
+
+    [Fact]
+    public async Task Ks4HeadlineMeasuresPage_TopPerformers_LinkToSecondaryComparisonAndAllThroughSecondaryTab()
+    {
+        SetupAllThroughSchool();
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment(Urn, "Test School 1", x => x.Open().AllThrough().InLA("001").WithTypeOfEstablishment("28").WithAddress("1 Test Street", "", "", "Test Town", "TT1 1TT")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100003", "Test School 3", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100004", "Test School 4", x => x.Open().AllThrough().InLA("001")),
+            Build.Establishment("100005", "Test School 5", x => x.Open().AllThrough().InLA("001")));
+
+        Fixture.SimilarSchoolsSecondaryRepository.SetupGroups(
+            Build.SecondaryGroup(Urn, ["100002", "100003", "100004", "100005"]));
+
+        Fixture.Ks4PerformanceRepository.SetupEstablishmentPerformance(
+            Build.Ks4Performance.Establishment(Urn, x => x.WithAttainment8(current: "101.1", prev: "100.5", prev2: "99.5")),
+            Build.Ks4Performance.Establishment("100002", x => x.WithAttainment8(current: "104.2", prev: "103.1", prev2: "102.1")),
+            Build.Ks4Performance.Establishment("100003", x => x.WithAttainment8(current: "104.2", prev: "102.8", prev2: "101.8")),
+            Build.Ks4Performance.Establishment("100004", x => x.WithAttainment8(current: "106.3", prev: "105.4", prev2: "104.4")),
+            Build.Ks4Performance.Establishment("100005", x => x.WithAttainment8(current: "103.7", prev: "102.9", prev2: "101.9")));
+
+        var page = await Fixture.RequestPageAsync(Routes.AllThroughSchool(Urn).KS4HeadlineMeasures);
+
+        var similarSchoolsLink = page.ElementWithTestIdShouldExist("attainment8-top-performers-similar-schools-link");
+        similarSchoolsLink.GetAttribute("href").Should().Be($"{Routes.AllThroughSchool(Urn).ViewSimilarSchools}?phase=secondary");
+
+        var table = page.ElementWithTestIdShouldExist<IHtmlTableElement>("attainment8-top-performers-table");
+        var topPerformersLinks = table.QuerySelectorAll("a")
+            .Select(l => l.GetAttribute("href"));
+
+        topPerformersLinks.Should().BeEquivalentTo([
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100004").Similarity,
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100002").Similarity,
+            Routes.AllThroughSchool(Urn).SecondaryComparison("100003").Similarity
+        ]);
+    }
+
+    [Fact]
     public async Task Ks2PerformanceMeasuresPage_TopPerformers_LinkToPrimaryComparison()
     {
         SetupAllThroughSchool();

@@ -28,6 +28,7 @@ public class SchoolController(
         IUseCase<GetSchoolInfoRequest, GetSchoolInfoResponse> getSchoolInfoUseCase,
         IUseCase<GetSchoolDetailsRequest, GetSchoolDetailsResponse> getSchoolDetailsUseCase,
         IUseCase<GetSchoolKs2PerformanceMeasuresRequest, GetSchoolKs2PerformanceMeasuresResponse> getKs2PerformanceMeasuresUseCase,
+        IUseCase<GetSchoolKs4HeadlineMeasuresRequest, GetSchoolKs4HeadlineMeasuresResponse> getKs4HeadlineMeasuresUseCase,
         IUseCase<GetSchoolKs4CoreSubjectsMeasuresRequest, GetSchoolKs4CoreSubjectsMeasuresResponse> getKs4CoreSubjectsUseCase,
         ISimilarSchoolsPrimaryRepository similarSchoolsPrimaryRepository,
         ISimilarSchoolsSecondaryRepository similarSchoolsSecondaryRepository,
@@ -74,8 +75,24 @@ public class SchoolController(
 
     [HttpGet]
     [Route("ks4-headline-measures")]
-    public Task<IActionResult> Ks4HeadlineMeasures(string urn) =>
-        HeadingPage(urn, "KS4 headline performance measures");
+    public async Task<IActionResult> Ks4HeadlineMeasures(string urn)
+    {
+        var filters = Request.Query.ToDictionary(r => r.Key, r => r.Value.ToString());
+        var response = await getKs4HeadlineMeasuresUseCase.Execute(new(urn, filters));
+
+        await PopulateViewData(response.School);
+
+        var hasSimilarSecondarySchools = response.SimilarSchoolsCount > 0;
+        var model = new Ks4HeadlineMeasuresPageViewModel
+        {
+            School = SchoolInfoViewModel.FromSchoolInfo(response.School),
+            Attainment8 = MeasureViewModel.FromAllThroughSecondaryMeasure(response.Attainment8, response.School, hasSimilarSecondarySchools),
+            EnglishMaths = MeasureViewModel.FromAllThroughSecondaryMeasure(response.EnglishMaths, response.School, hasSimilarSecondarySchools),
+            Destinations = MeasureViewModel.FromAllThroughSecondaryMeasure(response.Destinations, response.School, hasSimilarSecondarySchools)
+        };
+
+        return View(model);
+    }
 
     [HttpGet]
     [Route("ks4-core-subjects")]
