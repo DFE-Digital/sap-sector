@@ -80,7 +80,7 @@ public class EstablishmentRepositoryTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(1, result.Count());
+        Assert.Single(result);
         Assert.Contains(result, e => e.URN == "1");
         _mockEstablishmentJsonFile.Verify(r => r.ReadAllAsync(), Times.Once);
     }

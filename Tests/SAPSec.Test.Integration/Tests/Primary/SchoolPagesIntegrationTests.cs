@@ -13,10 +13,21 @@ public class SchoolPagesIntegrationTests(
     [Fact]
     public async Task OverviewPage_ContainsWhatIsASimilarSchoolLink()
     {
-        Fixture.EstablishmentRepository.SetupEstablishments(
-            Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
+        //Fixture.EstablishmentRepository.SetupEstablishments(
+        //    Build.Establishment("100001", "Test School 1", x => x.Open().Primary()));
 
-        var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Overview);
+    
+        Fixture.EstablishmentRepository.SetupEstablishments(
+            Build.Establishment("100001", "Test School 1", x => x.Open().Primary().InLA("001")),
+            Build.Establishment("100002", "Test School 2", x => x.Open().Primary().InLA("002")));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupGroups(
+            Build.PrimaryGroup("100001", ["100002"]));
+
+        Fixture.SimilarSchoolsPrimaryRepository.SetupValues(
+            Build.PrimaryValues(["100001", "100002"]));
+
+            var page = await Fixture.RequestPageAsync(Routes.PrimarySchool("100001").Overview);
 
         var link = page.QuerySelector(".app-body-container-with-side-navigation a");
         link.Should().NotBeNull();
