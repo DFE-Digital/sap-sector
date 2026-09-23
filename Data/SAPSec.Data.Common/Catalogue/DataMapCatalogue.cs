@@ -3,15 +3,15 @@ using SAPData.Models;
 namespace SAPSec.Data.Common.Catalogue;
 
 /// <summary>
-/// Expands measure sets into the flat DataMap rows consumed by the SQL and JSON generators.
+/// Expands catalogue definitions into the flat DataMap rows consumed by the SQL and JSON generators.
 /// </summary>
 public static class DataMapCatalogue
 {
-    public static IReadOnlyList<DataMapRow> Expand(IEnumerable<MeasureSet> measureSets)
+    public static IReadOnlyList<DataMapRow> Expand(IEnumerable<IDataMapDefinition> definitions)
     {
-        var rows = measureSets.SelectMany(s => s.ToDataMapRows()).ToList();
+        var rows = definitions.SelectMany(d => d.ToDataMapRows()).ToList();
 
-        // Measure sets with different subtypes share a view (Range + Type), so check across all of them.
+        // Definitions with different subtypes share a view (Range + Type), so check across all of them.
         EnsureUniquePropertyNames(rows);
         return rows;
     }

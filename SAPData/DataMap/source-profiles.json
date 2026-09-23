@@ -1670,6 +1670,56 @@
         ]
       }
     },
+    "2026_07_03_matched_primary_schools_data": {
+      "Columns": [
+        "idaci_pupils",
+        "ks1_prior_rwm_avg",
+        "ks2_outcome_read_mat_avg",
+        "nor",
+        "p_stability",
+        "percent_eal",
+        "percent_fsm_ever",
+        "percent_sch_support",
+        "percent_statement_or_ehp",
+        "polar4quintile_pupils",
+        "urn"
+      ],
+      "Values": {}
+    },
+    "2026_07_03_matched_secondary_schools_data": {
+      "Columns": [
+        "idaci_pupils",
+        "ks2_prior_rm_avg",
+        "ks4_outcome_a8",
+        "nor",
+        "p_stability",
+        "percent_eal",
+        "percent_fsm_ever",
+        "percent_sch_support",
+        "percent_statement_or_ehp",
+        "polar4quintile_pupils",
+        "urn"
+      ],
+      "Values": {}
+    },
+    "2026_07_03_neighbours_list_primary": {
+      "Columns": [
+        "dist",
+        "neighbour_urn",
+        "rank",
+        "urn"
+      ],
+      "Values": {}
+    },
+    "2026_07_03_neighbours_list_secondary": {
+      "Columns": [
+        "dist",
+        "neighbour_urn",
+        "rank",
+        "urn"
+      ],
+      "Values": {}
+    },
     "6_absence_3term_characteristics": {
       "Columns": [
         "absence_terms",
@@ -2882,6 +2932,65 @@
       "Values": {
         "year": [
           "202425"
+        ]
+      }
+    },
+    "school-email-addresses-24-08-2026": {
+      "Columns": [
+        "closedate",
+        "establishmentname",
+        "establishmentnumber",
+        "establishmentstatus__name_",
+        "establishmenttypegroup__name_",
+        "mainemail",
+        "phaseofeducation__name_",
+        "typeofestablishment__name_",
+        "urn"
+      ],
+      "Values": {}
+    },
+    "workforce_ptrs_2010_2025_sch": {
+      "Columns": [
+        "adults_fte",
+        "country_code",
+        "country_name",
+        "establishment_type_group",
+        "geographic_level",
+        "la_name",
+        "new_la_code",
+        "old_la_code",
+        "pupil_to_adult_ratio",
+        "pupil_to_qual_teacher_ratio",
+        "pupil_to_qual_unqual_teacher_ratio",
+        "pupils_fte",
+        "qualified_teachers_fte",
+        "region_code",
+        "region_name",
+        "school_laestab",
+        "school_name",
+        "school_urn",
+        "teachers_fte",
+        "time_identifier",
+        "time_period"
+      ],
+      "Values": {
+        "time_period": [
+          "201011",
+          "201112",
+          "201213",
+          "201314",
+          "201415",
+          "201516",
+          "201617",
+          "201718",
+          "201819",
+          "201920",
+          "202021",
+          "202122",
+          "202223",
+          "202324",
+          "202425",
+          "202526"
         ]
       }
     }

@@ -15,7 +15,7 @@ namespace SAPSec.Data.Common.Catalogue;
 ///     .Metric(new Metric("Attainment8", "attainment8_average"));
 /// </code>
 /// </example>
-public sealed class MeasureSet
+public sealed class MeasureSet : IDataMapDefinition
 {
     // DataMapRow has Filter..Filter9.
     public const int MaxFilters = 9;
